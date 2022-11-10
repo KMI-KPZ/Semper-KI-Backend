@@ -1,0 +1,15 @@
+from django.shortcuts import render
+
+from django.http import HttpResponse
+
+# this makes it possible to assume for a function, that certain requests are passed through
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET", "POST"]) # get and post will make it this far
+def test_response(request):
+    if request.method == "GET":
+        return HttpResponse("Hello, world. GET")
+    elif request.method == "POST":
+        return HttpResponse("Hello, world. POST")
+    else:
+        return HttpResponse("Hello, world. " + request.method)
