@@ -19,6 +19,7 @@ from django.urls import include, path
 from .handlers import test_response
 
 urlpatterns = [
+    path('test_csrf/', test_response.test_response_csrf, name='test_response_csrf'),
     path('test/', test_response.test_response, name='test_response'),
     path('admin/', admin.site.urls),
 ]

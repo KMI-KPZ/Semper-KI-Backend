@@ -16,3 +16,6 @@ def test_response(request):
         return HttpResponse("Hello, world. POST")
     else:
         return HttpResponse("Hello, world. " + request.method)
+
+def test_response_csrf(request):
+    return HttpResponse("CSRF worked for: " + request.method)
