@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csrf_token, ensure_csrf_cookie
 
 # this makes it possible to assume for a function, that certain requests are passed through
 from django.views.decorators.http import require_http_methods
@@ -15,10 +15,14 @@ def test_response(request):
     elif request.method == "POST":
         print(request)
         print(request.body)
-        return HttpResponse("Hello, world. POST")
+        response = HttpResponse("Hello, world. POST")
+        return response
     else:
         return HttpResponse("Hello, world. " + request.method)
 
-@csrf_protect
+
+#@csrf_protect
+@ensure_csrf_cookie
 def test_response_csrf(request):
-    return HttpResponse("CSRF worked for: " + request.method)
+    response = HttpResponse("CSRF worked for: " + request.method)
+    return response

@@ -21,9 +21,7 @@
 			"python": {
 				"args": [
 					"runserver",
-					"0.0.0.0:8000",
-					"--nothreading",
-					"--noreload"
+					"0.0.0.0:8000"
 				],
 				"file": "manage.py"
 			}
