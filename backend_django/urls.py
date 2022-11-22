@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .handlers import test_response
+from .handlers import test_response, authentification
 
 urlpatterns = [
+    path("", authentification.index, name="index"),
     path('test/', test_response.test_response, name='test_response'),
     path('test_csrf/', test_response.test_response_csrf, name='test_response_csrf'),
     path('csrf_cookie/', test_response.test_response_csrf, name='test_response_csrf'),
+    path("login", authentification.login, name="login"),
+    path("logout", authentification.logout, name="logout"),
+    path("callback", authentification.callback, name="callback"),
     path('admin/', admin.site.urls),
 ]
