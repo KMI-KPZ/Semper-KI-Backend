@@ -11,6 +11,8 @@ services:
       - 8000:8000
     volumes:
       - .:/app
+    env_file:
+      - backend_django/.env
     #depends_on:
     #  - db
   #db:
