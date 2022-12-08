@@ -25,7 +25,9 @@ def login(request):
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
-    return redirect(request.build_absolute_uri(reverse("index")))
+    #uri = request.build_absolute_uri(reverse("index"))
+    uri = request.build_absolute_uri('http://localhost:3000/callback/login')
+    return redirect(uri)
 
 def logout(request):
     request.session.clear()
@@ -34,7 +36,8 @@ def logout(request):
         f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
         + urlencode(
             {
-                "returnTo": request.build_absolute_uri(reverse("index")),
+                #"returnTo": request.build_absolute_uri(reverse("index")),
+                "returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),
                 "client_id": settings.AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
