@@ -4,7 +4,7 @@ from django.conf import settings
 from django.shortcuts import redirect, render, redirect
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 oauth = OAuth()
 
@@ -28,8 +28,8 @@ def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
     #uri = request.build_absolute_uri(reverse("index"))
-    uri = request.build_absolute_uri('http://localhost:3000/callback/login')
-    return redirect(uri)
+    forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
+    return redirect(request.build_absolute_uri(forward_url))
 
 def logout(request):
     request.session.clear()
