@@ -29,7 +29,7 @@ def callback(request):
     request.session["user"] = token
     #uri = request.build_absolute_uri(reverse("index"))
     forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
-    return redirect(request.build_absolute_uri(forward_url))
+    return redirect(forward_url, token=token)
 
 def logout(request):
     request.session.clear()
