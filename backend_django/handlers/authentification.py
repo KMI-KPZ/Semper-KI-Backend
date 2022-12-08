@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import redirect, render, redirect
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
+from django.http import HttpResponse
 
 oauth = OAuth()
 
@@ -18,9 +19,10 @@ oauth.register(
 )
 
 def login(request):
-    return oauth.auth0.authorize_redirect(
+    uri = oauth.auth0.authorize_redirect(
         request, request.build_absolute_uri(reverse("callback"))
     )
+    return HttpResponse(uri.url)
 
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)

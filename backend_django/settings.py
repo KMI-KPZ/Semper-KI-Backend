@@ -28,17 +28,22 @@ SECRET_KEY = 'django-insecure-2ko+=d=%#@oumnsle)&ffms39s==n%er^431$%m(hx-!cbu09d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000",]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000",]
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000']
+ALLOWED_HOSTS = ['*']#['localhost', '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000"]
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
+
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = (
     'content-type',
     'accept',
-    'X-CSRFToken',
+    'X-CSRFToken', 
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Headers',
 )
 
 # Application definition
