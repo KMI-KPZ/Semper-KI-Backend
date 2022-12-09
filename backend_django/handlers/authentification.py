@@ -28,11 +28,14 @@ def login(request):
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
+    
+    token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
     forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
     response = HttpResponseRedirect(forward_url)
-    response["user"] = token
-    response.set_cookie("derp_cookie", value=token)
+    #response["user"] = token # This doesnt work
+    # TODO delete non-relevant or even secure information!
+    response.set_cookie("authToken", value=token)
     
     return response
     #return redirect(forward_url, data=token)

@@ -23,12 +23,12 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "backend_django", "templates")
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2ko+=d=%#@oumnsle)&ffms39s==n%er^431$%m(hx-!cbu09d'
+SECRET_KEY = os.environ.get("DJANGO_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']#['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000"]
 
