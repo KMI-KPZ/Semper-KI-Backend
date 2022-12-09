@@ -10,15 +10,9 @@ from django.views.decorators.http import require_http_methods
 @require_http_methods(["GET", "POST"]) # get and post will make it this far
 @csrf_exempt # ONLY FOR TESTING!!!!
 def test_response(request):
-    if request.method == "GET":
-        return HttpResponse("Hello, world. GET")
-    elif request.method == "POST":
-        print(request)
-        print(request.body)
-        response = HttpResponse("Hello, world. POST")
-        return response
-    else:
-        return HttpResponse("Hello, world. " + request.method)
+    outString = request.method
+    response = HttpResponse(outString)
+    return response
 
 
 #@csrf_protect

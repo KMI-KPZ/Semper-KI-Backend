@@ -28,7 +28,7 @@ def login(request):
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
-    
+
     token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
     forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
@@ -44,17 +44,20 @@ def callback(request):
 def logout(request):
     request.session.clear()
 
-    return redirect(
-        f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
-        + urlencode(
-            {
-                #"returnTo": request.build_absolute_uri(reverse("index")),
-                "returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),
-                "client_id": settings.AUTH0_CLIENT_ID,
-            },
-            quote_via=quote_plus,
-        ),
-    )
+    # return redirect(
+    #     f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
+    #     + urlencode(
+    #         {
+    #             #"returnTo": request.build_absolute_uri(reverse("index")),
+    #             "returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),
+    #             "client_id": settings.AUTH0_CLIENT_ID,
+    #         },
+    #         quote_via=quote_plus,
+    #     ),
+    # )
+
+    responseString = f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,)
+    return HttpResponse(responseString)
 
 def index(request):
     return render(
