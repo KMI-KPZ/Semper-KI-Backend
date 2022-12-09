@@ -7,11 +7,12 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csr
 # this makes it possible to assume for a function, that certain requests are passed through
 from django.views.decorators.http import require_http_methods
 
-@require_http_methods(["GET", "POST"]) # get and post will make it this far
+#@require_http_methods(["GET", "POST"]) # get and post will make it this far
 @csrf_exempt # ONLY FOR TESTING!!!!
 def test_response(request):
     outString = request.method
-    response = HttpResponse(outString)
+    response = HttpResponse(outString + " test")
+    response["testHeader"] = "TESTHEADER"
     return response
 
 
