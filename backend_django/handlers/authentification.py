@@ -36,7 +36,7 @@ def callback(request):
     #response["user"] = token # This doesnt work
     # TODO delete non-relevant or even secure information!
     response.set_cookie("authToken", value=token)
-    
+    response["authToken"] = token
     return response
     #return redirect(forward_url, data=token)
     # return redirect(request.build_absolute_uri(reverse("index")))
