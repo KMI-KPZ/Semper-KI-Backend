@@ -43,11 +43,10 @@ def callback(request):
 def getAuthInformation(request):
     information = request.session["user"]
     if information["authenticated"] is True:
-        response = JsonResponse()
-        response = json.dumps(information["user"])
+        response = JsonResponse(information)
         return response
     else:
-        return JsonResponse()
+        return JsonResponse({})
 
 def logout(request):
     request.session.clear()
