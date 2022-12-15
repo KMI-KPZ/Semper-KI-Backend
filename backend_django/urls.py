@@ -20,11 +20,12 @@ from .handlers import test_response, authentification
 
 urlpatterns = [
     path("", authentification.index, name="index"),
-    path('test/', test_response.test_response, name='test_response'),
-    path('test_csrf/', test_response.test_response_csrf, name='test_response_csrf'),
-    path('csrf_cookie/', test_response.test_response_csrf, name='test_response_csrf'),
+    path('test/', test_response.testResponse, name='test_response'),
+    path('testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
+    path('csrfCookie/', test_response.testResponseCsrf, name='test_response_csrf'),
     path("login", authentification.login, name="login"),
     path("logout", authentification.logout, name="logout"),
     path("callback", authentification.callback, name="callback"),
+    path("getUser", authentification.getAuthInformation, name="getAuthInformation"),
     path('admin/', admin.site.urls),
 ]

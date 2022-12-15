@@ -13,3 +13,5 @@ class StuffTests(TestCase):
         some logic, test if result is as expected
         """
         # self.assertIs(<stuff that should return true>, True)
+    
+    # TODO AuthTests

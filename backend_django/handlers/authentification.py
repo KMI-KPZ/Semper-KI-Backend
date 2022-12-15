@@ -28,18 +28,26 @@ def login(request):
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
+    request.session["user"]["authenticated"] = True
 
-    token = json.dumps(token)
+    # token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
     forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
     response = HttpResponseRedirect(forward_url)
     #response["user"] = token # This doesnt work
-    # TODO delete non-relevant or even secure information!
-    response.set_cookie("authToken", value=token)
-    response["authToken"] = token
+    # response.set_cookie("authToken", value=token)
     return response
     #return redirect(forward_url, data=token)
     # return redirect(request.build_absolute_uri(reverse("index")))
+
+def getAuthInformation(request):
+    information = request.session["user"]
+    if information["authenticated"] is True:
+        response = JsonResponse()
+        response = json.dumps(information["user"])
+        return response
+    else:
+        return JsonResponse()
 
 def logout(request):
     request.session.clear()
@@ -65,6 +73,6 @@ def index(request):
         "index.html",
         context={
             "session": request.session.get("user"),
-            "pretty": json.dumps(request.session.get("user"), indent=4),
+            #"pretty": json.dumps(request.session.get("user"), indent=4),
         },
     )

@@ -5,6 +5,8 @@
             "type": "docker",
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
+            "serverReadyAction":{
+            },
             "python": {
                 "pathMappings": [
                     {
@@ -15,5 +17,8 @@
                 "projectType": "django"
             }
         }
-    ]
+    ],
+    "launchBrowser": {
+        "enabled": false
+    }
 }

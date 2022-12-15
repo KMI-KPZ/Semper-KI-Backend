@@ -30,10 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000"]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'https://localhost:3000','https://localhost:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
 
 
 CORS_ALLOW_CREDENTIALS = True
@@ -44,6 +44,7 @@ CORS_ALLOW_HEADERS = (
     'X-CSRFToken', 
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Headers',
+    'Authorization'
 )
 
 # Application definition
@@ -89,6 +90,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_django.wsgi.application'
 
+# SSL
+# SECURE_SSL_REDIRECT = False # Redirects http to https
+# SESSION_COOKIE_SECURE =  True #Sets session cookies as secure
+# CSRF_COOKIE_SECURE = True # Sets csrf cookie as secure
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
