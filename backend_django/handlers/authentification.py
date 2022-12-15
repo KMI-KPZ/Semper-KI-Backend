@@ -28,7 +28,6 @@ def login(request):
 def callback(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
-    request.session["user"]["authenticated"] = True
 
     # token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
@@ -41,12 +40,12 @@ def callback(request):
     # return redirect(request.build_absolute_uri(reverse("index")))
 
 def getAuthInformation(request):
-    information = request.session["user"]
-    if information["authenticated"] is True:
-        response = JsonResponse(information)
+    # TODO check if cookies are expired
+    if "user" in request.session:
+        response = JsonResponse(request.session["user"])
         return response
     else:
-        return JsonResponse({})
+        return JsonResponse({}, status=401)
 
 def logout(request):
     request.session.clear()
