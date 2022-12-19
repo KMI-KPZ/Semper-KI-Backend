@@ -27,5 +27,6 @@ urlpatterns = [
     path("logout", authentification.logout, name="logout"),
     path("callback", authentification.callback, name="callback"),
     path("getUser/", authentification.getAuthInformation, name="getAuthInformation"),
+    path("deleteSession/", authentification.deleteSessionCookie, name="deleteSessionCookie"),
     path('admin/', admin.site.urls),
 ]

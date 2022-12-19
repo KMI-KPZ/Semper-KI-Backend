@@ -65,6 +65,11 @@ def logout(request):
     response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
     return response
 
+def deleteSessionCookie(request):
+    del request.COOKIES['sessionid']
+    return HttpResponse("Success")
+
+
 def index(request):
     return render(
         request,
