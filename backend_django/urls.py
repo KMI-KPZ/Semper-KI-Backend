@@ -23,10 +23,9 @@ urlpatterns = [
     path('test/', test_response.testResponse, name='test_response'),
     path('testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
     path('csrfCookie/', test_response.testResponseCsrf, name='test_response_csrf'),
-    path("login", authentification.login, name="login"),
-    path("logout", authentification.logout, name="logout"),
-    path("callback", authentification.callback, name="callback"),
+    path("login", authentification.loginUser, name="loginUser"),
+    path("logout", authentification.logoutUser, name="logoutUser"),
+    path("callback", authentification.callbackLogin, name="callbackLogin"),
     path("getUser/", authentification.getAuthInformation, name="getAuthInformation"),
-    path("deleteSession/", authentification.deleteSessionCookie, name="deleteSessionCookie"),
     path('admin/', admin.site.urls),
 ]

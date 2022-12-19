@@ -18,14 +18,14 @@ oauth.register(
     server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
 )
 
-def login(request):
+def loginUser(request):
     uri = oauth.auth0.authorize_redirect(
-        request, request.build_absolute_uri(reverse("callback"))
+        request, request.build_absolute_uri(reverse("callbackLogin"))
     )
     # return uri
     return HttpResponse(uri.url)
 
-def callback(request):
+def callbackLogin(request):
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
 
@@ -47,8 +47,9 @@ def getAuthInformation(request):
     else:
         return JsonResponse({}, status=401)
 
-def logout(request):
+def logoutUser(request):
     request.session.clear()
+    request.session.flush()
 
     # return redirect(
     #     f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
@@ -61,13 +62,8 @@ def logout(request):
     #         quote_via=quote_plus,
     #     ),
     # )
-
     response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
     return response
-
-def deleteSessionCookie(request):
-    del request.COOKIES['sessionid']
-    return HttpResponse("Success")
 
 
 def index(request):
