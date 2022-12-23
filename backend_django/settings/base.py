@@ -14,8 +14,14 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
 
+
+# Load environment definition file
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, "backend_django", "templates")
 
@@ -24,9 +30,6 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "backend_django", "templates")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
@@ -95,23 +99,7 @@ WSGI_APPLICATION = 'backend_django.wsgi.application'
 # SESSION_COOKIE_SECURE =  True #Sets session cookies as secure
 # CSRF_COOKIE_SECURE = True # Sets csrf cookie as secure
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-    #SQLITE
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    # POSTGRESQL
-        #"ENGINE": "django.db.backends.postgresql",
-        #"NAME": "postgres",
-        #"USER": "postgres",
-        #"PASSWORD": "postgres",
-        #"HOST": "db",  # set in docker-compose.yml
-        #"PORT": 5432,  # default postgres port
-    }
-}
+CONN_MAX_AGE = 10 # Seconds for which the database connection is enabled. 0 is for close after every request
 
 
 # Password validation
@@ -154,12 +142,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Load environment definition file
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
-
 
 # Load Auth0 application settings into memory
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")

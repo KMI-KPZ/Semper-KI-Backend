@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .handlers import test_response, authentification
+from .handlers import test_response, authentification, profiles
 
 urlpatterns = [
     path("", authentification.index, name="index"),
@@ -27,5 +27,7 @@ urlpatterns = [
     path("logout", authentification.logoutUser, name="logoutUser"),
     path("callback", authentification.callbackLogin, name="callbackLogin"),
     path("getUser/", authentification.getAuthInformation, name="getAuthInformation"),
-    path('admin/', admin.site.urls),
+    path("testDB/", profiles.checkConnection, name="checkConnection"),
+    path("createDB/", profiles.createTable, name="createTable"),
+    path("insertInDB/", profiles.insertUser, name="insertUser")
 ]

@@ -6,11 +6,11 @@
   <body>
     {% if session %}
     <h1>Welcome {{session.userinfo.name}}!</h1>
-    <p><a href="{% url 'logout' %}">Logout</a></p>
+    <p><a href="{% url 'logoutUser' %}">Logout</a></p>
     <div><pre>{{pretty}}</pre></div>
     {% else %}
     <h1>Welcome Guest</h1>
-    <p><a href="{% url 'login' %}">Login</a></p>
+    <p><a href="{% url 'loginUser' %}">Login</a></p>
     {% endif %}
   </body>
 </html>

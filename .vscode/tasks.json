@@ -24,7 +24,8 @@
 			"python": {
 				"args": [
 					"runserver",
-					"0.0.0.0:8000"
+					"0.0.0.0:8000",
+					"--settings=backend_django.settings.debug"
 				],
 				"file": "manage.py"
 			}

@@ -1,0 +1,22 @@
+from .base import *
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+    #SQLITE
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+    # POSTGRESQL
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": os.environ.get("POSTGRESPASSWORD"),
+        "HOST": "host.docker.internal",  # "db" set in docker-compose.yml
+        "PORT": 5432,  # default postgres port
+    }
+}
