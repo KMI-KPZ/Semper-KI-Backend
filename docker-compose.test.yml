@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  backend:
+    command: ["bash", "backend_django/runtests.sh"]
+  db:
+    volumes:
+      - ./postgres/test_data/:/var/lib/postgresql/data/

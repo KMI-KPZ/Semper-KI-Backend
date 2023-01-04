@@ -14,7 +14,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "postgres",
         "USER": "postgres",
-        "PASSWORD": os.environ.get("POSTGRESPASSWORD"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",  # "db" set in docker-compose.yml
         "PORT": 5432,  # default postgres port
     }

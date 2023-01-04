@@ -16,22 +16,11 @@ services:
       - db
     links:
       - db:db
-    networks:
-      - some_network
   db:
     image: postgres:15
+    env_file:
+     - backend_django/.env
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
-    networks:
-      - some_network
-      
-networks:
-  some_network:
-    driver: bridge
-
-volumes:
-  postgres_data:
+      - ./postgres/data/:/var/lib/postgresql/data/
