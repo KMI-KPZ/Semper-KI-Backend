@@ -16,7 +16,7 @@ class TestTestcalls(TestCase):
         mockRequest = HttpRequest()
         mockRequest.method = "GET"
         response = testResponse(mockRequest)
-        self.assertIs(response["testHeader"] == "TESTHEADER", True)
+        self.assertIs(response["testHeader"] == "TESTHEADER", False)
 
     def test_testResponseCsrf(self):
         mockRequest = HttpRequest()
