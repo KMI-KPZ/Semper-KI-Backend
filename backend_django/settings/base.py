@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000"]
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'https://localhost:3000','https://localhost:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'http://127.0.0.1:3000','http://127.0.0.1:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com']
 
 
 CORS_ALLOW_CREDENTIALS = True
@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [

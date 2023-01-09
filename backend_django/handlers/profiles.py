@@ -2,7 +2,32 @@ import json
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import psycopg2
+from django.db import models
 
+from ..modelFiles.profile import *
+
+def addUser(request):
+    testName = "testguy"
+    testEmail = "testguy@test.com"
+    testTypeOfUser = "user"
+    try:
+        searchResults = Profile.objects.filter(name=testName)
+        
+        if len(searchResults) == 0:
+            user = Profile(testName,testEmail,testTypeOfUser) 
+            user.save()
+        else:
+            user = searchResults.get(pk=1)
+            user.email = testEmail+"1"
+            user.role = testTypeOfUser+"1"
+            user.save()
+    except (Exception) as error:
+        print(error)
+        return HttpResponse(error, status=500)
+    return HttpResponse("Worked")
+
+
+#############################################################
 dbSettings = {
     "host": settings.DATABASES["default"]["HOST"],
     "database": "postgres",
@@ -88,6 +113,41 @@ def insertUser(profile):
 
     sql = """INSERT INTO profiles(name,email,type)
     VALUES(%s,%s,%s);"""
+    conn = None
+    try:
+        # read database configuration
+        params = dbSettings
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.execute(sql, (name,email,typeOfUser,))
+        # get the generated id back
+        # student_id = cur.fetchone()[0]
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        return HttpResponse(error, status=500)
+    finally:
+        if conn is not None:
+            conn.close()
+    
+    return HttpResponse("Worked")
+
+##############################################
+# profile is in json format
+def updateUser(profile):
+    name = "testguy" #profile["nickname"]
+    email = "testguy@test.com" #profile["email"]
+    typeOfUser = "user" #profile["role"]
+
+
+    sql = """UPDATE profiles SET (email,type) WHERE name=
+    VALUES(%s,%s);"""
     conn = None
     try:
         # read database configuration

@@ -29,5 +29,6 @@ urlpatterns = [
     path("getUser/", authentification.getAuthInformation, name="getAuthInformation"),
     path("testDB/", profiles.checkConnection, name="checkConnection"),
     path("createDB/", profiles.createTable, name="createTable"),
-    path("insertInDB/", profiles.insertUser, name="insertUser")
+    path("insertInDB/", profiles.insertUser, name="insertUser"),
+    path("addUser/", profiles.addUser, name="addUser")
 ]

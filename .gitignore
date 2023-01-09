@@ -130,3 +130,4 @@ dmypy.json
 
 feed/auth.txt
 postgres/
+backend_django/env_example.env

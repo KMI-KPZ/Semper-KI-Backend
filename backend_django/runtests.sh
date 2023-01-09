@@ -1,4 +1,5 @@
 #!/bin/bash
+# This is an entry point override for tests
 pwd
 gunicorn --bind 0.0.0.0:8000 backend_django.wsgi --reload &
 sleep 5
