@@ -33,10 +33,10 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET")
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', "dev.semper-ki.org", "semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org"]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", "dev.semper-ki.org", "semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "dev.semper-ki.org", "semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org"]
-CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'http://127.0.0.1:3000','http://127.0.0.1:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "dev.semper-ki.org", "semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'http://127.0.0.1:3000','http://127.0.0.1:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
 
 
 CORS_ALLOW_CREDENTIALS = True
