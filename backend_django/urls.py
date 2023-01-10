@@ -27,8 +27,11 @@ urlpatterns = [
     path("logout", authentification.logoutUser, name="logoutUser"),
     path("callback", authentification.callbackLogin, name="callbackLogin"),
     path("getUser/", authentification.getAuthInformation, name="getAuthInformation"),
-    path("testDB/", profiles.checkConnection, name="checkConnection"),
-    path("createDB/", profiles.createTable, name="createTable"),
-    path("insertInDB/", profiles.insertUser, name="insertUser"),
-    path("addUser/", profiles.addUser, name="addUser")
+    #path("testDB/", profiles.checkConnection, name="checkConnection"),
+    #path("createDB/", profiles.createTable, name="createTable"),
+    #path("insertInDB/", profiles.insertUser, name="insertUser"),
+    path("profile_addUser/", profiles.addUser, name="addUser"),
+    path("profile_getUser/", profiles.getUser, name="getUser"),
+    path("profile_updateUser/", profiles.updateUser, name="updateUser"),
+    path("profile_deleteUser/", profiles.deleteUser, name="deleteUser")
 ]
