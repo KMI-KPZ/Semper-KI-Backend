@@ -66,7 +66,12 @@ def logoutUser(request):
     #         quote_via=quote_plus,
     #     ),
     # )
-    response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri('http://localhost:3000/callback/logout'),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
+    if settings.PRODUCTION:
+        callbackString = request.build_absolute_uri('http://dev.semper-ki.org/callback/logout')
+    else:
+        callbackString = request.build_absolute_uri('http://localhost:3000/callback/logout')
+        
+    response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
     return response
 
 
