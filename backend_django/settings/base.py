@@ -30,6 +30,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "backend_django", "templates")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET")
+PRODUCTION=False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', "dev.semper-ki.org", "semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org"]
 

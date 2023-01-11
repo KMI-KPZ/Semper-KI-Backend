@@ -21,6 +21,8 @@ from .handlers import test_response, authentification, profiles
 urlpatterns = [
     path("", authentification.index, name="index"),
     path('test/', test_response.testResponse, name='test_response'),
+    path('public/test/', test_response.testResponse, name='test_response'),
+    path('private/test/', test_response.testResponse, name='test_response'),
     path('testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
     path('csrfCookie/', test_response.testResponseCsrf, name='test_response_csrf'),
     path("login/", authentification.loginUser, name="loginUser"),

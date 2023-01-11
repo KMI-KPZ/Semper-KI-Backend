@@ -31,7 +31,11 @@ def callbackLogin(request):
 
     # token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
-    forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
+    if settings.PRODUCTION:
+        forward_url = request.build_absolute_uri('http://dev.semper-ki.org/callback/login')
+    else:
+        forward_url = request.build_absolute_uri('http://localhost:3000/callback/login')
+        
     response = HttpResponseRedirect(forward_url)
     #response["user"] = token # This doesnt work
     # response.set_cookie("authToken", value=token)
