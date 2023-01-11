@@ -1,5 +1,6 @@
 #!/bin/bash
 # This is an entry point override for migrations
+sleep 10
 pwd
 export DJANGO_SETTINGS_MODULE=backend_django.settings.production
 python manage.py makemigrations
