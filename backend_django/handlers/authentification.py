@@ -19,6 +19,15 @@ oauth.register(
 )
 
 def loginUser(request):
+    """
+    Return a link for redirection to Auth0
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: HTTP Response.
+    :rtype: HTTP Link as str
+
+    """
     uri = oauth.auth0.authorize_redirect(
         request, request.build_absolute_uri(reverse("callbackLogin"))
     )

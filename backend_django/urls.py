@@ -16,22 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .handlers import test_response, authentification, profiles
+from .handlers import test_response, authentification, profiles, filter
 
 urlpatterns = [
     path("", authentification.index, name="index"),
     path('test/', test_response.testResponse, name='test_response'),
     path('public/test/', test_response.testResponse, name='test_response'),
-    path('private/test/', test_response.testResponse, name='test_response'),
     path('public/testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
     path('public/csrfCookie/', test_response.testResponseCsrf, name='test_response_csrf'),
     path("public/login/", authentification.loginUser, name="loginUser"),
     path("public/logout/", authentification.logoutUser, name="logoutUser"),
     path("public/callback/", authentification.callbackLogin, name="callbackLogin"),
     path("public/getUser/", authentification.getAuthInformation, name="getAuthInformation"),
+    path('public/getModels/', filter.getFilter, name='getFilter'),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
+    path('private/test/', test_response.testResponse, name='test_response'),
     path("private/profile_addUser/", profiles.addUser, name="addUser"),
     path("private/profile_getUser/", profiles.getUser, name="getUser"),
     path("private/profile_updateUser/", profiles.updateUser, name="updateUser"),
