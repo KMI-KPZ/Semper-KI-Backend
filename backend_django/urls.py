@@ -29,6 +29,7 @@ urlpatterns = [
     path("public/callback/", authentification.callbackLogin, name="callbackLogin"),
     path("public/getUser/", authentification.getAuthInformation, name="getAuthInformation"),
     path('public/getModels/', filter.getFilter, name='getFilter'),
+    path("public/profileDeleteUser/", profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
