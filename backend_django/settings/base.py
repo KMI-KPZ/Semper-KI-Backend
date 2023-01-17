@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', "dev.semper-ki.org", "semper-ki.org",
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
 
+
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
 CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:8000', 'http://127.0.0.1:3000','http://127.0.0.1:8000', 'https://dev-bdt24c5k0meleovv.eu.auth0.com', "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org"]
 
@@ -98,8 +99,10 @@ WSGI_APPLICATION = 'backend_django.wsgi.application'
 
 # SSL
 # SECURE_SSL_REDIRECT = False # Redirects http to https
-# SESSION_COOKIE_SECURE =  True #Sets session cookies as secure
-# CSRF_COOKIE_SECURE = True # Sets csrf cookie as secure
+SESSION_COOKIE_SECURE =  True #Sets session cookies as secure
+CSRF_COOKIE_SECURE = True # Sets csrf cookie as secure
+# CSRF_COOKIE_DOMAIN = '127.0.0.1' 
+
 
 CONN_MAX_AGE = 10 # Seconds for which the database connection is enabled. 0 is for close after every request
 

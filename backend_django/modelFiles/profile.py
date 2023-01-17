@@ -2,22 +2,29 @@ from django.db import models
 
 # Table for regular Users
 class Profile(models.Model):
+    """
+    Profile management class.
+    
+    :name: Nickname returned by Auth0, used for filter searches in DB
+    :email: E-Mail with which the user registered themselves
+    :role: Role assigned to the user, can be regular, manufacturer, ...
+    :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
+    :updatedWhen: Date and time at which the entry was updated
+    :accessedWhen: Last date and time the user was fetched from the database, automatically set
+    """
     name = models.CharField(max_length=30)
     email = models.CharField(max_length=30)
     role = models.CharField(max_length=30)
-    
-    def createUser(self, *args):
-        self.name = args[0]
-        self.email = args[1]
-        self.role = args[2]
-        # TODO Created by, Updated by, with date
+    createdWhen = models.DateTimeField(auto_now_add=True)
+    updatedWhen = models.DateTimeField()
+    accessedWhen = models.DateTimeField(auto_now=True)
 
     ###################################################
     def __str__(self):
-        return self.name + " " + self.email + " " + self.role
+        return self.name + " " + self.email + " " + self.role + " " + self.createdWhen + " " + self.updatedWhen + " " + self.accessedWhen
 
     ###################################################
     def toDict(self):
-        return {"name": self.name, "email" : self.email,  "type": self.role}
+        return {"name": self.name, "email" : self.email,  "type": self.role, "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
 
 # TODO: Table for Manufacturers

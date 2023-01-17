@@ -1,10 +1,10 @@
 import json
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
-from django.shortcuts import redirect, render, redirect
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from .profiles import addUser, getUser
 
 oauth = OAuth()
 
@@ -18,9 +18,27 @@ oauth.register(
     server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
 )
 
+#######################################################
+def checkIfUserIsLoggedIn(request):
+    """
+    Check whether a user is logged in or not.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: True if the user is logged in or False if not
+    :rtype: Bool
+
+    """
+
+    if "user" in request.session:
+        return True
+    else:
+        return False
+
+#######################################################
 def loginUser(request):
     """
-    Return a link for redirection to Auth0
+    Return a link for redirection to Auth0.
 
     :param request: GET request
     :type request: HTTP GET
@@ -34,9 +52,23 @@ def loginUser(request):
     # return uri
     return HttpResponse(uri.url)
 
+#######################################################
 def callbackLogin(request):
+    """
+    Get information back from Auth0.
+    Add user to database if entry doesn't exist.
+
+    :param request: POST request
+    :type request: HTTP POST
+    :return: URL forwarding with success to frontend/user
+    :rtype: HTTP Link as redirect
+
+    """
     token = oauth.auth0.authorize_access_token(request)
     request.session["user"] = token
+    
+    # Get Data from Database or create entry in it for logged in User
+    addUser(request)
 
     # token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
@@ -52,15 +84,36 @@ def callbackLogin(request):
     #return redirect(forward_url, data=token)
     # return redirect(request.build_absolute_uri(reverse("index")))
 
+#######################################################
 def getAuthInformation(request):
+    """
+    Return details about user after login. 
+    Accesses the database and creates or gets user.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: User details
+    :rtype: Json
+
+    """
     # TODO check if cookies are expired
-    if "user" in request.session:
-        response = JsonResponse(request.session["user"])
-        return response
+    if checkIfUserIsLoggedIn(request):
+        # Read user details from Database
+        return JsonResponse(getUser(request))
     else:
         return JsonResponse({}, status=401)
 
+#######################################################
 def logoutUser(request):
+    """
+    Delete session for this user and log out.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: URL to be forwarded
+    :rtype: HTTP URL
+
+    """
     request.session.clear()
     request.session.flush()
 
@@ -82,14 +135,3 @@ def logoutUser(request):
         
     response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
     return response
-
-
-def index(request):
-    return render(
-        request,
-        "index.html",
-        context={
-            "session": request.session.get("user"),
-            #"pretty": json.dumps(request.session.get("user"), indent=4),
-        },
-    )

@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from .handlers import test_response, authentification, profiles, filter
+from .handlers import test_response, authentification, profiles, filter, frontpage
 
 urlpatterns = [
-    path("", authentification.index, name="index"),
+    path("", frontpage.index, name="index"),
     path('test/', test_response.testResponse, name='test_response'),
     path('public/test/', test_response.testResponse, name='test_response'),
     path('public/testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
@@ -34,7 +34,7 @@ urlpatterns = [
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
     path('private/test/', test_response.testResponse, name='test_response'),
     path("private/profile_addUser/", profiles.addUser, name="addUser"),
-    path("private/profile_getUser/", profiles.getUser, name="getUser"),
+    path("private/profile_getUser/", profiles.getUserTest, name="getUserTest"),
     path("private/profile_updateUser/", profiles.updateUser, name="updateUser"),
     path("private/profile_deleteUser/", profiles.deleteUser, name="deleteUser")
 ]

@@ -19,7 +19,8 @@
 				"docker-build"
 			],
 			"dockerRun": {
-				"ports": [{"containerPort": 8000, "hostPort": 8000, "protocol": "tcp"}]
+				//"ports": [{"containerPort": 8000, "hostPort": 8000, "protocol": "tcp"}],
+				"customOptions": "-p 127.0.0.1:8000:8000"
 			},
 			"python": {
 				"args": [

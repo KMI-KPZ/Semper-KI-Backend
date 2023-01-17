@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import psycopg2
 from django.db import models
+from django.utils import timezone
 
 from ..modelFiles.profile import Profile
 #from ..models import Profile
@@ -11,23 +12,53 @@ from ..modelFiles.profile import Profile
 
 ##############################################
 def getUser(request):
-    testName = "testguy"
-    testEmail = "testguy@test.com"
-    testTypeOfUser = "user"
+    """
+    Check whether a user exists or not.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: User details from database
+    :rtype: Dictionary
+
+    """
+    userName = request.session["user"]["userinfo"]["nickname"]
+    obj = {}
     try:
-        obj = Profile.objects.get(name=testName).toDict()
+        obj = Profile.objects.get(name=userName).toDict()
     except (Exception) as error:
         print(error)
-        return HttpResponse(error, status=500)
-    return JsonResponse(obj)
+
+    return obj
+
+def getUserTest(request):
+    """
+    Same as getUser but for testing.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: User details from database
+    :rtype: JSON
+
+    """
+    return JsonResponse(getUser(request))
 
 ##############################################
 def addUser(request):
-    testName = "testguy"
-    testEmail = "testguy@test.com"
-    testTypeOfUser = "user"
+    """
+    Add user if the entry doesn't already exists.
+
+    :param request: POST request with session
+    :type request: HTTP POST
+    :return: HTTP response (only used for tests)
+    :rtype: HTTP Status
+
+    """
+    userName = request.session["user"]["userinfo"]["nickname"]
+    userEmail = request.session["user"]["userinfo"]["email"]
+    userType = "user"
+    updated = timezone.now()
     try:
-        obj, created = Profile.objects.get_or_create(name=testName, email=testEmail, role=testTypeOfUser)
+        obj, created = Profile.objects.get_or_create(name=userName, email=userEmail, role=userType, defaults={'updatedWhen': updated})
         
     except (Exception) as error:
         print(error)
@@ -36,11 +67,21 @@ def addUser(request):
 
 ##############################################
 def updateUser(request):
-    testName = "testguy"
-    testEmail = "testguy@test1.com"
-    testTypeOfUser = "user"
+    """
+    Update user details.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    userName = request.session["user"]["userinfo"]["nickname"]
+    userEmail = request.session["user"]["userinfo"]["email"]
+    userType = "user"
+    updated = timezone.now()
     try:
-        affected = Profile.objects.filter(name=testName).update(email=testEmail, role=testTypeOfUser)
+        affected = Profile.objects.filter(name=userName).update(email=userEmail, role=userType, updatedWhen=updated)
         
     except (Exception) as error:
         print(error)
@@ -49,9 +90,18 @@ def updateUser(request):
 
 ##############################################
 def deleteUser(request):
-    testName = "testguy"
+    """
+    Deletes an entry in the database corresponding to user name.
+
+    :param request: DELETE request
+    :type request: HTTP DELETE
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    userName = request.session["user"]["userinfo"]["nickname"]
     try:
-        affected = Profile.objects.filter(name=testName).delete()
+        affected = Profile.objects.filter(name=userName).delete()
         
     except (Exception) as error:
         print(error)

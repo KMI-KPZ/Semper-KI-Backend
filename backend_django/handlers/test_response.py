@@ -10,6 +10,15 @@ from django.views.decorators.http import require_http_methods
 #@require_http_methods(["GET", "POST"]) # get and post will make it this far
 @csrf_exempt # ONLY FOR TESTING!!!!
 def testResponse(request):
+    """
+    Tests whether request and response scheme works.
+
+    :param request: any request
+    :type request: HTTP 
+    :return: Response with answer string and testheader
+    :rtype: HTTP Response
+
+    """
     outString = request.method
     response = HttpResponse(outString + " test")
     response["testHeader"] = "TESTHEADER"
@@ -19,5 +28,14 @@ def testResponse(request):
 #@csrf_protect
 @ensure_csrf_cookie
 def testResponseCsrf(request):
+    """
+    Ensures that the csrf cookie is set correctly.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Response with cookie
+    :rtype: HTTP Response
+
+    """
     response = HttpResponse("CSRF worked for: " + request.method)
     return response
