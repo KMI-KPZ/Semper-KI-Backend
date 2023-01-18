@@ -18,24 +18,40 @@ from django.urls import include, path
 
 from .handlers import test_response, authentification, profiles, filter, frontpage
 
+paths = {
+    "index": "",
+    "test": 'public/test/',
+    "csrfTest": 'public/testCsrf/',
+    "csrfCookie": 'public/csrfCookie/',
+    "login" : "public/login/",
+    "logout": "public/logout/",
+    "callback": "public/callback/",
+    "getUser": "public/getUser/",
+    "getModels": 'public/getModels/',
+    "deleteUser": "public/profileDeleteUser/",
+    "addUser": "private/profile_addUser/",
+    "getUserTest": "private/profile_getUser/",
+    "updateUser": "private/profile_updateUser/",
+}
+
+
+
 urlpatterns = [
-    path("", frontpage.index, name="index"),
-    path('test/', test_response.testResponse, name='test_response'),
-    path('public/test/', test_response.testResponse, name='test_response'),
-    path('public/testCsrf/', test_response.testResponseCsrf, name='test_response_csrf'),
-    path('public/csrfCookie/', test_response.testResponseCsrf, name='test_response_csrf'),
-    path("public/login/", authentification.loginUser, name="loginUser"),
-    path("public/logout/", authentification.logoutUser, name="logoutUser"),
-    path("public/callback/", authentification.callbackLogin, name="callbackLogin"),
-    path("public/getUser/", authentification.getAuthInformation, name="getAuthInformation"),
-    path('public/getModels/', filter.getFilter, name='getFilter'),
-    path("public/profileDeleteUser/", profiles.deleteUser, name="deleteUser"),
+    path(paths["index"], frontpage.index, name="index"),
+    path(paths["test"], test_response.testResponse, name='test_response'),
+    path(paths["csrfTest"], test_response.testResponseCsrf, name='test_response_csrf'),
+    path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
+    path(paths["login"], authentification.loginUser, name="loginUser"),
+    path(paths["logout"], authentification.logoutUser, name="logoutUser"),
+    path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
+    path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
+    path(paths["getModels"], filter.getFilter, name='getFilter'),
+    path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
     path('private/test/', test_response.testResponse, name='test_response'),
-    path("private/profile_addUser/", profiles.addUser, name="addUser"),
-    path("private/profile_getUser/", profiles.getUserTest, name="getUserTest"),
-    path("private/profile_updateUser/", profiles.updateUser, name="updateUser"),
-    path("private/profile_deleteUser/", profiles.deleteUser, name="deleteUser")
+    path(paths["addUser"], profiles.addUser, name="addUser"),
+    path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
+    path(paths["updateUser"], profiles.updateUser, name="updateUser")
 ]
