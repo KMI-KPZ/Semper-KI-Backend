@@ -1,0 +1,42 @@
+:py:mod:`backend_django.handlers.frontpage`
+===========================================
+
+.. py:module:: backend_django.handlers.frontpage
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.frontpage.landingPage
+   backend_django.handlers.frontpage.docPage
+
+
+
+.. py:function:: landingPage(request)
+
+   Landing page for the backend
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: Rendered page
+   :rtype: None
+
+
+
+.. py:function:: docPage(request)
+
+   Documentation page for the backend
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: Rendered page
+   :rtype: None
+
+
+

@@ -14,12 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 from .handlers import test_response, authentification, profiles, filter, frontpage
 
+
 paths = {
-    "index": "",
+    "landingPage": "",
     "test": 'public/test/',
     "csrfTest": 'public/testCsrf/',
     "csrfCookie": 'public/csrfCookie/',
@@ -37,7 +38,8 @@ paths = {
 
 
 urlpatterns = [
-    path(paths["index"], frontpage.index, name="index"),
+    path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
+    re_path(r'^public/doc', frontpage.docPage, name="docPage"),
     path(paths["test"], test_response.testResponse, name='test_response'),
     path(paths["csrfTest"], test_response.testResponseCsrf, name='test_response_csrf'),
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),

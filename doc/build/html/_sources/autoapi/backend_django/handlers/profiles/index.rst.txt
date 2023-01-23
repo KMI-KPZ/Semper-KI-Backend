@@ -1,0 +1,78 @@
+:py:mod:`backend_django.handlers.profiles`
+==========================================
+
+.. py:module:: backend_django.handlers.profiles
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.profiles.getUser
+   backend_django.handlers.profiles.getUserTest
+   backend_django.handlers.profiles.addUser
+   backend_django.handlers.profiles.updateUser
+   backend_django.handlers.profiles.deleteUser
+
+
+
+.. py:function:: getUser(request)
+
+   Check whether a user exists or not.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: User details from database
+   :rtype: Dictionary
+
+
+
+.. py:function:: getUserTest(request)
+
+   Same as getUser but for testing.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: User details from database
+   :rtype: JSON
+
+
+
+.. py:function:: addUser(request)
+
+   Add user if the entry doesn't already exists.
+
+   :param request: POST request with session
+   :type request: HTTP POST
+   :return: HTTP response (only used for tests)
+   :rtype: HTTP Status
+
+
+
+.. py:function:: updateUser(request)
+
+   Update user details.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: HTTP response
+   :rtype: HTTP status
+
+
+
+.. py:function:: deleteUser(request)
+
+   Deletes an entry in the database corresponding to user name.
+
+   :param request: DELETE request
+   :type request: HTTP DELETE
+   :return: HTTP response
+   :rtype: HTTP status
+
+
+

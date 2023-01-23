@@ -1,0 +1,93 @@
+:py:mod:`backend_django.handlers.authentification`
+==================================================
+
+.. py:module:: backend_django.handlers.authentification
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.authentification.checkIfUserIsLoggedIn
+   backend_django.handlers.authentification.loginUser
+   backend_django.handlers.authentification.callbackLogin
+   backend_django.handlers.authentification.getAuthInformation
+   backend_django.handlers.authentification.logoutUser
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.authentification.oauth
+
+
+.. py:data:: oauth
+   
+
+   
+
+.. py:function:: checkIfUserIsLoggedIn(request)
+
+   Check whether a user is logged in or not.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: True if the user is logged in or False if not
+   :rtype: Bool
+
+
+
+.. py:function:: loginUser(request)
+
+   Return a link for redirection to Auth0.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: HTTP Response.
+   :rtype: HTTP Link as str
+
+
+
+.. py:function:: callbackLogin(request)
+
+   Get information back from Auth0.
+   Add user to database if entry doesn't exist.
+
+   :param request: POST request
+   :type request: HTTP POST
+   :return: URL forwarding with success to frontend/user
+   :rtype: HTTP Link as redirect
+
+
+
+.. py:function:: getAuthInformation(request)
+
+   Return details about user after login. 
+   Accesses the database and creates or gets user.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: User details
+   :rtype: Json
+
+
+
+.. py:function:: logoutUser(request)
+
+   Delete session for this user and log out.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: URL to be forwarded
+   :rtype: HTTP URL
+
+
+

@@ -13,7 +13,8 @@
                         "remoteRoot": "/app"
                     }
                 ],
-                "projectType": "django"
+                "projectType": "django",
+                "justMyCode": false,
             }
         }
     ],

@@ -24,6 +24,7 @@ if ENV_FILE:
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, "backend_django", "templates")
+DOC_DIR = os.path.join(BASE_DIR,'doc','build','html')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -82,7 +83,7 @@ ROOT_URLCONF = 'backend_django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR],
+        'DIRS': [TEMPLATE_DIR,DOC_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

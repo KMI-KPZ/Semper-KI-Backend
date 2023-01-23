@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
+#build/
 develop-eggs/
 dist/
 downloads/
@@ -131,3 +131,5 @@ dmypy.json
 feed/auth.txt
 postgres/
 backend_django/env_example.env
+
+#doc/build/html/

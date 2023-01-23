@@ -1,0 +1,74 @@
+:py:mod:`backend_django.tests`
+==============================
+
+.. py:module:: backend_django.tests
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.tests.TestTestcalls
+   backend_django.tests.TestProfiles
+
+
+
+
+.. py:class:: TestTestcalls(methodName='runTest')
+
+   Bases: :py:obj:`django.test.TestCase`
+
+   Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
+   test isolation.
+
+   In most situations, TestCase should be preferred to TransactionTestCase as
+   it allows faster execution. However, there are some situations where using
+   TransactionTestCase might be necessary (e.g. testing some transactional
+   behavior).
+
+   On database backends with no transaction support, TestCase behaves as
+   TransactionTestCase.
+
+   .. py:method:: setUp() -> None
+
+      Hook method for setting up the test fixture before exercising it.
+
+
+   .. py:method:: test_testResponse()
+
+      some logic, test if result is as expected
+
+
+   .. py:method:: test_testResponseCsrf()
+
+
+
+.. py:class:: TestProfiles(methodName='runTest')
+
+   Bases: :py:obj:`django.test.TestCase`
+
+   Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
+   test isolation.
+
+   In most situations, TestCase should be preferred to TransactionTestCase as
+   it allows faster execution. However, there are some situations where using
+   TransactionTestCase might be necessary (e.g. testing some transactional
+   behavior).
+
+   On database backends with no transaction support, TestCase behaves as
+   TransactionTestCase.
+
+   .. py:method:: test_addUser()
+
+
+   .. py:method:: test_updateUser()
+
+
+   .. py:method:: test_deleteUser()
+
+
+
