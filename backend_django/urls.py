@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from .handlers import test_response, authentification, profiles, filter, frontpage
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries
 
 
 paths = {
@@ -33,6 +33,7 @@ paths = {
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
     "updateUser": "private/profile_updateUser/",
+    "testQuery": "private/testquery/"
 }
 
 
@@ -55,5 +56,6 @@ urlpatterns = [
     path('private/test/', test_response.testResponse, name='test_response'),
     path(paths["addUser"], profiles.addUser, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
-    path(paths["updateUser"], profiles.updateUser, name="updateUser")
+    path(paths["updateUser"], profiles.updateUser, name="updateUser"),
+    path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery")
 ]

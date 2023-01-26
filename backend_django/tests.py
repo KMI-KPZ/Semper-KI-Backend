@@ -33,7 +33,8 @@ class TestProfiles(TestCase):
 
     def test_addUser(self):
         mockSession = self.client.session
-        mockSession["user"] = {"userinfo": {"nickname": "", "email": "", "type": ""}}
+        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser"
         mockSession["user"]["userinfo"]["nickname"] = "testuser"
         mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
         mockSession["user"]["userinfo"]["type"] = "user"
@@ -44,7 +45,8 @@ class TestProfiles(TestCase):
     
     def test_updateUser(self):
         mockSession = self.client.session
-        mockSession["user"] = {"userinfo": {"nickname": "", "email": "", "type": ""}}
+        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser2"
         mockSession["user"]["userinfo"]["nickname"] = "testuser2"
         mockSession["user"]["userinfo"]["email"] = "testuser2@test.de"
         mockSession["user"]["userinfo"]["type"] = "user"
@@ -58,7 +60,8 @@ class TestProfiles(TestCase):
     
     def test_deleteUser(self):      
         mockSession = self.client.session
-        mockSession["user"] = {"userinfo": {"nickname": "", "email": "", "type": ""}}
+        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser3"
         mockSession["user"]["userinfo"]["nickname"] = "testuser3"
         mockSession["user"]["userinfo"]["email"] = "testuser3@test.de"
         mockSession["user"]["userinfo"]["type"] = "user"

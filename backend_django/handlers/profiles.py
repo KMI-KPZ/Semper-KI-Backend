@@ -21,10 +21,10 @@ def getUser(request):
     :rtype: Dictionary
 
     """
-    userName = request.session["user"]["userinfo"]["nickname"]
+    userID = request.session["user"]["userinfo"]["sub"]
     obj = {}
     try:
-        obj = Profile.objects.get(name=userName).toDict()
+        obj = Profile.objects.get(subID=userID).toDict()
     except (Exception) as error:
         print(error)
 
@@ -53,12 +53,13 @@ def addUser(request):
     :rtype: HTTP Status
 
     """
+    userID = request.session["user"]["userinfo"]["sub"]
     userName = request.session["user"]["userinfo"]["nickname"]
     userEmail = request.session["user"]["userinfo"]["email"]
     userType = "user"
     updated = timezone.now()
     try:
-        obj, created = Profile.objects.get_or_create(name=userName, email=userEmail, role=userType, defaults={'updatedWhen': updated})
+        obj, created = Profile.objects.get_or_create(subID=userID, name=userName, email=userEmail, role=userType, defaults={'updatedWhen': updated})
         
     except (Exception) as error:
         print(error)
@@ -76,12 +77,13 @@ def updateUser(request):
     :rtype: HTTP status
 
     """
+    userID = request.session["user"]["userinfo"]["sub"]
     userName = request.session["user"]["userinfo"]["nickname"]
     userEmail = request.session["user"]["userinfo"]["email"]
     userType = "user"
     updated = timezone.now()
     try:
-        affected = Profile.objects.filter(name=userName).update(email=userEmail, role=userType, updatedWhen=updated)
+        affected = Profile.objects.filter(subID=userID).update(name=userName, email=userEmail, role=userType, updatedWhen=updated)
         
     except (Exception) as error:
         print(error)
@@ -99,9 +101,9 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    userName = request.session["user"]["userinfo"]["nickname"]
+    userID = request.session["user"]["userinfo"]["sub"]
     try:
-        affected = Profile.objects.filter(name=userName).delete()
+        affected = Profile.objects.filter(subID=userID).delete()
         
     except (Exception) as error:
         print(error)

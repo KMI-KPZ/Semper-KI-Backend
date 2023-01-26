@@ -4,7 +4,7 @@ pwd
 echo "SLEEPING FOR 10 SECONDS"
 sleep 10
 
-# rm backend_django/migrations/*
+rm backend_django/migrations/0001_initial.py
 export DJANGO_SETTINGS_MODULE=backend_django.settings.development
 python manage.py makemigrations
 python manage.py makemigrations backend_django
