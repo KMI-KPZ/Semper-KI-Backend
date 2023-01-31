@@ -28,12 +28,13 @@ paths = {
     "logout": "public/logout/",
     "callback": "public/callback/",
     "getUser": "public/getUser/",
-    "getModels": 'public/getModels/',
+    "getData": 'public/getData/',
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
     "updateUser": "private/profile_updateUser/",
-    "testQuery": "private/testquery/"
+    "testQuery": "private/testquery/",
+    "isLoggedIn": "public/isLoggedIn/"
 }
 
 
@@ -48,7 +49,7 @@ urlpatterns = [
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
-    path(paths["getModels"], filter.getFilter, name='getFilter'),
+    path(paths["getData"], filter.getData, name='getData'),
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
@@ -57,5 +58,6 @@ urlpatterns = [
     path(paths["addUser"], profiles.addUser, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateUser"], profiles.updateUser, name="updateUser"),
-    path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery")
+    path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
+    path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn")
 ]

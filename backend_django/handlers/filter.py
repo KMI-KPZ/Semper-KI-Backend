@@ -2,7 +2,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
-def getFilter(request):
+def getData(request):
     """
     Try to filter 3d-models according to json.
 

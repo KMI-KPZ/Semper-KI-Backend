@@ -1,9 +1,10 @@
-import json
+import json, datetime
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+
 from .profiles import addUser, getUser
 
 oauth = OAuth()
@@ -27,13 +28,46 @@ def checkIfUserIsLoggedIn(request):
     :type request: HTTP GET
     :return: True if the user is logged in or False if not
     :rtype: Bool
-
     """
 
     if "user" in request.session:
         return True
     else:
         return False
+
+#######################################################
+def checkIfTokenExpired(token):
+    """
+    Check whether the token of a user has expired and a new login is necessary
+
+    :param request: User session token
+    :type request: Dictionary
+    :return: True if the token is valid or False if not
+    :rtype: Bool
+    """
+    test = datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00")
+    if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
+        return False
+    return True
+
+#######################################################
+def isLoggedIn(request):
+    """
+    Check whether the token of a user has expired and a new login is necessary
+
+    :param request: User session token
+    :type request: Dictionary
+    :return: True if the token is valid or False if not
+    :rtype: Bool
+    """
+
+    if "user" in request.session:
+        if checkIfTokenExpired(request.session["user"]):
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=418)
+    
+    return HttpResponse(status=418)
 
 #######################################################
 def loginUser(request):
@@ -65,7 +99,10 @@ def callbackLogin(request):
 
     """
     token = oauth.auth0.authorize_access_token(request)
+    # convert expiration time to the corresponding date and time
+    now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
     request.session["user"] = token
+    request.session["user"]["tokenExpiresOn"] = str(now)
     
     # Get Data from Database or create entry in it for logged in User
     addUser(request)
