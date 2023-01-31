@@ -63,11 +63,11 @@ def isLoggedIn(request):
 
     if "user" in request.session:
         if checkIfTokenExpired(request.session["user"]):
-            return HttpResponse(status=200)
+            return HttpResponse("Successful",status=200)
         else:
-            return HttpResponse(status=418)
+            return HttpResponse("Failed",status=200)
     
-    return HttpResponse(status=418)
+    return HttpResponse("Failed",status=200)
 
 #######################################################
 def loginUser(request):
