@@ -110,9 +110,9 @@ def callbackLogin(request):
     # token = json.dumps(token)
     #uri = request.build_absolute_uri(reverse("index"))
     if settings.PRODUCTION:
-        forward_url = request.build_absolute_uri('https://dev.semper-ki.org/callback/login')
+        forward_url = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
-        forward_url = request.build_absolute_uri('http://127.0.0.1:3000/callback/login')
+        forward_url = request.build_absolute_uri('http://127.0.0.1:3000')
         
     response = HttpResponseRedirect(forward_url)
     #response["user"] = token # This doesnt work
@@ -166,9 +166,9 @@ def logoutUser(request):
     #     ),
     # )
     if settings.PRODUCTION:
-        callbackString = request.build_absolute_uri('https://dev.semper-ki.org/callback/logout')
+        callbackString = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
-        callbackString = request.build_absolute_uri('http://127.0.0.1:3000/callback/logout')
+        callbackString = request.build_absolute_uri('http://127.0.0.1:3000')
         
     response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
     return response
