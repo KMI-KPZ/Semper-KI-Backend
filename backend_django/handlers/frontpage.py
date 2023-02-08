@@ -16,11 +16,11 @@ def landingPage(request):
     """
     return render(
         request,
-        "landingPage.html",
-        context={
-            "session": request.session.get("user"),
+        "landingPage.html"#,
+        #context={
+        #    "session": request.session.get("user"),
             #"pretty": json.dumps(request.session.get("user"), indent=4),
-        },
+        #},
     )
 #######################################################
 def docPage(request):

@@ -56,7 +56,7 @@ def addUser(request):
     userID = request.session["user"]["userinfo"]["sub"]
     userName = request.session["user"]["userinfo"]["nickname"]
     userEmail = request.session["user"]["userinfo"]["email"]
-    userType = "user"
+    userType = request.session["usertype"]
     updated = timezone.now()
     try:
         obj, created = Profile.objects.get_or_create(subID=userID, name=userName, email=userEmail, role=userType, defaults={'updatedWhen': updated})
@@ -77,18 +77,21 @@ def updateUser(request):
     :rtype: HTTP status
 
     """
-    userID = request.session["user"]["userinfo"]["sub"]
-    userName = request.session["user"]["userinfo"]["nickname"]
-    userEmail = request.session["user"]["userinfo"]["email"]
-    userType = "user"
-    updated = timezone.now()
-    try:
-        affected = Profile.objects.filter(subID=userID).update(name=userName, email=userEmail, role=userType, updatedWhen=updated)
-        
-    except (Exception) as error:
-        print(error)
-        return HttpResponse(error, status=500)
-    return HttpResponse("Worked")
+    if "user" in request.session:
+        userID = request.session["user"]["userinfo"]["sub"]
+        userName = request.session["user"]["userinfo"]["nickname"]
+        userEmail = request.session["user"]["userinfo"]["email"]
+        userType = request.session["usertype"]
+        updated = timezone.now()
+        try:
+            affected = Profile.objects.filter(subID=userID).update(name=userName, email=userEmail, role=userType, updatedWhen=updated)
+            
+        except (Exception) as error:
+            print(error)
+            return HttpResponse(error, status=500)
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=401)
 
 ##############################################
 def deleteUser(request):

@@ -1,6 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 from django.http import JsonResponse
+import os
 
 def testQuery(request):
     """
@@ -12,24 +13,15 @@ def testQuery(request):
     :rtype: ?
 
     """
-
-    sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+    # maybe construct first, save that to redis and then search/filter from that
+    sparql = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem")
+    sparql.setCredentials(user=os.environ.get("SPARQLUSERNAME"), passwd=os.environ.get("SPARQLPW"))
     sparql.setReturnFormat(JSON)
     sparql.setQuery("""
-    PREFIX dbo: <http://dbpedia.org/ontology/>
-    PREFIX sdo: <https://schema.org/>
-
-    CONSTRUCT {
-      ?lang a sdo:Language ;
-      sdo:alternateName ?iso6391Code .
-    }
-    WHERE {
-      ?lang a dbo:Language ;
-      dbo:iso6391Code ?iso6391Code .
-      FILTER (STRLEN(?iso6391Code)=2) # to filter out non-valid values
-    }
-    LIMIT 3
+   SELECT *
+   where {?s ?p ?o}
+   LIMIT 100
     """)
 
     results = sparql.queryAndConvert()
-    return JsonResponse(results["results"]["bindings"])
+    return JsonResponse(results["results"]["bindings"], safe=False)

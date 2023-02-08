@@ -80,6 +80,7 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
+    request.session["usertype"] = request.headers["Usertype"]
     uri = oauth.auth0.authorize_redirect(
         request, request.build_absolute_uri(reverse("callbackLogin"))
     )

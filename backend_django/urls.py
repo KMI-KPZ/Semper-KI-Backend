@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files
 
 
 paths = {
@@ -32,9 +32,10 @@ paths = {
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
-    "updateUser": "private/profile_updateUser/",
+    "updateUser": "public/updateUser/",
     "testQuery": "private/testquery/",
-    "isLoggedIn": "public/isLoggedIn/"
+    "isLoggedIn": "public/isLoggedIn/",
+    "testRedis": "private/testRedis/"
 }
 
 
@@ -59,5 +60,6 @@ urlpatterns = [
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateUser"], profiles.updateUser, name="updateUser"),
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
-    path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn")
+    path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+    path(paths["testRedis"], files.testRedis, name="testRedis")
 ]

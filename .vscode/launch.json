@@ -15,6 +15,9 @@
                 ],
                 "projectType": "django",
                 "justMyCode": false,
+                "autoReload": {
+                    "enable": true
+                }
             }
         }
     ],
