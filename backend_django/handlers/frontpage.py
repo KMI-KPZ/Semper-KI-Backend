@@ -22,6 +22,7 @@ def landingPage(request):
             #"pretty": json.dumps(request.session.get("user"), indent=4),
         #},
     )
+
 #######################################################
 def docPage(request):
     """

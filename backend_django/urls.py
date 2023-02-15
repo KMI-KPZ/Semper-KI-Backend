@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics
 
 
 paths = {
@@ -33,15 +33,22 @@ paths = {
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
     "updateUser": "public/updateUser/",
+    "updateRole": "public/updateRole/",
     "testQuery": "private/testquery/",
     "isLoggedIn": "public/isLoggedIn/",
-    "testRedis": "private/testRedis/"
+    "testRedis": "private/testRedis/",
+    "uploadTemporary": "public/uploadFiles/",
+    "retrieveFilesTEST": "private/retrieveFiles/",
+    "getDatabase" : "admin/getData/",
+    "statistics": "public/getStatistics/"
 }
 
 
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
+    path(paths["getDatabase"], profiles.getAll, name="getDatabase"),
+    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics"),
     re_path(r'^public/doc', frontpage.docPage, name="docPage"),
     path(paths["test"], test_response.testResponse, name='test_response'),
     path(paths["csrfTest"], test_response.testResponseCsrf, name='test_response_csrf'),
@@ -59,7 +66,10 @@ urlpatterns = [
     path(paths["addUser"], profiles.addUser, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateUser"], profiles.updateUser, name="updateUser"),
+    path(paths["updateRole"], profiles.updateRole, name="updateRole"),
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
-    path(paths["testRedis"], files.testRedis, name="testRedis")
+    path(paths["testRedis"], files.testRedis, name="testRedis"),
+    path(paths["uploadTemporary"], files.uploadFileTemporary, name="uploadFiles"),
+    path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles")
 ]

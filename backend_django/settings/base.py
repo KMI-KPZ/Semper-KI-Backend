@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
-
+from session_cleanup.settings import weekly_schedule
 
 # Load environment definition file
 ENV_FILE = find_dotenv()
@@ -65,7 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'backend_django'
+    'backend_django',
+    'session_cleanup'
 ]
 
 MIDDLEWARE = [
@@ -158,3 +159,8 @@ AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 # REDIS
 REDIS_HOST = "host.docker.internal"
 REDIS_PORT = 6379
+
+# Session cleanup
+CELERYBEAT_SCHEDULE = {
+    'session_cleanup': weekly_schedule
+}

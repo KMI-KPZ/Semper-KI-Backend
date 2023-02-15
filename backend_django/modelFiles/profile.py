@@ -23,7 +23,7 @@ class Profile(models.Model):
 
     ###################################################
     def __str__(self):
-        return self.subID + " " + self.name + " " + self.email + " " + self.role + " " + self.createdWhen + " " + self.updatedWhen + " " + self.accessedWhen
+        return self.subID + " " + self.name + " " + self.email + " " + self.role + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
 
     ###################################################
     def toDict(self):

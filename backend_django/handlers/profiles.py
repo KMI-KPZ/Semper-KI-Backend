@@ -1,9 +1,10 @@
-import json
+import json, os
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import psycopg2
 from django.db import models
 from django.utils import timezone
+from urllib.parse import unquote
 
 from ..modelFiles.profile import Profile
 #from ..models import Profile
@@ -59,11 +60,18 @@ def addUser(request):
     userType = request.session["usertype"]
     updated = timezone.now()
     try:
-        obj, created = Profile.objects.get_or_create(subID=userID, name=userName, email=userEmail, role=userType, defaults={'updatedWhen': updated})
-        
+        # first get, then create
+        result = Profile.objects.get(subID=userID)
+        if result.role != userType:
+            Profile.objects.filter(subID=userID).update(role=userType)
     except (Exception) as error:
         print(error)
-        return HttpResponse(error, status=500)
+        try:
+            Profile.objects.create(subID=userID, name=userName, email=userEmail, role=userType, updatedWhen=updated) 
+        except (Exception) as error:
+            print(error)
+            return HttpResponse(error, status=500)
+        pass
     return HttpResponse("Worked")
 
 ##############################################
@@ -92,6 +100,102 @@ def updateUser(request):
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=401)
+
+##############################################
+def updateRole(request):
+    """
+    Update user role.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    if "user" in request.session:
+        userID = request.session["user"]["userinfo"]["sub"]
+        userType = request.session["usertype"]
+        if userType == "admin": # disallow admin
+            return HttpResponse("Failed", status=401)
+
+        updated = timezone.now()
+        try:
+            affected = Profile.objects.filter(subID=userID).update(role=userType, updatedWhen=updated)
+            
+        except (Exception) as error:
+            print(error)
+            return HttpResponse(error, status=500)
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=401)
+
+##############################################
+# def makeAdmin(request):
+#     """
+#     Make user an admin if the passphrase is correct.
+
+#     :param request: POST request
+#     :type request: HTTP POST
+#     :return: HTTP response
+#     :rtype: HTTP status
+
+#     """
+#     if request.method == "POST":
+#         if "user" in request.session:
+#             if "numberOfTriesToBeAdmin" in request.session:
+#                 if request.session["numberOfTriesToBeAdmin"] > 10:
+#                     return HttpResponse("Too many tries!", status=429)
+#                 else:
+#                     request.session["numberOfTriesToBeAdmin"] += 1
+#             else:
+#                 request.session["numberOfTriesToBeAdmin"] = 1
+#             body = request.body.decode("UTF-8")
+#             passphraseIndex = body.find("passphrase")
+#             passphrase = unquote(body[passphraseIndex:].lstrip("passphrase="))
+#             if passphrase == os.environ.get("DJANGO_SECRET"):
+#                 userID = request.session["user"]["userinfo"]["sub"]
+#                 updated = timezone.now()
+#                 try:
+#                     Profile.objects.filter(subID=userID).update(role="admin", updatedWhen=updated)
+#                 except (Exception) as error:
+#                     print(error)
+#                     return HttpResponse(error, status=500)
+#                 return HttpResponse("Worked")
+#             else:
+#                 return HttpResponse("Wrong password", status=403)
+#         else:
+#             return HttpResponse("Not logged in", status=401)
+#     return HttpResponse("Wrong method", status=405)
+
+##############################################
+def getAll(request):
+    """
+    Drop all information (of the DB) about all users for admin view.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: JSON response containing all entries of users
+    :rtype: JSON Respone
+
+    """
+    if "user" in request.session:
+        userID = request.session["user"]["userinfo"]["sub"]
+        try:
+            obj = Profile.objects.get(subID=userID).toDict()
+        except (Exception) as error:
+            print(error)
+            return HttpResponse("User not found", status=404)
+        if obj["type"] == "admin":
+            # get all information if you're an admin
+            allEntries = Profile.objects.all()
+            dictionaries = [ entry.toDict() for entry in allEntries ]
+            dictionaries = { "userList" : dictionaries }
+            return JsonResponse(dictionaries, safe=False)
+        else:
+            return HttpResponse("Not an admin!", status=401)
+    else:
+        return HttpResponse("Not logged in", status=401)
+
 
 ##############################################
 def deleteUser(request):

@@ -6,6 +6,7 @@ from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 from .profiles import addUser, getUser
+from .files import redis_instance
 
 oauth = OAuth()
 
@@ -60,7 +61,11 @@ def isLoggedIn(request):
     :return: True if the token is valid or False if not
     :rtype: Bool
     """
+    # Initialize session if not done already to generate session key
+    if "initialized" not in request.session:
+        request.session["initialized"] = True
 
+    # Check if user is already logged in
     if "user" in request.session:
         if checkIfTokenExpired(request.session["user"]):
             return HttpResponse("Successful",status=200)
@@ -100,10 +105,14 @@ def callbackLogin(request):
 
     """
     token = oauth.auth0.authorize_access_token(request)
+
     # convert expiration time to the corresponding date and time
     now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
     request.session["user"] = token
     request.session["user"]["tokenExpiresOn"] = str(now)
+    if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+        if request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"][0] == "semper-admin":
+            request.session["usertype"] = "admin"
     
     # Get Data from Database or create entry in it for logged in User
     addUser(request)
@@ -152,6 +161,12 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
+    # Delete saved files from redis
+    try:
+        redis_instance.delete(request.session.session_key)
+    except:
+        pass
+
     request.session.clear()
     request.session.flush()
 
