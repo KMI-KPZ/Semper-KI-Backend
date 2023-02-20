@@ -46,7 +46,7 @@ def checkIfTokenExpired(token):
     :return: True if the token is valid or False if not
     :rtype: Bool
     """
-    test = datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00")
+    
     if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
         return False
     return True
@@ -111,8 +111,9 @@ def callbackLogin(request):
     request.session["user"] = token
     request.session["user"]["tokenExpiresOn"] = str(now)
     if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
-        if request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"][0] == "semper-admin":
-            request.session["usertype"] = "admin"
+        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+            if request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"][0] == "semper-admin":
+                request.session["usertype"] = "admin"
     
     # Get Data from Database or create entry in it for logged in User
     addUser(request)
