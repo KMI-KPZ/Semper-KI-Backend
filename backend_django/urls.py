@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 
 from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics
+from Benchy.BenchyMcMarkface import startFromDjango
 
 
 paths = {
@@ -40,13 +41,17 @@ paths = {
     "uploadTemporary": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
     "getDatabase" : "admin/getData/",
-    "statistics": "public/getStatistics/"
+    "statistics": "public/getStatistics/",
+    "benchyPage": "private/benchy/",
+    "benchyMcMarkface": "private/benchyMcMarkface/"
 }
 
 
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
+    path(paths["benchyPage"], frontpage.benchyPage, name="benchy"),
+    path(paths["benchyMcMarkface"], startFromDjango, name="benchyMcMarkface"),
     path(paths["getDatabase"], profiles.getAll, name="getDatabase"),
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics"),
     re_path(r'^public/doc', frontpage.docPage, name="docPage"),

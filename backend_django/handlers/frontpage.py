@@ -24,6 +24,26 @@ def landingPage(request):
     )
 
 #######################################################
+def benchyPage(request):
+    """
+    Landing page for the benchmark tool
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Rendered page
+    :rtype: None
+
+    """
+    return render(
+        request,
+        "benchy.html"#,
+        #context={
+        #    "session": request.session.get("user"),
+            #"pretty": json.dumps(request.session.get("user"), indent=4),
+        #},
+    )
+
+#######################################################
 def docPage(request):
     """
     Documentation page for the backend

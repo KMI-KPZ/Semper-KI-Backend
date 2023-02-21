@@ -3,6 +3,7 @@ import numpy as np
 import asyncio
 import time
 import aiohttp
+from django.http import HttpResponse
 
 # BenchyMcMarkface is a script that can be used to benchmark a website
 # Needed as parameters: 
@@ -20,7 +21,11 @@ async def request(url):
 
 #############################################
 async def runLoop(url, paths):
-    return await request(url + np.random.choice(paths))
+    start = time.time()
+    path = np.random.choice(paths)
+    await request(url + path)
+    end = time.time()
+    return (path, end-start)
 
 #############################################
 async def main(argv):
@@ -31,7 +36,46 @@ async def main(argv):
     await asyncio.gather(*[runLoop(url, paths) for i in range(numOfCalls)])
     
 #############################################
-start = time.time()
-asyncio.run(main(sys.argv[1:]))
-end = time.time()
-print("TOE:", (end-start) * 10**3, "ms")
+async def mainDjango(argv):
+    url = argv[0]
+    paths = argv[1].read().decode("UTF-8").splitlines()
+    numOfCalls = int(argv[2])
+
+    start = time.time()
+    results = await asyncio.gather(*[runLoop(url, paths) for i in range(numOfCalls)])
+    end = time.time()
+    timediff = (end-start) * 10**3
+    resDict = {}
+    for entry in results:
+        path = entry[0]
+        resTime = entry[1]
+        if path in resDict:
+            resDict[path][0] += resTime
+            resDict[path][1] += 1
+        else:
+            resDict[path] = [resTime, 1]
+    
+    resList = list(resDict.items())
+    sorted(resList, reverse=True, key=lambda elem: elem[0])
+
+    outStr = "Results:\nTime in total: " + str(timediff) + " ms\n Paths and average times:\n"
+    for elem in resList:
+        print(elem)
+        outStr += elem[0] + " " + str(elem[1][0]/elem[1][1] * 10**3) + " ms\n"
+    return outStr
+    
+#############################################
+def startFromDjango(request):
+    numOfCalls = request.POST["NumberOfCalls"]
+    url = request.POST["URL"]
+    paths = request.FILES.get("PathFile")
+
+    outStr = asyncio.run(mainDjango([url, paths, numOfCalls]))
+    return HttpResponse(outStr,content_type="text/plain")
+
+
+#############################################
+#start = time.time()
+#asyncio.run(main(sys.argv[1:]))
+#end = time.time()
+#print("TOE:", (end-start) * 10**3, "ms")
