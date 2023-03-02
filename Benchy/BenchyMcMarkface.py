@@ -52,16 +52,16 @@ async def mainDjango(argv):
         if path in resDict:
             resDict[path][0] += resTime
             resDict[path][1] += 1
+            resDict[path][2].append(resTime)
         else:
-            resDict[path] = [resTime, 1]
+            resDict[path] = [resTime, 1, [resTime]]
     
     resList = list(resDict.items())
-    sorted(resList, reverse=True, key=lambda elem: elem[0])
+    sorted(resList, reverse=False, key=lambda elem: elem[1][0]/elem[1][1])
 
-    outStr = "Results:\nTime in total: " + str(timediff) + " ms\n Paths and average times:\n"
+    outStr = "Results:\nTime in total: " + str(timediff) + " ms\n Paths, median, average times:\n"
     for elem in resList:
-        print(elem)
-        outStr += elem[0] + " " + str(elem[1][0]/elem[1][1] * 10**3) + " ms\n"
+        outStr += elem[0] + " " + str(np.median(elem[1][2]) * 10**3) + " ms " + str(elem[1][0]/elem[1][1] * 10**3) + " ms\n"
     return outStr
     
 #############################################

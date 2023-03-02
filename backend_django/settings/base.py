@@ -159,6 +159,11 @@ AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 # REDIS
 REDIS_HOST = "host.docker.internal"
 REDIS_PORT = 6379
+REDIS_PASSWORD = os.environ.get("REDISPW")
+
+# SPARQL
+SPARQL_USERNAME = os.environ.get("SPARQLUSERNAME")
+SPARQL_PASSWORD = os.environ.get("SPARQLPW")
 
 # Session cleanup
 CELERYBEAT_SCHEDULE = {

@@ -1,24 +1,25 @@
 import json, datetime
-from authlib.integrations.django_client import OAuth
 from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
-from .profiles import addUser, getUser
-from .files import redis_instance
+from ..services import redis, postgres, oauth
 
-oauth = OAuth()
+#######################################################
+def checkIfTokenValid(token):
+    """
+    Check whether the token of a user has expired and a new login is necessary
 
-oauth.register(
-    "auth0",
-    client_id=settings.AUTH0_CLIENT_ID,
-    client_secret=settings.AUTH0_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
-)
+    :param request: User session token
+    :type request: Dictionary
+    :return: True if the token is valid or False if not
+    :rtype: Bool
+    """
+    
+    if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
+        return False
+    return True
 
 #######################################################
 def checkIfUserIsLoggedIn(request):
@@ -32,24 +33,12 @@ def checkIfUserIsLoggedIn(request):
     """
 
     if "user" in request.session:
-        return True
+        if checkIfTokenValid(request.session["user"]):
+            return True
+        else:
+            return False
     else:
         return False
-
-#######################################################
-def checkIfTokenExpired(token):
-    """
-    Check whether the token of a user has expired and a new login is necessary
-
-    :param request: User session token
-    :type request: Dictionary
-    :return: True if the token is valid or False if not
-    :rtype: Bool
-    """
-    
-    if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
-        return False
-    return True
 
 #######################################################
 def isLoggedIn(request):
@@ -67,7 +56,7 @@ def isLoggedIn(request):
 
     # Check if user is already logged in
     if "user" in request.session:
-        if checkIfTokenExpired(request.session["user"]):
+        if checkIfTokenValid(request.session["user"]):
             return HttpResponse("Successful",status=200)
         else:
             return HttpResponse("Failed",status=200)
@@ -85,10 +74,11 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
-    request.session["usertype"] = request.headers["Usertype"]
-    uri = oauth.auth0.authorize_redirect(
-        request, request.build_absolute_uri(reverse("callbackLogin"))
-    )
+    if "Usertype" not in request.headers:
+        request.session["usertype"] = "indefinite"
+    else:
+        request.session["usertype"] = request.headers["Usertype"]
+    uri = oauth.authorizeRedirect(request, reverse("callbackLogin"))
     # return uri
     return HttpResponse(uri.url)
 
@@ -104,33 +94,30 @@ def callbackLogin(request):
     :rtype: HTTP Link as redirect
 
     """
-    token = oauth.auth0.authorize_access_token(request)
+    # authorize callback token
+    token = oauth.authorizeToken(request)
 
     # convert expiration time to the corresponding date and time
     now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
     request.session["user"] = token
     request.session["user"]["tokenExpiresOn"] = str(now)
+
+    # check if person is admin
     if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
         if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
             if request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"][0] == "semper-admin":
                 request.session["usertype"] = "admin"
     
     # Get Data from Database or create entry in it for logged in User
-    addUser(request)
+    postgres.addUser(request.session)
 
-    # token = json.dumps(token)
-    #uri = request.build_absolute_uri(reverse("index"))
+    # Create redirect url
     if settings.PRODUCTION:
         forward_url = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
         forward_url = request.build_absolute_uri('http://127.0.0.1:3000')
         
-    response = HttpResponseRedirect(forward_url)
-    #response["user"] = token # This doesnt work
-    # response.set_cookie("authToken", value=token)
-    return response
-    #return redirect(forward_url, data=token)
-    # return redirect(request.build_absolute_uri(reverse("index")))
+    return HttpResponseRedirect(forward_url)
 
 #######################################################
 def getAuthInformation(request):
@@ -144,10 +131,10 @@ def getAuthInformation(request):
     :rtype: Json
 
     """
-    # TODO check if cookies are expired
+
     if checkIfUserIsLoggedIn(request):
         # Read user details from Database
-        return JsonResponse(getUser(request))
+        return JsonResponse(postgres.getUser(request.session))
     else:
         return JsonResponse({}, status=401)
 
@@ -163,10 +150,7 @@ def logoutUser(request):
 
     """
     # Delete saved files from redis
-    try:
-        redis_instance.delete(request.session.session_key)
-    except:
-        pass
+    redis.deleteKey(request.session.session_key)
 
     request.session.clear()
     request.session.flush()
@@ -186,6 +170,5 @@ def logoutUser(request):
         callbackString = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
         callbackString = request.build_absolute_uri('http://127.0.0.1:3000')
-        
-    response = HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
-    return response
+
+    return HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))

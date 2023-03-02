@@ -1,13 +1,15 @@
-import redis, json, os, pickle
-from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
-redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=os.environ.get("REDISPW"))
+from ..services import redis
+
+# TODO: DB: hash filepath from user id, create folder, connect user id and filepath and save into postgres
+# TODO: Upload: get file, save into redis with session id as key
+# TODO: Save file: get file from frontend, encode with user id, get filepath from postgres and save file
 
 #######################################################
 def testRedis(request):
     """
-    Save a key:value in redis and retrieve it to test if it works
+    Save a key:value in redis and retrieve it to test if it works.
 
     :param request: request
     :type request: HTTP GET
@@ -15,18 +17,11 @@ def testRedis(request):
     :rtype: JSON
 
     """
-    redis_instance.set("testkey", "testvalue")
-    redis_instance.expire("testkey", 10)
+    redis.addContent("testkey", "testvalue")
     if request.method == "GET":
-        items = {}
-        count = 0
-        for key in redis_instance.keys("*"):
-            items[key.decode("utf-8")] = (redis_instance.get(key)).decode("utf-8")
-            count += 1
+        result = redis.retrieveContent("testkey")
         response = {
-            'count': count,
-            'msg': f"Found {count} items.",
-            'items': items
+            'result': result,
         }
         return JsonResponse(response, status=200)
     # elif request.method == "POST":
@@ -39,15 +34,10 @@ def testRedis(request):
     #     }
     #     return JsonResponse(response, 201)
 
-# TODO: DB: hash filepath from user id, create folder, connect user id and filepath and save into postgres
-# TODO: Upload: get file, save into redis with session id as key
-# TODO: Save file: get file from frontend, encode with user id, get filepath from postgres and save file
-
 #######################################################
 def uploadFileTemporary(request):
-    # TODO: delete key:file pair after submit
     """
-    File upload for temporary use, save into redis
+    File upload for temporary use, save into redis.
 
     :param request: request
     :type request: HTTP POST
@@ -58,20 +48,18 @@ def uploadFileTemporary(request):
     if request.method == "POST":
         key = request.session.session_key
         files = request.FILES.getlist('File')
-        try:
-            redis_instance.set(key, pickle.dumps(files))
-            redis_instance.expire(key, 86400) # 24 hours until deletion of the file
+        returnVal = redis.addContent(key, files)
+        if returnVal is True:
             return HttpResponse("Success", status=200)
-        except (Exception) as error:
-            print(error)
-            return HttpResponse(error, status=500)
+        else:
+            return HttpResponse(returnVal, status=500)
     
     return HttpResponse("Wrong request method!", status=405)
 
 #######################################################
 def getUploadedFiles(session_key):
     """
-    Retrieve temporary files from redis
+    Retrieve temporary files from redis.
 
     :param session_key: session_key of user
     :type request: string
@@ -79,9 +67,11 @@ def getUploadedFiles(session_key):
     :rtype: binary
 
     """
-    files = pickle.loads(redis_instance.get(session_key))
-    redis_instance.delete(session_key)
-    return files
+    (contentOrError, Flag) = redis.retrieveContent(session_key)
+    if Flag is True:
+        return contentOrError
+    else:
+        return None
 
 #######################################################
 def testGetUploadedFiles(request):

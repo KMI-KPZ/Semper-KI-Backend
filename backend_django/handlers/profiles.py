@@ -7,30 +7,30 @@ from django.utils import timezone
 from urllib.parse import unquote
 
 from ..modelFiles.profile import Profile
-#from ..models import Profile
 
-#TODO: switch to async versions at some point
+from ..services import postgres
 
 ##############################################
-def getUser(request):
+def addUserTest(request):
     """
-    Check whether a user exists or not.
+    Same as addUser but for testing.
 
     :param request: GET request
     :type request: HTTP GET
-    :return: User details from database
-    :rtype: Dictionary
+    :return: HTTP response
+    :rtype: HTTP status
 
     """
-    userID = request.session["user"]["userinfo"]["sub"]
-    obj = {}
-    try:
-        obj = Profile.objects.get(subID=userID).toDict()
-    except (Exception) as error:
-        print(error)
+    if "user" in request.session:
+        flag = postgres.addUser(request.session)
+        if flag is True:
+            return HttpResponse("Worked")
+        else:
+            return HttpResponse("Failed", status=500)
+    else:
+        return HttpResponse("Failed", status=401)
 
-    return obj
-
+##############################################
 def getUserTest(request):
     """
     Same as getUser but for testing.
@@ -41,65 +41,7 @@ def getUserTest(request):
     :rtype: JSON
 
     """
-    return JsonResponse(getUser(request))
-
-##############################################
-def addUser(request):
-    """
-    Add user if the entry doesn't already exists.
-
-    :param request: POST request with session
-    :type request: HTTP POST
-    :return: HTTP response (only used for tests)
-    :rtype: HTTP Status
-
-    """
-    userID = request.session["user"]["userinfo"]["sub"]
-    userName = request.session["user"]["userinfo"]["nickname"]
-    userEmail = request.session["user"]["userinfo"]["email"]
-    userType = request.session["usertype"]
-    updated = timezone.now()
-    try:
-        # first get, then create
-        result = Profile.objects.get(subID=userID)
-        if result.role != userType:
-            Profile.objects.filter(subID=userID).update(role=userType)
-    except (Exception) as error:
-        print(error)
-        try:
-            Profile.objects.create(subID=userID, name=userName, email=userEmail, role=userType, updatedWhen=updated) 
-        except (Exception) as error:
-            print(error)
-            return HttpResponse(error, status=500)
-        pass
-    return HttpResponse("Worked")
-
-##############################################
-def updateUser(request):
-    """
-    Update user details.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: HTTP response
-    :rtype: HTTP status
-
-    """
-    if "user" in request.session:
-        userID = request.session["user"]["userinfo"]["sub"]
-        userName = request.session["user"]["userinfo"]["nickname"]
-        userEmail = request.session["user"]["userinfo"]["email"]
-        userType = request.session["usertype"]
-        updated = timezone.now()
-        try:
-            affected = Profile.objects.filter(subID=userID).update(name=userName, email=userEmail, role=userType, updatedWhen=updated)
-            
-        except (Exception) as error:
-            print(error)
-            return HttpResponse(error, status=500)
-        return HttpResponse("Worked")
-    else:
-        return HttpResponse("Failed", status=401)
+    return JsonResponse(postgres.getUser(request.session))
 
 ##############################################
 def updateRole(request):
@@ -113,21 +55,58 @@ def updateRole(request):
 
     """
     if "user" in request.session:
-        userID = request.session["user"]["userinfo"]["sub"]
-        userType = request.session["usertype"]
-        if userType == "admin": # disallow admin
-            return HttpResponse("Failed", status=401)
-
-        updated = timezone.now()
-        try:
-            affected = Profile.objects.filter(subID=userID).update(role=userType, updatedWhen=updated)
-            
-        except (Exception) as error:
-            print(error)
-            return HttpResponse(error, status=500)
-        return HttpResponse("Worked")
+        flag = postgres.updateRole(request.session)
+        if flag is True:
+            return HttpResponse("Worked")
+        else:
+            return HttpResponse("Failed", status=500)
     else:
         return HttpResponse("Failed", status=401)
+
+##############################################
+def deleteUser(request):
+    """
+    Deletes an entry in the database corresponding to user name.
+
+    :param request: DELETE request
+    :type request: HTTP DELETE
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    
+    flag = postgres.deleteUser(request.session)
+    if flag is True:
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=500)
+
+# ##############################################
+# def updateUser(request):
+#     """
+#     Update user details.
+
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: HTTP response
+#     :rtype: HTTP status
+
+#     """
+#     if "user" in request.session:
+#         userID = request.session["user"]["userinfo"]["sub"]
+#         userName = request.session["user"]["userinfo"]["nickname"]
+#         userEmail = request.session["user"]["userinfo"]["email"]
+#         userType = request.session["usertype"]
+#         updated = timezone.now()
+#         try:
+#             affected = Profile.objects.filter(subID=userID).update(name=userName, email=userEmail, role=userType, updatedWhen=updated)
+            
+#         except (Exception) as error:
+#             print(error)
+#             return HttpResponse(error, status=500)
+#         return HttpResponse("Worked")
+#     else:
+#         return HttpResponse("Failed", status=401)
 
 ##############################################
 # def makeAdmin(request):
@@ -168,54 +147,34 @@ def updateRole(request):
 #     return HttpResponse("Wrong method", status=405)
 
 ##############################################
-def getAll(request):
-    """
-    Drop all information (of the DB) about all users for admin view.
+# def getAll(request):
+#     """
+#     Drop all information (of the DB) about all users for admin view.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: JSON response containing all entries of users
-    :rtype: JSON Respone
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: JSON response containing all entries of users
+#     :rtype: JSON Respone
 
-    """
-    if "user" in request.session:
-        userID = request.session["user"]["userinfo"]["sub"]
-        try:
-            obj = Profile.objects.get(subID=userID).toDict()
-        except (Exception) as error:
-            print(error)
-            return HttpResponse("User not found", status=404)
-        if obj["type"] == "admin":
-            # get all information if you're an admin
-            allEntries = Profile.objects.all()
-            dictionaries = [ entry.toDict() for entry in allEntries ]
-            dictionaries = { "userList" : dictionaries }
-            return JsonResponse(dictionaries, safe=False)
-        else:
-            return HttpResponse("Not an admin!", status=401)
-    else:
-        return HttpResponse("Not logged in", status=401)
+#     """
+#     if "user" in request.session:
+#         userID = request.session["user"]["userinfo"]["sub"]
+#         try:
+#             obj = Profile.objects.get(subID=userID).toDict()
+#         except (Exception) as error:
+#             print(error)
+#             return HttpResponse("User not found", status=404)
+#         if obj["type"] == "admin":
+#             # get all information if you're an admin
+#             allEntries = Profile.objects.all()
+#             dictionaries = [ entry.toDict() for entry in allEntries ]
+#             dictionaries = { "userList" : dictionaries }
+#             return JsonResponse(dictionaries, safe=False)
+#         else:
+#             return HttpResponse("Not an admin!", status=401)
+#     else:
+#         return HttpResponse("Not logged in", status=401)
 
-
-##############################################
-def deleteUser(request):
-    """
-    Deletes an entry in the database corresponding to user name.
-
-    :param request: DELETE request
-    :type request: HTTP DELETE
-    :return: HTTP response
-    :rtype: HTTP status
-
-    """
-    userID = request.session["user"]["userinfo"]["sub"]
-    try:
-        affected = Profile.objects.filter(subID=userID).delete()
-        
-    except (Exception) as error:
-        print(error)
-        return HttpResponse(error, status=500)
-    return HttpResponse("Worked")
 
 # #############################################################
 # dbSettings = {
