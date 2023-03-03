@@ -25,3 +25,5 @@ DATABASES = {
         "PORT": 5432,  # default postgres port
     }
 }
+
+REDIS_HOST = "files"

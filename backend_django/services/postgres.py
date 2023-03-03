@@ -47,7 +47,6 @@ def addUser(session):
         if result.role != userType:
             Profile.objects.filter(subID=userID).update(role=userType)
     except (Exception) as error:
-        print(error)
         try:
             Profile.objects.create(subID=userID, name=userName, email=userEmail, role=userType, updatedWhen=updated) 
         except (Exception) as error:
