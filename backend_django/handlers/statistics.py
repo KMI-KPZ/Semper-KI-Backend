@@ -1,6 +1,7 @@
 from django.contrib.sessions.models import Session
 from django.utils import timezone
-from django.http import JsonResponse
+from django.conf import settings
+from django.http import JsonResponse, HttpResponse
 import asyncio
 import time
 from functools import reduce
@@ -59,3 +60,28 @@ def getNumberOfUsers(request):
     
     output = {"active": numOfActiveSessions, "loggedIn": numOfLoggedInUsers}
     return JsonResponse(output)
+
+
+##############################################
+def getIpAdress(request):
+    """
+    Get the IP Adress of any request and write it to a log file
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Response with f you
+    :rtype: HTTPResponse
+
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    
+    accessTime = timezone.now()
+    with open(str(settings.BASE_DIR) + "/logs/ip_log.txt", 'a') as ipLogFile:
+        ipLogFile.write(str(accessTime) + "\t" + request.path + "\t" + ip + "\n")
+        ipLogFile.close()
+    
+    return HttpResponse("fu")

@@ -78,5 +78,6 @@ urlpatterns = [
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadTemporary"], files.uploadFileTemporary, name="uploadFiles"),
-    path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles")
+    path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
+    re_path(r'^.*', statistics.getIpAdress, name="everythingElse")
 ]

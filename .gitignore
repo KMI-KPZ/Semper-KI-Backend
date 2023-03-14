@@ -133,3 +133,5 @@ postgres/
 backend_django/env_example.env
 
 #doc/build/html/
+
+/logs/*
