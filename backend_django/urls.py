@@ -29,8 +29,10 @@ paths = {
     "logout": "public/logout/",
     "callback": "public/callback/",
     "getUser": "public/getUser/",
-    "getData": 'public/getProcessData/',
+    "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
+    "getMaterials": 'public/getMaterials/',
+    "getPostProcessing": 'public/getPostProcessing/',
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
@@ -44,7 +46,8 @@ paths = {
     "getDatabase" : "admin/getData/",
     "statistics": "public/getStatistics/",
     "benchyPage": "private/benchy/",
-    "benchyMcMarkface": "private/benchyMcMarkface/"
+    "benchyMcMarkface": "private/benchyMcMarkface/",
+    "getMaterials": "public/getMaterials/"
 }
 
 
@@ -63,8 +66,10 @@ urlpatterns = [
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
-    path(paths["getData"], filter.getData, name='getData'),
+    path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getFilters"], filter.getFilters, name='getFilters'),
+    path(paths["getMaterials"], filter.getMaterials, name='getMaterials'),
+    path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
