@@ -1,8 +1,10 @@
 import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone
 
-from ..services import cmem
+from .files import getUploadedFiles
+from ..services import cmem, stl
 
 
 #######################################################
@@ -74,7 +76,28 @@ def getProcessData(request):
     filters.update(mockMaterials())
     filters.update(mockPostProcessing())
 
+    # TODO: gzip this 
     return JsonResponse(filters)
+
+#######################################################
+def getUploadedModel(file):
+    """
+    Get uploaded model
+
+    :return: uploaded model
+    :rtype: Dictionary
+
+    """
+
+    models = {"models": []}
+    model = {"title": "", "tags": [], "date": "1800-01-01", "license": "", "certificate": [], "URI": ""}
+    
+    now = timezone.now()
+    binaryJpg = stl.stlToJpg(file[1])
+    model = {"title": file[0], "tags": [], "date": str(now.year)+"-"+str(now.month)+"-"+str(now.day), "license": "", "certificate": [], "URI": str(binaryJpg)}
+
+    models["models"].append(model)
+    return model
 
 #######################################################
 def getModels(request):
@@ -89,15 +112,22 @@ def getModels(request):
     """
     # get filters set by user
     filters = json.loads(request.body.decode("utf-8"))
-    # Filter name is in question -> title, selected stuff is in "answer"
-    filtersForSparql = []
-    for entry in filters["filters"]:
-        filtersForSparql.append([entry["question"]["title"], entry["answer"]])
-    #TODO ask via sparql with most general filter and then iteratively filter response
+
+    # if user uploaded a file, show that instead
+    response = getUploadedFiles(request.session.session_key)
+    if response is not None:
+        filters.update(getUploadedModel(response))
+    else:
+        # Filter name is in question -> title, selected stuff is in "answer"
+        filtersForSparql = []
+        for entry in filters["filters"]:
+            filtersForSparql.append([entry["question"]["title"], entry["answer"]])
+        #TODO ask via sparql with most general filter and then iteratively filter response
+        
+        # mockup here:
+        filters.update(mockModels())
     
-    # mockup here:
-    filters.update(mockModels())
-    
+    # TODO: gzip this 
     return JsonResponse(filters)
 
 #######################################################
@@ -123,6 +153,7 @@ def getMaterials(request):
     # mockup here:
     filters.update(mockMaterials())
     
+    # TODO: gzip this 
     return JsonResponse(filters)
 
 #######################################################
@@ -147,6 +178,7 @@ def getPostProcessing(request):
     # mockup here:
     filters.update(mockPostProcessing())
     
+    # TODO: gzip this 
     return JsonResponse(filters)
 
 #######################################################
@@ -168,5 +200,5 @@ def getFilters(request):
         filtersForSparql.append([entry["question"]["title"], entry["answer"]])
     #TODO ask via sparql with most general filter and then iteratively filter response
     
-    
+    # TODO: gzip this 
     return JsonResponse(filters)

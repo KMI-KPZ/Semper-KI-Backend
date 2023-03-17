@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder
 from Benchy.BenchyMcMarkface import startFromDjango
 
 
@@ -31,6 +31,7 @@ paths = {
     "getUser": "public/getUser/",
     "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
+    "getModels": 'public/getModels/',
     "getMaterials": 'public/getMaterials/',
     "getPostProcessing": 'public/getPostProcessing/',
     "deleteUser": "public/profileDeleteUser/",
@@ -47,7 +48,9 @@ paths = {
     "statistics": "public/getStatistics/",
     "benchyPage": "private/benchy/",
     "benchyMcMarkface": "private/benchyMcMarkface/",
-    "getMaterials": "public/getMaterials/"
+    "getMaterials": "public/getMaterials/",
+    "updateCart": "public/updateCart/",
+    "checkPrintability": "public/checkPrintability"
 }
 
 
@@ -56,33 +59,44 @@ urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
     path(paths["benchyPage"], frontpage.benchyPage, name="benchy"),
     path(paths["benchyMcMarkface"], startFromDjango, name="benchyMcMarkface"),
-    #path(paths["getDatabase"], profiles.getAll, name="getDatabase"),
-    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics"),
+
     re_path(r'^public/doc', frontpage.docPage, name="docPage"),
+
     path(paths["test"], test_response.testResponse, name='test_response'),
     path(paths["csrfTest"], test_response.testResponseCsrf, name='test_response_csrf'),
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
+    path('private/test/', test_response.testResponse, name='test_response'),
+
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
+    path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
+    path(paths["getModels"], filter.getModels, name='getModels'),
     path(paths["getFilters"], filter.getFilters, name='getFilters'),
     path(paths["getMaterials"], filter.getMaterials, name='getMaterials'),
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
+
+    path(paths["updateCart"], checkOrder.updateCart, name='updateCart'),
+    path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
+
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
-    path('private/test/', test_response.testResponse, name='test_response'),
     path(paths["addUser"], profiles.addUserTest, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     #path(paths["updateUser"], profiles.updateUserTest, name="updateUser"),
     path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
-    path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+    
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadTemporary"], files.uploadFileTemporary, name="uploadFiles"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
+    
+    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics"),
     re_path(r'^.*', statistics.getIpAdress, name="everythingElse")
 ]

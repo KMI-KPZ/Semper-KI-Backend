@@ -47,8 +47,9 @@ def uploadFileTemporary(request):
     """
     if request.method == "POST":
         key = request.session.session_key
-        files = request.FILES.getlist('File')
-        returnVal = redis.addContent(key, files)
+        fileName = list(request.FILES.keys())[0]
+        files = request.FILES.getlist(fileName)[0]
+        returnVal = redis.addContent(key, (fileName, files))
         if returnVal is True:
             return HttpResponse("Success", status=200)
         else:
