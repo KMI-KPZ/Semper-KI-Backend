@@ -1,4 +1,4 @@
-import json, random
+import json, random, base64
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -94,7 +94,10 @@ def getUploadedModel(file):
     
     now = timezone.now()
     binaryJpg = stl.stlToJpg(file[1])
-    model = {"title": file[0], "tags": [], "date": str(now.year)+"-"+str(now.month)+"-"+str(now.day), "license": "", "certificate": [], "URI": str(binaryJpg)}
+    b64Jpg = base64.b64encode(binaryJpg)
+    model = {"title": file[0], "tags": [], "date": str(now.year)+"-"+str(now.month)+"-"+str(now.day), "license": "", "certificate": [], "URI": str(b64Jpg)}
+
+    # stl.binToJpg(b64Jpg) # sanity check
 
     models["models"].append(model)
     return model
