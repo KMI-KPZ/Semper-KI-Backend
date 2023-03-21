@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.conf import settings
 
 from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder
 from Benchy.BenchyMcMarkface import startFromDjango
-
+from django.conf.urls.static import static
 
 paths = {
     "landingPage": "",
@@ -50,6 +51,7 @@ paths = {
     "benchyMcMarkface": "private/benchyMcMarkface/",
     "getMaterials": "public/getMaterials/",
     "updateCart": "public/updateCart/",
+    "getCart": "public/getCart/",
     "checkPrintability": "public/checkPrintability"
 }
 
@@ -80,6 +82,7 @@ urlpatterns = [
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
 
     path(paths["updateCart"], checkOrder.updateCart, name='updateCart'),
+    path(paths["getCart"], checkOrder.getCart, name='getCart'),
     path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
@@ -97,6 +100,7 @@ urlpatterns = [
     path(paths["uploadTemporary"], files.uploadFileTemporary, name="uploadFiles"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
     
-    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics"),
-    re_path(r'^.*', statistics.getIpAdress, name="everythingElse")
-]
+    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+
+urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))

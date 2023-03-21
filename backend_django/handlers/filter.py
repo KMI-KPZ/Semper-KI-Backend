@@ -6,18 +6,28 @@ from django.utils import timezone
 from .files import getUploadedFiles
 from ..services import cmem, stl
 
+#######################################################
+class mockPicture():
+    picturePath = "/public/static/media/testpicture.jpg"
 
+    def __init__(self):
+        if settings.PRODUCTION:
+            self.backend_url = 'https://backend.semper-ki.org'
+        else:
+            self.backend_url = 'http://127.0.0.1:8000'
+        self.mockPicturePath = self.backend_url+self.picturePath
+
+testpicture = mockPicture()
 #######################################################
 def mockModels():
-    tags = ["tag1", "tag2", "tag3", "tag4"]
+
+    tags = ["Tag1", "Tag2", "Tag3", "Tag4"]
     licenses = ["MIT", "GNU GPLv3", "Apache 2.0", "Corporate"]
     certificates = ["ISO1", "ISO2", "ISO3"]
-    URIs = ["https://i0.wp.com/letsprint3d.net/wp-content/uploads/2017/04/benchy.jpg?resize=663%2C373&ssl=1","https://cdn.thingiverse.com/assets/66/33/72/e5/71/featured_preview_pika2.jpg", "https://cdn.thingiverse.com/assets/53/4d/bc/af/d8/featured_preview_IMG_20200405_112754.jpg"]
-
     models = {"models": []}
     for i in range(20):
         models["models"].append(
-            {"title": "testmodel " + str(i), "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": random.choice(URIs)}
+            {"title": "testmodel " + str(i), "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": testpicture.mockPicturePath}
         )
     return models
 
@@ -25,13 +35,12 @@ def mockModels():
 def mockMaterials():
     materials = {"materials": []}
 
-    materials["materials"].append({"title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1662649964/gallery/New%20images/Revised/ABS.jpg"})
-    materials["materials"].append({"title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1663921490/gallery/New%20images/Revised/PLA.jpg"})
-    materials["materials"].append({"title": "Nylon", "propList": ["Strong", "Lightweight", "Partially flexible", "Heat resistant", "Impact resistant"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1662650032/gallery/New%20images/Revised/SLS_PA12.jpg"})
-    materials["materials"].append({"title": "Standard resin", "propList": ["High resolution", "Smooth"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1662649994/gallery/New%20images/Revised/Highb_detail_resin.jpg"})
-    materials["materials"].append({"title": "Polyurethane resin", "propList": ["Long-term durability", "UV stable", "Sterilizability"], "URI": "https://i0.wp.com/i.all3dp.com/wp-content/uploads/2016/08/27050929/Formlabs-Form-2-Build.jpg?ssl=1"})
-    materials["materials"].append({"title": "Titanium", "propList": ["Lightweight", "Strong", "Heat resistant"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1662650037/gallery/New%20images/Revised/Titanium_raw.jpg"})
-    materials["materials"].append({"title": "Stainless steel", "propList": ["Strong", "Resistant to corrosion", "High ductility"], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1662649951/gallery/New%20images/Revised/17-4_PH_SS.jpg"})
+    materials["materials"].append({"title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"title": "Standard resin", "propList": ["High resolution", "Smooth"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"title": "Polyurethane resin", "propList": ["Long-term durability", "UV stable", "Sterilizability"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"title": "Titanium", "propList": ["Lightweight", "Strong", "Heat resistant"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"title": "Stainless steel", "propList": ["Strong", "Resistant to corrosion", "High ductility"], "URI": testpicture.mockPicturePath})
     
     return materials
 
@@ -43,11 +52,11 @@ def mockPostProcessing():
     processingOptions = ["selection", "number", "text"]
 
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i), "checked": False, "selectedValue": "", "valueList": [random.choice(possibleValues) for j in range(random.randint(1,3))], "type": processingOptions[0], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/gallery/pla.jpg"})
+        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i), "checked": False, "selectedValue": "", "valueList": [random.choice(possibleValues) for j in range(random.randint(1,3))], "type": processingOptions[0], "URI": testpicture.mockPicturePath})
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+3), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[1], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/gallery/sanded_pla.jpg"})
+        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+3), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[1], "URI": testpicture.mockPicturePath})
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+6), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[2], "URI": "https://res.cloudinary.com/all3dp/image/upload/w_550,q_90,f_auto/v1661938321/gallery/New%20images/SLS_polished.jpg"})
+        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+6), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[2], "URI": testpicture.mockPicturePath})
 
 
     return postProcessing
