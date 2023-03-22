@@ -1,4 +1,4 @@
-import json, random, base64
+import json, random, base64, hashlib
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
@@ -26,23 +26,26 @@ def mockModels():
     certificates = ["ISO1", "ISO2", "ISO3"]
     models = {"models": []}
     for i in range(20):
+        title = "testmodel " + str(i)
         models["models"].append(
-            {"title": "testmodel " + str(i), "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": testpicture.mockPicturePath}
+            {"id": hashlib.md5(title.encode()).hexdigest() ,"title": title, "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": testpicture.mockPicturePath}
         )
     return models
+modelMock = mockModels()
 
 #######################################################
 def mockMaterials():
     materials = {"materials": []}
 
-    materials["materials"].append({"title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": testpicture.mockPicturePath})
-    materials["materials"].append({"title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": testpicture.mockPicturePath})
-    materials["materials"].append({"title": "Standard resin", "propList": ["High resolution", "Smooth"], "URI": testpicture.mockPicturePath})
-    materials["materials"].append({"title": "Polyurethane resin", "propList": ["Long-term durability", "UV stable", "Sterilizability"], "URI": testpicture.mockPicturePath})
-    materials["materials"].append({"title": "Titanium", "propList": ["Lightweight", "Strong", "Heat resistant"], "URI": testpicture.mockPicturePath})
-    materials["materials"].append({"title": "Stainless steel", "propList": ["Strong", "Resistant to corrosion", "High ductility"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"ABS").hexdigest(), "title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"PLA").hexdigest(),"title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"Standard resin").hexdigest(),"title": "Standard resin", "propList": ["High resolution", "Smooth"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"Polyurethane resin").hexdigest(),"title": "Polyurethane resin", "propList": ["Long-term durability", "UV stable", "Sterilizability"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"Titanium").hexdigest(),"title": "Titanium", "propList": ["Lightweight", "Strong", "Heat resistant"], "URI": testpicture.mockPicturePath})
+    materials["materials"].append({"id": hashlib.md5(b"Stainless steel").hexdigest(),"title": "Stainless steel", "propList": ["Strong", "Resistant to corrosion", "High ductility"], "URI": testpicture.mockPicturePath})
     
     return materials
+materialMock = mockMaterials()
 
 #######################################################
 def mockPostProcessing():
@@ -52,14 +55,17 @@ def mockPostProcessing():
     processingOptions = ["selection", "number", "text"]
 
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i), "checked": False, "selectedValue": "", "valueList": [random.choice(possibleValues) for j in range(random.randint(1,3))], "type": processingOptions[0], "URI": testpicture.mockPicturePath})
+        title = "postProcessing " + str(i)
+        postProcessing["postProcessing"].append({"id": hashlib.md5(title.encode()).hexdigest(), "title": title, "checked": False, "selectedValue": "", "valueList": [random.choice(possibleValues) for j in range(random.randint(1,3))], "type": processingOptions[0], "URI": testpicture.mockPicturePath})
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+3), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[1], "URI": testpicture.mockPicturePath})
+        title = "postProcessing " + str(i+3)
+        postProcessing["postProcessing"].append({"id": hashlib.md5(title.encode()).hexdigest(), "title": title, "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[1], "URI": testpicture.mockPicturePath})
     for i in range(3):
-        postProcessing["postProcessing"].append({"title": "postProcessing " + str(i+6), "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[2], "URI": testpicture.mockPicturePath})
-
+        title = "postProcessing " + str(i+6)
+        postProcessing["postProcessing"].append({"id": hashlib.md5(title.encode()).hexdigest(), "title": title, "checked": False, "selectedValue": "", "valueList": [], "type": processingOptions[2], "URI": testpicture.mockPicturePath})
 
     return postProcessing
+postProcessingMock = mockPostProcessing()
 
 #######################################################
 def getProcessData(request):
@@ -81,9 +87,9 @@ def getProcessData(request):
     #TODO ask via sparql with most general filter and then iteratively filter response
     
     # mockup here:
-    filters.update(mockModels())
-    filters.update(mockMaterials())
-    filters.update(mockPostProcessing())
+    filters.update(modelMock)
+    filters.update(materialMock)
+    filters.update(postProcessingMock)
 
     # TODO: gzip this 
     return JsonResponse(filters)
@@ -137,7 +143,7 @@ def getModels(request):
         #TODO ask via sparql with most general filter and then iteratively filter response
         
         # mockup here:
-        filters.update(mockModels())
+        filters.update(modelMock)
     
     # TODO: gzip this 
     return JsonResponse(filters)
@@ -163,7 +169,7 @@ def getMaterials(request):
 
 
     # mockup here:
-    filters.update(mockMaterials())
+    filters.update(materialMock)
     
     # TODO: gzip this 
     return JsonResponse(filters)
@@ -188,7 +194,7 @@ def getPostProcessing(request):
     #TODO ask via sparql with most general filter and then iteratively filter response
 
     # mockup here:
-    filters.update(mockPostProcessing())
+    filters.update(postProcessingMock)
     
     # TODO: gzip this 
     return JsonResponse(filters)

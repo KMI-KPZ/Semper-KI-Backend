@@ -52,7 +52,9 @@ paths = {
     "getMaterials": "public/getMaterials/",
     "updateCart": "public/updateCart/",
     "getCart": "public/getCart/",
-    "checkPrintability": "public/checkPrintability"
+    "checkPrintability": "public/checkPrintability",
+    "checkPrices": "public/checkPrice",
+    "checkLogistics": "public/checkLogistics"
 }
 
 
@@ -84,6 +86,8 @@ urlpatterns = [
     path(paths["updateCart"], checkOrder.updateCart, name='updateCart'),
     path(paths["getCart"], checkOrder.getCart, name='getCart'),
     path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
+    path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
+    path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),

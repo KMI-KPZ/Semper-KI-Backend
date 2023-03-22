@@ -57,7 +57,11 @@ def retrieveContent(key, deleteOrNot=False):
 
     """
     try:
-        content = pickle.loads(redis_instance.get(key))
+        retrievedContent = redis_instance.get(key)
+        if retrievedContent is not None:
+            content = pickle.loads(retrievedContent)
+        else:
+            return ("", False)
     except (Exception) as error:
         print(error)
         return (error, False)
