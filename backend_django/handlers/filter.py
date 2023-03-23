@@ -33,7 +33,7 @@ def getProcessData(request):
     return JsonResponse(filters)
 
 #######################################################
-def getUploadedModel(file):
+def getUploadedModel(files):
     """
     Get uploaded model
 
@@ -41,14 +41,14 @@ def getUploadedModel(file):
     :rtype: Dictionary
 
     """
-
     models = {"models": []}
-    model = mocks.getEmptyMockModel()
-    model["id"] = file[0]
-    model["title"] = file[1]
-    model["URI"] = file[2]
+    for entry in files:
+        model = mocks.getEmptyMockModel()
+        model["id"] = entry[0]
+        model["title"] = entry[1]
+        model["URI"] = entry[2]
 
-    models["models"].append(model)
+        models["models"].append(model)
     return model
 
 #######################################################
@@ -66,7 +66,7 @@ def getModels(request):
     filters = json.loads(request.body.decode("utf-8"))
 
     # if user uploaded a file, show that instead
-    response = getUploadedFiles(request.session.session_key)[0] # TODO: select correct model via id
+    response = getUploadedFiles(request.session.session_key) # TODO: select correct model via id
     if response is not None:
         filters.update(getUploadedModel(response))
     else:

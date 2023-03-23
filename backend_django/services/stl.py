@@ -7,7 +7,7 @@ from PIL import Image
 import base64
 
 #######################################################
-def stlToBinJpg(file) -> str:
+async def stlToBinJpg(file) -> str:
     """
     Convert stl file to jpg
 

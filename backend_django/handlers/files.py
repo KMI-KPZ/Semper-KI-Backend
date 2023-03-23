@@ -1,4 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+import asyncio
 
 from ..services import crypto, redis, stl, mocks
 
@@ -57,6 +58,12 @@ def uploadFileTemporary(request):
     return HttpResponse("Wrong request method!", status=405)
 
 #######################################################
+async def createPreviewForOneFile(inMemoryFile):
+    return await stl.stlToBinJpg(inMemoryFile)
+
+async def createPreview(listOfFiles, fileNames):
+    return await asyncio.gather(*[createPreviewForOneFile(listOfFiles.getlist(fileName)[0]) for fileName in fileNames])
+
 def uploadModels(request):
     """
     File(s) upload for temporary use, save into redis. File(s) are 3D models
@@ -72,18 +79,19 @@ def uploadModels(request):
         fileNames = list(request.FILES.keys())
         files = []
         models = {"models": []}
-        for name in fileNames:
-            id = crypto.generateMD5(name + crypto.generateSalt())
 
-            binaryPreview = stl.stlToBinJpg(request.FILES.getlist(name)[0])
+        previews = asyncio.run(createPreview(request.FILES, fileNames))
+
+        for idx, name in enumerate(fileNames):
+            id = crypto.generateMD5(name + crypto.generateSalt())
 
             model = mocks.getEmptyMockModel()
             model["id"] = id
             model["title"] = name
-            model["URI"] = binaryPreview
+            model["URI"] = previews[idx]
             models["models"].append(model)
 
-            files.append( (id, name, binaryPreview, request.FILES.getlist(name)) )
+            files.append( (id, name, previews[idx], request.FILES.getlist(name)) )
 
         returnVal = redis.addContent(key, files)
         if returnVal is not True:

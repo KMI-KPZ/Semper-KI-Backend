@@ -43,7 +43,7 @@ paths = {
     "testQuery": "private/testquery/",
     "isLoggedIn": "public/isLoggedIn/",
     "testRedis": "private/testRedis/",
-    "uploadModels": "public/uploadModels/",
+    "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
     "retrieveFilesTEST": "private/retrieveFiles/",
     "getDatabase" : "admin/getData/",
     "statistics": "public/getStatistics/",
