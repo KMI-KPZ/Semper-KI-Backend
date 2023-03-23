@@ -46,7 +46,7 @@ def getUploadedModel(files):
         model = mocks.getEmptyMockModel()
         model["id"] = entry[0]
         model["title"] = entry[1]
-        model["URI"] = entry[2]
+        model["URI"] = str(entry[2])
 
         models["models"].append(model)
     return model

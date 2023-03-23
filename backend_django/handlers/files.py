@@ -88,8 +88,10 @@ def uploadModels(request):
             model = mocks.getEmptyMockModel()
             model["id"] = id
             model["title"] = name
-            model["URI"] = previews[idx]
+            model["URI"] = str(previews[idx])
             models["models"].append(model)
+
+            # stl.binToJpg(previews[idx])
 
             files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
 

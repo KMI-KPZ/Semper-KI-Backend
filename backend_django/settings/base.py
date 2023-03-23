@@ -144,7 +144,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR,'backend_django','static','public')
+STATIC_ROOT = os.path.join(BASE_DIR,'backend_django','static')
 STATIC_URL = 'public/static/'
 
 # Default primary key field type
@@ -161,6 +161,7 @@ AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
 REDIS_HOST = "host.docker.internal"
 REDIS_PORT = 6379
 REDIS_PASSWORD = os.environ.get("REDISPW")
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024
 
 # SPARQL
 SPARQL_USERNAME = os.environ.get("SPARQLUSERNAME")

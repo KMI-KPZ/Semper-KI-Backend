@@ -39,7 +39,7 @@ async def stlToBinJpg(file) -> str:
     convertedJpg = io.BytesIO()
     # pyplot.savefig(convertedJpg, format="jpg", bbox_inches='tight', pad_inches = 0) # too slow
     img.save(convertedJpg, format="jpeg", bbox_inches='tight')
-    return str(base64.b64encode(convertedJpg.getvalue()))
+    return base64.b64encode(convertedJpg.getvalue())
 
 #######################################################
 def binToJpg(binaryString):
@@ -52,5 +52,5 @@ def binToJpg(binaryString):
     """
     decoded = base64.b64decode(binaryString)
     img = Image.open(io.BytesIO(decoded))
-    img.save("test2.jpg")
+    img.save("test.jpg")
         
