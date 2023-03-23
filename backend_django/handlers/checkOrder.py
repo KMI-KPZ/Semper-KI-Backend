@@ -2,7 +2,7 @@ import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
-from ..services import redis
+from ..services import redis, mocks
 
 #######################################################
 def updateCart(request):
@@ -70,33 +70,6 @@ def checkPrintability(request):
     return HttpResponse("Printable")
 
 #######################################################
-def mockPrices(selection):
-    mockFactors = {"materials": {
-                "ABS": 1,
-                "PLA": 2,
-                "Standard resin": 3,
-                "Polyurethane resin": 4,
-                "Titanium": 5,
-                "Stainless steel": 6
-            },
-            "postProcessing": {
-                "postProcessing1": 1,
-                "postProcessing2": 2,
-                "postProcessing3": 3
-            }
-    }
-
-    mockPrices = {
-        "material": mockFactors["materials"][selection["materials"]["title"]] * 10,
-        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 5,
-        "logistics": random.randint(1,100)
-    }
-
-    mockPrices["totalPrice"] = mockPrices["material"] + mockPrices["postProcessing"]
-
-    return mockPrices
-
-#######################################################
 def checkPrice(request):
     """
     Check how much that'll cost
@@ -113,7 +86,7 @@ def checkPrice(request):
     (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
-        model = contentOrError
+        model = contentOrError[3]
     else:
         # if not, get selected model
         model = selected["model"]
@@ -123,34 +96,7 @@ def checkPrice(request):
 
     # TODO: use calculation service
 
-    return JsonResponse(mockPrices(selected))
-
-#######################################################
-def mockLogistics(selection):
-    mockFactors = {"materials": {
-                "ABS": 1,
-                "PLA": 2,
-                "Standard resin": 3,
-                "Polyurethane resin": 4,
-                "Titanium": 5,
-                "Stainless steel": 6
-            },
-            "postProcessing": {
-                "postProcessing1": 1,
-                "postProcessing2": 2,
-                "postProcessing3": 3
-            }
-    }
-
-    mockTimes = {
-        "material": mockFactors["materials"][selection["materials"]["title"]] * 5,
-        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 1,
-        "delivery": random.randint(1,10)
-    }
-
-    mockTimes["production"] = mockTimes["material"] + mockTimes["postProcessing"]
-
-    return mockTimes
+    return JsonResponse(mocks.mockPrices(selected))
 
 #######################################################
 def checkLogistics(request):
@@ -169,7 +115,7 @@ def checkLogistics(request):
     (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
-        model = contentOrError
+        model = contentOrError[3]
     else:
         # if not, get selected model
         model = selected["model"]
@@ -179,4 +125,4 @@ def checkLogistics(request):
 
     # TODO: use calculation service
 
-    return JsonResponse(mockLogistics(selected))
+    return JsonResponse(mocks.mockLogistics(selected))

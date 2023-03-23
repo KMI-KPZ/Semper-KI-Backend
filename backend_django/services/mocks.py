@@ -13,7 +13,7 @@ Contains: Mockups for various stuff
 
 #######################################################
 class mockPicture():
-    picturePath = "/public/static/media/testpicture.jpg"
+    picturePath = "/public/static/public/media/testpicture.jpg"
 
     def __init__(self):
         if settings.PRODUCTION:
@@ -78,3 +78,56 @@ def mockPostProcessing():
     return postProcessing
 postProcessingMock = mockPostProcessing()
 
+#######################################################
+def mockPrices(selection):
+    mockFactors = {"materials": {
+                "ABS": 1,
+                "PLA": 2,
+                "Standard resin": 3,
+                "Polyurethane resin": 4,
+                "Titanium": 5,
+                "Stainless steel": 6
+            },
+            "postProcessing": {
+                "postProcessing1": 1,
+                "postProcessing2": 2,
+                "postProcessing3": 3
+            }
+    }
+
+    mockPrices = {
+        "material": mockFactors["materials"][selection["materials"]["title"]] * 10,
+        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 5,
+        "logistics": random.randint(1,100)
+    }
+
+    mockPrices["totalPrice"] = mockPrices["material"] + mockPrices["postProcessing"]
+
+    return mockPrices
+
+#######################################################
+def mockLogistics(selection):
+    mockFactors = {"materials": {
+                "ABS": 1,
+                "PLA": 2,
+                "Standard resin": 3,
+                "Polyurethane resin": 4,
+                "Titanium": 5,
+                "Stainless steel": 6
+            },
+            "postProcessing": {
+                "postProcessing1": 1,
+                "postProcessing2": 2,
+                "postProcessing3": 3
+            }
+    }
+
+    mockTimes = {
+        "material": mockFactors["materials"][selection["materials"]["title"]] * 5,
+        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 1,
+        "delivery": random.randint(1,10)
+    }
+
+    mockTimes["production"] = mockTimes["material"] + mockTimes["postProcessing"]
+
+    return mockTimes

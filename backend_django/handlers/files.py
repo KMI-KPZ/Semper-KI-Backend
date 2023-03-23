@@ -47,7 +47,7 @@ def uploadFileTemporary(request):
         fileNames = list(request.FILES.keys())[0]
         files = []
         for name in fileNames:
-            files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)) )
+            files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)[0]) )
 
         returnVal = redis.addContent(key, files)
         if returnVal is True:
@@ -91,7 +91,7 @@ def uploadModels(request):
             model["URI"] = previews[idx]
             models["models"].append(model)
 
-            files.append( (id, name, previews[idx], request.FILES.getlist(name)) )
+            files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
 
         returnVal = redis.addContent(key, files)
         if returnVal is not True:
