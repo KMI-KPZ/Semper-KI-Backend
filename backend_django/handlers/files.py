@@ -1,10 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
-from ..services import redis
-
-# TODO: DB: hash filepath from user id, create folder, connect user id and filepath and save into postgres
-# TODO: Upload: get file, save into redis with session id as key
-# TODO: Save file: get file from frontend, encode with user id, get filepath from postgres and save file
+from ..services import crypto, redis, stl, mocks
 
 #######################################################
 def testRedis(request):
@@ -47,13 +43,54 @@ def uploadFileTemporary(request):
     """
     if request.method == "POST":
         key = request.session.session_key
-        fileName = list(request.FILES.keys())[0]
-        files = request.FILES.getlist(fileName)[0]
-        returnVal = redis.addContent(key, (fileName, files))
+        fileNames = list(request.FILES.keys())[0]
+        files = []
+        for name in fileNames:
+            files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)) )
+
+        returnVal = redis.addContent(key, files)
         if returnVal is True:
             return HttpResponse("Success", status=200)
         else:
             return HttpResponse(returnVal, status=500)
+    
+    return HttpResponse("Wrong request method!", status=405)
+
+#######################################################
+def uploadModels(request):
+    """
+    File(s) upload for temporary use, save into redis. File(s) are 3D models
+
+    :param request: request
+    :type request: HTTP POST
+    :return: Response with mock model of uploaded file
+    :rtype: HTTPResponse
+
+    """
+    if request.method == "POST":
+        key = request.session.session_key
+        fileNames = list(request.FILES.keys())
+        files = []
+        models = {"models": []}
+        for name in fileNames:
+            id = crypto.generateMD5(name + crypto.generateSalt())
+
+            binaryPreview = stl.stlToBinJpg(request.FILES.getlist(name)[0])
+
+            model = mocks.getEmptyMockModel()
+            model["id"] = id
+            model["title"] = name
+            model["URI"] = binaryPreview
+            models["models"].append(model)
+
+            files.append( (id, name, binaryPreview, request.FILES.getlist(name)) )
+
+        returnVal = redis.addContent(key, files)
+        if returnVal is not True:
+            return HttpResponse(returnVal, status=500)
+
+        return JsonResponse(models)
+
     
     return HttpResponse("Wrong request method!", status=405)
 

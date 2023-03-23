@@ -7,14 +7,14 @@ from PIL import Image
 import base64
 
 #######################################################
-def stlToJpg(file):
+def stlToBinJpg(file) -> str:
     """
     Convert stl file to jpg
 
-    :param request: open file from redis
-    :type request: binary string
+    :param file: open file from redis
+    :type file: binary file
     :return: jpg for rendering
-    :rtype: JPG as binary string
+    :rtype: JPG as base64 encoded binary string
 
     """
     # Create a new plot
@@ -39,7 +39,7 @@ def stlToJpg(file):
     convertedJpg = io.BytesIO()
     # pyplot.savefig(convertedJpg, format="jpg", bbox_inches='tight', pad_inches = 0) # too slow
     img.save(convertedJpg, format="jpeg", bbox_inches='tight')
-    return convertedJpg.getvalue()
+    return str(base64.b64encode(convertedJpg.getvalue()))
 
 #######################################################
 def binToJpg(binaryString):

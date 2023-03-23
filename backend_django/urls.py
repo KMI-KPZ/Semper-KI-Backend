@@ -43,7 +43,7 @@ paths = {
     "testQuery": "private/testquery/",
     "isLoggedIn": "public/isLoggedIn/",
     "testRedis": "private/testRedis/",
-    "uploadTemporary": "public/uploadFiles/",
+    "uploadModels": "public/uploadModels/",
     "retrieveFilesTEST": "private/retrieveFiles/",
     "getDatabase" : "admin/getData/",
     "statistics": "public/getStatistics/",
@@ -101,7 +101,7 @@ urlpatterns = [
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
     
     path(paths["testRedis"], files.testRedis, name="testRedis"),
-    path(paths["uploadTemporary"], files.uploadFileTemporary, name="uploadFiles"),
+    path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
     
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
