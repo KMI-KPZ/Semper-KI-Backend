@@ -57,9 +57,9 @@ paths = {
     "getMaterials": "public/getMaterials/",
     "updateCart": "public/updateCart/",
     "getCart": "public/getCart/",
-    "checkPrintability": "public/checkPrintability",
-    "checkPrices": "public/checkPrice",
-    "checkLogistics": "public/checkLogistics"
+    "checkPrintability": "public/checkPrintability/",
+    "checkPrices": "public/checkPrices/",
+    "checkLogistics": "public/checkLogistics/"
 }
 
 

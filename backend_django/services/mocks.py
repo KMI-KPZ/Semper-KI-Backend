@@ -90,21 +90,23 @@ def mockPrices(selection):
                 "Stainless steel": 6
             },
             "postProcessing": {
-                "postProcessing1": 1,
-                "postProcessing2": 2,
-                "postProcessing3": 3
+                "postProcessing 0": 1,
+                "postProcessing 1": 2,
+                "postProcessing 2": 3,
+                "postProcessing 3": 4
             }
     }
 
     mockPrices = {
-        "material": mockFactors["materials"][selection["materials"]["title"]] * 10,
-        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 5,
+        "material": mockFactors["materials"][selection["material"]["title"]] * 10,
+        "postProcessing": mockFactors["postProcessing"][selection["postProcessings"][0]["title"]] * 5,
         "logistics": random.randint(1,100)
     }
 
     mockPrices["totalPrice"] = mockPrices["material"] + mockPrices["postProcessing"]
 
-    return mockPrices
+    return mockPrices["totalPrice"]
+    #return mockPrices
 
 #######################################################
 def mockLogistics(selection):
@@ -117,18 +119,19 @@ def mockLogistics(selection):
                 "Stainless steel": 6
             },
             "postProcessing": {
-                "postProcessing1": 1,
-                "postProcessing2": 2,
-                "postProcessing3": 3
+                "postProcessing 0": 1,
+                "postProcessing 1": 2,
+                "postProcessing 2": 3,
+                "postProcessing 3": 4
             }
     }
 
     mockTimes = {
-        "material": mockFactors["materials"][selection["materials"]["title"]] * 5,
-        "postProcessing": mockFactors["postProcessing"][selection["postProcessing"]["title"]] * 1,
+        "material": mockFactors["materials"][selection["material"]["title"]] * 5,
+        "postProcessing": mockFactors["postProcessing"][selection["postProcessings"][0]["title"]] * 1,
         "delivery": random.randint(1,10)
     }
 
     mockTimes["production"] = mockTimes["material"] + mockTimes["postProcessing"]
-
-    return mockTimes
+    return mockTimes["production"] + mockTimes["delivery"]
+    #return mockTimes

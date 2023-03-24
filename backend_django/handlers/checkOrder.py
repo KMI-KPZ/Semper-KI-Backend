@@ -68,10 +68,10 @@ def checkPrintability(request):
         model = contentOrError
     else:
         # if not, get selected model
-        model = selected["models"]
+        model = selected["cart"][0]["model"]
     
-    material = selected["materials"]
-    postProcessing = selected["postProcessing"]
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
     # TODO: use simulation service
 
     # return success or failure
@@ -94,17 +94,18 @@ def checkPrice(request):
     (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
-        model = contentOrError[3]
+        model = contentOrError
     else:
         # if not, get selected model
-        model = selected["model"]
+        model = selected["cart"][0]["model"]
     
-    material = selected["materials"]
-    postProcessing = selected["postProcessing"]
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
 
     # TODO: use calculation service
 
-    return JsonResponse(mocks.mockPrices(selected))
+    #return JsonResponse(mocks.mockPrices(selected["cart"][0]))
+    return HttpResponse(mocks.mockPrices(selected["cart"][0]))
 
 #######################################################
 def checkLogistics(request):
@@ -123,14 +124,15 @@ def checkLogistics(request):
     (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
-        model = contentOrError[3]
+        model = contentOrError
     else:
         # if not, get selected model
-        model = selected["model"]
+        model = selected["cart"][0]["model"]
     
-    material = selected["materials"]
-    postProcessing = selected["postProcessing"]
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
 
     # TODO: use calculation service
 
-    return JsonResponse(mocks.mockLogistics(selected))
+    #return JsonResponse(mocks.mockLogistics(selected["cart"][0]))
+    return HttpResponse(mocks.mockLogistics(selected["cart"][0]))
