@@ -1,3 +1,12 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Further settings for development mode
+"""
+
+
 from .base import *
 
 # Database

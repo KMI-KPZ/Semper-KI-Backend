@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Model for user profiles
+"""
+
 from django.db import models
 
 # Table for regular Users

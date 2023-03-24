@@ -3,6 +3,15 @@
 
 .. py:module:: backend_django.handlers.profiles
 
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Handling of database requests
+
+
 
 Module Contents
 ---------------
@@ -13,22 +22,21 @@ Functions
 
 .. autoapisummary::
 
-   backend_django.handlers.profiles.getUser
+   backend_django.handlers.profiles.addUserTest
    backend_django.handlers.profiles.getUserTest
-   backend_django.handlers.profiles.addUser
-   backend_django.handlers.profiles.updateUser
+   backend_django.handlers.profiles.updateRole
    backend_django.handlers.profiles.deleteUser
 
 
 
-.. py:function:: getUser(request)
+.. py:function:: addUserTest(request)
 
-   Check whether a user exists or not.
+   Same as addUser but for testing.
 
    :param request: GET request
    :type request: HTTP GET
-   :return: User details from database
-   :rtype: Dictionary
+   :return: HTTP response
+   :rtype: HTTP status
 
 
 
@@ -43,20 +51,9 @@ Functions
 
 
 
-.. py:function:: addUser(request)
+.. py:function:: updateRole(request)
 
-   Add user if the entry doesn't already exists.
-
-   :param request: POST request with session
-   :type request: HTTP POST
-   :return: HTTP response (only used for tests)
-   :rtype: HTTP Status
-
-
-
-.. py:function:: updateUser(request)
-
-   Update user details.
+   Update user role.
 
    :param request: GET request
    :type request: HTTP GET

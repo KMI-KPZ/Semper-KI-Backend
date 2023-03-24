@@ -33,20 +33,123 @@
             
   <section id="module-backend_django.handlers.filter">
 <span id="backend-django-handlers-filter"></span><h1><a class="reference internal" href="#module-backend_django.handlers.filter" title="backend_django.handlers.filter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.handlers.filter</span></code></a><a class="headerlink" href="#module-backend_django.handlers.filter" title="Permalink to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Handling of frontend filters for models, materials and post processing</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getFilter" title="backend_django.handlers.filter.getFilter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFilter</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getProcessData" title="backend_django.handlers.filter.getProcessData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getProcessData</span></code></a>(request)</p></td>
+<td><p>Try to filter all according to json.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getUploadedModel" title="backend_django.handlers.filter.getUploadedModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUploadedModel</span></code></a>(files)</p></td>
+<td><p>Get uploaded model</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getModels" title="backend_django.handlers.filter.getModels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getModels</span></code></a>(request)</p></td>
+<td><p>Try to filter 3d-models according to json.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getMaterials" title="backend_django.handlers.filter.getMaterials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getMaterials</span></code></a>(request)</p></td>
+<td><p>Try to filter materials according to json.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getPostProcessing" title="backend_django.handlers.filter.getPostProcessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getPostProcessing</span></code></a>(request)</p></td>
+<td><p>Try to filter post processing according to json.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.filter.getFilters" title="backend_django.handlers.filter.getFilters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFilters</span></code></a>(request)</p></td>
 <td><p>Try to filter 3d-models according to json.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.filter.getFilter">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getFilter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getProcessData">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getProcessData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getProcessData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to filter all according to json.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – Json containing filters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Models accoding to filters via JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getUploadedModel">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getUploadedModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getUploadedModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get uploaded model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>files</strong> (<em>array</em><em> of </em><em>tuples</em>) – Saved files from redis</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>uploaded model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getModels">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to filter 3d-models according to json.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – Json containing filters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Models accoding to filters via JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getMaterials">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getMaterials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getMaterials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to filter materials according to json.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – Json containing filters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Materials accoding to filters via JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getPostProcessing">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getPostProcessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getPostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to filter post processing according to json.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – Json containing filters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Materials accoding to filters via JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.filter.getFilters">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.filter.</span></span><span class="sig-name descname"><span class="pre">getFilters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.filter.getFilters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to filter 3d-models according to json.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -120,7 +223,7 @@
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../../../_sources/autoapi/backend_django/handlers/filter/index.rst.txt"

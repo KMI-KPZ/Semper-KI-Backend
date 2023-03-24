@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Handling of database requests
+"""
+
 import json, os
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse

@@ -12,6 +12,7 @@ Subpackages
 
    handlers/index.rst
    modelFiles/index.rst
+   services/index.rst
    settings/index.rst
 
 

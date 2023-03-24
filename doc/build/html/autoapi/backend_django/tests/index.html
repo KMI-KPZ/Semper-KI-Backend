@@ -33,6 +33,9 @@
             
   <section id="module-backend_django.tests">
 <span id="backend-django-tests"></span><h1><a class="reference internal" href="#module-backend_django.tests" title="backend_django.tests"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.tests</span></code></a><a class="headerlink" href="#module-backend_django.tests" title="Permalink to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Tests for various functions and services</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
@@ -43,6 +46,9 @@
 <td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.tests.TestProfiles" title="backend_django.tests.TestProfiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestProfiles</span></code></a></p></td>
+<td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.tests.TestRedis" title="backend_django.tests.TestRedis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestRedis</span></code></a></p></td>
 <td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
 </tr>
 </tbody>
@@ -96,13 +102,32 @@ TransactionTestCase.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="backend_django.tests.TestProfiles.test_updateUser">
-<span class="sig-name descname"><span class="pre">test_updateUser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestProfiles.test_updateUser" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.tests.TestProfiles.test_updateUserType">
+<span class="sig-name descname"><span class="pre">test_updateUserType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestProfiles.test_updateUserType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="backend_django.tests.TestProfiles.test_deleteUser">
 <span class="sig-name descname"><span class="pre">test_deleteUser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestProfiles.test_deleteUser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.tests.TestRedis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.tests.</span></span><span class="sig-name descname"><span class="pre">TestRedis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestRedis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.test.TestCase</span></code></p>
+<p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve
+test isolation.</p>
+<p>In most situations, TestCase should be preferred to TransactionTestCase as
+it allows faster execution. However, there are some situations where using
+TransactionTestCase might be necessary (e.g. testing some transactional
+behavior).</p>
+<p>On database backends with no transaction support, TestCase behaves as
+TransactionTestCase.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestRedis.test_redis">
+<span class="sig-name descname"><span class="pre">test_redis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestRedis.test_redis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -166,7 +191,7 @@ TransactionTestCase.</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../../_sources/autoapi/backend_django/tests/index.rst.txt"

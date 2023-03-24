@@ -3,6 +3,15 @@
 
 .. py:module:: backend_django.handlers.test_response
 
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Handling test calls and getting a csrf cookie
+
+
 
 Module Contents
 ---------------

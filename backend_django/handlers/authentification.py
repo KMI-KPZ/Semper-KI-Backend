@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Authentification handling using Auth0
+"""
+
 import json, datetime
 from django.conf import settings
 from django.urls import reverse
@@ -11,8 +19,8 @@ def checkIfTokenValid(token):
     """
     Check whether the token of a user has expired and a new login is necessary
 
-    :param request: User session token
-    :type request: Dictionary
+    :param token: User session token
+    :type token: Dictionary
     :return: True if the token is valid or False if not
     :rtype: Bool
     """

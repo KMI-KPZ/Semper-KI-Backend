@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Handling of requests for statistics and ip logging
+"""
+
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.conf import settings
@@ -14,7 +22,7 @@ async def checkSession(session):
     Async check if user in session is logged in or not
 
     :param session: coded session dict
-    :type request: Dictionary
+    :type session: Dictionary
     :return: 1 or 0 if session is logged in or not
     :rtype: Integer
     """
@@ -29,8 +37,8 @@ async def getNumOfLoggedInUsers(activeSessions):
     """
     Async check how many users are currently logged in
 
-    :param session: sessions
-    :type request: hashtable 
+    :param activeSessions: sessions
+    :type activeSessions: hashtable 
     :return: number of logged in users
     :rtype: Integer
     """
@@ -65,7 +73,7 @@ def getNumberOfUsers(request):
 ##############################################
 def getIpAdress(request):
     """
-    Get the IP Adress of any request and write it to a log file
+    Get the IP Adress of any illegit request and write it to a log file
 
     :param request: GET request
     :type request: HTTP GET

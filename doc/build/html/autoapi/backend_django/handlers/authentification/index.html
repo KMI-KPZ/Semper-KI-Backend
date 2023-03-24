@@ -33,14 +33,23 @@
             
   <section id="module-backend_django.handlers.authentification">
 <span id="backend-django-handlers-authentification"></span><h1><a class="reference internal" href="#module-backend_django.handlers.authentification" title="backend_django.handlers.authentification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.handlers.authentification</span></code></a><a class="headerlink" href="#module-backend_django.handlers.authentification" title="Permalink to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Authentification handling using Auth0</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.checkIfUserIsLoggedIn" title="backend_django.handlers.authentification.checkIfUserIsLoggedIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIfUserIsLoggedIn</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.checkIfTokenValid" title="backend_django.handlers.authentification.checkIfTokenValid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIfTokenValid</span></code></a>(token)</p></td>
+<td><p>Check whether the token of a user has expired and a new login is necessary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.checkIfUserIsLoggedIn" title="backend_django.handlers.authentification.checkIfUserIsLoggedIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIfUserIsLoggedIn</span></code></a>(request)</p></td>
 <td><p>Check whether a user is logged in or not.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.isLoggedIn" title="backend_django.handlers.authentification.isLoggedIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isLoggedIn</span></code></a>(request)</p></td>
+<td><p>Check whether the token of a user has expired and a new login is necessary</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.loginUser" title="backend_django.handlers.authentification.loginUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loginUser</span></code></a>(request)</p></td>
 <td><p>Return a link for redirection to Auth0.</p></td>
@@ -56,20 +65,22 @@
 </tr>
 </tbody>
 </table>
-</section>
-<section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h3>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.oauth" title="backend_django.handlers.authentification.oauth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oauth</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py data">
-<dt class="sig sig-object py" id="backend_django.handlers.authentification.oauth">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">oauth</span></span><a class="headerlink" href="#backend_django.handlers.authentification.oauth" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.checkIfTokenValid">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">checkIfTokenValid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.checkIfTokenValid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the token of a user has expired and a new login is necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>token</strong> (<em>Dictionary</em>) – User session token</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the token is valid or False if not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="backend_django.handlers.authentification.checkIfUserIsLoggedIn">
@@ -81,6 +92,23 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if the user is logged in or False if not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.isLoggedIn">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">isLoggedIn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.isLoggedIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the token of a user has expired and a new login is necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>Dictionary</em>) – User session token</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the token is valid or False if not</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Bool</p>
@@ -217,7 +245,7 @@ Accesses the database and creates or gets user.</p>
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../../../_sources/autoapi/backend_django/handlers/authentification/index.rst.txt"

@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Test handler for sparql
+"""
+
 from django.http import JsonResponse
 
 from ..services import cmem

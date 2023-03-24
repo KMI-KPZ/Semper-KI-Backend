@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Handlers using simulation to check the orders
+"""
+
 import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse

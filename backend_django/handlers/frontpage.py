@@ -1,7 +1,13 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Views for some backend websites
+"""
+
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.conf import settings
-import os
 
 #######################################################
 def landingPage(request):

@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Services for oauth verification
+"""
+
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
 

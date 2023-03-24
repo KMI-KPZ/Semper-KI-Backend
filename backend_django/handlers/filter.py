@@ -1,6 +1,13 @@
-import json, base64
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Handling of frontend filters for models, materials and post processing
+"""
+
+import json
 from django.http import HttpResponse, JsonResponse
-from django.utils import timezone
 
 from .files import getUploadedFiles
 from ..services import cmem, mocks
@@ -37,6 +44,8 @@ def getUploadedModel(files):
     """
     Get uploaded model
 
+    :param files: Saved files from redis
+    :type files: array of tuples
     :return: uploaded model
     :rtype: Dictionary
 

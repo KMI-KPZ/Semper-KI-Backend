@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: File upload handling
+"""
+
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import asyncio
 
@@ -110,9 +118,9 @@ def getUploadedFiles(session_key):
     Retrieve temporary files from redis.
 
     :param session_key: session_key of user
-    :type request: string
-    :return: Files
-    :rtype: binary
+    :type session_key: string
+    :return: Saved content
+    :rtype: tuple
 
     """
     (contentOrError, Flag) = redis.retrieveContent(session_key)

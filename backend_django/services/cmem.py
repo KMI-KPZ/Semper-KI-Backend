@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Services for the sparql endpoint
+"""
+
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 

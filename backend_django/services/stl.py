@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Services for generating a preview of stl files
+"""
+
 import io, time
 from stl import mesh
 from mpl_toolkits import mplot3d

@@ -1,11 +1,11 @@
-import secrets, hashlib
-
 """
 Part of Semper-KI software
+
 Silvio Weging 2023
 
 Contains: Services for cryptographics
 """
+import secrets, hashlib
 
 #######################################################
 def generateMD5(someString) -> str:
@@ -25,6 +25,8 @@ def generateSalt(size = 5) -> str:
     """
     Generate unique random salt string to be attached to another string before hashing
 
+    :param size: Number of characters generated as salt
+    :type size: int
     :return: string containing salt
     :rtype: string
 

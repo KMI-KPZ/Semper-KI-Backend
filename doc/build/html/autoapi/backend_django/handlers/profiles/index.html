@@ -33,42 +33,42 @@
             
   <section id="module-backend_django.handlers.profiles">
 <span id="backend-django-handlers-profiles"></span><h1><a class="reference internal" href="#module-backend_django.handlers.profiles" title="backend_django.handlers.profiles"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.handlers.profiles</span></code></a><a class="headerlink" href="#module-backend_django.handlers.profiles" title="Permalink to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Handling of database requests</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.getUser" title="backend_django.handlers.profiles.getUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUser</span></code></a>(request)</p></td>
-<td><p>Check whether a user exists or not.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.addUserTest" title="backend_django.handlers.profiles.addUserTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addUserTest</span></code></a>(request)</p></td>
+<td><p>Same as addUser but for testing.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.getUserTest" title="backend_django.handlers.profiles.getUserTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUserTest</span></code></a>(request)</p></td>
 <td><p>Same as getUser but for testing.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.addUser" title="backend_django.handlers.profiles.addUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addUser</span></code></a>(request)</p></td>
-<td><p>Add user if the entry doesn't already exists.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.updateRole" title="backend_django.handlers.profiles.updateRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateRole</span></code></a>(request)</p></td>
+<td><p>Update user role.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.updateUser" title="backend_django.handlers.profiles.updateUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateUser</span></code></a>(request)</p></td>
-<td><p>Update user details.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.deleteUser" title="backend_django.handlers.profiles.deleteUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteUser</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.deleteUser" title="backend_django.handlers.profiles.deleteUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteUser</span></code></a>(request)</p></td>
 <td><p>Deletes an entry in the database corresponding to user name.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.profiles.getUser">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">getUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.getUser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether a user exists or not.</p>
+<dt class="sig sig-object py" id="backend_django.handlers.profiles.addUserTest">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">addUserTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.addUserTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as addUser but for testing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>User details from database</p>
+<dd class="field-even"><p>HTTP response</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary</p>
+<dd class="field-odd"><p>HTTP status</p>
 </dd>
 </dl>
 </dd></dl>
@@ -91,26 +91,9 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.profiles.addUser">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">addUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.addUser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add user if the entry doesn’t already exists.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST request with session</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>HTTP response (only used for tests)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>HTTP Status</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.profiles.updateUser">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">updateUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.updateUser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update user details.</p>
+<dt class="sig sig-object py" id="backend_django.handlers.profiles.updateRole">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">updateRole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.updateRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update user role.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
@@ -200,7 +183,7 @@
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../../../_sources/autoapi/backend_django/handlers/profiles/index.rst.txt"

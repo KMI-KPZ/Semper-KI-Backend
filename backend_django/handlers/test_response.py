@@ -1,4 +1,10 @@
-from django.shortcuts import render
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Handling test calls and getting a csrf cookie
+"""
 
 from django.http import HttpResponse
 

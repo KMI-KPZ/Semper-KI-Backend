@@ -1,15 +1,16 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Mockups for various stuff
+"""
+
 from django.conf import settings
 from django.utils import timezone
 import random
 
 from backend_django.services import crypto
-
-"""
-Part of Semper-KI software
-Silvio Weging 2023
-
-Contains: Mockups for various stuff
-"""
 
 #######################################################
 class mockPicture():

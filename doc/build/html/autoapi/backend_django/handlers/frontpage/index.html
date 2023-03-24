@@ -33,6 +33,9 @@
             
   <section id="module-backend_django.handlers.frontpage">
 <span id="backend-django-handlers-frontpage"></span><h1><a class="reference internal" href="#module-backend_django.handlers.frontpage" title="backend_django.handlers.frontpage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.handlers.frontpage</span></code></a><a class="headerlink" href="#module-backend_django.handlers.frontpage" title="Permalink to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Views for some backend websites</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="functions">
@@ -42,7 +45,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.frontpage.landingPage" title="backend_django.handlers.frontpage.landingPage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">landingPage</span></code></a>(request)</p></td>
 <td><p>Landing page for the backend</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.frontpage.docPage" title="backend_django.handlers.frontpage.docPage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">docPage</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.frontpage.benchyPage" title="backend_django.handlers.frontpage.benchyPage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">benchyPage</span></code></a>(request)</p></td>
+<td><p>Landing page for the benchmark tool</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.frontpage.docPage" title="backend_django.handlers.frontpage.docPage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">docPage</span></code></a>(request)</p></td>
 <td><p>Documentation page for the backend</p></td>
 </tr>
 </tbody>
@@ -51,6 +57,23 @@
 <dt class="sig sig-object py" id="backend_django.handlers.frontpage.landingPage">
 <span class="sig-prename descclassname"><span class="pre">backend_django.handlers.frontpage.</span></span><span class="sig-name descname"><span class="pre">landingPage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.frontpage.landingPage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Landing page for the backend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered page</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.frontpage.benchyPage">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.frontpage.</span></span><span class="sig-name descname"><span class="pre">benchyPage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.frontpage.benchyPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Landing page for the benchmark tool</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
@@ -140,7 +163,7 @@
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="../../../../_sources/autoapi/backend_django/handlers/frontpage/index.rst.txt"

@@ -1,17 +1,27 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: BenchyMcMarkface, it is a script that can be used to benchmark a website
+
+Needed as parameters: 
+
+The main url of the website
+
+A file containing suburls, one per line
+
+Number of async calls to be made randomly to the suburls
+
+"""
+
+
 import sys
 import numpy as np
 import asyncio
 import time
 import aiohttp
 from django.http import HttpResponse
-
-# BenchyMcMarkface is a script that can be used to benchmark a website
-# Needed as parameters: 
-# The main url of the website
-# A file containing suburls, one per line
-# Number of async calls to be made randomly to the suburls
-#
-# Created by: Silvio Weging, 2023
 
 #############################################
 async def request(url):

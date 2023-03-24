@@ -3,6 +3,15 @@
 
 .. py:module:: backend_django.handlers.authentification
 
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Authentification handling using Auth0
+
+
 
 Module Contents
 ---------------
@@ -13,7 +22,9 @@ Functions
 
 .. autoapisummary::
 
+   backend_django.handlers.authentification.checkIfTokenValid
    backend_django.handlers.authentification.checkIfUserIsLoggedIn
+   backend_django.handlers.authentification.isLoggedIn
    backend_django.handlers.authentification.loginUser
    backend_django.handlers.authentification.callbackLogin
    backend_django.handlers.authentification.getAuthInformation
@@ -21,18 +32,15 @@ Functions
 
 
 
-Attributes
-~~~~~~~~~~
+.. py:function:: checkIfTokenValid(token)
 
-.. autoapisummary::
+   Check whether the token of a user has expired and a new login is necessary
 
-   backend_django.handlers.authentification.oauth
+   :param token: User session token
+   :type token: Dictionary
+   :return: True if the token is valid or False if not
+   :rtype: Bool
 
-
-.. py:data:: oauth
-   
-
-   
 
 .. py:function:: checkIfUserIsLoggedIn(request)
 
@@ -43,6 +51,15 @@ Attributes
    :return: True if the user is logged in or False if not
    :rtype: Bool
 
+
+.. py:function:: isLoggedIn(request)
+
+   Check whether the token of a user has expired and a new login is necessary
+
+   :param request: User session token
+   :type request: Dictionary
+   :return: True if the token is valid or False if not
+   :rtype: Bool
 
 
 .. py:function:: loginUser(request)

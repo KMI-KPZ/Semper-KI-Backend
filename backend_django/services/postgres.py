@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Services for database calls
+"""
+
 from django.utils import timezone
 
 from ..modelFiles.profile import Profile

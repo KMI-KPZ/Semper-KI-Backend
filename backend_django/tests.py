@@ -1,3 +1,12 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2023
+
+Contains: Tests for various functions and services
+"""
+
+
 from django.test import TestCase, Client
 from django.http import HttpRequest, HttpResponse
 from django.test.client import RequestFactory
