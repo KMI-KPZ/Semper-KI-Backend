@@ -66,7 +66,7 @@ def mockPostProcessing():
     possibleValues = ["selection1", "selection2", "selection3"]
     processingOptions = ["selection", "number", "text"]
 
-    postProcessing["postProcessing"].append({"id": crypto.generateMD5(title), "title": "None", "checked": True, "selectedValue": "", "valueList": [], "type": "text", "URI": testpicture.mockPicturePath})
+    postProcessing["postProcessing"].append({"id": crypto.generateMD5("None"), "title": "None", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "URI": testpicture.mockPicturePath})
 
     for i in range(3):
         title = "postProcessing " + str(i)
