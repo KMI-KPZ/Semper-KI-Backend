@@ -35,7 +35,7 @@ def mockModels():
     for i in range(20):
         title = "testmodel " + str(i)
         models["models"].append(
-            {"id": crypto.generateMD5(title) ,"title": title, "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": testpicture.mockPicturePath}
+            {"id": crypto.generateMD5(title) ,"title": title, "tags": [random.choice(tags) for j in range(random.randint(1,4))], "date": "2023-02-01", "license": random.choice(licenses), "certificate": [random.choice(certificates) for j in range(random.randint(1,3))], "URI": testpicture.mockPicturePath, "CreatedBy": "kiss"}
         )
     return models
 modelMock = mockModels()
@@ -43,7 +43,7 @@ modelMock = mockModels()
 #######################################################
 def getEmptyMockModel():
     now = timezone.now()
-    return {"id": "","title": "", "tags": [], "date": str(now.year)+"-"+str(now.month)+"-"+str(now.day), "license": "", "certificate": [], "URI": ""}
+    return {"id": "","title": "", "tags": [], "date": str(now.year)+"-"+str(now.month)+"-"+str(now.day), "license": "", "certificate": [], "URI": "", "CreatedBy": "kiss"}
 
 #######################################################
 def mockMaterials():

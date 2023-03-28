@@ -56,6 +56,7 @@ def getUploadedModel(files):
         model["id"] = entry[0]
         model["title"] = entry[1]
         model["URI"] = str(entry[2])
+        model["CreatedBy"] = "user"
 
         models["models"].append(model)
     return model
@@ -75,18 +76,20 @@ def getModels(request):
     filters = json.loads(request.body.decode("utf-8"))
 
     # if user uploaded a file, show that instead
+    """     
     response = getUploadedFiles(request.session.session_key) # TODO: select correct model via id
     if response is not None:
         filters.update(getUploadedModel(response))
-    else:
-        # Filter name is in question -> title, selected stuff is in "answer"
-        filtersForSparql = []
-        for entry in filters["filters"]:
-            filtersForSparql.append([entry["question"]["title"], entry["answer"]])
-        #TODO ask via sparql with most general filter and then iteratively filter response
-        
-        # mockup here:
-        filters.update(mocks.modelMock)
+    else: 
+    """
+    # Filter name is in question -> title, selected stuff is in "answer"
+    filtersForSparql = []
+    for entry in filters["filters"]:
+        filtersForSparql.append([entry["question"]["title"], entry["answer"]])
+    #TODO ask via sparql with most general filter and then iteratively filter response
+    
+    # mockup here:
+    filters.update(mocks.modelMock)
     
     # TODO: gzip this 
     return JsonResponse(filters)
