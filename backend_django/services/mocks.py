@@ -96,7 +96,12 @@ def mockPrices(selection):
                 "postProcessing 0": 1,
                 "postProcessing 1": 2,
                 "postProcessing 2": 3,
-                "postProcessing 3": 4
+                "postProcessing 3": 4,
+                "postProcessing 4": 3,
+                "postProcessing 5": 3,
+                "postProcessing 6": 3,
+                "postProcessing 7": 3,
+                "postProcessing 8": 3
             }
     }
 
@@ -126,7 +131,12 @@ def mockLogistics(selection):
                 "postProcessing 0": 1,
                 "postProcessing 1": 2,
                 "postProcessing 2": 3,
-                "postProcessing 3": 4
+                "postProcessing 3": 4,
+                "postProcessing 4": 3,
+                "postProcessing 5": 3,
+                "postProcessing 6": 3,
+                "postProcessing 7": 3,
+                "postProcessing 8": 3
             }
     }
 
