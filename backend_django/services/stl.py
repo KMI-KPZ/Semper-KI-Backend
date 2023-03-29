@@ -13,16 +13,17 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot
 import numpy as np
 from PIL import Image
-import base64
+import base64 
 
-def find_mins_maxs(obj):
-    minx = obj.x.min()
-    maxx = obj.x.max()
-    miny = obj.y.min()
-    maxy = obj.y.max()
-    minz = obj.z.min()
-    maxz = obj.z.max()
-    return minx, maxx, miny, maxy, minz, maxz
+
+# def find_mins_maxs(obj):
+#     minx = obj.x.min()
+#     maxx = obj.x.max()
+#     miny = obj.y.min()
+#     maxy = obj.y.max()
+#     minz = obj.z.min()
+#     maxz = obj.z.max()
+#     return minx, maxx, miny, maxy, minz, maxz
 
 #######################################################
 async def stlToBinJpg(file) -> str:
@@ -41,20 +42,14 @@ async def stlToBinJpg(file) -> str:
     axes = figure.add_subplot(projection='3d')
     axes.grid(False)
     axes.axis('off')
+    axes.dist = 5.5
 
     # Load the STL files and add the vectors to the plot
     your_mesh = mesh.Mesh.from_file("",fh=file)
     axes.add_collection3d(mplot3d.art3d.Poly3DCollection(your_mesh.vectors))
-
-    minX, maxX, minY, maxY, minZ, maxZ = find_mins_maxs(your_mesh)
-
     # Auto scale to the mesh size
     scale = your_mesh.points.flatten()
     axes.auto_scale_xyz(scale, scale, scale)
-    axes.set_xlim(minX,maxX)
-    axes.set_ylim(minY,maxY)
-    axes.set_zlim3d(minZ,max(maxX,maxY,maxZ))
-    
 
     #pyplot.savefig("test.jpg", format="jpg", bbox_inches='tight', pad_inches = 0)
     # Save file into binary string
