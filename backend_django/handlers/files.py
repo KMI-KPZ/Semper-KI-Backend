@@ -97,6 +97,7 @@ def uploadModels(request):
             model["id"] = id
             model["title"] = name
             model["URI"] = str(previews[idx])
+            model["createdBy"] = "user"
             models["models"].append(model)
 
             # stl.binToJpg(previews[idx])
