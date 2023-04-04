@@ -42,7 +42,7 @@ async def stlToBinJpg(file) -> str:
     axes = figure.add_subplot(projection='3d')
     axes.grid(False)
     axes.axis('off')
-    axes.dist = 5.5
+    axes.dist = 5.5 # distance of the camera to the object, defined in Axes3D
 
     # Load the STL files and add the vectors to the plot
     your_mesh = mesh.Mesh.from_file("",fh=file)

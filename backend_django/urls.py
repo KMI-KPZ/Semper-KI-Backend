@@ -22,7 +22,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.conf import settings
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -59,7 +59,10 @@ paths = {
     "getCart": "public/getCart/",
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
-    "checkLogistics": "public/checkLogistics/"
+    "checkLogistics": "public/checkLogistics/",
+    "sendOrder": "public/sendOrder/",
+    "retrieveOrders": "public/getOrders/",
+    "updateOrders": "public/updateOrders/"
 }
 
 
@@ -93,6 +96,10 @@ urlpatterns = [
     path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
     path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
     path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
+    path(paths["sendOrder"], checkOrder.sendOrder, name='sendOrder'),
+
+    path(paths["retrieveOrders"], dashboard.retrieveOrders, name='retrieveOrders'),
+    path(paths["updateOrders"], dashboard.updateOrders, name='updateOrders'),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),

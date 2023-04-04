@@ -106,6 +106,7 @@ WSGI_APPLICATION = 'backend_django.wsgi.application'
 # SECURE_SSL_REDIRECT = False # Redirects http to https
 SESSION_COOKIE_SECURE =  True #Sets session cookies as secure
 CSRF_COOKIE_SECURE = True # Sets csrf cookie as secure
+SESSION_COOKIE_HTTPONLY = True
 # CSRF_COOKIE_DOMAIN = '127.0.0.1' 
 
 

@@ -10,7 +10,9 @@ import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
-from ..services import redis, mocks
+from ..handlers.authentification import checkIfUserIsLoggedIn
+
+from ..services import redis, mocks, postgres, crypto
 
 #######################################################
 def updateCart(request):
@@ -30,7 +32,7 @@ def updateCart(request):
         print(error)
         return HttpResponse("Failed",status=200)
     
-    return HttpResponse("Successful",status=200)
+    return HttpResponse("Success",status=200)
 
 #######################################################
 def getCart(request):
@@ -104,8 +106,12 @@ def checkPrice(request):
 
     # TODO: use calculation service
 
-    #return JsonResponse(mocks.mockPrices(selected["cart"][0]))
-    return HttpResponse(mocks.mockPrices(selected["cart"][0]))
+    summedUpPrices= 0
+    for idx, elem in enumerate(selected["cart"]):
+        prices = mocks.mockPrices(elem)
+        summedUpPrices += prices
+        request.session["selected"]["cart"][idx]["prices"] = prices
+    return HttpResponse(summedUpPrices)
 
 #######################################################
 def checkLogistics(request):
@@ -133,6 +139,34 @@ def checkLogistics(request):
     postProcessing = selected["cart"][0]["postProcessings"]
 
     # TODO: use calculation service
+    summedUpLogistics = 0
+    for idx, elem in enumerate(selected["cart"]):
+        logistics = mocks.mockLogistics(elem)
+        summedUpLogistics += logistics
+        request.session["selected"]["cart"][idx]["logistics"] = logistics
+    return HttpResponse(summedUpLogistics)
 
-    #return JsonResponse(mocks.mockLogistics(selected["cart"][0]))
-    return HttpResponse(mocks.mockLogistics(selected["cart"][0]))
+#######################################################
+def sendOrder(request):
+    """
+    Save order and send it to manufacturer
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response if sent successfully or not
+    :rtype: HTTP Response
+
+    """
+    if checkIfUserIsLoggedIn(request):
+        try:
+            selected = request.session["selected"]
+            uID = postgres.ProfileManagement.getUserID(request.session)
+            orderID = crypto.generateMD5(str(selected) + crypto.generateSalt())
+            postgres.OrderManagement.addOrder(uID,orderID,selected)
+
+            return HttpResponse("Success")
+        except (Exception) as error:
+            print(error)
+            return HttpResponse("Failed")
+    else:
+        return HttpResponse("Not logged in", status=401)

@@ -30,7 +30,7 @@ def addUserTest(request):
 
     """
     if "user" in request.session:
-        flag = postgres.addUser(request.session)
+        flag = postgres.ProfileManagement.addUser(request.session)
         if flag is True:
             return HttpResponse("Worked")
         else:
@@ -49,7 +49,7 @@ def getUserTest(request):
     :rtype: JSON
 
     """
-    return JsonResponse(postgres.getUser(request.session))
+    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
 ##############################################
 def updateRole(request):
@@ -63,7 +63,7 @@ def updateRole(request):
 
     """
     if "user" in request.session:
-        flag = postgres.updateRole(request.session)
+        flag = postgres.ProfileManagement.updateRole(request.session)
         if flag is True:
             return HttpResponse("Worked")
         else:
@@ -83,7 +83,7 @@ def deleteUser(request):
 
     """
     
-    flag = postgres.deleteUser(request.session)
+    flag = postgres.ProfileManagement.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")
     else:

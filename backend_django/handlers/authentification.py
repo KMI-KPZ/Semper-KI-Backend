@@ -65,7 +65,7 @@ def isLoggedIn(request):
     # Check if user is already logged in
     if "user" in request.session:
         if checkIfTokenValid(request.session["user"]):
-            return HttpResponse("Successful",status=200)
+            return HttpResponse("Success",status=200)
         else:
             return HttpResponse("Failed",status=200)
     
@@ -117,7 +117,7 @@ def callbackLogin(request):
                 request.session["usertype"] = "admin"
     
     # Get Data from Database or create entry in it for logged in User
-    postgres.addUser(request.session)
+    postgres.ProfileManagement.addUser(request.session)
 
     # Create redirect url
     if settings.PRODUCTION:
@@ -142,7 +142,7 @@ def getAuthInformation(request):
 
     if checkIfUserIsLoggedIn(request):
         # Read user details from Database
-        return JsonResponse(postgres.getUser(request.session))
+        return JsonResponse(postgres.ProfileManagement.getUser(request.session))
     else:
         return JsonResponse({}, status=401)
 
