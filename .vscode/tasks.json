@@ -24,11 +24,14 @@
 			},
 			"python": {
 				"args": [
-					"runserver",
-					"0.0.0.0:8000",
-					"--settings=backend_django.settings.debug"
+					//"runserver",
+					//"0.0.0.0:8000",
+					//"--settings=backend_django.settings.debug"
+					"backend_django.asgi --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=backend_django.settings.debug --capture-output --log-level debug -k uvicorn.workers.UvicornWorker --workers 1 --threads 1"
 				],
-				"file": "manage.py"
+
+				//"file": "manage.py"
+				"module": "gunicorn"
 			}
 		}
 	]

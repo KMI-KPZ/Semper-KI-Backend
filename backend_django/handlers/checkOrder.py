@@ -163,7 +163,7 @@ def sendOrder(request):
             uID = postgres.ProfileManagement.getUserID(request.session)
             orderID = crypto.generateMD5(str(selected) + crypto.generateSalt())
             postgres.OrderManagement.addOrder(uID,orderID,selected)
-
+            # TODO: send somewhere
             return HttpResponse("Success")
         except (Exception) as error:
             print(error)

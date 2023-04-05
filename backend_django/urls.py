@@ -65,8 +65,6 @@ paths = {
     "updateOrders": "public/updateOrders/"
 }
 
-
-
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
     path(paths["benchyPage"], frontpage.benchyPage, name="benchy"),

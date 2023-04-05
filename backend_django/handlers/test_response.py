@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csr
 # this makes it possible to assume for a function, that certain requests are passed through
 from django.views.decorators.http import require_http_methods
 
+###################################################
 #@require_http_methods(["GET", "POST"]) # get and post will make it this far
 @csrf_exempt # ONLY FOR TESTING!!!!
 def testResponse(request):
@@ -30,7 +31,7 @@ def testResponse(request):
     response["testHeader"] = "TESTHEADER"
     return response
 
-
+###################################################
 #@csrf_protect
 @ensure_csrf_cookie
 def testResponseCsrf(request):
@@ -45,3 +46,17 @@ def testResponseCsrf(request):
     """
     response = HttpResponse("CSRF worked for: " + request.method)
     return response
+
+###################################################
+from channels.generic.websocket import AsyncWebsocketConsumer
+class testWebSocket(AsyncWebsocketConsumer):
+    ##########################
+    async def connect(self):
+        await self.accept()
+    ##########################
+    async def disconnect(self, code):
+        pass
+    ##########################
+    async def receive(self, text_data=None, bytes_data=None):
+        print(text_data)
+        await self.send(text_data="PONG")

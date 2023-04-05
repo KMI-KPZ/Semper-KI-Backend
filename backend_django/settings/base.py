@@ -68,7 +68,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'backend_django',
-    'session_cleanup'
+    'session_cleanup',
+    'channels',
+    'uvicorn'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +103,22 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend_django.wsgi.application'
+ASGI_APPLICATION = "backend_django.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 # SSL
 # SECURE_SSL_REDIRECT = False # Redirects http to https
