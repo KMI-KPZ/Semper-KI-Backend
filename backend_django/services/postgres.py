@@ -112,9 +112,9 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def updateRole(session):
+    def updateName(session, userName):
         """
-        Update user role.
+        Update user name.
 
         :param session: GET request session
         :type session: Dictionary
@@ -123,14 +123,9 @@ class ProfileManagement():
 
         """
         userID = session["user"]["userinfo"]["sub"]
-        userType = session["usertype"]
-        if userType == "admin": # disallow admin
-            print("Getting to be an admin this way is not allowed!")
-            return False
-
         updated = timezone.now()
         try:
-            affected = Profile.objects.filter(subID=userID).update(role=userType, updatedWhen=updated)
+            affected = Profile.objects.filter(subID=userID).update(name=userName, updatedWhen=updated)
         except (Exception) as error:
             print(error)
             return False

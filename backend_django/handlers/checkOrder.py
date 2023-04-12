@@ -74,20 +74,6 @@ def getManufacturers(request):
 
     return JsonResponse(manufacturerList)
 
-##############################################
-def selectManufacturer(request):
-    """
-    Select a suitable manufacturer and save to session.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: Response if successful
-    :rtype: HTTP Response
-
-    """
-    request.session["selectedManufacturer"] = request.headers["Manufacturer"]
-    return HttpResponse("Success")
-
 #######################################################
 def checkPrintability(request):
     """
