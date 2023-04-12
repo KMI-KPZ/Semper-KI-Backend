@@ -41,6 +41,26 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
+    def getAllUsersByType(type):
+        """
+        Get all users of a certain type.
+
+        :param type: Usertype
+        :type type: string
+        :return: Users with specified type from database
+        :rtype: Dictionary
+
+        """
+        obj = {}
+        try:
+            obj = Profile.objects.filter(role=type).values("name")
+        except (Exception) as error:
+            print(error)
+
+        return obj
+    
+    ##############################################
+    @staticmethod
     def getUserID(session):
         """
         Retrieve User ID from Session
@@ -79,8 +99,8 @@ class ProfileManagement():
         try:
             # first get, then create
             result = Profile.objects.get(subID=userID)
-            if result.role != userType:
-                Profile.objects.filter(subID=userID).update(role=userType)
+            #if result.role != userType:
+                #Profile.objects.filter(subID=userID).update(role=userType)
         except (Exception) as error:
             try:
                 Profile.objects.create(subID=userID, name=userName, email=userEmail, role=userType, updatedWhen=updated) 

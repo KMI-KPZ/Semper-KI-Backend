@@ -27,7 +27,7 @@
 					//"runserver",
 					//"0.0.0.0:8000",
 					//"--settings=backend_django.settings.debug"
-					"backend_django.asgi --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=backend_django.settings.debug --capture-output --log-level debug -k uvicorn.workers.UvicornWorker --workers 1 --threads 1"
+					"backend_django.asgi --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=backend_django.settings.debug --capture-output --log-level debug -k uvicorn.workers.UvicornWorker --workers 1 --threads 1 --timeout 12000"
 				],
 
 				//"file": "manage.py"

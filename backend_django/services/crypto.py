@@ -21,6 +21,19 @@ def generateMD5(someString) -> str:
     return hashlib.md5(someString.encode()).hexdigest()
 
 #######################################################
+def generateSecureID(someString) -> str:
+    """
+    Convert string to as secure as possible hashed string
+
+    :param someString: String that shall be hashed
+    :type someString: string
+    :return: string containing the hash
+    :rtype: string
+
+    """
+    return hashlib.sha512(someString.encode()).hexdigest()
+
+#######################################################
 def generateSalt(size = 5) -> str:
     """
     Generate unique random salt string to be attached to another string before hashing

@@ -50,6 +50,44 @@ def getCart(request):
     else:
         return JsonResponse({})
 
+##############################################
+def getManufacturers(request):
+    """
+    Get all suitable manufacturers.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of manufacturers and some details
+    :rtype: JSON
+
+    """
+    manufacturerList = {}
+    listOfAllManufacturers = postgres.ProfileManagement.getAllUsersByType("contractor")
+    # TODO Check suitability
+
+    # remove unnecessary information and add identifier
+    for idx, elem in enumerate(listOfAllManufacturers):
+        nameOfManufacturer = elem["name"]
+        manufacturerList[idx] = {}
+        manufacturerList[idx]["name"] = nameOfManufacturer
+        manufacturerList[idx]["id"] = crypto.generateSecureID(nameOfManufacturer)
+
+    return JsonResponse(manufacturerList)
+
+##############################################
+def selectManufacturer(request):
+    """
+    Select a suitable manufacturer and save to session.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Response if successful
+    :rtype: HTTP Response
+
+    """
+    request.session["selectedManufacturer"] = request.headers["Manufacturer"]
+    return HttpResponse("Success")
+
 #######################################################
 def checkPrintability(request):
     """
@@ -61,23 +99,26 @@ def checkPrintability(request):
     :rtype: ?
 
     """
-    model = None
-    selected = request.session["selected"]
+    if checkIfUserIsLoggedIn(request):
+        model = None
+        selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-    if Flag:
-        # if a model has been uploaded, use that
-        model = contentOrError
+        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+        if Flag:
+            # if a model has been uploaded, use that
+            model = contentOrError
+        else:
+            # if not, get selected model
+            model = selected["cart"][0]["model"]
+        
+        material = selected["cart"][0]["material"]
+        postProcessing = selected["cart"][0]["postProcessings"]
+        # TODO: use simulation service
+
+        # return success or failure
+        return HttpResponse("Printable")
     else:
-        # if not, get selected model
-        model = selected["cart"][0]["model"]
-    
-    material = selected["cart"][0]["material"]
-    postProcessing = selected["cart"][0]["postProcessings"]
-    # TODO: use simulation service
-
-    # return success or failure
-    return HttpResponse("Printable")
+        return HttpResponse("Not logged in", status=401)
 
 #######################################################
 def checkPrice(request):
@@ -90,28 +131,31 @@ def checkPrice(request):
     :rtype: Json Response
 
     """
-    model = None
-    selected = request.session["selected"]
+    if checkIfUserIsLoggedIn(request):
+        model = None
+        selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-    if Flag:
-        # if a model has been uploaded, use that
-        model = contentOrError
+        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+        if Flag:
+            # if a model has been uploaded, use that
+            model = contentOrError
+        else:
+            # if not, get selected model
+            model = selected["cart"][0]["model"]
+        
+        material = selected["cart"][0]["material"]
+        postProcessing = selected["cart"][0]["postProcessings"]
+
+        # TODO: use calculation service
+
+        summedUpPrices= 0
+        for idx, elem in enumerate(selected["cart"]):
+            prices = mocks.mockPrices(elem)
+            summedUpPrices += prices
+            request.session["selected"]["cart"][idx]["prices"] = prices
+        return HttpResponse(summedUpPrices)
     else:
-        # if not, get selected model
-        model = selected["cart"][0]["model"]
-    
-    material = selected["cart"][0]["material"]
-    postProcessing = selected["cart"][0]["postProcessings"]
-
-    # TODO: use calculation service
-
-    summedUpPrices= 0
-    for idx, elem in enumerate(selected["cart"]):
-        prices = mocks.mockPrices(elem)
-        summedUpPrices += prices
-        request.session["selected"]["cart"][idx]["prices"] = prices
-    return HttpResponse(summedUpPrices)
+        return HttpResponse("Not logged in", status=401)
 
 #######################################################
 def checkLogistics(request):
@@ -124,27 +168,30 @@ def checkLogistics(request):
     :rtype: Json Response
 
     """
-    model = None
-    selected = request.session["selected"]
+    if checkIfUserIsLoggedIn(request):
+        model = None
+        selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-    if Flag:
-        # if a model has been uploaded, use that
-        model = contentOrError
+        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+        if Flag:
+            # if a model has been uploaded, use that
+            model = contentOrError
+        else:
+            # if not, get selected model
+            model = selected["cart"][0]["model"]
+        
+        material = selected["cart"][0]["material"]
+        postProcessing = selected["cart"][0]["postProcessings"]
+
+        # TODO: use calculation service
+        summedUpLogistics = 0
+        for idx, elem in enumerate(selected["cart"]):
+            logistics = mocks.mockLogistics(elem)
+            summedUpLogistics += logistics
+            request.session["selected"]["cart"][idx]["logistics"] = logistics
+        return HttpResponse(summedUpLogistics)
     else:
-        # if not, get selected model
-        model = selected["cart"][0]["model"]
-    
-    material = selected["cart"][0]["material"]
-    postProcessing = selected["cart"][0]["postProcessings"]
-
-    # TODO: use calculation service
-    summedUpLogistics = 0
-    for idx, elem in enumerate(selected["cart"]):
-        logistics = mocks.mockLogistics(elem)
-        summedUpLogistics += logistics
-        request.session["selected"]["cart"][idx]["logistics"] = logistics
-    return HttpResponse(summedUpLogistics)
+        return HttpResponse("Not logged in", status=401)
 
 #######################################################
 def sendOrder(request):

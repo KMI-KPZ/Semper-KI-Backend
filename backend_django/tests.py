@@ -54,21 +54,21 @@ class TestProfiles(TestCase):
         response = json.loads(self.client.get("/"+paths["getUser"]).content)
         self.assertIs(response["name"] == "testuser" and response["email"] == "testuser@test.de", True)
     
-    def test_updateUserType(self):
-        mockSession = self.client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser2"
-        mockSession["user"]["userinfo"]["nickname"] = "testuser2"
-        mockSession["user"]["userinfo"]["email"] = "testuser2@test.de"
-        mockSession["usertype"] = "indefinite"
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=1677589627))
-        mockSession.save()
-        self.client.get("/"+paths["addUser"])
-        mockSession["usertype"] = "manufacturer"
-        mockSession.save()
-        self.client.get("/"+paths["updateRole"])
-        response = json.loads(self.client.get("/"+paths["getUser"]).content)
-        self.assertIs(response["name"] == "testuser2" and response["type"] == "manufacturer", True)
+    # def test_updateUserType(self):
+    #     mockSession = self.client.session
+    #     mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+    #     mockSession["user"]["userinfo"]["sub"] = "auth0|testuser2"
+    #     mockSession["user"]["userinfo"]["nickname"] = "testuser2"
+    #     mockSession["user"]["userinfo"]["email"] = "testuser2@test.de"
+    #     mockSession["usertype"] = "indefinite"
+    #     mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=1677589627))
+    #     mockSession.save()
+    #     self.client.get("/"+paths["addUser"])
+    #     mockSession["usertype"] = "manufacturer"
+    #     mockSession.save()
+    #     self.client.get("/"+paths["updateRole"])
+    #     response = json.loads(self.client.get("/"+paths["getUser"]).content)
+    #     self.assertIs(response["name"] == "testuser2" and response["type"] == "manufacturer", True)
     
     def test_deleteUser(self):      
         mockSession = self.client.session

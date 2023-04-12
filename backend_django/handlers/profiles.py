@@ -52,24 +52,24 @@ def getUserTest(request):
     return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
 ##############################################
-def updateRole(request):
-    """
-    Update user role.
+# def updateRole(request):
+#     """
+#     Update user role.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: HTTP response
-    :rtype: HTTP status
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: HTTP response
+#     :rtype: HTTP status
 
-    """
-    if "user" in request.session:
-        flag = postgres.ProfileManagement.updateRole(request.session)
-        if flag is True:
-            return HttpResponse("Worked")
-        else:
-            return HttpResponse("Failed", status=500)
-    else:
-        return HttpResponse("Failed", status=401)
+#     """
+#     if "user" in request.session:
+#         flag = postgres.ProfileManagement.updateRole(request.session)
+#         if flag is True:
+#             return HttpResponse("Worked")
+#         else:
+#             return HttpResponse("Failed", status=500)
+#     else:
+#         return HttpResponse("Failed", status=401)
 
 ##############################################
 def deleteUser(request):

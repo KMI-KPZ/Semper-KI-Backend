@@ -62,7 +62,9 @@ paths = {
     "checkLogistics": "public/checkLogistics/",
     "sendOrder": "public/sendOrder/",
     "retrieveOrders": "public/getOrders/",
-    "updateOrders": "public/updateOrders/"
+    "updateOrders": "public/updateOrders/",
+    "getManufacturers": "public/getManufacturers/",
+    "setManufacturer": "public/setManufacturer/"
 }
 
 urlpatterns = [
@@ -91,6 +93,8 @@ urlpatterns = [
 
     path(paths["updateCart"], checkOrder.updateCart, name='updateCart'),
     path(paths["getCart"], checkOrder.getCart, name='getCart'),
+    path(paths["getManufacturers"], checkOrder.getManufacturers, name='getManufacturers'),
+    path(paths["setManufacturer"], checkOrder.selectManufacturer, name='setManufacturer'),
     path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
     path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
     path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
@@ -106,7 +110,7 @@ urlpatterns = [
     path(paths["addUser"], profiles.addUserTest, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     #path(paths["updateUser"], profiles.updateUserTest, name="updateUser"),
-    path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+    #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
     
