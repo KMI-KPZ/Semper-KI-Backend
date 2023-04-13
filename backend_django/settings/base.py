@@ -53,7 +53,8 @@ CORS_ALLOW_HEADERS = (
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Headers',
     'Authorization',
-    'Usertype'
+    'Usertype',
+    'Path'
 )
 
 # Application definition

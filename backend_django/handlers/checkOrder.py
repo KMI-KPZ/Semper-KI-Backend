@@ -61,18 +61,21 @@ def getManufacturers(request):
     :rtype: JSON
 
     """
-    manufacturerList = {}
-    listOfAllManufacturers = postgres.ProfileManagement.getAllUsersByType("contractor")
-    # TODO Check suitability
+    if checkIfUserIsLoggedIn(request):
+        manufacturerList = []
+        listOfAllManufacturers = postgres.ProfileManagement.getAllUsersByType("contractor")
+        # TODO Check suitability
 
-    # remove unnecessary information and add identifier
-    for idx, elem in enumerate(listOfAllManufacturers):
-        nameOfManufacturer = elem["name"]
-        manufacturerList[idx] = {}
-        manufacturerList[idx]["name"] = nameOfManufacturer
-        manufacturerList[idx]["id"] = crypto.generateSecureID(nameOfManufacturer)
+        # remove unnecessary information and add identifier
+        for idx, elem in enumerate(listOfAllManufacturers):
+            nameOfManufacturer = elem["name"]
+            manufacturerList.append({})
+            manufacturerList[idx]["name"] = nameOfManufacturer
+            manufacturerList[idx]["id"] = crypto.generateSecureID(nameOfManufacturer)
 
-    return JsonResponse(manufacturerList)
+        return JsonResponse(manufacturerList, safe=False)
+    else:
+        return HttpResponse("Not logged in", status=401)
 
 #######################################################
 def checkPrintability(request):
