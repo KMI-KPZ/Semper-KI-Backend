@@ -9,24 +9,32 @@ Contains: Model for orders of a user
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-# class userOrdersType:
-#     """
-#     userOrders class
-
-#     :arrayWithDicts: Contains the cart
-#     """
-#     arrayWithDicts = []
+###################################################
+class OrderCollection(models.Model):
+    """
+    Order Collection class.
+    
+    :orderCollectionID: Unique ID for that order collection, primary key
+    :status: Current state of the order collection
+    :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
+    :updatedWhen: Date and time at which the entry was updated
+    :accessedWhen: Last date and time the user was fetched from the database, automatically set
+    """
+    orderCollectionID = models.CharField(primary_key=True,max_length=513)
+    status = models.CharField(max_length=100)
+    createdWhen = models.DateTimeField(auto_now_add=True)
+    updatedWhen = models.DateTimeField()
+    accessedWhen = models.DateTimeField(auto_now=True)
 
 ###################################################
-
 class Orders(models.Model):
     """
     Order management class.
     
-    :uID: Unique ID for that person returned by Auth0, primary key
-    :orderIDs: IDs for every order of that user
+    :orderID: Unique ID for that order, primary key
+    :orderCollectionKey: Signals django to link that order to an order collection
     :userOrders: Orders from the cart including prices and everything
-    :orderStatus: How everything is going
+    :status: How everything is going
     :userCommunication: What was said by whom to whom and when
     :files: All URL Paths of files uploaded for an order
     :dates: Date created and updated for every order
@@ -35,10 +43,10 @@ class Orders(models.Model):
     :accessedWhen: Last date and time the user was fetched from the database, automatically set
     """
     ###################################################
-    uID = models.CharField(primary_key=True,max_length=256)
-    orderIDs = ArrayField(models.CharField(max_length=256))
+    orderID = models.CharField(primary_key=True,max_length=513)
+    orderCollectionKey = models.ForeignKey(OrderCollection, on_delete=models.CASCADE, related_name="orders")
     userOrders = models.JSONField()
-    orderStatus = models.JSONField()
+    status = models.CharField(max_length=100)
     userCommunication = models.JSONField()
     files = models.JSONField()
     dates = models.JSONField()
@@ -48,3 +56,4 @@ class Orders(models.Model):
     ###################################################
     def __str__(self):
         return ""
+    

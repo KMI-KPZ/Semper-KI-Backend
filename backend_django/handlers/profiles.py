@@ -14,7 +14,7 @@ from django.db import models
 from django.utils import timezone
 from urllib.parse import unquote
 
-from ..modelFiles.profile import Profile
+from ..modelFiles.profile import User
 
 from ..services import postgres
 

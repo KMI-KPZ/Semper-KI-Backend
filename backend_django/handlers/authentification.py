@@ -82,10 +82,32 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
+    # set type of user
     if "Usertype" not in request.headers:
-        request.session["usertype"] = "indefinite"
+        request.session["usertype"] = "user"
     else:
-        request.session["usertype"] = request.headers["Usertype"]
+        userType = request.headers["Usertype"]
+        if userType == "contractor" or userType == "manufacturer":
+            request.session["usertype"] = userType
+            request.session["organizationType"] = "manufacturer"
+        elif userType == "stakeholder":
+            request.session["usertype"] = userType
+            request.session["organizationType"] = "stakeholder"
+        else:
+            request.session["usertype"] = userType
+
+
+    # set redirect url
+    if settings.PRODUCTION:
+        forward_url = 'https://dev.semper-ki.org'
+    else:
+        forward_url = 'http://127.0.0.1:3000'
+    
+    if "Path" not in request.headers:
+        request.session["pathAfterLogin"] = forward_url
+    else:
+        request.session["pathAfterLogin"] = forward_url + request.headers["Path"]
+        
     uri = oauth.authorizeRedirect(request, reverse("callbackLogin"))
     # return uri
     return HttpResponse(uri.url)
@@ -118,14 +140,8 @@ def callbackLogin(request):
     
     # Get Data from Database or create entry in it for logged in User
     postgres.ProfileManagement.addUser(request.session)
-
-    # Create redirect url
-    if settings.PRODUCTION:
-        forward_url = request.build_absolute_uri('https://dev.semper-ki.org')
-    else:
-        forward_url = request.build_absolute_uri('http://127.0.0.1:3000')
         
-    return HttpResponseRedirect(forward_url)
+    return HttpResponseRedirect(request.session["pathAfterLogin"])
 
 #######################################################
 def getAuthInformation(request):

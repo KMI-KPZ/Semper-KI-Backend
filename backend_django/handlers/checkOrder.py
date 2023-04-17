@@ -63,7 +63,7 @@ def getManufacturers(request):
     """
     if checkIfUserIsLoggedIn(request):
         manufacturerList = []
-        listOfAllManufacturers = postgres.ProfileManagement.getAllUsersByType("contractor")
+        listOfAllManufacturers = postgres.ProfileManagement.getAllManufacturers(request.session)
         # TODO Check suitability
 
         # remove unnecessary information and add identifier
@@ -196,9 +196,10 @@ def sendOrder(request):
     if checkIfUserIsLoggedIn(request):
         try:
             selected = request.session["selected"]
+            # TODO get manufacturer
+            manufacturerID = ""
             uID = postgres.ProfileManagement.getUserID(request.session)
-            orderID = crypto.generateMD5(str(selected) + crypto.generateSalt())
-            postgres.OrderManagement.addOrder(uID,orderID,selected)
+            postgres.OrderManagement.addOrder(uID,manufacturerID,selected)
             # TODO: send somewhere
             return HttpResponse("Success")
         except (Exception) as error:
