@@ -22,6 +22,7 @@ class User(models.Model):
     :email: E-Mail with which the user registered themselves
     :organization: The Stakeholder that user belongs to
     :role: Role assigned to the user
+    :rights: The rights that user has
     :address: Where to find the user
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated
@@ -33,6 +34,7 @@ class User(models.Model):
     email = models.CharField(max_length=100)
     organization = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
+    rights = models.JSONField()
     address = models.JSONField()
     orders = models.ManyToManyField(OrderCollection)
     createdWhen = models.DateTimeField(auto_now_add=True)
@@ -41,11 +43,11 @@ class User(models.Model):
 
     ###################################################
     def __str__(self):
-        return self.hashedID + " " + self.name + " " + self.email + " " + self.organization + " " + self.role + " " + json.dumps(self.address) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
+        return self.hashedID + " " + self.name + " " + self.email + " " + self.organization + " " + self.role + " " + json.dumps(self.rights) + " " + json.dumps(self.address) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organization": self.organization,  "type": self.role, "address": json.dumps(self.address), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
+        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organization": self.organization,  "type": self.role, "rights": json.dumps(self.rights), "address": json.dumps(self.address), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
 
 #TODO solve this more elegantly!
 

@@ -68,10 +68,9 @@ def getManufacturers(request):
 
         # remove unnecessary information and add identifier
         for idx, elem in enumerate(listOfAllManufacturers):
-            nameOfManufacturer = elem["name"]
             manufacturerList.append({})
-            manufacturerList[idx]["name"] = nameOfManufacturer
-            manufacturerList[idx]["id"] = crypto.generateSecureID(nameOfManufacturer)
+            manufacturerList[idx]["name"] = elem["name"]
+            manufacturerList[idx]["id"] = elem["hashedID"]
 
         return JsonResponse(manufacturerList, safe=False)
     else:
@@ -195,12 +194,9 @@ def sendOrder(request):
     """
     if checkIfUserIsLoggedIn(request):
         try:
-            selected = request.session["selected"]
-            # TODO get manufacturer
-            manufacturerID = ""
             uID = postgres.ProfileManagement.getUserID(request.session)
-            postgres.OrderManagement.addOrder(uID,manufacturerID,selected)
-            # TODO: send somewhere
+            selected = request.session["selected"]["cart"]
+            postgres.OrderManagement.addOrder(uID, selected)
             return HttpResponse("Success")
         except (Exception) as error:
             print(error)

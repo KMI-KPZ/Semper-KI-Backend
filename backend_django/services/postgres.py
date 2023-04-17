@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for database calls
 """
-import types
+import types, json
 
 from django.utils import timezone
 
@@ -105,6 +105,7 @@ class ProfileManagement():
             organization = "None"
 
         role = session["usertype"]
+        rights = {role: "all"}
         address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
         updated = timezone.now()
         try:
@@ -113,7 +114,7 @@ class ProfileManagement():
         except (Exception) as error:
             try:
                 idHash = crypto.generateSecureID(userID)
-                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, organization=organization, address=address, updatedWhen=updated) 
+                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, rights=rights, organization=organization, address=address, updatedWhen=updated) 
                 if organizationType != "None":
                     if ProfileManagement.addUserToOrganization(createdUser, organization) == False:
                         if ProfileManagement.addOrganization(session, organizationType):
@@ -240,7 +241,7 @@ class ProfileManagement():
 class OrderManagement():
     ##############################################
     @staticmethod
-    def addOrder(userID, manufacturerID, orderFromUser):
+    def addOrder(userID, orderFromUser):
         """
         Add order for that user. Check if user already has orders and append if so, create a new user if not.
 
@@ -258,13 +259,15 @@ class OrderManagement():
         now = timezone.now()
         try:
             # first get user and manufacturer
-            userThatOrdered = User.objects.get(subID=userID)
-            selectedManufacturer = Manufacturer.objects.get(subID=manufacturerID)
+            userThatOrdered = User.objects.get(hashedID=userID)
             # generate key and order collection
             orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
             collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status="requested", updatedWhen=now)
             # generate orders
+            listOfSelectedManufacturers = []
             for entry in orderFromUser:
+                selectedManufacturer = Manufacturer.objects.get(hashedID=entry["manufacturerID"])
+                listOfSelectedManufacturers.append(selectedManufacturer)
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
                 status = "requested"
@@ -272,9 +275,14 @@ class OrderManagement():
                 files = []
                 dates = {"created": str(now), "updated": str(now)}
                 Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
-            # link OrderCollection to user and all users of a manufacturer
+            # link OrderCollection to user
             userThatOrdered.orders.add(collectionObj)
-            # selectedManufacturer.users_set.all() orders.add(collectionObj) #TODO
+            # link OrderCollection to every eligible user of every selected manufacturer
+            for manufacturer in listOfSelectedManufacturers:
+                testresult = manufacturer.users.all() 
+                for entry in testresult:
+                    # todo get rights to check if okay that this user can see this
+                    entry.orders.add(collectionObj)
         except (Exception) as error:
             print(error)
             return False
@@ -294,16 +302,33 @@ class OrderManagement():
         """
         try:
             # get user
-            currentUser = User.objects.get(uID=userID)
+            currentUser = User.objects.get(hashedID=userID)
             # get associated OrderCollections
+            output = []
             orderCollections = currentUser.orders.all()
-            for order in orderCollections:
-                print(order)
+            for orderCollection in orderCollections:
+                currentOrderCollection = {}
+                currentOrderCollection["id"] = orderCollection.orderCollectionID
+                currentOrderCollection["date"] = str(orderCollection.createdWhen)
+                currentOrderCollection["state"] = orderCollection.status
+                ordersOfThatCollection = []
+                for entry in orderCollection.orders.all():
+                    currentOrder = {}
+                    currentOrder["id"] = entry.orderID
+                    currentOrder["processList"] = entry.userOrders
+                    currentOrder["orderState"] = entry.status
+                    currentOrder["chat"] = json.dumps(entry.userCommunication)
+                    #currentOrder["files"] = json.dumps(entry.files)
+                    #currentOrder["dates"] = json.dumps(entry.dates)
+                    ordersOfThatCollection.append(currentOrder)
+                currentOrderCollection["orders"] = ordersOfThatCollection
+                output.append(currentOrderCollection)
+            return output
             #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
         except (Exception) as error:
             print(error)
         
-        return [{}, {}, {}, {}, {}]
+        return []
 
     ##############################################
     @staticmethod
