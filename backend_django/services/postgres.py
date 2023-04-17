@@ -104,7 +104,7 @@ class ProfileManagement():
             organizationType = "None"
             organization = "None"
 
-        role = "standard"
+        role = session["usertype"]
         address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
         updated = timezone.now()
         try:
