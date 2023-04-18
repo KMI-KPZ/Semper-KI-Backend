@@ -318,7 +318,7 @@ class OrderManagement():
                     currentOrder["id"] = entry.orderID
                     currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
-                    currentOrder["chat"] = json.dumps(entry.userCommunication)
+                    currentOrder["chat"] = entry.userCommunication
                     #currentOrder["files"] = json.dumps(entry.files)
                     #currentOrder["dates"] = json.dumps(entry.dates)
                     ordersOfThatCollection.append(currentOrder)
