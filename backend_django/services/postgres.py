@@ -316,7 +316,7 @@ class OrderManagement():
                 for entry in orderCollection.orders.all():
                     currentOrder = {}
                     currentOrder["id"] = entry.orderID
-                    currentOrder["processList"] = entry.userOrders
+                    currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = json.dumps(entry.userCommunication)
                     #currentOrder["files"] = json.dumps(entry.files)
@@ -335,12 +335,10 @@ class OrderManagement():
 
     ##############################################
     @staticmethod
-    def deleteOrder(userID, orderID):
+    def deleteOrder(orderID):
         """
-        Delete specific order for a user.
+        Delete specific order.
 
-        :param userID: user ID as primary key for search
-        :type userID: str
         :param orderID: unique order ID to be deleted
         :type orderID: str
         :return: Flag if it worked or not
@@ -349,14 +347,32 @@ class OrderManagement():
         """
         updated = timezone.now()
         try:
-            # result = Orders.objects.get(uID=userID)
-            # result.orderIDs.remove(orderID)
-            # result.userOrders.pop(orderID)
-            # result.orderStatus.pop(orderID)
-            # result.userCommunication.pop(orderID)
-            # result.files.pop(orderID)
-            # result.dates.pop(orderID)
-            # Orders.objects.filter(uID=userID).update(orderIDs=result.orderIDs, userOrders=result.userOrders, orderStatus=result.orderStatus, userCommunication=result.userCommunication, files=result.files, updatedWhen=updated)
+            #currentUser = User.objects.get(hashedID=userID)
+            currentOrder = Orders.objects.get(orderID=orderID)
+            currentOrder.orderCollectionKey.updatedWhen = updated
+            currentOrder.delete()
+            return True
+        except (Exception) as error:
+            print(error)
+        return False
+    
+    ##############################################
+    @staticmethod
+    def deleteOrderCollection(orderCollectionID):
+        """
+        Delete specific order.
+
+        :param orderID: unique order ID to be deleted
+        :type orderID: str
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
+        updated = timezone.now()
+        try:
+            #currentUser = User.objects.get(hashedID=userID)
+            currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+            currentOrderCollection.delete()
             return True
         except (Exception) as error:
             print(error)

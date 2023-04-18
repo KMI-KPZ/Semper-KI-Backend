@@ -24,9 +24,11 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 from django.urls import path
 from backend_django.handlers.test_response import testWebSocket
+from backend_django.handlers.websocket import GeneralWebSocket
 
 websockets = [
-    path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync")
+    path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync"),
+    path("ws/generalWebsocket/", GeneralWebSocket.as_asgi(), name="Websocket")
 ]
 
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend_django.settings.base")

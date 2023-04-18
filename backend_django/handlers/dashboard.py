@@ -17,7 +17,7 @@ from ..services import postgres
 #######################################################
 def retrieveOrders(request):
     """
-    Retrieve saved orders for dashboard
+    Retrieve saved orders for dashboard.
 
     :param request: GET Request
     :type request: HTTP GET
@@ -34,12 +34,12 @@ def retrieveOrders(request):
 #######################################################
 def updateOrders(request):
     """
-    Update saved orders for dashboard
+    Update saved orders for dashboard.
 
     :param request: POST Request
     :type request: HTTP POST
     :return: HTTP Response if update worked
-    :rtype: JSON Response
+    :rtype: HTTP Response
 
     """
     if checkIfUserIsLoggedIn(request):
@@ -49,5 +49,48 @@ def updateOrders(request):
             pass
 
         return HttpResponse("Success")
+    else:
+        return HttpResponse("Not logged in", status=401)
+    
+
+#######################################################
+def deleteOrder(request):
+    """
+    Delete a specific order.
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :return: HTTP Response if update worked
+    :rtype: HTTP Response
+
+    """
+    if checkIfUserIsLoggedIn(request):
+        if request.method == "DELETE":
+            content = json.loads(request.body.decode("utf-8"))
+            if postgres.OrderManagement.deleteOrder(content["id"]):
+                return HttpResponse("Success")
+            else:
+                return HttpResponse("Failed")
+    else:
+        return HttpResponse("Not logged in", status=401)
+
+#######################################################
+def deleteOrderCollection(request):
+    """
+    Delete a specific order collection.
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :return: HTTP Response if update worked
+    :rtype: HTTP Response
+
+    """
+    if checkIfUserIsLoggedIn(request):
+        if request.method == "DELETE":
+            content = json.loads(request.body.decode("utf-8"))
+            if postgres.OrderManagement.deleteOrderCollection(content["id"]):
+                return HttpResponse("Success")
+            else:
+                return HttpResponse("Failed")
     else:
         return HttpResponse("Not logged in", status=401)
