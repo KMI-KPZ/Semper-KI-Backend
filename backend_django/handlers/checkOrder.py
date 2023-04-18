@@ -197,6 +197,7 @@ def sendOrder(request):
             uID = postgres.ProfileManagement.getUserID(request.session)
             selected = request.session["selected"]["cart"]
             postgres.OrderManagement.addOrder(uID, selected)
+            # Save picture and files in permanent storage
             return HttpResponse("Success")
         except (Exception) as error:
             print(error)

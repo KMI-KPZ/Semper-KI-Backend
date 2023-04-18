@@ -272,7 +272,7 @@ class OrderManagement():
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
                 status = "requested"
-                userCommunication = {}
+                userCommunication = {"messages": []}
                 files = []
                 dates = {"created": str(now), "updated": str(now)}
                 Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
