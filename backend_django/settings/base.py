@@ -54,7 +54,8 @@ CORS_ALLOW_HEADERS = (
     'Access-Control-Allow-Headers',
     'Authorization',
     'Usertype',
-    'Path'
+    'Path',
+    'Register'
 )
 
 # Application definition

@@ -7,6 +7,7 @@ Contains: Services for database calls
 """
 import types, json
 
+from datetime import datetime
 from django.utils import timezone
 
 from ..modelFiles.profile import User,Manufacturer,Stakeholder
@@ -323,6 +324,8 @@ class OrderManagement():
                     ordersOfThatCollection.append(currentOrder)
                 currentOrderCollection["orders"] = ordersOfThatCollection
                 output.append(currentOrderCollection)
+            sorted(output, key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')))
             return output
             #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
         except (Exception) as error:

@@ -108,9 +108,15 @@ def loginUser(request):
     else:
         request.session["pathAfterLogin"] = forward_url + request.headers["Path"]
         
+    register = ""
+    if "Register" in request.headers:
+        if request.headers["Register"] == "true":
+            register = "&screen_hint=signup"
+
+
     uri = oauth.authorizeRedirect(request, reverse("callbackLogin"))
-    # return uri
-    return HttpResponse(uri.url)
+    # return uri and redirect to register if desired
+    return HttpResponse(uri.url + register)
 
 #######################################################
 def callbackLogin(request):
