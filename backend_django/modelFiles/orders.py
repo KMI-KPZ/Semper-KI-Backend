@@ -21,7 +21,7 @@ class OrderCollection(models.Model):
     :accessedWhen: Last date and time the user was fetched from the database, automatically set
     """
     orderCollectionID = models.CharField(primary_key=True,max_length=513)
-    status = models.CharField(max_length=100)
+    status = models.IntegerField()
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
@@ -46,7 +46,7 @@ class Orders(models.Model):
     orderID = models.CharField(primary_key=True,max_length=513)
     orderCollectionKey = models.ForeignKey(OrderCollection, on_delete=models.CASCADE, related_name="orders")
     userOrders = models.JSONField()
-    status = models.CharField(max_length=100)
+    status = models.IntegerField()
     userCommunication = models.JSONField()
     files = models.JSONField()
     dates = models.JSONField()

@@ -269,7 +269,7 @@ class OrderManagement():
             userThatOrdered = User.objects.get(hashedID=userID)
             # generate key and order collection
             orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
-            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status="0", updatedWhen=now)
+            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=0, updatedWhen=now)
             # generate orders
             listOfSelectedManufacturers = []
             for entry in orderFromUser:
@@ -277,7 +277,7 @@ class OrderManagement():
                 listOfSelectedManufacturers.append(selectedManufacturer)
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
-                status = "0"
+                status = 0
                 userCommunication = {"messages": []}
                 files = []
                 dates = {"created": str(now), "updated": str(now)}
