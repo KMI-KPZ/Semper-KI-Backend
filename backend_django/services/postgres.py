@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for database calls
 """
-import types, json
+import types, json, enum
 
 from datetime import datetime
 from django.utils import timezone
@@ -238,6 +238,12 @@ class ProfileManagement():
         return True
 
 ####################################################################################
+# Enum for updateOrder
+class EnumUpdates(enum.Enum):
+    status = 1
+    chat = 2
+    files = 3
+
 # Orders
 class OrderManagement():
     ##############################################
@@ -263,7 +269,7 @@ class OrderManagement():
             userThatOrdered = User.objects.get(hashedID=userID)
             # generate key and order collection
             orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
-            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status="requested", updatedWhen=now)
+            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status="0", updatedWhen=now)
             # generate orders
             listOfSelectedManufacturers = []
             for entry in orderFromUser:
@@ -271,19 +277,21 @@ class OrderManagement():
                 listOfSelectedManufacturers.append(selectedManufacturer)
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
-                status = "requested"
+                status = "0"
                 userCommunication = {"messages": []}
                 files = []
                 dates = {"created": str(now), "updated": str(now)}
                 Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
             # link OrderCollection to user
             userThatOrdered.orders.add(collectionObj)
+            userThatOrdered.save()
             # link OrderCollection to every eligible user of every selected manufacturer
             for manufacturer in listOfSelectedManufacturers:
                 testresult = manufacturer.users.all() 
                 for entry in testresult:
                     # todo get rights to check if okay that this user can see this
                     entry.orders.add(collectionObj)
+                    entry.save()
         except (Exception) as error:
             print(error)
             return False
@@ -319,7 +327,7 @@ class OrderManagement():
                     currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = entry.userCommunication
-                    #currentOrder["files"] = json.dumps(entry.files)
+                    currentOrder["files"] = entry.files
                     #currentOrder["dates"] = json.dumps(entry.dates)
                     ordersOfThatCollection.append(currentOrder)
                 currentOrderCollection["orders"] = ordersOfThatCollection
@@ -360,10 +368,10 @@ class OrderManagement():
     @staticmethod
     def deleteOrderCollection(orderCollectionID):
         """
-        Delete specific order.
+        Delete specific orderCollection.
 
-        :param orderID: unique order ID to be deleted
-        :type orderID: str
+        :param orderCollectionID: unique order ID to be deleted
+        :type orderCollectionID: str
         :return: Flag if it worked or not
         :rtype: Bool
 
@@ -380,43 +388,38 @@ class OrderManagement():
 
     ##############################################
     @staticmethod
-    def updateOrder(userID, orderID, orderFromUser={}, orderStatus={}, userCommunications={}, files={}):
+    def updateOrder(orderID, orderCollectionID, updateType: EnumUpdates, content):
         """
         Change details of an order, its status, or save communication 
 
-        :param userID: user ID as primary key for search
-        :type userID: str
         :param orderID: unique order ID to be edited
         :type orderID: str
-        :param orderFromUser: changed order details
-        :type orderFromUser: json dict
-        :param orderStatus: changed order status
-        :type orderStatus: json dict
-        :param userCommunications: new communication for that order
-        :type userCommunications: json dict
-        :param files: new file has been uploaded for an order
-        :type files: json dict
+        :param updateType: changed order details
+        :type updateType: EnumUpdates
+        :param content: changed order, can be many stuff
+        :type content: json dict
         :return: Flag if it worked or not
         :rtype: Bool
 
         """
         updated = timezone.now()
         try:
-            # result = Orders.objects.get(uID=userID)
-            # # edit one after another
-            # result.dates[orderID]["updated"] = str(updated)
-            # if orderFromUser != {}:
-            #     result.userOrders[orderID] = orderFromUser
-            #     Orders.objects.filter(uID=userID).update(userOrders=result.userOrders, dates=result.dates, updatedWhen=updated)
-            # if orderStatus != {}:
-            #     result.orderStatus[orderID] = orderStatus
-            #     Orders.objects.filter(uID=userID).update(orderStatus=result.orderStatus, dates=result.dates, updatedWhen=updated)
-            # if userCommunications != {}:
-            #     result.userCommunication[orderID] = userCommunications
-            #     Orders.objects.filter(uID=userID).update(userCommunication=result.userCommunication, dates=result.dates, updatedWhen=updated)
-            # if files != {}:
-            #     result.files[orderID] = files
-            #     Orders.objects.filter(uID=userID).update(files=result.files, dates=result.dates, updatedWhen=updated)
+            if updateType == EnumUpdates.chat:
+                currentOrder = Orders.objects.get(orderID=orderID)
+                currentOrder.userCommunication["messages"].append(content)
+                currentOrder.updatedWhen = updated
+                currentOrder.save()
+            elif updateType == EnumUpdates.status:
+                if orderID != "":
+                    currentOrder = Orders.objects.get(orderID=orderID)
+                    currentOrder.status = content
+                    currentOrder.updatedWhen = updated
+                    currentOrder.save()
+                if orderCollectionID != "":    
+                    currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+                    currentOrderCollection.status = content
+                    currentOrderCollection.updatedWhen = updated
+                    currentOrderCollection.save()
             return True
         except (Exception) as error:
             print(error)

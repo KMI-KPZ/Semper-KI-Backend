@@ -32,7 +32,7 @@ def retrieveOrders(request):
         return HttpResponse("Not logged in", status=401)
     
 #######################################################
-def updateOrders(request):
+def updateOrder(request):
     """
     Update saved orders for dashboard.
 
@@ -44,9 +44,20 @@ def updateOrders(request):
     """
     if checkIfUserIsLoggedIn(request):
         if request.method == "PUT":
-            # TODO retrieve cart
-            # TODO change stuff
-            pass
+            content = json.loads(request.body.decode("utf-8"))
+            if "props" in content:
+                orderID = ""
+                orderCollectionID = ""
+                if "orderID" in content["props"]:
+                    orderID = content["props"]["orderID"]
+                if "orderCollectionID" in content["props"]:
+                    orderCollectionID = content["props"]["orderCollectionID"]
+
+                if "chat" in content["props"]:
+                    postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.chat, content["props"]["chat"])
+                if "state" in content["props"]:
+                    postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.status, content["props"]["state"])
+
 
         return HttpResponse("Success")
     else:

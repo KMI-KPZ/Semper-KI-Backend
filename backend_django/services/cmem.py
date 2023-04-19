@@ -13,7 +13,7 @@ endpoint = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem")
 endpoint.setCredentials(user=settings.SPARQL_USERNAME, passwd=settings.SPARQL_PASSWORD)
 
 #######################################################
-def testQuery():
+def testQuery(query):
     """
     Test Sparql query.
 
@@ -24,11 +24,16 @@ def testQuery():
     # maybe construct first, save that to redis and then search/filter from that
     endpointCopy = endpoint
     endpointCopy.setReturnFormat(JSON)
-    endpointCopy.setQuery("""
-   SELECT *
-   where {?s ?p ?o}
-   LIMIT 100
-    """)
+    endpointCopy.setQuery(query)
+#     endpointCopy.setQuery("""
+#     PREFIX test: <http://www.exampe.org/O4A.owl#>
+#     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+#        SELECT *
+#    where {?s ?p test:Description}
+#    LIMIT 100
+#     """)
+    # SELECT *
+   #where {?s ?p ?o}
 
     results = endpointCopy.queryAndConvert()
     return results["results"]["bindings"]

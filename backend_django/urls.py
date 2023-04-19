@@ -46,6 +46,7 @@ paths = {
     "updateName": "public/updateName/",
     "updateRole": "public/updateRole/",
     "testQuery": "private/testquery/",
+    "testQuerySize": "private/query/",
     "isLoggedIn": "public/isLoggedIn/",
     "testRedis": "private/testRedis/",
     "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
@@ -62,7 +63,7 @@ paths = {
     "checkLogistics": "public/checkLogistics/",
     "sendOrder": "public/sendOrder/",
     "retrieveOrders": "public/getOrders/",
-    "updateOrders": "public/updateOrders/",
+    "updateOrder": "public/updateOrder/",
     "getManufacturers": "public/getManufacturers/",
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/"
@@ -101,7 +102,7 @@ urlpatterns = [
     path(paths["sendOrder"], checkOrder.sendOrder, name='sendOrder'),
 
     path(paths["retrieveOrders"], dashboard.retrieveOrders, name='retrieveOrders'),
-    path(paths["updateOrders"], dashboard.updateOrders, name='updateOrders'),
+    path(paths["updateOrder"], dashboard.updateOrder, name='updateOrder'),
     path(paths["deleteOrder"], dashboard.deleteOrder, name='deleteOrder'),
     path(paths["deleteOrderCollection"], dashboard.deleteOrderCollection, name='deleteOrderCollection'),
 
@@ -115,6 +116,7 @@ urlpatterns = [
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
+    path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
     
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),

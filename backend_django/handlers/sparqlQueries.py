@@ -21,6 +21,6 @@ def testQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.testQuery()
+    results = cmem.testQuery(request.POST["query"])
     
     return JsonResponse(results, safe=False)
