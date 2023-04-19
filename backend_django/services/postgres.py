@@ -415,11 +415,16 @@ class OrderManagement():
                     currentOrder.status = content
                     currentOrder.updatedWhen = updated
                     currentOrder.save()
-                if orderCollectionID != "":    
+                elif orderCollectionID != "":    
                     currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
                     currentOrderCollection.status = content
                     currentOrderCollection.updatedWhen = updated
                     currentOrderCollection.save()
+                    # update status for orders of that collection as well
+                    for order in currentOrderCollection.orders.all():
+                        order.status = content
+                        order.updatedWhen = updated
+                        order.save()
             return True
         except (Exception) as error:
             print(error)
