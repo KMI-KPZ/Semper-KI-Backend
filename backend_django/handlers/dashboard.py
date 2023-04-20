@@ -140,15 +140,19 @@ def getMissedEvents(request):
                     if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')):
                         newMessagesCount += 1
                 if lastLogin < orders["updatedWhen"]:
-                    currentOrder["status"] = 1
+                    status = 1
                 else:
-                    currentOrder["status"] = 0
+                    status = 0
+                
+                # if something changed, save it. If not, discard
+                if status !=0 or newMessagesCount != 0: 
+                    currentOrder["status"] = status
+                    currentOrder["messages"] = newMessagesCount
 
-                currentOrder["messages"] = newMessagesCount
-
-                orderArray.append(currentOrder)
-            currentCollection["orders"] = orderArray
-            output.append(currentCollection)
+                    orderArray.append(currentOrder)
+            if len(orderArray):
+                currentCollection["orders"] = orderArray
+                output.append(currentCollection)
         
         # set accessed time to now
         postgres.ProfileManagement.setLoginTime(user["hashedID"])
