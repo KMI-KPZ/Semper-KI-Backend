@@ -83,34 +83,37 @@ def uploadModels(request):
 
     """
     if request.method == "POST":
-        key = request.session.session_key
-        fileNames = list(request.FILES.keys())
-        files = []
-        models = {"models": []}
+        try:
+            key = request.session.session_key
+            fileNames = list(request.FILES.keys())
+            files = []
+            models = {"models": []}
 
-        previews = asyncio.run(createPreview(request.FILES, fileNames))
+            previews = asyncio.run(createPreview(request.FILES, fileNames))
 
-        for idx, name in enumerate(fileNames):
-            id = crypto.generateMD5(name + crypto.generateSalt())
+            for idx, name in enumerate(fileNames):
+                id = crypto.generateMD5(name + crypto.generateSalt())
 
-            model = mocks.getEmptyMockModel()
-            model["id"] = id
-            model["title"] = name
-            model["URI"] = str(previews[idx])
-            model["createdBy"] = "user"
-            models["models"].append(model)
+                model = mocks.getEmptyMockModel()
+                model["id"] = id
+                model["title"] = name
+                model["URI"] = str(previews[idx])
+                model["createdBy"] = "user"
+                models["models"].append(model)
 
-            # stl.binToJpg(previews[idx])
+                # stl.binToJpg(previews[idx])
 
-            files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
+                files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
 
-        returnVal = redis.addContent(key, files)
-        if returnVal is not True:
-            return HttpResponse(returnVal, status=500)
+            returnVal = redis.addContent(key, files)
+            if returnVal is not True:
+                return HttpResponse(returnVal, status=500)
 
-        return JsonResponse(models)
+            return JsonResponse(models)
+        except (Exception) as error:
+            print(error)
+            return HttpResponse(error, status=500)
 
-    
     return HttpResponse("Wrong request method!", status=405)
 
 #######################################################
