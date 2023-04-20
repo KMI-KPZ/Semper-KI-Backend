@@ -66,7 +66,8 @@ paths = {
     "updateOrder": "public/updateOrder/",
     "getManufacturers": "public/getManufacturers/",
     "deleteOrder": "public/deleteOrder/",
-    "deleteOrderCollection": "public/deleteOrderCollection/"
+    "deleteOrderCollection": "public/deleteOrderCollection/",
+    "getMissedEvents": "public/getMissedEvents/"
 }
 
 urlpatterns = [
@@ -105,6 +106,7 @@ urlpatterns = [
     path(paths["updateOrder"], dashboard.updateOrder, name='updateOrder'),
     path(paths["deleteOrder"], dashboard.deleteOrder, name='deleteOrder'),
     path(paths["deleteOrderCollection"], dashboard.deleteOrderCollection, name='deleteOrderCollection'),
+    path(paths["getMissedEvents"], dashboard.getMissedEvents, name='getMissedEvents'),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),

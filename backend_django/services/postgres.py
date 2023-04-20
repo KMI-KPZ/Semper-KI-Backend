@@ -84,6 +84,21 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
+    def setLoginTime(userIDHash):
+        """
+        Sets the accessed Time to now. Used for 'Last Login'.
+
+        :param session: userID
+        :type session: str
+        :return: Nothing
+        :rtype: None
+
+        """
+        currUser = User.objects.get(hashedID=userIDHash)
+        currUser.save()
+
+    ##############################################
+    @staticmethod
     def addUser(session):
         """
         Add user if the entry doesn't already exists.
@@ -328,6 +343,7 @@ class OrderManagement():
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = entry.userCommunication
                     currentOrder["files"] = entry.files
+                    currentOrder["updatedWhen"] = entry.updatedWhen
                     #currentOrder["dates"] = json.dumps(entry.dates)
                     ordersOfThatCollection.append(currentOrder)
                 currentOrderCollection["orders"] = ordersOfThatCollection
@@ -415,6 +431,22 @@ class OrderManagement():
                     currentOrder.status = content
                     currentOrder.updatedWhen = updated
                     currentOrder.save()
+                    
+                    # if at least one order is being processed, the collection is set to 'in process'
+                    respectiveOrderCollection = currentOrder.orderCollectionKey
+                    if respectiveOrderCollection.status == 0 and content != 0:
+                        respectiveOrderCollection.status = 1
+                        respectiveOrderCollection.save()
+                    
+                    # if order is set to finished, check if the whole collection ca be set to 'finished'
+                    finishedFlag = True
+                    for orderOfCollection in respectiveOrderCollection.orders.all():
+                        if orderOfCollection.status != 6:
+                            finishedFlag = False
+                            break
+                    if finishedFlag:
+                        respectiveOrderCollection.status = 3
+
                 elif orderCollectionID != "":    
                     currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
                     currentOrderCollection.status = content

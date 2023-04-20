@@ -9,6 +9,8 @@ Contains: Handlers for the dashboard
 import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from datetime import datetime
+from django.utils import timezone
 
 from ..handlers.authentification import checkIfUserIsLoggedIn
 
@@ -105,3 +107,54 @@ def deleteOrderCollection(request):
                 return HttpResponse("Failed")
     else:
         return HttpResponse("Not logged in", status=401)
+    
+
+#######################################################
+def getMissedEvents(request):
+    """
+    Show how many events (chat messages ...) were missed since last login.
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response with numbers for every order and orderCollection
+    :rtype: JSON Response
+
+    """
+    if checkIfUserIsLoggedIn(request):
+        user = postgres.ProfileManagement.getUser(request.session)
+        lastLogin = user["accessed"]
+        orderCollections = postgres.OrderManagement.getOrders(user["hashedID"])
+
+        output = []
+
+        for orderCollection in orderCollections:
+            currentCollection = {}
+            currentCollection["orderCollectionID"] = orderCollection["id"]
+            orderArray = []
+            for orders in orderCollection["orders"]:
+                currentOrder = {}
+                currentOrder["orderID"] = orders["id"]
+                newMessagesCount = 0
+                chat = orders["chat"]["messages"]
+                for messages in chat:
+                    if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')):
+                        newMessagesCount += 1
+                if lastLogin < orders["updatedWhen"]:
+                    currentOrder["status"] = 1
+                else:
+                    currentOrder["status"] = 0
+
+                currentOrder["messages"] = newMessagesCount
+
+                orderArray.append(currentOrder)
+            currentCollection["orders"] = orderArray
+            output.append(currentCollection)
+        
+        # set accessed time to now
+        postgres.ProfileManagement.setLoginTime(user["hashedID"])
+
+        return JsonResponse(output, status=200, safe=False)
+    else:
+        return HttpResponse("Not logged in", status=401)
+
+
