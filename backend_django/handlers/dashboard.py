@@ -12,6 +12,9 @@ from django.http import HttpResponse, JsonResponse
 from datetime import datetime
 from django.utils import timezone
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from ..handlers.authentification import checkIfUserIsLoggedIn
 
 from ..services import postgres
@@ -55,13 +58,29 @@ def updateOrder(request):
                 if "orderCollectionID" in content["props"]:
                     orderCollectionID = content["props"]["orderCollectionID"]
 
+                outputDict = {}
+                outputDict["orderCollectionID"] = orderCollectionID
+
                 if "chat" in content["props"]:
                     postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.chat, content["props"]["chat"])
+                    outputDict["orders"] = [{"orderID": orderID, "status": 0, "messages": 1}]
+
                 if "state" in content["props"]:
                     postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.status, content["props"]["state"])
+                    outputDict["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
 
+                # send to websockets that are active, that a new message/status is available for that order
+                channel_layer = get_channel_layer()
+                listOfUsers = postgres.OrderManagement.getAllUsersOfOrder(orderID)
+                for user in listOfUsers:
+                    if user.subID != postgres.ProfileManagement.getUserKey(session=request.session):
+                        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=user.subID), {
+                            "type": "sendMessageJSON",
+                            "dict": outputDict,
+                        })
 
-        return HttpResponse("Success")
+            return HttpResponse("Success")
+        return HttpResponse("Wrong method!", status=405)
     else:
         return HttpResponse("Not logged in", status=401)
     

@@ -42,7 +42,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
         session = await sync_to_async(self.getSession)()
         if "user" in session:
             # Then gather the user ID from the session user token and create room from that
-            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session)
+            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
             # in other function send to that "group"/"channel"
             #TODO https://channels.readthedocs.io/en/stable/topics/channel_layers.html
             await self.channel_layer.group_add(uID, self.channel_name)
@@ -52,13 +52,14 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         session = await sync_to_async(self.getSession)()
         if "user" in session:
-            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session)
+            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
             await self.channel_layer.group_discard(uID, self.channel_name)
         raise StopConsumer("Connection closed")
     
     ##########################
     async def receive(self, text_data=None, bytes_data=None):
-        
+        #if text_data == "Printability":
+
         await self.send(text_data="PONG")
 
     ##########################

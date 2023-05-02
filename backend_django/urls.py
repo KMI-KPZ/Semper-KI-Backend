@@ -141,6 +141,6 @@ from .handlers.test_response import testWebSocket
 from .handlers.websocket import GeneralWebSocket
 
 websockets = [
-    path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync"),
+    #path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync"),
     path("ws/generalWebsocket/", GeneralWebSocket.as_asgi(), name="Websocket")
 ]

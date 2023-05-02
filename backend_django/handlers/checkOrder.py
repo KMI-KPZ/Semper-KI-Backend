@@ -110,7 +110,7 @@ def checkPrintability(request):
         outputDict = {}
         outputDict = {"printability": True}
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(request.session), {
+        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
             "type": "sendMessageJSON",
             "dict": outputDict,
         })

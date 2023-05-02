@@ -104,7 +104,7 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
-    def getUserKeyWOSC(session):
+    def getUserKeyWOSC(session=None, uID=None):
         """
         Retrieve User ID from Session without special characters
 
@@ -116,7 +116,10 @@ class ProfileManagement():
         """
         userID = ""
         try:
-            userID = session["user"]["userinfo"]["sub"]
+            if session is not None:
+                userID = session["user"]["userinfo"]["sub"]
+            if uID is not None:
+                userID = uID
             userID = re.sub(r"[^a-zA-Z0-9]", "", userID)
         except (Exception) as error:
             print(error)
@@ -396,6 +399,26 @@ class OrderManagement():
         except (Exception) as error:
             print(error)
         
+        return []
+
+    ##############################################
+    @staticmethod
+    def getAllUsersOfOrder(orderID):
+        """
+        Get all users that are connected to that orderID.
+
+        :param orderID: unique order ID
+        :type orderID: str
+        :return: List of all userIDs
+        :rtype: List
+
+        """
+        try:
+            currentOrder = Orders.objects.get(orderID=orderID)
+            users = User.objects.filter(orders=currentOrder.orderCollectionKey).all()
+            return list(users)
+        except (Exception) as error:
+            print(error)
         return []
 
     ##############################################

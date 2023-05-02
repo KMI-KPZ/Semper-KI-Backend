@@ -68,7 +68,7 @@ from backend_django.services import postgres
 def testCallToWebsocket(request):
     if "user" in request.session:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(request.session), {
+        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
     "type": "sendMessage",
     "text": "Hello there!",
 })
