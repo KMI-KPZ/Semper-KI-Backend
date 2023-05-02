@@ -22,6 +22,9 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.conf import settings
 
+##############################################################################
+### WSGI
+
 from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
@@ -45,7 +48,8 @@ paths = {
     "getUserTest": "private/profile_getUser/",
     "updateName": "public/updateName/",
     "updateRole": "public/updateRole/",
-    "testQuery": "private/testquery/",
+    "testQuery": "public/testquery/",
+    "sendQuery": "private/sendQuery/",
     "testQuerySize": "private/query/",
     "isLoggedIn": "public/isLoggedIn/",
     "testRedis": "private/testRedis/",
@@ -81,6 +85,7 @@ urlpatterns = [
     path(paths["csrfTest"], test_response.testResponseCsrf, name='test_response_csrf'),
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
     path('private/test/', test_response.testResponse, name='test_response'),
+    path('private/testWebsocket/', test_response.testCallToWebsocket, name='testCallToWebsocket'),
 
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
@@ -119,6 +124,7 @@ urlpatterns = [
 
     path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
+    path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
     
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
@@ -128,3 +134,13 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
 urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
+
+##############################################################################
+### ASGI
+from .handlers.test_response import testWebSocket
+from .handlers.websocket import GeneralWebSocket
+
+websockets = [
+    path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync"),
+    path("ws/generalWebsocket/", GeneralWebSocket.as_asgi(), name="Websocket")
+]

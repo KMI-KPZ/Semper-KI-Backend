@@ -11,9 +11,24 @@ from django.http import JsonResponse
 from ..services import cmem
 
 #######################################################
+def sendQuery(request):
+    """
+    Test Sparql queries that come from the form.
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Json containing results of the query
+    :rtype: JSONResponse
+
+    """
+    results = cmem.testQuery(request.POST["query"])
+    
+    return JsonResponse(results, safe=False)
+
+#######################################################
 def testQuery(request):
     """
-    Test Sparql queries
+    Test Sparql query.
 
     :param request: GET Request
     :type request: HTTP GET
@@ -21,6 +36,6 @@ def testQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.testQuery(request.POST["query"])
+    results = cmem.testQuery("SELECT * where {?s ?p ?o} LIMIT 100")
     
     return JsonResponse(results, safe=False)

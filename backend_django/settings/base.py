@@ -68,11 +68,11 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'uvicorn',
+    'channels',
     'corsheaders',
     'backend_django',
-    'session_cleanup',
-    'channels',
-    'uvicorn'
+    'session_cleanup'
 ]
 
 MIDDLEWARE = [
@@ -103,9 +103,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'backend_django.wsgi.application'
-ASGI_APPLICATION = "backend_django.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
@@ -194,3 +191,8 @@ SPARQL_PASSWORD = os.environ.get("SPARQLPW")
 CELERYBEAT_SCHEDULE = {
     'session_cleanup': weekly_schedule
 }
+
+
+# Callers
+WSGI_APPLICATION = 'backend_django.wsgi.application'
+ASGI_APPLICATION = "backend_django.asgi.application"

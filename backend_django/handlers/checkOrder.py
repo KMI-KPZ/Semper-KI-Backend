@@ -10,6 +10,9 @@ import json, random
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from ..handlers.authentification import checkIfUserIsLoggedIn
 
 from ..services import redis, mocks, postgres, crypto
@@ -104,6 +107,13 @@ def checkPrintability(request):
         # TODO: use simulation service
 
         # return success or failure
+        outputDict = {}
+        outputDict = {"printability": True}
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(request.session), {
+            "type": "sendMessageJSON",
+            "dict": outputDict,
+        })
         return HttpResponse("Printable")
     else:
         return HttpResponse("Not logged in", status=401)
@@ -194,7 +204,7 @@ def sendOrder(request):
     """
     if checkIfUserIsLoggedIn(request):
         try:
-            uID = postgres.ProfileManagement.getUserID(request.session)
+            uID = postgres.ProfileManagement.getUserHashID(request.session)
             selected = request.session["selected"]["cart"]
             postgres.OrderManagement.addOrder(uID, selected)
             # Save picture and files in permanent storage

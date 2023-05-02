@@ -5,10 +5,9 @@
   </head>
   <body>
     <h1>Testquery</h1>
-    <form  method="post" action="/private/testquery/" enctype="multipart/form-data">
+    <form  method="post" action="/private/sendQuery/" enctype="multipart/form-data">
         {% csrf_token  %}
-        <textarea id="sparql_query" name="query" rows="10" cols="50">
-        </textarea>
+        <textarea id="sparql_query" name="query" rows="10" cols="50"></textarea>
         <button type="submit" >Submit</button>
     </form>  
   </body>

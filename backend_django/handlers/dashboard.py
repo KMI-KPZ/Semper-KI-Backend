@@ -28,7 +28,7 @@ def retrieveOrders(request):
 
     """
     if checkIfUserIsLoggedIn(request):
-        uID = postgres.ProfileManagement.getUserID(request.session)
+        uID = postgres.ProfileManagement.getUserHashID(request.session)
         return JsonResponse(postgres.OrderManagement.getOrders(uID), safe=False)
     else:
         return HttpResponse("Not logged in", status=401)

@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for database calls
 """
-import types, json, enum
+import types, json, enum, re
 
 from datetime import datetime
 from django.utils import timezone
@@ -63,14 +63,14 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
-    def getUserID(session):
+    def getUserHashID(session):
         """
         Retrieve hashed User ID from Session
 
         :param session: session
         :type session: Dictionary
         :return: Hashed user key from database
-        :rtype: Dictionary
+        :rtype: Str
 
         """
         hashID = ""
@@ -81,6 +81,47 @@ class ProfileManagement():
             print(error)
 
         return hashID
+    
+    ##############################################
+    @staticmethod
+    def getUserKey(session):
+        """
+        Retrieve User ID from Session
+
+        :param session: session
+        :type session: Dictionary
+        :return: User key from database
+        :rtype: Str
+
+        """
+        userID = ""
+        try:
+            userID = session["user"]["userinfo"]["sub"]
+        except (Exception) as error:
+            print(error)
+
+        return userID
+    
+    ##############################################
+    @staticmethod
+    def getUserKeyWOSC(session):
+        """
+        Retrieve User ID from Session without special characters
+
+        :param session: session
+        :type session: Dictionary
+        :return: User key from database without stuff like | or ^
+        :rtype: Str
+
+        """
+        userID = ""
+        try:
+            userID = session["user"]["userinfo"]["sub"]
+            userID = re.sub(r"[^a-zA-Z0-9]", "", userID)
+        except (Exception) as error:
+            print(error)
+
+        return userID
     
     ##############################################
     @staticmethod

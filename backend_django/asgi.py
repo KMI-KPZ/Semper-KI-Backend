@@ -18,25 +18,22 @@ https://docs.djangoproject.com/en/4.1/howto/deployment/asgi/
 
 import os
 
+from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
-from django.core.asgi import get_asgi_application
-from django.urls import path
-from backend_django.handlers.test_response import testWebSocket
-from backend_django.handlers.websocket import GeneralWebSocket
+from channels.sessions import SessionMiddlewareStack
 
-websockets = [
-    path("ws/testWebsocket/", testWebSocket.as_asgi(), name="testAsync"),
-    path("ws/generalWebsocket/", GeneralWebSocket.as_asgi(), name="Websocket")
-]
+django_asgi_app = get_asgi_application()
+
+from .urls import websockets
 
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend_django.settings.base")
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
-        "https": get_asgi_application(),
-        "websocket":URLRouter(websockets) #AllowedHostsOriginValidator(AuthMiddlewareStack(URLRouter(websockets))),
+        "http": django_asgi_app,
+        "https": django_asgi_app,
+        "websocket": AllowedHostsOriginValidator(SessionMiddlewareStack(URLRouter(websockets))),
     }
 )

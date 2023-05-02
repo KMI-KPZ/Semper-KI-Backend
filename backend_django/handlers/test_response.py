@@ -60,3 +60,18 @@ class testWebSocket(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         print(text_data)
         await self.send(text_data="PONG")
+
+################################################### 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from backend_django.services import postgres
+def testCallToWebsocket(request):
+    if "user" in request.session:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(request.session), {
+    "type": "sendMessage",
+    "text": "Hello there!",
+})
+
+        return HttpResponse("Success", status=200)
+    return HttpResponse("Not Logged In", status=401)
