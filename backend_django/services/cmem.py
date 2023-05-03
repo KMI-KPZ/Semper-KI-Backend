@@ -13,10 +13,11 @@ endpoint = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem")
 endpoint.setCredentials(user=settings.SPARQL_USERNAME, passwd=settings.SPARQL_PASSWORD)
 
 #######################################################
-def testQuery(query):
+def sendQuery(query):
     """
-    Test Sparql query.
-
+    Send SPARQL query.
+    :param query: Contains sparql query as string
+    :type query: str
     :return: result of query
     :rtype: JSON
 

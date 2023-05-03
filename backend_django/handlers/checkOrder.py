@@ -107,13 +107,13 @@ def checkPrintability(request):
         # TODO: use simulation service
 
         # return success or failure
-        outputDict = {}
-        outputDict = {"printability": True}
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
-            "type": "sendMessageJSON",
-            "dict": outputDict,
-        })
+        # outputDict = {}
+        # outputDict = {"printability": True}
+        # channel_layer = get_channel_layer()
+        # async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
+        #     "type": "sendMessageJSON",
+        #     "dict": outputDict,
+        # })
         return HttpResponse("Printable")
     else:
         return HttpResponse("Not logged in", status=401)
@@ -146,11 +146,13 @@ def checkPrice(request):
 
         # TODO: use calculation service
 
+        # THIS IS A MOCK
         summedUpPrices= 0
         for idx, elem in enumerate(selected["cart"]):
-            prices = mocks.mockPrices(elem)
+            prices = random.randint(1,100) #mocks.mockPrices(elem)
             summedUpPrices += prices
             request.session["selected"]["cart"][idx]["prices"] = prices
+
         return HttpResponse(summedUpPrices)
     else:
         return HttpResponse("Not logged in", status=401)
@@ -184,7 +186,7 @@ def checkLogistics(request):
         # TODO: use calculation service
         summedUpLogistics = 0
         for idx, elem in enumerate(selected["cart"]):
-            logistics = mocks.mockLogistics(elem)
+            logistics = random.randint(1,100) #mocks.mockLogistics(elem)
             summedUpLogistics += logistics
             request.session["selected"]["cart"][idx]["logistics"] = logistics
         return HttpResponse(summedUpLogistics)

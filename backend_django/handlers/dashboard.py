@@ -156,7 +156,7 @@ def getMissedEvents(request):
                 newMessagesCount = 0
                 chat = orders["chat"]["messages"]
                 for messages in chat:
-                    if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')):
+                    if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages["userID"] != user["hashedID"]:
                         newMessagesCount += 1
                 if lastLogin < orders["updatedWhen"]:
                     status = 1

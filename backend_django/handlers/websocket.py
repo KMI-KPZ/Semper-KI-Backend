@@ -15,14 +15,6 @@ from channels.db import database_sync_to_async
 
 from backend_django.services import postgres
 
-
-
-# TODO 
-# 1. Check if websocket is active or not -> Check
-# 2. Link session to websocket (save if active or not) -> Check
-# 3. Link User from database to session
-# 4. Send message from one user to the other -> https://stackoverflow.com/questions/53461830/send-message-using-django-channels-from-outside-consumer-class
-
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
     ##########################
@@ -44,7 +36,6 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
             # Then gather the user ID from the session user token and create room from that
             uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
             # in other function send to that "group"/"channel"
-            #TODO https://channels.readthedocs.io/en/stable/topics/channel_layers.html
             await self.channel_layer.group_add(uID, self.channel_name)
             await self.accept()
 

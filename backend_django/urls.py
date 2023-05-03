@@ -122,7 +122,7 @@ urlpatterns = [
     path(paths["updateName"], profiles.updateName, name="updateName"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 
-    path(paths["testQuery"], sparqlQueries.testQuery, name="testQuery"),
+    path(paths["testQuery"], sparqlQueries.sendQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
     path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
     

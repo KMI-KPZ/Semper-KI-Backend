@@ -435,10 +435,12 @@ class OrderManagement():
         """
         updated = timezone.now()
         try:
-            #currentUser = User.objects.get(hashedID=userID)
             currentOrder = Orders.objects.get(orderID=orderID)
-            currentOrder.orderCollectionKey.updatedWhen = updated
-            currentOrder.delete()
+            if len(currentOrder.orderCollectionKey.orders.all()) == 1:
+                currentOrder.orderCollectionKey.delete()
+            else:
+                currentOrder.orderCollectionKey.updatedWhen = updated
+                currentOrder.delete()
             return True
         except (Exception) as error:
             print(error)

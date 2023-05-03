@@ -21,12 +21,12 @@ def sendQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.testQuery(request.POST["query"])
+    results = cmem.sendQuery(request.POST["query"])
     
     return JsonResponse(results, safe=False)
 
 #######################################################
-def testQuery(request):
+def sendQuery(request):
     """
     Test Sparql query.
 
@@ -36,6 +36,6 @@ def testQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.testQuery("SELECT * where {?s ?p ?o} LIMIT 100")
+    results = cmem.sendQuery("SELECT * where {?s ?p ?o} LIMIT 100")
     
     return JsonResponse(results, safe=False)
