@@ -7,9 +7,11 @@ Contains: File upload handling
 """
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-import asyncio
+import asyncio, json
 
-from ..services import crypto, redis, stl, mocks
+from ..handlers.authentification import checkIfUserIsLoggedIn
+
+from ..services import crypto, redis, stl, mocks, postgres
 
 #######################################################
 def testRedis(request):
@@ -137,5 +139,33 @@ def getUploadedFiles(session_key):
 def testGetUploadedFiles(request):
     return HttpResponse(getUploadedFiles(request.session.session_key), content_type='multipart/form-data')
 
+#######################################################
+def downloadFiles(request):
+    """
+    Send file to user from temporary, later permanent storage
 
+    :param request: Request of user for a specific file of an order
+    :type request: HTTP POST
+    :return: Saved content
+    :rtype: HTTP Response
+
+    """
+    if checkIfUserIsLoggedIn(request):
+        if request.method == "POST":
+            content = json.loads(request.body.decode("utf-8"))
+            orderID = content["id"]
+            fileName = content["filename"]
+            currentOrder = postgres.OrderManagement.getOrder(orderID)
+            for idx, elem in enumerate(currentOrder.files):
+                if fileName == elem["filename"]:
+                    (contentOrError, Flag) = redis.retrieveContent(elem["path"])
+                    if Flag:
+                        return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
+                    else:
+                        return HttpResponse(contentOrError, status=500)
+            return HttpResponse("Not found!", status=404)
+        else:
+            return HttpResponse("Wrong method!", status=405)
+    else:
+        return HttpResponse("Not logged in", status=401)
     

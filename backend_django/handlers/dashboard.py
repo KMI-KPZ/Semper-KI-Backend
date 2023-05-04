@@ -41,8 +41,8 @@ def updateOrder(request):
     """
     Update saved orders for dashboard.
 
-    :param request: POST Request
-    :type request: HTTP POST
+    :param request: PUT Request
+    :type request: HTTP PUT
     :return: HTTP Response if update worked
     :rtype: HTTP Response
 

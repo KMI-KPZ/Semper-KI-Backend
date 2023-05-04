@@ -13,7 +13,7 @@ from django.utils import timezone
 from ..modelFiles.profile import User,Manufacturer,Stakeholder
 from ..modelFiles.orders import Orders,OrderCollection
 
-from backend_django.services import crypto
+from backend_django.services import crypto, redis
 
 #TODO: switch to async versions at some point
 
@@ -307,16 +307,16 @@ class EnumUpdates(enum.Enum):
 class OrderManagement():
     ##############################################
     @staticmethod
-    def addOrder(userID, orderFromUser):
+    def addOrder(userID, orderFromUser, session):
         """
         Add order for that user. Check if user already has orders and append if so, create a new user if not.
 
         :param userID: user ID of a user
         :type userID: str
-        :param orderID: unique order collection ID
-        :type orderID: str
         :param orderFromUser: order details
         :type orderFromUser: json dict
+        :param session: session of user
+        :type session: session dict
         :return: Flag if it worked or not
         :rtype: Bool
 
@@ -329,16 +329,26 @@ class OrderManagement():
             # generate key and order collection
             orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
             collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=0, updatedWhen=now)
+            # retrieve files
+            uploadedFiles = []
+            (contentOrError, Flag) = redis.retrieveContent(session.session_key)
+            if Flag:
+                for entry in contentOrError:
+                    uploadedFiles.append({"filename":entry[1], "path": session.session_key})
+
             # generate orders
             listOfSelectedManufacturers = []
-            for entry in orderFromUser:
+            for idx, entry in enumerate(orderFromUser):
                 selectedManufacturer = Manufacturer.objects.get(hashedID=entry["manufacturerID"])
                 listOfSelectedManufacturers.append(selectedManufacturer)
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
                 status = 0
                 userCommunication = {"messages": []}
-                files = []
+                if len(uploadedFiles) != 0:
+                    files = [uploadedFiles[idx]]
+                else:
+                    files = []
                 dates = {"created": str(now), "updated": str(now)}
                 Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
             # link OrderCollection to user
@@ -364,8 +374,8 @@ class OrderManagement():
 
         :param userID: user ID for a user
         :type userID: str
-        :return: Tuple with all jsons (orders, status, communication, files)
-        :rtype: Tuple of JSONs
+        :return: sorted list with all jsons (orders, status, communication, files)
+        :rtype: list
 
         """
         try:
@@ -386,7 +396,11 @@ class OrderManagement():
                     currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = entry.userCommunication
-                    currentOrder["files"] = entry.files
+                    filesOutput = []
+                    if len(entry.files) != 0:
+                        for elem in entry.files:
+                            filesOutput.append(elem["filename"])
+                    currentOrder["files"] = filesOutput
                     currentOrder["updatedWhen"] = entry.updatedWhen
                     #currentOrder["dates"] = json.dumps(entry.dates)
                     ordersOfThatCollection.append(currentOrder)
@@ -400,6 +414,26 @@ class OrderManagement():
             print(error)
         
         return []
+    
+    ##############################################
+    @staticmethod
+    def getOrder(orderID):
+        """
+        Get one order.
+
+        :param orderID: order ID for an order
+        :type orderID: str
+        :return: Requested order
+        :rtype: Order
+
+        """
+        try:
+            currentOrder = Orders.objects.get(orderID=orderID)
+            return currentOrder
+        except (Exception) as error:
+            print(error)
+        
+        return None
 
     ##############################################
     @staticmethod

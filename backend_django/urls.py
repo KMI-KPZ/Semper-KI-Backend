@@ -71,7 +71,8 @@ paths = {
     "getManufacturers": "public/getManufacturers/",
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/",
-    "getMissedEvents": "public/getMissedEvents/"
+    "getMissedEvents": "public/getMissedEvents/",
+    "getFileFromOrder": "public/getFileFromOrder/"
 }
 
 urlpatterns = [
@@ -129,6 +130,7 @@ urlpatterns = [
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
+    path(paths["getFileFromOrder"], files.downloadFiles, name="getFileFromOrder"),
     
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
