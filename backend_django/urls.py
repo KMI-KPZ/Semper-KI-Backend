@@ -48,7 +48,7 @@ paths = {
     "getUserTest": "private/profile_getUser/",
     "updateName": "public/updateName/",
     "updateRole": "public/updateRole/",
-    "testQuery": "public/testquery/",
+    "testQuery": "private/testquery/",
     "sendQuery": "private/sendQuery/",
     "testQuerySize": "private/query/",
     "isLoggedIn": "public/isLoggedIn/",

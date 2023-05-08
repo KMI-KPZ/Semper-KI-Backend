@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: File upload handling
 """
 
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
 import asyncio, json
 
 from ..handlers.authentification import checkIfUserIsLoggedIn
@@ -161,6 +161,7 @@ def downloadFiles(request):
                     (contentOrError, Flag) = redis.retrieveContent(elem["path"])
                     if Flag:
                         return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
+                        #return FileResponse(contentOrError[idx][3].seek(0)) #, content_type='multipart/form-data')
                     else:
                         return HttpResponse(contentOrError, status=500)
             return HttpResponse("Not found!", status=404)

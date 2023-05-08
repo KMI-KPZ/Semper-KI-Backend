@@ -9,7 +9,7 @@ Contains: Services for the sparql endpoint
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 
-endpoint = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem")
+endpoint = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem") #https://cmem.semper-ki.org/dataplatform/proxy/default/sparql
 endpoint.setCredentials(user=settings.SPARQL_USERNAME, passwd=settings.SPARQL_PASSWORD)
 
 #######################################################
