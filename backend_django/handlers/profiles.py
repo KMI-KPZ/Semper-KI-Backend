@@ -14,6 +14,8 @@ from django.db import models
 from django.utils import timezone
 from urllib.parse import unquote
 
+from ..handlers.authentification import checkIfUserIsLoggedIn
+
 from ..modelFiles.profile import User
 
 from ..services import postgres
@@ -29,14 +31,14 @@ def addUserTest(request):
     :rtype: HTTP status
 
     """
-    if "user" in request.session:
+    if checkIfUserIsLoggedIn(request):
         flag = postgres.ProfileManagement.addUser(request.session)
         if flag is True:
             return HttpResponse("Worked")
         else:
             return HttpResponse("Failed", status=500)
     else:
-        return HttpResponse("Failed", status=401)
+        return HttpResponse("Not logged in", status=401)
 
 ##############################################
 def getUserTest(request):
@@ -56,20 +58,23 @@ def updateName(request):
     """
     Update user name.
 
-    :param request: GET request
-    :type request: HTTP GET
+    :param request: POST request
+    :type request: HTTP POST
     :return: HTTP response
     :rtype: HTTP status
 
     """
-    if "user" in request.session:
-        flag = postgres.ProfileManagement.updateName(request.session, request.header["username"])
-        if flag is True:
-            return HttpResponse("Worked")
+    if request.method == "PUT":
+        content = json.loads(request.body.decode("utf-8"))
+        if checkIfUserIsLoggedIn(request):
+            flag = postgres.ProfileManagement.updateName(request.session, content["username"])
+            if flag is True:
+                return HttpResponse("Worked")
+            else:
+                return HttpResponse("Failed", status=500)
         else:
-            return HttpResponse("Failed", status=500)
-    else:
-        return HttpResponse("Failed", status=401)
+            return HttpResponse("Not logged in", status=401)
+    return HttpResponse("Wrong method!", status=405)
 
 ##############################################
 def deleteUser(request):
@@ -82,12 +87,14 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    
-    flag = postgres.ProfileManagement.deleteUser(request.session)
-    if flag is True:
-        return HttpResponse("Worked")
+    if checkIfUserIsLoggedIn(request):
+        flag = postgres.ProfileManagement.deleteUser(request.session)
+        if flag is True:
+            return HttpResponse("Worked")
+        else:
+            return HttpResponse("Failed", status=500)
     else:
-        return HttpResponse("Failed", status=500)
+        return HttpResponse("Not logged in", status=401)
 
 # ##############################################
 # def updateUser(request):

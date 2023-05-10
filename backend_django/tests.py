@@ -11,7 +11,7 @@ from django.test import TestCase, Client
 from django.http import HttpRequest, HttpResponse
 from django.test.client import RequestFactory
 import datetime
-import json
+import json, io
 from .urls import paths
 
 # Create your tests here.
@@ -48,7 +48,8 @@ class TestProfiles(TestCase):
         mockSession["user"]["userinfo"]["nickname"] = "testuser"
         mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
         mockSession["usertype"] = "indefinite"
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=1677589627))
+        currentTime = datetime.datetime.now()
+        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
         self.client.get("/"+paths["addUser"])
         response = json.loads(self.client.get("/"+paths["getUser"]).content)
@@ -61,10 +62,11 @@ class TestProfiles(TestCase):
         mockSession["user"]["userinfo"]["nickname"] = "testuser2"
         mockSession["user"]["userinfo"]["email"] = "testuser2@test.de"
         mockSession["usertype"] = "indefinite"
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=1677589627))
+        currentTime = datetime.datetime.now()
+        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
         self.client.get("/"+paths["addUser"])
-        self.client.get("/"+paths["updateName"],headers={"username": "testuser2TEST"})
+        self.client.put("/"+paths["updateName"], '{"username": "testuser2TEST"}')
         response = json.loads(self.client.get("/"+paths["getUser"]).content)
         self.assertIs(response["name"] == "testuser2TEST", True)
     
@@ -75,7 +77,8 @@ class TestProfiles(TestCase):
         mockSession["user"]["userinfo"]["nickname"] = "testuser3"
         mockSession["user"]["userinfo"]["email"] = "testuser3@test.de"
         mockSession["usertype"] = "indefinite"
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=1677589627))
+        currentTime = datetime.datetime.now()
+        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
         self.client.get("/"+paths["addUser"])
         response = json.loads(self.client.get("/"+paths["getUser"]).content)
@@ -89,128 +92,235 @@ class TestRedis(TestCase):
     def testRedis(self):
         response = json.loads(self.client.get("/"+paths["testRedis"]).content)
         self.assertIs(response["result"] == ["testvalue", True], True)
-    
-    def testUploadFile(self):
-        # create File in memory
-        # call to uploadFileTemporary as POST with file in FILES
-        # call testGetUploadedFiles and check if file is the same via md5
-        pass
 
 class TestOrders(TestCase):
+    testFile = io.BytesIO(b'binary stl file                                                                \x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x00\x80\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00')
+    mockCart = {"cart": [{"title": "Cube_3d_printing_sample.stl", "model": {"id": "ceec76ddd0b621bb6d488aa5d6087320", "title": "Cube_3d_printing_sample.stl", "tags": [], "date": "2023-5-10", "license": "", "certificate": [], "URI": "", "createdBy": "user"}, "material": {"id": "a9ae8dcc04ef529de1153d5731c4d65c", "title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": "http://127.0.0.1:8000/public/static/public/media/testpicture.jpg"}, "postProcessings": [{"id": "d3c3ac57e13df2834f84f1f3d96546bf", "title": "postProcessing 0", "checked": True, "selectedValue": "", "valueList": ["selection2", "selection1"], "type": "selection", "URI": "http://127.0.0.1:8000/public/static/public/media/testpicture.jpg"}], "manufacturerID": "44f92f0d8186a77c2f88b7deb4a49004957734e5fd1c7ddab1932318d6d7f6eeb39c7b6f1b3e84035422d219bd3abdad665d07acb26a115a78dd34d612173407"}]}
+    # not part of the tests!
+    @classmethod
+    def createManufacturer(self):
+        mockSession = self.client.session
+        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        mockSession["user"]["userinfo"]["sub"] = "auth0|testmanufacturer"
+        mockSession["user"]["userinfo"]["nickname"] = "testmanufacturer"
+        mockSession["user"]["userinfo"]["email"] = "testmanufacturer@test.de"
+        mockSession["usertype"] = "manufacturer"
+        mockSession["organizationType"] = "manufacturer"
+        currentTime = datetime.datetime.now()
+        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        mockSession.save()
+        self.client.get("/"+paths["addUser"])
+        returnedJson = self.client.get("/"+paths["getManufacturers"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        localMockCart = self.mockCart
+        localMockCart["cart"][0]["manufacturerID"] = returnedJsonAsDict[0]["id"]
+        self.mockCart = localMockCart
+
+    @staticmethod
+    def createUserInSession(mockSession):
+        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser"
+        mockSession["user"]["userinfo"]["nickname"] = "testuser"
+        mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
+        mockSession["usertype"] = "user"
+        currentTime = datetime.datetime.now()
+        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        return mockSession
+
+    @classmethod
+    def setUpClass(self):
+        super().setUpClass()
+        self.client = Client()
+        self.createManufacturer()
+    
+    def testUploadModel(self):
+        # call to uploadFileTemporary as POST with file in FILES
+        mockSession = self.client.session
+        returnedJson = self.client.post("/"+paths["uploadModels"], {'testfile.stl':self.testFile} )
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict["models"]) == 1, True)
+    
+    def testDownloadModel(self):
+        # upload model to redis
+        #mockSession = self.client.session
+        #self.client.post("/"+paths["uploadModels"], {'testfile.stl':self.testFile} )
+        # send post to getFileFromOrder
+
+        # if md5 of upload and download equal, it worked
+        pass
 
     def testAddingToCart(self):
         # mock cart data structure 
         # create mock session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
         # send to updateCart with mock in body as json
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
         # test with getCart if worked
-        pass
+        returnedJson = self.client.get("/"+paths["getCart"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(returnedJsonAsDict == self.mockCart, True)
     
     def testGetManufacturers(self):
         # create manufacturer in database
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
         # call getManufacturers
+        returnedJson = self.client.get("/"+paths["getManufacturers"])
         # check if created one is the same as the result
-        pass
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict) >= 1, True)
 
     def testCheckPrintability(self):
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
         # create mock cart and save to session
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
         # call checkPrintability
+        returnMessage = self.client.get("/"+ paths["checkPrintability"]).content
         # If answer is "Printable", it worked
-        pass
+        self.assertIs(returnMessage == b"Printable", True)
 
     def testCheckPrice(self):
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
         # create mock cart and save to session
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
         # call checkPrice
+        returnMessage = self.client.get("/"+ paths["checkPrices"]).content.decode("UTF-8")
         # If answer an integer, it worked
-        pass
+        self.assertIs(int(returnMessage) > 0, True)
 
     def testCheckLogistics(self):
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
         # create mock cart and save to session
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
         # call checkLogistics
+        returnMessage = self.client.get("/"+ paths["checkLogistics"]).content.decode("UTF-8")
         # If answer an integer, it worked
-        pass
+        self.assertIs(int(returnMessage) > 0, True)
 
     def testSendOrder(self):
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
+        testRet = self.client.get("/"+paths["addUser"])
+        self.assertIs(testRet.content == b"Worked", True)
+
         # create mock cart and save to session
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
         # call sendOrder
+        testRet = self.client.get("/"+paths["sendOrder"])
+        self.assertIs(testRet.content == b"Success", True)
         # call to database to get Order
+        returnedJson = self.client.get("/"+paths["retrieveOrders"])
         # If Order is the same, it worked
-        pass
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(returnedJsonAsDict[0]["orders"][0]["item"]["model"]["id"] == self.mockCart["cart"][0]["model"]["id"], True)
 
-class TestDashboard(TestCase):
+    #def testRetrieveOrders(self): redundant to testSendOrder
 
-    def testRetrieveOrders(self):
-        # create manufacturer
-        # log in by creating a "user" token in session
-        # create cart and save to session and into database via sendOrder
-        # call retrieveOrders
-        # if order is the same, it worked
-        pass
-    
-    def testUpdateOrder(self):
-        # create manufacturer
-        # log in by creating a "user" token in session
-        # create cart and save to session and into database via sendOrder
-        # call updateOrder with PUT and json body
-        # call retrieveOrders
-        # if order was changed, it worked
-        pass
+    #def testUpdateOrder(self): # redundant to testSendOrder
 
     def testDeleteOrder(self):
         # create manufacturer
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
+        testRet = self.client.get("/"+paths["addUser"])
+        self.assertIs(testRet.content == b"Worked", True)
         # create cart and save to session and into database via sendOrder
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
+        # call sendOrder
+        testRet = self.client.get("/"+paths["sendOrder"])
         # call retrieveOrder to get ID
+        returnedJson = self.client.get("/"+paths["retrieveOrders"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        orderID = returnedJsonAsDict[0]["orders"][0]["id"]
         # call deleteOrder with DELETE and body as json with id of order
+        self.client.delete("/"+paths["deleteOrder"], content_type="application/json", data={"id": orderID})
         # call retrieveOrder
+        returnedJson = self.client.get("/"+paths["retrieveOrders"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
         # if empty, it worked
-        pass
+        self.assertIs(len(returnedJsonAsDict) == 0, True)
 
-    def testDeleteOrder(self):
+    def testDeleteOrderCollection(self):
         # create manufacturer
         # log in by creating a "user" token in session
+        mockSession = self.client.session
+        mockSession = self.createUserInSession(mockSession)
+        mockSession.save()
+        testRet = self.client.get("/"+paths["addUser"])
+        self.assertIs(testRet.content == b"Worked", True)
         # create cart and save to session and into database via sendOrder
-        # call retrieveOrder to get orderCollectionID
-        # call deleteOrder with DELETE and body as json with id of orderCollection
+        self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
+        # call sendOrder
+        testRet = self.client.get("/"+paths["sendOrder"])
+        # call retrieveOrder to get ID
+        returnedJson = self.client.get("/"+paths["retrieveOrders"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        orderCollectionID = returnedJsonAsDict[0]["id"]
+        # call deleteOrderCollection with DELETE and body as json with id of orderCollection
+        self.client.delete("/"+paths["deleteOrderCollection"], content_type="application/json", data={"id": orderCollectionID})
         # call retrieveOrder
+        returnedJson = self.client.get("/"+paths["retrieveOrders"])
+        returnedJsonAsDict = json.loads(returnedJson.content)
         # if empty, it worked
-        pass
+        self.assertIs(len(returnedJsonAsDict) == 0, True)
     
     def testGetMissedEvents(self):
         # create manufacturer and save login data (time)
         # log in as user
         # create cart and save to session and into database via sendOrder
+        # updateOrder with Message
         # log in as manufacturer
         # call getMissedEvents
         # if json output is not empty, it worked
         pass
 
 class TestFilters(TestCase):
+    filters = {"filters": [{"id": 0, "isChecked": False, "isOpen": False, "question": {"isSelectable": True, "title": "costs", "category": "general", "type": "slider", "range": [0, 9999], "values": "null", "units": "\u20ac"}, "answer": "null"}]}
 
-    def TestGetFilters(self):
-        # create filters in format of frontend
+    def testGetFilters(self):
         # send via POST as body to getFilters
+        returnedJson = self.client.post("/"+paths["getFilters"], content_type="application/json", data=self.filters)
         # if json is as expected, it worked
-        pass
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict["filters"]) == 1, True) #TODO
 
-    def TestGetPostProcessing(self):
-        # create filters in format of frontend
+    def testGetPostProcessing(self):
         # send via POST as body to getPostProcessing
+        returnedJson = self.client.post("/"+paths["getPostProcessing"], content_type="application/json", data=self.filters)
         # if json is as expected and contains postProcessing stuff, it worked
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict["postProcessing"]) >= 1, True)
         pass
 
-    def TestGetMaterials(self):
-        # create filters in format of frontend
+    def testGetMaterials(self):
         # send via POST as body to getMaterials
-        # if json is as expected and contains postProcessing stuff, it worked
+        returnedJson = self.client.post("/"+paths["getMaterials"], content_type="application/json", data=self.filters)
+        # if json is as expected and contains materials stuff, it worked
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict["materials"]) >= 1, True)
         pass
 
-    def TestGetModels(self):
-        # create filters in format of frontend
+    def testGetModels(self):
         # send via POST as body to getModels
-        # if json is as expected and contains postProcessing stuff, it worked
+        returnedJson = self.client.post("/"+paths["getModels"], content_type="application/json", data=self.filters)
+        # if json is as expected and contains models stuff, it worked
+        returnedJsonAsDict = json.loads(returnedJson.content)
+        self.assertIs(len(returnedJsonAsDict["models"]) >= 1, True)
         pass

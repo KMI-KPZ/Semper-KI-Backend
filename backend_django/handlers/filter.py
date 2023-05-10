@@ -113,16 +113,16 @@ def getMaterials(request):
     for entry in filters["filters"]:
         filtersForSparql.append([entry["question"]["title"], entry["answer"]])
     #TODO ask via sparql with most general filter and then iteratively filter response
-    resultsOfQueries = {"materials": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
-        onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())
-        for elem in onto4AddResults:
-            title = elem["s"]["value"].replace("http://www.onto4additive.com/onto4add#","")
-            resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
+    #resultsOfQueries = {"materials": []}
+    # with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
+    #     onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())
+    #     for elem in onto4AddResults:
+    #         title = elem["s"]["value"].replace("http://www.onto4additive.com/onto4add#","")
+    #         resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
 
     # mockup here:
-    #filters.update(mocks.materialMock)
-    filters.update(resultsOfQueries)
+    filters.update(mocks.materialMock)
+    #filters.update(resultsOfQueries)
     
     # TODO: gzip this 
     return JsonResponse(filters)

@@ -106,7 +106,6 @@ def uploadModels(request):
                 # stl.binToJpg(previews[idx])
 
                 files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
-
             returnVal = redis.addContent(key, files)
             if returnVal is not True:
                 return HttpResponse(returnVal, status=500)
