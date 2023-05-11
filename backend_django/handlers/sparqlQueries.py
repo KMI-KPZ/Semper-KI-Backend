@@ -26,7 +26,7 @@ def sendQuery(request):
     return JsonResponse(results, safe=False)
 
 #######################################################
-def sendQuery(request):
+def sendTestQuery(request):
     """
     Test Sparql query.
 
@@ -39,3 +39,8 @@ def sendQuery(request):
     results = cmem.sendQuery("SELECT * where {?s ?p ?o} LIMIT 100")
     
     return JsonResponse(results, safe=False)
+
+#######################################################
+def testAuth(request):
+    cmem.testGettingTheTokenAndBearWithIt(request)
+    

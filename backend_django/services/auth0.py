@@ -9,9 +9,9 @@ Contains: Services for oauth verification
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
 
-oauth = OAuth()
+oauth_auth0 = OAuth()
 
-oauth.register(
+oauth_auth0.register(
     "auth0",
     client_id=settings.AUTH0_CLIENT_ID,
     client_secret=settings.AUTH0_CLIENT_SECRET,
@@ -32,7 +32,7 @@ def authorizeToken(request):
     :rtype: Dictionary
 
     """
-    return oauth.auth0.authorize_access_token(request)
+    return oauth_auth0.auth0.authorize_access_token(request)
 
 #######################################################
 def authorizeRedirect(request, callback):
@@ -48,6 +48,6 @@ def authorizeRedirect(request, callback):
 
     """
 
-    return oauth.auth0.authorize_redirect(
+    return oauth_auth0.auth0.authorize_redirect(
         request, request.build_absolute_uri(callback)
     )

@@ -12,7 +12,7 @@ from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
-from ..services import redis, postgres, oauth
+from ..services import auth0, redis, postgres
 
 #######################################################
 def checkIfTokenValid(token):
@@ -114,7 +114,7 @@ def loginUser(request):
             register = "&screen_hint=signup"
 
 
-    uri = oauth.authorizeRedirect(request, reverse("callbackLogin"))
+    uri = auth0.authorizeRedirect(request, reverse("callbackLogin"))
     # return uri and redirect to register if desired
     return HttpResponse(uri.url + register)
 
@@ -131,7 +131,7 @@ def callbackLogin(request):
 
     """
     # authorize callback token
-    token = oauth.authorizeToken(request)
+    token = auth0.authorizeToken(request)
 
     # convert expiration time to the corresponding date and time
     now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])

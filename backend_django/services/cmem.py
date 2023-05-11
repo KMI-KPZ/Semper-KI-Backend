@@ -8,9 +8,42 @@ Contains: Services for the sparql endpoint
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
+import requests
+"""
+Part of Semper-KI software
 
-endpoint = SPARQLWrapper("http://host.docker.internal:7200/repositories/cmem") #https://cmem.semper-ki.org/dataplatform/proxy/default/sparql
-endpoint.setCredentials(user=settings.SPARQL_USERNAME, passwd=settings.SPARQL_PASSWORD)
+Silvio Weging 2023
+
+Contains: Services for oauth verification
+"""
+
+#######################################################
+def get_access_token(url, client_id, client_secret):
+    """
+    Get access token from cmem
+    :param url: Url where to get the token from
+    :type url: str
+    :param client_id: Client ID from settings/env
+    :type client_id: str
+    :param client_secret: Client Secret from settings/env
+    :type client_secret: str
+    :return: Access token as bearer from cmem
+    :rtype: JSON
+
+    """
+    response = requests.post(
+        url,
+        data={"grant_type": "client_credentials"},
+        auth=(client_id, client_secret),
+    )
+    return response.json()["access_token"]
+
+endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
+endpoint.addCustomHttpHeader(
+    httpHeaderName="Authorization", httpHeaderValue="Bearer "
+    +get_access_token("https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token",
+                       settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET))
+
 
 #######################################################
 def sendQuery(query):

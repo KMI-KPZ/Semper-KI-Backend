@@ -186,12 +186,59 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024
 # SPARQL
 SPARQL_USERNAME = os.environ.get("SPARQLUSERNAME")
 SPARQL_PASSWORD = os.environ.get("SPARQLPW")
+CMEM_CLIENT_ID = os.environ.get("CMEMCLIENTID")
+CMEM_CLIENT_SECRET = os.environ.get("CMEMCLIENTSECRET")
 
 # Session cleanup
 CELERYBEAT_SCHEDULE = {
     'session_cleanup': weekly_schedule
 }
 
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'detailed': {
+            'format': '{levelname} [{asctime}]{name} :  {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'detailed'
+            },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        # django.template and django.backends must not use DEBUG-level, since it is buggy
+        'django.template': {
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'django.db.backends': {
+            'propagate': True,
+            'level': 'INFO',
+        },
+        # use same format for logs from uvicorn
+        'uvicorn': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'INFO',
+        },
+    }
+}
 
 # Callers
 WSGI_APPLICATION = 'backend_django.wsgi.application'
