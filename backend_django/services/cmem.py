@@ -8,14 +8,21 @@ Contains: Services for the sparql endpoint
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
+from django.http import HttpRequest
+from authlib.integrations.django_client import OAuth
 import requests
-"""
-Part of Semper-KI software
 
-Silvio Weging 2023
+oauth_cmem = OAuth()
 
-Contains: Services for oauth verification
-"""
+oauth_cmem.register(
+    "cmem",
+    client_id=settings.CMEM_CLIENT_ID,
+    client_secret=settings.CMEM_CLIENT_SECRET,
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f"https://cmem.semper-ki.org/auth/realms/cmem/.well-known/openid-configuration",
+)
 
 #######################################################
 def get_access_token(url, client_id, client_secret):
@@ -31,11 +38,17 @@ def get_access_token(url, client_id, client_secret):
     :rtype: JSON
 
     """
+
+    #oauth_cmem.auth0.authorize_redirect(
+    #    request, request.build_absolute_uri(callback)
+    #)
+    #oauth_cmem.cmem.authorize_access_token(request)
     response = requests.post(
         url,
         data={"grant_type": "client_credentials"},
         auth=(client_id, client_secret),
     )
+
     return response.json()["access_token"]
 
 endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
@@ -55,6 +68,9 @@ def sendQuery(query):
     :rtype: JSON
 
     """
+    # request a refresh token
+    
+
     # maybe construct first, save that to redis and then search/filter from that
     endpointCopy = endpoint
     endpointCopy.setReturnFormat(JSON)
