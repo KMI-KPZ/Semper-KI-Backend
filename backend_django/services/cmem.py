@@ -8,55 +8,45 @@ Contains: Services for the sparql endpoint
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
-from django.http import HttpRequest
-from authlib.integrations.django_client import OAuth
-import requests
+import datetime
+from authlib.integrations.requests_client import OAuth2Session
 
-oauth_cmem = OAuth()
-
-oauth_cmem.register(
-    "cmem",
-    client_id=settings.CMEM_CLIENT_ID,
-    client_secret=settings.CMEM_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://cmem.semper-ki.org/auth/realms/cmem/.well-known/openid-configuration",
-)
-
-#######################################################
-def get_access_token(url, client_id, client_secret):
+class ManageToken:
     """
-    Get access token from cmem
-    :param url: Url where to get the token from
-    :type url: str
-    :param client_id: Client ID from settings/env
-    :type client_id: str
-    :param client_secret: Client Secret from settings/env
-    :type client_secret: str
-    :return: Access token as bearer from cmem
-    :rtype: JSON
-
+    Manage oauth token class.
     """
+    token = {}
+    client = OAuth2Session(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET,token_endpoint="https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token", token_endpoint_auth_method='client_secret_post')
 
-    #oauth_cmem.auth0.authorize_redirect(
-    #    request, request.build_absolute_uri(callback)
-    #)
-    #oauth_cmem.cmem.authorize_access_token(request)
-    response = requests.post(
-        url,
-        data={"grant_type": "client_credentials"},
-        auth=(client_id, client_secret),
-    )
+    #######################################################
+    def __init__(self):
+        self.getAccessToken()
 
-    return response.json()["access_token"]
+    #######################################################
+    def getAccessToken(self):
+        """
+        Get initial token. Made as a function to be callable from outside. 
+        """
+        self.token = self.client.fetch_token(grant_type='client_credentials')
+    
+    #######################################################
+    def checkIfExpired(self):
+        """
+        Check if token has expired and if so, refresh it. 
+        """
+        expirationTimeAT = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=self.token["expires_at"]))
+        expirationTimeRT = str(datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=self.token["expires_at"]-self.token["expires_in"]+self.token["refresh_expires_in"]))
+        if datetime.datetime.now() > datetime.datetime.strptime(expirationTimeAT,"%Y-%m-%d %H:%M:%S+00:00"):
+            # check if refresh token has expired as well
+            if datetime.datetime.now() > datetime.datetime.strptime(expirationTimeRT,"%Y-%m-%d %H:%M:%S+00:00"):
+                # it has, request new token
+                self.getAccessToken()
+            else:
+                # it has not, ask for refresh token
+                self.token = self.client.refresh_token("https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token", refresh_token=self.token["refresh_token"])
 
 endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
-endpoint.addCustomHttpHeader(
-    httpHeaderName="Authorization", httpHeaderValue="Bearer "
-    +get_access_token("https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token",
-                       settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET))
-
+oauthToken = ManageToken()
 
 #######################################################
 def sendQuery(query):
@@ -69,10 +59,12 @@ def sendQuery(query):
 
     """
     # request a refresh token
-    
+    oauthToken.checkIfExpired()
 
     # maybe construct first, save that to redis and then search/filter from that
     endpointCopy = endpoint
+    endpointCopy.addCustomHttpHeader(
+    httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
     endpointCopy.setReturnFormat(JSON)
     endpointCopy.setQuery(query)
 #     endpointCopy.setQuery("""

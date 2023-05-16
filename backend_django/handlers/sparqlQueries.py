@@ -7,6 +7,8 @@ Contains: Test handler for sparql
 """
 
 from django.http import JsonResponse
+from django.urls import reverse
+from django.http import HttpResponseRedirect, HttpResponse
 
 from ..services import cmem
 
@@ -39,8 +41,3 @@ def sendTestQuery(request):
     results = cmem.sendQuery("SELECT * where {?s ?p ?o} LIMIT 100")
     
     return JsonResponse(results, safe=False)
-
-#######################################################
-def testAuth(request):
-    cmem.testGettingTheTokenAndBearWithIt(request)
-    
