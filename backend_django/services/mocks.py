@@ -21,7 +21,7 @@ class mockPicture():
             self.backend_url = 'https://backend.semper-ki.org'
         else:
             self.backend_url = 'http://127.0.0.1:8000'
-        self.mockPicturePath = self.backend_url+self.picturePath
+        self.mockPicturePath = "https://cdn.pixabay.com/photo/2014/06/03/19/38/road-sign-361514_960_720.png"#self.backend_url+self.picturePath
 
 testpicture = mockPicture()
 
