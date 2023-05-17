@@ -12,10 +12,6 @@ services:
       - .:/app
     env_file:
       - .env
-    #depends_on:
-    #  - db
-    #links:
-    #  - db:db
   db:
     image: postgres:15
     env_file:

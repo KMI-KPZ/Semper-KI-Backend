@@ -1,13 +1,34 @@
 version: '3.4'
  
 services:
-  backend:
+  backend-dev:
+    image: backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     command: ["bash", "backend_django/runDev.sh"]
-  db:
+    ports:
+      - 127.0.0.1:8001:8000
     volumes:
-      - ./postgres/data/:/var/lib/postgresql/data/
-  files:
+      - .:/app
+    env_file:
+      - .env
+  db-dev:
+    image: postgres:15
+    env_file:
+     - .env
+    ports:
+      - 127.0.0.1:5433:5432
     volumes:
-      - ./redis/data/:/var/lib/redis/data/
+      - ./postgres/data/:/var/lib/postgresql/data-dev/
+  files-dev:
+    image: redis:7
+    env_file:
+    - .env
+    volumes:
+      - ./redis/data/:/var/lib/redis/data-dev/
     extra_hosts:
      - "host.docker.internal:host-gateway"
+    ports:
+      - 127.0.0.1:6380:6379
+    command: --save 60 1 --loglevel warning --requirepass ${REDISPW}
