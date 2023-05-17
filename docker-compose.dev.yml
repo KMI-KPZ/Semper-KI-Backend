@@ -6,3 +6,8 @@ services:
   db:
     volumes:
       - ./postgres/data/:/var/lib/postgresql/data/
+  files:
+    volumes:
+      - ./redis/data/:/var/lib/redis/data/
+    extra_hosts:
+     - "host.docker.internal:host-gateway"

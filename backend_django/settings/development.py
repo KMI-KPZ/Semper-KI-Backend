@@ -14,6 +14,11 @@ from .base import *
 
 DEBUG=True
 
+# for nginx
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_DOMAIN = '.semper-ki.org'
+
 DATABASES = {
     'default': {
     #SQLITE
