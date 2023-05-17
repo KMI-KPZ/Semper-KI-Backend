@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>SPARQL - Testquery</title>
+  </head>
+  <body>
+    <h1>Testquery</h1>
+    <form  method="post" action="/private/sendQuery/" enctype="multipart/form-data">
+        {% csrf_token  %}
+        <textarea id="sparql_query" name="query" rows="10" cols="50"></textarea>
+        <button type="submit" >Submit</button>
+    </form>  
+  </body>
+</html>

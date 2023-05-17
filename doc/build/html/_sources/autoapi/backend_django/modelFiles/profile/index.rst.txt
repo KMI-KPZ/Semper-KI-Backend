@@ -1,0 +1,86 @@
+:py:mod:`backend_django.modelFiles.profile`
+===========================================
+
+.. py:module:: backend_django.modelFiles.profile
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Model for user profiles
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.modelFiles.profile.Profile
+
+
+
+
+.. py:class:: Profile(*args, **kwargs)
+
+   Bases: :py:obj:`django.db.models.Model`
+
+   Profile management class.
+
+   :subID: Unique ID for that person returned by Auth0, primary key
+   :name: Nickname returned by Auth0, used for filter searches in DB
+   :email: E-Mail with which the user registered themselves
+   :role: Role assigned to the user, can be regular, manufacturer, ...
+   :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
+   :updatedWhen: Date and time at which the entry was updated
+   :accessedWhen: Last date and time the user was fetched from the database, automatically set
+
+   .. py:attribute:: subID
+      
+
+      
+
+   .. py:attribute:: name
+      
+
+      
+
+   .. py:attribute:: email
+      
+
+      
+
+   .. py:attribute:: role
+      
+
+      
+
+   .. py:attribute:: createdWhen
+      
+
+      
+
+   .. py:attribute:: updatedWhen
+      
+
+      
+
+   .. py:attribute:: accessedWhen
+      
+
+      
+
+   .. py:method:: __str__()
+
+      Return str(self).
+
+
+   .. py:method:: toDict()
+
+
+

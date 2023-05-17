@@ -1,0 +1,50 @@
+:py:mod:`backend_django.services.cmem`
+======================================
+
+.. py:module:: backend_django.services.cmem
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Services for the sparql endpoint
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.services.cmem.testQuery
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.services.cmem.endpoint
+
+
+.. py:data:: endpoint
+   
+
+   
+
+.. py:function:: testQuery()
+
+   Test Sparql query.
+
+   :return: result of query
+   :rtype: JSON
+
+
+

@@ -1,0 +1,51 @@
+:py:mod:`backend_django.handlers.test_response`
+===============================================
+
+.. py:module:: backend_django.handlers.test_response
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Handling test calls and getting a csrf cookie
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.test_response.testResponse
+   backend_django.handlers.test_response.testResponseCsrf
+
+
+
+.. py:function:: testResponse(request)
+
+   Tests whether request and response scheme works.
+
+   :param request: any request
+   :type request: HTTP 
+   :return: Response with answer string and testheader
+   :rtype: HTTP Response
+
+
+
+.. py:function:: testResponseCsrf(request)
+
+   Ensures that the csrf cookie is set correctly.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: Response with cookie
+   :rtype: HTTP Response
+
+
+

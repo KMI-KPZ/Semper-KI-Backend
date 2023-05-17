@@ -1,5 +1,5 @@
 version: '3.4'
-
+ 
 services:
   backend:
     image: backend
@@ -7,19 +7,29 @@ services:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - 8000:8000
+      - 127.0.0.1:8000:8000
     volumes:
       - .:/app
     env_file:
-      - backend_django/.env
+      - .env
     #depends_on:
     #  - db
-  #db:
-  #  image: postgres:15
-  #  volumes:
-  #    - postgres_data:/var/lib/postgresql/data/
-  #  environment:
-  #    - "POSTGRES_HOST_AUTH_METHOD=trust"
-
-#volumes:
-#  postgres_data:
+    #links:
+    #  - db:db
+  db:
+    image: postgres:15
+    env_file:
+     - .env
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./postgres/data/:/var/lib/postgresql/data/
+  files:
+    image: redis:7
+    env_file:
+    - .env
+    ports:
+      - 127.0.0.1:6379:6379
+    volumes:
+      - ./redis/data/:/var/lib/redis/data/
+    command: --save 60 1 --loglevel warning --requirepass ${REDISPW}
