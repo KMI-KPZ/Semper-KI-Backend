@@ -19,14 +19,19 @@
 				"docker-build"
 			],
 			"dockerRun": {
-				"ports": [{"containerPort": 8000, "hostPort": 8000, "protocol": "tcp"}]
+				//"ports": [{"containerPort": 8000, "hostPort": 8000, "protocol": "tcp"}],
+				"customOptions": "-p 127.0.0.1:8000:8000"
 			},
 			"python": {
 				"args": [
-					"runserver",
-					"0.0.0.0:8000"
+					//"runserver",
+					//"0.0.0.0:8000",
+					//"--settings=backend_django.settings.debug"
+					"backend_django.asgi --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=backend_django.settings.debug --capture-output --log-level debug -k uvicorn.workers.UvicornWorker --workers 1 --threads 1 --timeout 12000"
 				],
-				"file": "manage.py"
+
+				//"file": "manage.py"
+				"module": "gunicorn"
 			}
 		}
 	]

@@ -5,8 +5,7 @@
             "type": "docker",
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
-            "serverReadyAction":{
-            },
+            "serverReadyAction": {},
             "python": {
                 "pathMappings": [
                     {
@@ -14,7 +13,11 @@
                         "remoteRoot": "/app"
                     }
                 ],
-                "projectType": "django"
+                "projectType": "django",
+                "justMyCode": false,
+                "autoReload": {
+                    "enable": true
+                }
             }
         }
     ],

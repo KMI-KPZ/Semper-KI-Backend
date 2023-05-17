@@ -1,0 +1,28 @@
+:py:mod:`backend_django.settings.development`
+=============================================
+
+.. py:module:: backend_django.settings.development
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Further settings for development mode
+
+
+
+Module Contents
+---------------
+
+.. py:data:: DEBUG
+   :annotation: = True
+
+   
+
+.. py:data:: DATABASES
+   
+
+   
+
