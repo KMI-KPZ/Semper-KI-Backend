@@ -29,7 +29,9 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": "db",  # "db" set in docker-compose.yml
+        "HOST": "db-dev",  # "db" set in docker-compose.yml
         "PORT": 5432,  # default postgres port
     }
 }
+
+REDIS_HOST = "files-dev"
