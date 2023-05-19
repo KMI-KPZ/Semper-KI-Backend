@@ -14,6 +14,11 @@ from .base import *
 
 DEBUG=True
 
+# for nginx
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_DOMAIN = '.semper-ki.org'
+
 DATABASES = {
     'default': {
     #SQLITE
@@ -24,7 +29,9 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": "db",  # "db" set in docker-compose.yml
+        "HOST": "db-dev",  # "db" set in docker-compose.yml
         "PORT": 5432,  # default postgres port
     }
 }
+
+REDIS_HOST = "files-dev"
