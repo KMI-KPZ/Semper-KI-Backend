@@ -28,4 +28,6 @@ services:
       - 127.0.0.1:6379:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
+    extra_hosts:
+     - "host.docker.internal:host-gateway"
     command: --save 60 1 --loglevel warning --requirepass ${REDISPW}

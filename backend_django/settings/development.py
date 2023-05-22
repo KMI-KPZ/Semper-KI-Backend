@@ -12,11 +12,12 @@ from .base import *
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DEBUG=True
+DEBUG=False
 
 # for nginx
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+PRODUCTION=True
 CSRF_COOKIE_DOMAIN = '.semper-ki.org'
 
 DATABASES = {
