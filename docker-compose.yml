@@ -2,7 +2,7 @@ version: '3.4'
  
 services:
   backend:
-    image: backend
+    image: backend-local
     build:
       context: .
       dockerfile: ./Dockerfile

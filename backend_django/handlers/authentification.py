@@ -83,6 +83,7 @@ def loginUser(request):
 
     """
     # set type of user
+    isPartOfOrganization = False
     if "Usertype" not in request.headers:
         request.session["usertype"] = "user"
     else:
@@ -90,12 +91,13 @@ def loginUser(request):
         if userType == "contractor" or userType == "manufacturer":
             request.session["usertype"] = userType
             request.session["organizationType"] = "manufacturer"
+            isPartOfOrganization = True
         elif userType == "stakeholder":
             request.session["usertype"] = userType
             request.session["organizationType"] = "stakeholder"
+            isPartOfOrganization = True
         else:
             request.session["usertype"] = userType
-
 
     # set redirect url
     if settings.PRODUCTION:
@@ -113,8 +115,10 @@ def loginUser(request):
         if request.headers["Register"] == "true":
             register = "&screen_hint=signup"
 
-
-    uri = auth0.authorizeRedirect(request, reverse("callbackLogin"))
+    if isPartOfOrganization:
+        uri = auth0.authorizeRedirectOrga(request, reverse("callbackLogin"))
+    else:
+        uri = auth0.authorizeRedirect(request, reverse("callbackLogin"))
     # return uri and redirect to register if desired
     return HttpResponse(uri.url + register)
 
@@ -131,7 +135,10 @@ def callbackLogin(request):
 
     """
     # authorize callback token
-    token = auth0.authorizeToken(request)
+    if "organizationType" in request.session:
+        token = auth0.authorizeTokenOrga(request)
+    else:
+        token = auth0.authorizeToken(request)
 
     # convert expiration time to the corresponding date and time
     now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])

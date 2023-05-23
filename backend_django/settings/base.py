@@ -177,6 +177,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
+AUTH0_ORGA_CLIENT_ID = os.environ.get("AUTH0_ORGA_CLIENT_ID")
+AUTH0_ORGA_CLIENT_SECRET = os.environ.get("AUTH0_ORGA_CLIENT_SECRET")
+AUTH0_API_CLIENT_ID = os.environ.get("AUTH0_API_CLIENT_ID")
+AUTH0_API_CLIENT_SECRET = os.environ.get("AUTH0_API_CLIENT_SECRET")
 
 # REDIS
 REDIS_HOST = "host.docker.internal"

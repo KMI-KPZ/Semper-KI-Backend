@@ -13,7 +13,7 @@ from django.utils import timezone
 from ..modelFiles.profile import User,Manufacturer,Stakeholder
 from ..modelFiles.orders import Orders,OrderCollection
 
-from backend_django.services import crypto, redis
+from backend_django.services import crypto, redis, auth0
 
 #TODO: switch to async versions at some point
 
@@ -156,10 +156,10 @@ class ProfileManagement():
         userID = session["user"]["userinfo"]["sub"]
         userName = session["user"]["userinfo"]["nickname"]
         userEmail = session["user"]["userinfo"]["email"]
-        # TODO
+
         if "organizationType" in session:
             organizationType = session["organizationType"]
-            organization = session["usertype"]
+            organization = auth0.retrieveOrganisationName(session["user"]["userinfo"]["org_id"])
         else:
             organizationType = "None"
             organization = "None"
