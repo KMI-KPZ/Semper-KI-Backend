@@ -18,8 +18,9 @@ from backend_django.services import postgres
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
     ##########################
-    def getSession(self):
-        self.scope["session"].save()
+    def getSession(self, save=True):
+        if save:
+            self.scope["session"].save()
         return self.scope["session"]  
      
     ##########################
@@ -41,7 +42,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
 
     ##########################
     async def disconnect(self, code):
-        session = await sync_to_async(self.getSession)()
+        session = await sync_to_async(self.getSession)(False)
         if "user" in session:
             uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
             await self.channel_layer.group_discard(uID, self.channel_name)
