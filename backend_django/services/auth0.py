@@ -131,7 +131,6 @@ def retrieveOrganisationName(org_id):
     # Get all Applications using the token
     try:
         res = requests.get(f'{base_url}/api/v2/organizations/{org_id}', headers=headers)
-        print(res.json())
     except requests.HTTPError as e:
         print(f'HTTPError: {str(e.code)} {str(e.reason)}')
     except requests.URLRequired as e:

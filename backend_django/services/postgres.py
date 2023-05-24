@@ -176,9 +176,9 @@ class ProfileManagement():
                 idHash = crypto.generateSecureID(userID)
                 createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, rights=rights, organization=organization, address=address, updatedWhen=updated) 
                 if organizationType != "None":
-                    if ProfileManagement.addUserToOrganization(createdUser, organization) == False:
-                        if ProfileManagement.addOrganization(session, organizationType):
-                            ProfileManagement.addUserToOrganization(createdUser, organization)
+                    if ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
+                        if ProfileManagement.addOrganization(session["user"]["userinfo"]["org_id"], organization, organizationType):
+                            ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"])
                         else:
                             print("User could not be added to organization!", createdUser, organization)
             except (Exception) as error:
@@ -189,7 +189,7 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
-    def addUserToOrganization(userToBeAdded, organization):
+    def addUserToOrganization(userToBeAdded, organizationID):
         """
         Add user to organization.
 
@@ -202,12 +202,12 @@ class ProfileManagement():
 
         """
         try:
-            result = Manufacturer.objects.get(subID=organization)
+            result = Manufacturer.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
         except (Exception) as error:
             pass
         try:
-            result = Stakeholder.objects.get(subID=organization)
+            result = Stakeholder.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
         except (Exception) as error:
             print("Organization doesn't exist!")
@@ -217,7 +217,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def addOrganization(session, typeOfOrganization):
+    def addOrganization(org_id, organizationName, typeOfOrganization):
         """
         Add organization if the entry doesn't already exists.
 
@@ -229,8 +229,8 @@ class ProfileManagement():
         :rtype: Bool
 
         """
-        orgaID = session["usertype"]
-        orgaName = session["usertype"]
+        orgaID = org_id
+        orgaName = organizationName
         orgaEmail = "testOrga1@test.org"
         orgaAddress = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
         updated = timezone.now()
