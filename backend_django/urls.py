@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -72,7 +72,8 @@ paths = {
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
-    "getFileFromOrder": "public/getFileFromOrder/"
+    "getFileFromOrder": "public/getFileFromOrder/",
+    "handleOrganizations": "public/organizations/"
 }
 
 urlpatterns = [
@@ -122,6 +123,8 @@ urlpatterns = [
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateName"], profiles.updateName, name="updateName"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+
+    path(paths["handleOrganizations"], organizations.handleCallToPath, name="handleCallToPath"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
