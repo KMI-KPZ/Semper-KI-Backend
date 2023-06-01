@@ -214,7 +214,7 @@ def getRoles(orgID, baseURL, baseHeader, orgaName):
         rolesOut = []
         for entry in roles:
             if orgaName in entry["name"]:
-                entry["name"].replace(orgaName+"-", "")
+                entry["name"] = entry["name"].replace(orgaName+"-", "")
                 rolesOut.append(entry)
         return rolesOut
     except Exception as e:
