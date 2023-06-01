@@ -191,6 +191,40 @@ def assignRole(orgID, baseURL, baseHeader, userMail, roleID):
         return e
 
 #######################################################
+def editRole(orgID, baseURL, baseHeader, roleID, roleName, roleDescription):
+    """
+    Ask Auth0 API to edit a role
+
+    :param orgID: the id of the current organization
+    :type orgID: str
+    :param baseURL: start of the url
+    :type baseURL: str
+    :param baseHeader: Header with basic stuff
+    :type baseHeader: Dict
+    :param roleID: ID of the role for that person
+    :type roleID: str
+    :param roleName: name of role
+    :type roleName: str
+    :param roleDescription: what the role stands for
+    :type roleDescription: str
+    :return: If successful true or an error if not
+    :rtype: Bool or error
+    """
+    try:
+        header = baseHeader
+        header["Cache-Control"] = "no-cache"
+
+        data = { "name": roleName, "description": roleDescription}
+        response = requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=header, json=data)
+        if response.status_code == 200 or response.status_code == 204:
+            return True
+        else:
+            raise response.text
+    except Exception as e:
+        return e
+
+
+#######################################################
 def getRoles(orgID, baseURL, baseHeader, orgaName):
     """
     Fetch all roles and filter for the organization
@@ -235,8 +269,8 @@ def deleteRole(orgID, baseURL, baseHeader, roleID):
     :type orgaName: str
     :param roleID: ID of the role that shall be deleted
     :type roleID: str
-    :return: If successful, list of roles for that organization, error if not
-    :rtype: List or error
+    :return: If successful, true, error if not
+    :rtype: Bool or error
     """
     try:
         response = requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=baseHeader)
@@ -330,6 +364,14 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
         
+        elif content["intent"] == "editRole":
+            roleID = content["content"]["roleID"]
+            roleName = orgaName + "-" + content["content"]["roleName"]
+            roleDescription = content["content"]["roleDescription"]
+            result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
+            if isinstance(result, Exception):
+                raise result
+
         elif content["intent"] == "deleteRole":
             roleID = content["content"]["roleID"]
             result = deleteRole(orgID, baseURL, headers, roleID)
