@@ -221,6 +221,34 @@ def getRoles(orgID, baseURL, baseHeader, orgaName):
         return e
 
 #######################################################
+def deleteRole(orgID, baseURL, baseHeader, roleID):
+    """
+    Delete role via ID
+
+    :param orgID: the id of the current organization
+    :type orgID: str
+    :param baseURL: start of the url
+    :type baseURL: str
+    :param baseHeader: Header with basic stuff
+    :type baseHeader: Dict
+    :param orgaName: Name of the organization
+    :type orgaName: str
+    :param roleID: ID of the role that shall be deleted
+    :type roleID: str
+    :return: If successful, list of roles for that organization, error if not
+    :rtype: List or error
+    """
+    try:
+        response = requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=baseHeader)
+        if response.status_code == 200:
+            return True
+        else:
+            raise response.text
+    except Exception as e:
+        return e
+
+
+#######################################################
 def handleCallToPath(request):
     """
     Ask Auth0 API for various stuff
@@ -299,6 +327,12 @@ def handleCallToPath(request):
             emailAdressOfUser = content["content"]["email"]
             roleID = content["content"]["roleID"]
             result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+            if isinstance(result, Exception):
+                raise result
+        
+        elif content["intent"] == "deleteRole":
+            roleID = content["content"]["roleID"]
+            result = deleteRole(orgID, baseURL, headers, roleID)
             if isinstance(result, Exception):
                 raise result
 
