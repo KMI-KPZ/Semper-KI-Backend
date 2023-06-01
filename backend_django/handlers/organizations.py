@@ -251,7 +251,7 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             else:
-                return JsonResponse(result)
+                return JsonResponse(result, safe=False)
 
         elif content["intent"] == "deleteUser":
             emailAdressOfUser = content["content"]["email"]
@@ -272,7 +272,7 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             else:
-                return JsonResponse(result)
+                return JsonResponse(result, safe=False)
         
         elif content["intent"] == "getRoles":
             orgaName = getOrganizationName(orgID, baseURL, headers)
@@ -282,7 +282,7 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             else:
-                return JsonResponse(result)
+                return JsonResponse(result, safe=False)
 
         elif content["intent"] == "assignRole":
             emailAdressOfUser = content["content"]["email"]
@@ -297,7 +297,9 @@ def handleCallToPath(request):
                 raise result
             else:
                 return HttpResponse(result["invitation_url"])
-            
+        else:
+            return HttpResponse("Invalid request", status=400)
+
         return HttpResponse("Success", status=200)
     except Exception as e:
         print(f'Generic Exception: {e}')
