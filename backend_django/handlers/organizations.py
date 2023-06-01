@@ -33,7 +33,7 @@ def getOrganizationName(orgID, baseURL, baseHeader):
         return e
 
 #######################################################
-def sendInvite(orgID, baseURL, baseHeader, nameOfCurrentUser, withEmail, emailAdressOfUserToBeAdded=""):
+def sendInvite(orgID, baseURL, baseHeader, nameOfCurrentUser, withEmail, emailAdressOfUserToBeAdded):
     """
     Ask Auth0 API to invite someone via e-mail
 
@@ -246,6 +246,14 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             
+        elif content["intent"] == "getInviteLink":
+            emailAdressOfUserToBeAdded = content["content"]["email"]
+            result = sendInvite(orgID, baseURL, headers, userName, False, emailAdressOfUserToBeAdded)
+            if isinstance(result, Exception):
+                raise result
+            else:
+                return HttpResponse(result["invitation_url"])
+            
         elif content["intent"] == "fetchUsers":
             result = getMembersOfOrganization(orgID, baseURL, headers)
             if isinstance(result, Exception):
@@ -290,13 +298,7 @@ def handleCallToPath(request):
             result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
             if isinstance(result, Exception):
                 raise result
-            
-        elif content["intent"] == "getInviteLink":
-            result = sendInvite(orgID, baseURL, headers, userName, False)
-            if isinstance(result, Exception):
-                raise result
-            else:
-                return HttpResponse(result["invitation_url"])
+
         else:
             return HttpResponse("Invalid request", status=400)
 
