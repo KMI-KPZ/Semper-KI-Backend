@@ -84,7 +84,9 @@ def getMembersOfOrganization(orgID, baseURL, baseHeader):
     try:
         response = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader)
         responseDict = response.json()
-        for entry in responseDict:
+        for idx, entry in enumerate(responseDict):
+            resp = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=baseHeader)
+            responseDict[idx]["roles"] = resp.json()
             entry.pop("user_id")
         return responseDict
     except Exception as e:
