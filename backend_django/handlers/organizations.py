@@ -305,8 +305,8 @@ def addPermissionsToRole(orgID, baseURL, baseHeader, roleID, listOfPermissionIDs
         for entry in listOfPermissionIDs:
             data["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry})
 
-        response = requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=header, data=data)
-        if response.status_code == 200 or response.status_code == 204:
+        response = requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=header, json=data)
+        if response.status_code == 200 or response.status_code == 201:
             return True
         else:
             raise response.text
