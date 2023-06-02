@@ -330,7 +330,7 @@ def getAllPermissions(orgID, baseURL, baseHeader):
     try:
         response = requests.get(f'{baseURL}/api/v2/resource-servers/back.semper-ki.org', headers=baseHeader)
         if response.status_code == 200 or response.status_code == 204:
-            return response.json()
+            return response.json()["scopes"]
         else:
             raise response.text
     except Exception as e:
