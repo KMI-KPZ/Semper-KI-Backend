@@ -38,6 +38,7 @@ paths = {
     "logout": "public/logout/",
     "callback": "public/callback/",
     "getUser": "public/getUser/",
+    "getRoles": "public/getRoles/",
     "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
     "getModels": 'public/getModels/',
@@ -94,6 +95,7 @@ urlpatterns = [
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+    path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),

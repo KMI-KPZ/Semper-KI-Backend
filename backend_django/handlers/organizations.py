@@ -68,7 +68,7 @@ def sendInvite(orgID, baseURL, baseHeader, nameOfCurrentUser, withEmail, emailAd
         return e
 
 #######################################################
-def getMembersOfOrganization(orgID, baseURL, baseHeader):
+def getMembersOfOrganization(orgID, baseURL, baseHeader, orgaName):
     """
     Ask Auth0 API to invite someone via e-mail
 
@@ -78,6 +78,8 @@ def getMembersOfOrganization(orgID, baseURL, baseHeader):
     :type baseURL: str
     :param baseHeader: Header with basic stuff
     :type baseHeader: Dict
+    :param orgaName: Name of organization
+    :type orgaName: str
     :return: If successful or not
     :rtype: Json or error
     """
@@ -87,6 +89,7 @@ def getMembersOfOrganization(orgID, baseURL, baseHeader):
         for idx, entry in enumerate(responseDict):
             resp = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=baseHeader)
             responseDict[idx]["roles"] = resp.json()
+            responseDict[idx]["roles"]["name"] = responseDict[idx]["roles"]["name"].replace(orgaName+"-", "")
             entry.pop("user_id")
         return responseDict
     except Exception as e:
@@ -399,7 +402,10 @@ def handleCallToPath(request):
                 return HttpResponse(result["invitation_url"])
             
         elif content["intent"] == "fetchUsers":
-            result = getMembersOfOrganization(orgID, baseURL, headers)
+            orgaName = getOrganizationName(orgID, baseURL, headers)
+            if isinstance(orgaName, Exception):
+                raise orgaName
+            result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
             if isinstance(result, Exception):
                 raise result
             else:
