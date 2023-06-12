@@ -278,7 +278,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def deleteUser(session):
+    def deleteUser(session, uID=""):
         """
         Delete User.
 
@@ -288,7 +288,11 @@ class ProfileManagement():
         :rtype: Bool
 
         """
-        userID = session["user"]["userinfo"]["sub"]
+        if uID != "":
+            userID = uID
+        else:
+            userID = session["user"]["userinfo"]["sub"]
+            
         try:
             affected = User.objects.filter(subID=userID).delete()
         except (Exception) as error:

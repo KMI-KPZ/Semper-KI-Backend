@@ -7,6 +7,7 @@ Contains: Services for oauth verification
 """
 
 from authlib.integrations.django_client import OAuth
+import datetime
 from django.conf import settings
 import requests
 
@@ -97,6 +98,55 @@ def authorizeRedirectOrga(request, callback):
         request, request.build_absolute_uri(callback)
     )
 
+#######################################################
+class ManageAPIToken:
+    """
+    Manage oauth token class.
+    """
+    savedToken = {}
+    accessToken = ""
+
+    #######################################################
+    def __init__(self):
+        self.getAccessToken()
+
+    #######################################################
+    def getAccessToken(self):
+        """
+        Get initial token. Made as a function to be callable from outside. 
+        """
+            # Configuration Values
+        audience = f'https://{settings.AUTH0_DOMAIN}/api/v2/'
+
+        # Get an Access Token from Auth0
+        base_url = f"https://{settings.AUTH0_DOMAIN}"
+        payload =  { 
+            'grant_type': "client_credentials",
+            'client_id': settings.AUTH0_API_CLIENT_ID,
+            'client_secret': settings.AUTH0_API_CLIENT_SECRET,
+            'audience': audience
+        }
+        response = requests.post(f'{base_url}/oauth/token', data=payload)
+        oauth = response.json()
+        self.accessToken = oauth.get('access_token')
+        self.savedToken = oauth
+        now = datetime.datetime.now()
+        self.savedToken["expires_at"] = now + datetime.timedelta(seconds=oauth["expires_in"])
+    
+    #######################################################
+    def checkIfExpired(self):
+        """
+        Check if token has expired and if so, request a new one. 
+        """
+        # check if token has expired
+        if datetime.datetime.now() > self.savedToken["expires_at"]:
+            # it has, request new token
+            self.getAccessToken()
+
+#######################################################
+apiToken = ManageAPIToken()
+
+#######################################################
 def retrieveOrganisationName(org_id):
     """
     Ask Auth0 API for name of an organisation
@@ -107,28 +157,16 @@ def retrieveOrganisationName(org_id):
     :rtype: str
 
     """
-    # Configuration Values
-    audience = f'https://{settings.AUTH0_DOMAIN}/api/v2/'
-
-    # Get an Access Token from Auth0
-    base_url = f"https://{settings.AUTH0_DOMAIN}"
-    payload =  { 
-        'grant_type': "client_credentials",
-        'client_id': settings.AUTH0_API_CLIENT_ID,
-        'client_secret': settings.AUTH0_API_CLIENT_SECRET,
-        'audience': audience
-    }
-    response = requests.post(f'{base_url}/oauth/token', data=payload)
-    oauth = response.json()
-    access_token = oauth.get('access_token')
+    apiToken.checkIfExpired()
 
     # Add the token to the Authorization header of the request
     headers = {
-        'authorization': f'Bearer {access_token}',
+        'authorization': f'Bearer {apiToken.accessToken}',
         'content-Type': 'application/json'
     }
 
     # Get all Applications using the token
+    base_url = f"https://{settings.AUTH0_DOMAIN}"
     try:
         res = requests.get(f'{base_url}/api/v2/organizations/{org_id}', headers=headers)
     except requests.HTTPError as e:

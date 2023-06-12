@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -38,6 +38,7 @@ paths = {
     "logout": "public/logout/",
     "callback": "public/callback/",
     "getUser": "public/getUser/",
+    "getRoles": "public/getRoles/",
     "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
     "getModels": 'public/getModels/',
@@ -72,7 +73,8 @@ paths = {
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
-    "getFileFromOrder": "public/getFileFromOrder/"
+    "getFileFromOrder": "public/getFileFromOrder/",
+    "handleOrganizations": "public/organizations/"
 }
 
 urlpatterns = [
@@ -93,6 +95,7 @@ urlpatterns = [
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+    path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),
@@ -122,6 +125,8 @@ urlpatterns = [
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateName"], profiles.updateName, name="updateName"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+
+    path(paths["handleOrganizations"], organizations.handleCallToPath, name="handleCallToPath"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

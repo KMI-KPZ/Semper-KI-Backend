@@ -47,6 +47,28 @@ def checkIfUserIsLoggedIn(request):
             return False
     else:
         return False
+    
+#######################################################
+def getRolesOfUser(request):
+    """
+    Get Roles of User.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of roles
+    :rtype: JSONResponse
+    """
+
+    if checkIfUserIsLoggedIn(request):
+        if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+            if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+                return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
+            else:
+                return JsonResponse([], safe=False, status=200)
+        else:
+            return JsonResponse([], safe=False, status=400)
+    else:
+        return JsonResponse([], status=401)
 
 #######################################################
 def isLoggedIn(request):
