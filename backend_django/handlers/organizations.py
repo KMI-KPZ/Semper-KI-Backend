@@ -13,6 +13,21 @@ from django.http import HttpResponse, JsonResponse
 from ..services import auth0, postgres
 
 #######################################################
+def handleTooManyRequestsError(statusCode):
+    """
+    Checks, ifthere were too many requests
+    :param statusCode: Status code of answer
+    :type statusCode: Integer
+    :return: If so, say so, if not, then don't
+    :rtype: Tuple of Bool and String
+    """
+    if statusCode == 429:
+        return (True, "Too many requests! Please wait a bit and try again.")
+    else:
+        return (False, "")
+
+
+#######################################################
 def getOrganizationName(orgID, baseURL, baseHeader):
     """
     Get Name of the Organization
@@ -28,6 +43,9 @@ def getOrganizationName(orgID, baseURL, baseHeader):
     """
     try:
         res = requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(res.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         return res.json()["display_name"]
     except Exception as e:
         return e
@@ -58,11 +76,17 @@ def sendInvite(orgID, baseURL, baseHeader, nameOfCurrentUser, withEmail, emailAd
         if withEmail:
 
             response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data)
+            wasTooMuch = handleTooManyRequestsError(response.status_code)
+            if wasTooMuch[0]:
+                raise Exception(wasTooMuch[1])
             return True
         else:
             data["send_invitation_email"] = False
 
             response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data)
+            wasTooMuch = handleTooManyRequestsError(response.status_code)
+            if wasTooMuch[0]:
+                raise Exception(wasTooMuch[1])
             return response.json()
     except Exception as e:
         return e
@@ -85,11 +109,18 @@ def getMembersOfOrganization(orgID, baseURL, baseHeader, orgaName):
     """
     try:
         response = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         responseDict = response.json()
         for idx, entry in enumerate(responseDict):
             resp = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=baseHeader)
+            wasTooMuch = handleTooManyRequestsError(resp.status_code)
+            if wasTooMuch[0]:
+                raise Exception(wasTooMuch[1])
             responseDict[idx]["roles"] = resp.json()
-            responseDict[idx]["roles"]["name"] = responseDict[idx]["roles"]["name"].replace(orgaName+"-", "")
+            for elemIdx in range(len(responseDict[idx]["roles"])):
+                responseDict[idx]["roles"][elemIdx]["name"] = responseDict[idx]["roles"][elemIdx]["name"].replace(orgaName+"-", "")
             entry.pop("user_id")
         return responseDict
     except Exception as e:
@@ -117,10 +148,16 @@ def deleteUserFromOrganization(orgID, baseURL, baseHeader, userMail):
 
         # fetch user id via E-Mail of the user
         response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         userID = response.json()[0]["user_id"]
         # delete person from organization via userID
         data = { "members": [userID]}
         response = requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 204:
             # delete user from database as well
             postgres.ProfileManagement.deleteUser("", uID=userID)
@@ -150,11 +187,14 @@ def createRole(baseURL, baseHeader, roleName, roleDescription):
 
         data = { "name": roleName, "description": roleDescription}
         response = requests.post(f'{baseURL}/api/v2/roles', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         roleInfo = response.json()
         if response.status_code == 200:
             return roleInfo
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -182,14 +222,20 @@ def assignRole(orgID, baseURL, baseHeader, userMail, roleID):
 
         # fetch user id via E-Mail of the user
         response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         userID = response.json()[0]["user_id"]
 
         data = { "roles": [roleID]}
         response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 204:
             return True
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -219,10 +265,13 @@ def editRole(orgID, baseURL, baseHeader, roleID, roleName, roleDescription):
 
         data = { "name": roleName, "description": roleDescription}
         response = requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 200 or response.status_code == 204:
             return True
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -247,6 +296,9 @@ def getRoles(orgID, baseURL, baseHeader, orgaName):
         header = baseHeader
         header["Cache-Control"] = "no-cache"
         response = requests.get(f'{baseURL}/api/v2/roles', headers=header)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         roles = response.json()
         rolesOut = []
         for entry in roles:
@@ -275,10 +327,13 @@ def deleteRole(orgID, baseURL, baseHeader, roleID):
     """
     try:
         response = requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 200:
             return True
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -309,10 +364,13 @@ def addPermissionsToRole(orgID, baseURL, baseHeader, roleID, listOfPermissionIDs
             data["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry})
 
         response = requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 200 or response.status_code == 201:
             return True
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -332,10 +390,13 @@ def getAllPermissions(orgID, baseURL, baseHeader):
     """ 
     try:
         response = requests.get(f'{baseURL}/api/v2/resource-servers/back.semper-ki.org', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 200 or response.status_code == 204:
             return response.json()["scopes"]
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -357,10 +418,13 @@ def getPermissionsForRole(orgID, baseURL, baseHeader, roleID):
     """    
     try:
         response = requests.get(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
         if response.status_code == 200 or response.status_code == 204:
             return response.json()
         else:
-            raise response.text
+            raise Exception(response.text)
     except Exception as e:
         return e
 
@@ -491,5 +555,8 @@ def handleCallToPath(request):
         return HttpResponse("Success", status=200)
     except Exception as e:
         print(f'Generic Exception: {e}')
-        return HttpResponse("Failed", status=500)
+        if "many requests" in e.args[0]:
+            return HttpResponse("Failed - " + str(e), status=429)
+        else:
+            return HttpResponse("Failed - " + str(e), status=500)
     
