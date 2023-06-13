@@ -5,8 +5,9 @@ Silvio Weging 2023
 
 Contains: Handling test calls and getting a csrf cookie
 """
+import subprocess, platform, json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, requires_csrf_token, ensure_csrf_cookie
 
@@ -46,6 +47,47 @@ def testResponseCsrf(request):
     """
     response = HttpResponse("CSRF worked for: " + request.method)
     return response
+
+###################################################
+def isMagazineUp(request):
+    """
+    Pings the magazine website and check if that works or not
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Response with True or False 
+    :rtype: JSON Response
+
+    """
+    if request.method == "POST":
+        content = json.loads(request.body.decode("utf-8"))
+        response = {"up": True}
+        for entry in content:
+            param = '-n' if platform.system().lower()=='windows' else '-c'
+
+            # Building the command. Ex: "ping -c 1 google.com"
+            command = ['ping', param, '1', entry]
+
+            pRet = subprocess.run(command)
+            if pRet.returncode != 0:
+                response["up"] = False
+                break
+        
+        return JsonResponse(response)
+    elif request.method == "GET":
+        param = '-n' if platform.system().lower()=='windows' else '-c'
+
+        # Building the command. Ex: "ping -c 1 google.com"
+        command = ['ping', param, '1', 'magazin.semper-ki.org']
+
+        response = {"up": True}
+        pRet = subprocess.run(command)
+        if pRet.returncode != 0:
+            response["up"] = False
+        return JsonResponse(response)
+    else:
+        return HttpResponse("Wrong method!", status=405)
+
 
 ###################################################
 from channels.generic.websocket import AsyncWebsocketConsumer

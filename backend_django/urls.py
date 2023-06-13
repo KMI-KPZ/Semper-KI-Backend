@@ -74,7 +74,8 @@ paths = {
     "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
     "getFileFromOrder": "public/getFileFromOrder/",
-    "handleOrganizations": "public/organizations/"
+    "handleOrganizations": "public/organizations/",
+    "isMagazineUp": "public/isMagazineUp/"
 }
 
 urlpatterns = [
@@ -127,6 +128,8 @@ urlpatterns = [
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 
     path(paths["handleOrganizations"], organizations.handleCallToPath, name="handleCallToPath"),
+
+    path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

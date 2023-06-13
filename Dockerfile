@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install psycopg2
 RUN apt-get update \
-    && apt-get -y install libpq-dev gcc bash \
+    && apt-get -y install libpq-dev gcc bash iputils-ping \
     && pip install psycopg2
 # Install pip requirements
 COPY requirements.txt .
