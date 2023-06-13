@@ -238,6 +238,47 @@ def assignRole(orgID, baseURL, baseHeader, userMail, roleID):
             raise Exception(response.text)
     except Exception as e:
         return e
+    
+#######################################################
+def removeRole(orgID, baseURL, baseHeader, userMail, roleID):
+    """
+    Remove a role from a person
+
+    :param orgID: the id of the current organization
+    :type orgID: str
+    :param baseURL: start of the url
+    :type baseURL: str
+    :param baseHeader: Header with basic stuff
+    :type baseHeader: Dict
+    :param userMail: mail adress of person
+    :type userMail: str
+    :param roleID: ID of the role for that person
+    :type roleID: str
+    :return: If successful or not
+    :rtype: True or error
+    """
+    try:
+        header = baseHeader
+        header["Cache-Control"] = "no-cache"
+
+        # fetch user id via E-Mail of the user
+        response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
+        userID = response.json()[0]["user_id"]
+
+        data = { "roles": [roleID]}
+        response = requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data)
+        wasTooMuch = handleTooManyRequestsError(response.status_code)
+        if wasTooMuch[0]:
+            raise Exception(wasTooMuch[1])
+        if response.status_code == 204 or response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.text)
+    except Exception as e:
+        return e
 
 #######################################################
 def editRole(orgID, baseURL, baseHeader, roleID, roleName, roleDescription):
@@ -510,6 +551,13 @@ def handleCallToPath(request):
             emailAdressOfUser = content["content"]["email"]
             roleID = content["content"]["roleID"]
             result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+            if isinstance(result, Exception):
+                raise result
+            
+        elif content["intent"] == "removeRole":
+            emailAdressOfUser = content["content"]["email"]
+            roleID = content["content"]["roleID"]
+            result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
             if isinstance(result, Exception):
                 raise result
         
