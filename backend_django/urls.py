@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations, ontology
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -75,7 +75,20 @@ paths = {
     "getMissedEvents": "public/getMissedEvents/",
     "getFileFromOrder": "public/getFileFromOrder/",
     "handleOrganizations": "public/organizations/",
-    "isMagazineUp": "public/isMagazineUp/"
+    "isMagazineUp": "public/isMagazineUp/",
+    "onto_getPrinters": "public/onto/getPrinters/",
+    "onto_getPrinter": "public/onto/getPrinter/",
+    "onto_getMaterials": "public/onto/getMaterials/",
+    "onto_getMaterial": "public/onto/getMaterial/",
+    "orga_getPrinters": "public/orga/getPrinters/",
+    "orga_addPrinter": "public/orga/addPrinter/",
+    "orga_addPrinterEdit": "public/orga/addPrinterEdit/",
+    "orga_createPrinter": "public/orga/createPrinter/",
+    "orga_removePrinter": "public/orga/removePrinter/",
+    "orga_getMaterials": "public/orga/getMaterials/",
+    "orga_addMaterial": "public/orga/addMaterial/",
+    "orga_createMaterial": "public/orga/createMaterial/",
+    "orga_removeMaterial": "public/orga/removeMaterial/"
 }
 
 urlpatterns = [
@@ -130,6 +143,9 @@ urlpatterns = [
     path(paths["handleOrganizations"], organizations.handleCallToPath, name="handleCallToPath"),
 
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
+
+    path(paths["onto_getMaterials"], ontology.onto_getMaterials, name="getMaterials"),
+    path(paths["onto_getPrinters"], ontology.onto_getPrinters, name="getPrinters"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

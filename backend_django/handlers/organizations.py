@@ -11,6 +11,7 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
 from ..services import auth0, postgres
+from ..handlers.authentification import checkIfUserIsLoggedIn
 
 #######################################################
 def handleTooManyRequestsError(statusCode):
@@ -479,132 +480,134 @@ def handleCallToPath(request):
     :return: Response if successful or not
     :rtype: HTTP/JSON Response
     """
-    content = json.loads(request.body.decode("utf-8"))["data"]
+    if checkIfUserIsLoggedIn(request):
+        content = json.loads(request.body.decode("utf-8"))["data"]
 
-    # Get token and attach to header that every call needs
-    auth0.apiToken.checkIfExpired()
-    headers = {
-        'authorization': f'Bearer {auth0.apiToken.accessToken}',
-        'content-Type': 'application/json'
-    }
-    baseURL = f"https://{settings.AUTH0_DOMAIN}"
-    orgID = request.session["user"]["userinfo"]["org_id"]
-    userName = request.session["user"]["userinfo"]["nickname"]
+        # Get token and attach to header that every call needs
+        auth0.apiToken.checkIfExpired()
+        headers = {
+            'authorization': f'Bearer {auth0.apiToken.accessToken}',
+            'content-Type': 'application/json'
+        }
+        baseURL = f"https://{settings.AUTH0_DOMAIN}"
+        orgID = request.session["user"]["userinfo"]["org_id"]
+        userName = request.session["user"]["userinfo"]["nickname"]
 
-    try:
-        if content["intent"] == "addUser":
-            emailAdressOfUserToBeAdded = content["content"]["email"]
-            result = sendInvite(orgID, baseURL, headers, userName, True, emailAdressOfUserToBeAdded)
-            if isinstance(result, Exception):
-                raise result
+        try:
+            if content["intent"] == "addUser":
+                emailAdressOfUserToBeAdded = content["content"]["email"]
+                result = sendInvite(orgID, baseURL, headers, userName, True, emailAdressOfUserToBeAdded)
+                if isinstance(result, Exception):
+                    raise result
+                
+            elif content["intent"] == "getInviteLink":
+                emailAdressOfUserToBeAdded = content["content"]["email"]
+                result = sendInvite(orgID, baseURL, headers, userName, False, emailAdressOfUserToBeAdded)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return HttpResponse(result["invitation_url"])
+                
+            elif content["intent"] == "fetchUsers":
+                orgaName = getOrganizationName(orgID, baseURL, headers)
+                if isinstance(orgaName, Exception):
+                    raise orgaName
+                result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return JsonResponse(result, safe=False)
+
+            elif content["intent"] == "deleteUser":
+                emailAdressOfUser = content["content"]["email"]
+                result = deleteUserFromOrganization(orgID, baseURL, headers, emailAdressOfUser)
+                if isinstance(result, Exception):
+                    raise result
+
+            elif content["intent"] == "createRole":
+                orgaName = getOrganizationName(orgID, baseURL, headers)
+                if isinstance(orgaName, Exception):
+                    raise orgaName
+                
+                # append organization name to the role name to avoid that two different organizations create the same role
+                roleName = orgaName + "-" + content["content"]["roleName"]
+                roleDescription = content["content"]["roleDescription"]
+
+                result = createRole(baseURL, headers, roleName, roleDescription)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return JsonResponse(result, safe=False)
             
-        elif content["intent"] == "getInviteLink":
-            emailAdressOfUserToBeAdded = content["content"]["email"]
-            result = sendInvite(orgID, baseURL, headers, userName, False, emailAdressOfUserToBeAdded)
-            if isinstance(result, Exception):
-                raise result
-            else:
-                return HttpResponse(result["invitation_url"])
+            elif content["intent"] == "getRoles":
+                orgaName = getOrganizationName(orgID, baseURL, headers)
+                if isinstance(orgaName, Exception):
+                    raise orgaName
+                result = getRoles(orgID, baseURL, headers, orgaName)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return JsonResponse(result, safe=False)
+
+            elif content["intent"] == "assignRole":
+                emailAdressOfUser = content["content"]["email"]
+                roleID = content["content"]["roleID"]
+                result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+                if isinstance(result, Exception):
+                    raise result
+                
+            elif content["intent"] == "removeRole":
+                emailAdressOfUser = content["content"]["email"]
+                roleID = content["content"]["roleID"]
+                result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+                if isinstance(result, Exception):
+                    raise result
             
-        elif content["intent"] == "fetchUsers":
-            orgaName = getOrganizationName(orgID, baseURL, headers)
-            if isinstance(orgaName, Exception):
-                raise orgaName
-            result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
-            if isinstance(result, Exception):
-                raise result
-            else:
-                return JsonResponse(result, safe=False)
+            elif content["intent"] == "editRole":
+                roleID = content["content"]["roleID"]
+                roleName = orgaName + "-" + content["content"]["roleName"]
+                roleDescription = content["content"]["roleDescription"]
+                result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
+                if isinstance(result, Exception):
+                    raise result
 
-        elif content["intent"] == "deleteUser":
-            emailAdressOfUser = content["content"]["email"]
-            result = deleteUserFromOrganization(orgID, baseURL, headers, emailAdressOfUser)
-            if isinstance(result, Exception):
-                raise result
+            elif content["intent"] == "deleteRole":
+                roleID = content["content"]["roleID"]
+                result = deleteRole(orgID, baseURL, headers, roleID)
+                if isinstance(result, Exception):
+                    raise result
 
-        elif content["intent"] == "createRole":
-            orgaName = getOrganizationName(orgID, baseURL, headers)
-            if isinstance(orgaName, Exception):
-                raise orgaName
+            elif content["intent"] == "getPermissions":
+                result = getAllPermissions(orgID, baseURL, headers)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return JsonResponse(result,safe=False)
             
-            # append organization name to the role name to avoid that two different organizations create the same role
-            roleName = orgaName + "-" + content["content"]["roleName"]
-            roleDescription = content["content"]["roleDescription"]
+            elif content["intent"] == "getPermissionsForRole":
+                roleID = content["content"]["roleID"]
+                result = getPermissionsForRole(orgID, baseURL, headers, roleID)
+                if isinstance(result, Exception):
+                    raise result
+                else:
+                    return JsonResponse(result,safe=False)
 
-            result = createRole(baseURL, headers, roleName, roleDescription)
-            if isinstance(result, Exception):
-                raise result
+            elif content["intent"] == "setPermissionsForRole":
+                roleID = content["content"]["roleID"]
+                permissionList = content["content"]["permissionIDs"]
+                result = addPermissionsToRole(orgID, baseURL, headers, roleID, permissionList)
+                if isinstance(result, Exception):
+                    raise result
+                
             else:
-                return JsonResponse(result, safe=False)
-        
-        elif content["intent"] == "getRoles":
-            orgaName = getOrganizationName(orgID, baseURL, headers)
-            if isinstance(orgaName, Exception):
-                raise orgaName
-            result = getRoles(orgID, baseURL, headers, orgaName)
-            if isinstance(result, Exception):
-                raise result
+                return HttpResponse("Invalid request", status=400)
+
+            return HttpResponse("Success", status=200)
+        except Exception as e:
+            print(f'Generic Exception: {e}')
+            if "many requests" in e.args[0]:
+                return HttpResponse("Failed - " + str(e), status=429)
             else:
-                return JsonResponse(result, safe=False)
-
-        elif content["intent"] == "assignRole":
-            emailAdressOfUser = content["content"]["email"]
-            roleID = content["content"]["roleID"]
-            result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
-            if isinstance(result, Exception):
-                raise result
-            
-        elif content["intent"] == "removeRole":
-            emailAdressOfUser = content["content"]["email"]
-            roleID = content["content"]["roleID"]
-            result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
-            if isinstance(result, Exception):
-                raise result
-        
-        elif content["intent"] == "editRole":
-            roleID = content["content"]["roleID"]
-            roleName = orgaName + "-" + content["content"]["roleName"]
-            roleDescription = content["content"]["roleDescription"]
-            result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
-            if isinstance(result, Exception):
-                raise result
-
-        elif content["intent"] == "deleteRole":
-            roleID = content["content"]["roleID"]
-            result = deleteRole(orgID, baseURL, headers, roleID)
-            if isinstance(result, Exception):
-                raise result
-
-        elif content["intent"] == "getPermissions":
-            result = getAllPermissions(orgID, baseURL, headers)
-            if isinstance(result, Exception):
-                raise result
-            else:
-                return JsonResponse(result,safe=False)
-        
-        elif content["intent"] == "getPermissionsForRole":
-            roleID = content["content"]["roleID"]
-            result = getPermissionsForRole(orgID, baseURL, headers, roleID)
-            if isinstance(result, Exception):
-                raise result
-            else:
-                return JsonResponse(result,safe=False)
-
-        elif content["intent"] == "setPermissionsForRole":
-            roleID = content["content"]["roleID"]
-            permissionList = content["content"]["permissionIDs"]
-            result = addPermissionsToRole(orgID, baseURL, headers, roleID, permissionList)
-            if isinstance(result, Exception):
-                raise result
-            
-        else:
-            return HttpResponse("Invalid request", status=400)
-
-        return HttpResponse("Success", status=200)
-    except Exception as e:
-        print(f'Generic Exception: {e}')
-        if "many requests" in e.args[0]:
-            return HttpResponse("Failed - " + str(e), status=429)
-        else:
-            return HttpResponse("Failed - " + str(e), status=500)
-    
+                return HttpResponse("Failed - " + str(e), status=500)
+    else:
+        return HttpResponse("Not logged in", status=401)

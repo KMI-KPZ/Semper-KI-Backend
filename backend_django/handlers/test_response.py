@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Handling test calls and getting a csrf cookie
 """
-import subprocess, platform, json
+import platform, subprocess, json, requests
 
 from django.http import HttpResponse, JsonResponse
 
@@ -60,25 +60,22 @@ def isMagazineUp(request):
 
     """
     if request.method == "POST":
-        content = json.loads(request.body.decode("utf-8"))
-        response = {"up": True}
-        for entry in content:
-            param = '-n' if platform.system().lower()=='windows' else '-c'
-
-            # Building the command. Ex: "ping -c 1 google.com"
-            command = ['ping', param, '1', entry]
-
-            pRet = subprocess.run(command)
-            if pRet.returncode != 0:
-                response["up"] = False
-                break
-        
-        return JsonResponse(response)
+        try:
+            content = json.loads(request.body.decode("utf-8"))
+            response = {"up": True}
+            for entry in content["urls"]:
+                resp = requests.get(entry)
+                if resp.status_code != 200:
+                    response["up"] = False
+                
+            return JsonResponse(response)
+        except Exception as e:
+            return HttpResponse(e, status=500)
     elif request.method == "GET":
         param = '-n' if platform.system().lower()=='windows' else '-c'
 
         # Building the command. Ex: "ping -c 1 google.com"
-        command = ['ping', param, '1', 'magazin.semper-ki.org']
+        command = ['ping', param, '2', 'magazin.semper-ki.org', '-4']
 
         response = {"up": True}
         pRet = subprocess.run(command)
