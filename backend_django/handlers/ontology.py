@@ -27,7 +27,7 @@ def onto_getMaterials(request):
         materialsRes = cmem.sendQuery(materials.read())
         for elem in materialsRes:
             title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"title": title, "propList": [], "URI": elem["Material"]["value"]})
+            resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
             
     return JsonResponse(resultsOfQueries)
 
@@ -37,7 +37,7 @@ def onto_getPrinters(request):
     Gathers all available 3D printers from the knowledge graph/ontology
     :param request: Get request from frontend
     :type request: HTTP GET
-    :return: Flat list of Materials
+    :return: Flat list of printers
     :rtype: JSONResponse
     """
     resultsOfQueries = {"printers": []}
@@ -45,6 +45,24 @@ def onto_getPrinters(request):
         printersRes = cmem.sendQuery(printers.read())
         for elem in printersRes:
             title = elem["Printer"]["value"]
-            resultsOfQueries["printers"].append({"title": title, "propList": [], "URI": elem["Printer"]["value"]})
+            resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
+            
+    return JsonResponse(resultsOfQueries)
+
+#######################################################
+def onto_getPrinter(request):
+    """
+    Gathers info about one specific 3D printer from the knowledge graph/ontology
+    :param request: Get request from frontend
+    :type request: HTTP GET
+    :return: Flat list of Materials
+    :rtype: JSONResponse
+    """
+    resultsOfQueries = {"printer": []}
+    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Printer/GetSpecificPrinterDetails.txt") as printer:
+        printersRes = cmem.sendQuery(printer.read())
+        for elem in printersRes:
+            title = elem["Printer"]["value"]
+            resultsOfQueries["printer"].append({"title": title, "properties": {}, "URI": elem["Printer"]["value"]})
             
     return JsonResponse(resultsOfQueries)
