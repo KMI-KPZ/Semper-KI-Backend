@@ -87,6 +87,7 @@ paths = {
     "orga_removePrinter": "public/orga/removePrinter/",
     "orga_getMaterials": "public/orga/getMaterials/",
     "orga_addMaterial": "public/orga/addMaterial/",
+    "orga_addMaterialEdit": "public/orga/addMaterial/",
     "orga_createMaterial": "public/orga/createMaterial/",
     "orga_removeMaterial": "public/orga/removeMaterial/"
 }
@@ -145,7 +146,19 @@ urlpatterns = [
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 
     path(paths["onto_getMaterials"], ontology.onto_getMaterials, name="getMaterials"),
+    path(paths["onto_getMaterial"], ontology.onto_getMaterial, name="getMaterial"),
     path(paths["onto_getPrinters"], ontology.onto_getPrinters, name="getPrinters"),
+    path(paths["onto_getPrinter"], ontology.onto_getPrinter, name="onto_getPrinter"),
+    path(paths["orga_addPrinter"], ontology.orga_addPrinter, name="orga_addPrinter"),
+    path(paths["orga_addPrinterEdit"], ontology.orga_addPrinterEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createPrinter"], ontology.orga_createPrinter, name="orga_createPrinter"),
+    path(paths["orga_removePrinter"], ontology.orga_removePrinter, name="orga_removePrinter"),
+    path(paths["orga_getPrinters"], ontology.orga_getPrinters, name="orga_getPrinters"),
+    path(paths["orga_addMaterial"], ontology.orga_addMaterial, name="orga_addMaterial"),
+    path(paths["orga_addMaterialEdit"], ontology.orga_addMaterialEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createMaterial"], ontology.orga_createMaterial, name="orga_createMaterial"),
+    path(paths["orga_removeMaterial"], ontology.orga_removeMaterial, name="orga_removeMaterial"),
+    path(paths["orga_getMaterials"], ontology.orga_getMaterials, name="orga_getMaterials"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

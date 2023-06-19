@@ -149,3 +149,14 @@ def mockLogistics(selection):
     mockTimes["production"] = mockTimes["material"] + mockTimes["postProcessing"]
     return mockTimes["production"] + mockTimes["delivery"]
     #return mockTimes
+
+#######################################################
+def mockPrinter():
+    outList = [{"Property 1": 5}, "Property 2", {"Property 3": "Test", "Property 4": [1,10]}, {"Property 5": [{"Property 6": "Test2"},{"Property 7": 2}]}]
+
+    return outList
+
+#######################################################
+def mockMaterial():
+    return mockPrinter()
+
