@@ -208,21 +208,19 @@ def sendOrder(request):
         try:
             uID = postgres.ProfileManagement.getUserHashID(request.session)
             selected = request.session["selected"]["cart"]
-            postgres.OrderManagement.addOrder(uID, selected, request.session)
+            dictForEvents = postgres.OrderManagement.addOrder(uID, selected, request.session)
             # Save picture and files in permanent storage
 
 
             # send to websockets that are active, that a new message/status is available for that order
-            # TODO needs OrderCollectionID from addOrder, maybe as return value
-            # should work without order ID or for all orderIDs if multiple manufacturers were chosen
-            # channel_layer = get_channel_layer()
-            # listOfUsers = postgres.OrderManagement.getAllUsersOfOrder(orderID)
-            # for user in listOfUsers:
-            #     if user.subID != postgres.ProfileManagement.getUserKey(session=request.session):
-            #         async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=user.subID), {
-            #             "type": "sendMessageJSON",
-            #             "dict": outputDict,
-            #         })
+            channel_layer = get_channel_layer()
+            for userID in dictForEvents:
+                values = dictForEvents[userID]
+                if userID != postgres.ProfileManagement.getUserKey(session=request.session):
+                    async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+                        "type": "sendMessageJSON",
+                        "dict": values,
+                    })
             return HttpResponse("Success")
         except (Exception) as error:
             print(error)

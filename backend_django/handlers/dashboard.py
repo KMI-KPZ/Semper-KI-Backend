@@ -58,7 +58,7 @@ def updateOrder(request):
                 if "orderCollectionID" in content["props"]:
                     orderCollectionID = content["props"]["orderCollectionID"]
 
-                outputDict = {}
+                outputDict = {"eventType": "orderEvent"}
                 outputDict["orderCollectionID"] = orderCollectionID
 
                 if "chat" in content["props"]:
@@ -141,7 +141,7 @@ def getMissedEvents(request):
     """
     if checkIfUserIsLoggedIn(request):
         user = postgres.ProfileManagement.getUser(request.session)
-        lastLogin = user["accessed"]
+        lastLogin = user["lastSeen"]
         orderCollections = postgres.OrderManagement.getOrders(user["hashedID"])
 
         output = []

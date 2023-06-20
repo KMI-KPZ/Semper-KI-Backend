@@ -40,14 +40,15 @@ class User(models.Model):
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
+    lastSeen = models.DateTimeField()
 
     ###################################################
     def __str__(self):
-        return self.hashedID + " " + self.name + " " + self.email + " " + self.organization + " " + self.role + " " + json.dumps(self.rights) + " " + json.dumps(self.address) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
+        return self.hashedID + " " + self.name + " " + self.email + " " + self.organization + " " + self.role + " " + json.dumps(self.rights) + " " + json.dumps(self.address) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen) + " " + str(self.lastSeen)
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organization": self.organization,  "type": self.role, "rights": json.dumps(self.rights), "address": json.dumps(self.address), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
+        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organization": self.organization,  "type": self.role, "rights": json.dumps(self.rights), "address": json.dumps(self.address), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}
 
 #TODO solve this more elegantly!
 
