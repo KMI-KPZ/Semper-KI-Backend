@@ -160,7 +160,7 @@ class ProfileManagement():
 
         if "organizationType" in session:
             organizationType = session["organizationType"]
-            organization = auth0.retrieveOrganisationName(session["user"]["userinfo"]["org_id"])
+            organization = session["organizationName"] #auth0.retrieveOrganisationName(session["user"]["userinfo"]["org_id"])
         else:
             organizationType = "None"
             organization = "None"

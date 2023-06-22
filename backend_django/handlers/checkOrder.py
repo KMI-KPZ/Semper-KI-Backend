@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import redis, mocks, postgres, crypto
 

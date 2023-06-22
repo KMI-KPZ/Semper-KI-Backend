@@ -14,7 +14,7 @@ import asyncio
 import time
 from functools import reduce
 
-from .authentification import checkIfTokenValid
+from ..handlers.basics import checkIfTokenValid
 
 ##############################################
 async def checkSession(session):

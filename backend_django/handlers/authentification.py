@@ -6,47 +6,15 @@ Silvio Weging 2023
 Contains: Authentification handling using Auth0
 """
 
-import json, datetime
+import json, datetime, requests
+from anyio import sleep
 from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from ..handlers import basics
 
 from ..services import auth0, redis, postgres
-
-#######################################################
-def checkIfTokenValid(token):
-    """
-    Check whether the token of a user has expired and a new login is necessary
-
-    :param token: User session token
-    :type token: Dictionary
-    :return: True if the token is valid or False if not
-    :rtype: Bool
-    """
-    
-    if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
-        return False
-    return True
-
-#######################################################
-def checkIfUserIsLoggedIn(request):
-    """
-    Check whether a user is logged in or not.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: True if the user is logged in or False if not
-    :rtype: Bool
-    """
-
-    if "user" in request.session:
-        if checkIfTokenValid(request.session["user"]):
-            return True
-        else:
-            return False
-    else:
-        return False
     
 #######################################################
 def getRolesOfUser(request):
@@ -59,7 +27,7 @@ def getRolesOfUser(request):
     :rtype: JSONResponse
     """
 
-    if checkIfUserIsLoggedIn(request):
+    if basics.checkIfUserIsLoggedIn(request):
         if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
             if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
                 return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
@@ -86,7 +54,7 @@ def isLoggedIn(request):
 
     # Check if user is already logged in
     if "user" in request.session:
-        if checkIfTokenValid(request.session["user"]):
+        if basics.checkIfTokenValid(request.session["user"]):
             return HttpResponse("Success",status=200)
         else:
             return HttpResponse("Failed",status=200)
@@ -145,6 +113,115 @@ def loginUser(request):
     return HttpResponse(uri.url + register)
 
 #######################################################
+def setOrganizationName(request):
+    """
+    Set's the Organization name based on the information of the token
+
+    :param request: request containing OAuth Token
+    :type request: Dict
+    :return: Nothing
+    :rtype: None
+
+    """
+    if "https://auth.semper-ki.org/claims/organization" in request.session["user"]["userinfo"]:
+        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"]) != 0:
+            request.session["organizationName"] = request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"]
+        else:
+            request.session["organizationName"] = ""
+    else:
+        request.session["organizationName"] = ""
+
+#######################################################
+def retrieveRolesAndPermissionsForMemberOfOrganization(session):
+    """
+    Get the roles and the permissions via API from Auth0
+
+    :param session: The session of the user
+    :type session: Dict
+    :return: Dict with roles and permissions
+    :rtype: Dict
+    """
+    try:
+        auth0.apiToken.checkIfExpired()
+        headers = {
+            'authorization': f'Bearer {auth0.apiToken.accessToken}',
+            'content-Type': 'application/json',
+            'Cache-Control': "no-cache"
+        }
+        baseURL = f"https://{settings.AUTH0_DOMAIN}"
+        orgID = session["user"]["userinfo"]["org_id"]
+        userID = postgres.ProfileManagement.getUserKey(session)
+
+        itCountUntilBreak = 10
+        iterationCount = 0
+        response = ""
+        while iterationCount < itCountUntilBreak:
+            response = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers)
+            wasTooMuch = basics.handleTooManyRequestsError(response.status_code)
+            if wasTooMuch[0]:
+                sleep(1)
+                iterationCount+=1
+            else:
+                break
+        if response == "":
+            raise Exception(wasTooMuch[1])
+        else:
+            roles = response.json()
+        
+        for entry in roles:
+            itCountUntilBreak = 10
+            iterationCount = 0
+            response = ""
+            while iterationCount < itCountUntilBreak:
+                response = requests.get(f'{baseURL}/api/v2/roles/{entry["id"]}/permissions', headers=headers)
+                wasTooMuch = basics.handleTooManyRequestsError(response.status_code)
+                if wasTooMuch[0]:
+                    sleep(1)
+                    iterationCount+=1
+                else:
+                    break
+            if response == "":
+                raise Exception(wasTooMuch[1])
+            else:
+                permissions = response.json()
+        
+        outDict = {"roles": roles, "permissions": permissions}
+        return outDict
+    except Exception as e:
+        return e
+
+#######################################################
+def setRoleAndPermissionsOfUser(request):
+    """
+    Set's the role and the permissions of the user based on the information of the token
+
+    :param request: request containing OAuth Token
+    :type request: Dict
+    :return: Nothing
+    :rtype: None
+
+    """
+    try:
+        # check if person is admin, global role so check works differently
+        if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+            if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+                if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
+                    request.session["usertype"] = "admin"
+                    request.session["userRoles"] = ["semper-admin"]
+        
+        # now gather roles from organization if the user is in one
+        if "org_id" in request.session["user"]["userinfo"]:
+            resultDict = retrieveRolesAndPermissionsForMemberOfOrganization(request.session)
+            if isinstance(resultDict, Exception):
+                raise resultDict
+            else:
+                request.session["userRoles"] = resultDict["roles"]
+                request.session["userPermissions"] = resultDict["permissions"]
+
+    except Exception as e:
+        print(f'Generic Exception: {e}')
+
+#######################################################
 def callbackLogin(request):
     """
     Get information back from Auth0.
@@ -167,12 +244,10 @@ def callbackLogin(request):
     request.session["user"] = token
     request.session["user"]["tokenExpiresOn"] = str(now)
 
-    # check if person is admin
-    if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
-        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
-            if request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"][0] == "semper-admin":
-                request.session["usertype"] = "admin"
-    
+    # get roles and permissions
+    setOrganizationName(request)
+    setRoleAndPermissionsOfUser(request)
+
     # Get Data from Database or create entry in it for logged in User
     postgres.ProfileManagement.addUser(request.session)
         
@@ -191,7 +266,7 @@ def getAuthInformation(request):
 
     """
 
-    if checkIfUserIsLoggedIn(request):
+    if basics.checkIfUserIsLoggedIn(request):
         # Read user details from Database
         return JsonResponse(postgres.ProfileManagement.getUser(request.session))
     else:

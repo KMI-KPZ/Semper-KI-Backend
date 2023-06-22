@@ -147,34 +147,34 @@ class ManageAPIToken:
 apiToken = ManageAPIToken()
 
 #######################################################
-def retrieveOrganisationName(org_id):
-    """
-    Ask Auth0 API for name of an organisation
+# def retrieveOrganisationName(org_id):
+#     """
+#     Ask Auth0 API for name of an organisation
 
-    :param org_id: ID gained from oauth token
-    :type org_id: str
-    :return: Name of organisation
-    :rtype: str
+#     :param org_id: ID gained from oauth token
+#     :type org_id: str
+#     :return: Name of organisation
+#     :rtype: str
 
-    """
-    apiToken.checkIfExpired()
+#     """
+#     apiToken.checkIfExpired()
 
-    # Add the token to the Authorization header of the request
-    headers = {
-        'authorization': f'Bearer {apiToken.accessToken}',
-        'content-Type': 'application/json'
-    }
+#     # Add the token to the Authorization header of the request
+#     headers = {
+#         'authorization': f'Bearer {apiToken.accessToken}',
+#         'content-Type': 'application/json'
+#     }
 
-    # Get all Applications using the token
-    base_url = f"https://{settings.AUTH0_DOMAIN}"
-    try:
-        res = requests.get(f'{base_url}/api/v2/organizations/{org_id}', headers=headers)
-    except requests.HTTPError as e:
-        print(f'HTTPError: {str(e.code)} {str(e.reason)}')
-    except requests.URLRequired as e:
-        print(f'URLRequired: {str(e.reason)}')
-    except requests.RequestException as e:
-        print(f'RequestException: {e}')
-    except Exception as e:
-        print(f'Generic Exception: {e}')
-    return res.json()["display_name"]
+#     # Get all Applications using the token
+#     base_url = f"https://{settings.AUTH0_DOMAIN}"
+#     try:
+#         res = requests.get(f'{base_url}/api/v2/organizations/{org_id}', headers=headers)
+#     except requests.HTTPError as e:
+#         print(f'HTTPError: {str(e.code)} {str(e.reason)}')
+#     except requests.URLRequired as e:
+#         print(f'URLRequired: {str(e.reason)}')
+#     except requests.RequestException as e:
+#         print(f'RequestException: {e}')
+#     except Exception as e:
+#         print(f'Generic Exception: {e}')
+#     return res.json()["display_name"]

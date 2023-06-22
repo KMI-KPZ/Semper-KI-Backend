@@ -15,7 +15,7 @@ from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import postgres
 
@@ -144,7 +144,7 @@ def getMissedEvents(request):
         lastLogin = user["lastSeen"]
         orderCollections = postgres.OrderManagement.getOrders(user["hashedID"])
 
-        output = []
+        output = {"eventType": "orderEvent", "events": []}
 
         for orderCollection in orderCollections:
             currentCollection = {}
@@ -171,7 +171,7 @@ def getMissedEvents(request):
                     orderArray.append(currentOrder)
             if len(orderArray):
                 currentCollection["orders"] = orderArray
-                output.append(currentCollection)
+                output["events"].append(currentCollection)
         
         # set accessed time to now
         postgres.ProfileManagement.setLoginTime(user["hashedID"])

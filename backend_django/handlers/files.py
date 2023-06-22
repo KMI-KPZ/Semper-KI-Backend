@@ -9,7 +9,7 @@ Contains: File upload handling
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
 import asyncio, json
 
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import crypto, redis, stl, mocks, postgres
 

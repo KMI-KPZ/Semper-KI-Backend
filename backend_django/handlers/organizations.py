@@ -11,25 +11,12 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
 from ..services import auth0, postgres
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError
 
-#######################################################
-def handleTooManyRequestsError(statusCode):
-    """
-    Checks, ifthere were too many requests
-    :param statusCode: Status code of answer
-    :type statusCode: Integer
-    :return: If so, say so, if not, then don't
-    :rtype: Tuple of Bool and String
-    """
-    if statusCode == 429:
-        return (True, "Too many requests! Please wait a bit and try again.")
-    else:
-        return (False, "")
 
 
 #######################################################
-def getOrganizationName(orgID, baseURL, baseHeader):
+def getOrganizationName(session, orgID, baseURL, baseHeader):
     """
     Get Name of the Organization
 
@@ -43,6 +30,10 @@ def getOrganizationName(orgID, baseURL, baseHeader):
     :rtype: str or error
     """
     try:
+        if "organizationName" in session:
+            if session["organizationName"] != "":
+                return session["organizationName"]
+            
         res = requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader)
         wasTooMuch = handleTooManyRequestsError(res.status_code)
         if wasTooMuch[0]:

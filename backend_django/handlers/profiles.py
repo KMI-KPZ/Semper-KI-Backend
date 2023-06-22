@@ -14,7 +14,7 @@ from django.db import models
 from django.utils import timezone
 from urllib.parse import unquote
 
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..modelFiles.profile import User
 

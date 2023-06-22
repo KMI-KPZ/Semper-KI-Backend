@@ -10,7 +10,6 @@ import json
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
-from .files import getUploadedFiles
 from ..services import cmem, mocks, crypto
 
 #######################################################

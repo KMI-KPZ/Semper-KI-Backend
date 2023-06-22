@@ -9,7 +9,7 @@ Contains: Calls to ontology for adding and retrieving data
 import json, requests
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import cmem, mocks
 
