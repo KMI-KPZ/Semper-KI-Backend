@@ -39,6 +39,32 @@ def getRolesOfUser(request):
         return JsonResponse([], status=401)
 
 #######################################################
+def getPermissionsOfUser(request):
+    """
+    Get Permissions of User.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of roles
+    :rtype: JSONResponse
+    """
+    if basics.checkIfUserIsLoggedIn(request):
+        if "userPermissions" in request.session:
+            if len(request.session["userPermissions"]) != 0:
+                outArray = []
+                for entry in request.session["userPermissions"]:
+                    context, permission = entry["permission_name"].split(":")
+                    outArray.append({"context": context, "permission": permission})
+
+                return JsonResponse(outArray, safe=False)
+            else:
+                return JsonResponse([], safe=False, status=200)
+        else:
+            return JsonResponse([], safe=False, status=400)
+    else:
+        return JsonResponse([], status=401)
+
+#######################################################
 def isLoggedIn(request):
     """
     Check whether the token of a user has expired and a new login is necessary
