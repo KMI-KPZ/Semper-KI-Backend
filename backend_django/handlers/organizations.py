@@ -500,7 +500,7 @@ def handleCallToPath(request):
                     return HttpResponse(result["invitation_url"])
                 
             elif content["intent"] == "fetchUsers":
-                orgaName = getOrganizationName(orgID, baseURL, headers)
+                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
                 if isinstance(orgaName, Exception):
                     raise orgaName
                 result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
@@ -516,7 +516,7 @@ def handleCallToPath(request):
                     raise result
 
             elif content["intent"] == "createRole":
-                orgaName = getOrganizationName(orgID, baseURL, headers)
+                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
                 if isinstance(orgaName, Exception):
                     raise orgaName
                 
@@ -531,7 +531,7 @@ def handleCallToPath(request):
                     return JsonResponse(result, safe=False)
             
             elif content["intent"] == "getRoles":
-                orgaName = getOrganizationName(orgID, baseURL, headers)
+                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
                 if isinstance(orgaName, Exception):
                     raise orgaName
                 result = getRoles(orgID, baseURL, headers, orgaName)
