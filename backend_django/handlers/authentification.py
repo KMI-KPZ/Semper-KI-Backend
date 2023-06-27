@@ -249,7 +249,7 @@ def setRoleAndPermissionsOfUser(request):
         print(f'Generic Exception: {e}')
 
 #######################################################
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "GET"])
 def callbackLogin(request):
     """
     Get information back from Auth0.

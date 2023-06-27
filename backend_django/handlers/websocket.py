@@ -31,22 +31,29 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
 
     ##########################
     async def connect(self):
-        # check if person ist logged in or not. If not, refuse connection, if yes, allow it.
-        session = await sync_to_async(self.getSession)()
-        if "user" in session:
-            # Then gather the user ID from the session user token and create room from that
-            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
-            # in other function send to that "group"/"channel"
-            await self.channel_layer.group_add(uID, self.channel_name)
-            await self.accept()
+        try:
+            # check if person ist logged in or not. If not, refuse connection, if yes, allow it.
+            session = await sync_to_async(self.getSession)()
+            if "user" in session:
+                # Then gather the user ID from the session user token and create room from that
+                uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
+                # in other function send to that "group"/"channel"
+                await self.channel_layer.group_add(uID, self.channel_name)
+                await self.accept()
+        except Exception as e:
+            print(e)
 
     ##########################
     async def disconnect(self, code):
-        session = await sync_to_async(self.getSession)(False)
-        if "user" in session:
-            uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
-            await self.channel_layer.group_discard(uID, self.channel_name)
-        raise StopConsumer("Connection closed")
+        try:
+            session = await sync_to_async(self.getSession)(False)
+            if "user" in session:
+                uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
+                await self.channel_layer.group_discard(uID, self.channel_name)
+                raise StopConsumer("Connection closed")
+        except Exception as e:
+            print(e)
+
     
     ##########################
     async def receive(self, text_data=None, bytes_data=None):
