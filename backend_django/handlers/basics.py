@@ -7,6 +7,10 @@ Contains: Basic stuff that is imported everywhere
 """
 
 import datetime
+from functools import wraps
+from django.http import HttpResponse, JsonResponse
+
+from anyio import sleep
 
 #######################################################
 def checkIfTokenValid(token):
@@ -24,7 +28,7 @@ def checkIfTokenValid(token):
     return True
 
 #######################################################
-def checkIfUserIsLoggedIn(request):
+def checkIfUserIsLoggedIn(json=False):
     """
     Check whether a user is logged in or not.
 
@@ -34,24 +38,49 @@ def checkIfUserIsLoggedIn(request):
     :rtype: Bool
     """
 
-    if "user" in request.session:
-        if checkIfTokenValid(request.session["user"]):
-            return True
-        else:
-            return False
-    else:
-        return False
-    
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            if "user" in request.session:
+                if checkIfTokenValid(request.session["user"]):
+                    return func(request, *args, **kwargs)
+                else:
+                    if json:
+                        return JsonResponse({}, status=401)
+                    else:
+                        return HttpResponse("Not logged in", status=401)
+            else:
+                if json:
+                    return JsonResponse({}, status=401)
+                else:
+                    return HttpResponse("Not logged in", status=401)
+            
+        return inner
+
+    return decorator
+
 #######################################################
-def handleTooManyRequestsError(statusCode):
+def handleTooManyRequestsError(callToAPI):
     """
-    Checks, ifthere were too many requests
-    :param statusCode: Status code of answer
-    :type statusCode: Integer
-    :return: If so, say so, if not, then don't
-    :rtype: Tuple of Bool and String
+    Calls the function and checks, if there were too many requests. If so, repeat the request until it's done.
+    :param callToAPI: Function call to Auth0 API
+    :type callToAPI: Lambda func
+    :return: Either an error, or the response
+    :rtype: Exception | JSON/Dict
     """
-    if statusCode == 429:
-        return (True, "Too many requests! Please wait a bit and try again.")
+    response = callToAPI()
+    iterationVariable = 0
+    if response.status_code == 429:
+        while response.status_code == 429:
+            if iterationVariable > 100:
+                return Exception("Too many requests")
+            sleep(1)
+            response = callToAPI()
+            iterationVariable += 1
+        return response.json()
+    elif response.status_code != 200 and response.status_code != 201 and response.status_code != 203:
+        return Exception(response.text)
     else:
-        return (False, "")
+        return response.json()
+    
+        

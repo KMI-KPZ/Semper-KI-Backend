@@ -49,12 +49,13 @@ def testResponseCsrf(request):
     return response
 
 ###################################################
+@require_http_methods(["POST", "GET"])
 def isMagazineUp(request):
     """
     Pings the magazine website and check if that works or not
 
-    :param request: GET request
-    :type request: HTTP GET
+    :param request: GET/POST request
+    :type request: HTTP GET/POST
     :return: Response with True or False 
     :rtype: JSON Response
 
@@ -82,8 +83,6 @@ def isMagazineUp(request):
         if pRet.returncode != 0:
             response["up"] = False
         return JsonResponse(response)
-    else:
-        return HttpResponse("Wrong method!", status=405)
 
 
 ###################################################

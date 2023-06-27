@@ -13,6 +13,7 @@ import psycopg2
 from django.db import models
 from django.utils import timezone
 from urllib.parse import unquote
+from django.views.decorators.http import require_http_methods
 
 from ..handlers.basics import checkIfUserIsLoggedIn
 
@@ -21,6 +22,8 @@ from ..modelFiles.profile import User
 from ..services import postgres
 
 ##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def addUserTest(request):
     """
     Same as addUser but for testing.
@@ -31,16 +34,17 @@ def addUserTest(request):
     :rtype: HTTP status
 
     """
-    if checkIfUserIsLoggedIn(request):
-        flag = postgres.ProfileManagement.addUser(request.session)
-        if flag is True:
-            return HttpResponse("Worked")
-        else:
-            return HttpResponse("Failed", status=500)
+
+    flag = postgres.ProfileManagement.addUser(request.session)
+    if flag is True:
+        return HttpResponse("Worked")
     else:
-        return HttpResponse("Not logged in", status=401)
+        return HttpResponse("Failed", status=500)
+
 
 ##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def getUserTest(request):
     """
     Same as getUser but for testing.
@@ -54,29 +58,31 @@ def getUserTest(request):
     return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
 ##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["PUT"])
 def updateName(request):
     """
     Update user name.
 
-    :param request: POST request
-    :type request: HTTP POST
+    :param request: PUT request
+    :type request: HTTP PUT
     :return: HTTP response
     :rtype: HTTP status
 
     """
-    if request.method == "PUT":
-        content = json.loads(request.body.decode("utf-8"))
-        if checkIfUserIsLoggedIn(request):
-            flag = postgres.ProfileManagement.updateName(request.session, content["username"])
-            if flag is True:
-                return HttpResponse("Worked")
-            else:
-                return HttpResponse("Failed", status=500)
-        else:
-            return HttpResponse("Not logged in", status=401)
-    return HttpResponse("Wrong method!", status=405)
+
+    content = json.loads(request.body.decode("utf-8"))
+
+    flag = postgres.ProfileManagement.updateName(request.session, content["username"])
+    if flag is True:
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=500)
+
 
 ##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["DELETE"])
 def deleteUser(request):
     """
     Deletes an entry in the database corresponding to user name.
@@ -87,14 +93,13 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    if checkIfUserIsLoggedIn(request):
-        flag = postgres.ProfileManagement.deleteUser(request.session)
-        if flag is True:
-            return HttpResponse("Worked")
-        else:
-            return HttpResponse("Failed", status=500)
+
+    flag = postgres.ProfileManagement.deleteUser(request.session)
+    if flag is True:
+        return HttpResponse("Worked")
     else:
-        return HttpResponse("Not logged in", status=401)
+        return HttpResponse("Failed", status=500)
+
 
 # ##############################################
 # def updateUser(request):

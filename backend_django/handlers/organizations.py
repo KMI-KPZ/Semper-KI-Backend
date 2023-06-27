@@ -9,10 +9,10 @@ Contains: Handling of admin requests for organizations, api calls to auth0
 import json, requests
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, postgres
 from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError
-
 
 
 #######################################################
@@ -33,12 +33,11 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
         if "organizationName" in session:
             if session["organizationName"] != "":
                 return session["organizationName"]
-            
-        res = requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(res.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        return res.json()["display_name"]
+        
+        res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader))
+        if isinstance(res, Exception):
+            raise res
+        return res["display_name"].capitalize()
     except Exception as e:
         return e
 
@@ -67,19 +66,17 @@ def sendInvite(orgID, baseURL, baseHeader, nameOfCurrentUser, withEmail, emailAd
         data = { "inviter": { "name": nameOfCurrentUser }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
         if withEmail:
 
-            response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data)
-            wasTooMuch = handleTooManyRequestsError(response.status_code)
-            if wasTooMuch[0]:
-                raise Exception(wasTooMuch[1])
+            response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data))
+            if isinstance(response, Exception):
+                raise response
             return True
         else:
             data["send_invitation_email"] = False
 
-            response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data)
-            wasTooMuch = handleTooManyRequestsError(response.status_code)
-            if wasTooMuch[0]:
-                raise Exception(wasTooMuch[1])
-            return response.json()
+            response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=header, json=data))
+            if isinstance(response, Exception):
+                raise response
+            return response
     except Exception as e:
         return e
 
@@ -100,17 +97,15 @@ def getMembersOfOrganization(orgID, baseURL, baseHeader, orgaName):
     :rtype: Json or error
     """
     try:
-        response = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        responseDict = response.json()
+        response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        responseDict = response
         for idx, entry in enumerate(responseDict):
-            resp = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=baseHeader)
-            wasTooMuch = handleTooManyRequestsError(resp.status_code)
-            if wasTooMuch[0]:
-                raise Exception(wasTooMuch[1])
-            responseDict[idx]["roles"] = resp.json()
+            resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=baseHeader) )
+            if isinstance(resp, Exception):
+                raise resp
+            responseDict[idx]["roles"] = resp
             for elemIdx in range(len(responseDict[idx]["roles"])):
                 responseDict[idx]["roles"][elemIdx]["name"] = responseDict[idx]["roles"][elemIdx]["name"].replace(orgaName+"-", "")
             entry.pop("user_id")
@@ -139,21 +134,17 @@ def deleteUserFromOrganization(orgID, baseURL, baseHeader, userMail):
         header["Cache-Control"] = "no-cache"
 
         # fetch user id via E-Mail of the user
-        response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        userID = response.json()[0]["user_id"]
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        userID = response[0]["user_id"]
         # delete person from organization via userID
         data = { "members": [userID]}
-        response = requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 204:
-            # delete user from database as well
-            postgres.ProfileManagement.deleteUser("", uID=userID)
-            return True
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=header, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        postgres.ProfileManagement.deleteUser("", uID=userID)
+        return True
     except Exception as e:
         return e
     
@@ -178,15 +169,11 @@ def createRole(baseURL, baseHeader, roleName, roleDescription):
         header["Cache-Control"] = "no-cache"
 
         data = { "name": roleName, "description": roleDescription}
-        response = requests.post(f'{baseURL}/api/v2/roles', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        roleInfo = response.json()
-        if response.status_code == 200:
-            return roleInfo
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda: requests.post(f'{baseURL}/api/v2/roles', headers=header, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        
+        return response
     except Exception as e:
         return e
 
@@ -213,21 +200,18 @@ def assignRole(orgID, baseURL, baseHeader, userMail, roleID):
         header["Cache-Control"] = "no-cache"
 
         # fetch user id via E-Mail of the user
-        response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        userID = response.json()[0]["user_id"]
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = requests.post(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 204:
-            return True
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data) )
+        if isinstance(response, Exception):
+            raise response
+
+        return True
+
     except Exception as e:
         return e
     
@@ -254,21 +238,18 @@ def removeRole(orgID, baseURL, baseHeader, userMail, roleID):
         header["Cache-Control"] = "no-cache"
 
         # fetch user id via E-Mail of the user
-        response = requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        userID = response.json()[0]["user_id"]
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users?q=email:"{userMail}"&search_engine=v3', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 204 or response.status_code == 200:
-            return True
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=header, json=data))
+        if isinstance(response, Exception):
+            raise response
+        
+        return True
+        
     except Exception as e:
         return e
 
@@ -297,14 +278,11 @@ def editRole(orgID, baseURL, baseHeader, roleID, roleName, roleDescription):
         header["Cache-Control"] = "no-cache"
 
         data = { "name": roleName, "description": roleDescription}
-        response = requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 200 or response.status_code == 204:
-            return True
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=header, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        
+        return True
     except Exception as e:
         return e
 
@@ -328,11 +306,10 @@ def getRoles(orgID, baseURL, baseHeader, orgaName):
     try:
         header = baseHeader
         header["Cache-Control"] = "no-cache"
-        response = requests.get(f'{baseURL}/api/v2/roles', headers=header)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        roles = response.json()
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/roles', headers=header) )
+        if isinstance(response, Exception):
+            raise response
+        roles = response
         rolesOut = []
         for entry in roles:
             if orgaName in entry["name"]:
@@ -359,14 +336,11 @@ def deleteRole(orgID, baseURL, baseHeader, roleID):
     :rtype: Bool or error
     """
     try:
-        response = requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 200:
-            return True
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        return True
+        
     except Exception as e:
         return e
 
@@ -396,14 +370,11 @@ def addPermissionsToRole(orgID, baseURL, baseHeader, roleID, listOfPermissionIDs
         for entry in listOfPermissionIDs:
             data["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry})
 
-        response = requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=header, json=data)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 200 or response.status_code == 201:
-            return True
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=header, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        return True
+
     except Exception as e:
         return e
 
@@ -422,14 +393,11 @@ def getAllPermissions(orgID, baseURL, baseHeader):
     :rtype: JSON or error
     """ 
     try:
-        response = requests.get(f'{baseURL}/api/v2/resource-servers/back.semper-ki.org', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 200 or response.status_code == 204:
-            return response.json()["scopes"]
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/resource-servers/back.semper-ki.org', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        return response["scopes"]
+
     except Exception as e:
         return e
 
@@ -450,18 +418,17 @@ def getPermissionsForRole(orgID, baseURL, baseHeader, roleID):
     :rtype: JSON or error
     """    
     try:
-        response = requests.get(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=baseHeader)
-        wasTooMuch = handleTooManyRequestsError(response.status_code)
-        if wasTooMuch[0]:
-            raise Exception(wasTooMuch[1])
-        if response.status_code == 200 or response.status_code == 204:
-            return response.json()
-        else:
-            raise Exception(response.text)
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=baseHeader) )
+        if isinstance(response, Exception):
+            raise response
+        return response
+
     except Exception as e:
         return e
 
 #######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["POST"])
 def handleCallToPath(request):
     """
     Ask Auth0 API for various stuff
@@ -471,134 +438,132 @@ def handleCallToPath(request):
     :return: Response if successful or not
     :rtype: HTTP/JSON Response
     """
-    if checkIfUserIsLoggedIn(request):
-        content = json.loads(request.body.decode("utf-8"))["data"]
 
-        # Get token and attach to header that every call needs
-        auth0.apiToken.checkIfExpired()
-        headers = {
-            'authorization': f'Bearer {auth0.apiToken.accessToken}',
-            'content-Type': 'application/json'
-        }
-        baseURL = f"https://{settings.AUTH0_DOMAIN}"
-        orgID = request.session["user"]["userinfo"]["org_id"]
-        userName = request.session["user"]["userinfo"]["nickname"]
+    content = json.loads(request.body.decode("utf-8"))["data"]
 
-        try:
-            if content["intent"] == "addUser":
-                emailAdressOfUserToBeAdded = content["content"]["email"]
-                result = sendInvite(orgID, baseURL, headers, userName, True, emailAdressOfUserToBeAdded)
-                if isinstance(result, Exception):
-                    raise result
-                
-            elif content["intent"] == "getInviteLink":
-                emailAdressOfUserToBeAdded = content["content"]["email"]
-                result = sendInvite(orgID, baseURL, headers, userName, False, emailAdressOfUserToBeAdded)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return HttpResponse(result["invitation_url"])
-                
-            elif content["intent"] == "fetchUsers":
-                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
-                if isinstance(orgaName, Exception):
-                    raise orgaName
-                result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return JsonResponse(result, safe=False)
+    # Get token and attach to header that every call needs
+    auth0.apiToken.checkIfExpired()
+    headers = {
+        'authorization': f'Bearer {auth0.apiToken.accessToken}',
+        'content-Type': 'application/json'
+    }
+    baseURL = f"https://{settings.AUTH0_DOMAIN}"
+    orgID = request.session["user"]["userinfo"]["org_id"]
+    userName = request.session["user"]["userinfo"]["nickname"]
 
-            elif content["intent"] == "deleteUser":
-                emailAdressOfUser = content["content"]["email"]
-                result = deleteUserFromOrganization(orgID, baseURL, headers, emailAdressOfUser)
-                if isinstance(result, Exception):
-                    raise result
-
-            elif content["intent"] == "createRole":
-                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
-                if isinstance(orgaName, Exception):
-                    raise orgaName
-                
-                # append organization name to the role name to avoid that two different organizations create the same role
-                roleName = orgaName + "-" + content["content"]["roleName"]
-                roleDescription = content["content"]["roleDescription"]
-
-                result = createRole(baseURL, headers, roleName, roleDescription)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return JsonResponse(result, safe=False)
+    try:
+        if content["intent"] == "addUser":
+            emailAdressOfUserToBeAdded = content["content"]["email"]
+            result = sendInvite(orgID, baseURL, headers, userName, True, emailAdressOfUserToBeAdded)
+            if isinstance(result, Exception):
+                raise result
             
-            elif content["intent"] == "getRoles":
-                orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
-                if isinstance(orgaName, Exception):
-                    raise orgaName
-                result = getRoles(orgID, baseURL, headers, orgaName)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return JsonResponse(result, safe=False)
-
-            elif content["intent"] == "assignRole":
-                emailAdressOfUser = content["content"]["email"]
-                roleID = content["content"]["roleID"]
-                result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
-                if isinstance(result, Exception):
-                    raise result
-                
-            elif content["intent"] == "removeRole":
-                emailAdressOfUser = content["content"]["email"]
-                roleID = content["content"]["roleID"]
-                result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
-                if isinstance(result, Exception):
-                    raise result
-            
-            elif content["intent"] == "editRole":
-                roleID = content["content"]["roleID"]
-                roleName = orgaName + "-" + content["content"]["roleName"]
-                roleDescription = content["content"]["roleDescription"]
-                result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
-                if isinstance(result, Exception):
-                    raise result
-
-            elif content["intent"] == "deleteRole":
-                roleID = content["content"]["roleID"]
-                result = deleteRole(orgID, baseURL, headers, roleID)
-                if isinstance(result, Exception):
-                    raise result
-
-            elif content["intent"] == "getPermissions":
-                result = getAllPermissions(orgID, baseURL, headers)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return JsonResponse(result,safe=False)
-            
-            elif content["intent"] == "getPermissionsForRole":
-                roleID = content["content"]["roleID"]
-                result = getPermissionsForRole(orgID, baseURL, headers, roleID)
-                if isinstance(result, Exception):
-                    raise result
-                else:
-                    return JsonResponse(result,safe=False)
-
-            elif content["intent"] == "setPermissionsForRole":
-                roleID = content["content"]["roleID"]
-                permissionList = content["content"]["permissionIDs"]
-                result = addPermissionsToRole(orgID, baseURL, headers, roleID, permissionList)
-                if isinstance(result, Exception):
-                    raise result
-                
+        elif content["intent"] == "getInviteLink":
+            emailAdressOfUserToBeAdded = content["content"]["email"]
+            result = sendInvite(orgID, baseURL, headers, userName, False, emailAdressOfUserToBeAdded)
+            if isinstance(result, Exception):
+                raise result
             else:
-                return HttpResponse("Invalid request", status=400)
-
-            return HttpResponse("Success", status=200)
-        except Exception as e:
-            print(f'Generic Exception: {e}')
-            if "many requests" in e.args[0]:
-                return HttpResponse("Failed - " + str(e), status=429)
+                return HttpResponse(result["invitation_url"])
+            
+        elif content["intent"] == "fetchUsers":
+            orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
+            if isinstance(orgaName, Exception):
+                raise orgaName
+            result = getMembersOfOrganization(orgID, baseURL, headers, orgaName)
+            if isinstance(result, Exception):
+                raise result
             else:
-                return HttpResponse("Failed - " + str(e), status=500)
-    else:
-        return HttpResponse("Not logged in", status=401)
+                return JsonResponse(result, safe=False)
+
+        elif content["intent"] == "deleteUser":
+            emailAdressOfUser = content["content"]["email"]
+            result = deleteUserFromOrganization(orgID, baseURL, headers, emailAdressOfUser)
+            if isinstance(result, Exception):
+                raise result
+
+        elif content["intent"] == "createRole":
+            orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
+            if isinstance(orgaName, Exception):
+                raise orgaName
+            
+            # append organization name to the role name to avoid that two different organizations create the same role
+            roleName = orgaName + "-" + content["content"]["roleName"]
+            roleDescription = content["content"]["roleDescription"]
+
+            result = createRole(baseURL, headers, roleName, roleDescription)
+            if isinstance(result, Exception):
+                raise result
+            else:
+                return JsonResponse(result, safe=False)
+        
+        elif content["intent"] == "getRoles":
+            orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
+            if isinstance(orgaName, Exception):
+                raise orgaName
+            result = getRoles(orgID, baseURL, headers, orgaName)
+            if isinstance(result, Exception):
+                raise result
+            else:
+                return JsonResponse(result, safe=False)
+
+        elif content["intent"] == "assignRole":
+            emailAdressOfUser = content["content"]["email"]
+            roleID = content["content"]["roleID"]
+            result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+            if isinstance(result, Exception):
+                raise result
+            
+        elif content["intent"] == "removeRole":
+            emailAdressOfUser = content["content"]["email"]
+            roleID = content["content"]["roleID"]
+            result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
+            if isinstance(result, Exception):
+                raise result
+        
+        elif content["intent"] == "editRole":
+            roleID = content["content"]["roleID"]
+            roleName = orgaName + "-" + content["content"]["roleName"]
+            roleDescription = content["content"]["roleDescription"]
+            result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
+            if isinstance(result, Exception):
+                raise result
+
+        elif content["intent"] == "deleteRole":
+            roleID = content["content"]["roleID"]
+            result = deleteRole(orgID, baseURL, headers, roleID)
+            if isinstance(result, Exception):
+                raise result
+
+        elif content["intent"] == "getPermissions":
+            result = getAllPermissions(orgID, baseURL, headers)
+            if isinstance(result, Exception):
+                raise result
+            else:
+                return JsonResponse(result,safe=False)
+        
+        elif content["intent"] == "getPermissionsForRole":
+            roleID = content["content"]["roleID"]
+            result = getPermissionsForRole(orgID, baseURL, headers, roleID)
+            if isinstance(result, Exception):
+                raise result
+            else:
+                return JsonResponse(result,safe=False)
+
+        elif content["intent"] == "setPermissionsForRole":
+            roleID = content["content"]["roleID"]
+            permissionList = content["content"]["permissionIDs"]
+            result = addPermissionsToRole(orgID, baseURL, headers, roleID, permissionList)
+            if isinstance(result, Exception):
+                raise result
+            
+        else:
+            return HttpResponse("Invalid request", status=400)
+
+        return HttpResponse("Success", status=200)
+    except Exception as e:
+        print(f'Generic Exception: {e}')
+        if "many requests" in e.args[0]:
+            return HttpResponse("Failed - " + str(e), status=429)
+        else:
+            return HttpResponse("Failed - " + str(e), status=500)

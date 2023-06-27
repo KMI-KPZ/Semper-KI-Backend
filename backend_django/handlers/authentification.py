@@ -13,10 +13,13 @@ from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from ..handlers import basics
+from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, redis, postgres
     
 #######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods("GET")
 def getRolesOfUser(request):
     """
     Get Roles of User.
@@ -27,18 +30,17 @@ def getRolesOfUser(request):
     :rtype: JSONResponse
     """
 
-    if basics.checkIfUserIsLoggedIn(request):
-        if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
-            if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
-                return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
-            else:
-                return JsonResponse([], safe=False, status=200)
+    if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+            return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
         else:
-            return JsonResponse([], safe=False, status=400)
+            return JsonResponse([], safe=False, status=200)
     else:
-        return JsonResponse([], status=401)
+        return JsonResponse([], safe=False, status=400)
 
 #######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
 def getPermissionsOfUser(request):
     """
     Get Permissions of User.
@@ -48,23 +50,21 @@ def getPermissionsOfUser(request):
     :return: List of roles
     :rtype: JSONResponse
     """
-    if basics.checkIfUserIsLoggedIn(request):
-        if "userPermissions" in request.session:
-            if len(request.session["userPermissions"]) != 0:
-                outArray = []
-                for entry in request.session["userPermissions"]:
-                    context, permission = entry["permission_name"].split(":")
-                    outArray.append({"context": context, "permission": permission})
+    if "userPermissions" in request.session:
+        if len(request.session["userPermissions"]) != 0:
+            outArray = []
+            for entry in request.session["userPermissions"]:
+                context, permission = entry["permission_name"].split(":")
+                outArray.append({"context": context, "permission": permission})
 
-                return JsonResponse(outArray, safe=False)
-            else:
-                return JsonResponse([], safe=False, status=200)
+            return JsonResponse(outArray, safe=False)
         else:
-            return JsonResponse([], safe=False, status=400)
+            return JsonResponse([], safe=False, status=200)
     else:
-        return JsonResponse([], status=401)
+        return JsonResponse([], safe=False, status=400)
 
 #######################################################
+@require_http_methods(["GET"])
 def isLoggedIn(request):
     """
     Check whether the token of a user has expired and a new login is necessary
@@ -88,6 +88,7 @@ def isLoggedIn(request):
     return HttpResponse("Failed",status=200)
 
 #######################################################
+@require_http_methods(["GET"])
 def loginUser(request):
     """
     Return a link for redirection to Auth0.
@@ -248,6 +249,7 @@ def setRoleAndPermissionsOfUser(request):
         print(f'Generic Exception: {e}')
 
 #######################################################
+@require_http_methods(["POST"])
 def callbackLogin(request):
     """
     Get information back from Auth0.
@@ -280,6 +282,8 @@ def callbackLogin(request):
     return HttpResponseRedirect(request.session["pathAfterLogin"])
 
 #######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
 def getAuthInformation(request):
     """
     Return details about user after login. 
@@ -291,14 +295,12 @@ def getAuthInformation(request):
     :rtype: Json
 
     """
+    # Read user details from Database
+    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
-    if basics.checkIfUserIsLoggedIn(request):
-        # Read user details from Database
-        return JsonResponse(postgres.ProfileManagement.getUser(request.session))
-    else:
-        return JsonResponse({}, status=401)
 
 #######################################################
+@require_http_methods(["GET"])
 def logoutUser(request):
     """
     Delete session for this user and log out.
