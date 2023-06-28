@@ -18,52 +18,6 @@ from django.views.decorators.http import require_http_methods
 from ..services import auth0, redis, postgres
     
 #######################################################
-@basics.checkIfUserIsLoggedIn(json=True)
-@require_http_methods("GET")
-def getRolesOfUser(request):
-    """
-    Get Roles of User.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: List of roles
-    :rtype: JSONResponse
-    """
-
-    if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
-        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
-            return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
-        else:
-            return JsonResponse([], safe=False, status=200)
-    else:
-        return JsonResponse([], safe=False, status=400)
-
-#######################################################
-@basics.checkIfUserIsLoggedIn(json=True)
-@require_http_methods(["GET"])
-def getPermissionsOfUser(request):
-    """
-    Get Permissions of User.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: List of roles
-    :rtype: JSONResponse
-    """
-    if "userPermissions" in request.session:
-        if len(request.session["userPermissions"]) != 0:
-            outArray = []
-            for entry in request.session["userPermissions"]:
-                context, permission = entry["permission_name"].split(":")
-                outArray.append({"context": context, "permission": permission})
-
-            return JsonResponse(outArray, safe=False)
-        else:
-            return JsonResponse([], safe=False, status=200)
-    else:
-        return JsonResponse([], safe=False, status=400)
-
-#######################################################
 @require_http_methods(["GET"])
 def isLoggedIn(request):
     """
@@ -179,38 +133,18 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         orgID = session["user"]["userinfo"]["org_id"]
         userID = postgres.ProfileManagement.getUserKey(session)
 
-        itCountUntilBreak = 10
-        iterationCount = 0
-        response = ""
-        while iterationCount < itCountUntilBreak:
-            response = requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers)
-            wasTooMuch = basics.handleTooManyRequestsError(response.status_code)
-            if wasTooMuch[0]:
-                sleep(1)
-                iterationCount+=1
-            else:
-                break
-        if response == "":
-            raise Exception(wasTooMuch[1])
-        else:
-            roles = response.json()
+        
+        response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers) )
+        if isinstance(response, Exception):
+            raise response
+        roles = response
         
         for entry in roles:
-            itCountUntilBreak = 10
-            iterationCount = 0
-            response = ""
-            while iterationCount < itCountUntilBreak:
-                response = requests.get(f'{baseURL}/api/v2/roles/{entry["id"]}/permissions', headers=headers)
-                wasTooMuch = basics.handleTooManyRequestsError(response.status_code)
-                if wasTooMuch[0]:
-                    sleep(1)
-                    iterationCount+=1
-                else:
-                    break
-            if response == "":
-                raise Exception(wasTooMuch[1])
+            response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/roles/{entry["id"]}/permissions', headers=headers) )
+            if isinstance(response, Exception):
+                raise response
             else:
-                permissions = response.json()
+                permissions = response
         
         outDict = {"roles": roles, "permissions": permissions}
         return outDict
@@ -224,8 +158,8 @@ def setRoleAndPermissionsOfUser(request):
 
     :param request: request containing OAuth Token
     :type request: Dict
-    :return: Nothing
-    :rtype: None
+    :return: Exception or True
+    :rtype: Exception or Bool
 
     """
     try:
@@ -244,9 +178,10 @@ def setRoleAndPermissionsOfUser(request):
             else:
                 request.session["userRoles"] = resultDict["roles"]
                 request.session["userPermissions"] = resultDict["permissions"]
-
+        return True
     except Exception as e:
         print(f'Generic Exception: {e}')
+        return e
 
 #######################################################
 @require_http_methods(["POST", "GET"])
@@ -261,26 +196,33 @@ def callbackLogin(request):
     :rtype: HTTP Link as redirect
 
     """
-    # authorize callback token
-    if "organizationType" in request.session:
-        token = auth0.authorizeTokenOrga(request)
-    else:
-        token = auth0.authorizeToken(request)
+    try:
+        # authorize callback token
+        if "organizationType" in request.session:
+            token = auth0.authorizeTokenOrga(request)
+        else:
+            token = auth0.authorizeToken(request)
 
-    # convert expiration time to the corresponding date and time
-    now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
-    request.session["user"] = token
-    request.session["user"]["tokenExpiresOn"] = str(now)
+        # convert expiration time to the corresponding date and time
+        now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
+        request.session["user"] = token
+        request.session["user"]["tokenExpiresOn"] = str(now)
 
-    # get roles and permissions
-    setOrganizationName(request)
-    setRoleAndPermissionsOfUser(request)
+        # get roles and permissions
+        setOrganizationName(request)
+        retVal = setRoleAndPermissionsOfUser(request)
+        if isinstance(retVal, Exception):
+            raise retVal
 
-    # Get Data from Database or create entry in it for logged in User
-    postgres.ProfileManagement.addUser(request.session)
-        
-    return HttpResponseRedirect(request.session["pathAfterLogin"])
-
+        # Get Data from Database or create entry in it for logged in User
+        postgres.ProfileManagement.addUser(request.session)
+            
+        return HttpResponseRedirect(request.session["pathAfterLogin"])
+    except Exception as e:
+        returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
+        returnObj.write(str(e))
+        return returnObj
+    
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
@@ -298,6 +240,68 @@ def getAuthInformation(request):
     # Read user details from Database
     return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
+#######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods("GET")
+def getRolesOfUser(request):
+    """
+    Get Roles of User.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of roles
+    :rtype: JSONResponse
+    """
+
+    if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+        if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+            return JsonResponse(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"], safe=False)
+        else:
+            return JsonResponse([], safe=False, status=200)
+    else:
+        return JsonResponse([], safe=False, status=400)
+
+#######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
+def getPermissionsOfUser(request):
+    """
+    Get Permissions of User.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of roles
+    :rtype: JSONResponse
+    """
+    if "userPermissions" in request.session:
+        if len(request.session["userPermissions"]) != 0:
+            outArray = []
+            for entry in request.session["userPermissions"]:
+                context, permission = entry["permission_name"].split(":")
+                outArray.append({"context": context, "permission": permission})
+
+            return JsonResponse(outArray, safe=False)
+        else:
+            return JsonResponse([], safe=False, status=200)
+    else:
+        return JsonResponse([], safe=False, status=400)
+
+#######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
+def getNewRoleAndPermissionsForUser(request):
+    """
+    In case the role changed, get new role and new permissions from auth0
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: New Permissions for User
+    :rtype: JSONResponse
+    """
+    retVal = setRoleAndPermissionsOfUser(request)
+    if isinstance(retVal, Exception):
+        return HttpResponse(retVal, status=500)
+    return getPermissionsOfUser(request)    
 
 #######################################################
 @require_http_methods(["GET"])

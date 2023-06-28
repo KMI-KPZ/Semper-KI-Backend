@@ -78,8 +78,10 @@ def handleTooManyRequestsError(callToAPI):
             response = callToAPI()
             iterationVariable += 1
         return response.json()
-    elif response.status_code != 200 and response.status_code != 201 and response.status_code != 203:
+    elif response.status_code != 200 and response.status_code != 201 and response.status_code != 202 and response.status_code != 203 and response.status_code != 204:
         return Exception(response.text)
+    elif response.status_code == 204:
+        return ""
     else:
         return response.json()
     

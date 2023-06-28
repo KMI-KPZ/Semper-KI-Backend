@@ -10,9 +10,53 @@ import json, requests
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 from ..services import auth0, postgres
 from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError
+
+
+#######################################################
+def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
+    """
+    """
+    try:
+        channel_layer = get_channel_layer()
+        if eventName == "assignRole" or eventName == "removeRole":
+            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+                "type": "sendMessageJSON",
+                "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
+            })
+
+        elif eventName == "addPermissionsToRole" or eventName == "editRole":
+            # get list of all members, retrieve the user ids and filter for those affected
+            response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader) )
+            if isinstance(response, Exception):
+                raise response
+            responseDict = response
+            for user in responseDict:
+                userID = user["user_id"]
+                
+                resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=baseHeader) )
+                if isinstance(resp, Exception):
+                    raise resp    
+                for elem in resp:
+                    if elem["id"] == args:
+                        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+                            "type": "sendMessageJSON",
+                            "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
+                        })
+
+        elif eventName == "deleteUserFromOrganization":
+            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+                "type": "sendMessageJSON",
+                "dict": {"eventType": "orgaEvent", "type": "userDeleted"},
+            })
+
+        return True
+    except Exception as e:
+        return e
 
 
 #######################################################
@@ -144,7 +188,7 @@ def deleteUserFromOrganization(orgID, baseURL, baseHeader, userMail):
         if isinstance(response, Exception):
             raise response
         postgres.ProfileManagement.deleteUser("", uID=userID)
-        return True
+        return userID
     except Exception as e:
         return e
     
@@ -210,7 +254,7 @@ def assignRole(orgID, baseURL, baseHeader, userMail, roleID):
         if isinstance(response, Exception):
             raise response
 
-        return True
+        return userID
 
     except Exception as e:
         return e
@@ -248,7 +292,7 @@ def removeRole(orgID, baseURL, baseHeader, userMail, roleID):
         if isinstance(response, Exception):
             raise response
         
-        return True
+        return userID
         
     except Exception as e:
         return e
@@ -481,6 +525,9 @@ def handleCallToPath(request):
             result = deleteUserFromOrganization(orgID, baseURL, headers, emailAdressOfUser)
             if isinstance(result, Exception):
                 raise result
+            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "deleteUserFromOrganization", result)
+            if isinstance(retVal, Exception):
+                raise retVal
 
         elif content["intent"] == "createRole":
             orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
@@ -513,6 +560,9 @@ def handleCallToPath(request):
             result = assignRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
             if isinstance(result, Exception):
                 raise result
+            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "assignRole", result)
+            if isinstance(retVal, Exception):
+                raise retVal
             
         elif content["intent"] == "removeRole":
             emailAdressOfUser = content["content"]["email"]
@@ -520,6 +570,9 @@ def handleCallToPath(request):
             result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
             if isinstance(result, Exception):
                 raise result
+            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "removeRole", result)
+            if isinstance(retVal, Exception):
+                raise retVal
         
         elif content["intent"] == "editRole":
             roleID = content["content"]["roleID"]
@@ -528,6 +581,9 @@ def handleCallToPath(request):
             result = editRole(orgID, baseURL, headers, roleID, roleName, roleDescription)
             if isinstance(result, Exception):
                 raise result
+            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "editRole", roleID)
+            if isinstance(retVal, Exception):
+                raise retVal
 
         elif content["intent"] == "deleteRole":
             roleID = content["content"]["roleID"]
@@ -556,7 +612,9 @@ def handleCallToPath(request):
             result = addPermissionsToRole(orgID, baseURL, headers, roleID, permissionList)
             if isinstance(result, Exception):
                 raise result
-            
+            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "addPermissionsToRole", roleID)
+            if isinstance(retVal, Exception):
+                raise retVal
         else:
             return HttpResponse("Invalid request", status=400)
 

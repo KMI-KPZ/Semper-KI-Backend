@@ -40,6 +40,7 @@ paths = {
     "getUser": "public/getUser/",
     "getRoles": "public/getRoles/",
     "getPermissions": "public/getPermissions/",
+    "getNewPermissions": "public/getNewPermissions/",
     "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
     "getModels": 'public/getModels/',
@@ -113,6 +114,7 @@ urlpatterns = [
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
     path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
     path(paths["getPermissions"], authentification.getPermissionsOfUser, name="getPermissions"),
+    path(paths["getNewPermissions"], authentification.getNewRoleAndPermissionsForUser, name="getNewPermissions"),
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),
