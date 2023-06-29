@@ -6,14 +6,16 @@ Silvio Weging 2023
 Contains: Calls to ontology for adding and retrieving data
 """
 
-import json, requests
+import datetime
+import json, requests, logging
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from ..handlers.basics import checkIfUserIsLoggedIn
 from django.views.decorators.http import require_http_methods
 
-from ..services import cmem, mocks
+from ..services import cmem, mocks, postgres
 
+logger = logging.getLogger(__name__)
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
@@ -148,7 +150,8 @@ def orga_addPrinter(request):
     body = json.loads(request.body.decode("utf-8"))
     orgaName = body["organization"]
     printerName = body["printer"]
-    
+
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} added the printer {printerName} to the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -170,6 +173,7 @@ def orga_addPrinterEdit(request):
     printerName = body["printer"]
     props = body["properties"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} added/edited the printer {printerName} to/in the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -191,6 +195,7 @@ def orga_createPrinter(request):
     printerName = body["printer"]
     props = body["properties"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} created the printer {printerName} in the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -211,6 +216,7 @@ def orga_removePrinter(request):
     orgaName = body["organization"]
     printerName = body["printer"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} removed the printer {printerName} from the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -231,6 +237,7 @@ def orga_addMaterial(request):
     orgaName = body["organization"]
     materialName = body["material"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} added the material {materialName} to the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
     
@@ -252,6 +259,7 @@ def orga_addMaterialEdit(request):
     materialName = body["material"]
     props = body["properties"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} added/edited the material {materialName} to/in the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 #######################################################
@@ -272,6 +280,7 @@ def orga_createMaterial(request):
     materialName = body["material"]
     props = body["properties"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} created the material {materialName} in the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 #######################################################
@@ -291,6 +300,7 @@ def orga_removeMaterial(request):
     orgaName = body["organization"]
     materialName = body["material"]
     
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} removed the material {materialName} from the ontology at " + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 

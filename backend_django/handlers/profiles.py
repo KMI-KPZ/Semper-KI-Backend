@@ -6,7 +6,8 @@ Silvio Weging 2023
 Contains: Handling of database requests
 """
 
-import json, os
+import datetime
+import json, os, logging
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 import psycopg2
@@ -21,6 +22,7 @@ from ..modelFiles.profile import User
 
 from ..services import postgres
 
+logger = logging.getLogger(__name__)
 ##############################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
@@ -72,7 +74,7 @@ def updateName(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated their name to {content['username']} at " + str(datetime.datetime.now()))
     flag = postgres.ProfileManagement.updateName(request.session, content["username"])
     if flag is True:
         return HttpResponse("Worked")
@@ -93,7 +95,7 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted themselves at " + str(datetime.datetime.now()))
     flag = postgres.ProfileManagement.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")

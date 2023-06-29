@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Authentification handling using Auth0
 """
 
-import json, datetime, requests
+import json, datetime, requests, logging
 from anyio import sleep
 from django.conf import settings
 from django.urls import reverse
@@ -17,6 +17,8 @@ from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, redis, postgres
     
+
+logger = logging.getLogger(__name__)
 #######################################################
 @require_http_methods(["GET"])
 def isLoggedIn(request):
@@ -43,6 +45,27 @@ def isLoggedIn(request):
 
 #######################################################
 @require_http_methods(["GET"])
+@basics.checkIfUserIsLoggedIn(json=True)
+def provideRightsFile(request):
+    """
+    Returns the json file containing the rights for the frontend
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: JSON Response.
+    :rtype: JSONResponse
+
+    """
+    with open(str(settings.BASE_DIR) + "/backend_django/rights.json") as rightsFile:
+        rightsFileJSON = json.load(rightsFile)
+        for elem in rightsFileJSON["Rights"]:
+            elem.pop("paths")
+        return JsonResponse(rightsFileJSON, safe=False)
+
+            
+
+#######################################################
+@require_http_methods(["GET"])
 def loginUser(request):
     """
     Return a link for redirection to Auth0.
@@ -53,6 +76,22 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
+    # check number of login attempts
+    if "numOfLoginAttempts" in request.session:
+        if (datetime.datetime.now() - datetime.datetime.strptime(request.session["lastLoginAttempt"],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
+            request.session["numOfLoginAttempts"] = 0
+            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+        else:
+            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+
+        if request.session["numOfLoginAttempts"] > 10:
+            return HttpResponse("Too many login attempts! Please wait 5 Minutes.", status=429)
+        else:
+            request.session["numOfLoginAttempts"] += 1
+    else:
+        request.session["numOfLoginAttempts"] = 1
+        request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+
     # set type of user
     isPartOfOrganization = False
     if "Usertype" not in request.headers:
@@ -217,6 +256,7 @@ def callbackLogin(request):
         # Get Data from Database or create entry in it for logged in User
         postgres.ProfileManagement.addUser(request.session)
             
+        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged in at " + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
     except Exception as e:
         returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
@@ -315,6 +355,8 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged out at " + str(datetime.datetime.now()))
+
     # Delete saved files from redis
     redis.deleteKey(request.session.session_key)
 

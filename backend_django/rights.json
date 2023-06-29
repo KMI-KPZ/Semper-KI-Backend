@@ -1,0 +1,79 @@
+{
+    "Rights":[
+       {
+          "permission":{
+             "context":"orders",
+             "permission":"read"
+          },
+          "elements":[
+             "OrderCollectionOverview"
+          ],
+          "paths":[
+             
+          ]
+       },
+       {
+          "permission":{
+             "context":"orders",
+             "permission":"files"
+          },
+          "elements":[
+             "OrderFileView"
+          ],
+          "paths":[
+             
+          ]
+       },
+       {
+          "permission":{
+             "context":"orders",
+             "permission":"chat"
+          },
+          "elements":[
+             "ChatView",
+             "ChatButtons"
+          ],
+          "paths":[
+             
+          ]
+       },
+       {
+          "permission":{
+             "context":"orders",
+             "permission":"edit"
+          },
+          "elements":[
+             "OrderButtons",
+             "OrderStatus"
+          ],
+          "paths":[
+             
+          ]
+       },
+       {
+          "permission":{
+             "context":"orga",
+             "permission":"edit"
+          },
+          "elements":[
+             "OrganizationRoles",
+             "ButtonChangeRole"
+          ],
+          "paths":[
+             
+          ]
+       },
+       {
+          "permission":{
+             "context":"orga",
+             "permission":"read"
+          },
+          "elements":[
+             "OrganizationView"
+          ],
+          "paths":[
+             
+          ]
+       }
+    ]
+ }

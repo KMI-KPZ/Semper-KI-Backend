@@ -6,14 +6,16 @@ Silvio Weging 2023
 Contains: File upload handling
 """
 
+import datetime
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
-import asyncio, json
+import asyncio, json, logging
 from django.views.decorators.http import require_http_methods
 
 from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import crypto, redis, stl, mocks, postgres
 
+logger = logging.getLogger(__name__)
 #######################################################
 @require_http_methods(["GET"])
 def testRedis(request):
@@ -161,6 +163,7 @@ def downloadFiles(request):
         if fileName == elem["filename"]:
             (contentOrError, Flag) = redis.retrieveContent(elem["path"])
             if Flag:
+                logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} downloaded file {fileName} at " + str(datetime.datetime.now()))
                 return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
                 #return FileResponse(contentOrError[idx][3].seek(0)) #, content_type='multipart/form-data')
             else:

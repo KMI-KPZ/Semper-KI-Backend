@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Handlers for the dashboard
 """
 
-import json, random
+import json, random, logging
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from datetime import datetime
@@ -20,6 +20,7 @@ from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import postgres
 
+logger = logging.getLogger(__name__)
 #######################################################
 @checkIfUserIsLoggedIn()
 def retrieveOrders(request):
@@ -78,7 +79,7 @@ def updateOrder(request):
                     "type": "sendMessageJSON",
                     "dict": outputDict,
                 })
-
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated order {orderID} at " + str(datetime.now()))
     return HttpResponse("Success")
 
 #######################################################
@@ -97,6 +98,7 @@ def deleteOrder(request):
 
     content = json.loads(request.body.decode("utf-8"))
     if postgres.OrderManagement.deleteOrder(content["id"]):
+        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted order {content['id']} at " + str(datetime.now()))
         return HttpResponse("Success")
     else:
         return HttpResponse("Failed")
@@ -116,6 +118,7 @@ def deleteOrderCollection(request):
     """
     content = json.loads(request.body.decode("utf-8"))
     if postgres.OrderManagement.deleteOrderCollection(content["id"]):
+        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted orderCollection {content['id']} at " + str(datetime.now()))
         return HttpResponse("Success")
     else:
         return HttpResponse("Failed")

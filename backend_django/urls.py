@@ -39,6 +39,7 @@ paths = {
     "callback": "public/callback/",
     "getUser": "public/getUser/",
     "getRoles": "public/getRoles/",
+    "getPermissionsFile": "public/getPermissionMask/",
     "getPermissions": "public/getPermissions/",
     "getNewPermissions": "public/getNewPermissions/",
     "getProcessData": 'public/getProcessData/',
@@ -115,6 +116,7 @@ urlpatterns = [
     path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
     path(paths["getPermissions"], authentification.getPermissionsOfUser, name="getPermissions"),
     path(paths["getNewPermissions"], authentification.getNewRoleAndPermissionsForUser, name="getNewPermissions"),
+    path(paths["getPermissionsFile"], authentification.provideRightsFile, name="getPermissionsFile"),
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),

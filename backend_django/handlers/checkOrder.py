@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Handlers using simulation to check the orders
 """
 
-import json, random
+import json, random, logging, datetime
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -18,6 +18,7 @@ from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import redis, mocks, postgres, crypto
 
+logger = logging.getLogger(__name__)
 #######################################################
 @require_http_methods(["POST"])
 def updateCart(request):
@@ -225,6 +226,7 @@ def sendOrder(request):
                     "type": "sendMessageJSON",
                     "dict": values,
                 })
+        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
         return HttpResponse("Success")
     except (Exception) as error:
         print(error)

@@ -6,7 +6,8 @@ Silvio Weging 2023
 Contains: Handling of admin requests for organizations, api calls to auth0
 """
 
-import json, requests
+import datetime
+import json, requests, logging
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -16,7 +17,7 @@ from channels.layers import get_channel_layer
 from ..services import auth0, postgres
 from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError
 
-
+logger = logging.getLogger(__name__)
 #######################################################
 def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     """
@@ -501,6 +502,7 @@ def handleCallToPath(request):
             result = sendInvite(orgID, baseURL, headers, userName, True, emailAdressOfUserToBeAdded)
             if isinstance(result, Exception):
                 raise result
+            logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
             
         elif content["intent"] == "getInviteLink":
             emailAdressOfUserToBeAdded = content["content"]["email"]
@@ -508,6 +510,7 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             else:
+                logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
                 return HttpResponse(result["invitation_url"])
             
         elif content["intent"] == "fetchUsers":
@@ -528,6 +531,7 @@ def handleCallToPath(request):
             retVal = sendEventViaWebsocket(orgID, baseURL, headers, "deleteUserFromOrganization", result)
             if isinstance(retVal, Exception):
                 raise retVal
+            logger.info(f"{userName} deleted the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
 
         elif content["intent"] == "createRole":
             orgaName = getOrganizationName(request.session, orgID, baseURL, headers)
@@ -542,6 +546,7 @@ def handleCallToPath(request):
             if isinstance(result, Exception):
                 raise result
             else:
+                logger.info(f"{userName} created the role {roleName} at " + str(datetime.datetime.now()))
                 return JsonResponse(result, safe=False)
         
         elif content["intent"] == "getRoles":
@@ -563,6 +568,7 @@ def handleCallToPath(request):
             retVal = sendEventViaWebsocket(orgID, baseURL, headers, "assignRole", result)
             if isinstance(retVal, Exception):
                 raise retVal
+            logger.info(f"{userName} assigned the role {roleID} to {emailAdressOfUser} at " + str(datetime.datetime.now()))
             
         elif content["intent"] == "removeRole":
             emailAdressOfUser = content["content"]["email"]
@@ -570,9 +576,10 @@ def handleCallToPath(request):
             result = removeRole(orgID, baseURL, headers, emailAdressOfUser, roleID)
             if isinstance(result, Exception):
                 raise result
-            retVal = sendEventViaWebsocket(orgID, baseURL, headers, "removeRole", result)
-            if isinstance(retVal, Exception):
-                raise retVal
+            # retVal = sendEventViaWebsocket(orgID, baseURL, headers, "removeRole", result)
+            # if isinstance(retVal, Exception):
+            #     raise retVal
+            logger.info(f"{userName} removed the role {roleID} from {emailAdressOfUser} at " + str(datetime.datetime.now()))
         
         elif content["intent"] == "editRole":
             roleID = content["content"]["roleID"]
@@ -584,12 +591,14 @@ def handleCallToPath(request):
             retVal = sendEventViaWebsocket(orgID, baseURL, headers, "editRole", roleID)
             if isinstance(retVal, Exception):
                 raise retVal
+            logger.info(f"{userName} edited the role {roleName} at " + str(datetime.datetime.now()))
 
         elif content["intent"] == "deleteRole":
             roleID = content["content"]["roleID"]
             result = deleteRole(orgID, baseURL, headers, roleID)
             if isinstance(result, Exception):
                 raise result
+            logger.info(f"{userName} deleted the role {roleID} at " + str(datetime.datetime.now()))
 
         elif content["intent"] == "getPermissions":
             result = getAllPermissions(orgID, baseURL, headers)
@@ -615,6 +624,7 @@ def handleCallToPath(request):
             retVal = sendEventViaWebsocket(orgID, baseURL, headers, "addPermissionsToRole", roleID)
             if isinstance(retVal, Exception):
                 raise retVal
+            logger.info(f"{userName} set permissions of role {roleID} at " + str(datetime.datetime.now()))
         else:
             return HttpResponse("Invalid request", status=400)
 
