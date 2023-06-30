@@ -16,13 +16,14 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 
 from ..services import postgres
 
 logger = logging.getLogger(__name__)
 #######################################################
 @checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient("retrieveOrders", json=True)
 def retrieveOrders(request):
     """
     Retrieve saved orders for dashboard.

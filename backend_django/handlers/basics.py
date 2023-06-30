@@ -12,6 +12,8 @@ from django.http import HttpResponse, JsonResponse
 
 from anyio import sleep
 
+from ..services import rights
+
 #######################################################
 def checkIfTokenValid(token):
     """
@@ -27,15 +29,15 @@ def checkIfTokenValid(token):
         return False
     return True
 
-#######################################################
+#################### DECORATOR ###################################
 def checkIfUserIsLoggedIn(json=False):
     """
     Check whether a user is logged in or not.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: True if the user is logged in or False if not
-    :rtype: Bool
+    :param json: Controls if the output is in JSON Format or not
+    :type json: Bool
+    :return: Response whether the user is logged in or not. If so, call the function.
+    :rtype: HTTPRespone/JSONResponse, Func
     """
 
     def decorator(func):
@@ -84,5 +86,36 @@ def handleTooManyRequestsError(callToAPI):
         return ""
     else:
         return response.json()
-    
+
+#################### DECORATOR ###################################
+def checkIfRightsAreSufficient(funcName, json=False):
+    """
+    Check whether a user has sufficient rights to call that function.
+
+    :param json: Controls if the output is in JSON Format or not
+    :type json: Bool
+    :return: Response if the rights were not sufficient, function call if they were.
+    :rtype: HTTPRespone/JSONResponse, Func
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            if "user" in request.session:
+                if rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], funcName):
+                    return func(request, *args, **kwargs)
+                else:
+                    if json:
+                        return JsonResponse({}, status=401)
+                    else:
+                        return HttpResponse("Insufficient rights", status=403)
+            else:
+                if json:
+                    return JsonResponse({}, status=401)
+                else:
+                    return HttpResponse("Insufficient rights", status=403)
+            
+        return inner
+
+    return decorator    
         

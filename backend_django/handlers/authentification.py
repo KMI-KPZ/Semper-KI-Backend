@@ -191,6 +191,48 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         return e
 
 #######################################################
+def retrieveRolesAndPermissionsForStandardUser(session):
+    """
+    Get the roles and the permissions via API from Auth0
+
+    :param session: The session of the user
+    :type session: Dict
+    :return: Dict with roles and permissions
+    :rtype: Dict
+    """
+    try:
+        auth0.apiToken.checkIfExpired()
+        headers = {
+            'authorization': f'Bearer {auth0.apiToken.accessToken}',
+            'content-Type': 'application/json',
+            'Cache-Control': "no-cache"
+        }
+        baseURL = f"https://{settings.AUTH0_DOMAIN}"
+        userID = postgres.ProfileManagement.getUserKey(session)
+        
+        response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers) )
+        if isinstance(response, Exception):
+            raise response
+        roles = response
+
+        # set default role
+        if len(roles) == 0:
+            response = basics.handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers, json={"roles": ["rol_jG8PAa9b9LUlSz3q"]}))
+            roles = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
+        
+        for entry in roles:
+            response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/roles/{entry["id"]}/permissions', headers=headers) )
+            if isinstance(response, Exception):
+                raise response
+            else:
+                permissions = response
+        
+        outDict = {"roles": roles, "permissions": permissions}
+        return outDict
+    except Exception as e:
+        return e
+
+#######################################################
 def setRoleAndPermissionsOfUser(request):
     """
     Set's the role and the permissions of the user based on the information of the token
@@ -217,6 +259,14 @@ def setRoleAndPermissionsOfUser(request):
             else:
                 request.session["userRoles"] = resultDict["roles"]
                 request.session["userPermissions"] = resultDict["permissions"]
+        else:
+            resultDict = retrieveRolesAndPermissionsForStandardUser(request.session)
+            if isinstance(resultDict, Exception):
+                raise resultDict
+            else:
+                request.session["userRoles"] = resultDict["roles"]
+                request.session["userPermissions"] = resultDict["permissions"]
+
         return True
     except Exception as e:
         print(f'Generic Exception: {e}')
