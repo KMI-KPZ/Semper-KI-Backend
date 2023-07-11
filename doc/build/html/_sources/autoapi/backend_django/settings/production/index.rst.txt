@@ -47,7 +47,7 @@ Module Contents
    
 
 .. py:data:: REDIS_HOST
-   :annotation: = files
+   :annotation: = files-prod
 
    
 

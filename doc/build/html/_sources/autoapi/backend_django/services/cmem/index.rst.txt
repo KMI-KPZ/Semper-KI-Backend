@@ -16,13 +16,21 @@
 Module Contents
 ---------------
 
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.services.cmem.ManageToken
+
+
 
 Functions
 ~~~~~~~~~
 
 .. autoapisummary::
 
-   backend_django.services.cmem.testQuery
+   backend_django.services.cmem.sendQuery
 
 
 
@@ -32,6 +40,32 @@ Attributes
 .. autoapisummary::
 
    backend_django.services.cmem.endpoint
+   backend_django.services.cmem.oauthToken
+
+
+.. py:class:: ManageToken
+
+   Manage oauth token class.
+
+   .. py:attribute:: token
+      
+
+      
+
+   .. py:attribute:: client
+      
+
+      
+
+   .. py:method:: getAccessToken()
+
+      Get initial token. Made as a function to be callable from outside. 
+
+
+   .. py:method:: checkIfExpired()
+
+      Check if token has expired and if so, refresh it. 
+
 
 
 .. py:data:: endpoint
@@ -39,10 +73,16 @@ Attributes
 
    
 
-.. py:function:: testQuery()
+.. py:data:: oauthToken
+   
 
-   Test Sparql query.
+   
 
+.. py:function:: sendQuery(query)
+
+   Send SPARQL query.
+   :param query: Contains sparql query as string
+   :type query: str
    :return: result of query
    :rtype: JSON
 

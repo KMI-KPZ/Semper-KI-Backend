@@ -23,6 +23,7 @@ Functions
 .. autoapisummary::
 
    backend_django.services.crypto.generateMD5
+   backend_django.services.crypto.generateSecureID
    backend_django.services.crypto.generateSalt
 
 
@@ -34,6 +35,17 @@ Functions
    :param someString: String that shall be hashed
    :type someString: string
    :return: string containing the md5 hash
+   :rtype: string
+
+
+
+.. py:function:: generateSecureID(someString) -> str
+
+   Convert string to as secure as possible hashed string
+
+   :param someString: String that shall be hashed
+   :type someString: string
+   :return: string containing the hash
    :rtype: string
 
 

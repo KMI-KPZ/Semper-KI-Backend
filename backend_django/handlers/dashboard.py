@@ -40,6 +40,7 @@ def retrieveOrders(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PUT"])
+@checkIfRightsAreSufficient("updateOrder", json=False)
 def updateOrder(request):
     """
     Update saved orders for dashboard.
@@ -86,6 +87,7 @@ def updateOrder(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
+@checkIfRightsAreSufficient("deleteOrder", json=False)
 def deleteOrder(request):
     """
     Delete a specific order.
@@ -107,6 +109,7 @@ def deleteOrder(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
+@checkIfRightsAreSufficient("deleteOrderCollection", json=False)
 def deleteOrderCollection(request):
     """
     Delete a specific order collection.
@@ -128,6 +131,7 @@ def deleteOrderCollection(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
+@checkIfRightsAreSufficient("getMissedEvents", json=True)
 def getMissedEvents(request):
     """
     Show how many events (chat messages ...) were missed since last login.

@@ -405,7 +405,12 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged out at " + str(datetime.datetime.now()))
+    user = postgres.ProfileManagement.getUser(request.session)
+    if user != {}:
+        logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))
+    else:
+        logger.info(f"Deleted user was logged out at " + str(datetime.datetime.now()))
+
 
     # Delete saved files from redis
     redis.deleteKey(request.session.session_key)

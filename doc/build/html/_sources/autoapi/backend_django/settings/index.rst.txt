@@ -12,6 +12,7 @@ Submodules
 
    base/index.rst
    debug/index.rst
+   debug_local/index.rst
    development/index.rst
    production/index.rst
 

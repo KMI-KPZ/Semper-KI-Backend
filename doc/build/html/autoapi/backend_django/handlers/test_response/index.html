@@ -38,6 +38,16 @@
 <p>Contains: Handling test calls and getting a csrf cookie</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.test_response.testWebSocket" title="backend_django.handlers.test_response.testWebSocket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testWebSocket</span></code></a></p></td>
+<td><p>Base WebSocket consumer, async version. Provides a general encapsulation</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
@@ -47,6 +57,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.test_response.testResponseCsrf" title="backend_django.handlers.test_response.testResponseCsrf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testResponseCsrf</span></code></a>(request)</p></td>
 <td><p>Ensures that the csrf cookie is set correctly.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.test_response.isMagazineUp" title="backend_django.handlers.test_response.isMagazineUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMagazineUp</span></code></a>(request)</p></td>
+<td><p>Pings the magazine website and check if that works or not</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.test_response.testCallToWebsocket" title="backend_django.handlers.test_response.testCallToWebsocket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testCallToWebsocket</span></code></a>(request)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -83,6 +99,53 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.isMagazineUp">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.test_response.</span></span><span class="sig-name descname"><span class="pre">isMagazineUp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.isMagazineUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pings the magazine website and check if that works or not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET/POST</em>) – GET/POST request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response with True or False</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.testWebSocket">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.handlers.test_response.</span></span><span class="sig-name descname"><span class="pre">testWebSocket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.testWebSocket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">channels.generic.websocket.AsyncWebsocketConsumer</span></code></p>
+<p>Base WebSocket consumer, async version. Provides a general encapsulation
+for the WebSocket handling model that other applications can build on.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.testWebSocket.connect">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.testWebSocket.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.testWebSocket.disconnect">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.testWebSocket.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a WebSocket connection is closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.testWebSocket.receive">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">receive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.testWebSocket.receive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called with a decoded WebSocket frame.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.test_response.testCallToWebsocket">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.test_response.</span></span><span class="sig-name descname"><span class="pre">testCallToWebsocket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.test_response.testCallToWebsocket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 </section>

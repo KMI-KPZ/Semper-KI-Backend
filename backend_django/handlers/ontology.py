@@ -16,12 +16,14 @@ from django.views.decorators.http import require_http_methods
 from ..services import cmem, mocks, postgres
 
 logger = logging.getLogger(__name__)
+
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
 def onto_getMaterials(request):
     """
     Gathers all available materials from the knowledge graph/ontology
+
     :param request: Get request from frontend
     :type request: HTTP GET
     :return: Flat list of Materials
@@ -43,6 +45,7 @@ def onto_getMaterials(request):
 def onto_getPrinters(request):
     """
     Gathers all available 3D printers from the knowledge graph/ontology
+
     :param request: Get request from frontend
     :type request: HTTP GET
     :return: Flat list of printers
@@ -65,11 +68,13 @@ def onto_getPrinters(request):
 def onto_getPrinter(request):
     """
     Gathers info about one specific 3D printer from the knowledge graph/ontology
+
     :param request: Post request from frontend
     :type request: HTTP POST
     :return: Info about a printer
     :rtype: JSONResponse
     """
+
     ######### mocked #########
 
     printerName = json.loads(request.body.decode("utf-8"))["printer"]
@@ -90,11 +95,13 @@ def onto_getPrinter(request):
 def onto_getMaterial(request):
     """
     Gathers info about one specific meterial from the knowledge graph/ontology
+
     :param request: Post request from frontend
     :type request: HTTP POST
     :return: Info about a material
     :rtype: JSONResponse
     """
+
     ######### mocked #########
 
     printerName = json.loads(request.body.decode("utf-8"))["material"]
@@ -117,11 +124,13 @@ def onto_getMaterial(request):
 def orga_getPrinters(request):
     """
     Gathers list of printers assigned to that organization from the knowledge graph/ontology
+
     :param request: Post request from frontend
     :type request: HTTP POST
     :return: List of printers
     :rtype: JSONResponse
     """
+
     ######### mocked #########
 
     orgaName = json.loads(request.body.decode("utf-8"))["organization"]
@@ -140,11 +149,13 @@ def orga_getPrinters(request):
 def orga_addPrinter(request):
     """
     Links an existing printer to that organization in the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and printer name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -161,11 +172,13 @@ def orga_addPrinter(request):
 def orga_addPrinterEdit(request):
     """
     Links an existing printer to that organization in the knowledge graph/ontology and adds some extra info
+
     :param request: Post request from frontend with organization name and printer name as well as properties
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -183,11 +196,13 @@ def orga_addPrinterEdit(request):
 def orga_createPrinter(request):
     """
     Adds a new printer for that organization to the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and printer details
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -205,11 +220,13 @@ def orga_createPrinter(request):
 def orga_removePrinter(request):
     """
     Unlinks an existing printer of that organization in the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and printer name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -226,11 +243,13 @@ def orga_removePrinter(request):
 def orga_addMaterial(request):
     """
     Links an existing material to that organization in the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and material name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -247,11 +266,13 @@ def orga_addMaterial(request):
 def orga_addMaterialEdit(request):
     """
     Links an existing material to that organization in the knowledge graph/ontology and adds some custom properties
+
     :param request: Post request from frontend with organization name and material name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -268,11 +289,13 @@ def orga_addMaterialEdit(request):
 def orga_createMaterial(request):
     """
     Creates a new material and links it to that organization in the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and material name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -289,11 +312,13 @@ def orga_createMaterial(request):
 def orga_removeMaterial(request):
     """
     Unlinks an existing material of that organization in the knowledge graph/ontology
+
     :param request: Post request from frontend with organization name and material name
     :type request: HTTP POST
     :return: Success or not
     :rtype: HTTPResponse
     """
+
     ######### mocked #########
 
     body = json.loads(request.body.decode("utf-8"))
@@ -310,6 +335,7 @@ def orga_removeMaterial(request):
 def orga_getMaterials(request):
     """
     Lists all materials of that organization from the knowledge graph/ontology
+    
     :param request: Post request from frontend with organization name
     :type request: HTTP POST
     :return: Success or not

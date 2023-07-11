@@ -106,12 +106,12 @@ def checkIfRightsAreSufficient(funcName, json=False):
                     return func(request, *args, **kwargs)
                 else:
                     if json:
-                        return JsonResponse({}, status=401)
+                        return JsonResponse({}, status=403)
                     else:
                         return HttpResponse("Insufficient rights", status=403)
             else:
                 if json:
-                    return JsonResponse({}, status=401)
+                    return JsonResponse({}, status=403)
                 else:
                     return HttpResponse("Insufficient rights", status=403)
             

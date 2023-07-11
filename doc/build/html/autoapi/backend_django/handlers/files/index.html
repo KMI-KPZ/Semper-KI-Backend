@@ -63,8 +63,26 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.files.testGetUploadedFiles" title="backend_django.handlers.files.testGetUploadedFiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testGetUploadedFiles</span></code></a>(request)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.files.downloadFiles" title="backend_django.handlers.files.downloadFiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">downloadFiles</span></code></a>(request)</p></td>
+<td><p>Send file to user from temporary, later permanent storage</p></td>
+</tr>
 </tbody>
 </table>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.files.logger" title="backend_django.handlers.files.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.handlers.files.logger">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.files.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#backend_django.handlers.files.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="backend_django.handlers.files.testRedis">
 <span class="sig-prename descclassname"><span class="pre">backend_django.handlers.files.</span></span><span class="sig-name descname"><span class="pre">testRedis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.files.testRedis" title="Permalink to this definition">¶</a></dt>
@@ -147,6 +165,23 @@
 <dt class="sig sig-object py" id="backend_django.handlers.files.testGetUploadedFiles">
 <span class="sig-prename descclassname"><span class="pre">backend_django.handlers.files.</span></span><span class="sig-name descname"><span class="pre">testGetUploadedFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.files.testGetUploadedFiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.files.downloadFiles">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.files.</span></span><span class="sig-name descname"><span class="pre">downloadFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.files.downloadFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send file to user from temporary, later permanent storage</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – Request of user for a specific file of an order</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Saved content</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>

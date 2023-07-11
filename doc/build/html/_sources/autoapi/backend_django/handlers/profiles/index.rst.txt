@@ -24,10 +24,23 @@ Functions
 
    backend_django.handlers.profiles.addUserTest
    backend_django.handlers.profiles.getUserTest
-   backend_django.handlers.profiles.updateRole
+   backend_django.handlers.profiles.updateName
    backend_django.handlers.profiles.deleteUser
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.profiles.logger
+
+
+.. py:data:: logger
+   
+
+   
 
 .. py:function:: addUserTest(request)
 
@@ -51,12 +64,12 @@ Functions
 
 
 
-.. py:function:: updateRole(request)
+.. py:function:: updateName(request)
 
-   Update user role.
+   Update user name.
 
-   :param request: GET request
-   :type request: HTTP GET
+   :param request: PUT request
+   :type request: HTTP PUT
    :return: HTTP response
    :rtype: HTTP status
 

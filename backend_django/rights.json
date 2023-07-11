@@ -9,7 +9,7 @@
              "OrderCollectionOverview"
           ],
           "paths":[
-             "retrieveOrders"
+             "retrieveOrders", "getMissedEvents"
           ]
        },
        {
@@ -21,7 +21,7 @@
              "OrderFileView"
           ],
           "paths":[
-             
+             "downloadFiles"
           ]
        },
        {
@@ -34,7 +34,7 @@
              "ChatButtons"
           ],
           "paths":[
-             
+             "updateOrder"
           ]
        },
        {
@@ -47,7 +47,9 @@
              "OrderStatus"
           ],
           "paths":[
-             
+            "updateOrder", 
+            "deleteOrder", 
+            "deleteOrderCollection"
           ]
        },
        {
@@ -60,7 +62,15 @@
              "ButtonChangeRole"
           ],
           "paths":[
-             
+             "organisations_setPermissionsForRole",
+             "organisations_deleteRole",
+             "organisations_editRole",
+             "organisations_removeRole",
+             "organisations_assignRole",
+             "organisations_createRole",
+             "organisations_deleteUser",
+             "organisations_addUser",
+             "organisations_getInviteLink"
           ]
        },
        {
@@ -72,7 +82,10 @@
              "OrganizationView"
           ],
           "paths":[
-             
+             "organisations_getPermissionsForRole",
+             "organisations_getPermissions",
+             "organisations_getRoles", 
+             "organisations_fetchUsers"
           ]
        }
     ]

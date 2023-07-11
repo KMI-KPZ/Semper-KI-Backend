@@ -38,12 +38,22 @@
 <p>Contains: Services for the sparql endpoint</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.cmem.ManageToken" title="backend_django.services.cmem.ManageToken"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManageToken</span></code></a></p></td>
+<td><p>Manage oauth token class.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.cmem.testQuery" title="backend_django.services.cmem.testQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testQuery</span></code></a>()</p></td>
-<td><p>Test Sparql query.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.cmem.sendQuery" title="backend_django.services.cmem.sendQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sendQuery</span></code></a>(query)</p></td>
+<td><p>Send SPARQL query.</p></td>
 </tr>
 </tbody>
 </table>
@@ -55,25 +65,57 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.cmem.endpoint" title="backend_django.services.cmem.endpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">endpoint</span></code></a></p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.services.cmem.oauthToken" title="backend_django.services.cmem.oauthToken"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oauthToken</span></code></a></p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.services.cmem.ManageToken">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.services.cmem.</span></span><span class="sig-name descname"><span class="pre">ManageToken</span></span><a class="headerlink" href="#backend_django.services.cmem.ManageToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage oauth token class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.services.cmem.ManageToken.token">
+<span class="sig-name descname"><span class="pre">token</span></span><a class="headerlink" href="#backend_django.services.cmem.ManageToken.token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.services.cmem.ManageToken.client">
+<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#backend_django.services.cmem.ManageToken.client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.services.cmem.ManageToken.getAccessToken">
+<span class="sig-name descname"><span class="pre">getAccessToken</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.services.cmem.ManageToken.getAccessToken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get initial token. Made as a function to be callable from outside.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.services.cmem.ManageToken.checkIfExpired">
+<span class="sig-name descname"><span class="pre">checkIfExpired</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.services.cmem.ManageToken.checkIfExpired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if token has expired and if so, refresh it.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py data">
 <dt class="sig sig-object py" id="backend_django.services.cmem.endpoint">
 <span class="sig-prename descclassname"><span class="pre">backend_django.services.cmem.</span></span><span class="sig-name descname"><span class="pre">endpoint</span></span><a class="headerlink" href="#backend_django.services.cmem.endpoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.services.cmem.oauthToken">
+<span class="sig-prename descclassname"><span class="pre">backend_django.services.cmem.</span></span><span class="sig-name descname"><span class="pre">oauthToken</span></span><a class="headerlink" href="#backend_django.services.cmem.oauthToken" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.services.cmem.testQuery">
-<span class="sig-prename descclassname"><span class="pre">backend_django.services.cmem.</span></span><span class="sig-name descname"><span class="pre">testQuery</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.services.cmem.testQuery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Sparql query.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>result of query</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>JSON</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="backend_django.services.cmem.sendQuery">
+<span class="sig-prename descclassname"><span class="pre">backend_django.services.cmem.</span></span><span class="sig-name descname"><span class="pre">sendQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.services.cmem.sendQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send SPARQL query.
+:param query: Contains sparql query as string
+:type query: str
+:return: result of query
+:rtype: JSON</p>
 </dd></dl>
 
 </section>

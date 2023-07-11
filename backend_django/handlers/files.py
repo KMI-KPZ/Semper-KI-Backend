@@ -11,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileRe
 import asyncio, json, logging
 from django.views.decorators.http import require_http_methods
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 
 from ..services import crypto, redis, stl, mocks, postgres
 
@@ -144,6 +144,7 @@ def testGetUploadedFiles(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("downloadFiles", json=False)
 def downloadFiles(request):
     """
     Send file to user from temporary, later permanent storage
