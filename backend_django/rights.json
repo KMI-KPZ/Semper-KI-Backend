@@ -111,8 +111,10 @@
          "permission":"edit"
       },
       "elements":[
-         "ResourcesPrintersAdd",
-          "AddButtonResourcesPrinters"
+         "ResourcesPrintersAddButton",
+          "ResourcesPrintersAdd",
+            "ResourcesMaterialsForm",
+          "ResourcesMaterialsAddButton"
       ],
       "paths":[
          "orga_removeMaterial",
