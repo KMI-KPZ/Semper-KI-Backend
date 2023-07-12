@@ -10,7 +10,7 @@ import datetime
 import json, requests, logging
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from django.views.decorators.http import require_http_methods
 
 from ..services import cmem, mocks, postgres
@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
+@checkIfRightsAreSufficient("onto_getMaterials", json=True)
 def onto_getMaterials(request):
     """
     Gathers all available materials from the knowledge graph/ontology
@@ -42,6 +43,7 @@ def onto_getMaterials(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
+@checkIfRightsAreSufficient("onto_getPrinters", json=True)
 def onto_getPrinters(request):
     """
     Gathers all available 3D printers from the knowledge graph/ontology
@@ -65,6 +67,7 @@ def onto_getPrinters(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("onto_getPrinter", json=True)
 def onto_getPrinter(request):
     """
     Gathers info about one specific 3D printer from the knowledge graph/ontology
@@ -92,6 +95,7 @@ def onto_getPrinter(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("onto_getMaterial", json=True)
 def onto_getMaterial(request):
     """
     Gathers info about one specific meterial from the knowledge graph/ontology
@@ -121,6 +125,7 @@ def onto_getMaterial(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_getPrinters", json=True)
 def orga_getPrinters(request):
     """
     Gathers list of printers assigned to that organization from the knowledge graph/ontology
@@ -146,6 +151,7 @@ def orga_getPrinters(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_addPrinter", json=True)
 def orga_addPrinter(request):
     """
     Links an existing printer to that organization in the knowledge graph/ontology
@@ -169,6 +175,7 @@ def orga_addPrinter(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_addPrinterEdit", json=True)
 def orga_addPrinterEdit(request):
     """
     Links an existing printer to that organization in the knowledge graph/ontology and adds some extra info
@@ -193,6 +200,7 @@ def orga_addPrinterEdit(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_createPrinter", json=True)
 def orga_createPrinter(request):
     """
     Adds a new printer for that organization to the knowledge graph/ontology
@@ -217,6 +225,7 @@ def orga_createPrinter(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_removePrinter", json=True)
 def orga_removePrinter(request):
     """
     Unlinks an existing printer of that organization in the knowledge graph/ontology
@@ -240,6 +249,7 @@ def orga_removePrinter(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_addMaterial", json=True)
 def orga_addMaterial(request):
     """
     Links an existing material to that organization in the knowledge graph/ontology
@@ -263,6 +273,7 @@ def orga_addMaterial(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_addMaterialEdit", json=True)
 def orga_addMaterialEdit(request):
     """
     Links an existing material to that organization in the knowledge graph/ontology and adds some custom properties
@@ -286,6 +297,7 @@ def orga_addMaterialEdit(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_createMaterial", json=True)
 def orga_createMaterial(request):
     """
     Creates a new material and links it to that organization in the knowledge graph/ontology
@@ -309,6 +321,7 @@ def orga_createMaterial(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_removeMaterial", json=True)
 def orga_removeMaterial(request):
     """
     Unlinks an existing material of that organization in the knowledge graph/ontology
@@ -332,6 +345,7 @@ def orga_removeMaterial(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
+@checkIfRightsAreSufficient("orga_getMaterials", json=True)
 def orga_getMaterials(request):
     """
     Lists all materials of that organization from the knowledge graph/ontology
