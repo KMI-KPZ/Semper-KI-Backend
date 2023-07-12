@@ -21,6 +21,10 @@ class ManageToken:
     #######################################################
     def __init__(self):
         self.getAccessToken()
+    
+    #######################################################
+    def __del__(self):
+        self.client.close()
 
     #######################################################
     def getAccessToken(self):
