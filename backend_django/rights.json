@@ -6,7 +6,7 @@
              "permission":"read"
           },
           "elements":[
-             "OrderCollectionOverview"
+             "Orders"
           ],
           "paths":[
              "retrieveOrders", "getMissedEvents"
@@ -18,7 +18,7 @@
              "permission":"files"
           },
           "elements":[
-             "OrderFileView"
+             "OrderFile"
           ],
           "paths":[
              "downloadFiles"
@@ -30,8 +30,8 @@
              "permission":"chat"
           },
           "elements":[
-             "ChatView",
-             "ChatButtons"
+             "Chat",
+             "ChatButton"
           ],
           "paths":[
              "updateOrder"
@@ -81,12 +81,28 @@
           "elements":[
              "OrganizationView"
           ],
-          "paths":[
-             "organisations_getPermissionsForRole",
-             "organisations_getPermissions",
-             "organisations_getRoles", 
-             "organisations_fetchUsers"
-          ]
+          "paths":[]
+       },
+      {
+      "permission":{
+         "context":"resources",
+         "permission":"read"
+      },
+      "elements":[
+         "Resouces"
+      ],
+      "paths":[]
+       },
+        {
+      "permission":{
+         "context":"resources",
+         "permission":"edit"
+      },
+      "elements":[
+         "ResourcesPrintersAdd",
+          "AddButtonResourcesPrinters"
+      ],
+      "paths":[]
        }
     ]
  }
