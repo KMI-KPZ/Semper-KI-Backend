@@ -113,7 +113,7 @@
       "elements":[
          "ResourcesPrintersAddButton",
           "ResourcesPrintersAdd",
-            "ResourcesMaterialsForm",
+          "ResourcesMaterialsForm",
           "ResourcesMaterialsAddButton"
       ],
       "paths":[
