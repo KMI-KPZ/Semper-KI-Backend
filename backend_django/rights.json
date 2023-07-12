@@ -79,7 +79,7 @@
              "permission":"read"
           },
           "elements":[
-             "OrganizationView"
+             "Organization"
           ],
           "paths":[             
             "organisations_getPermissionsForRole",
