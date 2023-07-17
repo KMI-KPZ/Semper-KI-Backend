@@ -9,6 +9,8 @@ Contains: Model for orders of a user
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+import profileModel
+
 ###################################################
 class OrderCollection(models.Model):
     """
@@ -50,6 +52,8 @@ class Orders(models.Model):
     userCommunication = models.JSONField()
     files = models.JSONField()
     dates = models.JSONField()
+    client = models.OneToOneRel(profileModel.Organization)
+    contractor = models.OneToOneRel(profileModel.Organization)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)

@@ -10,8 +10,8 @@ import types, json, enum, re
 from datetime import datetime
 from django.utils import timezone
 
-from ..modelFiles.profile import User,Manufacturer,Stakeholder
-from ..modelFiles.orders import Orders,OrderCollection
+from ..modelFiles.profileModel import User, Organization
+from ..modelFiles.ordersModel import Orders, OrderCollection
 
 from backend_django.services import crypto, redis, auth0
 
@@ -55,11 +55,14 @@ class ProfileManagement():
         """
         obj = {}
         try:
-            obj = Manufacturer.objects.all().values("hashedID", "name", "address")
+            listOfManufacturers = Organization.objects.filter(canManufacture=True)
+            returnValue = []
+            for entry in listOfManufacturers:
+                returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "address": entry.address})
         except (Exception) as error:
             print(error)
 
-        return obj
+        return returnValue
     
     ##############################################
     @staticmethod
@@ -144,7 +147,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def addUser(session):
+    def addUser(session, organization=None):
         """
         Add user if the entry doesn't already exists.
 
@@ -154,35 +157,27 @@ class ProfileManagement():
         :rtype: Bool
 
         """
+
         userID = session["user"]["userinfo"]["sub"]
-        userName = session["user"]["userinfo"]["nickname"]
-        userEmail = session["user"]["userinfo"]["email"]
-
-        if "organizationType" in session:
-            organizationType = session["organizationType"]
-            organization = session["organizationName"] #auth0.retrieveOrganisationName(session["user"]["userinfo"]["org_id"])
-        else:
-            organizationType = "None"
-            organization = "None"
-
-        role = session["usertype"]
-        rights = {role: "all"}
-        address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
-        updated = timezone.now()
-        lastSeen = timezone.now()
         try:
             # first get, then create
             result = User.objects.get(subID=userID)
         except (Exception) as error:
             try:
+                userName = session["user"]["userinfo"]["nickname"]
+                userEmail = session["user"]["userinfo"]["email"]
+                address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
+                updated = timezone.now()
+                lastSeen = timezone.now()
                 idHash = crypto.generateSecureID(userID)
-                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, rights=rights, organization=organization, address=address, updatedWhen=updated, lastSeen=lastSeen) 
-                if organizationType != "None":
+                 
+                if organization != None:
+                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=[organization.subID], address=address, updatedWhen=updated, lastSeen=lastSeen)
                     if ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
-                        if ProfileManagement.addOrganization(session["user"]["userinfo"]["org_id"], organization, organizationType):
-                            ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"])
-                        else:
-                            print("User could not be added to organization!", createdUser, organization)
+                        raise Exception(f"User could not be added to organization!, {createdUser}, {organization}")
+                else:
+                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=["None"], address=address, updatedWhen=updated, lastSeen=lastSeen)
+
             except (Exception) as error:
                 print(error)
                 return False

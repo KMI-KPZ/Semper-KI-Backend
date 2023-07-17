@@ -18,7 +18,7 @@ from django.views.decorators.http import require_http_methods
 
 from ..handlers.basics import checkIfUserIsLoggedIn
 
-from ..modelFiles.profile import User
+from ..modelFiles.profileModel import User
 
 from ..services import postgres
 
