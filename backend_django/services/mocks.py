@@ -19,6 +19,8 @@ class mockPicture():
     def __init__(self):
         if settings.PRODUCTION:
             self.backend_url = 'https://backend.semper-ki.org'
+        elif settings.DEVELOPMENT:
+            self.backend_url = "https://dev-backend.semper-ki.org"
         else:
             self.backend_url = 'http://127.0.0.1:8000'
         self.mockPicturePath = "https://cdn.pixabay.com/photo/2014/06/03/19/38/road-sign-361514_960_720.png"#self.backend_url+self.picturePath
@@ -149,3 +151,14 @@ def mockLogistics(selection):
     mockTimes["production"] = mockTimes["material"] + mockTimes["postProcessing"]
     return mockTimes["production"] + mockTimes["delivery"]
     #return mockTimes
+
+#######################################################
+def mockPrinter():
+    outList = [{"Property 1": 5}, "Property 2", {"Property 3": "Test", "Property 4": [1,10]}, {"Property 5": [{"Property 6": "Test2"},{"Property 7": 2}]}]
+
+    return outList
+
+#######################################################
+def mockMaterial():
+    return mockPrinter()
+

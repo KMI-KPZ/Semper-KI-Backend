@@ -51,6 +51,12 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.tests.TestRedis" title="backend_django.tests.TestRedis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestRedis</span></code></a></p></td>
 <td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.tests.TestOrders" title="backend_django.tests.TestOrders"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestOrders</span></code></a></p></td>
+<td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.tests.TestFilters" title="backend_django.tests.TestFilters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestFilters</span></code></a></p></td>
+<td><p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py class">
@@ -102,8 +108,8 @@ TransactionTestCase.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="backend_django.tests.TestProfiles.test_updateUserType">
-<span class="sig-name descname"><span class="pre">test_updateUserType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestProfiles.test_updateUserType" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.tests.TestProfiles.test_updateUserName">
+<span class="sig-name descname"><span class="pre">test_updateUserName</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestProfiles.test_updateUserName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -126,8 +132,142 @@ behavior).</p>
 <p>On database backends with no transaction support, TestCase behaves as
 TransactionTestCase.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="backend_django.tests.TestRedis.test_redis">
-<span class="sig-name descname"><span class="pre">test_redis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestRedis.test_redis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.tests.TestRedis.testRedis">
+<span class="sig-name descname"><span class="pre">testRedis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestRedis.testRedis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.tests.</span></span><span class="sig-name descname"><span class="pre">TestOrders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.test.TestCase</span></code></p>
+<p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve
+test isolation.</p>
+<p>In most situations, TestCase should be preferred to TransactionTestCase as
+it allows faster execution. However, there are some situations where using
+TransactionTestCase might be necessary (e.g. testing some transactional
+behavior).</p>
+<p>On database backends with no transaction support, TestCase behaves as
+TransactionTestCase.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testFile">
+<span class="sig-name descname"><span class="pre">testFile</span></span><a class="headerlink" href="#backend_django.tests.TestOrders.testFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.mockCart">
+<span class="sig-name descname"><span class="pre">mockCart</span></span><a class="headerlink" href="#backend_django.tests.TestOrders.mockCart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.createManufacturer">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createManufacturer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.createManufacturer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.createUserInSession">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createUserInSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mockSession</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.createUserInSession" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testUploadModel">
+<span class="sig-name descname"><span class="pre">testUploadModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testUploadModel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testDownloadModel">
+<span class="sig-name descname"><span class="pre">testDownloadModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testDownloadModel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testAddingToCart">
+<span class="sig-name descname"><span class="pre">testAddingToCart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testAddingToCart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testGetManufacturers">
+<span class="sig-name descname"><span class="pre">testGetManufacturers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testGetManufacturers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testCheckPrintability">
+<span class="sig-name descname"><span class="pre">testCheckPrintability</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testCheckPrintability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testCheckPrice">
+<span class="sig-name descname"><span class="pre">testCheckPrice</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testCheckPrice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testCheckLogistics">
+<span class="sig-name descname"><span class="pre">testCheckLogistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testCheckLogistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testSendOrder">
+<span class="sig-name descname"><span class="pre">testSendOrder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testSendOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testDeleteOrder">
+<span class="sig-name descname"><span class="pre">testDeleteOrder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testDeleteOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testDeleteOrderCollection">
+<span class="sig-name descname"><span class="pre">testDeleteOrderCollection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testDeleteOrderCollection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestOrders.testGetMissedEvents">
+<span class="sig-name descname"><span class="pre">testGetMissedEvents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestOrders.testGetMissedEvents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.tests.</span></span><span class="sig-name descname"><span class="pre">TestFilters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestFilters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.test.TestCase</span></code></p>
+<p>Similar to TransactionTestCase, but use <cite>transaction.atomic()</cite> to achieve
+test isolation.</p>
+<p>In most situations, TestCase should be preferred to TransactionTestCase as
+it allows faster execution. However, there are some situations where using
+TransactionTestCase might be necessary (e.g. testing some transactional
+behavior).</p>
+<p>On database backends with no transaction support, TestCase behaves as
+TransactionTestCase.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters.filters">
+<span class="sig-name descname"><span class="pre">filters</span></span><a class="headerlink" href="#backend_django.tests.TestFilters.filters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters.testGetFilters">
+<span class="sig-name descname"><span class="pre">testGetFilters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestFilters.testGetFilters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters.testGetPostProcessing">
+<span class="sig-name descname"><span class="pre">testGetPostProcessing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestFilters.testGetPostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters.testGetMaterials">
+<span class="sig-name descname"><span class="pre">testGetMaterials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestFilters.testGetMaterials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="backend_django.tests.TestFilters.testGetModels">
+<span class="sig-name descname"><span class="pre">testGetModels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.tests.TestFilters.testGetModels" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

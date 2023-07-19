@@ -12,7 +12,8 @@ from .base import *
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DEBUG=True
+DEBUG=False
+DEVELOPMENT=True
 
 # for nginx
 USE_X_FORWARDED_HOST = True

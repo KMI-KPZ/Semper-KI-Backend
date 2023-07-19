@@ -29,8 +29,22 @@ Functions
    backend_django.handlers.files.uploadModels
    backend_django.handlers.files.getUploadedFiles
    backend_django.handlers.files.testGetUploadedFiles
+   backend_django.handlers.files.downloadFiles
 
 
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   backend_django.handlers.files.logger
+
+
+.. py:data:: logger
+   
+
+   
 
 .. py:function:: testRedis(request)
 
@@ -85,5 +99,16 @@ Functions
 
 
 .. py:function:: testGetUploadedFiles(request)
+
+
+.. py:function:: downloadFiles(request)
+
+   Send file to user from temporary, later permanent storage
+
+   :param request: Request of user for a specific file of an order
+   :type request: HTTP POST
+   :return: Saved content
+   :rtype: HTTP Response
+
 
 

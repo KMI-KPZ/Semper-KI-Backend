@@ -13,7 +13,7 @@ from django.utils import timezone
 from ..modelFiles.profile import User,Manufacturer,Stakeholder
 from ..modelFiles.orders import Orders,OrderCollection
 
-from backend_django.services import crypto, redis
+from backend_django.services import crypto, redis, auth0
 
 #TODO: switch to async versions at some point
 
@@ -130,7 +130,7 @@ class ProfileManagement():
     @staticmethod
     def setLoginTime(userIDHash):
         """
-        Sets the accessed Time to now. Used for 'Last Login'.
+        Sets the las login Time to now. Used for 'Last Login'.
 
         :param session: userID
         :type session: str
@@ -139,6 +139,7 @@ class ProfileManagement():
 
         """
         currUser = User.objects.get(hashedID=userIDHash)
+        currUser.lastSeen = timezone.now()
         currUser.save()
 
     ##############################################
@@ -156,10 +157,10 @@ class ProfileManagement():
         userID = session["user"]["userinfo"]["sub"]
         userName = session["user"]["userinfo"]["nickname"]
         userEmail = session["user"]["userinfo"]["email"]
-        # TODO
+
         if "organizationType" in session:
             organizationType = session["organizationType"]
-            organization = session["usertype"]
+            organization = session["organizationName"] #auth0.retrieveOrganisationName(session["user"]["userinfo"]["org_id"])
         else:
             organizationType = "None"
             organization = "None"
@@ -168,17 +169,18 @@ class ProfileManagement():
         rights = {role: "all"}
         address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
         updated = timezone.now()
+        lastSeen = timezone.now()
         try:
             # first get, then create
             result = User.objects.get(subID=userID)
         except (Exception) as error:
             try:
                 idHash = crypto.generateSecureID(userID)
-                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, rights=rights, organization=organization, address=address, updatedWhen=updated) 
+                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, role=role, rights=rights, organization=organization, address=address, updatedWhen=updated, lastSeen=lastSeen) 
                 if organizationType != "None":
-                    if ProfileManagement.addUserToOrganization(createdUser, organization) == False:
-                        if ProfileManagement.addOrganization(session, organizationType):
-                            ProfileManagement.addUserToOrganization(createdUser, organization)
+                    if ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
+                        if ProfileManagement.addOrganization(session["user"]["userinfo"]["org_id"], organization, organizationType):
+                            ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"])
                         else:
                             print("User could not be added to organization!", createdUser, organization)
             except (Exception) as error:
@@ -189,7 +191,7 @@ class ProfileManagement():
     
     ##############################################
     @staticmethod
-    def addUserToOrganization(userToBeAdded, organization):
+    def addUserToOrganization(userToBeAdded, organizationID):
         """
         Add user to organization.
 
@@ -202,12 +204,12 @@ class ProfileManagement():
 
         """
         try:
-            result = Manufacturer.objects.get(subID=organization)
+            result = Manufacturer.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
         except (Exception) as error:
             pass
         try:
-            result = Stakeholder.objects.get(subID=organization)
+            result = Stakeholder.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
         except (Exception) as error:
             print("Organization doesn't exist!")
@@ -217,7 +219,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def addOrganization(session, typeOfOrganization):
+    def addOrganization(org_id, organizationName, typeOfOrganization):
         """
         Add organization if the entry doesn't already exists.
 
@@ -229,8 +231,8 @@ class ProfileManagement():
         :rtype: Bool
 
         """
-        orgaID = session["usertype"]
-        orgaName = session["usertype"]
+        orgaID = org_id
+        orgaName = organizationName
         orgaEmail = "testOrga1@test.org"
         orgaAddress = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
         updated = timezone.now()
@@ -278,7 +280,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def deleteUser(session):
+    def deleteUser(session, uID=""):
         """
         Delete User.
 
@@ -288,7 +290,11 @@ class ProfileManagement():
         :rtype: Bool
 
         """
-        userID = session["user"]["userinfo"]["sub"]
+        if uID != "":
+            userID = uID
+        else:
+            userID = session["user"]["userinfo"]["sub"]
+            
         try:
             affected = User.objects.filter(subID=userID).delete()
         except (Exception) as error:
@@ -317,13 +323,15 @@ class OrderManagement():
         :type orderFromUser: json dict
         :param session: session of user
         :type session: session dict
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: Dictionary of users with order collection id and orders in order for the websocket to fire events
+        :rtype: Dict
 
         """
-
         now = timezone.now()
         try:
+            # outputList for events
+            dictForEventsAsOutput = {}
+
             # first get user and manufacturer
             userThatOrdered = User.objects.get(hashedID=userID)
             # generate key and order collection
@@ -336,11 +344,9 @@ class OrderManagement():
                 for entry in contentOrError:
                     uploadedFiles.append({"filename":entry[1], "path": session.session_key})
 
-            # generate orders
-            listOfSelectedManufacturers = []
             for idx, entry in enumerate(orderFromUser):
+                # generate orders
                 selectedManufacturer = Manufacturer.objects.get(hashedID=entry["manufacturerID"])
-                listOfSelectedManufacturers.append(selectedManufacturer)
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
                 status = 0
@@ -351,20 +357,31 @@ class OrderManagement():
                     files = []
                 dates = {"created": str(now), "updated": str(now)}
                 Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
+
+                # add for users of manufacturer TODO Rights
+                for member in selectedManufacturer.users.all():
+                    memberID = member.subID
+
+                    # save memberID of manufacturer and the rest for the websocket events
+                    if memberID in dictForEventsAsOutput:
+                        dictForEventsAsOutput[memberID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
+                    else:
+                        dictForEventsAsOutput[memberID] = {"eventType": "orderEvent"}
+                        dictForEventsAsOutput[memberID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
+                        dictForEventsAsOutput[memberID]["orderCollectionID"] = orderCollectionID
+
+                    # link OrderCollection to every eligible user of every selected manufacturer
+                    member.orders.add(collectionObj)
+                    member.save()
+
             # link OrderCollection to user
             userThatOrdered.orders.add(collectionObj)
             userThatOrdered.save()
-            # link OrderCollection to every eligible user of every selected manufacturer
-            for manufacturer in listOfSelectedManufacturers:
-                testresult = manufacturer.users.all() 
-                for entry in testresult:
-                    # todo get rights to check if okay that this user can see this
-                    entry.orders.add(collectionObj)
-                    entry.save()
+
+            return dictForEventsAsOutput
         except (Exception) as error:
             print(error)
-            return False
-        return True
+            return {}
 
     ##############################################
     @staticmethod
@@ -402,6 +419,7 @@ class OrderManagement():
                             filesOutput.append(elem["filename"])
                     currentOrder["files"] = filesOutput
                     currentOrder["updatedWhen"] = entry.updatedWhen
+                    currentOrder["createdWhen"] = entry.createdWhen
                     #currentOrder["dates"] = json.dumps(entry.dates)
                     ordersOfThatCollection.append(currentOrder)
                 currentOrderCollection["orders"] = ordersOfThatCollection
@@ -538,7 +556,7 @@ class OrderManagement():
                         respectiveOrderCollection.status = 1
                         respectiveOrderCollection.save()
                     
-                    # if order is set to finished, check if the whole collection ca be set to 'finished'
+                    # if order is set to finished, check if the whole collection can be set to 'finished'
                     finishedFlag = True
                     for orderOfCollection in respectiveOrderCollection.orders.all():
                         if orderOfCollection.status != 6:

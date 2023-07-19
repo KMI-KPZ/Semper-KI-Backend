@@ -9,11 +9,12 @@ Contains: Handling of frontend filters for models, materials and post processing
 import json
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_http_methods
 
-from .files import getUploadedFiles
 from ..services import cmem, mocks, crypto
 
 #######################################################
+@require_http_methods(["POST"])
 def getProcessData(request):
     """
     Try to filter all according to json.
@@ -63,6 +64,7 @@ def getUploadedModel(files):
     return model
 
 #######################################################
+@require_http_methods(["POST"])
 def getModels(request):
     """
     Try to filter 3d-models according to json.
@@ -96,6 +98,7 @@ def getModels(request):
     return JsonResponse(filters)
 
 #######################################################
+@require_http_methods(["POST"])
 def getMaterials(request):
     """
     Try to filter materials according to json.
@@ -114,11 +117,17 @@ def getMaterials(request):
         filtersForSparql.append([entry["question"]["title"], entry["answer"]])
     #TODO ask via sparql with most general filter and then iteratively filter response
     resultsOfQueries = {"materials": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
-        onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())
-        for elem in onto4AddResults:
-            title = elem["s"]["value"].replace("http://www.onto4additive.com/onto4add#","")
+    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt") as materials:
+        materialsRes = cmem.sendQuery(materials.read())
+        for elem in materialsRes:
+            title = elem["Material"]["value"]
             resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
+    # resultsOfQueries = {"materials": []}
+    # with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
+    #     onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())
+    #     for elem in onto4AddResults:
+    #         title = elem["s"]["value"].replace("http://www.onto4additive.com/onto4add#","")
+    #         resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
 
     # mockup here:
     #filters.update(mocks.materialMock)
@@ -128,6 +137,7 @@ def getMaterials(request):
     return JsonResponse(filters)
 
 #######################################################
+@require_http_methods(["POST"])
 def getPostProcessing(request):
     """
     Try to filter post processing according to json.
@@ -153,6 +163,7 @@ def getPostProcessing(request):
     return JsonResponse(filters)
 
 #######################################################
+@require_http_methods(["POST"])
 def getFilters(request):
     """
     Try to filter 3d-models according to json.

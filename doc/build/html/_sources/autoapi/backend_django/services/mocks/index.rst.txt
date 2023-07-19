@@ -36,6 +36,8 @@ Functions
    backend_django.services.mocks.mockPostProcessing
    backend_django.services.mocks.mockPrices
    backend_django.services.mocks.mockLogistics
+   backend_django.services.mocks.mockPrinter
+   backend_django.services.mocks.mockMaterial
 
 
 
@@ -94,5 +96,11 @@ Attributes
 
 
 .. py:function:: mockLogistics(selection)
+
+
+.. py:function:: mockPrinter()
+
+
+.. py:function:: mockMaterial()
 
 

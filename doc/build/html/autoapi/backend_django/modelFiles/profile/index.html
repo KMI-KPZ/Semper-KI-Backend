@@ -35,35 +35,53 @@
 <span id="backend-django-modelfiles-profile"></span><h1><a class="reference internal" href="#module-backend_django.modelFiles.profile" title="backend_django.modelFiles.profile"><code class="xref py py-mod docutils literal notranslate"><span class="pre">backend_django.modelFiles.profile</span></code></a><a class="headerlink" href="#module-backend_django.modelFiles.profile" title="Permalink to this heading">¶</a></h1>
 <p>Part of Semper-KI software</p>
 <p>Silvio Weging 2023</p>
-<p>Contains: Model for user profiles</p>
+<p>Contains: Model for user and manufacturer profiles, as well as their meta classes</p>
 <section id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.modelFiles.profile.Profile" title="backend_django.modelFiles.profile.Profile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Profile</span></code></a></p></td>
-<td><p>Profile management class.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.modelFiles.profile.User" title="backend_django.modelFiles.profile.User"><code class="xref py py-obj docutils literal notranslate"><span class="pre">User</span></code></a></p></td>
+<td><p>Profile management class for regular users.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.modelFiles.profile.Stakeholder" title="backend_django.modelFiles.profile.Stakeholder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stakeholder</span></code></a></p></td>
+<td><p>Profile management class for stakeholder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.modelFiles.profile.Manufacturer" title="backend_django.modelFiles.profile.Manufacturer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Manufacturer</span></code></a></p></td>
+<td><p>Profile management class for manufacturers.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py class">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.modelFiles.profile.</span></span><span class="sig-name descname"><span class="pre">Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.modelFiles.profile.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.User" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.db.models.Model</span></code></p>
-<p>Profile management class.</p>
+<p>Profile management class for regular users.</p>
 <dl class="field-list simple">
 <dt class="field-odd">SubID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Unique ID for that person returned by Auth0, primary key</p>
 </dd>
-<dt class="field-even">Name<span class="colon">:</span></dt>
-<dd class="field-even"><p>Nickname returned by Auth0, used for filter searches in DB</p>
+<dt class="field-even">HashedID<span class="colon">:</span></dt>
+<dd class="field-even"><p>SHA-512 hashed value of the subID for anonymous identification</p>
 </dd>
-<dt class="field-odd">Email<span class="colon">:</span></dt>
-<dd class="field-odd"><p>E-Mail with which the user registered themselves</p>
+<dt class="field-odd">Name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nickname returned by Auth0, used for filter searches in DB</p>
+</dd>
+<dt class="field-even">Email<span class="colon">:</span></dt>
+<dd class="field-even"><p>E-Mail with which the user registered themselves</p>
+</dd>
+<dt class="field-odd">Organization<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The Stakeholder that user belongs to</p>
 </dd>
 <dt class="field-even">Role<span class="colon">:</span></dt>
-<dd class="field-even"><p>Role assigned to the user, can be regular, manufacturer, …</p>
+<dd class="field-even"><p>Role assigned to the user</p>
+</dd>
+<dt class="field-odd">Rights<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The rights that user has</p>
+</dd>
+<dt class="field-even">Address<span class="colon">:</span></dt>
+<dd class="field-even"><p>Where to find the user</p>
 </dd>
 <dt class="field-odd">CreatedWhen<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Automatically assigned date and time(UTC+0) when the user first registered</p>
@@ -76,49 +94,249 @@
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.subID">
-<span class="sig-name descname"><span class="pre">subID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.subID" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.subID">
+<span class="sig-name descname"><span class="pre">subID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.subID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.hashedID">
+<span class="sig-name descname"><span class="pre">hashedID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.hashedID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.email">
-<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.email" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.role">
-<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.role" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.email" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.createdWhen">
-<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.createdWhen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.organization">
+<span class="sig-name descname"><span class="pre">organization</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.organization" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.updatedWhen">
-<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.role">
+<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.role" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.accessedWhen">
-<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.accessedWhen" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.rights">
+<span class="sig-name descname"><span class="pre">rights</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.rights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.address">
+<span class="sig-name descname"><span class="pre">address</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.orders">
+<span class="sig-name descname"><span class="pre">orders</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.orders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.createdWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.accessedWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.lastSeen">
+<span class="sig-name descname"><span class="pre">lastSeen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.User.lastSeen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.__str__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.User.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str(self).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Profile.toDict">
-<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.Profile.toDict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.User.toDict">
+<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.User.toDict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.modelFiles.profile.</span></span><span class="sig-name descname"><span class="pre">Stakeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.db.models.Model</span></code></p>
+<p>Profile management class for stakeholder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">SubID<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Unique ID for that stakeholder returned by Auth0, primary key</p>
+</dd>
+<dt class="field-even">HashedID<span class="colon">:</span></dt>
+<dd class="field-even"><p>SHA-512 hashed value of the subID for anonymous identification</p>
+</dd>
+<dt class="field-odd">Name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nickname returned by Auth0, used for filter searches in DB</p>
+</dd>
+<dt class="field-even">Email<span class="colon">:</span></dt>
+<dd class="field-even"><p>E-Mail with which the user registered themselves</p>
+</dd>
+<dt class="field-odd">Address<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Where to find the user</p>
+</dd>
+<dt class="field-even">Users<span class="colon">:</span></dt>
+<dd class="field-even"><p>Link to users belonging to that stakeholder</p>
+</dd>
+<dt class="field-odd">CreatedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Automatically assigned date and time(UTC+0) when the user first registered</p>
+</dd>
+<dt class="field-even">UpdatedWhen<span class="colon">:</span></dt>
+<dd class="field-even"><p>Date and time at which the entry was updated</p>
+</dd>
+<dt class="field-odd">AccessedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Last date and time the user was fetched from the database, automatically set</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.subID">
+<span class="sig-name descname"><span class="pre">subID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.subID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.hashedID">
+<span class="sig-name descname"><span class="pre">hashedID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.hashedID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.email" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.address">
+<span class="sig-name descname"><span class="pre">address</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.users">
+<span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.createdWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Stakeholder.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Stakeholder.accessedWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backend_django.modelFiles.profile.</span></span><span class="sig-name descname"><span class="pre">Manufacturer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.db.models.Model</span></code></p>
+<p>Profile management class for manufacturers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">SubID<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Unique ID for that person returned by Auth0, primary key</p>
+</dd>
+<dt class="field-even">HashedID<span class="colon">:</span></dt>
+<dd class="field-even"><p>SHA-512 hashed value of the subID for anonymous identification</p>
+</dd>
+<dt class="field-odd">Name<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nickname returned by Auth0, used for filter searches in DB</p>
+</dd>
+<dt class="field-even">Email<span class="colon">:</span></dt>
+<dd class="field-even"><p>E-Mail with which the user registered themselves</p>
+</dd>
+<dt class="field-odd">Address<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Where to find the manufacturer</p>
+</dd>
+<dt class="field-even">Users<span class="colon">:</span></dt>
+<dd class="field-even"><p>Link to users belonging to that manufacturer</p>
+</dd>
+<dt class="field-odd">Uri<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Representation link inside the knowledge graph</p>
+</dd>
+<dt class="field-even">CreatedWhen<span class="colon">:</span></dt>
+<dd class="field-even"><p>Automatically assigned date and time(UTC+0) when the user first registered</p>
+</dd>
+<dt class="field-odd">UpdatedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Date and time at which the entry was updated</p>
+</dd>
+<dt class="field-even">AccessedWhen<span class="colon">:</span></dt>
+<dd class="field-even"><p>Last date and time the user was fetched from the database, automatically set</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.subID">
+<span class="sig-name descname"><span class="pre">subID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.subID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.hashedID">
+<span class="sig-name descname"><span class="pre">hashedID</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.hashedID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.email" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.address">
+<span class="sig-name descname"><span class="pre">address</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.users">
+<span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.uri">
+<span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.uri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.createdWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="backend_django.modelFiles.profile.Manufacturer.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#backend_django.modelFiles.profile.Manufacturer.accessedWhen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

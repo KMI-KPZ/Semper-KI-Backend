@@ -42,15 +42,35 @@
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.sparqlQueries.testQuery" title="backend_django.handlers.sparqlQueries.testQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">testQuery</span></code></a>(request)</p></td>
-<td><p>Test Sparql queries</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.sparqlQueries.sendQuery" title="backend_django.handlers.sparqlQueries.sendQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sendQuery</span></code></a>(request)</p></td>
+<td><p>Test Sparql queries that come from the form.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.sparqlQueries.sendTestQuery" title="backend_django.handlers.sparqlQueries.sendTestQuery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sendTestQuery</span></code></a>(request)</p></td>
+<td><p>Test Sparql query.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.sparqlQueries.testQuery">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.sparqlQueries.</span></span><span class="sig-name descname"><span class="pre">testQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.sparqlQueries.testQuery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Sparql queries</p>
+<dt class="sig sig-object py" id="backend_django.handlers.sparqlQueries.sendQuery">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.sparqlQueries.</span></span><span class="sig-name descname"><span class="pre">sendQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.sparqlQueries.sendQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Sparql queries that come from the form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Json containing results of the query</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.sparqlQueries.sendTestQuery">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.sparqlQueries.</span></span><span class="sig-name descname"><span class="pre">sendTestQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.sparqlQueries.sendTestQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Sparql query.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>

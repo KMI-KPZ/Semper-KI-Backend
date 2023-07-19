@@ -10,12 +10,13 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   auth0/index.rst
    cmem/index.rst
    crypto/index.rst
    mocks/index.rst
-   oauth/index.rst
    postgres/index.rst
    redis/index.rst
+   rights/index.rst
    stl/index.rst
 
 

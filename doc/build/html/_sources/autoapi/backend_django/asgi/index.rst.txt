@@ -17,6 +17,11 @@
 Module Contents
 ---------------
 
+.. py:data:: django_asgi_app
+   
+
+   
+
 .. py:data:: application
    
 

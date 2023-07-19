@@ -45,7 +45,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.crypto.generateMD5" title="backend_django.services.crypto.generateMD5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generateMD5</span></code></a>(→ str)</p></td>
 <td><p>Convert string to md5 hashed string</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.services.crypto.generateSalt" title="backend_django.services.crypto.generateSalt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generateSalt</span></code></a>(→ str)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.services.crypto.generateSecureID" title="backend_django.services.crypto.generateSecureID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generateSecureID</span></code></a>(→ str)</p></td>
+<td><p>Convert string to as secure as possible hashed string</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.services.crypto.generateSalt" title="backend_django.services.crypto.generateSalt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generateSalt</span></code></a>(→ str)</p></td>
 <td><p>Generate unique random salt string to be attached to another string before hashing</p></td>
 </tr>
 </tbody>
@@ -60,6 +63,23 @@
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>string containing the md5 hash</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.services.crypto.generateSecureID">
+<span class="sig-prename descclassname"><span class="pre">backend_django.services.crypto.</span></span><span class="sig-name descname"><span class="pre">generateSecureID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">someString</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#backend_django.services.crypto.generateSecureID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert string to as secure as possible hashed string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>someString</strong> (<em>string</em>) – String that shall be hashed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>string containing the hash</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>string</p>

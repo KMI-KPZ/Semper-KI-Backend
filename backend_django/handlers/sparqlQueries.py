@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from ..services import cmem
 
 #######################################################
+
 def sendQuery(request):
     """
     Test Sparql queries that come from the form.

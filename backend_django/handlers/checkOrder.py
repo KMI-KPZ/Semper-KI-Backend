@@ -6,18 +6,21 @@ Silvio Weging 2023
 Contains: Handlers using simulation to check the orders
 """
 
-import json, random
+import json, random, logging, datetime
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_http_methods
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers.authentification import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn
 
 from ..services import redis, mocks, postgres, crypto
 
+logger = logging.getLogger(__name__)
 #######################################################
+@require_http_methods(["POST"])
 def updateCart(request):
     """
     Save selection of user into session
@@ -31,13 +34,13 @@ def updateCart(request):
     try:
         selected = json.loads(request.body.decode("utf-8"))
         request.session["selected"] = selected
+        return HttpResponse("Success")
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed",status=200)
-    
-    return HttpResponse("Success",status=200)
 
 #######################################################
+@require_http_methods(["GET"])
 def getCart(request):
     """
     Retrieve selection from session
@@ -54,6 +57,8 @@ def getCart(request):
         return JsonResponse({})
 
 ##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def getManufacturers(request):
     """
     Get all suitable manufacturers.
@@ -64,22 +69,22 @@ def getManufacturers(request):
     :rtype: JSON
 
     """
-    if checkIfUserIsLoggedIn(request):
-        manufacturerList = []
-        listOfAllManufacturers = postgres.ProfileManagement.getAllManufacturers(request.session)
-        # TODO Check suitability
 
-        # remove unnecessary information and add identifier
-        for idx, elem in enumerate(listOfAllManufacturers):
-            manufacturerList.append({})
-            manufacturerList[idx]["name"] = elem["name"]
-            manufacturerList[idx]["id"] = elem["hashedID"]
+    manufacturerList = []
+    listOfAllManufacturers = postgres.ProfileManagement.getAllManufacturers(request.session)
+    # TODO Check suitability
 
-        return JsonResponse(manufacturerList, safe=False)
-    else:
-        return HttpResponse("Not logged in", status=401)
+    # remove unnecessary information and add identifier
+    for idx, elem in enumerate(listOfAllManufacturers):
+        manufacturerList.append({})
+        manufacturerList[idx]["name"] = elem["name"]
+        manufacturerList[idx]["id"] = elem["hashedID"]
+
+    return JsonResponse(manufacturerList, safe=False)
 
 #######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def checkPrintability(request):
     """
     Check if model is printable
@@ -90,35 +95,36 @@ def checkPrintability(request):
     :rtype: ?
 
     """
-    if checkIfUserIsLoggedIn(request):
-        model = None
-        selected = request.session["selected"]
 
-        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-        if Flag:
-            # if a model has been uploaded, use that
-            model = contentOrError
-        else:
-            # if not, get selected model
-            model = selected["cart"][0]["model"]
-        
-        material = selected["cart"][0]["material"]
-        postProcessing = selected["cart"][0]["postProcessings"]
-        # TODO: use simulation service
+    model = None
+    selected = request.session["selected"]
 
-        # return success or failure
-        # outputDict = {}
-        # outputDict = {"printability": True}
-        # channel_layer = get_channel_layer()
-        # async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
-        #     "type": "sendMessageJSON",
-        #     "dict": outputDict,
-        # })
-        return HttpResponse("Printable")
+    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    if Flag:
+        # if a model has been uploaded, use that
+        model = contentOrError
     else:
-        return HttpResponse("Not logged in", status=401)
+        # if not, get selected model
+        model = selected["cart"][0]["model"]
+    
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
+    # TODO: use simulation service
+
+    # return success or failure
+    # outputDict = {}
+    # outputDict = {"printability": True}
+    # channel_layer = get_channel_layer()
+    # async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
+    #     "type": "sendMessageJSON",
+    #     "dict": outputDict,
+    # })
+    return HttpResponse("Printable")
+
 
 #######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def checkPrice(request):
     """
     Check how much that'll cost
@@ -129,35 +135,34 @@ def checkPrice(request):
     :rtype: Json Response
 
     """
-    if checkIfUserIsLoggedIn(request):
-        model = None
-        selected = request.session["selected"]
+    model = None
+    selected = request.session["selected"]
 
-        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-        if Flag:
-            # if a model has been uploaded, use that
-            model = contentOrError
-        else:
-            # if not, get selected model
-            model = selected["cart"][0]["model"]
-        
-        material = selected["cart"][0]["material"]
-        postProcessing = selected["cart"][0]["postProcessings"]
-
-        # TODO: use calculation service
-
-        # THIS IS A MOCK
-        summedUpPrices= 0
-        for idx, elem in enumerate(selected["cart"]):
-            prices = random.randint(1,100) #mocks.mockPrices(elem)
-            summedUpPrices += prices
-            request.session["selected"]["cart"][idx]["prices"] = prices
-
-        return HttpResponse(summedUpPrices)
+    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    if Flag:
+        # if a model has been uploaded, use that
+        model = contentOrError
     else:
-        return HttpResponse("Not logged in", status=401)
+        # if not, get selected model
+        model = selected["cart"][0]["model"]
+    
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
+
+    # TODO: use calculation service
+
+    # THIS IS A MOCK
+    summedUpPrices= 0
+    for idx, elem in enumerate(selected["cart"]):
+        prices = random.randint(1,100) #mocks.mockPrices(elem)
+        summedUpPrices += prices
+        request.session["selected"]["cart"][idx]["prices"] = prices
+
+    return HttpResponse(summedUpPrices)
 
 #######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def checkLogistics(request):
     """
     Check how much time stuff'll need
@@ -168,32 +173,32 @@ def checkLogistics(request):
     :rtype: Json Response
 
     """
-    if checkIfUserIsLoggedIn(request):
-        model = None
-        selected = request.session["selected"]
+    model = None
+    selected = request.session["selected"]
 
-        (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
-        if Flag:
-            # if a model has been uploaded, use that
-            model = contentOrError
-        else:
-            # if not, get selected model
-            model = selected["cart"][0]["model"]
-        
-        material = selected["cart"][0]["material"]
-        postProcessing = selected["cart"][0]["postProcessings"]
-
-        # TODO: use calculation service
-        summedUpLogistics = 0
-        for idx, elem in enumerate(selected["cart"]):
-            logistics = random.randint(1,100) #mocks.mockLogistics(elem)
-            summedUpLogistics += logistics
-            request.session["selected"]["cart"][idx]["logistics"] = logistics
-        return HttpResponse(summedUpLogistics)
+    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    if Flag:
+        # if a model has been uploaded, use that
+        model = contentOrError
     else:
-        return HttpResponse("Not logged in", status=401)
+        # if not, get selected model
+        model = selected["cart"][0]["model"]
+    
+    material = selected["cart"][0]["material"]
+    postProcessing = selected["cart"][0]["postProcessings"]
+
+    # TODO: use calculation service
+    summedUpLogistics = 0
+    for idx, elem in enumerate(selected["cart"]):
+        logistics = random.randint(1,100) #mocks.mockLogistics(elem)
+        summedUpLogistics += logistics
+        request.session["selected"]["cart"][idx]["logistics"] = logistics
+    return HttpResponse(summedUpLogistics)
+
 
 #######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
 def sendOrder(request):
     """
     Save order and send it to manufacturer
@@ -204,28 +209,25 @@ def sendOrder(request):
     :rtype: HTTP Response
 
     """
-    if checkIfUserIsLoggedIn(request):
-        try:
-            uID = postgres.ProfileManagement.getUserHashID(request.session)
-            selected = request.session["selected"]["cart"]
-            postgres.OrderManagement.addOrder(uID, selected, request.session)
-            # Save picture and files in permanent storage
+
+    try:
+        uID = postgres.ProfileManagement.getUserHashID(request.session)
+        selected = request.session["selected"]["cart"]
+        dictForEvents = postgres.OrderManagement.addOrder(uID, selected, request.session)
+        # Save picture and files in permanent storage
 
 
-            # send to websockets that are active, that a new message/status is available for that order
-            # TODO needs OrderCollectionID from addOrder, maybe as return value
-            # should work without order ID or for all orderIDs if multiple manufacturers were chosen
-            # channel_layer = get_channel_layer()
-            # listOfUsers = postgres.OrderManagement.getAllUsersOfOrder(orderID)
-            # for user in listOfUsers:
-            #     if user.subID != postgres.ProfileManagement.getUserKey(session=request.session):
-            #         async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=user.subID), {
-            #             "type": "sendMessageJSON",
-            #             "dict": outputDict,
-            #         })
-            return HttpResponse("Success")
-        except (Exception) as error:
-            print(error)
-            return HttpResponse("Failed")
-    else:
-        return HttpResponse("Not logged in", status=401)
+        # send to websockets that are active, that a new message/status is available for that order
+        channel_layer = get_channel_layer()
+        for userID in dictForEvents:
+            values = dictForEvents[userID]
+            if userID != postgres.ProfileManagement.getUserKey(session=request.session):
+                async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+                    "type": "sendMessageJSON",
+                    "dict": values,
+                })
+        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
+        return HttpResponse("Success")
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed")

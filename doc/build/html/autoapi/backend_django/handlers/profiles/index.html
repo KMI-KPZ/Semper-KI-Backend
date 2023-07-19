@@ -48,14 +48,29 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.getUserTest" title="backend_django.handlers.profiles.getUserTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUserTest</span></code></a>(request)</p></td>
 <td><p>Same as getUser but for testing.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.updateRole" title="backend_django.handlers.profiles.updateRole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateRole</span></code></a>(request)</p></td>
-<td><p>Update user role.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.updateName" title="backend_django.handlers.profiles.updateName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateName</span></code></a>(request)</p></td>
+<td><p>Update user name.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.deleteUser" title="backend_django.handlers.profiles.deleteUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteUser</span></code></a>(request)</p></td>
 <td><p>Deletes an entry in the database corresponding to user name.</p></td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.profiles.logger" title="backend_django.handlers.profiles.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.handlers.profiles.logger">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#backend_django.handlers.profiles.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="backend_django.handlers.profiles.addUserTest">
 <span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">addUserTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.addUserTest" title="Permalink to this definition">¶</a></dt>
@@ -91,12 +106,12 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.profiles.updateRole">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">updateRole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.updateRole" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update user role.</p>
+<dt class="sig sig-object py" id="backend_django.handlers.profiles.updateName">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.profiles.</span></span><span class="sig-name descname"><span class="pre">updateName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.profiles.updateName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update user name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP PUT</em>) – PUT request</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>HTTP response</p>

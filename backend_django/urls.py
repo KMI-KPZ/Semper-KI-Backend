@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations, ontology
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -38,6 +38,10 @@ paths = {
     "logout": "public/logout/",
     "callback": "public/callback/",
     "getUser": "public/getUser/",
+    "getRoles": "public/getRoles/",
+    "getPermissionsFile": "public/getPermissionMask/",
+    "getPermissions": "public/getPermissions/",
+    "getNewPermissions": "public/getNewPermissions/",
     "getProcessData": 'public/getProcessData/',
     "getFilters": 'public/getFilters/',
     "getModels": 'public/getModels/',
@@ -72,7 +76,35 @@ paths = {
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
-    "getFileFromOrder": "public/getFileFromOrder/"
+    "getFileFromOrder": "public/getFileFromOrder/",
+    "isMagazineUp": "public/isMagazineUp/",
+    "organisations_addUser": "public/organizations/addUser/",
+    "organisations_getInviteLink": "public/organizations/getInviteLink/",
+    "organisations_fetchUsers": "public/organizations/fetchUsers/",
+    "organisations_deleteUser": "public/organizations/deleteUser/",
+    "organisations_createRole": "public/organizations/createRole/",
+    "organisations_getRoles": "public/organizations/getRoles/",
+    "organisations_assignRole": "public/organizations/assignRole/",
+    "organisations_removeRole": "public/organizations/removeRole/",
+    "organisations_editRole": "public/organizations/editRole/",
+    "organisations_deleteRole": "public/organizations/deleteRole/",
+    "organisations_getPermissions": "public/organizations/getPermissions/",
+    "organisations_getPermissionsForRole": "public/organizations/getPermissionsForRole/",
+    "organisations_setPermissionsForRole": "public/organizations/setPermissionsForRole/",
+    "onto_getPrinters": "public/onto/getPrinters/",
+    "onto_getPrinter": "public/onto/getPrinter/",
+    "onto_getMaterials": "public/onto/getMaterials/",
+    "onto_getMaterial": "public/onto/getMaterial/",
+    "orga_getPrinters": "public/orga/getPrinters/",
+    "orga_addPrinter": "public/orga/addPrinter/",
+    "orga_addPrinterEdit": "public/orga/addPrinterEdit/",
+    "orga_createPrinter": "public/orga/createPrinter/",
+    "orga_removePrinter": "public/orga/removePrinter/",
+    "orga_getMaterials": "public/orga/getMaterials/",
+    "orga_addMaterial": "public/orga/addMaterial/",
+    "orga_addMaterialEdit": "public/orga/addMaterial/",
+    "orga_createMaterial": "public/orga/createMaterial/",
+    "orga_removeMaterial": "public/orga/removeMaterial/"
 }
 
 urlpatterns = [
@@ -93,6 +125,10 @@ urlpatterns = [
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
     path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
+    path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
+    path(paths["getPermissions"], authentification.getPermissionsOfUser, name="getPermissions"),
+    path(paths["getNewPermissions"], authentification.getNewRoleAndPermissionsForUser, name="getNewPermissions"),
+    path(paths["getPermissionsFile"], authentification.provideRightsFile, name="getPermissionsFile"),
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),
@@ -122,6 +158,37 @@ urlpatterns = [
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateName"], profiles.updateName, name="updateName"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+
+    path(paths["organisations_addUser"], organizations.organisations_addUser, name="organisations_addUser"),
+    path(paths["organisations_fetchUsers"], organizations.organisations_fetchUsers, name="organisations_fetchUsers"),
+    path(paths["organisations_createRole"], organizations.organisations_createRole, name="organisations_createRole"),
+    path(paths["organisations_deleteUser"], organizations.organisations_deleteUser, name="organisations_deleteUser"),
+    path(paths["organisations_getInviteLink"], organizations.organisations_getInviteLink, name="organisations_getInviteLink"),
+    path(paths["organisations_assignRole"], organizations.organisations_assignRole, name="organisations_assignRole"),
+    path(paths["organisations_getRoles"], organizations.organisations_getRoles, name="organisations_getRoles"),
+    path(paths["organisations_setPermissionsForRole"], organizations.organisations_setPermissionsForRole, name="organisations_setPermissionsForRole"),
+    path(paths["organisations_getPermissions"], organizations.organisations_getPermissions, name="organisations_getPermissions"),
+    path(paths["organisations_getPermissionsForRole"], organizations.organisations_getPermissionsForRole, name="organisations_getPermissionsForRole"),
+    path(paths["organisations_removeRole"], organizations.organisations_removeRole, name="organisations_removeRole"),
+    path(paths["organisations_editRole"], organizations.organisations_editRole, name="organisations_editRole"),
+    path(paths["organisations_deleteRole"], organizations.organisations_deleteRole, name="organisations_deleteRole"),
+
+    path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
+
+    path(paths["onto_getMaterials"], ontology.onto_getMaterials, name="getMaterials"),
+    path(paths["onto_getMaterial"], ontology.onto_getMaterial, name="getMaterial"),
+    path(paths["onto_getPrinters"], ontology.onto_getPrinters, name="getPrinters"),
+    path(paths["onto_getPrinter"], ontology.onto_getPrinter, name="onto_getPrinter"),
+    path(paths["orga_addPrinter"], ontology.orga_addPrinter, name="orga_addPrinter"),
+    path(paths["orga_addPrinterEdit"], ontology.orga_addPrinterEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createPrinter"], ontology.orga_createPrinter, name="orga_createPrinter"),
+    path(paths["orga_removePrinter"], ontology.orga_removePrinter, name="orga_removePrinter"),
+    path(paths["orga_getPrinters"], ontology.orga_getPrinters, name="orga_getPrinters"),
+    path(paths["orga_addMaterial"], ontology.orga_addMaterial, name="orga_addMaterial"),
+    path(paths["orga_addMaterialEdit"], ontology.orga_addMaterialEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createMaterial"], ontology.orga_createMaterial, name="orga_createMaterial"),
+    path(paths["orga_removeMaterial"], ontology.orga_removeMaterial, name="orga_removeMaterial"),
+    path(paths["orga_getMaterials"], ontology.orga_getMaterials, name="orga_getMaterials"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

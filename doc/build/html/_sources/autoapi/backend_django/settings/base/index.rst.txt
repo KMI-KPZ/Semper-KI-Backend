@@ -52,6 +52,11 @@ Module Contents
 
    
 
+.. py:data:: DEBUG
+   :annotation: = True
+
+   
+
 .. py:data:: ALLOWED_HOSTS
    :annotation: = ['localhost', '127.0.0.1', 'dev.semper-ki.org', 'semper-ki.org', 'https://dev.semper-ki.org',...
 
@@ -102,8 +107,8 @@ Module Contents
 
    
 
-.. py:data:: WSGI_APPLICATION
-   :annotation: = backend_django.wsgi.application
+.. py:data:: CHANNEL_LAYERS
+   
 
    
 
@@ -113,6 +118,11 @@ Module Contents
    
 
 .. py:data:: CSRF_COOKIE_SECURE
+   :annotation: = True
+
+   
+
+.. py:data:: SESSION_COOKIE_HTTPONLY
    :annotation: = True
 
    
@@ -177,6 +187,26 @@ Module Contents
 
    
 
+.. py:data:: AUTH0_ORGA_CLIENT_ID
+   
+
+   
+
+.. py:data:: AUTH0_ORGA_CLIENT_SECRET
+   
+
+   
+
+.. py:data:: AUTH0_API_CLIENT_ID
+   
+
+   
+
+.. py:data:: AUTH0_API_CLIENT_SECRET
+   
+
+   
+
 .. py:data:: REDIS_HOST
    :annotation: = host.docker.internal
 
@@ -207,8 +237,33 @@ Module Contents
 
    
 
+.. py:data:: CMEM_CLIENT_ID
+   
+
+   
+
+.. py:data:: CMEM_CLIENT_SECRET
+   
+
+   
+
 .. py:data:: CELERYBEAT_SCHEDULE
    
+
+   
+
+.. py:data:: LOGGING
+   
+
+   
+
+.. py:data:: WSGI_APPLICATION
+   :annotation: = backend_django.wsgi.application
+
+   
+
+.. py:data:: ASGI_APPLICATION
+   :annotation: = backend_django.asgi.application
 
    
 

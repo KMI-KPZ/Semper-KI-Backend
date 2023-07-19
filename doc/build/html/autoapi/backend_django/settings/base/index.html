@@ -73,6 +73,11 @@
 <dd></dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.DEBUG">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">DEBUG</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#backend_django.settings.base.DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="backend_django.settings.base.ALLOWED_HOSTS">
 <span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">ALLOWED_HOSTS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">['localhost',</span> <span class="pre">'127.0.0.1',</span> <span class="pre">'dev.semper-ki.org',</span> <span class="pre">'semper-ki.org',</span> <span class="pre">'https://dev.semper-ki.org',...</span></em><a class="headerlink" href="#backend_django.settings.base.ALLOWED_HOSTS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -123,8 +128,8 @@
 <dd></dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="backend_django.settings.base.WSGI_APPLICATION">
-<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">WSGI_APPLICATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">backend_django.wsgi.application</span></em><a class="headerlink" href="#backend_django.settings.base.WSGI_APPLICATION" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="backend_django.settings.base.CHANNEL_LAYERS">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">CHANNEL_LAYERS</span></span><a class="headerlink" href="#backend_django.settings.base.CHANNEL_LAYERS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py data">
@@ -135,6 +140,11 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="backend_django.settings.base.CSRF_COOKIE_SECURE">
 <span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">CSRF_COOKIE_SECURE</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#backend_django.settings.base.CSRF_COOKIE_SECURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.SESSION_COOKIE_HTTPONLY">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">SESSION_COOKIE_HTTPONLY</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#backend_django.settings.base.SESSION_COOKIE_HTTPONLY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py data">
@@ -198,6 +208,26 @@
 <dd></dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.AUTH0_ORGA_CLIENT_ID">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">AUTH0_ORGA_CLIENT_ID</span></span><a class="headerlink" href="#backend_django.settings.base.AUTH0_ORGA_CLIENT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.AUTH0_ORGA_CLIENT_SECRET">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">AUTH0_ORGA_CLIENT_SECRET</span></span><a class="headerlink" href="#backend_django.settings.base.AUTH0_ORGA_CLIENT_SECRET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.AUTH0_API_CLIENT_ID">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">AUTH0_API_CLIENT_ID</span></span><a class="headerlink" href="#backend_django.settings.base.AUTH0_API_CLIENT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.AUTH0_API_CLIENT_SECRET">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">AUTH0_API_CLIENT_SECRET</span></span><a class="headerlink" href="#backend_django.settings.base.AUTH0_API_CLIENT_SECRET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="backend_django.settings.base.REDIS_HOST">
 <span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">REDIS_HOST</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">host.docker.internal</span></em><a class="headerlink" href="#backend_django.settings.base.REDIS_HOST" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -228,8 +258,33 @@
 <dd></dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.CMEM_CLIENT_ID">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">CMEM_CLIENT_ID</span></span><a class="headerlink" href="#backend_django.settings.base.CMEM_CLIENT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.CMEM_CLIENT_SECRET">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">CMEM_CLIENT_SECRET</span></span><a class="headerlink" href="#backend_django.settings.base.CMEM_CLIENT_SECRET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="backend_django.settings.base.CELERYBEAT_SCHEDULE">
 <span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">CELERYBEAT_SCHEDULE</span></span><a class="headerlink" href="#backend_django.settings.base.CELERYBEAT_SCHEDULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.LOGGING">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">LOGGING</span></span><a class="headerlink" href="#backend_django.settings.base.LOGGING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.WSGI_APPLICATION">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">WSGI_APPLICATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">backend_django.wsgi.application</span></em><a class="headerlink" href="#backend_django.settings.base.WSGI_APPLICATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.settings.base.ASGI_APPLICATION">
+<span class="sig-prename descclassname"><span class="pre">backend_django.settings.base.</span></span><span class="sig-name descname"><span class="pre">ASGI_APPLICATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">backend_django.asgi.application</span></em><a class="headerlink" href="#backend_django.settings.base.ASGI_APPLICATION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>

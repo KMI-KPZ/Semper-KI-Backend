@@ -39,3 +39,8 @@ Module Contents
 
    
 
+.. py:data:: websockets
+   
+
+   
+

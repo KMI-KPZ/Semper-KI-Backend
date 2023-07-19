@@ -42,62 +42,61 @@
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.checkIfTokenValid" title="backend_django.handlers.authentification.checkIfTokenValid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIfTokenValid</span></code></a>(token)</p></td>
-<td><p>Check whether the token of a user has expired and a new login is necessary</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.checkIfUserIsLoggedIn" title="backend_django.handlers.authentification.checkIfUserIsLoggedIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkIfUserIsLoggedIn</span></code></a>(request)</p></td>
-<td><p>Check whether a user is logged in or not.</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.isLoggedIn" title="backend_django.handlers.authentification.isLoggedIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isLoggedIn</span></code></a>(request)</p></td>
 <td><p>Check whether the token of a user has expired and a new login is necessary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.loginUser" title="backend_django.handlers.authentification.loginUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loginUser</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.provideRightsFile" title="backend_django.handlers.authentification.provideRightsFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">provideRightsFile</span></code></a>(request)</p></td>
+<td><p>Returns the json file containing the rights for the frontend</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.loginUser" title="backend_django.handlers.authentification.loginUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loginUser</span></code></a>(request)</p></td>
 <td><p>Return a link for redirection to Auth0.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.callbackLogin" title="backend_django.handlers.authentification.callbackLogin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">callbackLogin</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.setOrganizationName" title="backend_django.handlers.authentification.setOrganizationName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setOrganizationName</span></code></a>(request)</p></td>
+<td><p>Set's the Organization name based on the information of the token</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.retrieveRolesAndPermissionsForMemberOfOrganization" title="backend_django.handlers.authentification.retrieveRolesAndPermissionsForMemberOfOrganization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieveRolesAndPermissionsForMemberOfOrganization</span></code></a>(session)</p></td>
+<td><p>Get the roles and the permissions via API from Auth0</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.retrieveRolesAndPermissionsForStandardUser" title="backend_django.handlers.authentification.retrieveRolesAndPermissionsForStandardUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieveRolesAndPermissionsForStandardUser</span></code></a>(session)</p></td>
+<td><p>Get the roles and the permissions via API from Auth0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.setRoleAndPermissionsOfUser" title="backend_django.handlers.authentification.setRoleAndPermissionsOfUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setRoleAndPermissionsOfUser</span></code></a>(request)</p></td>
+<td><p>Set's the role and the permissions of the user based on the information of the token</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.callbackLogin" title="backend_django.handlers.authentification.callbackLogin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">callbackLogin</span></code></a>(request)</p></td>
 <td><p>Get information back from Auth0.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.getAuthInformation" title="backend_django.handlers.authentification.getAuthInformation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAuthInformation</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.getAuthInformation" title="backend_django.handlers.authentification.getAuthInformation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAuthInformation</span></code></a>(request)</p></td>
 <td><p>Return details about user after login.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.getRolesOfUser" title="backend_django.handlers.authentification.getRolesOfUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getRolesOfUser</span></code></a>(request)</p></td>
+<td><p>Get Roles of User.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.getPermissionsOfUser" title="backend_django.handlers.authentification.getPermissionsOfUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getPermissionsOfUser</span></code></a>(request)</p></td>
+<td><p>Get Permissions of User.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.getNewRoleAndPermissionsForUser" title="backend_django.handlers.authentification.getNewRoleAndPermissionsForUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNewRoleAndPermissionsForUser</span></code></a>(request)</p></td>
+<td><p>In case the role changed, get new role and new permissions from auth0</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.logoutUser" title="backend_django.handlers.authentification.logoutUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logoutUser</span></code></a>(request)</p></td>
 <td><p>Delete session for this user and log out.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.authentification.checkIfTokenValid">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">checkIfTokenValid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.checkIfTokenValid" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether the token of a user has expired and a new login is necessary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>token</strong> (<em>Dictionary</em>) – User session token</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the token is valid or False if not</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="backend_django.handlers.authentification.checkIfUserIsLoggedIn">
-<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">checkIfUserIsLoggedIn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.checkIfUserIsLoggedIn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether a user is logged in or not.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the user is logged in or False if not</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Bool</p>
-</dd>
-</dl>
-</dd></dl>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#backend_django.handlers.authentification.logger" title="backend_django.handlers.authentification.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py data">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.logger">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#backend_django.handlers.authentification.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="backend_django.handlers.authentification.isLoggedIn">
@@ -117,6 +116,23 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.provideRightsFile">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">provideRightsFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.provideRightsFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the json file containing the rights for the frontend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON Response.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="backend_django.handlers.authentification.loginUser">
 <span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">loginUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.loginUser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a link for redirection to Auth0.</p>
@@ -129,6 +145,74 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>HTTP Link as str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.setOrganizationName">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">setOrganizationName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.setOrganizationName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set’s the Organization name based on the information of the token</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>Dict</em>) – request containing OAuth Token</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.retrieveRolesAndPermissionsForMemberOfOrganization">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">retrieveRolesAndPermissionsForMemberOfOrganization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.retrieveRolesAndPermissionsForMemberOfOrganization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the roles and the permissions via API from Auth0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session</strong> (<em>Dict</em>) – The session of the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict with roles and permissions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.retrieveRolesAndPermissionsForStandardUser">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">retrieveRolesAndPermissionsForStandardUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.retrieveRolesAndPermissionsForStandardUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the roles and the permissions via API from Auth0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session</strong> (<em>Dict</em>) – The session of the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict with roles and permissions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.setRoleAndPermissionsOfUser">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">setRoleAndPermissionsOfUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.setRoleAndPermissionsOfUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set’s the role and the permissions of the user based on the information of the token</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>Dict</em>) – request containing OAuth Token</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exception or True</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exception or Bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -165,6 +249,57 @@ Accesses the database and creates or gets user.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Json</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.getRolesOfUser">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">getRolesOfUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.getRolesOfUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Roles of User.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of roles</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.getPermissionsOfUser">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">getPermissionsOfUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.getPermissionsOfUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Permissions of User.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of roles</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="backend_django.handlers.authentification.getNewRoleAndPermissionsForUser">
+<span class="sig-prename descclassname"><span class="pre">backend_django.handlers.authentification.</span></span><span class="sig-name descname"><span class="pre">getNewRoleAndPermissionsForUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#backend_django.handlers.authentification.getNewRoleAndPermissionsForUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>In case the role changed, get new role and new permissions from auth0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New Permissions for User</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
 </dd>
 </dl>
 </dd></dl>
