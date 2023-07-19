@@ -401,6 +401,7 @@ def getNewRoleAndPermissionsForUser(request):
     return getPermissionsOfUser(request)    
 
 #######################################################
+@basics.checkIfUserIsLoggedIn(json=False)
 @require_http_methods(["GET"])
 def logoutUser(request):
     """
