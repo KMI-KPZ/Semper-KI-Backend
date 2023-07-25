@@ -104,13 +104,17 @@ class TestOrders(TestCase):
         mockSession["user"]["userinfo"]["sub"] = "auth0|testmanufacturer"
         mockSession["user"]["userinfo"]["nickname"] = "testmanufacturer"
         mockSession["user"]["userinfo"]["email"] = "testmanufacturer@test.de"
+        mockSession["user"]["userinfo"]["org_id"] = "id123"
+        mockSession["userPermissions"] = [{"permission_name": "orders:read"},{"permission_name": "orders:files"},{"permission_name": "orders:chat"},{"permission_name": "orders:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
         mockSession["usertype"] = "manufacturer"
+        mockSession["organizationName"] = "manufacturer"
         mockSession["organizationType"] = "manufacturer"
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
         self.client.get("/"+paths["addUser"])
         returnedJson = self.client.get("/"+paths["getManufacturers"])
+        print(returnedJson)
         returnedJsonAsDict = json.loads(returnedJson.content)
         localMockCart = self.mockCart
         localMockCart["cart"][0]["manufacturerID"] = returnedJsonAsDict[0]["id"]
@@ -122,6 +126,7 @@ class TestOrders(TestCase):
         mockSession["user"]["userinfo"]["sub"] = "auth0|testuser"
         mockSession["user"]["userinfo"]["nickname"] = "testuser"
         mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
+        mockSession["userPermissions"] = [{"permission_name": "orders:read"},{"permission_name": "orders:files"},{"permission_name": "orders:chat"},{"permission_name": "orders:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
         mockSession["usertype"] = "user"
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))

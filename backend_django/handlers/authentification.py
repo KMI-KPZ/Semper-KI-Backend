@@ -76,6 +76,11 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
+
+    # disable login in production as of now (19.7.2023)
+    if settings.PRODUCTION:
+        return HttpResponse("Currently, logging in is not allowed. Sorry.", status=403)
+
     # check number of login attempts
     if "numOfLoginAttempts" in request.session:
         if (datetime.datetime.now() - datetime.datetime.strptime(request.session["lastLoginAttempt"],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
@@ -111,6 +116,8 @@ def loginUser(request):
 
     # set redirect url
     if settings.PRODUCTION:
+        forward_url = 'https://www.semper-ki.org'
+    elif settings.DEVELOPMENT:
         forward_url = 'https://dev.semper-ki.org'
     else:
         forward_url = 'http://127.0.0.1:3000'
@@ -394,6 +401,7 @@ def getNewRoleAndPermissionsForUser(request):
     return getPermissionsOfUser(request)    
 
 #######################################################
+@basics.checkIfUserIsLoggedIn(json=False)
 @require_http_methods(["GET"])
 def logoutUser(request):
     """
@@ -430,6 +438,8 @@ def logoutUser(request):
     #     ),
     # )
     if settings.PRODUCTION:
+        callbackString = request.build_absolute_uri('https://www.semper-ki.org')
+    elif settings.DEVELOPMENT:
         callbackString = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
         callbackString = request.build_absolute_uri('http://127.0.0.1:3000')
