@@ -22,7 +22,7 @@ class User(models.Model):
     :name: Nickname returned by Auth0, used for filter searches in DB
     :email: E-Mail with which the user registered themselves
     :organizations: The organizations that the user belongs to
-    :address: Where to find the user
+    :details: Adress, ...
     :orders: The OrderCollections that this user submitted, only added if the user is not in an organization
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated
@@ -34,7 +34,7 @@ class User(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     organizations = ArrayField(models.CharField(max_length=513))
-    address = models.JSONField()
+    details = models.JSONField()
     orders = models.ManyToManyField(ordersModel.OrderCollection)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
@@ -59,7 +59,7 @@ class Organization(models.Model):
     :hashedID: SHA-512 hashed value of the subID for anonymous identification
     :name: Nickname returned by Auth0, used for filter searches in DB
     :email: E-Mail with which the user registered themselves
-    :address: Where to find the organization
+    :details: Adress, tax id and so on
     :users: Link to users belonging to that organization
     :canManufacture: True if this organization can manufacture something
     :ordersSubmitted: Orders that this organisation submitted
@@ -73,7 +73,7 @@ class Organization(models.Model):
     hashedID = models.CharField(max_length=513)
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
-    address = models.JSONField()
+    details = models.JSONField()
     users = models.ManyToManyField(User)
     canManufacture = models.BooleanField(default=False)
     ordersSubmitted = models.ManyToManyField(ordersModel.Orders)
