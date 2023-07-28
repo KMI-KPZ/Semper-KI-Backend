@@ -201,6 +201,7 @@ def checkLogistics(request):
 @require_http_methods(["GET"])
 def sendOrder(request):
     """
+    TODO
     Save order and send it to manufacturer
 
     :param request: GET Request

@@ -9,6 +9,7 @@ import types, json, enum, re
 
 from datetime import datetime
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 from ..modelFiles.profileModel import User, Organization
 from ..modelFiles.ordersModel import Orders, OrderCollection
@@ -58,7 +59,7 @@ class ProfileManagement():
             listOfManufacturers = Organization.objects.filter(canManufacture=True)
             returnValue = []
             for entry in listOfManufacturers:
-                returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "address": entry.address})
+                returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "details": entry.details})
         except (Exception) as error:
             print(error)
 
@@ -147,7 +148,7 @@ class ProfileManagement():
 
     ##############################################
     @staticmethod
-    def addUser(session, organization=None):
+    def addUserIfNotExists(session, organization=None):
         """
         Add user if the entry doesn't already exists.
 
@@ -162,21 +163,21 @@ class ProfileManagement():
         try:
             # first get, then create
             result = User.objects.get(subID=userID)
-        except (Exception) as error:
+        except (ObjectDoesNotExist) as error:
             try:
                 userName = session["user"]["userinfo"]["nickname"]
                 userEmail = session["user"]["userinfo"]["email"]
-                address = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
+                details = {}
                 updated = timezone.now()
                 lastSeen = timezone.now()
                 idHash = crypto.generateSecureID(userID)
                  
                 if organization != None:
-                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=[organization.subID], address=address, updatedWhen=updated, lastSeen=lastSeen)
+                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=[organization.subID], details=details, updatedWhen=updated, lastSeen=lastSeen)
                     if ProfileManagement.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
                         raise Exception(f"User could not be added to organization!, {createdUser}, {organization}")
                 else:
-                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=["None"], address=address, updatedWhen=updated, lastSeen=lastSeen)
+                    createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=["None"], details=details, updatedWhen=updated, lastSeen=lastSeen)
 
             except (Exception) as error:
                 print(error)
@@ -199,22 +200,17 @@ class ProfileManagement():
 
         """
         try:
-            result = Manufacturer.objects.get(subID=organizationID)
+            result = Organization.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
-        except (Exception) as error:
-            pass
-        try:
-            result = Stakeholder.objects.get(subID=organizationID)
-            result.users.add(userToBeAdded)
-        except (Exception) as error:
-            print("Organization doesn't exist!")
+        except (ObjectDoesNotExist) as error:
+            print("Organization doesn't exist!", error)
             return False
 
         return True
 
     ##############################################
     @staticmethod
-    def addOrganization(org_id, organizationName, typeOfOrganization):
+    def addOrGetOrganization(session):
         """
         Add organization if the entry doesn't already exists.
 
@@ -226,37 +222,32 @@ class ProfileManagement():
         :rtype: Bool
 
         """
-        orgaID = org_id
-        orgaName = organizationName
-        orgaEmail = "testOrga1@test.org"
-        orgaAddress = {"country": "Germany", "city": "Leipzig", "zipcode": "12345", "street": "Nowherestreet", "number": "42"}
+        orgaID = session["user"]["userinfo"]["org_id"]
         updated = timezone.now()
         try:
             # first get, then create
-            if typeOfOrganization == "manufacturer":
-                Manufacturer.objects.get(subID=orgaID)
-            elif typeOfOrganization == "stakeholder":
-                Stakeholder.objects.get(subID=orgaID)
-            
-        except (Exception) as error:
+            resultObj = Organization.objects.get(subID=orgaID)
+            return resultObj
+        except (ObjectDoesNotExist) as error:
             try:
+                orgaName = session["organizationName"]
+                orgaDetails = {"e-mail": "", "adress": "", "taxID": ""}
                 idHash = crypto.generateSecureID(orgaID)
-                if typeOfOrganization == "manufacturer":
-                    uri = "www.test.org"
-                    Manufacturer.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, email=orgaEmail, address=orgaAddress, uri=uri, updatedWhen=updated) 
-                elif typeOfOrganization == "stakeholder":
-                    Stakeholder.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, email=orgaEmail, address=orgaAddress, updatedWhen=updated) 
+                uri = ""
+                resultObj = Organization.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, details=orgaDetails, uri=uri, updatedWhen=updated) 
+                return resultObj
             except (Exception) as error:
                 print(error)
-                return False
-            pass
-        return True
+                return None
+        except (Exception) as error:
+            print(error)
+            return None
 
     ##############################################
     @staticmethod
-    def updateName(session, userName):
+    def updateDetails(session, details):
         """
-        Update user name.
+        Update user details.
 
         :param session: GET request session
         :type session: Dictionary
@@ -267,7 +258,28 @@ class ProfileManagement():
         userID = session["user"]["userinfo"]["sub"]
         updated = timezone.now()
         try:
-            affected = User.objects.filter(subID=userID).update(name=userName, updatedWhen=updated)
+            affected = User.objects.filter(subID=userID).update(details=details, updatedWhen=updated)
+        except (Exception) as error:
+            print(error)
+            return False
+        return True
+    
+    ##############################################
+    @staticmethod
+    def updateDetailsOfOrganisation(session, details):
+        """
+        Update user details.
+
+        :param session: GET request session
+        :type session: Dictionary
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
+        orgID = session["user"]["userinfo"]["org_id"]
+        updated = timezone.now()
+        try:
+            affected = Organization.objects.filter(subID=orgID).update(details=details, updatedWhen=updated)
         except (Exception) as error:
             print(error)
             return False
@@ -308,9 +320,9 @@ class EnumUpdates(enum.Enum):
 class OrderManagement():
     ##############################################
     @staticmethod
-    def addOrder(userID, orderFromUser, session):
+    def addOrder(orderFromUser, session):
         """
-        Add order for that user. Check if user already has orders and append if so, create a new user if not.
+        Add order for that user. Check if user already has orders and append if so, create a new order if not.
 
         :param userID: user ID of a user
         :type userID: str
@@ -327,8 +339,12 @@ class OrderManagement():
             # outputList for events
             dictForEventsAsOutput = {}
 
-            # first get user and manufacturer
-            userThatOrdered = User.objects.get(hashedID=userID)
+            # first get user or organisation
+            if "isPartOfOrganization" in session:
+                client = Organization.objects.get(hashedID=session["user"]["userinfo"]["org_id"])
+            else:
+                client = User.objects.get(hashedID=session["user"]["userinfo"]["sub"])
+            
             # generate key and order collection
             orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
             collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=0, updatedWhen=now)
@@ -341,7 +357,7 @@ class OrderManagement():
 
             for idx, entry in enumerate(orderFromUser):
                 # generate orders
-                selectedManufacturer = Manufacturer.objects.get(hashedID=entry["manufacturerID"])
+                selectedManufacturer = Organization.objects.get(hashedID=entry["manufacturerID"])
                 orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
                 userOrders = entry
                 status = 0
@@ -351,27 +367,23 @@ class OrderManagement():
                 else:
                     files = []
                 dates = {"created": str(now), "updated": str(now)}
-                Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, updatedWhen=now)
+                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
+                selectedManufacturer.ordersReceived.add(ordersObj)
+                
+                # save ID of manufacturers for the websocket events
+                if selectedManufacturer.hashedID in dictForEventsAsOutput:
+                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
+                else:
+                    dictForEventsAsOutput[selectedManufacturer.hashedID] = {"eventType": "orderEvent"}
+                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
+                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orderCollectionID"] = orderCollectionID
 
-                # add for users of manufacturer TODO Rights
-                for member in selectedManufacturer.users.all():
-                    memberID = member.subID
-
-                    # save memberID of manufacturer and the rest for the websocket events
-                    if memberID in dictForEventsAsOutput:
-                        dictForEventsAsOutput[memberID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
-                    else:
-                        dictForEventsAsOutput[memberID] = {"eventType": "orderEvent"}
-                        dictForEventsAsOutput[memberID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                        dictForEventsAsOutput[memberID]["orderCollectionID"] = orderCollectionID
-
-                    # link OrderCollection to every eligible user of every selected manufacturer
-                    member.orders.add(collectionObj)
-                    member.save()
-
-            # link OrderCollection to user
-            userThatOrdered.orders.add(collectionObj)
-            userThatOrdered.save()
+            # link OrderCollection to client
+            if "isPartOfOrganization" in session:
+                client.ordersSubmitted.add(collectionObj)
+            else:
+                client.orders.add(collectionObj)
+            client.save()
 
             return dictForEventsAsOutput
         except (Exception) as error:
@@ -380,22 +392,28 @@ class OrderManagement():
 
     ##############################################
     @staticmethod
-    def getOrders(userID):
+    def getOrders(session):
         """
+        TODO
         Get all orders for that user.
 
-        :param userID: user ID for a user
-        :type userID: str
+        :param session: session of that user
+        :type session: dict
         :return: sorted list with all jsons (orders, status, communication, files)
         :rtype: list
 
         """
         try:
             # get user
-            currentUser = User.objects.get(hashedID=userID)
+            if "isPartOfOrganization" in session:
+                currentUser = Organization.objects.get(hashedID=session["user"]["userinfo"]["org_id"])
+                orderCollections = currentUser.orders.all()
+            else:
+                currentUser = User.objects.get(hashedID=session["user"]["userinfo"]["sub"])
+                orderCollections = currentUser.orders.all()
             # get associated OrderCollections
             output = []
-            orderCollections = currentUser.orders.all()
+            
             for orderCollection in orderCollections:
                 currentOrderCollection = {}
                 currentOrderCollection["id"] = orderCollection.orderCollectionID
@@ -452,6 +470,7 @@ class OrderManagement():
     @staticmethod
     def getAllUsersOfOrder(orderID):
         """
+        TODO
         Get all users that are connected to that orderID.
 
         :param orderID: unique order ID
@@ -462,7 +481,9 @@ class OrderManagement():
         """
         try:
             currentOrder = Orders.objects.get(orderID=orderID)
-            users = User.objects.filter(orders=currentOrder.orderCollectionKey).all()
+
+            users = list(User.objects.filter(orders=currentOrder.orderCollectionKey).all())
+            users.extend(list(Organization.objects.filter(ordersSubmitted=currentOrder.orderCollectionKey).all()))
             return list(users)
         except (Exception) as error:
             print(error)
@@ -519,6 +540,7 @@ class OrderManagement():
     @staticmethod
     def updateOrder(orderID, orderCollectionID, updateType: EnumUpdates, content):
         """
+        TODO
         Change details of an order, its status, or save communication 
 
         :param orderID: unique order ID to be edited

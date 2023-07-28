@@ -62,7 +62,7 @@ class Organization(models.Model):
     :details: Adress, tax id and so on
     :users: Link to users belonging to that organization
     :canManufacture: True if this organization can manufacture something
-    :ordersSubmitted: Orders that this organisation submitted
+    :ordersSubmitted: OrderCollections that this organisation submitted
     :ordersReceived: Orders that this organisation received
     :uri: Representation link inside the knowledge graph
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
@@ -72,11 +72,10 @@ class Organization(models.Model):
     subID = models.CharField(primary_key=True,max_length=100)
     hashedID = models.CharField(max_length=513)
     name = models.CharField(max_length=100)
-    email = models.CharField(max_length=100)
     details = models.JSONField()
     users = models.ManyToManyField(User)
     canManufacture = models.BooleanField(default=False)
-    ordersSubmitted = models.ManyToManyField(ordersModel.Orders)
+    ordersSubmitted = models.ManyToManyField(ordersModel.OrderCollection)
     ordersReceived = models.ManyToManyField(ordersModel.Orders)
     uri = models.CharField(max_length=200)
     createdWhen = models.DateTimeField(auto_now_add=True)

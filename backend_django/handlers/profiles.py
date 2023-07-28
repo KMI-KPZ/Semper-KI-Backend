@@ -16,7 +16,7 @@ from django.utils import timezone
 from urllib.parse import unquote
 from django.views.decorators.http import require_http_methods
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 
 from ..modelFiles.profileModel import User
 
@@ -62,9 +62,9 @@ def getUserTest(request):
 ##############################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PUT"])
-def updateName(request):
+def updateDetails(request):
     """
-    Update user name.
+    Update user details.
 
     :param request: PUT request
     :type request: HTTP PUT
@@ -74,8 +74,31 @@ def updateName(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated their name to {content['username']} at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.updateName(request.session, content["username"])
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated their details to {content['details']} at " + str(datetime.datetime.now()))
+    flag = postgres.ProfileManagement.updateDetails(request.session, content["details"])
+    if flag is True:
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=500)
+    
+##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["PUT"])
+@checkIfRightsAreSufficient("updateDetailsOfOrganisation")
+def updateDetailsOfOrganisation(request):
+    """
+    Update details of organisation of that user.
+
+    :param request: PUT request
+    :type request: HTTP PUT
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+
+    content = json.loads(request.body.decode("utf-8"))
+    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated details of their organisation to {content['details']} at " + str(datetime.datetime.now()))
+    flag = postgres.ProfileManagement.updateDetailsOfOrganisation(request.session, content["details"])
     if flag is True:
         return HttpResponse("Worked")
     else:

@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 @checkIfRightsAreSufficient("retrieveOrders", json=True)
 def retrieveOrders(request):
     """
+    TODO
     Retrieve saved orders for dashboard.
 
     :param request: GET Request
@@ -43,6 +44,7 @@ def retrieveOrders(request):
 @checkIfRightsAreSufficient("updateOrder", json=False)
 def updateOrder(request):
     """
+    TODO
     Update saved orders for dashboard.
 
     :param request: PUT Request
@@ -134,6 +136,7 @@ def deleteOrderCollection(request):
 @checkIfRightsAreSufficient("getMissedEvents", json=True)
 def getMissedEvents(request):
     """
+    TODO
     Show how many events (chat messages ...) were missed since last login.
 
     :param request: GET Request

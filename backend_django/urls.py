@@ -50,7 +50,8 @@ paths = {
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
-    "updateName": "public/updateName/",
+    "updateDetails": "public/updateDetails/",
+    "updateDetailsOfOrga": "public/updateOrgaDetails",
     "updateRole": "public/updateRole/",
     "testQuery": "private/testquery/",
     "sendQuery": "private/sendQuery/",
@@ -156,7 +157,7 @@ urlpatterns = [
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
     path(paths["addUser"], profiles.addUserTest, name="addUser"),
     path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
-    path(paths["updateName"], profiles.updateName, name="updateName"),
+    path(paths["updateDetails"], profiles.updateDetails, name="updateDetails"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 
     path(paths["organisations_addUser"], organizations.organisations_addUser, name="organisations_addUser"),
@@ -172,6 +173,7 @@ urlpatterns = [
     path(paths["organisations_removeRole"], organizations.organisations_removeRole, name="organisations_removeRole"),
     path(paths["organisations_editRole"], organizations.organisations_editRole, name="organisations_editRole"),
     path(paths["organisations_deleteRole"], organizations.organisations_deleteRole, name="organisations_deleteRole"),
+    path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganisation, name="updateDetailsOfOrganisation"),
 
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 

@@ -103,13 +103,9 @@ def loginUser(request):
         request.session["usertype"] = "user"
     else:
         userType = request.headers["Usertype"]
-        if userType == "contractor" or userType == "manufacturer":
+        if userType == "organisation":
             request.session["usertype"] = userType
-            request.session["organizationType"] = "manufacturer"
-            isPartOfOrganization = True
-        elif userType == "stakeholder":
-            request.session["usertype"] = userType
-            request.session["organizationType"] = "stakeholder"
+            request.session["isPartOfOrganization"] = True
             isPartOfOrganization = True
         else:
             request.session["usertype"] = userType
@@ -294,7 +290,7 @@ def callbackLogin(request):
     """
     try:
         # authorize callback token
-        if "organizationType" in request.session:
+        if "isPartOfOrganization" in request.session:
             token = auth0.authorizeTokenOrga(request)
         else:
             token = auth0.authorizeToken(request)
@@ -311,7 +307,14 @@ def callbackLogin(request):
             raise retVal
 
         # Get Data from Database or create entry in it for logged in User
-        postgres.ProfileManagement.addUser(request.session)
+        if "isPartOfOrganization" in request.session:
+            orgaObj = postgres.ProfileManagement.addOrGetOrganization(request.session)
+            if orgaObj != None:
+                postgres.ProfileManagement.addUserIfNotExists(request.session, orgaObj)
+            else:
+                raise Exception("Organisation could not be found or created!")
+        else:
+            postgres.ProfileManagement.addUserIfNotExists(request.session)
             
         logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged in at " + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
