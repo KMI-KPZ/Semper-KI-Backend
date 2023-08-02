@@ -12,10 +12,12 @@ from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+
+from ..services.postgresDB import pgProfiles, pgOrders
 from ..handlers import basics
 from django.views.decorators.http import require_http_methods
 
-from ..services import auth0, redis, postgres
+from ..services import auth0, redis
     
 
 logger = logging.getLogger(__name__)
@@ -101,14 +103,16 @@ def loginUser(request):
     isPartOfOrganization = False
     if "Usertype" not in request.headers:
         request.session["usertype"] = "user"
+        request.session["isPartOfOrganization"] = False
     else:
         userType = request.headers["Usertype"]
-        if userType == "organisation":
+        if userType == "organisation" or userType == "manufacturer":
             request.session["usertype"] = userType
             request.session["isPartOfOrganization"] = True
             isPartOfOrganization = True
         else:
             request.session["usertype"] = userType
+            request.session["isPartOfOrganization"] = False
 
     # set redirect url
     if settings.PRODUCTION:
@@ -173,7 +177,7 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         orgID = session["user"]["userinfo"]["org_id"]
-        userID = postgres.ProfileManagement.getUserKey(session)
+        userID = session["pgProfileClass"].getUserKey(session)
 
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers) )
@@ -211,7 +215,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
             'Cache-Control': "no-cache"
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
-        userID = postgres.ProfileManagement.getUserKey(session)
+        userID = session["pgProfileClass"].getUserKey(session)
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers) )
         if isinstance(response, Exception):
@@ -259,16 +263,13 @@ def setRoleAndPermissionsOfUser(request):
             resultDict = retrieveRolesAndPermissionsForMemberOfOrganization(request.session)
             if isinstance(resultDict, Exception):
                 raise resultDict
-            else:
-                request.session["userRoles"] = resultDict["roles"]
-                request.session["userPermissions"] = resultDict["permissions"]
         else:
             resultDict = retrieveRolesAndPermissionsForStandardUser(request.session)
             if isinstance(resultDict, Exception):
                 raise resultDict
-            else:
-                request.session["userRoles"] = resultDict["roles"]
-                request.session["userPermissions"] = resultDict["permissions"]
+
+        request.session["userRoles"] = resultDict["roles"]
+        request.session["userPermissions"] = {x["permission_name"]: "" for x in resultDict["permissions"] } # save only the permission names, the dict is for faster access
 
         return True
     except Exception as e:
@@ -279,6 +280,7 @@ def setRoleAndPermissionsOfUser(request):
 @require_http_methods(["POST", "GET"])
 def callbackLogin(request):
     """
+    TODO: Check if user really is part of an organisation or not -> check if misclick at login, and set flags and instances here
     Get information back from Auth0.
     Add user to database if entry doesn't exist.
 
@@ -290,7 +292,7 @@ def callbackLogin(request):
     """
     try:
         # authorize callback token
-        if "isPartOfOrganization" in request.session:
+        if request.session["isPartOfOrganization"]:
             token = auth0.authorizeTokenOrga(request)
         else:
             token = auth0.authorizeToken(request)
@@ -307,16 +309,15 @@ def callbackLogin(request):
             raise retVal
 
         # Get Data from Database or create entry in it for logged in User
-        if "isPartOfOrganization" in request.session:
-            orgaObj = postgres.ProfileManagement.addOrGetOrganization(request.session)
-            if orgaObj != None:
-                postgres.ProfileManagement.addUserIfNotExists(request.session, orgaObj)
-            else:
+        orgaObj = None
+        if request.session["isPartOfOrganization"]:
+            orgaObj = pgProfiles.ProfileManagementOrganisation.addOrGetOrganization(request.session)
+            if orgaObj == None:
                 raise Exception("Organisation could not be found or created!")
-        else:
-            postgres.ProfileManagement.addUserIfNotExists(request.session)
+
+        request.session["pgProfileClass"].addUserIfNotExists(request.session, orgaObj)
             
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged in at " + str(datetime.datetime.now()))
+        logger.info(f"{request.session['user']['userinfo']['nickname']} logged in at " + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
     except Exception as e:
         returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
@@ -338,7 +339,7 @@ def getAuthInformation(request):
 
     """
     # Read user details from Database
-    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
+    return JsonResponse(request.session["pgProfileClass"].getUser(request.session))
 
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)
@@ -377,7 +378,7 @@ def getPermissionsOfUser(request):
         if len(request.session["userPermissions"]) != 0:
             outArray = []
             for entry in request.session["userPermissions"]:
-                context, permission = entry["permission_name"].split(":")
+                context, permission = entry.split(":")
                 outArray.append({"context": context, "permission": permission})
 
             return JsonResponse(outArray, safe=False)
@@ -416,7 +417,7 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
-    user = postgres.ProfileManagement.getUser(request.session)
+    user = request.session["pgProfileClass"].getUser(request.session)
     if user != {}:
         logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))
     else:

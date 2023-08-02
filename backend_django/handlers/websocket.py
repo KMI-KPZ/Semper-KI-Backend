@@ -13,7 +13,7 @@ from channels.exceptions import StopConsumer
 from asgiref.sync import sync_to_async, async_to_sync
 from channels.db import database_sync_to_async
 
-from backend_django.services import postgres
+from backend_django.services.postgresDB import pgProfiles
 
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
@@ -36,7 +36,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
             session = await sync_to_async(self.getSession)()
             if "user" in session:
                 # Then gather the user ID from the session user token and create room from that
-                uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
+                uID = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(session=session)
                 # in other function send to that "group"/"channel"
                 await self.channel_layer.group_add(uID, self.channel_name)
                 await self.accept()
@@ -48,7 +48,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
         try:
             session = await sync_to_async(self.getSession)(False)
             if "user" in session:
-                uID = await sync_to_async(postgres.ProfileManagement.getUserKeyWOSC)(session=session)
+                uID = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(session=session)
                 await self.channel_layer.group_discard(uID, self.channel_name)
                 raise StopConsumer("Connection closed")
         except Exception as e:

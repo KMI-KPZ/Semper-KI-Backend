@@ -14,7 +14,9 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..services import auth0, postgres
+from ..services.postgresDB import pgProfiles
+
+from ..services import auth0
 from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient
 
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     try:
         channel_layer = get_channel_layer()
         if eventName == "assignRole" or eventName == "removeRole":
-            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+            async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args), {
                 "type": "sendMessageJSON",
                 "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
             })
@@ -44,13 +46,13 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
                     raise resp    
                 for elem in resp:
                     if elem["id"] == args:
-                        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+                        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
                             "type": "sendMessageJSON",
                             "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
                         })
 
         elif eventName == "deleteUserFromOrganization":
-            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+            async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args), {
                 "type": "sendMessageJSON",
                 "dict": {"eventType": "orgaEvent", "type": "userDeleted"},
             })
@@ -89,7 +91,7 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_getInviteLink", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_getInviteLink(request):
     """
     Ask Auth0 API to invite someone via e-mail and retrieve the link
@@ -132,7 +134,7 @@ def organisations_getInviteLink(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_addUser", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_addUser(request):
     """
     Ask Auth0 API to invite someone via e-mail
@@ -175,7 +177,7 @@ def organisations_addUser(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_fetchUsers", json=True)
+@checkIfRightsAreSufficient(json=True)
 def organisations_fetchUsers(request):
     """
     Ask Auth0 API for all users of an organisation
@@ -225,7 +227,7 @@ def organisations_fetchUsers(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_deleteUser", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_deleteUser(request):
     """
     Ask Auth0 API to delete someone from an organization via their name
@@ -260,7 +262,7 @@ def organisations_deleteUser(request):
         response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
-        postgres.ProfileManagement.deleteUser("", uID=userID)
+        pgProfiles.ProfileManagement.deleteUser("", uID=userID)
         logger.info(f"{userName} deleted the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
         
         # Send event to websocket
@@ -280,7 +282,7 @@ def organisations_deleteUser(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_createRole", json=True)
+@checkIfRightsAreSufficient(json=True)
 def organisations_createRole(request):
     """
     Ask Auth0 API to create a new role
@@ -329,7 +331,7 @@ def organisations_createRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_assignRole", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_assignRole(request):
     """
     Assign a role to a person
@@ -382,7 +384,7 @@ def organisations_assignRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_removeRole", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_removeRole(request):
     """
     Remove a role from a person
@@ -434,7 +436,7 @@ def organisations_removeRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_editRole", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_editRole(request):
     """
     Ask Auth0 API to edit a role
@@ -487,7 +489,7 @@ def organisations_editRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_getRoles", json=True)
+@checkIfRightsAreSufficient(json=True)
 def organisations_getRoles(request):
     """
     Fetch all roles for the organization
@@ -533,7 +535,7 @@ def organisations_getRoles(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_deleteRole", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_deleteRole(request):
     """
     Delete role via ID
@@ -573,7 +575,7 @@ def organisations_deleteRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_setPermissionsForRole", json=False)
+@checkIfRightsAreSufficient(json=False)
 def organisations_setPermissionsForRole(request):
     """
     Add Permissions to role
@@ -632,7 +634,7 @@ def organisations_setPermissionsForRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_getPermissions", json=True)
+@checkIfRightsAreSufficient(json=True)
 def organisations_getPermissions(request):
     """
     Get all Permissions
@@ -667,7 +669,7 @@ def organisations_getPermissions(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_getPermissionsForRole", json=True)
+@checkIfRightsAreSufficient(json=True)
 def organisations_getPermissionsForRole(request):
     """
     Get Permissions of role

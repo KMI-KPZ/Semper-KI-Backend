@@ -9,7 +9,7 @@ import json
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-import ordersModel
+from ..modelFiles import ordersModel
 
 # Table for regular Users
 ###################################################
@@ -43,11 +43,11 @@ class User(models.Model):
 
     ###################################################
     def __str__(self):
-        return self.hashedID + " " + self.name + " " + self.email + " " + str(self.organizations) + " " + json.dumps(self.address) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen) + " " + str(self.lastSeen)
+        return self.hashedID + " " + self.name + " " + self.email + " " + str(self.organizations) + " " + json.dumps(self.details) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen) + " " + str(self.lastSeen)
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organizations": self.organizations, "address": json.dumps(self.address), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}
+        return {"hashedID": self.hashedID, "name": self.name, "email" : self.email, "organizations": self.organizations, "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}
 
 #Table for Organizations
 ###################################################

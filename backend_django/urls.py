@@ -155,8 +155,8 @@ urlpatterns = [
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
     #path("private/createDB/", profiles.createTable, name="createTable"),
     #path("private/insertInDB/", profiles.insertUser, name="insertUser"),
-    path(paths["addUser"], profiles.addUserTest, name="addUser"),
-    path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
+    #path(paths["addUser"], profiles.addUserTest, name="addUser"),
+    #path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateDetails"], profiles.updateDetails, name="updateDetails"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
 

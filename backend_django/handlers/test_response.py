@@ -102,11 +102,11 @@ class testWebSocket(AsyncWebsocketConsumer):
 ################################################### 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from backend_django.services import postgres
+from backend_django.services.postgresDB import pgProfiles
 def testCallToWebsocket(request):
     if "user" in request.session:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(session=request.session), {
+        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(session=request.session), {
     "type": "sendMessage",
     "text": "Hello there!",
 })

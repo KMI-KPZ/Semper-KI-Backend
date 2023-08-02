@@ -14,9 +14,11 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+from ..services.postgresDB import pgProfiles, pgOrders
+
 from ..handlers.basics import checkIfUserIsLoggedIn
 
-from ..services import redis, mocks, postgres, crypto
+from ..services import redis, mocks, crypto
 
 logger = logging.getLogger(__name__)
 #######################################################
@@ -71,7 +73,7 @@ def getManufacturers(request):
     """
 
     manufacturerList = []
-    listOfAllManufacturers = postgres.ProfileManagement.getAllManufacturers(request.session)
+    listOfAllManufacturers = pgProfiles.ProfileManagementOrganisation.getAllManufacturers()
     # TODO Check suitability
 
     # remove unnecessary information and add identifier
@@ -198,10 +200,9 @@ def checkLogistics(request):
 
 #######################################################
 @checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
+@require_http_methods(["GET"]) 
 def sendOrder(request):
     """
-    TODO
     Save order and send it to manufacturer
 
     :param request: GET Request
@@ -212,9 +213,12 @@ def sendOrder(request):
     """
 
     try:
-        uID = postgres.ProfileManagement.getUserHashID(request.session)
+        uID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         selected = request.session["selected"]["cart"]
-        dictForEvents = postgres.OrderManagement.addOrder(uID, selected, request.session)
+        if request.session["isPartOfOrganization"]:
+            dictForEvents = pgOrders.OrderManagementOrganisation.addOrder(selected, request.session)
+        else:
+            dictForEvents = pgOrders.OrderManagementUser.addOrder(selected, request.session)
         # Save picture and files in permanent storage
 
 
@@ -222,12 +226,12 @@ def sendOrder(request):
         channel_layer = get_channel_layer()
         for userID in dictForEvents:
             values = dictForEvents[userID]
-            if userID != postgres.ProfileManagement.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
                     "type": "sendMessageJSON",
                     "dict": values,
                 })
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
         return HttpResponse("Success")
     except (Exception) as error:
         print(error)

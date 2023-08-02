@@ -21,7 +21,11 @@ class Rights:
         with open(str(settings.BASE_DIR) + "/backend_django/rights.json") as rightsFile:
             tempDict = json.load(rightsFile)
             for entry in tempDict["Rights"]:
-                self.rightsDict[entry["permission"]["context"]+":"+entry["permission"]["permission"]] = entry["paths"]
+                for elem in entry["paths"]:
+                    if elem in self.rightsDict:
+                        self.rightsDict[elem].add(entry["permission"]["context"]+":"+entry["permission"]["permission"])
+                    else:
+                        self.rightsDict[elem] = set([entry["permission"]["context"]+":"+entry["permission"]["permission"]])
     
     #######################################################
     def checkIfAllowed(self, permissions, path):
@@ -36,9 +40,14 @@ class Rights:
         :rtype: Bool
         """
 
-        for permission in permissions:
-            if path in self.rightsDict[permission["permission_name"]]:
+        for elem in self.rightsDict[path]:
+            if elem in permissions:
                 return True
+            
+
+        # for permission in permissions:
+        #     if path in self.rightsDict[permission["permission_name"]]:
+        #         return True
         
         return False
     

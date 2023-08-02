@@ -20,44 +20,44 @@ from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 
 from ..modelFiles.profileModel import User
 
-from ..services import postgres
+from ..services.postgresDB import pgProfiles
 
 logger = logging.getLogger(__name__)
 ##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def addUserTest(request):
-    """
-    Same as addUser but for testing.
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["GET"])
+# def addUserTest(request):
+#     """
+#     Same as addUser but for testing.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: HTTP response
-    :rtype: HTTP status
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: HTTP response
+#     :rtype: HTTP status
 
-    """
+#     """
 
-    flag = postgres.ProfileManagement.addUser(request.session)
-    if flag is True:
-        return HttpResponse("Worked")
-    else:
-        return HttpResponse("Failed", status=500)
+#     flag = request.session["pgProfileClass"].addUserIfNotExists(request.session)
+#     if flag is True:
+#         return HttpResponse("Worked")
+#     else:
+#         return HttpResponse("Failed", status=500)
 
 
 ##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def getUserTest(request):
-    """
-    Same as getUser but for testing.
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["GET"])
+# def getUserTest(request):
+#     """
+#     Same as getUser but for testing.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: User details from database
-    :rtype: JSON
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: User details from database
+#     :rtype: JSON
 
-    """
-    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
+#     """
+#     return JsonResponse(pgProfiles.ProfileManagement.getUser(request.session))
 
 ##############################################
 @checkIfUserIsLoggedIn()
@@ -74,8 +74,8 @@ def updateDetails(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated their details to {content['details']} at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.updateDetails(request.session, content["details"])
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated their details to {content['details']} at " + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementUser.updateDetails(request.session, content["details"])
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -84,7 +84,7 @@ def updateDetails(request):
 ##############################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PUT"])
-@checkIfRightsAreSufficient("updateDetailsOfOrganisation")
+@checkIfRightsAreSufficient()
 def updateDetailsOfOrganisation(request):
     """
     Update details of organisation of that user.
@@ -97,8 +97,8 @@ def updateDetailsOfOrganisation(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated details of their organisation to {content['details']} at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.updateDetailsOfOrganisation(request.session, content["details"])
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organisation to {content['details']} at " + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementOrganisation.updateDetails(request.session, content["details"])
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -118,8 +118,8 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted themselves at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.deleteUser(request.session)
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted themselves at " + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementUser.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")
     else:

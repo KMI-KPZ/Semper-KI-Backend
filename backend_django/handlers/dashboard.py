@@ -18,15 +18,14 @@ from channels.layers import get_channel_layer
 
 from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 
-from ..services import postgres
+from ..services.postgresDB import pgProfiles, pgOrders
 
 logger = logging.getLogger(__name__)
 #######################################################
 @checkIfUserIsLoggedIn()
-@checkIfRightsAreSufficient("retrieveOrders", json=True)
+@checkIfRightsAreSufficient(json=True)
 def retrieveOrders(request):
     """
-    TODO
     Retrieve saved orders for dashboard.
 
     :param request: GET Request
@@ -35,16 +34,15 @@ def retrieveOrders(request):
     :rtype: JSON Response
 
     """
-    uID = postgres.ProfileManagement.getUserHashID(request.session)
-    return JsonResponse(postgres.OrderManagement.getOrders(uID), safe=False)
+
+    return JsonResponse(request.session["pgOrderClass"].getOrders(request.session), safe=False)
     
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PUT"])
-@checkIfRightsAreSufficient("updateOrder", json=False)
+@checkIfRightsAreSufficient(json=False)
 def updateOrder(request):
     """
-    TODO
     Update saved orders for dashboard.
 
     :param request: PUT Request
@@ -67,29 +65,29 @@ def updateOrder(request):
         outputDict["orderCollectionID"] = orderCollectionID
 
         if "chat" in content["props"]:
-            postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.chat, content["props"]["chat"])
+            pgOrders.OrderManagementBase.updateOrder(orderID, orderCollectionID, pgOrders.EnumUpdates.chat, content["props"]["chat"])
             outputDict["orders"] = [{"orderID": orderID, "status": 0, "messages": 1}]
 
         if "state" in content["props"]:
-            postgres.OrderManagement.updateOrder(orderID, orderCollectionID, postgres.EnumUpdates.status, content["props"]["state"])
+            pgOrders.OrderManagementBase.updateOrder(orderID, orderCollectionID, pgOrders.EnumUpdates.status, content["props"]["state"])
             outputDict["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
 
         # send to websockets that are active, that a new message/status is available for that order
         channel_layer = get_channel_layer()
-        listOfUsers = postgres.OrderManagement.getAllUsersOfOrder(orderID)
+        listOfUsers = pgOrders.OrderManagementBase.getAllUsersOfOrder(orderID)
         for user in listOfUsers:
-            if user.subID != postgres.ProfileManagement.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=user.subID), {
+            if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
                     "type": "sendMessageJSON",
                     "dict": outputDict,
                 })
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated order {orderID} at " + str(datetime.now()))
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated order {orderID} at " + str(datetime.now()))
     return HttpResponse("Success")
 
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
-@checkIfRightsAreSufficient("deleteOrder", json=False)
+@checkIfRightsAreSufficient(json=False)
 def deleteOrder(request):
     """
     Delete a specific order.
@@ -102,8 +100,8 @@ def deleteOrder(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    if postgres.OrderManagement.deleteOrder(content["id"]):
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted order {content['id']} at " + str(datetime.now()))
+    if pgOrders.OrderManagementBase.deleteOrder(content["id"]):
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted order {content['id']} at " + str(datetime.now()))
         return HttpResponse("Success")
     else:
         return HttpResponse("Failed")
@@ -111,7 +109,7 @@ def deleteOrder(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
-@checkIfRightsAreSufficient("deleteOrderCollection", json=False)
+@checkIfRightsAreSufficient(json=False)
 def deleteOrderCollection(request):
     """
     Delete a specific order collection.
@@ -123,8 +121,8 @@ def deleteOrderCollection(request):
 
     """
     content = json.loads(request.body.decode("utf-8"))
-    if postgres.OrderManagement.deleteOrderCollection(content["id"]):
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted orderCollection {content['id']} at " + str(datetime.now()))
+    if pgOrders.OrderManagementBase.deleteOrderCollection(content["id"]):
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted orderCollection {content['id']} at " + str(datetime.now()))
         return HttpResponse("Success")
     else:
         return HttpResponse("Failed")
@@ -133,10 +131,9 @@ def deleteOrderCollection(request):
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("getMissedEvents", json=True)
+@checkIfRightsAreSufficient(json=True)
 def getMissedEvents(request):
     """
-    TODO
     Show how many events (chat messages ...) were missed since last login.
 
     :param request: GET Request
@@ -146,9 +143,9 @@ def getMissedEvents(request):
 
     """
 
-    user = postgres.ProfileManagement.getUser(request.session)
+    user = pgProfiles.ProfileManagementBase.getUser(request.session)
     lastLogin = user["lastSeen"]
-    orderCollections = postgres.OrderManagement.getOrders(user["hashedID"])
+    orderCollections = request.session["pgOrderClass"].getOrders(request.session)
 
     output = {"eventType": "orderEvent", "events": []}
 
@@ -180,7 +177,7 @@ def getMissedEvents(request):
             output["events"].append(currentCollection)
     
     # set accessed time to now
-    postgres.ProfileManagement.setLoginTime(user["hashedID"])
+    pgProfiles.ProfileManagementBase.setLoginTime(user["hashedID"])
 
     return JsonResponse(output, status=200, safe=False)
 

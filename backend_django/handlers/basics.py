@@ -88,7 +88,7 @@ def handleTooManyRequestsError(callToAPI):
         return response.json()
 
 #################### DECORATOR ###################################
-def checkIfRightsAreSufficient(funcName, json=False):
+def checkIfRightsAreSufficient(json=False):
     """
     Check whether a user has sufficient rights to call that function.
 
@@ -102,7 +102,7 @@ def checkIfRightsAreSufficient(funcName, json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session:
-                if rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], funcName):
+                if rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
                     if json:
