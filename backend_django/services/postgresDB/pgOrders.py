@@ -228,7 +228,8 @@ class OrderManagementUser(OrderManagementBase):
                 else:
                     files = []
                 dates = {"created": str(now), "updated": str(now)}
-                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
+                details = {}
+                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
                 selectedManufacturer.ordersReceived.add(ordersObj)
                 
                 # save ID of manufacturers for the websocket events
@@ -279,6 +280,7 @@ class OrderManagementUser(OrderManagementBase):
                     currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = entry.userCommunication
+                    currentOrder["details"] = entry.details
                     filesOutput = []
                     if len(entry.files) != 0:
                         for elem in entry.files:
@@ -350,7 +352,8 @@ class OrderManagementOrganisation(OrderManagementBase):
                 else:
                     files = []
                 dates = {"created": str(now), "updated": str(now)}
-                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
+                details = {}
+                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
                 selectedManufacturer.ordersReceived.add(ordersObj)
                 
                 # save ID of manufacturers for the websocket events
@@ -403,6 +406,7 @@ class OrderManagementOrganisation(OrderManagementBase):
                     currentOrder["item"] = entry.userOrders
                     currentOrder["orderState"] = entry.status
                     currentOrder["chat"] = entry.userCommunication
+                    currentOrder["details"] = entry.details
                     filesOutput = []
                     if len(entry.files) != 0:
                         for elem in entry.files:
@@ -430,6 +434,7 @@ class OrderManagementOrganisation(OrderManagementBase):
                 currentOrder["item"] = orderEntry.userOrders
                 currentOrder["orderState"] = orderEntry.status
                 currentOrder["chat"] = orderEntry.userCommunication
+                currentOrder["details"] = orderEntry.details
                 filesOutput = []
                 if len(orderEntry.files) != 0:
                     for elem in orderEntry.files:

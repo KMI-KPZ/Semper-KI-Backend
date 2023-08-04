@@ -31,54 +31,56 @@ from django.conf.urls.static import static
 
 paths = {
     "landingPage": "",
+    "benchyPage": "private/benchy/",
+    "benchyMcMarkface": "private/benchyMcMarkface/",
+
     "test": 'public/test/',
     "csrfTest": 'public/testCsrf/',
     "csrfCookie": 'public/csrfCookie/',
+
     "login" : "public/login/",
     "logout": "public/logout/",
     "callback": "public/callback/",
-    "getUser": "public/getUser/",
+    "isLoggedIn": "public/isLoggedIn/",
     "getRoles": "public/getRoles/",
-    "getPermissionsFile": "public/getPermissionMask/",
     "getPermissions": "public/getPermissions/",
     "getNewPermissions": "public/getNewPermissions/",
+    "getPermissionsFile": "public/getPermissionMask/",
+    "updateRole": "public/updateRole/",
+    
     "getProcessData": 'public/getProcessData/',
-    "getFilters": 'public/getFilters/',
     "getModels": 'public/getModels/',
+    "getFilters": 'public/getFilters/',
     "getMaterials": 'public/getMaterials/',
     "getPostProcessing": 'public/getPostProcessing/',
-    "deleteUser": "public/profileDeleteUser/",
-    "addUser": "private/profile_addUser/",
-    "getUserTest": "private/profile_getUser/",
-    "updateDetails": "public/updateDetails/",
-    "updateDetailsOfOrga": "public/updateOrgaDetails",
-    "updateRole": "public/updateRole/",
-    "testQuery": "private/testquery/",
-    "sendQuery": "private/sendQuery/",
-    "testQuerySize": "private/query/",
-    "isLoggedIn": "public/isLoggedIn/",
-    "testRedis": "private/testRedis/",
-    "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
-    "retrieveFilesTEST": "private/retrieveFiles/",
-    "getDatabase" : "admin/getData/",
-    "statistics": "public/getStatistics/",
-    "benchyPage": "private/benchy/",
-    "benchyMcMarkface": "private/benchyMcMarkface/",
-    "getMaterials": "public/getMaterials/",
+
     "updateCart": "public/updateCart/",
     "getCart": "public/getCart/",
+    "getManufacturers": "public/getManufacturers/",
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
     "checkLogistics": "public/checkLogistics/",
     "sendOrder": "public/sendOrder/",
+
     "retrieveOrders": "public/getOrders/",
     "updateOrder": "public/updateOrder/",
-    "getManufacturers": "public/getManufacturers/",
     "deleteOrder": "public/deleteOrder/",
     "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
-    "getFileFromOrder": "public/getFileFromOrder/",
-    "isMagazineUp": "public/isMagazineUp/",
+
+    "deleteUser": "public/profileDeleteUser/",
+    "addUser": "private/profile_addUser/",
+    "getUserTest": "private/profile_getUser/",
+    "getUser": "public/getUser/",
+    "getOrganisation": "public/getOrganisation/",
+    "updateDetails": "public/updateUserDetails/",
+    "updateDetailsOfOrga": "public/updateOrganisationDetails/",
+    "deleteOrganisation": "public/deleteOrganisation/",
+    
+    "adminGetAll": "public/admin/getAll/",
+    "adminDelete": "public/admin/deleteUser/",
+    "adminDeleteOrga": "public/admin/deleteOrganisation/",
+
     "organisations_addUser": "public/organizations/addUser/",
     "organisations_getInviteLink": "public/organizations/getInviteLink/",
     "organisations_fetchUsers": "public/organizations/fetchUsers/",
@@ -92,6 +94,10 @@ paths = {
     "organisations_getPermissions": "public/organizations/getPermissions/",
     "organisations_getPermissionsForRole": "public/organizations/getPermissionsForRole/",
     "organisations_setPermissionsForRole": "public/organizations/setPermissionsForRole/",
+    "organisations_createOrganisation": "public/organisations/createNew/",
+
+    "isMagazineUp": "public/isMagazineUp/",
+
     "onto_getPrinters": "public/onto/getPrinters/",
     "onto_getPrinter": "public/onto/getPrinter/",
     "onto_getMaterials": "public/onto/getMaterials/",
@@ -105,7 +111,18 @@ paths = {
     "orga_addMaterial": "public/orga/addMaterial/",
     "orga_addMaterialEdit": "public/orga/addMaterial/",
     "orga_createMaterial": "public/orga/createMaterial/",
-    "orga_removeMaterial": "public/orga/removeMaterial/"
+    "orga_removeMaterial": "public/orga/removeMaterial/",
+
+    "testQuery": "private/testquery/",
+    "sendQuery": "private/sendQuery/",
+    "testQuerySize": "private/query/",
+
+    "testRedis": "private/testRedis/",
+    "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
+    "retrieveFilesTEST": "private/retrieveFiles/",
+    "getFileFromOrder": "public/getFileFromOrder/",
+
+    "statistics": "public/getStatistics/",
 }
 
 urlpatterns = [
@@ -124,7 +141,6 @@ urlpatterns = [
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
-    path(paths["getUser"], authentification.getAuthInformation, name="getAuthInformation"),
     path(paths["isLoggedIn"], authentification.isLoggedIn, name="isLoggedIn"),
     path(paths["getRoles"], authentification.getRolesOfUser, name="getRoles"),
     path(paths["getPermissions"], authentification.getPermissionsOfUser, name="getPermissions"),
@@ -159,6 +175,14 @@ urlpatterns = [
     #path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateDetails"], profiles.updateDetails, name="updateDetails"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
+    path(paths["getUser"], profiles.getUserDetails, name="getUserDetails"),
+    path(paths["getOrganisation"], profiles.getOrganisationDetails, name="getOrganisationDetails"),
+    path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganisation, name="updateDetailsOfOrganisation"),
+    path(paths["deleteOrganisation"], profiles.deleteOrganisation, name="deleteOrganisation"),
+
+    path(paths["adminGetAll"], profiles.getAll, name="getAll"),
+    path(paths["adminDelete"], profiles.deleteUserAsAdmin, name="deleteUserAsAdmin"),
+    path(paths["adminDeleteOrga"], profiles.deleteOrganisationAsAdmin, name="deleteOrganisationAsAdmin"),
 
     path(paths["organisations_addUser"], organizations.organisations_addUser, name="organisations_addUser"),
     path(paths["organisations_fetchUsers"], organizations.organisations_fetchUsers, name="organisations_fetchUsers"),
@@ -173,7 +197,7 @@ urlpatterns = [
     path(paths["organisations_removeRole"], organizations.organisations_removeRole, name="organisations_removeRole"),
     path(paths["organisations_editRole"], organizations.organisations_editRole, name="organisations_editRole"),
     path(paths["organisations_deleteRole"], organizations.organisations_deleteRole, name="organisations_deleteRole"),
-    path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganisation, name="updateDetailsOfOrganisation"),
+    path(paths["organisations_createOrganisation"], organizations.organisations_createNewOrganisation, name="organisations_createNewOrganisation"),
 
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 

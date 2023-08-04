@@ -107,11 +107,11 @@ def loginUser(request):
     else:
         userType = request.headers["Usertype"]
         if userType == "organisation" or userType == "manufacturer":
-            request.session["usertype"] = userType
+            request.session["usertype"] = "organisation"
             request.session["isPartOfOrganization"] = True
             isPartOfOrganization = True
         else:
-            request.session["usertype"] = userType
+            request.session["usertype"] = "user"
             request.session["isPartOfOrganization"] = False
 
     # set redirect url
@@ -251,14 +251,8 @@ def setRoleAndPermissionsOfUser(request):
 
     """
     try:
-        # check if person is admin, global role so check works differently
-        if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
-            if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
-                if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
-                    request.session["usertype"] = "admin"
-                    request.session["userRoles"] = ["semper-admin"]
-        
-        # now gather roles from organization if the user is in one
+          
+        # gather roles from organization if the user is in one
         if "org_id" in request.session["user"]["userinfo"]:
             resultDict = retrieveRolesAndPermissionsForMemberOfOrganization(request.session)
             if isinstance(resultDict, Exception):
@@ -270,6 +264,12 @@ def setRoleAndPermissionsOfUser(request):
 
         request.session["userRoles"] = resultDict["roles"]
         request.session["userPermissions"] = {x["permission_name"]: "" for x in resultDict["permissions"] } # save only the permission names, the dict is for faster access
+
+        # check if person is admin, global role so check works differently
+        if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
+            if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
+                if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
+                    request.session["usertype"] = "admin"
 
         return True
     except Exception as e:
@@ -297,6 +297,16 @@ def callbackLogin(request):
         else:
             token = auth0.authorizeToken(request)
 
+        # email of user was not verified yet, tell them that!
+        if token["userinfo"]["email_verified"] == False:
+            if settings.PRODUCTION:
+                forward_url = 'https://www.semper-ki.org'
+            elif settings.DEVELOPMENT:
+                forward_url = 'https://dev.semper-ki.org'
+            else:
+                forward_url = 'http://127.0.0.1:3000'
+            return HttpResponseRedirect(forward_url+"/verifyLogin", status=401)
+
         # convert expiration time to the corresponding date and time
         now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
         request.session["user"] = token
@@ -315,7 +325,10 @@ def callbackLogin(request):
             if orgaObj == None:
                 raise Exception("Organisation could not be found or created!")
 
-        request.session["pgProfileClass"].addUserIfNotExists(request.session, orgaObj)
+        userObj = request.session["pgProfileClass"].addUserIfNotExists(request.session, orgaObj)
+        if isinstance(userObj, Exception):
+            raise userObj
+        
             
         logger.info(f"{request.session['user']['userinfo']['nickname']} logged in at " + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
@@ -323,23 +336,6 @@ def callbackLogin(request):
         returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
         returnObj.write(str(e))
         return returnObj
-    
-#######################################################
-@basics.checkIfUserIsLoggedIn(json=True)
-@require_http_methods(["GET"])
-def getAuthInformation(request):
-    """
-    Return details about user after login. 
-    Accesses the database and creates or gets user.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: User details
-    :rtype: Json
-
-    """
-    # Read user details from Database
-    return JsonResponse(request.session["pgProfileClass"].getUser(request.session))
 
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)

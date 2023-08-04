@@ -81,3 +81,11 @@ class Organization(models.Model):
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
+
+    ###################################################
+    def __str__(self):
+        return self.hashedID + " " + self.name + " " + json.dumps(self.details) + " " + "canManufacturer: " + str(self.canManufacture) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
+
+    ###################################################
+    def toDict(self):
+        return {"hashedID": self.hashedID, "name": self.name, "details": json.dumps(self.details), "canManufacturer": self.canManufacture, "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}

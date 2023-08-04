@@ -702,3 +702,77 @@ def organisations_getPermissionsForRole(request):
             return HttpResponse("Failed - " + str(e), status=429)
         else:
             return HttpResponse("Failed - " + str(e), status=500)
+
+#######################################################
+@checkIfUserIsLoggedIn
+@require_http_methods(["POST"])
+def organisations_createNewOrganisation(request):
+    """
+    Create a new organisation, create an admin role, invite a person via email as admin.
+    All via Auth0s API.
+
+    :param request: request with content as json
+    :type request: HTTP POST
+    :return: Successfull or not
+    :rtype: HTTPResponse
+    """    
+
+    try:
+        content = json.loads(request.body.decode("utf-8"))["data"]
+
+        auth0.apiToken.checkIfExpired()
+        headers = {
+            'authorization': f'Bearer {auth0.apiToken.accessToken}',
+            'content-Type': 'application/json',
+            "Cache-Control": "no-cache"
+        }
+        baseURL = f"https://{settings.AUTH0_DOMAIN}"
+
+        # create organisation
+        data = { "name": content["content"]["name"], 
+                "display_name": content["content"]["display_name"], 
+                "branding":
+                    { "logo_url": content["content"]["logo_url"], 
+                     "colors": 
+                     { "primary": content["content"]["primary_color"], 
+                        "page_background": content["content"]["background_color"] }
+                    },
+                "metadata": content["content"]["metadata"],
+                "enabled_connections": [ { "connection_id": "con_t6i9YJzm5KLo4Jlf", "assign_membership_on_login": False } ] }
+
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations', headers=headers, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        
+        org_id = response["id"]
+        
+        # create admin role
+        roleName = content["content"]["name"] + "-" + "admin"
+        roleDescription = "admin"
+
+        data = { "name": roleName, "description": roleDescription}
+        response = handleTooManyRequestsError( lambda: requests.post(f'{baseURL}/api/v2/roles', headers=headers, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        roleID = response["id"]
+
+        # invite person to organisation as admin
+        email = content["content"]["email"]
+
+        data = { "inviter": { "name": "Semper-KI" }, "invitee": { "email": email }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "roles": [ roleID ], "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
+        
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{org_id}/invitations', headers=headers, json=data))
+        if isinstance(response, Exception):
+            raise response
+        
+        logger.info(f"Semper-KI created organisation {content['content']['name']} and invited the user {email} at " + str(datetime.datetime.now()))
+        
+        return HttpResponse("Success", status=200)
+    
+    except Exception as e:
+        print(f'Generic Exception: {e}')
+        if "many requests" in e.args[0]:
+            return HttpResponse("Failed - " + str(e), status=429)
+        else:
+            return HttpResponse("Failed - " + str(e), status=500)    
+

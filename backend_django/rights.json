@@ -56,12 +56,22 @@
       {
          "permission": {
             "context": "orga",
+            "permission": "delete"
+         },
+         "elements": [
+         ],
+         "paths": [
+            "deleteOrganisation"
+         ]
+      },
+      {
+         "permission": {
+            "context": "orga",
             "permission": "edit"
          },
          "elements": [
             "OrganizationRoles",
-            "ButtonChangeRole",
-            "updateDetailsOfOrganisation"
+            "ButtonChangeRole"
          ],
          "paths": [
             "organisations_setPermissionsForRole",
@@ -72,7 +82,8 @@
             "organisations_createRole",
             "organisations_deleteUser",
             "organisations_addUser",
-            "organisations_getInviteLink"
+            "organisations_getInviteLink",
+            "updateDetailsOfOrganisation"
          ]
       },
       {

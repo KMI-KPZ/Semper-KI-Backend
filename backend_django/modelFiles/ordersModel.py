@@ -48,6 +48,7 @@ class Orders(models.Model):
     userOrders = models.JSONField()
     status = models.IntegerField()
     userCommunication = models.JSONField()
+    details = models.JSONField()
     files = models.JSONField()
     dates = models.JSONField()
     client = models.CharField(max_length=513)

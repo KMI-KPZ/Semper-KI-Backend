@@ -24,7 +24,7 @@ class ProfileManagementBase():
     @staticmethod
     def getUser(session):
         """
-        Check whether a user exists or not.
+        Check whether a user exists or not and retrieve entry.
 
         :param session: session
         :type session: Dictionary
@@ -36,6 +36,27 @@ class ProfileManagementBase():
         obj = {}
         try:
             obj = User.objects.get(subID=userID).toDict()
+        except (Exception) as error:
+            print(error)
+
+        return obj
+    
+    ##############################################
+    @staticmethod
+    def getOrganisation(session):
+        """
+        Check whether an organisation exists or not and retrieve information.
+
+        :param session: session
+        :type session: Dictionary
+        :return: Organisation details from database
+        :rtype: Dictionary
+
+        """
+        orgaID = session["user"]["userinfo"]["org_id"]
+        obj = {}
+        try:
+            obj = Organization.objects.get(subID=orgaID).toDict()
         except (Exception) as error:
             print(error)
 
@@ -124,7 +145,7 @@ class ProfileManagementBase():
 
     ##############################################
     @staticmethod
-    def deleteUser(session, uID=""):
+    def deleteUser(session, uHashedID=""):
         """
         Delete User.
 
@@ -134,18 +155,56 @@ class ProfileManagementBase():
         :rtype: Bool
 
         """
-        if uID != "":
-            userID = uID
-        else:
-            userID = session["user"]["userinfo"]["sub"]
-            
         try:
-            affected = User.objects.filter(subID=userID).delete()
+            if uHashedID != "":
+                affected = User.objects.filter(hashedID=uHashedID).delete()
+            else:
+                affected = User.objects.filter(subID=session["user"]["userinfo"]["sub"]).delete()
         except (Exception) as error:
             print(error)
             return False
         return True
     
+    ##############################################
+    @staticmethod
+    def deleteOrganisation(session, orgID=""):
+        """
+        Delete Organisation.
+
+        :param session: GET request session
+        :type session: Dictionary
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
+        try:
+            if orgID != "":
+                affected = Organization.objects.filter(hashedID=orgID).delete()
+            else:
+                affected = Organization.objects.filter(subID=session["user"]["userinfo"]["org_id"]).delete()
+            
+        except (Exception) as error:
+            print(error)
+            return False
+        return True
+    
+    ##############################################
+    @staticmethod
+    def getAll():
+        """
+        Get all Users and Organisations.
+
+        :return: Two arrays containing all entries
+        :rtype: List, List
+
+        """
+        userList = []
+        orgaList = []
+        for user in User.objects.all():
+            userList.append(user.toDict())
+        for orga in Organization.objects.all():
+            orgaList.append(orga.toDict())
+        return userList, orgaList
 
 ####################################################################################
 class ProfileManagementUser(ProfileManagementBase):
@@ -158,8 +217,10 @@ class ProfileManagementUser(ProfileManagementBase):
 
         :param session: POST request session
         :type session: Dictionary
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :param organization: Dummy object to comply to interface of function with same name from sister class
+        :type organization: None
+        :return: Information about the user. Necessary to check if database entry is equal to callback information
+        :rtype: User Object
 
         """
 
@@ -167,6 +228,9 @@ class ProfileManagementUser(ProfileManagementBase):
         try:
             # first get, then create
             result = User.objects.get(subID=userID)
+
+            return result
+
         except (ObjectDoesNotExist) as error:
             try:
                 userName = session["user"]["userinfo"]["nickname"]
@@ -178,11 +242,10 @@ class ProfileManagementUser(ProfileManagementBase):
                  
                 createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=["None"], details=details, updatedWhen=updated, lastSeen=lastSeen)
 
+                return createdUser
             except (Exception) as error:
                 print(error)
-                return False
-            pass
-        return True
+                return error
 
     ##############################################
     @staticmethod
@@ -238,8 +301,8 @@ class ProfileManagementOrganisation(ProfileManagementBase):
 
         :param session: POST request session
         :type session: Dictionary
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: User info for verification
+        :rtype: User object
 
         """
 
@@ -247,6 +310,7 @@ class ProfileManagementOrganisation(ProfileManagementBase):
         try:
             # first get, then create
             result = User.objects.get(subID=userID)
+            return result
         except (ObjectDoesNotExist) as error:
             try:
                 userName = session["user"]["userinfo"]["nickname"]
@@ -261,11 +325,10 @@ class ProfileManagementOrganisation(ProfileManagementBase):
                 if ProfileManagementOrganisation.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
                     raise Exception(f"User could not be added to organization!, {createdUser}, {organization}")
                 
+                return createdUser
             except (Exception) as error:
                 print(error)
-                return False
-            pass
-        return True
+                return error
 
     ##############################################
     @staticmethod
