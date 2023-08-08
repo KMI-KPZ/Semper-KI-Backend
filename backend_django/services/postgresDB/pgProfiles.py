@@ -268,6 +268,18 @@ class ProfileManagementUser(ProfileManagementBase):
             return False
         return True
     
+    ##############################################
+    @staticmethod
+    def getClientID(session):
+        """
+        Get ID of current client (can be organisation or user)
+        :param session: request session
+        :type session: dict
+        :return: hashed ID
+        :rtype: String
+
+        """
+        return ProfileManagementUser.getUserHashID(session)
 
 ####################################################################################
 class ProfileManagementOrganisation(ProfileManagementBase):
@@ -409,6 +421,18 @@ class ProfileManagementOrganisation(ProfileManagementBase):
             return False
         return True
 
+    ##############################################
+    @staticmethod
+    def getClientID(session):
+        """
+        Get ID of current client (can be organisation or user)
+        :param session: request session
+        :type session: dict
+        :return: hashed ID
+        :rtype: String
+
+        """
+        return ProfileManagementBase.getOrganisation(session).hashedID
 
 pgPBase = ProfileManagementBase()
 pgPUser = ProfileManagementUser()

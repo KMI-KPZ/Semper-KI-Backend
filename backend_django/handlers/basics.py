@@ -29,6 +29,24 @@ def checkIfTokenValid(token):
         return False
     return True
 
+#######################################################
+def manualCheckifLoggedIn(session):
+    """
+    Check whether a user is logged in or not.
+
+    :param session: Session of user
+    :type session: dict
+    :return: Response whether the user is logged in or not.
+    :rtype: Bool
+    """
+    if "user" in session:
+        if checkIfTokenValid(session["user"]):
+            return True
+        else:
+            return False
+    else:
+        return False
+
 #################### DECORATOR ###################################
 def checkIfUserIsLoggedIn(json=False):
     """

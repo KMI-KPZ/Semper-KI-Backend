@@ -21,43 +21,6 @@ from ..handlers.basics import checkIfUserIsLoggedIn
 from ..services import redis, mocks, crypto
 
 logger = logging.getLogger(__name__)
-#######################################################
-@require_http_methods(["POST"])
-def updateCart(request):
-    """
-    Save selection of user into session
-
-    :param request: json containing selection
-    :type request: JSON
-    :return: Response if saving worked or not
-    :rtype: HTTP Response
-
-    """
-    try:
-        selected = json.loads(request.body.decode("utf-8"))
-        request.session["selected"] = selected
-        return HttpResponse("Success")
-    except (Exception) as error:
-        print(error)
-        return HttpResponse("Failed",status=200)
-
-#######################################################
-@require_http_methods(["GET"])
-def getCart(request):
-    """
-    Retrieve selection from session
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: JSON cart
-    :rtype: JSON Response
-
-    """
-    if "selected" in request.session:
-        return JsonResponse(request.session["selected"])
-    else:
-        return JsonResponse({})
-
 ##############################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
@@ -197,42 +160,3 @@ def checkLogistics(request):
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
 
-
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"]) 
-def sendOrder(request):
-    """
-    Save order and send it to manufacturer
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: Response if sent successfully or not
-    :rtype: HTTP Response
-
-    """
-
-    try:
-        uID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-        selected = request.session["selected"]["cart"]
-        if request.session["isPartOfOrganization"]:
-            dictForEvents = pgOrders.OrderManagementOrganisation.addOrder(selected, request.session)
-        else:
-            dictForEvents = pgOrders.OrderManagementUser.addOrder(selected, request.session)
-        # Save picture and files in permanent storage
-
-
-        # send to websockets that are active, that a new message/status is available for that order
-        channel_layer = get_channel_layer()
-        for userID in dictForEvents:
-            values = dictForEvents[userID]
-            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
-                    "type": "sendMessageJSON",
-                    "dict": values,
-                })
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
-        return HttpResponse("Success")
-    except (Exception) as error:
-        print(error)
-        return HttpResponse("Failed")

@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for cryptographics
 """
-import secrets, hashlib
+import secrets, hashlib, xxhash
 
 #######################################################
 def generateMD5(someString) -> str:
@@ -47,3 +47,26 @@ def generateSalt(size = 5) -> str:
     return secrets.token_hex(size)
 
 
+#######################################################
+def generateNoncryptographicHash(someString) -> str:
+    """
+    Convert string to hashed string
+
+    :param someString: String that shall be hashed
+    :type someString: string
+    :return: string containing the hash
+    :rtype: string
+
+    """
+    return xxhash.xxh128_hexdigest(someString.encode())
+
+#######################################################
+def generateURLFriendlyRandomString() -> str:
+    """
+    Generate random string
+
+    :return: random string
+    :rtype: string
+
+    """
+    return secrets.token_urlsafe(32)
