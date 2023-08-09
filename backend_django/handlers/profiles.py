@@ -160,7 +160,9 @@ def getUserDetails(request):
 
     """
     # Read user details from Database
-    return JsonResponse(pgProfiles.ProfileManagementBase.getUser(request.session))
+    userObj = pgProfiles.ProfileManagementBase.getUser(request.session)
+    userObj["usertype"] = request.session["usertype"]
+    return JsonResponse(userObj)
 
 ##############################################
 @basics.checkIfUserIsLoggedIn()
