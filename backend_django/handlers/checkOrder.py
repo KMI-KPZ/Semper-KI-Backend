@@ -36,7 +36,7 @@ def getManufacturers(request):
     """
 
     manufacturerList = []
-    listOfAllManufacturers = pgProfiles.ProfileManagementOrganisation.getAllManufacturers()
+    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllManufacturers()
     # TODO Check suitability
 
     # remove unnecessary information and add identifier

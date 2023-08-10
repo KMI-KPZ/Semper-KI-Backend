@@ -84,48 +84,48 @@ def updateOrder(request):
     logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated order {orderID} at " + str(datetime.now()))
     return HttpResponse("Success")
 
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["DELETE"])
-@checkIfRightsAreSufficient(json=False)
-def deleteOrder(request):
-    """
-    Delete a specific order.
+# #######################################################
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["DELETE"])
+# @checkIfRightsAreSufficient(json=False)
+# def deleteOrder(request):
+#     """
+#     Delete a specific order.
 
-    :param request: DELETE Request
-    :type request: HTTP DELETE
-    :return: HTTP Response if update worked
-    :rtype: HTTP Response
+#     :param request: DELETE Request
+#     :type request: HTTP DELETE
+#     :return: HTTP Response if update worked
+#     :rtype: HTTP Response
 
-    """
+#     """
 
-    content = json.loads(request.body.decode("utf-8"))
-    if pgOrders.OrderManagementBase.deleteOrder(content["id"]):
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted order {content['id']} at " + str(datetime.now()))
-        return HttpResponse("Success")
-    else:
-        return HttpResponse("Failed")
+#     content = json.loads(request.body.decode("utf-8"))
+#     if pgOrders.OrderManagementBase.deleteOrder(content["id"]):
+#         logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted order {content['id']} at " + str(datetime.now()))
+#         return HttpResponse("Success")
+#     else:
+#         return HttpResponse("Failed")
 
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["DELETE"])
-@checkIfRightsAreSufficient(json=False)
-def deleteOrderCollection(request):
-    """
-    Delete a specific order collection.
+# #######################################################
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["DELETE"])
+# @checkIfRightsAreSufficient(json=False)
+# def deleteOrderCollection(request):
+#     """
+#     Delete a specific order collection.
 
-    :param request: DELETE Request
-    :type request: HTTP DELETE
-    :return: HTTP Response if update worked
-    :rtype: HTTP Response
+#     :param request: DELETE Request
+#     :type request: HTTP DELETE
+#     :return: HTTP Response if update worked
+#     :rtype: HTTP Response
 
-    """
-    content = json.loads(request.body.decode("utf-8"))
-    if pgOrders.OrderManagementBase.deleteOrderCollection(content["id"]):
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted orderCollection {content['id']} at " + str(datetime.now()))
-        return HttpResponse("Success")
-    else:
-        return HttpResponse("Failed")
+#     """
+#     content = json.loads(request.body.decode("utf-8"))
+#     if pgOrders.OrderManagementBase.deleteOrderCollection(content["id"]):
+#         logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted orderCollection {content['id']} at " + str(datetime.now()))
+#         return HttpResponse("Success")
+#     else:
+#         return HttpResponse("Failed")
     
 
 #######################################################

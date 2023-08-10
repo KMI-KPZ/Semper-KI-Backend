@@ -31,8 +31,8 @@ def sessionModifierMiddleware(get_response):
             session = await sync_to_async(getSession)(request)
             if "isPartOfOrganization" in session:
                 if request.session["isPartOfOrganization"]:
-                    session["pgProfileClass"] = pgProfiles.pgPOrganisation
-                    session["pgOrderClass"] = pgOrders.pgOOrganisation
+                    session["pgProfileClass"] = pgProfiles.pgPOrganization
+                    session["pgOrderClass"] = pgOrders.pgOOrganization
                 else:
                     session["pgProfileClass"] = pgProfiles.pgPUser
                     session["pgOrderClass"] = pgOrders.pgOUser
@@ -52,8 +52,8 @@ def sessionModifierMiddleware(get_response):
             # What shall happen before other middleware
             if "isPartOfOrganization" in request.session:
                 if request.session["isPartOfOrganization"]:
-                    request.session["pgProfileClass"] = pgProfiles.pgPOrganisation
-                    request.session["pgOrderClass"] = pgOrders.pgOOrganisation
+                    request.session["pgProfileClass"] = pgProfiles.pgPOrganization
+                    request.session["pgOrderClass"] = pgOrders.pgOOrganization
                 else:
                     request.session["pgProfileClass"] = pgProfiles.pgPUser
                     request.session["pgOrderClass"] = pgOrders.pgOUser

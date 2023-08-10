@@ -128,7 +128,7 @@ def createOrderID(request, orderCollectionID):
     # generate ID, timestamp and template for sub order
     orderID = crypto.generateURLFriendlyRandomString()
     now = timezone.now()
-    template = {"subOrderID": orderID, "contractor": "", "state": 0, "created": str(now), "updated": str(now), "files": [], "details": {}, "chat": [], "service": {}}
+    template = {"subOrderID": orderID, "contractor": [], "state": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "chat": {"messages": []}, "service": {}}
     
     # save into respective order collection
     request.session["currentOrder"][orderCollectionID]["subOrders"][orderID] = template
@@ -211,7 +211,7 @@ def sendOrder(request):
         uID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         selected = request.session["currentOrder"]["cart"]
         if request.session["isPartOfOrganization"]:
-            dictForEvents = pgOrders.OrderManagementOrganisation.addOrder(selected, request.session)
+            dictForEvents = pgOrders.OrderManagementOrganization.addOrder(selected, request.session)
         else:
             dictForEvents = pgOrders.OrderManagementUser.addOrder(selected, request.session)
         # Save picture and files in permanent storage
@@ -244,19 +244,31 @@ def getFlatOrders(request):
     :rtype: JSON Response
 
     """
-    # TODO db
-    outDict = {"orders": []}
-    for entry in request.session["currentOrder"]:
-        tempDict = {}
-        tempDict["orderID"] = request.session["currentOrder"][entry]["orderID"]
-        tempDict["client"] = request.session["currentOrder"][entry]["client"]
-        tempDict["state"] =  request.session["currentOrder"][entry]["state"]
-        tempDict["created"] = request.session["currentOrder"][entry]["created"]
-        tempDict["updated"] = request.session["currentOrder"][entry]["updated"]
-        tempDict["subOrderCount"] = len(request.session["currentOrder"][entry]["subOrders"])
-        outDict["orders"].append(tempDict)
+    try:
+        outDict = {"orders": []}
+        # From session
+        if "currentOrder" in request.session:
+            for entry in request.session["currentOrder"]:
+                tempDict = {}
+                tempDict["orderID"] = request.session["currentOrder"][entry]["orderID"]
+                tempDict["client"] = request.session["currentOrder"][entry]["client"]
+                tempDict["state"] =  request.session["currentOrder"][entry]["state"]
+                tempDict["created"] = request.session["currentOrder"][entry]["created"]
+                tempDict["updated"] = request.session["currentOrder"][entry]["updated"]
+                tempDict["subOrderCount"] = len(request.session["currentOrder"][entry]["subOrders"])
+                outDict["orders"].append(tempDict)
+        
+        # From Database
+        objFromDB = request.session["pgOrderClass"].getOrdersFlat(request.session)
+        if len(objFromDB) > 1:
+            outDict["orders"].extend(objFromDB)
+
+        return JsonResponse(outDict)
     
-    return JsonResponse(outDict)
+    except (Exception) as error:
+        print(error)
+        
+    return JsonResponse({"orders": []})
 
 #######################################################
 @require_http_methods(["GET"]) 
@@ -268,19 +280,29 @@ def getOrder(request, orderCollectionID):
     :type request: HTTP GET
     :param orderCollectionID: id of the order collection
     :type orderCollectionID: str
-    :return: Response with list
+    :return: Response with dict
     :rtype: JSON Response
 
     """
-    # TODO db
-    outDict = {}
-    outDict["orderID"] = request.session["currentOrder"][orderCollectionID]["orderID"]
-    outDict["client"] = request.session["currentOrder"][orderCollectionID]["client"]
-    outDict["state"] =  request.session["currentOrder"][orderCollectionID]["state"]
-    outDict["created"] = request.session["currentOrder"][orderCollectionID]["created"]
-    outDict["updated"] = request.session["currentOrder"][orderCollectionID]["updated"]
-    outDict["subOrders"] = []
-    for elem in request.session["currentOrder"][orderCollectionID]["subOrders"]:
-        outDict["subOrders"].append(request.session["currentOrder"][orderCollectionID]["subOrders"][elem])
-    
-    return JsonResponse(outDict)
+    try:
+        outDict = {}
+        if "currentOrder" in request.session["currentOrder"]:
+            if orderCollectionID in request.session["currentOrder"][orderCollectionID]:
+                outDict["orderID"] = request.session["currentOrder"][orderCollectionID]["orderID"]
+                outDict["client"] = request.session["currentOrder"][orderCollectionID]["client"]
+                outDict["state"] =  request.session["currentOrder"][orderCollectionID]["state"]
+                outDict["created"] = request.session["currentOrder"][orderCollectionID]["created"]
+                outDict["updated"] = request.session["currentOrder"][orderCollectionID]["updated"]
+                outDict["subOrders"] = []
+                for elem in request.session["currentOrder"][orderCollectionID]["subOrders"]:
+                    outDict["subOrders"].append(request.session["currentOrder"][orderCollectionID]["subOrders"][elem])
+                return JsonResponse(outDict)
+        
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getOrder"):
+            return JsonResponse(pgOrders.OrderManagementBase.getOrder(orderCollectionID))
+
+        return JsonResponse(outDict)
+    except (Exception) as error:
+            print(error)
+    return JsonResponse({})
+

@@ -75,6 +75,52 @@ class OrderManagementBase():
 
     ##############################################
     @staticmethod
+    def getOrder(orderCollectionID):
+        """
+        Get info about one order collection.
+
+        :param orderCollectionID: ID of the order collection
+        :type orderCollectionID: str
+        :return: dict with info about that order collection
+        :rtype: dict
+
+        """
+        try:
+            # get order collection
+            orderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+
+            output = {}
+            
+            output["orderID"] = orderCollection.orderCollectionID
+            output["created"] = str(orderCollection.createdWhen)
+            output["updated"] = str(orderCollection.updatedWhen)
+            output["client"] = orderCollection.client
+            output["state"] = orderCollection.status
+            ordersOfThatCollection = []
+            for entry in orderCollection.orders.all():
+                currentOrder = {}
+                currentOrder["client"] = entry.client
+                currentOrder["subOrderID"] = entry.orderID
+                currentOrder["contractor"] = entry.contractor
+                currentOrder["service"] = entry.userOrders
+                currentOrder["state"] = entry.status
+                currentOrder["created"] = str(entry.createdWhen)
+                currentOrder["updated"] = str(entry.updatedWhen)
+                currentOrder["chat"] = entry.userCommunication
+                currentOrder["details"] = entry.details
+                currentOrder["files"] = entry.files
+                ordersOfThatCollection.append(currentOrder)
+            output["subOrders"] = ordersOfThatCollection
+            
+            return output
+
+        except (Exception) as error:
+            print(error)
+        
+        return {}
+
+    ##############################################
+    @staticmethod
     def getAllUsersOfOrder(orderID):
         """
         Get all users that are connected to that orderID.
@@ -225,6 +271,7 @@ class OrderManagementUser(OrderManagementBase):
         :rtype: Dict
 
         """
+        #TODO
         now = timezone.now()
         try:
             # outputList for events
@@ -251,9 +298,9 @@ class OrderManagementUser(OrderManagementBase):
                 status = 0
                 userCommunication = {"messages": []}
                 if len(uploadedFiles) != 0:
-                    files = [uploadedFiles[idx]]
+                    files = {"files": [uploadedFiles[idx]]}
                 else:
-                    files = []
+                    files = {"files": []}
                 dates = {"created": str(now), "updated": str(now)}
                 details = {}
                 ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
@@ -275,7 +322,7 @@ class OrderManagementUser(OrderManagementBase):
         except (Exception) as error:
             print(error)
             return {}
-        
+
     ##############################################
     @staticmethod
     def getOrders(session):
@@ -284,7 +331,7 @@ class OrderManagementUser(OrderManagementBase):
 
         :param session: session of that user
         :type session: dict
-        :return: sorted list with all jsons (orders, status, communication, files)
+        :return: sorted list with all orders
         :rtype: list
 
         """
@@ -297,41 +344,77 @@ class OrderManagementUser(OrderManagementBase):
             
             for orderCollection in orderCollections:
                 currentOrderCollection = {}
-                currentOrderCollection["id"] = orderCollection.orderCollectionID
-                currentOrderCollection["date"] = str(orderCollection.createdWhen)
+                currentOrderCollection["orderID"] = orderCollection.orderCollectionID
+                currentOrderCollection["created"] = str(orderCollection.createdWhen)
+                currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
+                currentOrderCollection["client"] = orderCollection.client
                 currentOrderCollection["state"] = orderCollection.status
                 ordersOfThatCollection = []
                 for entry in orderCollection.orders.all():
                     currentOrder = {}
-                    currentOrder["id"] = entry.orderID
-                    currentOrder["item"] = entry.userOrders
-                    currentOrder["orderState"] = entry.status
+                    currentOrder["client"] = entry.client
+                    currentOrder["subOrderID"] = entry.orderID
+                    currentOrder["contractor"] = entry.contractor
+                    currentOrder["service"] = entry.userOrders
+                    currentOrder["state"] = entry.status
+                    currentOrder["created"] = str(entry.createdWhen)
+                    currentOrder["updated"] = str(entry.updatedWhen)
                     currentOrder["chat"] = entry.userCommunication
                     currentOrder["details"] = entry.details
-                    filesOutput = []
-                    if len(entry.files) != 0:
-                        for elem in entry.files:
-                            filesOutput.append(elem["filename"])
-                    currentOrder["files"] = filesOutput
-                    currentOrder["updatedWhen"] = entry.updatedWhen
-                    currentOrder["createdWhen"] = entry.createdWhen
-                    #currentOrder["dates"] = json.dumps(entry.dates)
+                    currentOrder["files"] = entry.files
                     ordersOfThatCollection.append(currentOrder)
-                currentOrderCollection["orders"] = ordersOfThatCollection
+                currentOrderCollection["subOrders"] = ordersOfThatCollection
                 output.append(currentOrderCollection)
             output = sorted(output, key=lambda x: 
                    timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
-            #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
+
         except (Exception) as error:
             print(error)
         
         return []
     
+    ##############################################
+    @staticmethod
+    def getOrdersFlat(session):
+        """
+        Get all orders for that user but with limited detail.
+
+        :param session: session of that user
+        :type session: dict
+        :return: sorted list with orders
+        :rtype: list
+
+        """
+        try:
+            # get user
+            currentUser = User.objects.get(subID=session["user"]["userinfo"]["sub"])
+            orderCollections = currentUser.orders.all()
+            # get associated OrderCollections
+            output = []
+            
+            for orderCollection in orderCollections:
+                currentOrderCollection = {}
+                currentOrderCollection["orderID"] = orderCollection.orderCollectionID
+                currentOrderCollection["created"] = str(orderCollection.createdWhen)
+                currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
+                currentOrderCollection["state"] = orderCollection.status
+                currentOrderCollection["client"] = orderCollection.client
+                currentOrderCollection["subOrderCount"] = len(orderCollection.orders.all())
+                    
+                output.append(currentOrderCollection)
+            output = sorted(output, key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+            return output
+
+        except (Exception) as error:
+            print(error)
+        
+        return []
 
 ####################################################################################
-# Orders from and for Organisations
-class OrderManagementOrganisation(OrderManagementBase):
+# Orders from and for Organizations
+class OrderManagementOrganization(OrderManagementBase):
 
     ##############################################
     @staticmethod
@@ -349,6 +432,7 @@ class OrderManagementOrganisation(OrderManagementBase):
         :rtype: Dict
 
         """
+        #TODO
         now = timezone.now()
         try:
             # outputList for events
@@ -375,9 +459,9 @@ class OrderManagementOrganisation(OrderManagementBase):
                 status = 0
                 userCommunication = {"messages": []}
                 if len(uploadedFiles) != 0:
-                    files = [uploadedFiles[idx]]
+                    files = {"files": [uploadedFiles[idx]]}
                 else:
-                    files = []
+                    files = {"files": []}
                 dates = {"created": str(now), "updated": str(now)}
                 details = {}
                 ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
@@ -399,12 +483,12 @@ class OrderManagementOrganisation(OrderManagementBase):
         except (Exception) as error:
             print(error)
             return {}
-        
+    
     ##############################################
     @staticmethod
     def getOrders(session):
         """
-        Get all orders for that user.
+        Get all orders for that organisation.
 
         :param session: session of that user
         :type session: dict
@@ -422,28 +506,26 @@ class OrderManagementOrganisation(OrderManagementBase):
             
             for orderCollection in orderCollections:
                 currentOrderCollection = {}
-                currentOrderCollection["id"] = orderCollection.orderCollectionID
-                currentOrderCollection["date"] = str(orderCollection.createdWhen)
+                currentOrderCollection["orderID"] = orderCollection.orderCollectionID
+                currentOrderCollection["created"] = str(orderCollection.createdWhen)
+                currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
                 currentOrderCollection["state"] = orderCollection.status
-                currentOrderCollection["receivedOrSubmitted"] = "submitted"
+                currentOrderCollection["client"] = orderCollection.client
                 ordersOfThatCollection = []
                 for entry in orderCollection.orders.all():
                     currentOrder = {}
-                    currentOrder["id"] = entry.orderID
-                    currentOrder["item"] = entry.userOrders
-                    currentOrder["orderState"] = entry.status
+                    currentOrder["subOrderID"] = entry.orderID
+                    currentOrder["contractor"] = entry.contractor
+                    currentOrder["client"] = entry.client
+                    currentOrder["service"] = entry.userOrders
+                    currentOrder["state"] = entry.status
+                    currentOrder["created"] = str(entry.createdWhen)
+                    currentOrder["updated"] = str(entry.updatedWhen)
                     currentOrder["chat"] = entry.userCommunication
                     currentOrder["details"] = entry.details
-                    filesOutput = []
-                    if len(entry.files) != 0:
-                        for elem in entry.files:
-                            filesOutput.append(elem["filename"])
-                    currentOrder["files"] = filesOutput
-                    currentOrder["updatedWhen"] = entry.updatedWhen
-                    currentOrder["createdWhen"] = entry.createdWhen
-                    #currentOrder["dates"] = json.dumps(entry.dates)
+                    currentOrder["files"] = entry.files
                     ordersOfThatCollection.append(currentOrder)
-                currentOrderCollection["orders"] = ordersOfThatCollection
+                currentOrderCollection["subOrders"] = ordersOfThatCollection
                 output.append(currentOrderCollection)
 
             # get received orders
@@ -454,23 +536,77 @@ class OrderManagementOrganisation(OrderManagementBase):
                 orderCollection = orderEntry.orderCollectionKey
 
                 if orderCollection.orderCollectionID not in receivedOrdersCollections:
-                    receivedOrdersCollections[orderCollection.orderCollectionID] = {"id": orderCollection.orderCollectionID,"date": str(orderCollection.createdWhen), "state": orderCollection.status, "receivedOrSubmitted": "received", "orders": []}
+                    receivedOrdersCollections[orderCollection.orderCollectionID] = {"orderID": orderCollection.orderCollectionID, "client": orderCollection.client, "created": str(orderCollection.createdWhen), "updated": str(orderCollection.updatedWhen), "state": orderCollection.status, "subOrders": []}
 
                 currentOrder = {}
-                currentOrder["id"] = orderEntry.orderID
-                currentOrder["item"] = orderEntry.userOrders
-                currentOrder["orderState"] = orderEntry.status
+                currentOrder["subOrderID"] = orderEntry.orderID
+                currentOrder["contractor"] = orderEntry.contractor
+                currentOrder["client"] = orderEntry.client
+                currentOrder["service"] = orderEntry.userOrders
+                currentOrder["state"] = orderEntry.status
+                currentOrder["created"] = str(orderEntry.createdWhen)
+                currentOrder["updated"] = str(orderEntry.updatedWhen)
                 currentOrder["chat"] = orderEntry.userCommunication
                 currentOrder["details"] = orderEntry.details
-                filesOutput = []
-                if len(orderEntry.files) != 0:
-                    for elem in orderEntry.files:
-                        filesOutput.append(elem["filename"])
-                currentOrder["files"] = filesOutput
-                currentOrder["updatedWhen"] = orderEntry.updatedWhen
-                currentOrder["createdWhen"] = orderEntry.createdWhen
+                currentOrder["files"] = orderEntry.files
 
                 receivedOrdersCollections[orderCollection.orderCollectionID]["orders"].append(currentOrder)
+            
+            # after collection the order collections and their orders, we need to add them to the output
+            for orderCollection in receivedOrdersCollections:
+                output.append(orderCollection)
+
+
+            output = sorted(output, key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+            return output
+            #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
+        except (Exception) as error:
+            print(error)
+        
+        return []
+    
+    ##############################################
+    @staticmethod
+    def getOrdersFlat(session):
+        """
+        Get all orders for that organisation with little information.
+
+        :param session: session of that user
+        :type session: dict
+        :return: sorted list 
+        :rtype: list
+
+        """
+        try:
+            # get organisation
+            currentUser = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
+            orderCollections = currentUser.ordersSubmitted.all()
+
+            # get associated OrderCollections for submitted orders
+            output = []
+            
+            for orderCollection in orderCollections:
+                currentOrderCollection = {}
+                currentOrderCollection["orderID"] = orderCollection.orderCollectionID
+                currentOrderCollection["created"] = str(orderCollection.createdWhen)
+                currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
+                currentOrderCollection["state"] = orderCollection.status
+                currentOrderCollection["client"] = orderCollection.client
+                currentOrderCollection["subOrderCount"] = len(list(orderCollection.orders.all()))
+
+                output.append(currentOrderCollection)
+
+            # get received orders
+            receivedOrders = currentUser.ordersReceived.all()
+            # since multiple orders could have been received within the same Order Collection, we need to collect those
+            receivedOrdersCollections = {}
+            for orderEntry in receivedOrders:
+                orderCollection = orderEntry.orderCollectionKey
+
+                if orderCollection.orderCollectionID not in receivedOrdersCollections:
+                    receivedOrdersCollections[orderCollection.orderCollectionID] = {"orderID": orderCollection.orderCollectionID, "client": orderCollection.client, "created": str(orderCollection.createdWhen), "updated": str(orderCollection.updatedWhen), "state": orderCollection.status, "subOrderCount": 0}
+                receivedOrdersCollections[orderCollection.orderCollectionID]["subOrderCount"] += 1
             
             # after collection the order collections and their orders, we need to add them to the output
             for orderCollection in receivedOrdersCollections:
@@ -489,4 +625,4 @@ class OrderManagementOrganisation(OrderManagementBase):
 
 pgOBase = OrderManagementBase()
 pgOUser = OrderManagementUser()
-pgOOrganisation = OrderManagementOrganisation()
+pgOOrganization = OrderManagementOrganization()

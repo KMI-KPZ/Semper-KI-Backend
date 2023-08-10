@@ -60,24 +60,24 @@ logger = logging.getLogger(__name__)
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
-def getOrganisationDetails(request):
+def getOrganizationDetails(request):
     """
     Return details about organisation. 
 
     :param request: GET request
     :type request: HTTP GET
-    :return: Organisation details
+    :return: Organization details
     :rtype: Json
 
     """
     # Read organisation details from Database
-    return JsonResponse(pgProfiles.ProfileManagementBase.getOrganisation(request.session))
+    return JsonResponse(pgProfiles.ProfileManagementBase.getOrganization(request.session))
 
 ##############################################
 @basics.checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"])
 @basics.checkIfRightsAreSufficient()
-def updateDetailsOfOrganisation(request):
+def updateDetailsOfOrganization(request):
     """
     Update details of organisation of that user.
 
@@ -90,7 +90,7 @@ def updateDetailsOfOrganisation(request):
 
     content = json.loads(request.body.decode("utf-8"))
     logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organisation to {content['details']} at " + str(datetime.datetime.now()))
-    flag = pgProfiles.ProfileManagementOrganisation.updateDetails(request.session, content["details"])
+    flag = pgProfiles.ProfileManagementOrganization.updateDetails(request.session, content["details"])
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -100,7 +100,7 @@ def updateDetailsOfOrganisation(request):
 @basics.checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
 @basics.checkIfRightsAreSufficient()
-def deleteOrganisation(request):
+def deleteOrganization(request):
     """
     Deletes an entry in the database corresponding to user name.
 
@@ -110,8 +110,8 @@ def deleteOrganisation(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted organisation {pgProfiles.ProfileManagementOrganisation.getOrganisation(request.session)['name']} at " + str(datetime.datetime.now()))
-    flag = pgProfiles.ProfileManagementBase.deleteOrganisation(request.session)
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted organisation {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']} at " + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -120,7 +120,7 @@ def deleteOrganisation(request):
 ##############################################
 @basics.checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
-def deleteOrganisationAsAdmin(request):
+def deleteOrganizationAsAdmin(request):
     """
     Deletes an entry in the database corresponding to orga id.
 
@@ -135,7 +135,7 @@ def deleteOrganisationAsAdmin(request):
         orgaID = content["hashedID"]
         orgaName = content["name"]
 
-        flag = pgProfiles.ProfileManagementBase.deleteOrganisation(request.session, orgaID)
+        flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session, orgaID)
         if flag is True:
             logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted organisation {orgaName} at " + str(datetime.datetime.now()))
             return HttpResponse("Worked")

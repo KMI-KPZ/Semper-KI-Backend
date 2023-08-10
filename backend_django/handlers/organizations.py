@@ -706,7 +706,7 @@ def organisations_getPermissionsForRole(request):
 #######################################################
 @checkIfUserIsLoggedIn
 @require_http_methods(["POST"])
-def organisations_createNewOrganisation(request):
+def organisations_createNewOrganization(request):
     """
     Create a new organisation, create an admin role, invite a person via email as admin.
     All via Auth0s API.

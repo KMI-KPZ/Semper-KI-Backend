@@ -6,11 +6,13 @@
             "permission": "read"
          },
          "elements": [
-            "Orders"
+            "Orders",
+            "HomeAuthorizedOrder"
          ],
          "paths": [
             "retrieveOrders",
-            "getMissedEvents"
+            "getMissedEvents",
+            "getOrder"
          ]
       },
       {
@@ -103,6 +105,7 @@
             "permission": "read"
          },
          "elements": [
+            "HomeAuthorizedOrganization",
             "Organization"
          ],
          "paths": [
@@ -118,7 +121,8 @@
             "permission": "read"
          },
          "elements": [
-            "Resouces"
+            "HomeAuthorizedResources",
+            "Resources"
          ],
          "paths": [
             "orga_getMaterials",

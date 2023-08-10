@@ -43,13 +43,13 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
-    def getOrganisation(session):
+    def getOrganization(session):
         """
         Check whether an organisation exists or not and retrieve information.
 
         :param session: session
         :type session: Dictionary
-        :return: Organisation details from database
+        :return: Organization details from database
         :rtype: Dictionary
 
         """
@@ -167,9 +167,9 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
-    def deleteOrganisation(session, orgID=""):
+    def deleteOrganization(session, orgID=""):
         """
-        Delete Organisation.
+        Delete Organization.
 
         :param session: GET request session
         :type session: Dictionary
@@ -192,7 +192,7 @@ class ProfileManagementBase():
     @staticmethod
     def getAll():
         """
-        Get all Users and Organisations.
+        Get all Users and Organizations.
 
         :return: Two arrays containing all entries
         :rtype: List, List
@@ -282,7 +282,7 @@ class ProfileManagementUser(ProfileManagementBase):
         return ProfileManagementUser.getUserHashID(session)
 
 ####################################################################################
-class ProfileManagementOrganisation(ProfileManagementBase):
+class ProfileManagementOrganization(ProfileManagementBase):
     
     ##############################################
     @staticmethod
@@ -334,7 +334,7 @@ class ProfileManagementOrganisation(ProfileManagementBase):
                  
 
                 createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=[organization.subID], details=details, updatedWhen=updated, lastSeen=lastSeen)
-                if ProfileManagementOrganisation.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
+                if ProfileManagementOrganization.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
                     raise Exception(f"User could not be added to organization!, {createdUser}, {organization}")
                 
                 return createdUser
@@ -432,8 +432,8 @@ class ProfileManagementOrganisation(ProfileManagementBase):
         :rtype: String
 
         """
-        return ProfileManagementBase.getOrganisation(session).hashedID
+        return ProfileManagementBase.getOrganization(session).hashedID
 
 pgPBase = ProfileManagementBase()
 pgPUser = ProfileManagementUser()
-pgPOrganisation = ProfileManagementOrganisation()
+pgPOrganization = ProfileManagementOrganization()

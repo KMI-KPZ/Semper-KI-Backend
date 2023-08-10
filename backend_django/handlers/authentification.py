@@ -321,9 +321,9 @@ def callbackLogin(request):
         # Get Data from Database or create entry in it for logged in User
         orgaObj = None
         if request.session["isPartOfOrganization"]:
-            orgaObj = pgProfiles.ProfileManagementOrganisation.addOrGetOrganization(request.session)
+            orgaObj = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
             if orgaObj == None:
-                raise Exception("Organisation could not be found or created!")
+                raise Exception("Organization could not be found or created!")
 
         userObj = request.session["pgProfileClass"].addUserIfNotExists(request.session, orgaObj)
         if isinstance(userObj, Exception):

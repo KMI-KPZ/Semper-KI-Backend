@@ -147,7 +147,7 @@ class ManageAPIToken:
 apiToken = ManageAPIToken()
 
 #######################################################
-# def retrieveOrganisationName(org_id):
+# def retrieveOrganizationName(org_id):
 #     """
 #     Ask Auth0 API for name of an organisation
 

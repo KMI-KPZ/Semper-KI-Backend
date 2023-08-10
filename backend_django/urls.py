@@ -79,14 +79,14 @@ paths = {
     "addUser": "private/profile_addUser/",
     "getUserTest": "private/profile_getUser/",
     "getUser": "public/getUser/",
-    "getOrganisation": "public/getOrganisation/",
+    "getOrganization": "public/getOrganization/",
     "updateDetails": "public/updateUserDetails/",
-    "updateDetailsOfOrga": "public/updateOrganisationDetails/",
-    "deleteOrganisation": "public/deleteOrganisation/",
+    "updateDetailsOfOrga": "public/updateOrganizationDetails/",
+    "deleteOrganization": "public/deleteOrganization/",
     
     "adminGetAll": "public/admin/getAll/",
     "adminDelete": "public/admin/deleteUser/",
-    "adminDeleteOrga": "public/admin/deleteOrganisation/",
+    "adminDeleteOrga": "public/admin/deleteOrganization/",
 
     "organisations_addUser": "public/organizations/addUser/",
     "organisations_getInviteLink": "public/organizations/getInviteLink/",
@@ -101,7 +101,7 @@ paths = {
     "organisations_getPermissions": "public/organizations/getPermissions/",
     "organisations_getPermissionsForRole": "public/organizations/getPermissionsForRole/",
     "organisations_setPermissionsForRole": "public/organizations/setPermissionsForRole/",
-    "organisations_createOrganisation": "public/organisations/createNew/",
+    "organisations_createOrganization": "public/organisations/createNew/",
 
     "isMagazineUp": "public/isMagazineUp/",
 
@@ -191,13 +191,13 @@ urlpatterns = [
     path(paths["updateDetails"], profiles.updateDetails, name="updateDetails"),
     #path(paths["updateRole"], profiles.updateRole, name="updateRole"),
     path(paths["getUser"], profiles.getUserDetails, name="getUserDetails"),
-    path(paths["getOrganisation"], profiles.getOrganisationDetails, name="getOrganisationDetails"),
-    path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganisation, name="updateDetailsOfOrganisation"),
-    path(paths["deleteOrganisation"], profiles.deleteOrganisation, name="deleteOrganisation"),
+    path(paths["getOrganization"], profiles.getOrganizationDetails, name="getOrganizationDetails"),
+    path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganization, name="updateDetailsOfOrganization"),
+    path(paths["deleteOrganization"], profiles.deleteOrganization, name="deleteOrganization"),
 
     path(paths["adminGetAll"], profiles.getAll, name="getAll"),
     path(paths["adminDelete"], profiles.deleteUserAsAdmin, name="deleteUserAsAdmin"),
-    path(paths["adminDeleteOrga"], profiles.deleteOrganisationAsAdmin, name="deleteOrganisationAsAdmin"),
+    path(paths["adminDeleteOrga"], profiles.deleteOrganizationAsAdmin, name="deleteOrganizationAsAdmin"),
 
     path(paths["organisations_addUser"], organizations.organisations_addUser, name="organisations_addUser"),
     path(paths["organisations_fetchUsers"], organizations.organisations_fetchUsers, name="organisations_fetchUsers"),
@@ -212,7 +212,7 @@ urlpatterns = [
     path(paths["organisations_removeRole"], organizations.organisations_removeRole, name="organisations_removeRole"),
     path(paths["organisations_editRole"], organizations.organisations_editRole, name="organisations_editRole"),
     path(paths["organisations_deleteRole"], organizations.organisations_deleteRole, name="organisations_deleteRole"),
-    path(paths["organisations_createOrganisation"], organizations.organisations_createNewOrganisation, name="organisations_createNewOrganisation"),
+    path(paths["organisations_createOrganization"], organizations.organisations_createNewOrganization, name="organisations_createNewOrganization"),
 
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 

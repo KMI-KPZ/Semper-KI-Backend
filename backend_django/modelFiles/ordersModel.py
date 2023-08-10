@@ -22,6 +22,7 @@ class OrderCollection(models.Model):
     """
     orderCollectionID = models.CharField(primary_key=True,max_length=513)
     status = models.IntegerField()
+    client = models.CharField(max_length=513)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
