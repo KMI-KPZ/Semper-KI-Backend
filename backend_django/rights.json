@@ -49,6 +49,17 @@
          ],
          "paths": [
             "updateOrder",
+            "updateOrderCollection"
+         ]
+      },
+      {
+         "permission": {
+            "context": "orders",
+            "permission": "delete"
+         },
+         "elements": [
+         ],
+         "paths": [
             "deleteOrder",
             "deleteOrderCollection"
          ]

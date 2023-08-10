@@ -42,10 +42,8 @@ def manualCheckifLoggedIn(session):
     if "user" in session:
         if checkIfTokenValid(session["user"]):
             return True
-        else:
-            return False
-    else:
-        return False
+
+    return False
 
 #################### DECORATOR ###################################
 def checkIfUserIsLoggedIn(json=False):
@@ -104,6 +102,25 @@ def handleTooManyRequestsError(callToAPI):
         return ""
     else:
         return response.json()
+
+#######################################################
+def manualCheckIfRightsAreSufficient(session, funcName):
+    """
+    Check whether a user has the permissions to do something.
+
+    :param session: Session of user
+    :type session: dict
+    :param funcName: The function that called this
+    :type funcName: str
+    :return: Response whether the user is logged in or not.
+    :rtype: Bool
+    """
+    if "user" in session:
+        if rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
+            return True
+
+    return False
+    
 
 #################### DECORATOR ###################################
 def checkIfRightsAreSufficient(json=False):

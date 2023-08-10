@@ -44,6 +44,30 @@ class OrderManagementBase():
         try:
             currentOrder = Orders.objects.get(orderID=orderID)
             return currentOrder
+        except (ObjectDoesNotExist) as error:
+            return None
+        except (Exception) as error:
+            print(error)
+        
+        return None
+    
+    ##############################################
+    @staticmethod
+    def getOrderCollection(orderCollectionID):
+        """
+        Get one orderCollection object.
+
+        :param orderID: order collection ID for an order collection
+        :type orderID: str
+        :return: Requested orderCollection object
+        :rtype: Order
+
+        """
+        try:
+            currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+            return currentOrderCollection
+        except (ObjectDoesNotExist) as error:
+            return None
         except (Exception) as error:
             print(error)
         
@@ -123,10 +147,13 @@ class OrderManagementBase():
     @staticmethod
     def updateOrder(orderID, orderCollectionID, updateType: EnumUpdates, content):
         """
-        Change details of an order, its status, or save communication 
+        Change details of an order or orderCollection like its status, or save communication.
+        If orderID == "" the orderCollectionID is relevant and vice versa. 
 
         :param orderID: unique order ID to be edited
         :type orderID: str
+        :param orderCollectionID: orderCollection ID that this order belongs to
+        :type orderCollectionID: str
         :param updateType: changed order details
         :type updateType: EnumUpdates
         :param content: changed order, can be many stuff

@@ -17,7 +17,7 @@ from channels.layers import get_channel_layer
 
 from ..services.postgresDB import pgProfiles, pgOrders
 
-from ..handlers.basics import checkIfUserIsLoggedIn, manualCheckifLoggedIn
+from ..handlers.basics import checkIfUserIsLoggedIn, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from ..services import redis, crypto
 
@@ -65,17 +65,51 @@ def updateOrderCollection(request):
     :rtype: HTTPResponse
 
     """
-    # TODO: for database orders
     try:
         changes = json.loads(request.body.decode("utf-8"))
         orderCollectionID = changes["orderID"]
-        for elem in changes["changes"]:
-            request.session["currentOrder"][orderCollectionID][elem] = changes["changes"][elem]
+
+        if orderCollectionID in request.session["currentOrder"]:
+            if "state" in changes["changes"]:
+                request.session["currentOrder"][orderCollectionID]["state"] = changes["changes"]["state"]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrderCollection"):
+                orderCollectionObj = pgOrders.OrderManagementBase.getOrderCollection(orderCollectionID)
+                if orderCollectionObj != None and "state" in changes["changes"]:
+                    orderCollectionObj.status = changes["changes"]["state"]
+            else:
+                return HttpResponse("Not logged in", status=401)
+
         return HttpResponse("Success")
     except (Exception) as error:
         print(error)
-        return HttpResponse("Failed",status=200)
+        return HttpResponse("Failed",status=500)
 
+#######################################################
+@require_http_methods(["DELETE"])
+def deleteOrderCollection(request, orderCollectionID):
+    """
+    Delete the whole order collection
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param orderCollectionID: id of the order collection
+    :type orderCollectionID: str
+    :return: Success or not
+    :rtype: HTTPRespone
+
+    """
+    try:
+        if orderCollectionID in request.session["currentOrder"]:
+            del request.session["currentOrder"][orderCollectionID]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
+                pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
+        
+        return HttpResponse("Surccess")
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed",status=500)
 
 #######################################################
 @require_http_methods(["GET"])
@@ -85,6 +119,8 @@ def createOrderID(request, orderCollectionID):
 
     :param request: GET Request
     :type request: HTTP GET
+    :param orderCollectionID: id of the order collection the created order should belong to
+    :type orderCollectionID: str
     :return: order ID as string
     :rtype: JSONResponse
 
@@ -127,8 +163,35 @@ def updateOrder(request):
         return HttpResponse("Success")
     except (Exception) as error:
         print(error)
-        return HttpResponse("Failed",status=200)
+        return HttpResponse("Failed",status=500)
 
+#######################################################
+@require_http_methods(["DELETE"])
+def deleteOrder(request, orderCollectionID, orderID):
+    """
+    Delete one order
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param orderCollectionID: id of the order collection
+    :type orderCollectionID: str
+    :param orderID: id of the order
+    :type orderID: str
+    :return: Success or not
+    :rtype: HTTPRespone
+
+    """
+    try:
+        if orderCollectionID in request.session["currentOrder"]:
+            del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
+                pgOrders.OrderManagementBase.deleteOrder(orderID)
+        
+        return HttpResponse("Surccess")
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed",status=500)
 
 #######################################################
 @checkIfUserIsLoggedIn()
@@ -203,6 +266,8 @@ def getOrder(request, orderCollectionID):
 
     :param request: GET Request
     :type request: HTTP GET
+    :param orderCollectionID: id of the order collection
+    :type orderCollectionID: str
     :return: Response with list
     :rtype: JSON Response
 

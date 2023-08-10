@@ -63,9 +63,6 @@ paths = {
     "sendOrder": "public/sendOrder/",
 
     "retrieveOrders": "public/getOrders/",
-    "updateOrder": "public/updateOrder/",
-    "deleteOrder": "public/deleteOrder/",
-    "deleteOrderCollection": "public/deleteOrderCollection/",
     "getMissedEvents": "public/getMissedEvents/",
 
     "getFlatOrders": "public/getFlatOrders/",
@@ -73,6 +70,10 @@ paths = {
     "getOrder": "public/getOrder/<orderCollectionID>/",
     "createSubOrder": "public/createSubOrder/<orderCollectionID>/",
     "updateOrderCollection": "public/updateSubOrder/",
+    "updateOrder": "public/updateOrder/",
+    "deleteOrder": "public/deleteSubOrder/<orderCollectionID>/<orderID>/",
+    "deleteOrderCollection": "public/deleteOrder/<orderCollectionID>/",
+
 
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
@@ -168,8 +169,6 @@ urlpatterns = [
 
     path(paths["retrieveOrders"], dashboard.retrieveOrders, name='retrieveOrders'),
     #path(paths["updateOrder"], dashboard.updateOrder, name='updateOrder'),
-    path(paths["deleteOrder"], dashboard.deleteOrder, name='deleteOrder'),
-    path(paths["deleteOrderCollection"], dashboard.deleteOrderCollection, name='deleteOrderCollection'),
     path(paths["getMissedEvents"], dashboard.getMissedEvents, name='getMissedEvents'),
 
     path(paths["getFlatOrders"], orderManagement.getFlatOrders, name="getFlatOrders"),
@@ -179,6 +178,8 @@ urlpatterns = [
     path(paths["sendOrder"], orderManagement.sendOrder, name='sendOrder'),
     path(paths["updateOrder"], orderManagement.updateOrder, name='updateOrder'),
     path(paths["updateOrderCollection"], orderManagement.updateOrderCollection, name='updateOrderCollection'),
+    path(paths["deleteOrder"], orderManagement.deleteOrder, name='deleteOrder'),
+    path(paths["deleteOrderCollection"], orderManagement.deleteOrderCollection, name='deleteOrderCollection'),
 
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
