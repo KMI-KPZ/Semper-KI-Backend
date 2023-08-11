@@ -286,7 +286,7 @@ def getOrder(request, orderCollectionID):
     """
     try:
         outDict = {}
-        if "currentOrder" in request.session["currentOrder"]:
+        if "currentOrder" in request.session:
             if orderCollectionID in request.session["currentOrder"][orderCollectionID]:
                 outDict["orderID"] = request.session["currentOrder"][orderCollectionID]["orderID"]
                 outDict["client"] = request.session["currentOrder"][orderCollectionID]["client"]
