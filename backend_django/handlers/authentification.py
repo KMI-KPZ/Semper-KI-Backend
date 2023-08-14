@@ -106,8 +106,8 @@ def loginUser(request):
         request.session["isPartOfOrganization"] = False
     else:
         userType = request.headers["Usertype"]
-        if userType == "organisation" or userType == "manufacturer":
-            request.session["usertype"] = "organisation"
+        if userType == "organization" or userType == "manufacturer":
+            request.session["usertype"] = "organization"
             request.session["isPartOfOrganization"] = True
             isPartOfOrganization = True
         else:
