@@ -280,7 +280,7 @@ def setRoleAndPermissionsOfUser(request):
 @require_http_methods(["POST", "GET"])
 def callbackLogin(request):
     """
-    TODO: Check if user really is part of an organisation or not -> check if misclick at login, and set flags and instances here
+    TODO: Check if user really is part of an organization or not -> check if misclick at login, and set flags and instances here
     Get information back from Auth0.
     Add user to database if entry doesn't exist.
 

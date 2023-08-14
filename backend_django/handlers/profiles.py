@@ -62,7 +62,7 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["GET"])
 def getOrganizationDetails(request):
     """
-    Return details about organisation. 
+    Return details about organization. 
 
     :param request: GET request
     :type request: HTTP GET
@@ -70,7 +70,7 @@ def getOrganizationDetails(request):
     :rtype: Json
 
     """
-    # Read organisation details from Database
+    # Read organization details from Database
     return JsonResponse(pgProfiles.ProfileManagementBase.getOrganization(request.session))
 
 ##############################################
@@ -79,7 +79,7 @@ def getOrganizationDetails(request):
 @basics.checkIfRightsAreSufficient()
 def updateDetailsOfOrganization(request):
     """
-    Update details of organisation of that user.
+    Update details of organization of that user.
 
     :param request: PATCH request
     :type request: HTTP PATCH
@@ -89,7 +89,7 @@ def updateDetailsOfOrganization(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organisation to {content['details']} at " + str(datetime.datetime.now()))
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organization to {content['details']} at " + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateDetails(request.session, content["details"])
     if flag is True:
         return HttpResponse("Worked")
@@ -110,7 +110,7 @@ def deleteOrganization(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted organisation {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']} at " + str(datetime.datetime.now()))
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']} at " + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
         return HttpResponse("Worked")
@@ -137,7 +137,7 @@ def deleteOrganizationAsAdmin(request):
 
         flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session, orgaID)
         if flag is True:
-            logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted organisation {orgaName} at " + str(datetime.datetime.now()))
+            logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted organization {orgaName} at " + str(datetime.datetime.now()))
             return HttpResponse("Worked")
         else:
             return HttpResponse("Failed", status=500)
@@ -250,8 +250,8 @@ def getAll(request):
     """
     if request.session["usertype"] == "admin":
         # get all information if you're an admin
-        users, organisations = pgProfiles.ProfileManagementBase.getAll()
-        outLists = { "user" : users, "organisations": organisations }
+        users, organizations = pgProfiles.ProfileManagementBase.getAll()
+        outLists = { "user" : users, "organizations": organizations }
         logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all users and orgas at " + str(datetime.datetime.now()))
         return JsonResponse(outLists, safe=False)
     else:

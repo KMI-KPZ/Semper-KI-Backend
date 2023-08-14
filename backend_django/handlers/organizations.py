@@ -34,14 +34,14 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
 
         elif eventName == "addPermissionsToRole" or eventName == "editRole":
             # get list of all members, retrieve the user ids and filter for those affected
-            response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader) )
+            response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=baseHeader) )
             if isinstance(response, Exception):
                 raise response
             responseDict = response
             for user in responseDict:
                 userID = user["user_id"]
                 
-                resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=baseHeader) )
+                resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=baseHeader) )
                 if isinstance(resp, Exception):
                     raise resp    
                 for elem in resp:
@@ -81,7 +81,7 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
             if session["organizationName"] != "":
                 return session["organizationName"]
         
-        res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader))
+        res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}', headers=baseHeader))
         if isinstance(res, Exception):
             raise res
         return res["display_name"].capitalize()
@@ -92,7 +92,7 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_getInviteLink(request):
+def organizations_getInviteLink(request):
     """
     Ask Auth0 API to invite someone via e-mail and retrieve the link
 
@@ -117,7 +117,7 @@ def organisations_getInviteLink(request):
 
         data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": False }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -135,7 +135,7 @@ def organisations_getInviteLink(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_addUser(request):
+def organizations_addUser(request):
     """
     Ask Auth0 API to invite someone via e-mail
 
@@ -160,7 +160,7 @@ def organisations_addUser(request):
 
         data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -178,9 +178,9 @@ def organisations_addUser(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
-def organisations_fetchUsers(request):
+def organizations_fetchUsers(request):
     """
-    Ask Auth0 API for all users of an organisation
+    Ask Auth0 API for all users of an organization
 
     :param request: Request with session in it
     :type request: HTTP GET
@@ -202,13 +202,13 @@ def organisations_fetchUsers(request):
         if isinstance(orgaName, Exception):
             raise orgaName
 
-        response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers) )
+        response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=headers) )
         if isinstance(response, Exception):
             raise response
         
         responseDict = response
         for idx, entry in enumerate(responseDict):
-            resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=headers) )
+            resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members/{entry["user_id"]}/roles', headers=headers) )
             if isinstance(resp, Exception):
                 raise resp
             responseDict[idx]["roles"] = resp
@@ -228,7 +228,7 @@ def organisations_fetchUsers(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_deleteUser(request):
+def organizations_deleteUser(request):
     """
     Ask Auth0 API to delete someone from an organization via their name
 
@@ -259,7 +259,7 @@ def organisations_deleteUser(request):
 
         # delete person from organization via userID
         data = { "members": [userID]}
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
         pgProfiles.ProfileManagement.deleteUser("", uID=userID)
@@ -283,7 +283,7 @@ def organisations_deleteUser(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=True)
-def organisations_createRole(request):
+def organizations_createRole(request):
     """
     Ask Auth0 API to create a new role
 
@@ -332,7 +332,7 @@ def organisations_createRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_assignRole(request):
+def organizations_assignRole(request):
     """
     Assign a role to a person
 
@@ -363,7 +363,7 @@ def organisations_assignRole(request):
         userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
 
@@ -385,7 +385,7 @@ def organisations_assignRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_removeRole(request):
+def organizations_removeRole(request):
     """
     Remove a role from a person
 
@@ -416,7 +416,7 @@ def organisations_removeRole(request):
         userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -437,7 +437,7 @@ def organisations_removeRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_editRole(request):
+def organizations_editRole(request):
     """
     Ask Auth0 API to edit a role
 
@@ -490,7 +490,7 @@ def organisations_editRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
-def organisations_getRoles(request):
+def organizations_getRoles(request):
     """
     Fetch all roles for the organization
 
@@ -536,7 +536,7 @@ def organisations_getRoles(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_deleteRole(request):
+def organizations_deleteRole(request):
     """
     Delete role via ID
 
@@ -576,7 +576,7 @@ def organisations_deleteRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=False)
-def organisations_setPermissionsForRole(request):
+def organizations_setPermissionsForRole(request):
     """
     Add Permissions to role
 
@@ -635,7 +635,7 @@ def organisations_setPermissionsForRole(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
-def organisations_getPermissions(request):
+def organizations_getPermissions(request):
     """
     Get all Permissions
 
@@ -670,7 +670,7 @@ def organisations_getPermissions(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfRightsAreSufficient(json=True)
-def organisations_getPermissionsForRole(request):
+def organizations_getPermissionsForRole(request):
     """
     Get Permissions of role
 
@@ -706,9 +706,9 @@ def organisations_getPermissionsForRole(request):
 #######################################################
 @checkIfUserIsLoggedIn
 @require_http_methods(["POST"])
-def organisations_createNewOrganization(request):
+def organizations_createNewOrganization(request):
     """
-    Create a new organisation, create an admin role, invite a person via email as admin.
+    Create a new organization, create an admin role, invite a person via email as admin.
     All via Auth0s API.
 
     :param request: request with content as json
@@ -728,7 +728,7 @@ def organisations_createNewOrganization(request):
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
 
-        # create organisation
+        # create organization
         data = { "name": content["content"]["name"], 
                 "display_name": content["content"]["display_name"], 
                 "branding":
@@ -756,16 +756,16 @@ def organisations_createNewOrganization(request):
             raise response
         roleID = response["id"]
 
-        # invite person to organisation as admin
+        # invite person to organization as admin
         email = content["content"]["email"]
 
         data = { "inviter": { "name": "Semper-KI" }, "invitee": { "email": email }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "roles": [ roleID ], "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{org_id}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{org_id}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"Semper-KI created organisation {content['content']['name']} and invited the user {email} at " + str(datetime.datetime.now()))
+        logger.info(f"Semper-KI created organization {content['content']['name']} and invited the user {email} at " + str(datetime.datetime.now()))
         
         return HttpResponse("Success", status=200)
     

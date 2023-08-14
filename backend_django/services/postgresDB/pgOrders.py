@@ -438,7 +438,7 @@ class OrderManagementOrganization(OrderManagementBase):
             # outputList for events
             dictForEventsAsOutput = {}
 
-            # first get organisation
+            # first get organization
             client = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
 
             # generate key and order collection
@@ -488,7 +488,7 @@ class OrderManagementOrganization(OrderManagementBase):
     @staticmethod
     def getOrders(session):
         """
-        Get all orders for that organisation.
+        Get all orders for that organization.
 
         :param session: session of that user
         :type session: dict
@@ -497,7 +497,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
         """
         try:
-            # get organisation
+            # get organization
             currentUser = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
             orderCollections = currentUser.ordersSubmitted.all()
 
@@ -570,7 +570,7 @@ class OrderManagementOrganization(OrderManagementBase):
     @staticmethod
     def getOrdersFlat(session):
         """
-        Get all orders for that organisation with little information.
+        Get all orders for that organization with little information.
 
         :param session: session of that user
         :type session: dict
@@ -579,7 +579,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
         """
         try:
-            # get organisation
+            # get organization
             currentUser = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
             orderCollections = currentUser.ordersSubmitted.all()
 

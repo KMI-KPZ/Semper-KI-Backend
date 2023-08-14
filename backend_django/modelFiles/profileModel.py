@@ -62,8 +62,8 @@ class Organization(models.Model):
     :details: Adress, tax id and so on
     :users: Link to users belonging to that organization
     :canManufacture: True if this organization can manufacture something
-    :ordersSubmitted: OrderCollections that this organisation submitted
-    :ordersReceived: Orders that this organisation received
+    :ordersSubmitted: OrderCollections that this organization submitted
+    :ordersReceived: Orders that this organization received
     :uri: Representation link inside the knowledge graph
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated

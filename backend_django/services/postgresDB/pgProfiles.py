@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2023
 
-Contains: Services for database calls to manage a user/organisation profile
+Contains: Services for database calls to manage a user/organization profile
 """
 import types, json, enum, re
 
@@ -45,7 +45,7 @@ class ProfileManagementBase():
     @staticmethod
     def getOrganization(session):
         """
-        Check whether an organisation exists or not and retrieve information.
+        Check whether an organization exists or not and retrieve information.
 
         :param session: session
         :type session: Dictionary
@@ -272,7 +272,7 @@ class ProfileManagementUser(ProfileManagementBase):
     @staticmethod
     def getClientID(session):
         """
-        Get ID of current client (can be organisation or user)
+        Get ID of current client (can be organization or user)
         :param session: request session
         :type session: dict
         :return: hashed ID
@@ -425,7 +425,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
     @staticmethod
     def getClientID(session):
         """
-        Get ID of current client (can be organisation or user)
+        Get ID of current client (can be organization or user)
         :param session: request session
         :type session: dict
         :return: hashed ID
