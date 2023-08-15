@@ -14,6 +14,7 @@ from .base import *
 
 DEBUG=False
 DEVELOPMENT=True
+BACKEND_SETTINGS= "development"
 
 # for nginx
 USE_X_FORWARDED_HOST = True
