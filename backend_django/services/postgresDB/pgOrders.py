@@ -24,6 +24,8 @@ class EnumUpdates(enum.Enum):
     status = 1
     chat = 2
     files = 3
+    service = 4
+    contractor = 5
 
 ####################################################################################
 # Orders general
@@ -191,13 +193,10 @@ class OrderManagementBase():
 
     ##############################################
     @staticmethod
-    def updateOrder(orderID, orderCollectionID, updateType: EnumUpdates, content):
+    def updateOrderCollection(orderCollectionID, updateType: EnumUpdates, content):
         """
-        Change details of an order or orderCollection like its status, or save communication.
-        If orderID == "" the orderCollectionID is relevant and vice versa. 
+        Change details of an orderCollection like its status. 
 
-        :param orderID: unique order ID to be edited
-        :type orderID: str
         :param orderCollectionID: orderCollection ID that this order belongs to
         :type orderCollectionID: str
         :param updateType: changed order details
@@ -210,68 +209,94 @@ class OrderManagementBase():
         """
         updated = timezone.now()
         try:
-            if updateType == EnumUpdates.chat:
-                currentOrder = Orders.objects.get(orderID=orderID)
-                currentOrder.userCommunication["messages"].append(content)
-                currentOrder.updatedWhen = updated
-                currentOrder.save()
-            elif updateType == EnumUpdates.status:
-                if orderID != "":
-                    currentOrder = Orders.objects.get(orderID=orderID)
-                    currentOrder.status = content
-                    currentOrder.updatedWhen = updated
-                    currentOrder.save()
-                    
-                    # if at least one order is being processed, the collection is set to 'in process'
-                    respectiveOrderCollection = currentOrder.orderCollectionKey
-                    if respectiveOrderCollection.status == 0 and content != 0:
-                        respectiveOrderCollection.status = 1
-                        respectiveOrderCollection.save()
-                    
-                    # if order is set to finished, check if the whole collection can be set to 'finished'
-                    finishedFlag = True
-                    for orderOfCollection in respectiveOrderCollection.orders.all():
-                        if orderOfCollection.status != 6:
-                            finishedFlag = False
-                            break
-                    if finishedFlag:
-                        respectiveOrderCollection.status = 3
-
-                elif orderCollectionID != "":    
-                    currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
-                    currentOrderCollection.status = content
-                    currentOrderCollection.updatedWhen = updated
-                    currentOrderCollection.save()
-                    # update status for orders of that collection as well
-                    for order in currentOrderCollection.orders.all():
-                        order.status = content
-                        order.updatedWhen = updated
-                        order.save()
+            if updateType == EnumUpdates.status:
+                currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+                currentOrderCollection.status = content
+                currentOrderCollection.updatedWhen = updated
+                currentOrderCollection.save()
+                # # update status for orders of that collection as well
+                # for order in currentOrderCollection.orders.all():
+                #     order.status = content
+                #     order.updatedWhen = updated
+                #     order.save()
             return True
         except (Exception) as error:
             print(error)
-        return False
+            return error
+    
+    ##############################################
+    @staticmethod
+    def updateOrder(orderID, updateType: EnumUpdates, content):
+        """
+        Change details of an order like its status, or save communication. 
+
+        :param orderID: unique order ID to be edited
+        :type orderID: str
+        :param updateType: changed order details
+        :type updateType: EnumUpdates
+        :param content: changed order, can be many stuff
+        :type content: json dict
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
+        updated = timezone.now()
+        try:
+            currentOrder = Orders.objects.get(orderID=orderID)
+            currentOrder.updatedWhen = updated
+
+            if updateType == EnumUpdates.chat:
+                currentOrder.userCommunication["messages"].append(content)
+                currentOrder.save()
+            
+            elif updateType == EnumUpdates.status:
+                currentOrder.status = content
+                currentOrder.save()
+                
+                # # if at least one order is being processed, the collection is set to 'in process'
+                # respectiveOrderCollection = currentOrder.orderCollectionKey
+                # if respectiveOrderCollection.status == 0 and content != 0:
+                #     respectiveOrderCollection.status = 1
+                #     respectiveOrderCollection.save()
+                
+                # # if order is set to finished, check if the whole collection can be set to 'finished'
+                # finishedFlag = True
+                # for orderOfCollection in respectiveOrderCollection.orders.all():
+                #     if orderOfCollection.status != 6:
+                #         finishedFlag = False
+                #         break
+                # if finishedFlag:
+                #     respectiveOrderCollection.status = 3
+            elif updateType == EnumUpdates.files:
+                currentOrder.files = content
+                
+            elif updateType == EnumUpdates.service:
+                currentOrder.userOrders = content
+
+            elif updateType == EnumUpdates.contractor:
+                currentOrder.contractor = content
+
+            currentOrder.save()
+            return True
+        except (Exception) as error:
+            print(error)
+            return error
     
 ####################################################################################
 # Orders from User
 class OrderManagementUser(OrderManagementBase):
     ##############################################
     @staticmethod
-    def addOrder(orderFromUser, session):
+    def addOrder(session):
         """
         Add order for that user. Check if user already has orders and append if so, create a new order if not.
 
-        :param userID: user ID of a user
-        :type userID: str
-        :param orderFromUser: order details
-        :type orderFromUser: json dict
         :param session: session of user
         :type session: session dict
         :return: Dictionary of users with order collection id and orders in order for the websocket to fire events
         :rtype: Dict
 
         """
-        #TODO
         now = timezone.now()
         try:
             # outputList for events
@@ -279,44 +304,47 @@ class OrderManagementUser(OrderManagementBase):
 
             # first get user
             client = User.objects.get(subID=session["user"]["userinfo"]["sub"])
-            
-            # generate key and order collection
-            orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
-            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=0, updatedWhen=now)
-            # retrieve files
-            uploadedFiles = []
-            (contentOrError, Flag) = redis.retrieveContent(session.session_key)
-            if Flag:
-                for entry in contentOrError:
-                    uploadedFiles.append({"filename":entry[1], "path": session.session_key})
 
-            for idx, entry in enumerate(orderFromUser):
-                # generate orders
-                selectedManufacturer = Organization.objects.get(hashedID=entry["manufacturerID"])
-                orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
-                userOrders = entry
-                status = 0
-                userCommunication = {"messages": []}
-                if len(uploadedFiles) != 0:
-                    files = {"files": [uploadedFiles[idx]]}
-                else:
-                    files = {"files": []}
-                dates = {"created": str(now), "updated": str(now)}
-                details = {}
-                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
-                selectedManufacturer.ordersReceived.add(ordersObj)
-                
-                # save ID of manufacturers for the websocket events
-                if selectedManufacturer.hashedID in dictForEventsAsOutput:
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
-                else:
-                    dictForEventsAsOutput[selectedManufacturer.hashedID] = {"eventType": "orderEvent"}
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orderCollectionID"] = orderCollectionID
+            # then go through order Collections
+            for orderCollectionID in session["currentOrder"]:
 
-            # link OrderCollection to client
-            client.orders.add(collectionObj)
-            client.save()
+                # order collection object
+                existingObj = session["currentOrder"][orderCollectionID]
+                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=existingObj["client"])
+                # retrieve files
+                # uploadedFiles = []
+                # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
+                # if Flag:
+                #     for entry in contentOrError:
+                #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
+
+                # save subOrders
+                for entry in session["currentOrder"][orderCollectionID]["subOrders"]:
+                    selectedManufacturer = entry["contractor"]
+                    orderID = entry["subOrderID"]
+                    userOrders = entry["service"]
+                    status = entry["state"]
+                    userCommunication = entry["chat"]
+                    files = entry["files"]
+                    dates = {"created": entry["created"], "updated": str(now)}
+                    details = entry["details"]
+                    ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=client.hashedID, contractor=selectedManufacturer, updatedWhen=now)
+                    for contractor in selectedManufacturer:
+                        contractorObj = Organization.objects.get(hashedID=contractor)
+                        contractorObj.ordersReceived.add(ordersObj)
+                        contractorObj.save()
+                    
+                        # save ID of manufacturers for the websocket events
+                        if contractorObj.hashedID in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractorObj.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
+                        else:
+                            dictForEventsAsOutput[contractorObj.hashedID] = {"eventType": "orderEvent"}
+                            dictForEventsAsOutput[contractorObj.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
+                            dictForEventsAsOutput[contractorObj.hashedID]["orderCollectionID"] = orderCollectionID
+
+                # link OrderCollection to client
+                client.orders.add(collectionObj)
+                client.save()
 
             return dictForEventsAsOutput
         except (Exception) as error:
@@ -418,21 +446,16 @@ class OrderManagementOrganization(OrderManagementBase):
 
     ##############################################
     @staticmethod
-    def addOrder(orderFromUser, session):
+    def addOrder(session):
         """
-        Add order for that user. Check if user already has orders and append if so, create a new order if not.
+        Add order for that organization. 
 
-        :param userID: user ID of a user
-        :type userID: str
-        :param orderFromUser: order details
-        :type orderFromUser: json dict
         :param session: session of user
         :type session: session dict
         :return: Dictionary of users with order collection id and orders in order for the websocket to fire events
         :rtype: Dict
 
         """
-        #TODO
         now = timezone.now()
         try:
             # outputList for events
@@ -441,43 +464,52 @@ class OrderManagementOrganization(OrderManagementBase):
             # first get organization
             client = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
 
-            # generate key and order collection
-            orderCollectionID = crypto.generateMD5(str(orderFromUser) + crypto.generateSalt())
-            collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=0, updatedWhen=now)
-            # retrieve files
-            uploadedFiles = []
-            (contentOrError, Flag) = redis.retrieveContent(session.session_key)
-            if Flag:
-                for entry in contentOrError:
-                    uploadedFiles.append({"filename":entry[1], "path": session.session_key})
+            # then go through order Collections
+            for orderCollectionID in session["currentOrder"]:
 
-            for idx, entry in enumerate(orderFromUser):
-                # generate orders
-                selectedManufacturer = Organization.objects.get(hashedID=entry["manufacturerID"])
-                orderID = crypto.generateMD5(str(entry) + crypto.generateSalt())
-                userOrders = entry
-                status = 0
-                userCommunication = {"messages": []}
-                if len(uploadedFiles) != 0:
-                    files = {"files": [uploadedFiles[idx]]}
-                else:
-                    files = {"files": []}
-                dates = {"created": str(now), "updated": str(now)}
-                details = {}
-                ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, details=details, files=files, dates=dates, client=client.hashedID, contractor=[selectedManufacturer.hashedID], updatedWhen=now)
-                selectedManufacturer.ordersReceived.add(ordersObj)
-                
-                # save ID of manufacturers for the websocket events
-                if selectedManufacturer.hashedID in dictForEventsAsOutput:
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
-                else:
-                    dictForEventsAsOutput[selectedManufacturer.hashedID] = {"eventType": "orderEvent"}
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                    dictForEventsAsOutput[selectedManufacturer.hashedID]["orderCollectionID"] = orderCollectionID
+                # order collection object
+                existingObj = session["currentOrder"][orderCollectionID]
+                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=existingObj["client"])
+                # retrieve files
+                # uploadedFiles = []
+                # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
+                # if Flag:
+                #     for entry in contentOrError:
+                #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
 
-            # link OrderCollection to client
-            client.ordersSubmitted.add(collectionObj)
-            client.save()
+                # save subOrders
+                for entry in session["currentOrder"][orderCollectionID]["subOrders"]:
+                    selectedManufacturer = entry["contractor"]
+                    orderID = entry["subOrderID"]
+                    userOrders = entry["service"]
+                    status = entry["state"]
+                    userCommunication = entry["chat"]
+                    files = entry["files"]
+                    dates = {"created": entry["created"], "updated": str(now)}
+                    details = entry["details"]
+                    ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=client.hashedID, contractor=selectedManufacturer, updatedWhen=now)
+
+                    for contractor in selectedManufacturer:
+                        contractorObj = Organization.objects.get(hashedID=contractor)
+                        contractorObj.ordersReceived.add(ordersObj)
+                        contractorObj.save()
+            
+                        # save ID of manufacturers for the websocket events
+                        if contractorObj.hashedID in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractorObj.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
+                        else:
+                            dictForEventsAsOutput[contractorObj.hashedID] = {"eventType": "orderEvent"}
+                            dictForEventsAsOutput[contractorObj.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
+                            dictForEventsAsOutput[contractorObj.hashedID]["orderCollectionID"] = orderCollectionID
+
+                # link OrderCollection to client
+                client.ordersSubmitted.add(collectionObj)
+                client.save()
+
+                # save ID of client for websocket events
+                dictForEventsAsOutput[client.hashedID] = {"eventType": "orderEvent"}
+                dictForEventsAsOutput[client.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
+                dictForEventsAsOutput[client.hashedID]["orderCollectionID"] = orderCollectionID
 
             return dictForEventsAsOutput
         except (Exception) as error:

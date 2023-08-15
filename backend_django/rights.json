@@ -24,7 +24,8 @@
             "OrderFile"
          ],
          "paths": [
-            "downloadFiles"
+            "downloadFiles",
+            "updateOrder"
          ]
       },
       {
