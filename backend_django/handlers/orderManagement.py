@@ -77,6 +77,7 @@ def updateOrderCollection(request):
                 orderCollectionObj = pgOrders.OrderManagementBase.getOrderCollection(orderCollectionID)
                 if orderCollectionObj != None and "state" in changes["changes"]:
                     orderCollectionObj.status = changes["changes"]["state"]
+                    orderCollectionObj.save()
             else:
                 return HttpResponse("Not logged in", status=401)
 
@@ -154,10 +155,17 @@ def updateOrder(request):
         orderCollectionID = changes["orderID"]
         orderID = changes["subOrderID"]
         for elem in changes["changes"]:
-            if elem == "service": # service is an array in itself
+            if elem == "service": # service is a dict in itself
                 for entry in changes["changes"]["service"]:
                     request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
+            elif elem == "chat":
+                for entry in changes["changes"]["chat"]:
+                    request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(entry)
+            elif elem == "files":
+                for entry in changes["changes"]["files"]:
+                    request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["files"]["files"].append(entry)
             else:
+                # state
                 request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem] = changes["changes"][elem]
 
         return HttpResponse("Success")

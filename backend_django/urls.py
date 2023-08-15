@@ -69,8 +69,8 @@ paths = {
     "createOrder": "public/createOrder/",
     "getOrder": "public/getOrder/<orderCollectionID>/",
     "createSubOrder": "public/createSubOrder/<orderCollectionID>/",
-    "updateOrderCollection": "public/updateSubOrder/",
-    "updateOrder": "public/updateOrder/",
+    "updateOrder": "public/updateSubOrder/",
+    "updateOrderCollection": "public/updateOrder/",
     "deleteOrder": "public/deleteSubOrder/<orderCollectionID>/<orderID>/",
     "deleteOrderCollection": "public/deleteOrder/<orderCollectionID>/",
 
