@@ -243,6 +243,9 @@ urlpatterns = [
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
+if settings.DEBUG:
+    urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
+
 urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
 
 ##############################################################################
