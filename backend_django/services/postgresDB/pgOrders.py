@@ -33,7 +33,7 @@ class OrderManagementBase():
     
     ##############################################
     @staticmethod
-    def getOrder(orderID):
+    def getOrderObj(orderID):
         """
         Get one order.
 
@@ -55,7 +55,7 @@ class OrderManagementBase():
     
     ##############################################
     @staticmethod
-    def getOrderCollection(orderCollectionID):
+    def getOrderCollectionObj(orderCollectionID):
         """
         Get one orderCollection object.
 
@@ -77,7 +77,7 @@ class OrderManagementBase():
 
     ##############################################
     @staticmethod
-    def getOrder(orderCollectionID):
+    def getOrderCollection(orderCollectionID):
         """
         Get info about one order collection.
 
@@ -310,7 +310,7 @@ class OrderManagementUser(OrderManagementBase):
 
                 # order collection object
                 existingObj = session["currentOrder"][orderCollectionID]
-                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=existingObj["client"])
+                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=client.hashedID)
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -320,14 +320,15 @@ class OrderManagementUser(OrderManagementBase):
 
                 # save subOrders
                 for entry in session["currentOrder"][orderCollectionID]["subOrders"]:
-                    selectedManufacturer = entry["contractor"]
-                    orderID = entry["subOrderID"]
-                    userOrders = entry["service"]
-                    status = entry["state"]
-                    userCommunication = entry["chat"]
-                    files = entry["files"]
-                    dates = {"created": entry["created"], "updated": str(now)}
-                    details = entry["details"]
+                    subOrder = session["currentOrder"][orderCollectionID]["subOrders"][entry]
+                    selectedManufacturer = subOrder["contractor"]
+                    orderID = subOrder["subOrderID"]
+                    userOrders = subOrder["service"]
+                    status = subOrder["state"]
+                    userCommunication = subOrder["chat"]
+                    files = subOrder["files"]
+                    dates = {"created": subOrder["created"], "updated": str(now)}
+                    details = subOrder["details"]
                     ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=client.hashedID, contractor=selectedManufacturer, updatedWhen=now)
                     for contractor in selectedManufacturer:
                         contractorObj = Organization.objects.get(hashedID=contractor)
@@ -394,7 +395,7 @@ class OrderManagementUser(OrderManagementBase):
                 currentOrderCollection["subOrders"] = ordersOfThatCollection
                 output.append(currentOrderCollection)
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:
@@ -432,7 +433,7 @@ class OrderManagementUser(OrderManagementBase):
                     
                 output.append(currentOrderCollection)
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:
@@ -469,7 +470,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
                 # order collection object
                 existingObj = session["currentOrder"][orderCollectionID]
-                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=existingObj["client"])
+                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=client.hashedID)
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -590,7 +591,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
 
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
             #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
         except (Exception) as error:
@@ -646,7 +647,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
 
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
             #return [result.userOrders, result.orderStatus, result.userCommunication, result.files, result.dates]
         except (Exception) as error:

@@ -432,7 +432,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
         :rtype: String
 
         """
-        return ProfileManagementBase.getOrganization(session).hashedID
+        return ProfileManagementBase.getOrganization(session)["hashedID"]
 
 pgPBase = ProfileManagementBase()
 pgPUser = ProfileManagementUser()

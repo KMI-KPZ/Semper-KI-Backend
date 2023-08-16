@@ -12,7 +12,9 @@
          "paths": [
             "retrieveOrders",
             "getMissedEvents",
-            "getOrder"
+            "getOrder",
+            "getOrders",
+            "getFlatOrders"
          ]
       },
       {
@@ -52,7 +54,10 @@
          ],
          "paths": [
             "updateOrder",
-            "updateOrderCollection"
+            "updateOrderCollection",
+            "getManufacturers",
+            "saveOrder",
+            "verifyOrder"
          ]
       },
       {
@@ -75,7 +80,7 @@
          "elements": [
          ],
          "paths": [
-            "deleteOrganisation"
+            "deleteOrganization"
          ]
       },
       {
@@ -88,16 +93,16 @@
             "ButtonChangeRole"
          ],
          "paths": [
-            "organisations_setPermissionsForRole",
-            "organisations_deleteRole",
-            "organisations_editRole",
-            "organisations_removeRole",
-            "organisations_assignRole",
-            "organisations_createRole",
-            "organisations_deleteUser",
-            "organisations_addUser",
-            "organisations_getInviteLink",
-            "updateDetailsOfOrganisation"
+            "organizations_setPermissionsForRole",
+            "organizations_deleteRole",
+            "organizations_editRole",
+            "organizations_removeRole",
+            "organizations_assignRole",
+            "organizations_createRole",
+            "organizations_deleteUser",
+            "organizations_addUser",
+            "organizations_getInviteLink",
+            "updateDetailsOfOrganization"
          ]
       },
       {
@@ -110,10 +115,10 @@
             "Organization"
          ],
          "paths": [
-            "organisations_getPermissionsForRole",
-            "organisations_getPermissions",
-            "organisations_getRoles",
-            "organisations_fetchUsers"
+            "organizations_getPermissionsForRole",
+            "organizations_getPermissions",
+            "organizations_getRoles",
+            "organizations_fetchUsers"
          ]
       },
       {

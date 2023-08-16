@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, dashboard, organizations, ontology, orderManagement
+from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, ontology, orderManagement
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -60,7 +60,7 @@ paths = {
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
     "checkLogistics": "public/checkLogistics/",
-    "sendOrder": "public/sendOrder/",
+    "saveOrder": "public/saveOrder/",
 
     "retrieveOrders": "public/getOrders/",
     "getMissedEvents": "public/getMissedEvents/",
@@ -73,7 +73,8 @@ paths = {
     "updateOrderCollection": "public/updateOrder/",
     "deleteOrder": "public/deleteSubOrder/<orderCollectionID>/<orderID>/",
     "deleteOrderCollection": "public/deleteOrder/<orderCollectionID>/",
-
+    "verifyOrder": "public/verifyOrder/<orderCollectionID>/<orderID>/",
+    "sendOrder": "public/sendOrder/<orderCollectionID>/<orderID>/",
 
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
@@ -160,27 +161,24 @@ urlpatterns = [
     path(paths["getMaterials"], filter.getMaterials, name='getMaterials'),
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
 
-    #path(paths["updateCart"], checkOrder.updateCart, name='updateCart'),
-    #path(paths["getCart"], checkOrder.getCart, name='getCart'),
-    path(paths["getManufacturers"], checkOrder.getManufacturers, name='getManufacturers'),
     path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
     path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
     path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
 
-    path(paths["retrieveOrders"], dashboard.retrieveOrders, name='retrieveOrders'),
-    #path(paths["updateOrder"], dashboard.updateOrder, name='updateOrder'),
-    path(paths["getMissedEvents"], dashboard.getMissedEvents, name='getMissedEvents'),
-
+    path(paths["getMissedEvents"], orderManagement.getMissedEvents, name='getMissedEvents'),
     path(paths["getFlatOrders"], orderManagement.getFlatOrders, name="getFlatOrders"),
+    path(paths["retrieveOrders"], orderManagement.retrieveOrders, name='retrieveOrders'),
     path(paths["createOrder"], orderManagement.createOrderCollectionID, name="createOrderCollectionID"),
     path(paths["createSubOrder"], orderManagement.createOrderID, name="createOrderID"),
     path(paths["getOrder"], orderManagement.getOrder, name="getOrder"),
-    path(paths["sendOrder"], orderManagement.sendOrder, name='sendOrder'),
+    path(paths["saveOrder"], orderManagement.saveOrder, name='saveOrder'),
     path(paths["updateOrder"], orderManagement.updateOrder, name='updateOrder'),
     path(paths["updateOrderCollection"], orderManagement.updateOrderCollection, name='updateOrderCollection'),
     path(paths["deleteOrder"], orderManagement.deleteOrder, name='deleteOrder'),
     path(paths["deleteOrderCollection"], orderManagement.deleteOrderCollection, name='deleteOrderCollection'),
-
+    path(paths["getManufacturers"], orderManagement.getManufacturers, name='getManufacturers'),
+    path(paths["verifyOrder"], orderManagement.verifyOrder, name="verifyOrder"),
+    path(paths["sendOrder"], orderManagement.sendOrder, name="sendOrder"),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),

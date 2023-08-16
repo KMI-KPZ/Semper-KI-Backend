@@ -21,31 +21,7 @@ from ..handlers.basics import checkIfUserIsLoggedIn
 from ..services import redis, mocks, crypto
 
 logger = logging.getLogger(__name__)
-##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def getManufacturers(request):
-    """
-    Get all suitable manufacturers.
 
-    :param request: GET request
-    :type request: HTTP GET
-    :return: List of manufacturers and some details
-    :rtype: JSON
-
-    """
-
-    manufacturerList = []
-    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllManufacturers()
-    # TODO Check suitability
-
-    # remove unnecessary information and add identifier
-    for idx, elem in enumerate(listOfAllManufacturers):
-        manufacturerList.append({})
-        manufacturerList[idx]["name"] = elem["name"]
-        manufacturerList[idx]["id"] = elem["hashedID"]
-
-    return JsonResponse(manufacturerList, safe=False)
 
 #######################################################
 @checkIfUserIsLoggedIn()

@@ -6,7 +6,9 @@ Silvio Weging 2023
 Contains: Handlers managing the orders
 """
 
-import json, random, logging, datetime
+import json, random, logging
+from datetime import datetime
+from django.utils import timezone
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -17,11 +19,13 @@ from channels.layers import get_channel_layer
 
 from ..services.postgresDB import pgProfiles, pgOrders
 
-from ..handlers.basics import checkIfUserIsLoggedIn, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from ..services import redis, crypto
 
 logger = logging.getLogger(__name__)
+################################################################################################
+# order collections aka orders
 
 #######################################################
 @require_http_methods(["GET"])
@@ -125,6 +129,8 @@ def deleteOrderCollection(request, orderCollectionID):
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed",status=500)
+################################################################################################
+# orders aka subOrders
 
 #######################################################
 @require_http_methods(["GET"])
@@ -240,45 +246,8 @@ def deleteOrder(request, orderCollectionID, orderID):
         print(error)
         return HttpResponse("Failed",status=500)
 
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"]) 
-def sendOrder(request):
-    """
-    Save order and send it to manufacturer
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: Response if sent successfully or not
-    :rtype: HTTP Response
-
-    """
-
-    try:
-        # TODO Save picture and files in permanent storage, and change "files" field to urls
-
-        if request.session["isPartOfOrganization"]:
-            dictForEvents = pgOrders.OrderManagementOrganization.addOrder(request.session)
-        else:
-            dictForEvents = pgOrders.OrderManagementUser.addOrder(request.session)
-        
-
-
-        # send to websockets that are active, that a new message/status is available for that order
-        channel_layer = get_channel_layer()
-        for userID in dictForEvents:
-            values = dictForEvents[userID]
-            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
-                    "type": "sendMessageJSON",
-                    "dict": values,
-                })
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
-        return HttpResponse("Success")
-    
-    except (Exception) as error:
-        print(error)
-        return HttpResponse("Failed")
+################################################################################################
+# retrieval
 
 #######################################################
 @require_http_methods(["GET"]) 
@@ -307,9 +276,10 @@ def getFlatOrders(request):
                 outDict["orders"].append(tempDict)
         
         # From Database
-        objFromDB = request.session["pgOrderClass"].getOrdersFlat(request.session)
-        if len(objFromDB) > 1:
-            outDict["orders"].extend(objFromDB)
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getFlatOrders"):
+            objFromDB = request.session["pgOrderClass"].getOrdersFlat(request.session)
+            if len(objFromDB) >= 1:
+                outDict["orders"].extend(objFromDB)
 
         return JsonResponse(outDict)
     
@@ -347,10 +317,200 @@ def getOrder(request, orderCollectionID):
                 return JsonResponse(outDict)
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getOrder"):
-            return JsonResponse(pgOrders.OrderManagementBase.getOrder(orderCollectionID))
+            return JsonResponse(pgOrders.OrderManagementBase.getOrderCollection(orderCollectionID))
 
         return JsonResponse(outDict)
     except (Exception) as error:
             print(error)
     return JsonResponse({})
 
+#######################################################
+@checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient(json=True)
+def retrieveOrders(request):
+    """
+    Retrieve all saved orders.
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response with orders of that user
+    :rtype: JSON Response
+
+    """
+
+    return JsonResponse(request.session["pgOrderClass"].getOrders(request.session), safe=False)
+    
+
+#######################################################
+@checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=True)
+def getMissedEvents(request):
+    """
+    Show how many events (chat messages ...) were missed since last login.
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response with numbers for every order and orderCollection
+    :rtype: JSON Response
+
+    """
+
+    user = pgProfiles.ProfileManagementBase.getUser(request.session)
+    lastLogin = user["lastSeen"]
+    orderCollections = request.session["pgOrderClass"].getOrders(request.session)
+
+    output = {"eventType": "orderEvent", "events": []}
+
+    for orderCollection in orderCollections:
+        currentCollection = {}
+        currentCollection["orderCollectionID"] = orderCollection["orderID"]
+        orderArray = []
+        for orders in orderCollection["subOrders"]:
+            currentOrder = {}
+            currentOrder["orderID"] = orders["subOrderID"]
+            newMessagesCount = 0
+            chat = orders["chat"]["messages"]
+            for messages in chat:
+                if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')) and messages["userID"] != user["hashedID"]:
+                    newMessagesCount += 1
+            if lastLogin < timezone.make_aware(datetime.strptime(orders["updated"], '%Y-%m-%d %H:%M:%S.%f+00:00')):
+                status = 1
+            else:
+                status = 0
+            
+            # if something changed, save it. If not, discard
+            if status !=0 or newMessagesCount != 0: 
+                currentOrder["status"] = status
+                currentOrder["messages"] = newMessagesCount
+
+                orderArray.append(currentOrder)
+        if len(orderArray):
+            currentCollection["orders"] = orderArray
+            output["events"].append(currentCollection)
+    
+    # set accessed time to now
+    pgProfiles.ProfileManagementBase.setLoginTime(user["hashedID"])
+
+    return JsonResponse(output, status=200, safe=False)
+
+################################################################################################
+# Save, verify, send
+
+##############################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=True)
+def getManufacturers(request):
+    """
+    Get all suitable manufacturers.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: List of manufacturers and some details
+    :rtype: JSON
+
+    """
+
+    manufacturerList = []
+    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllManufacturers()
+    # TODO Check suitability
+
+    # remove unnecessary information and add identifier
+    for idx, elem in enumerate(listOfAllManufacturers):
+        manufacturerList.append({})
+        manufacturerList[idx]["name"] = elem["name"]
+        manufacturerList[idx]["id"] = elem["hashedID"]
+
+    return JsonResponse(manufacturerList, safe=False)
+
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"]) 
+@checkIfRightsAreSufficient(json=False)
+def saveOrder(request):
+    """
+    Save order in database
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response if sent successfully or not
+    :rtype: HTTP Response
+
+    """
+
+    try:
+        # TODO Save picture and files in permanent storage, and change "files" field to urls
+
+        if request.session["isPartOfOrganization"]:
+            dictForEvents = pgOrders.OrderManagementOrganization.addOrder(request.session)
+        else:
+            dictForEvents = pgOrders.OrderManagementUser.addOrder(request.session)
+        
+
+
+        # send to websockets that are active, that a new message/status is available for that order
+        channel_layer = get_channel_layer()
+        for userID in dictForEvents:
+            values = dictForEvents[userID]
+            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
+                    "type": "sendMessageJSON",
+                    "dict": values,
+                })
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} ordered something at " + str(datetime.now()))
+        return HttpResponse("Success")
+    
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed")
+    
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"]) 
+@checkIfRightsAreSufficient(json=False)
+def verifyOrder(request, orderCollectionID, orderID):
+    """
+    Start calculations on server and set status accordingly
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response if processes are started successfully
+    :rtype: HTTP Response
+
+    """
+    try:
+        # TODO start services
+
+        # TODO set status to verify
+
+        return HttpResponse("Success")
+    
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed")
+    
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"]) 
+@checkIfRightsAreSufficient(json=False)
+def sendOrder(request, orderCollectionID, orderID):
+    """
+    Retrieve Calculations and send order to manufacturer(s)
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response if processes are started successfully
+    :rtype: HTTP Response
+
+    """
+    try:
+        # TODO collect results
+        # TODO send to manufacturer(s))
+        # TODO set status to send
+
+        return HttpResponse("Success")
+    
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed")

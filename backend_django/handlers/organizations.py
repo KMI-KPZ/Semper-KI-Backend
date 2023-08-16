@@ -34,14 +34,14 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
 
         elif eventName == "addPermissionsToRole" or eventName == "editRole":
             # get list of all members, retrieve the user ids and filter for those affected
-            response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=baseHeader) )
+            response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=baseHeader) )
             if isinstance(response, Exception):
                 raise response
             responseDict = response
             for user in responseDict:
                 userID = user["user_id"]
                 
-                resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=baseHeader) )
+                resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=baseHeader) )
                 if isinstance(resp, Exception):
                     raise resp    
                 for elem in resp:
@@ -81,7 +81,7 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
             if session["organizationName"] != "":
                 return session["organizationName"]
         
-        res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}', headers=baseHeader))
+        res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader))
         if isinstance(res, Exception):
             raise res
         return res["display_name"].capitalize()
@@ -117,7 +117,7 @@ def organizations_getInviteLink(request):
 
         data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": False }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -160,7 +160,7 @@ def organizations_addUser(request):
 
         data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -202,13 +202,13 @@ def organizations_fetchUsers(request):
         if isinstance(orgaName, Exception):
             raise orgaName
 
-        response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=headers) )
+        response = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers) )
         if isinstance(response, Exception):
             raise response
         
         responseDict = response
         for idx, entry in enumerate(responseDict):
-            resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organisations/{orgID}/members/{entry["user_id"]}/roles', headers=headers) )
+            resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{entry["user_id"]}/roles', headers=headers) )
             if isinstance(resp, Exception):
                 raise resp
             responseDict[idx]["roles"] = resp
@@ -259,7 +259,7 @@ def organizations_deleteUser(request):
 
         # delete person from organization via userID
         data = { "members": [userID]}
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organisations/{orgID}/members', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
         pgProfiles.ProfileManagement.deleteUser("", uID=userID)
@@ -363,7 +363,7 @@ def organizations_assignRole(request):
         userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
 
@@ -416,7 +416,7 @@ def organizations_removeRole(request):
         userID = response[0]["user_id"]
 
         data = { "roles": [roleID]}
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organisations/{orgID}/members/{userID}/roles', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
@@ -740,7 +740,7 @@ def organizations_createNewOrganization(request):
                 "metadata": content["content"]["metadata"],
                 "enabled_connections": [ { "connection_id": "con_t6i9YJzm5KLo4Jlf", "assign_membership_on_login": False } ] }
 
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
         
@@ -761,7 +761,7 @@ def organizations_createNewOrganization(request):
 
         data = { "inviter": { "name": "Semper-KI" }, "invitee": { "email": email }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "roles": [ roleID ], "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
         
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organisations/{org_id}/invitations', headers=headers, json=data))
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{org_id}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
             raise response
         
