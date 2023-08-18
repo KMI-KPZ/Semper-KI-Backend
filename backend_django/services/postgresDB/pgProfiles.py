@@ -428,7 +428,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
         except (ObjectDoesNotExist) as error:
             try:
                 orgaName = session["organizationName"]
-                orgaDetails = {"e-mail": "", "adress": "", "taxID": ""}
+                orgaDetails = {"email": "", "adress": "", "taxID": ""}
                 idHash = crypto.generateSecureID(orgaID)
                 uri = ""
                 resultObj = Organization.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, details=orgaDetails, uri=uri, updatedWhen=updated) 

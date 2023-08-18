@@ -151,8 +151,6 @@ def createOrderID(request, orderCollectionID):
         orderID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
         template = {"subOrderID": orderID, "contractor": [], "state": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "chat": {"messages": []}, "service": {}}
-        
-        # TODO: create suborder for order in database
 
         # save into respective order collection
         if "currentOrder" in request.session:
@@ -260,13 +258,14 @@ def deleteOrder(request, orderCollectionID, orderID):
 
     """
     try:
+        # TODO delete from both
         if orderCollectionID in request.session["currentOrder"]:
             del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
                 pgOrders.OrderManagementBase.deleteOrder(orderID)
         
-        return HttpResponse("Surccess")
+        return HttpResponse("Success")
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed",status=500)
