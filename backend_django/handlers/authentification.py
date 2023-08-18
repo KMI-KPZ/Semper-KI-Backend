@@ -14,7 +14,7 @@ from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 from ..services.postgresDB import pgProfiles, pgOrders
-from ..handlers import basics
+from ..handlers import basics, orderManagement
 from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, redis
@@ -413,6 +413,9 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
+    if "currentOrder" in request.session:
+        orderManagement.saveOrder(request)
+
     user = request.session["pgProfileClass"].getUser(request.session)
     if user != {}:
         logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))

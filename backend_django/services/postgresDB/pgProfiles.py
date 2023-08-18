@@ -102,7 +102,7 @@ class ProfileManagementBase():
             print(error)
 
         return userID
-    
+
     ##############################################
     @staticmethod
     def getUserKeyWOSC(session=None, uID=None):
@@ -211,6 +211,26 @@ class ProfileManagementUser(ProfileManagementBase):
 
     ##############################################
     @staticmethod
+    def getUserKeyViaHash(hashedID):
+        """
+        Retrieve User ID via Database and hashkey
+
+        :param hashedID: hashed ID
+        :type hashedID: str
+        :return: User key from database
+        :rtype: Str
+
+        """
+        userID = ""
+        try:
+            userID = User.objects.get(hashedID=hashedID).subID
+        except (Exception) as error:
+            print(error)
+
+        return userID
+
+    ##############################################
+    @staticmethod
     def addUserIfNotExists(session, organization=None):
         """
         Add user if the entry doesn't already exists.
@@ -284,6 +304,26 @@ class ProfileManagementUser(ProfileManagementBase):
 ####################################################################################
 class ProfileManagementOrganization(ProfileManagementBase):
     
+    ##############################################
+    @staticmethod
+    def getUserKeyViaHash(hashedID):
+        """
+        Retrieve User ID via Database and hashkey
+
+        :param hashedID: hashed ID
+        :type hashedID: str
+        :return: Orga key from database
+        :rtype: Str
+
+        """
+        orgaID = ""
+        try:
+            orgaID = Organization.objects.get(hashedID=hashedID).subID
+        except (Exception) as error:
+            print(error)
+
+        return orgaID
+
     ##############################################
     @staticmethod
     def getAllManufacturers():
@@ -415,7 +455,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
         orgID = session["user"]["userinfo"]["org_id"]
         updated = timezone.now()
         try:
-            affected = Organization.objects.filter(subID=orgID).update(details=details, updatedWhen=updated)
+            affected = Organization.objects.filter(subID=orgID).update(details=details["details"], canManufacture=details["canManufacture"], updatedWhen=updated)
         except (Exception) as error:
             print(error)
             return False

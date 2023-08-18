@@ -146,16 +146,31 @@ def createOrderID(request, orderCollectionID):
     :rtype: JSONResponse
 
     """
-    # generate ID, timestamp and template for sub order
-    orderID = crypto.generateURLFriendlyRandomString()
-    now = timezone.now()
-    template = {"subOrderID": orderID, "contractor": [], "state": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "chat": {"messages": []}, "service": {}}
-    
-    # save into respective order collection
-    request.session["currentOrder"][orderCollectionID]["subOrders"][orderID] = template
+    try:
+        # generate ID, timestamp and template for sub order
+        orderID = crypto.generateURLFriendlyRandomString()
+        now = timezone.now()
+        template = {"subOrderID": orderID, "contractor": [], "state": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "chat": {"messages": []}, "service": {}}
+        
+        # TODO: create suborder for order in database
 
-    # return just the generated ID for frontend
-    return JsonResponse({"subOrderID": orderID})
+        # save into respective order collection
+        if "currentOrder" in request.session:
+            if orderCollectionID in request.session["currentOrder"]:
+                request.session["currentOrder"][orderCollectionID]["subOrders"][orderID] = template
+                return JsonResponse({"subOrderID": orderID})
+
+        # else: it's in the database, fetch it from there
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderID"):
+            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, request.session["pgProfileClass"].getClientID)
+            if isinstance(returnObj, Exception):
+                raise returnObj
+
+        # return just the generated ID for frontend
+        return JsonResponse({"subOrderID": orderID})
+    except (Exception) as error:
+        print(error)
+        return JsonResponse({}, status=500)
 
 #######################################################
 @require_http_methods(["PATCH"])
@@ -173,20 +188,20 @@ def updateOrder(request):
         changes = json.loads(request.body.decode("utf-8"))
         orderCollectionID = changes["orderID"]
         orderID = changes["subOrderID"]
-
-        if orderCollectionID in request.session["currentOrder"]:
-            for elem in changes["changes"]:
-                if elem == "service": # service is a dict in itself
-                    for entry in changes["changes"]["service"]:
-                        request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
-                elif elem == "chat":
-                    for entry in changes["changes"]["chat"]:
-                        request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(entry)
-                elif elem == "files":
-                    request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["files"]["files"] = changes["changes"]["files"]
-                    # state, contractor
-                else:
-                    request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem] = changes["changes"][elem]
+        if "currentOrder" in request.session:
+            if orderCollectionID in request.session["currentOrder"]:
+                for elem in changes["changes"]:
+                    if elem == "service": # service is a dict in itself
+                        for entry in changes["changes"]["service"]:
+                            request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
+                    elif elem == "chat":
+                        for entry in changes["changes"]["chat"]:
+                            request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(entry)
+                    elif elem == "files":
+                        request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["files"]["files"] = changes["changes"]["files"]
+                        # state, contractor
+                    else:
+                        request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem] = changes["changes"][elem]
         else:
             # database version
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrder"):
@@ -207,7 +222,17 @@ def updateOrder(request):
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 
-                # TODO websocket
+                # websocket
+                dictForEvents = pgOrders.OrderManagementBase.getInfoAboutOrderForWebsocket(orderCollectionID)
+                channel_layer = get_channel_layer()
+                for userID in dictForEvents:
+                    values = dictForEvents[userID]
+                    subID = request.session["pgProfileClass"].getUserKeyViaHash(userID)
+                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+                        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID), {
+                            "type": "sendMessageJSON",
+                            "dict": values,
+                        })
                 logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated subOrder {orderID} at " + str(datetime.now()))
 
             else:
@@ -425,6 +450,32 @@ def getManufacturers(request):
     return JsonResponse(manufacturerList, safe=False)
 
 #######################################################
+def saveOrderViaWebsocket(session):
+    """
+    Save order in database
+
+    :param session: session of user
+    :type session: Dict
+    :return: None
+    :rtype: None
+
+    """
+    try:
+        if manualCheckifLoggedIn(session) and manualCheckIfRightsAreSufficient(session, "saveOrder"):
+            if session["isPartOfOrganization"]:
+                error = pgOrders.OrderManagementOrganization.addOrderToDatabase(session)
+            else:
+                error = pgOrders.OrderManagementUser.addOrderToDatabase(session)
+            if isinstance(error, Exception):
+                raise error
+            logger.info(f"{pgProfiles.ProfileManagementBase.getUser(session)['name']} saved their order at " + str(datetime.now()))
+        return None
+    
+    except (Exception) as error:
+        print(error)
+        return error
+
+#######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"]) 
 @checkIfRightsAreSufficient(json=False)
@@ -443,22 +494,23 @@ def saveOrder(request):
         # TODO Save picture and files in permanent storage, and change "files" field to urls
 
         if request.session["isPartOfOrganization"]:
-            dictForEvents = pgOrders.OrderManagementOrganization.addOrder(request.session)
+            error = pgOrders.OrderManagementOrganization.addOrderToDatabase(request.session)
         else:
-            dictForEvents = pgOrders.OrderManagementUser.addOrder(request.session)
-        
+            error = pgOrders.OrderManagementUser.addOrderToDatabase(request.session)
+        if isinstance(error, Exception):
+            raise error
 
 
         # send to websockets that are active, that a new message/status is available for that order
-        channel_layer = get_channel_layer()
-        for userID in dictForEvents:
-            values = dictForEvents[userID]
-            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
-                    "type": "sendMessageJSON",
-                    "dict": values,
-                })
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} ordered something at " + str(datetime.now()))
+        # channel_layer = get_channel_layer()
+        # for userID in dictForEvents:
+        #     values = dictForEvents[userID]
+        #     if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+        #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
+        #             "type": "sendMessageJSON",
+        #             "dict": values,
+        #         })
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} saved their order at " + str(datetime.now()))
         return HttpResponse("Success")
     
     except (Exception) as error:
@@ -484,6 +536,10 @@ def verifyOrder(request, orderCollectionID, orderID):
 
         # TODO set status to verify
 
+        # TODO Websocket Event
+
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} wants to verify their order at " + str(datetime.now()))
+
         return HttpResponse("Success")
     
     except (Exception) as error:
@@ -508,7 +564,9 @@ def sendOrder(request, orderCollectionID, orderID):
         # TODO collect results
         # TODO send to manufacturer(s))
         # TODO set status to send
-
+        # TODO Websocket Events
+        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} sent their order at " + str(datetime.now()))
+        
         return HttpResponse("Success")
     
     except (Exception) as error:

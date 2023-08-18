@@ -282,12 +282,88 @@ class OrderManagementBase():
             print(error)
             return error
     
+    ##############################################
+    @staticmethod
+    def addOrderTemplateToCollection(orderCollectionID, template, clientID):
+        """
+        add an order to an existing orderCollection in the database
+
+        :param orderCollectionID: order ID to retrieve data from
+        :type orderCollectionID: str
+        :param template: Dictionary with templated order/subOrder
+        :type template: Dict
+        :return: None or Error
+        :rtype: None or Error
+
+        """
+
+        try:
+            # check if exists
+            orderCollectionObj = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+            
+            # if it does, create order
+            selectedManufacturer = template["contractor"]
+            orderID = template["subOrderID"]
+            userOrders = template["service"]
+            status = template["state"]
+            userCommunication = template["chat"]
+            files = template["files"]
+            dates = {"created": template["created"], "updated": str(timezone.now())}
+            details = template["details"]
+            ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=orderCollectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=clientID, contractor=selectedManufacturer, updatedWhen=timezone.now())
+            return None
+        except (Exception) as error:
+            print(error)
+            return error
+
+
+    ##############################################
+    @staticmethod
+    def getInfoAboutOrderForWebsocket(orderCollectionID):
+        """
+        Retrieve information about the users connected to the order from the database. 
+
+        :param orderCollectionID: order ID to retrieve data from
+        :type orderCollectionID: str
+        :return: Dictionary of users with order collection id and orders in order for the websocket to fire events
+        :rtype: Dict
+
+        """
+        # outputList for events
+        dictForEventsAsOutput = {}
+
+        orderCollectionObj = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+        dictForEventsAsOutput[orderCollectionObj.client] = {"eventType": "orderEvent"}
+        dictForEventsAsOutput[orderCollectionObj.client]["subOrderID"] = []
+        dictForEventsAsOutput[orderCollectionObj.client]["orderID"] = orderCollectionID
+        for subOrder in orderCollectionObj.orders.all():
+            if orderCollectionObj.client != subOrder.client:
+                if subOrder.client not in dictForEventsAsOutput:
+                    dictForEventsAsOutput[subOrder.client] = {"eventType": "orderEvent"}
+                    dictForEventsAsOutput[subOrder.client]["subOrderID"] = [{"orderID": subOrder.orderID, "status": 1, "messages": 0}]
+                    dictForEventsAsOutput[subOrder.client]["orderID"] = orderCollectionID
+                else:
+                    dictForEventsAsOutput[subOrder.client]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+            else:
+                dictForEventsAsOutput[orderCollectionObj.client]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+            
+            for contractor in subOrder.contractor:
+                if orderCollectionObj.client != contractor:
+                    if contractor not in dictForEventsAsOutput:
+                        dictForEventsAsOutput[contractor] = {"eventType": "orderEvent"}
+                        dictForEventsAsOutput[contractor]["subOrderID"] = [{"orderID": subOrder.orderID, "status": 1, "messages": 0}]
+                        dictForEventsAsOutput[contractor]["orderID"] = orderCollectionID
+                    else:
+                        dictForEventsAsOutput[contractor]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+
+        return dictForEventsAsOutput
+
 ####################################################################################
 # Orders from User
 class OrderManagementUser(OrderManagementBase):
     ##############################################
     @staticmethod
-    def addOrder(session):
+    def addOrderToDatabase(session):
         """
         Add order for that user. Check if user already has orders and append if so, create a new order if not.
 
@@ -299,9 +375,6 @@ class OrderManagementUser(OrderManagementBase):
         """
         now = timezone.now()
         try:
-            # outputList for events
-            dictForEventsAsOutput = {}
-
             # first get user
             client = User.objects.get(subID=session["user"]["userinfo"]["sub"])
 
@@ -309,8 +382,11 @@ class OrderManagementUser(OrderManagementBase):
             for orderCollectionID in session["currentOrder"]:
 
                 # order collection object
+                # check if obj already exists in database and overwrite it
+                # if not, create a new entry
                 existingObj = session["currentOrder"][orderCollectionID]
-                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=client.hashedID)
+
+                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -329,28 +405,20 @@ class OrderManagementUser(OrderManagementBase):
                     files = subOrder["files"]
                     dates = {"created": subOrder["created"], "updated": str(now)}
                     details = subOrder["details"]
-                    ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=client.hashedID, contractor=selectedManufacturer, updatedWhen=now)
+                    ordersObj, flag = Orders.objects.get_or_create(orderID=orderID, defaults={"orderCollectionKey":collectionObj, "userOrders": userOrders, "status": status, "userCommunication": userCommunication, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedManufacturer, "updatedWhen": now})
                     for contractor in selectedManufacturer:
                         contractorObj = Organization.objects.get(hashedID=contractor)
                         contractorObj.ordersReceived.add(ordersObj)
                         contractorObj.save()
                     
-                        # save ID of manufacturers for the websocket events
-                        if contractorObj.hashedID in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractorObj.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
-                        else:
-                            dictForEventsAsOutput[contractorObj.hashedID] = {"eventType": "orderEvent"}
-                            dictForEventsAsOutput[contractorObj.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                            dictForEventsAsOutput[contractorObj.hashedID]["orderCollectionID"] = orderCollectionID
-
                 # link OrderCollection to client
                 client.orders.add(collectionObj)
                 client.save()
 
-            return dictForEventsAsOutput
+            return None
         except (Exception) as error:
             print(error)
-            return {}
+            return error
 
     ##############################################
     @staticmethod
@@ -423,6 +491,9 @@ class OrderManagementUser(OrderManagementBase):
             output = []
             
             for orderCollection in orderCollections:
+                if "currentOrder" in session:
+                    if orderCollection.orderCollectionID in session["currentOrder"]:
+                        continue
                 currentOrderCollection = {}
                 currentOrderCollection["orderID"] = orderCollection.orderCollectionID
                 currentOrderCollection["created"] = str(orderCollection.createdWhen)
@@ -447,20 +518,18 @@ class OrderManagementOrganization(OrderManagementBase):
 
     ##############################################
     @staticmethod
-    def addOrder(session):
+    def addOrderToDatabase(session):
         """
-        Add order for that organization. 
+        Add orders to database for that organization. 
 
         :param session: session of user
         :type session: session dict
-        :return: Dictionary of users with order collection id and orders in order for the websocket to fire events
-        :rtype: Dict
+        :return: None
+        :rtype: None or Exception
 
         """
         now = timezone.now()
         try:
-            # outputList for events
-            dictForEventsAsOutput = {}
 
             # first get organization
             client = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
@@ -470,7 +539,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
                 # order collection object
                 existingObj = session["currentOrder"][orderCollectionID]
-                collectionObj = OrderCollection.objects.create(orderCollectionID=orderCollectionID, status=existingObj["state"], updatedWhen=now, client=client.hashedID)
+                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -488,35 +557,23 @@ class OrderManagementOrganization(OrderManagementBase):
                     files = entry["files"]
                     dates = {"created": entry["created"], "updated": str(now)}
                     details = entry["details"]
-                    ordersObj = Orders.objects.create(orderID=orderID, orderCollectionKey=collectionObj, userOrders=userOrders, status=status, userCommunication=userCommunication, dates=dates, details=details, files=files, client=client.hashedID, contractor=selectedManufacturer, updatedWhen=now)
+                    ordersObj, flag = Orders.objects.get_or_create(orderID=orderID, defaults={"orderCollectionKey": collectionObj, "userOrders": userOrders, "status": status, "userCommunication": userCommunication, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedManufacturer, "updatedWhen": now})
 
                     for contractor in selectedManufacturer:
                         contractorObj = Organization.objects.get(hashedID=contractor)
                         contractorObj.ordersReceived.add(ordersObj)
                         contractorObj.save()
             
-                        # save ID of manufacturers for the websocket events
-                        if contractorObj.hashedID in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractorObj.hashedID]["orders"].append({"orderID": orderID, "status": 1, "messages": 0})
-                        else:
-                            dictForEventsAsOutput[contractorObj.hashedID] = {"eventType": "orderEvent"}
-                            dictForEventsAsOutput[contractorObj.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                            dictForEventsAsOutput[contractorObj.hashedID]["orderCollectionID"] = orderCollectionID
-
                 # link OrderCollection to client
                 client.ordersSubmitted.add(collectionObj)
                 client.save()
 
-                # save ID of client for websocket events
-                dictForEventsAsOutput[client.hashedID] = {"eventType": "orderEvent"}
-                dictForEventsAsOutput[client.hashedID]["orders"] = [{"orderID": orderID, "status": 1, "messages": 0}]
-                dictForEventsAsOutput[client.hashedID]["orderCollectionID"] = orderCollectionID
-
-            return dictForEventsAsOutput
+            return None
         except (Exception) as error:
             print(error)
-            return {}
+            return error
     
+
     ##############################################
     @staticmethod
     def getOrders(session):
@@ -620,6 +677,9 @@ class OrderManagementOrganization(OrderManagementBase):
             output = []
             
             for orderCollection in orderCollections:
+                if "currentOrder" in session:
+                    if orderCollection.orderCollectionID in session["currentOrder"]:
+                        continue
                 currentOrderCollection = {}
                 currentOrderCollection["orderID"] = orderCollection.orderCollectionID
                 currentOrderCollection["created"] = str(orderCollection.createdWhen)

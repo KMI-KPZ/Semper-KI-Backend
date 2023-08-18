@@ -16,6 +16,9 @@ from django.utils import timezone
 from urllib.parse import unquote
 from django.views.decorators.http import require_http_methods
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from ..handlers import basics
 
 from ..services.postgresDB import pgProfiles
@@ -88,9 +91,9 @@ def updateDetailsOfOrganization(request):
 
     """
 
-    content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organization to {content['details']} at " + str(datetime.datetime.now()))
-    flag = pgProfiles.ProfileManagementOrganization.updateDetails(request.session, content["details"])
+    content = json.loads(request.body.decode("utf-8"))["data"]["content"]
+    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organization at " + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementOrganization.updateDetails(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -222,10 +225,17 @@ def deleteUserAsAdmin(request):
     """
     if request.session["usertype"] == "admin":
         content = json.loads(request.body.decode("utf-8"))
-        userID = content["hashedID"]
+        userHasedID = content["hashedID"]
+        userID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userHasedID)
         userName = content["name"]
+        # websocket event for that user
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
+                "type": "sendMessageJSON",
+                "dict": {"eventType": "accountEvent", "context": "deleteUser"},
+            })
 
-        flag = pgProfiles.ProfileManagementUser.deleteUser(request.session, userID)
+        flag = pgProfiles.ProfileManagementUser.deleteUser(request.session, userHasedID)
         if flag is True:
             logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted {userName} at " + str(datetime.datetime.now()))
             return HttpResponse("Worked")

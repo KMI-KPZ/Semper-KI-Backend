@@ -57,7 +57,8 @@
             "updateOrderCollection",
             "getManufacturers",
             "saveOrder",
-            "verifyOrder"
+            "verifyOrder",
+            "createOrderID"
          ]
       },
       {
