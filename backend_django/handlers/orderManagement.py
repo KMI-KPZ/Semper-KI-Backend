@@ -44,7 +44,7 @@ def createOrderCollectionID(request):
     now = timezone.now()
 
     # login defines client
-    if manualCheckifLoggedIn(request.session):
+    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderCollectionID"):
         template = {"orderID": orderCollectionID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
     else:
         template = {"orderID": orderCollectionID, "client": "", "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 

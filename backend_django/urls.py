@@ -124,6 +124,7 @@ paths = {
     "testQuery": "private/testquery/",
     "sendQuery": "private/sendQuery/",
     "testQuerySize": "private/query/",
+    "testCoypu": "private/coypu/",
 
     "testRedis": "private/testRedis/",
     "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
@@ -232,6 +233,7 @@ urlpatterns = [
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
     path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
+    path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
     
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),

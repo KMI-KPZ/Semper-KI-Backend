@@ -38,9 +38,8 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                 # Then gather the user ID or organization id from the session user token and create room from that
                 if "isPartOfOrganization" in session:
                     if session["isPartOfOrganization"]:
-                        orgaID = await sync_to_async(pgProfiles.ProfileManagementBase.getOrganization)(session)
                         # in other function send to that "group"/"channel"
-                        orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=orgaID["subID"])
+                        orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=session["user"]["userinfo"]["org_id"])
                         await self.channel_layer.group_add(orgaIDWOSC, self.channel_name)
                         # add rights
                         for entry in rights.rightsManagement.getRightsList():
@@ -65,8 +64,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
 
                 if "isPartOfOrganization" in session:
                     if session["isPartOfOrganization"]:
-                        orgaID = await sync_to_async(pgProfiles.ProfileManagementBase.getOrganization)(session)
-                        orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=orgaID["subID"])
+                        orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=session["user"]["userinfo"]["org_id"])
                         await self.channel_layer.group_discard(orgaIDWOSC, self.channel_name)
                         for entry in rights.rightsManagement.getRightsList():
                             await self.channel_layer.group_discard(orgaIDWOSC+entry, self.channel_name)

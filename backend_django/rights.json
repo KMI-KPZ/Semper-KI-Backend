@@ -58,7 +58,8 @@
             "getManufacturers",
             "saveOrder",
             "verifyOrder",
-            "createOrderID"
+            "createOrderID",
+            "createOrderCollectionID"
          ]
       },
       {

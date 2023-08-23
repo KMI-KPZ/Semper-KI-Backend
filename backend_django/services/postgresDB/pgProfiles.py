@@ -36,6 +36,11 @@ class ProfileManagementBase():
         obj = {}
         try:
             obj = User.objects.get(subID=userID).toDict()
+
+            if len(obj["organizations"]) !=0:
+                if obj["organizations"][0] != "None":
+                    for idx, elem in enumerate(obj["organizations"]):
+                        obj["organizations"][idx] = Organization.objects.get(subID=elem).hashedID
         except (Exception) as error:
             print(error)
 
