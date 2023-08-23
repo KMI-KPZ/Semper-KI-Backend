@@ -52,8 +52,50 @@ class ManageToken:
 endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
 oauthToken = ManageToken()
 
+class ManageQueries:
+    """
+    Contains query from file as object
+
+    """
+    savedQuery = None
+
+    #######################################################
+    def __init__(self, filePathAndName) -> None:
+        with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
+            self.savedQuery = queryFile.read()
+
+    #######################################################
+    def sendQuery(self):
+        """
+        Send SPARQL query.
+        :param self: Contains sparql query as obj
+        :type self: Object
+        :return: result of query
+        :rtype: JSON
+
+        """
+        # request a refresh token
+        oauthToken.checkIfExpired()
+
+        # maybe construct first, save that to redis and then search/filter from that
+        endpointCopy = endpoint
+        endpointCopy.addCustomHttpHeader(
+        httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
+        endpointCopy.setReturnFormat(JSON)
+        endpointCopy.setQuery(self.savedQuery)
+
+        results = endpointCopy.queryAndConvert()
+        return results["results"]["bindings"]
+
+
+########################################
+# list of objects
+getAllMaterials = ManageQueries("/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt")
+getAllPrinters = ManageQueries("/backend_django/SPARQLQueries/Printer/GetAll3DPrinters.txt")
+    
+
 #######################################################
-def sendQuery(query):
+def sendGeneralQuery(query):
     """
     Send SPARQL query.
     :param query: Contains sparql query as string
@@ -71,15 +113,6 @@ def sendQuery(query):
     httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
     endpointCopy.setReturnFormat(JSON)
     endpointCopy.setQuery(query)
-#     endpointCopy.setQuery("""
-#     PREFIX test: <http://www.exampe.org/O4A.owl#>
-#     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-#        SELECT *
-#    where {?s ?p test:Description}
-#    LIMIT 100
-#     """)
-    # SELECT *
-   #where {?s ?p ?o}
 
     results = endpointCopy.queryAndConvert()
     return results["results"]["bindings"]

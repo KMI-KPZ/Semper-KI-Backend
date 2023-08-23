@@ -21,7 +21,7 @@ from ..services.postgresDB import pgProfiles, pgOrders
 
 from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
-from ..services import redis, crypto
+from ..services import redis, crypto, rights
 
 logger = logging.getLogger(__name__)
 ################################################################################################
@@ -45,7 +45,7 @@ def createOrderCollectionID(request):
 
     # login defines client
     if manualCheckifLoggedIn(request.session):
-        template = {"orderID": orderCollectionID, "client": request.session["pgProfileClass"].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
+        template = {"orderID": orderCollectionID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
     else:
         template = {"orderID": orderCollectionID, "client": "", "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
     
@@ -53,6 +53,7 @@ def createOrderCollectionID(request):
     if "currentOrder" not in request.session:
         request.session["currentOrder"] = {}
     request.session["currentOrder"][orderCollectionID] = template
+    request.session.modified = True
 
     #return just the id for the frontend
     return JsonResponse({"orderID": orderCollectionID})
@@ -76,6 +77,7 @@ def updateOrderCollection(request):
         if orderCollectionID in request.session["currentOrder"]:
             if "state" in changes["changes"]:
                 request.session["currentOrder"][orderCollectionID]["state"] = changes["changes"]["state"]
+            request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrderCollection"):
                 returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
@@ -121,11 +123,12 @@ def deleteOrderCollection(request, orderCollectionID):
     try:
         if orderCollectionID in request.session["currentOrder"]:
             del request.session["currentOrder"][orderCollectionID]
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
-                pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
+            request.session.modified = True
+
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
+            pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
         
-        return HttpResponse("Surccess")
+        return HttpResponse("Success")
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed",status=500)
@@ -156,11 +159,12 @@ def createOrderID(request, orderCollectionID):
         if "currentOrder" in request.session:
             if orderCollectionID in request.session["currentOrder"]:
                 request.session["currentOrder"][orderCollectionID]["subOrders"][orderID] = template
+                request.session.modified = True
                 return JsonResponse({"subOrderID": orderID})
 
         # else: it's in the database, fetch it from there
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderID"):
-            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, request.session["pgProfileClass"].getClientID)
+            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID)
             if isinstance(returnObj, Exception):
                 raise returnObj
 
@@ -200,6 +204,10 @@ def updateOrder(request):
                         # state, contractor
                     else:
                         request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem] = changes["changes"][elem]
+                if "deletions" in changes:
+                    for elem in changes["deletions"]:
+                        del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem]
+                request.session.modified = True
         else:
             # database version
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrder"):
@@ -219,18 +227,23 @@ def updateOrder(request):
 
                     if isinstance(returnVal, Exception):
                         raise returnVal
+                if "deletions" in changes:
+                    for elem in changes["deletions"]:
+                        pass #TODO
                 
                 # websocket
                 dictForEvents = pgOrders.OrderManagementBase.getInfoAboutOrderForWebsocket(orderCollectionID)
                 channel_layer = get_channel_layer()
-                for userID in dictForEvents:
-                    values = dictForEvents[userID]
-                    subID = request.session["pgProfileClass"].getUserKeyViaHash(userID)
-                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-                        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID), {
-                            "type": "sendMessageJSON",
-                            "dict": values,
-                        })
+                for userID in dictForEvents: # user/orga that is associated with that order
+                    values = dictForEvents[userID] # message, formatted for frontend
+                    subID = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUserKeyViaHash(userID) # primary key
+                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+                        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                        for permission in rights.rightsManagement.getPermissionsNeededForPath("updateOrder"):
+                            async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                                "type": "sendMessageJSON",
+                                "dict": values,
+                            })
                 logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated subOrder {orderID} at " + str(datetime.now()))
 
             else:
@@ -258,12 +271,12 @@ def deleteOrder(request, orderCollectionID, orderID):
 
     """
     try:
-        # TODO delete from both
         if orderCollectionID in request.session["currentOrder"]:
             del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
-                pgOrders.OrderManagementBase.deleteOrder(orderID)
+            request.session.modified = True
+
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
+            pgOrders.OrderManagementBase.deleteOrder(orderID)
         
         return HttpResponse("Success")
     except (Exception) as error:
@@ -301,7 +314,7 @@ def getFlatOrders(request):
         
         # From Database
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getFlatOrders"):
-            objFromDB = request.session["pgOrderClass"].getOrdersFlat(request.session)
+            objFromDB = pgOrders.orderManagement[request.session["pgOrderClass"]].getOrdersFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["orders"].extend(objFromDB)
 
@@ -362,7 +375,7 @@ def retrieveOrders(request):
 
     """
 
-    return JsonResponse(request.session["pgOrderClass"].getOrders(request.session), safe=False)
+    return JsonResponse(pgOrders.orderManagement[request.session["pgOrderClass"]].getOrders(request.session), safe=False)
     
 
 #######################################################
@@ -374,7 +387,7 @@ def getMissedEvents(request):
     Show how many events (chat messages ...) were missed since last login.
 
     :param request: GET Request
-    :type request: HTTP GET
+    :type request: HTTP GETF
     :return: JSON Response with numbers for every order and orderCollection
     :rtype: JSON Response
 
@@ -382,7 +395,7 @@ def getMissedEvents(request):
 
     user = pgProfiles.ProfileManagementBase.getUser(request.session)
     lastLogin = user["lastSeen"]
-    orderCollections = request.session["pgOrderClass"].getOrders(request.session)
+    orderCollections = pgOrders.orderManagement[request.session["pgOrderClass"]].getOrders(request.session)
 
     output = {"eventType": "orderEvent", "events": []}
 

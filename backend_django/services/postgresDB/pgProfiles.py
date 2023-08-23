@@ -474,6 +474,4 @@ class ProfileManagementOrganization(ProfileManagementBase):
         """
         return ProfileManagementBase.getOrganization(session)["hashedID"]
 
-pgPBase = ProfileManagementBase()
-pgPUser = ProfileManagementUser()
-pgPOrganization = ProfileManagementOrganization()
+profileManagement= {"user": ProfileManagementUser(), "organization": ProfileManagementOrganization()}

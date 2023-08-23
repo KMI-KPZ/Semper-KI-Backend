@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, ontology, orderManagement
+from .handlers import resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, orderManagement
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -214,20 +214,20 @@ urlpatterns = [
 
     path(paths["isMagazineUp"], test_response.isMagazineUp, name="isMagazineUp"),
 
-    path(paths["onto_getMaterials"], ontology.onto_getMaterials, name="getMaterials"),
-    path(paths["onto_getMaterial"], ontology.onto_getMaterial, name="getMaterial"),
-    path(paths["onto_getPrinters"], ontology.onto_getPrinters, name="getPrinters"),
-    path(paths["onto_getPrinter"], ontology.onto_getPrinter, name="onto_getPrinter"),
-    path(paths["orga_addPrinter"], ontology.orga_addPrinter, name="orga_addPrinter"),
-    path(paths["orga_addPrinterEdit"], ontology.orga_addPrinterEdit, name="orga_addPrinterEdit"),
-    path(paths["orga_createPrinter"], ontology.orga_createPrinter, name="orga_createPrinter"),
-    path(paths["orga_removePrinter"], ontology.orga_removePrinter, name="orga_removePrinter"),
-    path(paths["orga_getPrinters"], ontology.orga_getPrinters, name="orga_getPrinters"),
-    path(paths["orga_addMaterial"], ontology.orga_addMaterial, name="orga_addMaterial"),
-    path(paths["orga_addMaterialEdit"], ontology.orga_addMaterialEdit, name="orga_addPrinterEdit"),
-    path(paths["orga_createMaterial"], ontology.orga_createMaterial, name="orga_createMaterial"),
-    path(paths["orga_removeMaterial"], ontology.orga_removeMaterial, name="orga_removeMaterial"),
-    path(paths["orga_getMaterials"], ontology.orga_getMaterials, name="orga_getMaterials"),
+    path(paths["onto_getMaterials"], resources.onto_getMaterials, name="getMaterials"),
+    path(paths["onto_getMaterial"], resources.onto_getMaterial, name="getMaterial"),
+    path(paths["onto_getPrinters"], resources.onto_getPrinters, name="getPrinters"),
+    path(paths["onto_getPrinter"], resources.onto_getPrinter, name="onto_getPrinter"),
+    path(paths["orga_addPrinter"], resources.orga_addPrinter, name="orga_addPrinter"),
+    path(paths["orga_addPrinterEdit"], resources.orga_addPrinterEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createPrinter"], resources.orga_createPrinter, name="orga_createPrinter"),
+    path(paths["orga_removePrinter"], resources.orga_removePrinter, name="orga_removePrinter"),
+    path(paths["orga_getPrinters"], resources.orga_getPrinters, name="orga_getPrinters"),
+    path(paths["orga_addMaterial"], resources.orga_addMaterial, name="orga_addMaterial"),
+    path(paths["orga_addMaterialEdit"], resources.orga_addMaterialEdit, name="orga_addPrinterEdit"),
+    path(paths["orga_createMaterial"], resources.orga_createMaterial, name="orga_createMaterial"),
+    path(paths["orga_removeMaterial"], resources.orga_removeMaterial, name="orga_removeMaterial"),
+    path(paths["orga_getMaterials"], resources.orga_getMaterials, name="orga_getMaterials"),
 
     path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),

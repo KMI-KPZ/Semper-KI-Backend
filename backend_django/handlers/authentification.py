@@ -104,15 +104,21 @@ def loginUser(request):
     if "Usertype" not in request.headers:
         request.session["usertype"] = "user"
         request.session["isPartOfOrganization"] = False
+        request.session["pgProfileClass"] = "user"
+        request.session["pgOrderClass"] = "user"
     else:
         userType = request.headers["Usertype"]
         if userType == "organization" or userType == "manufacturer":
             request.session["usertype"] = "organization"
             request.session["isPartOfOrganization"] = True
+            request.session["pgProfileClass"] = "organization"
+            request.session["pgOrderClass"] = "organization"
             isPartOfOrganization = True
         else:
             request.session["usertype"] = "user"
             request.session["isPartOfOrganization"] = False
+            request.session["pgProfileClass"] = "user"
+            request.session["pgOrderClass"] = "user"
 
     # set redirect url
     if settings.PRODUCTION:
@@ -177,7 +183,7 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         orgID = session["user"]["userinfo"]["org_id"]
-        userID = session["pgProfileClass"].getUserKey(session)
+        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
 
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers) )
@@ -215,7 +221,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
             'Cache-Control': "no-cache"
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
-        userID = session["pgProfileClass"].getUserKey(session)
+        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers) )
         if isinstance(response, Exception):
@@ -305,7 +311,7 @@ def callbackLogin(request):
                 forward_url = 'https://dev.semper-ki.org'
             else:
                 forward_url = 'http://127.0.0.1:3000'
-            return HttpResponseRedirect(forward_url+"/verifyLogin", status=401)
+            return HttpResponseRedirect(forward_url+"/verifyEMail", status=401)
 
         # convert expiration time to the corresponding date and time
         now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
@@ -325,7 +331,7 @@ def callbackLogin(request):
             if orgaObj == None:
                 raise Exception("Organization could not be found or created!")
 
-        userObj = request.session["pgProfileClass"].addUserIfNotExists(request.session, orgaObj)
+        userObj = pgProfiles.profileManagement[request.session["pgProfileClass"]].addUserIfNotExists(request.session, orgaObj)
         if isinstance(userObj, Exception):
             raise userObj
         
@@ -416,7 +422,7 @@ def logoutUser(request):
     if "currentOrder" in request.session:
         orderManagement.saveOrder(request)
 
-    user = request.session["pgProfileClass"].getUser(request.session)
+    user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
     if user != {}:
         logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))
     else:

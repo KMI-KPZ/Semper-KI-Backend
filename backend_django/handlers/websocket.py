@@ -14,15 +14,14 @@ from asgiref.sync import sync_to_async, async_to_sync
 from channels.db import database_sync_to_async
 
 from backend_django.services.postgresDB import pgProfiles
+from backend_django.services import rights
 from backend_django.handlers.orderManagement import saveOrderViaWebsocket
 
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
     ##########################
-    def getSession(self, save=True):
-        if save:
-            self.scope["session"].save()
-        return self.scope["session"]  
+    def getSession(self):
+        return self.scope["session"].load() 
      
     ##########################
     def setSession(self, key, value):
@@ -43,9 +42,15 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                         # in other function send to that "group"/"channel"
                         orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=orgaID["subID"])
                         await self.channel_layer.group_add(orgaIDWOSC, self.channel_name)
+                        # add rights
+                        for entry in rights.rightsManagement.getRightsList():
+                            await self.channel_layer.group_add(orgaIDWOSC+entry, self.channel_name)
 
                 uID = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(session=session)
                 await self.channel_layer.group_add(uID, self.channel_name)
+                # add rights
+                for entry in rights.rightsManagement.getRightsList():
+                    await self.channel_layer.group_add(uID+entry, self.channel_name)
                 await self.accept()
         except Exception as e:
             print(e)
@@ -53,18 +58,22 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
     ##########################
     async def disconnect(self, code):
         try:
-            session = await sync_to_async(self.getSession)(False)
+            session = await sync_to_async(self.getSession)()
             if "user" in session:
                 if "currentOrder" in session:
                     await sync_to_async(saveOrderViaWebsocket)(session)
 
                 if "isPartOfOrganization" in session:
-                    orgaID = await sync_to_async(pgProfiles.ProfileManagementBase.getOrganization)(session)
-                    orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=orgaID["subID"])
-                    await self.channel_layer.group_discard(orgaIDWOSC, self.channel_name)
-
+                    if session["isPartOfOrganization"]:
+                        orgaID = await sync_to_async(pgProfiles.ProfileManagementBase.getOrganization)(session)
+                        orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=orgaID["subID"])
+                        await self.channel_layer.group_discard(orgaIDWOSC, self.channel_name)
+                        for entry in rights.rightsManagement.getRightsList():
+                            await self.channel_layer.group_discard(orgaIDWOSC+entry, self.channel_name)
                 uID = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(session=session)
                 await self.channel_layer.group_discard(uID, self.channel_name)
+                for entry in rights.rightsManagement.getRightsList():
+                    await self.channel_layer.group_discard(uID+entry, self.channel_name)
                 raise StopConsumer("Connection closed")
         except Exception as e:
             print(e)

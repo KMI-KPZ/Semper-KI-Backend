@@ -12,7 +12,7 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
 from ..services.postgresDB import pgProfiles
-from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from .basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from django.views.decorators.http import require_http_methods
 
 from ..services import cmem, mocks
@@ -34,12 +34,11 @@ def onto_getMaterials(request):
     """
 
     resultsOfQueries = {"materials": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt") as materials:
-        materialsRes = cmem.sendQuery(materials.read())
-        for elem in materialsRes:
-            title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-            
+    materialsRes = cmem.getAllMaterials.sendQuery()
+    for elem in materialsRes:
+        title = elem["Material"]["value"]
+        resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
+        
     return JsonResponse(resultsOfQueries)
 
 #######################################################
@@ -57,12 +56,11 @@ def onto_getPrinters(request):
     """
 
     resultsOfQueries = {"printers": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Printer/GetAll3DPrinters.txt") as printers:
-        printersRes = cmem.sendQuery(printers.read())
-        for elem in printersRes:
-            title = elem["Printer"]["value"]
-            resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
-            
+    printersRes = cmem.getAllPrinters.sendQuery()
+    for elem in printersRes:
+        title = elem["Printer"]["value"]
+        resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
+        
     return JsonResponse(resultsOfQueries)
 
 
@@ -142,11 +140,10 @@ def orga_getPrinters(request):
 
     orgaName = json.loads(request.body.decode("utf-8"))["organization"]
     resultsOfQueries = {"printers": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Printer/GetAll3DPrinters.txt") as printers:
-        printersRes = cmem.sendQuery(printers.read())
-        for elem in printersRes:
-            title = elem["Printer"]["value"]
-            resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
+    printersRes = cmem.getAllPrinters.sendQuery()
+    for elem in printersRes:
+        title = elem["Printer"]["value"]
+        resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
     return JsonResponse(resultsOfQueries)
 
     
@@ -361,10 +358,9 @@ def orga_getMaterials(request):
 
     orgaName = json.loads(request.body.decode("utf-8"))["organization"]
     resultsOfQueries = {"materials": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt") as materials:
-        materialsRes = cmem.sendQuery(materials.read())
-        for elem in materialsRes:
-            title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
+    materialsRes = cmem.getAllMaterials.sendQuery()
+    for elem in materialsRes:
+        title = elem["Material"]["value"]
+        resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
             
     return JsonResponse(resultsOfQueries)

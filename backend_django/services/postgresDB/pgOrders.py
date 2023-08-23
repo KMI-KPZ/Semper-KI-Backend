@@ -165,6 +165,8 @@ class OrderManagementBase():
                 currentOrder.orderCollectionKey.updatedWhen = updated
                 currentOrder.delete()
             return True
+        except (ObjectDoesNotExist) as error:
+            return None
         except (Exception) as error:
             print(error)
         return False
@@ -187,6 +189,8 @@ class OrderManagementBase():
             currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
             currentOrderCollection.delete()
             return True
+        except (ObjectDoesNotExist) as error:
+            return None
         except (Exception) as error:
             print(error)
         return False
@@ -715,7 +719,4 @@ class OrderManagementOrganization(OrderManagementBase):
         
         return []
     
-
-pgOBase = OrderManagementBase()
-pgOUser = OrderManagementUser()
-pgOOrganization = OrderManagementOrganization()
+orderManagement= {"user": OrderManagementUser(), "organization": OrderManagementOrganization()}

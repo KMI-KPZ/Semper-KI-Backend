@@ -16,18 +16,33 @@ from channels.layers import get_channel_layer
 
 from ..services.postgresDB import pgProfiles
 
-from ..services import auth0
+from ..services import auth0, rights
 from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient
 
 logger = logging.getLogger(__name__)
 #######################################################
 def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     """
+    Send events to the respective websockets.
+
+    :param orgID: ID of that organization
+    :type orgID: str
+    :param baseURL: stuff for Auth0
+    :type baseURL: str
+    :param baseHeader: stuff for Auth0
+    :type baseHeader: str
+    :param eventName: stuff for frontend
+    :type eventName: str
+    :param args: other arguments
+    :type args: str
+    :return: True or exception
+    :rtype: Bool or exception
     """
     try:
         channel_layer = get_channel_layer()
         if eventName == "assignRole" or eventName == "removeRole":
-            async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args), {
+            groupName = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args)
+            async_to_sync(channel_layer.group_send)(groupName, {
                 "type": "sendMessageJSON",
                 "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
             })
@@ -44,9 +59,10 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
                 resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=baseHeader) )
                 if isinstance(resp, Exception):
                     raise resp    
+                groupName = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID)
                 for elem in resp:
                     if elem["id"] == args:
-                        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
+                        async_to_sync(channel_layer.group_send)(groupName, {
                             "type": "sendMessageJSON",
                             "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
                         })
