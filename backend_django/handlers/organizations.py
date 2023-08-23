@@ -484,7 +484,7 @@ def organizations_editRole(request):
         roleDescription = content["content"]["roleDescription"]
 
         data = { "name": roleName, "description": roleDescription}
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.patch(f'{baseURL}/api/v2/roles/{roleID}', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
         
@@ -627,9 +627,10 @@ def organizations_setPermissionsForRole(request):
         permissionsToBeRemoved = {"permissions": []}
         for entry in response:
             permissionsToBeRemoved["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry["permission_name"]})
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=permissionsToBeRemoved) )
-        if isinstance(response, Exception):
-            raise response
+        if len(permissionsToBeRemoved["permissions"]) > 0: # there are permissions that need removal
+            response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=permissionsToBeRemoved) )
+            if isinstance(response, Exception):
+                raise response
         response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
