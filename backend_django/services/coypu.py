@@ -11,8 +11,8 @@ from django.conf import settings
 import datetime
 
 
-endpoint = SPARQLWrapper("https://skynet.coypu.org/coypu-internal/query")
-endpoint.setCredentials("kiss-demo", "TODO")
+endpoint = SPARQLWrapper("https://skynet.coypu.org/coypu-internal")
+endpoint.setCredentials(settings.COYPU_CLIENTID, settings.COYPU_PASSWORD)
 
 class ManageQueries:
     """

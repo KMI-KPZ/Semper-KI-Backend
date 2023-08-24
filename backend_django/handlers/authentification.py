@@ -229,7 +229,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
         roles = response
 
         # set default role
-        if len(roles) == 0:
+        if len(roles) == 0 and session["usertype"] == "user":
             response = basics.handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers, json={"roles": ["rol_jG8PAa9b9LUlSz3q"]}))
             roles = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
         

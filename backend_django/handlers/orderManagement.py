@@ -164,7 +164,7 @@ def createOrderID(request, orderCollectionID):
 
         # else: it's in the database, fetch it from there
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderID"):
-            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID)
+            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session))
             if isinstance(returnObj, Exception):
                 raise returnObj
 
@@ -187,15 +187,20 @@ def updateOrder(request):
 
     """
     try:
+        now = timezone.now()
         changes = json.loads(request.body.decode("utf-8"))
         orderCollectionID = changes["orderID"]
         orderID = changes["subOrderID"]
         if "currentOrder" in request.session:
             if orderCollectionID in request.session["currentOrder"]:
+                # changes
                 for elem in changes["changes"]:
                     if elem == "service": # service is a dict in itself
-                        for entry in changes["changes"]["service"]:
-                            request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
+                        if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
+                                request.session["currentOrder"][orderCollectionID]["subOrders"][orderID] = {"subOrderID": orderID, "contractor": [], "state": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "chat": {"messages": []}, "service": {}}
+                        else:
+                            for entry in changes["changes"]["service"]:
+                                request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
                     elif elem == "chat":
                         for entry in changes["changes"]["chat"]:
                             request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(entry)
@@ -204,50 +209,74 @@ def updateOrder(request):
                         # state, contractor
                     else:
                         request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem] = changes["changes"][elem]
+                # deletions
                 if "deletions" in changes:
                     for elem in changes["deletions"]:
-                        del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem]
-                request.session.modified = True
-        else:
-            # database version
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrder"):
-                for elem in changes["changes"]:
-                    returnVal = True
-                    if elem == "service": # service is a dict in itself
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.service, changes["changes"]["service"])
-                    elif elem == "chat":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.chat, changes["changes"]["chat"])
-                    elif elem == "files":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.files, changes["changes"]["files"])
-                    elif elem == "contractor":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.contractor, changes["changes"]["contractor"])
-                    else:
-                        # state
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
-
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-                if "deletions" in changes:
-                    for elem in changes["deletions"]:
-                        pass #TODO
+                        if len(changes["deletions"][elem]) > 0:
+                            for entry in changes["deletions"][elem]:
+                                del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem][entry]
+                        else:
+                            del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID][elem]
                 
-                # websocket
-                dictForEvents = pgOrders.OrderManagementBase.getInfoAboutOrderForWebsocket(orderCollectionID)
-                channel_layer = get_channel_layer()
-                for userID in dictForEvents: # user/orga that is associated with that order
-                    values = dictForEvents[userID] # message, formatted for frontend
-                    subID = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUserKeyViaHash(userID) # primary key
-                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
-                        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                        for permission in rights.rightsManagement.getPermissionsNeededForPath("updateOrder"):
-                            async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                                "type": "sendMessageJSON",
-                                "dict": values,
-                            })
-                logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated subOrder {orderID} at " + str(datetime.now()))
-
+                request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["updated"] = str(now)
+                request.session.modified = True
             else:
-                return HttpResponse("Not logged in", status=401)
+                # database version
+                if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrder"):
+                    for elem in changes["changes"]:
+                        returnVal = True
+                        if elem == "service": # service is a dict in itself
+                            if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
+                                returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.service, {})
+                            else:        
+                                returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.service, changes["changes"]["service"])
+                        elif elem == "chat":
+                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.chat, changes["changes"]["chat"])
+                        elif elem == "files":
+                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.files, changes["changes"]["files"])
+                        elif elem == "contractor":
+                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.contractor, changes["changes"]["contractor"])
+                        else:
+                            # state
+                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
+
+                        if isinstance(returnVal, Exception):
+                            raise returnVal
+                    if "deletions" in changes:
+                        for elem in changes["deletions"]:
+                            returnVal = True
+                            if elem == "service": # service is a dict in itself      
+                                returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.service, changes["deletions"]["service"])
+                            elif elem == "chat":
+                                returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.chat, changes["deletions"]["chat"])
+                            elif elem == "files":
+                                returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.files, changes["deletions"]["files"])
+                            elif elem == "contractor":
+                                returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.contractor, changes["deletions"]["contractor"])
+                            else:
+                                # state
+                                returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.status, changes["deletions"]["state"])
+
+                            if isinstance(returnVal, Exception):
+                                raise returnVal
+                    
+                    # websocket
+                    dictForEvents = pgOrders.OrderManagementBase.getInfoAboutOrderForWebsocket(orderCollectionID)
+                    channel_layer = get_channel_layer()
+                    for userID in dictForEvents: # user/orga that is associated with that order
+                        values = dictForEvents[userID] # message, formatted for frontend
+                        subID = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUserKeyViaHash(userID) # primary key
+                        if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+                            userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                            for permission in rights.rightsManagement.getPermissionsNeededForPath("updateOrder"):
+                                async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                                    "type": "sendMessageJSON",
+                                    "dict": values,
+                                })
+                    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated subOrder {orderID} at " + str(datetime.now()))
+
+                else:
+                    return HttpResponse("Not logged in", status=401)
 
         return HttpResponse("Success")
     except (Exception) as error:

@@ -251,11 +251,9 @@ class OrderManagementBase():
 
             if updateType == EnumUpdates.chat:
                 currentOrder.userCommunication["messages"].append(content)
-                currentOrder.save()
             
             elif updateType == EnumUpdates.status:
                 currentOrder.status = content
-                currentOrder.save()
                 
                 # # if at least one order is being processed, the collection is set to 'in process'
                 # respectiveOrderCollection = currentOrder.orderCollectionKey
@@ -275,7 +273,8 @@ class OrderManagementBase():
                 currentOrder.files = content
                 
             elif updateType == EnumUpdates.service:
-                currentOrder.userOrders = content
+                for entry in content:
+                    currentOrder.userOrders[entry] = content[entry]
 
             elif updateType == EnumUpdates.contractor:
                 currentOrder.contractor = content
@@ -286,6 +285,66 @@ class OrderManagementBase():
             print(error)
             return error
     
+    ##############################################
+    @staticmethod
+    def deleteFromOrder(orderID, updateType: EnumUpdates, content):
+        """
+        Delete details of an order like its status, or content. 
+
+        :param orderID: unique order ID to be edited
+        :type orderID: str
+        :param updateType: changed order details
+        :type updateType: EnumUpdates
+        :param content: deletions
+        :type content: json dict
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
+        updated = timezone.now()
+        try:
+            currentOrder = Orders.objects.get(orderID=orderID)
+            currentOrder.updatedWhen = updated
+
+            if updateType == EnumUpdates.chat:
+                currentOrder.userCommunication["messages"].remove(content)
+            
+            elif updateType == EnumUpdates.status:
+                currentOrder.status = 0
+                
+                # # if at least one order is being processed, the collection is set to 'in process'
+                # respectiveOrderCollection = currentOrder.orderCollectionKey
+                # if respectiveOrderCollection.status == 0 and content != 0:
+                #     respectiveOrderCollection.status = 1
+                #     respectiveOrderCollection.save()
+                
+                # # if order is set to finished, check if the whole collection can be set to 'finished'
+                # finishedFlag = True
+                # for orderOfCollection in respectiveOrderCollection.orders.all():
+                #     if orderOfCollection.status != 6:
+                #         finishedFlag = False
+                #         break
+                # if finishedFlag:
+                #     respectiveOrderCollection.status = 3
+            elif updateType == EnumUpdates.files:
+                currentOrder.files = []
+                
+            elif updateType == EnumUpdates.service:
+                if len(content) > 0:
+                    for entry in content:
+                        del currentOrder.userOrders[entry]
+                else:
+                    currentOrder.userOrders = {}
+
+            elif updateType == EnumUpdates.contractor:
+                currentOrder.contractor = []
+
+            currentOrder.save()
+            return True
+        except (Exception) as error:
+            print(error)
+            return error
+
     ##############################################
     @staticmethod
     def addOrderTemplateToCollection(orderCollectionID, template, clientID):
