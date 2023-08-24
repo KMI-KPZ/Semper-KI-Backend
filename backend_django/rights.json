@@ -7,7 +7,8 @@
          },
          "elements": [
             "Orders",
-            "HomeAuthorizedOrder"
+            "HomeAuthorizedOrder",
+            "OrdersButton"
          ],
          "paths": [
             "retrieveOrders",
@@ -23,7 +24,7 @@
             "permission": "files"
          },
          "elements": [
-            "OrderFile"
+             "OrderFile"
          ],
          "paths": [
             "downloadFiles",
@@ -37,7 +38,7 @@
          },
          "elements": [
             "Chat",
-            "ChatButton"
+            "SubOrderButtonChat"
          ],
          "paths": [
             "updateOrder"
@@ -49,8 +50,24 @@
             "permission": "edit"
          },
          "elements": [
-            "OrderButtons",
-            "OrderStatus"
+            "OrdersButtonNew",
+            "OrderButtonEdit",
+            "OrderButtonNew",
+            "OrderButtonManufacturerSelection",
+            "OrderButtonRequest",
+            "OrderButtonVerify",
+            "OrderButtonReOrder",
+            "OrderButtonConfirm",
+            "OrderButtonReject",
+            "OrderButtonVerify",
+            "SubOrderCheckout",
+            "SubOrderVerification",
+            "SubOrderManufacturerSelection",
+            "SubOrderButtonEdit",
+            "SubOrderButtonReOrder",
+            "SubOrderButtonReject",
+            "SubOrderButtonConfirm",
+            "SubOrderButtonVerify"
          ],
          "paths": [
             "updateOrder",
@@ -68,6 +85,8 @@
             "permission": "delete"
          },
          "elements": [
+            "OrderButtonDelete",
+            "SubOrderButtonDelete"
          ],
          "paths": [
             "deleteOrder",
@@ -80,6 +99,7 @@
             "permission": "delete"
          },
          "elements": [
+            "OrganizationButtonDelete"
          ],
          "paths": [
             "deleteOrganization"
@@ -91,8 +111,9 @@
             "permission": "edit"
          },
          "elements": [
-            "OrganizationRoles",
-            "ButtonChangeRole"
+            "OrganizationInvitation",
+            "OrganizationButtonDeleteUser",
+            "OrganizationButtonDeleteRole"
          ],
          "paths": [
             "organizations_setPermissionsForRole",
@@ -113,8 +134,9 @@
             "permission": "read"
          },
          "elements": [
+            "Organization",
             "HomeAuthorizedOrganization",
-            "Organization"
+            "OrganizationRoles"
          ],
          "paths": [
             "organizations_getPermissionsForRole",
@@ -129,8 +151,8 @@
             "permission": "read"
          },
          "elements": [
-            "HomeAuthorizedResources",
-            "Resources"
+            "Resources",
+            "HomeAuthorizedResources"
          ],
          "paths": [
             "orga_getMaterials",
@@ -147,10 +169,10 @@
             "permission": "edit"
          },
          "elements": [
-            "ResourcesPrintersAddButton",
-            "ResourcesPrintersAdd",
             "ResourcesMaterialsForm",
-            "ResourcesMaterialsAddButton"
+            "ResourcesPrintersAdd",
+            "ResourcesButtonAddMaterial",
+            "ResourcesButtonAddPrinter"
          ],
          "paths": [
             "orga_removeMaterial",
