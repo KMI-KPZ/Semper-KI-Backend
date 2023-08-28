@@ -62,7 +62,7 @@
             "OrderButtonVerify",
             "SubOrderCheckout",
             "SubOrderVerification",
-            "SubOrderManufacturerSelection",
+            "SubOrderContractorSelection",
             "SubOrderButtonEdit",
             "SubOrderButtonReOrder",
             "SubOrderButtonReject",
