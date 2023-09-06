@@ -612,14 +612,15 @@ class OrderManagementOrganization(OrderManagementBase):
 
                 # save subOrders
                 for entry in session["currentOrder"][orderCollectionID]["subOrders"]:
-                    selectedManufacturer = entry["contractor"]
-                    orderID = entry["subOrderID"]
-                    userOrders = entry["service"]
-                    status = entry["state"]
-                    userCommunication = entry["chat"]
-                    files = entry["files"]
-                    dates = {"created": entry["created"], "updated": str(now)}
-                    details = entry["details"]
+                    subOrder = session["currentOrder"][orderCollectionID]["subOrders"][entry]
+                    selectedManufacturer = subOrder["contractor"]
+                    orderID = subOrder["subOrderID"]
+                    userOrders = subOrder["service"]
+                    status = subOrder["state"]
+                    userCommunication = subOrder["chat"]
+                    files = subOrder["files"]
+                    dates = {"created": subOrder["created"], "updated": str(now)}
+                    details = subOrder["details"]
                     ordersObj, flag = Orders.objects.get_or_create(orderID=orderID, defaults={"orderCollectionKey": collectionObj, "userOrders": userOrders, "status": status, "userCommunication": userCommunication, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedManufacturer, "updatedWhen": now})
 
                     for contractor in selectedManufacturer:
@@ -766,7 +767,15 @@ class OrderManagementOrganization(OrderManagementBase):
             
             # after collection the order collections and their orders, we need to add them to the output
             for orderCollection in receivedOrdersCollections:
-                output.append(orderCollection)
+                currentOrderCollection = {}
+                currentOrderCollection["orderID"] = receivedOrdersCollections[orderCollection]["orderID"]
+                currentOrderCollection["created"] = receivedOrdersCollections[orderCollection]["created"]
+                currentOrderCollection["updated"] = receivedOrdersCollections[orderCollection]["updated"]
+                currentOrderCollection["state"] = receivedOrdersCollections[orderCollection]["state"]
+                currentOrderCollection["client"] = receivedOrdersCollections[orderCollection]["client"]
+                currentOrderCollection["subOrderCount"] = receivedOrdersCollections[orderCollection]["subOrderCount"]
+
+                output.append(currentOrderCollection)
 
 
             output = sorted(output, key=lambda x: 

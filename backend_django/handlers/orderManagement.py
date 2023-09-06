@@ -202,8 +202,7 @@ def updateOrder(request):
                             for entry in changes["changes"]["service"]:
                                 request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["service"][entry] = changes["changes"]["service"][entry]
                     elif elem == "chat":
-                        for entry in changes["changes"]["chat"]:
-                            request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(entry)
+                        request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["chat"]["messages"].append(changes["changes"]["chat"])
                     elif elem == "files":
                         request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]["files"]["files"] = changes["changes"]["files"]
                         # state, contractor
@@ -265,7 +264,7 @@ def updateOrder(request):
                     channel_layer = get_channel_layer()
                     for userID in dictForEvents: # user/orga that is associated with that order
                         values = dictForEvents[userID] # message, formatted for frontend
-                        subID = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUserKeyViaHash(userID) # primary key
+                        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
                         if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
                             userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
                             for permission in rights.rightsManagement.getPermissionsNeededForPath("updateOrder"):

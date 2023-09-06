@@ -10,7 +10,7 @@ import datetime
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
-from anyio import sleep
+from time import sleep
 
 from ..services import rights
 

@@ -90,6 +90,28 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
+    def getUserKeyViaHash(hashedID):
+        """
+        Retrieve User ID via Database and hashkey
+
+        :param hashedID: hashed ID
+        :type hashedID: str
+        :return: Orga key from database
+        :rtype: Str
+
+        """
+        IDOfUserOrOrga = ""
+        try:
+            IDOfUserOrOrga = Organization.objects.get(hashedID=hashedID).subID
+        except (ObjectDoesNotExist) as error:
+            IDOfUserOrOrga = User.objects.get(hashedID=hashedID).subID
+        except (Exception) as error:
+            print(error)
+
+        return IDOfUserOrOrga
+
+    ##############################################
+    @staticmethod
     def getUserKey(session):
         """
         Retrieve User ID from Session
@@ -216,26 +238,6 @@ class ProfileManagementUser(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def getUserKeyViaHash(hashedID):
-        """
-        Retrieve User ID via Database and hashkey
-
-        :param hashedID: hashed ID
-        :type hashedID: str
-        :return: User key from database
-        :rtype: Str
-
-        """
-        userID = ""
-        try:
-            userID = User.objects.get(hashedID=hashedID).subID
-        except (Exception) as error:
-            print(error)
-
-        return userID
-
-    ##############################################
-    @staticmethod
     def addUserIfNotExists(session, organization=None):
         """
         Add user if the entry doesn't already exists.
@@ -308,26 +310,6 @@ class ProfileManagementUser(ProfileManagementBase):
 
 ####################################################################################
 class ProfileManagementOrganization(ProfileManagementBase):
-    
-    ##############################################
-    @staticmethod
-    def getUserKeyViaHash(hashedID):
-        """
-        Retrieve User ID via Database and hashkey
-
-        :param hashedID: hashed ID
-        :type hashedID: str
-        :return: Orga key from database
-        :rtype: Str
-
-        """
-        orgaID = ""
-        try:
-            orgaID = Organization.objects.get(hashedID=hashedID).subID
-        except (Exception) as error:
-            print(error)
-
-        return orgaID
 
     ##############################################
     @staticmethod
