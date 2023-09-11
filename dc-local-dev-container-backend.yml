@@ -1,0 +1,18 @@
+version: '3.4'
+ 
+services:
+  backend:
+    image: local-dev-container-backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 127.0.0.1:8000:8000
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - semper-ki-dev-network
+networks:
+    semper-ki-dev-network:

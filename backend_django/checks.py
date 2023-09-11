@@ -1,0 +1,57 @@
+import os
+import threading
+
+from django.core.checks import Tags as DjangoTags, Error, Info
+from django.apps import apps
+from django.core.checks import register
+from .helper.classes import SemperKiConfigHelper
+from django.db import connections, OperationalError
+
+
+class Tags(DjangoTags):
+    env_check = 'env_check'
+    db_check = 'db_check'
+
+
+
+def check_env(app_configs=None, **kwargs):
+    print('checking environment variables in thread: '+ str(threading.get_ident()))
+    errors = []
+    if app_configs is None:
+        app_configs = apps.get_app_configs()
+
+    for app in app_configs:
+        if issubclass(type(app), SemperKiConfigHelper):
+            print(f'checking environment variables for {str(app)}\n')
+            errors.extend(app.check_env_vars())
+    return errors
+
+def check_db(app_configs=None, **kwargs):
+    print('checking databases in thread: '+ str(threading.get_ident()))
+    errors = []
+    if app_configs is None:
+        app_configs = apps.get_app_configs()
+
+    for app in app_configs:
+        if issubclass(type(app), SemperKiConfigHelper):
+            print(f'checking databases for {str(app)}\n')
+            for db_alias in app.get_db_aliases():
+                db_conn = connections[db_alias]
+                from django.conf import settings
+                db_name = settings.DATABASES[db_alias].get("NAME")
+                try:
+                    c = db_conn.cursor()
+                    errors.append(Info(f'connected to database with alias "{db_alias}" on "{db_conn.settings_dict["HOST"]}"\n db_name: "{db_name}"',id='db_check'))
+                except OperationalError:
+                    connected = False
+                    errors.append(Error(f'could not connect to database with alias "{db_alias}" on "{settings.DATABASES[db_alias]["HOST"]}\n db_name: "{db_name}"',
+                                        hint=f'Check your .env file and it\'s settings and check if database exists',
+                                        id='db_check'))
+                else:
+                    connected = True
+    if len(errors) == 0:
+        from django.apps import apps
+        tables = [m._meta.db_table for c in apps.get_app_configs() for m in c.get_models()]
+        print(f'all tables by models {str(tables)}\n')
+
+    return errors

@@ -12,7 +12,7 @@ from .base import *
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DEBUG=False
+DEBUG = False
 DEVELOPMENT=True
 BACKEND_SETTINGS= "development"
 
@@ -21,19 +21,5 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_DOMAIN = '.semper-ki.org'
 
-DATABASES = {
-    'default': {
-    #SQLITE
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-    # POSTGRESQL
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": "db-dev",  # "db" set in docker-compose.yml
-        "PORT": 5432,  # default postgres port
-    }
-}
 
 REDIS_HOST = "files-dev"

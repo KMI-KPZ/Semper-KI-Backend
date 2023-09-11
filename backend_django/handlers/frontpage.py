@@ -5,6 +5,8 @@ Silvio Weging 2023
 
 Contains: Views for some backend websites
 """
+import threading
+
 from django.shortcuts import render
 from django.conf import settings
 
@@ -19,6 +21,9 @@ def landingPage(request):
     :rtype: None
 
     """
+    print("landingpage")
+    # print thread id
+    print('landing page in thread: '+ str(threading.get_ident()))
     return render(
         request,
         "landingPage.html"#,
@@ -100,4 +105,6 @@ def sparqlPage(request):
 def getSettingsToken(request):
     from django.conf import settings
     from django.http.response import JsonResponse
+    from ..services.postgresDB.pgProfiles import pgPBase
+    pgPBase.getAll()
     return JsonResponse({"token": settings.BACKEND_SETTINGS})
