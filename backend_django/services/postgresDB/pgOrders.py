@@ -288,6 +288,10 @@ class OrderManagementBase():
             elif updateType == EnumUpdates.contractor:
                 currentOrder.contractor = content
 
+            elif updateType == EnumUpdates.details:
+                for entry in content:
+                    currentOrder.details[entry] = content[entry]
+
             currentOrder.save()
             return True
         except (Exception) as error:
@@ -347,6 +351,10 @@ class OrderManagementBase():
 
             elif updateType == EnumUpdates.contractor:
                 currentOrder.contractor = []
+
+            elif updateType == EnumUpdates.details:
+                for key in content:
+                    del currentOrder.details[key]
 
             currentOrder.save()
             return True
