@@ -26,6 +26,7 @@ class EnumUpdates(enum.Enum):
     files = 3
     service = 4
     contractor = 5
+    details = 6
 
 ####################################################################################
 # Orders general
@@ -98,6 +99,8 @@ class OrderManagementBase():
             output["updated"] = str(orderCollection.updatedWhen)
             output["client"] = orderCollection.client
             output["state"] = orderCollection.status
+            output["details"] = orderCollection.details
+
             ordersOfThatCollection = []
             for entry in orderCollection.orders.all():
                 currentOrder = {}
@@ -223,6 +226,12 @@ class OrderManagementBase():
                 #     order.status = content
                 #     order.updatedWhen = updated
                 #     order.save()
+            elif updateType == EnumUpdates.details:
+                currentOrderCollection = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+                for key in content:
+                    currentOrderCollection.details[key] = content[key]
+                currentOrderCollection.updatedWhen = updated
+                currentOrderCollection.save()
             return True
         except (Exception) as error:
             print(error)
@@ -449,7 +458,7 @@ class OrderManagementUser(OrderManagementBase):
                 # if not, create a new entry
                 existingObj = session["currentOrder"][orderCollectionID]
 
-                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID})
+                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -509,6 +518,7 @@ class OrderManagementUser(OrderManagementBase):
                 currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
                 currentOrderCollection["client"] = orderCollection.client
                 currentOrderCollection["state"] = orderCollection.status
+                currentOrderCollection["details"] = orderCollection.details
                 ordersOfThatCollection = []
                 for entry in orderCollection.orders.all():
                     currentOrder = {}
@@ -563,6 +573,7 @@ class OrderManagementUser(OrderManagementBase):
                 currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
                 currentOrderCollection["state"] = orderCollection.status
                 currentOrderCollection["client"] = orderCollection.client
+                currentOrderCollection["details"] = orderCollection.details
                 currentOrderCollection["subOrderCount"] = len(orderCollection.orders.all())
                     
                 output.append(currentOrderCollection)
@@ -602,7 +613,7 @@ class OrderManagementOrganization(OrderManagementBase):
 
                 # order collection object
                 existingObj = session["currentOrder"][orderCollectionID]
-                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID})
+                collectionObj, flag = OrderCollection.objects.get_or_create(orderCollectionID=orderCollectionID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -665,6 +676,7 @@ class OrderManagementOrganization(OrderManagementBase):
                 currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
                 currentOrderCollection["state"] = orderCollection.status
                 currentOrderCollection["client"] = orderCollection.client
+                currentOrderCollection["details"] = orderCollection.details
                 ordersOfThatCollection = []
                 for entry in orderCollection.orders.all():
                     currentOrder = {}
@@ -750,6 +762,7 @@ class OrderManagementOrganization(OrderManagementBase):
                 currentOrderCollection["updated"] = str(orderCollection.updatedWhen)
                 currentOrderCollection["state"] = orderCollection.status
                 currentOrderCollection["client"] = orderCollection.client
+                currentOrderCollection["details"] = orderCollection.details
                 currentOrderCollection["subOrderCount"] = len(list(orderCollection.orders.all()))
 
                 output.append(currentOrderCollection)
@@ -773,6 +786,7 @@ class OrderManagementOrganization(OrderManagementBase):
                 currentOrderCollection["updated"] = receivedOrdersCollections[orderCollection]["updated"]
                 currentOrderCollection["state"] = receivedOrdersCollections[orderCollection]["state"]
                 currentOrderCollection["client"] = receivedOrdersCollections[orderCollection]["client"]
+                currentOrderCollection["details"] = receivedOrdersCollections[orderCollection]["details"]
                 currentOrderCollection["subOrderCount"] = receivedOrdersCollections[orderCollection]["subOrderCount"]
 
                 output.append(currentOrderCollection)

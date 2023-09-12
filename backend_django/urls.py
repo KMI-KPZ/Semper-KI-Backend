@@ -73,7 +73,7 @@ paths = {
     "updateOrderCollection": "public/updateOrder/",
     "deleteOrder": "public/deleteSubOrder/<orderCollectionID>/<orderID>/",
     "deleteOrderCollection": "public/deleteOrder/<orderCollectionID>/",
-    "verifyOrder": "public/verifyOrder/<orderCollectionID>/<orderID>/",
+    "verifyOrder": "public/verifyOrder/",
     "sendOrder": "public/sendOrder/<orderCollectionID>/<orderID>/",
 
     "deleteUser": "public/profileDeleteUser/",

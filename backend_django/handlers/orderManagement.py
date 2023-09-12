@@ -45,9 +45,9 @@ def createOrderCollectionID(request):
 
     # login defines client
     if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderCollectionID"):
-        template = {"orderID": orderCollectionID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
+        template = {"orderID": orderCollectionID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "details": {}, "subOrders": {}} 
     else:
-        template = {"orderID": orderCollectionID, "client": "", "state": 0, "created": str(now), "updated": str(now), "subOrders": {}} 
+        template = {"orderID": orderCollectionID, "client": "", "state": 0, "created": str(now), "updated": str(now), "details": {}, "subOrders": {}} 
     
     # save order collection template in session for now
     if "currentOrder" not in request.session:
@@ -77,12 +77,20 @@ def updateOrderCollection(request):
         if orderCollectionID in request.session["currentOrder"]:
             if "state" in changes["changes"]:
                 request.session["currentOrder"][orderCollectionID]["state"] = changes["changes"]["state"]
+            elif "title" in changes["changes"]:
+                request.session["currentOrder"][orderCollectionID]["details"] = {"title": changes["changes"]["title"]}
             request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrderCollection"):
-                returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
-                if isinstance(returnVal, Exception):
-                    raise returnVal
+                if "state" in changes["changes"]:
+                    returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
+                if "title" in changes["changes"]:
+                    paramObj = {"title": changes["changes"]["title"]}
+                    returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.details, paramObj)
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
                 
                 # TODO send to websockets that are active, that a new message/status is available for that order
                 # outputDict = {"eventType": "orderEvent"}
@@ -121,13 +129,16 @@ def deleteOrderCollection(request, orderCollectionID):
 
     """
     try:
-        if orderCollectionID in request.session["currentOrder"]:
-            del request.session["currentOrder"][orderCollectionID]
-            request.session.modified = True
+        if "currentOrder" in request.session:
+            if orderCollectionID in request.session["currentOrder"]:
+                del request.session["currentOrder"][orderCollectionID]
+                request.session.modified = True
 
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
+        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
             pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
-        
+        else:
+            raise Exception("Not logged in or rights insufficient!")
+
         return HttpResponse("Success")
     except (Exception) as error:
         print(error)
@@ -299,12 +310,15 @@ def deleteOrder(request, orderCollectionID, orderID):
 
     """
     try:
-        if orderCollectionID in request.session["currentOrder"]:
-            del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]
-            request.session.modified = True
+        if "currentOrder" in request.session:
+            if orderCollectionID in request.session["currentOrder"]:
+                del request.session["currentOrder"][orderCollectionID]["subOrders"][orderID]
+                request.session.modified = True
 
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
+        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
             pgOrders.OrderManagementBase.deleteOrder(orderID)
+        else:
+            raise Exception("Not logged in or rights insufficient!")
         
         return HttpResponse("Success")
     except (Exception) as error:
@@ -337,6 +351,7 @@ def getFlatOrders(request):
                 tempDict["state"] =  request.session["currentOrder"][entry]["state"]
                 tempDict["created"] = request.session["currentOrder"][entry]["created"]
                 tempDict["updated"] = request.session["currentOrder"][entry]["updated"]
+                tempDict["details"] = request.session["currentOrder"][entry]["details"]
                 tempDict["subOrderCount"] = len(request.session["currentOrder"][entry]["subOrders"])
                 outDict["orders"].append(tempDict)
         
@@ -376,6 +391,7 @@ def getOrder(request, orderCollectionID):
                 outDict["state"] =  request.session["currentOrder"][orderCollectionID]["state"]
                 outDict["created"] = request.session["currentOrder"][orderCollectionID]["created"]
                 outDict["updated"] = request.session["currentOrder"][orderCollectionID]["updated"]
+                outDict["details"] = request.session["currentOrder"][orderCollectionID]["details"]
                 outDict["subOrders"] = []
                 for elem in request.session["currentOrder"][orderCollectionID]["subOrders"]:
                     outDict["subOrders"].append(request.session["currentOrder"][orderCollectionID]["subOrders"][elem])
@@ -540,16 +556,6 @@ def saveOrder(request):
         if isinstance(error, Exception):
             raise error
 
-
-        # send to websockets that are active, that a new message/status is available for that order
-        # channel_layer = get_channel_layer()
-        # for userID in dictForEvents:
-        #     values = dictForEvents[userID]
-        #     if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-        #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
-        #             "type": "sendMessageJSON",
-        #             "dict": values,
-        #         })
         logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} saved their order at " + str(datetime.now()))
         return HttpResponse("Success")
     
@@ -559,9 +565,9 @@ def saveOrder(request):
     
 #######################################################
 @checkIfUserIsLoggedIn()
-@require_http_methods(["GET"]) 
+@require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
-def verifyOrder(request, orderCollectionID, orderID):
+def verifyOrder(request):
     """
     Start calculations on server and set status accordingly
 
@@ -572,6 +578,11 @@ def verifyOrder(request, orderCollectionID, orderID):
 
     """
     try:
+        # get information
+        info = json.loads(request.body.decode("utf-8"))
+        orderID = info["orderID"]
+        sendToManufacturerAfterVerification = info["send"]
+        subOrderIDArray = info["subOrderIDs"]
         # TODO start services
 
         # TODO set status to verify
@@ -588,7 +599,7 @@ def verifyOrder(request, orderCollectionID, orderID):
     
 #######################################################
 @checkIfUserIsLoggedIn()
-@require_http_methods(["GET"]) 
+@require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
 def sendOrder(request, orderCollectionID, orderID):
     """
