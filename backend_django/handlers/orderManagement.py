@@ -74,11 +74,12 @@ def updateOrderCollection(request):
         changes = json.loads(request.body.decode("utf-8"))
         orderCollectionID = changes["orderID"]
 
-        if orderCollectionID in request.session["currentOrder"]:
+        if "currentOrder" in request.session and orderCollectionID in request.session["currentOrder"]:
             if "state" in changes["changes"]:
                 request.session["currentOrder"][orderCollectionID]["state"] = changes["changes"]["state"]
-            elif "title" in changes["changes"]:
-                request.session["currentOrder"][orderCollectionID]["details"] = {"title": changes["changes"]["title"]}
+            elif "details" in changes["changes"]:
+                for elem in changes["changes"]["details"]:
+                    request.session["currentOrder"][orderCollectionID]["details"][elem] = changes["changes"]["details"][elem]
             request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrderCollection"):
@@ -86,8 +87,10 @@ def updateOrderCollection(request):
                     returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
-                if "title" in changes["changes"]:
-                    paramObj = {"title": changes["changes"]["title"]}
+                if "details" in changes["changes"]:
+                    paramObj = {}
+                    for elem in changes["changes"]["details"]:
+                        paramObj[elem] = changes["changes"]["details"][elem]
                     returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.details, paramObj)
                     if isinstance(returnVal, Exception):
                         raise returnVal
@@ -129,10 +132,9 @@ def deleteOrderCollection(request, orderCollectionID):
 
     """
     try:
-        if "currentOrder" in request.session:
-            if orderCollectionID in request.session["currentOrder"]:
-                del request.session["currentOrder"][orderCollectionID]
-                request.session.modified = True
+        if "currentOrder" in request.session and orderCollectionID in request.session["currentOrder"]:
+            del request.session["currentOrder"][orderCollectionID]
+            request.session.modified = True
 
         elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
             pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
