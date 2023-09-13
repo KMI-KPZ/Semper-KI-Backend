@@ -65,6 +65,7 @@
             "SubOrderCheckout",
             "SubOrderVerification",
             "SubOrderContractorSelection",
+            "SubOrderServiceSelection",
             "SubOrderButtonEdit",
             "SubOrderButtonContractorSelection",
             "SubOrderButtonRequest",
