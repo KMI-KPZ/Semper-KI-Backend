@@ -115,6 +115,7 @@
             "OrganizationButtonEditOrga",
             "OrganizationButtonEditUser",
             "OrganizationButtonDeleteUser",
+            "OrganizationButtonCreateRole",
             "OrganizationButtonEditRole",
             "OrganizationButtonDeleteRole"
          ],
