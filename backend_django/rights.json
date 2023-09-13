@@ -112,6 +112,7 @@
          },
          "elements": [
             "OrganizationInvitation",
+            "OrganizationButtonEditOrga",
             "OrganizationButtonEditUser",
             "OrganizationButtonDeleteUser",
             "OrganizationButtonEditRole",
