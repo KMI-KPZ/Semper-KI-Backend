@@ -112,7 +112,9 @@
          },
          "elements": [
             "OrganizationInvitation",
+            "OrganizationButtonEditUser",
             "OrganizationButtonDeleteUser",
+            "OrganizationButtonEditRole",
             "OrganizationButtonDeleteRole"
          ],
          "paths": [
