@@ -29,3 +29,6 @@ DATABASES = {
         "PORT": 5432,  # default postgres port
     }
 }
+
+CELERY_BROKER_URL = "redis://:"+REDIS_PASSWORD+"@host.docker.internal:6379/0"
+CELERY_RESULT_BACKEND = "redis://:"+REDIS_PASSWORD+"@host.docker.internal:6379/0"

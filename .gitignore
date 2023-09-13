@@ -138,3 +138,5 @@ backend_django/env_example.env
 /logs/*
 
 quickDebug.py
+
+Ontology/

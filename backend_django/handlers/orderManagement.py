@@ -22,6 +22,7 @@ from ..services.postgresDB import pgProfiles, pgOrders
 from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from ..services import redis, crypto, rights
+from ..services.processes import price
 
 logger = logging.getLogger(__name__)
 ################################################################################################
@@ -587,6 +588,9 @@ def verifyOrder(request):
         sendToManufacturerAfterVerification = info["send"]
         subOrderIDArray = info["subOrderIDs"]
         # TODO start services
+        call = price.calculatePrice_Mock.delay([1,2,3])
+        # save ID to database
+        # call.id
 
         # TODO set status to verify
 
@@ -615,7 +619,8 @@ def sendOrder(request, orderCollectionID, orderID):
 
     """
     try:
-        # TODO collect results
+        # TODO collect results via saved celery ids
+
         # TODO send to manufacturer(s))
         # TODO set status to send
         # TODO Websocket Events
