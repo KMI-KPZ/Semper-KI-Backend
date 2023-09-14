@@ -7,7 +7,7 @@ from django.apps import AppConfig
 from .services import auth0
 
 from django.core.checks import register
-from .checks import Tags, check_env, check_db
+from .checks import Tags, checkEnv, checkDb
 from .helper.classes import SemperKiConfigHelper
 
 #
@@ -27,16 +27,16 @@ class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
         from django.conf import settings
         print(f'\n\n********** BackendDjangoConfig.ready() **********\nSettings-Module: {settings.BACKEND_SETTINGS}\n')
 
-        if self.do_check('check_env'):
-            register(check_env, Tags.env_check) # register check_env function with tag env_check
-        if self.do_check('check_db'):
-            register(check_db, Tags.db_check) # register check_db function with tag db_check
+        if self.doCheck('check_env'):
+            register(checkEnv, Tags.env_check) # register check_env function with tag env_check
+        if self.doCheck('check_db'):
+            register(checkDb, Tags.db_check) # register check_db function with tag db_check
         super(BackendDjangoConfig, self).ready()
 
     def __repr__(self):
         return self.name
 
-    def do_check(self, check_name):
+    def doCheck(self, check_name):
         import sys
         for tokens in sys.argv:
             if tokens in self.checks_disable[check_name]:

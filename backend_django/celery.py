@@ -13,7 +13,7 @@ from celery import Celery
 
 from django.conf import settings
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend_django.settings.debug")# os.environ.get("DJANGO_SETTINGS_MODULE"))
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend_django.settings.debug")# os.environ.get("DJANGO_SETTINGS_MODULE"))
 
 # include this variable into files using Celery
 app = Celery('backend_django')

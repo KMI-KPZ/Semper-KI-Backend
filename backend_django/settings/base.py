@@ -25,9 +25,7 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
     dbs = ('default',)
     # required env vars
 
-    env_vars = {
-        'DJANGO_SECRET': {'var': 'SECRET_KEY', 'hint': 'Django secret key used for hashing and encryption',
-                          'default': '1234567890', 'required': True},
+    env_vars_external = {
         # AUTH0
         'AUTH0_DOMAIN': {'var': 'AUTH0_DOMAIN',
                          'hint': 'Auth0 domain as endpoint for authentication services for semper-ki', 'default': None,
@@ -50,24 +48,6 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'AUTH0_API_CLIENT_SECRET': {'var': 'AUTH0_API_CLIENT_SECRET',
                                     'hint': 'Auth0 client secret for authentication services for management via m2m calls',
                                     'default': None, 'required': True},
-        # Postgres PW
-        'POSTGRES_PASSWORD': {'var': 'POSTGRES_PASSWORD', 'hint': 'Postgres password for database', 'default': None,
-                              'required': True},
-        'POSTGRES_HOST': {'var': 'POSTGRES_HOST', 'hint': 'Postgres host for database', 'default': 'db-dev',
-                          'required': True},
-        'POSTGRES_PORT': {'var': 'POSTGRES_PORT', 'hint': 'Postgres port for database', 'default': '5432',
-                          'required': True},
-        'POSTGRES_NAME': {'var': 'POSTGRES_NAME', 'hint': 'Postgres database for database', 'default': 'postgres',
-                          'required': True},
-        'POSTGRES_USER': {'var': 'POSTGRES_USER', 'hint': 'Postgres username for database', 'default': 'postgres',
-                          'required': True},
-
-        # REDIS
-        'REDIS_HOST': {'var': 'REDIS_HOST', 'hint': 'Redis host for caching', 'default': 'host.docker.internal',
-                       'required': False},
-        'REDIS_PORT': {'var': 'REDIS_PORT', 'hint': 'Redis port for caching', 'default': '6379', 'required': False},
-        'REDISPW': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': None, 'required': True},
-
         # SPARQL
         'SPARQLUSERNAME': {'var': 'SPARQL_USERNAME', 'hint': 'Sparql username for querying the triple store',
                            'default': None, 'required': True},
@@ -88,6 +68,34 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'COYPUPASSWORD': {'var': 'COYPU_PASSWORD',
                           'hint': 'COYPU password for authentication services for management via m2m calls',
                           'default': None, 'required': True},
+    }
+
+    env_vars_internal = {
+        'DJANGO_SECRET': {'var': 'SECRET_KEY', 'hint': 'Django secret key used for hashing and encryption',
+                          'default': '1234567890', 'required': True},
+
+        # Postgres PW
+        'POSTGRES_PASSWORD': {'var': 'POSTGRES_PASSWORD', 'hint': 'Postgres password for database - default is used for docker-dev-environment', 'default': "pg_pw",
+                              'required': True
+                              },
+        'POSTGRES_HOST': {'var': 'POSTGRES_HOST', 'hint': 'Postgres host for database', 'default': 'db-dev-local',
+                          'required': True},
+        'POSTGRES_PORT': {'var': 'POSTGRES_PORT', 'hint': 'Postgres port for database', 'default': '5432',
+                          'required': True},
+        'POSTGRES_NAME': {'var': 'POSTGRES_NAME', 'hint': 'Postgres database for database', 'default': 'semperki-dev',
+                          'required': True},
+        'POSTGRES_USER': {'var': 'POSTGRES_USER', 'hint': 'Postgres username for database', 'default': 'postgres',
+                          'required': True},
+
+        # REDIS
+        'REDIS_HOST': {'var': 'REDIS_HOST', 'hint': 'Redis host for caching', 'default': 'host.docker.internal',
+                       'required': False},
+        'REDIS_PORT': {'var': 'REDIS_PORT', 'hint': 'Redis port for caching', 'default': '6379', 'required': False},
+        'REDISPW': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': "redis_pw", 'required': True},
+        'CELERY_BROKER_URL': {'var': 'CELERY_BROKER_URL', 'default': "redis://:redis_pw@host.docker.internal:6379/0",
+                            'hint': 'Celery broker url for checking msg queue?', 'required': True},
+        'CELERY_RESULT_BACKEND' : {'var': 'CELERY_RESULT_BACKEND', 'default': "redis://:redis_pw@host.docker.internal:6379/0'",
+                            'hint': 'Celery result backend?', 'required': True},
 
         # Allowed hosts
         'ALLOWED_HOSTS': {'var': 'ALLOWED_HOSTS', 'hint': 'Allowed hosts for the backend API calls, comma separated',
@@ -98,6 +106,10 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
                    'default': 'DEFAULT_ENV', 'required': False},
 
     }
+
+    def __init__(self):
+        self.env_vars = {**self.env_vars_external, **self.env_vars_internal}
+        super().__init__()
 
     def configure_database(self, module):
         print('************* configuring database: thread: ' + str(threading.current_thread().ident) + ' *************')
@@ -370,5 +382,5 @@ WSGI_APPLICATION = 'backend_django.wsgi.application'
 ASGI_APPLICATION = "backend_django.asgi.application"
 
 settings_helper = BackendDjangoConfigHelper()
-settings_helper.load_env_vars(sys.modules[__name__])
+settings_helper.loadEnvVars(sys.modules[__name__])
 settings_helper.configure_database(sys.modules[__name__])

@@ -5,7 +5,8 @@ services:
     image: local-dev-container-backend
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile_new
+    command: ["-e local_container"]
     ports:
       - 127.0.0.1:8000:8000
     volumes:

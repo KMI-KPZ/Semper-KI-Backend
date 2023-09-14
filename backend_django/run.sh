@@ -2,10 +2,11 @@
 pwd
 echo "Starting SemperKI-Backend"
 ENV="production"
-MIGRATIONS=0
+MIGRATIONS=1
 CHECKS=1
+DEBUG=0
 
-while getopts "e:mc" opt; do
+while getopts "e:mcd" opt; do
   case $opt in
     e)
       ENV="$OPTARG"
@@ -15,6 +16,9 @@ while getopts "e:mc" opt; do
       ;;
     c)
       CHECKS=1
+      ;;
+    d)
+      DEBUG=1
       ;;
     \?)
       echo "Ungültige Option: -$OPTARG" >&2
@@ -26,6 +30,10 @@ done
 echo "ENVIRONMENT: $ENV"
 echo "MIGRATIONS: $MIGRATIONS"
 echo "CHECKS: $CHECKS"
+echo "DEBUG: $DEBUG"
+
+echo "...Waiting for postgres..."
+SLEEP 10
 
 if [ $CHECKS -eq 1 ]; then
   echo "running python manage.py check backend_django --env $ENV"
@@ -58,4 +66,10 @@ if [ $MIGRATIONS -eq 1 ]; then
   echo -e "\nrunning python manage.py migrate --env $ENV"
   python manage.py migrate --env $ENV
 fi
+
+if [ $DEBUG -eq 1 ]; then
+  echo -e "\nrunning python manage.py runserver"
+  exec backend_django.asgi:application --reload --reload-include *.* --reload-dir ./backend_django --log-level info --env-file $ENV --host 0.0.0.0 --port 8000
+fi
+
 exec gunicorn --bind 0.0.0.0:8000 backend_django.asgi --reload --forwarded-allow-ips="*" --env MODE="$ENV"  --capture-output  -k uvicorn.workers.UvicornWorker --workers 16 --threads 16 --timeout 12000

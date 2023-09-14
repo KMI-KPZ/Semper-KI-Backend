@@ -1,0 +1,1 @@
+docker-compose -f dc-local-dev-services.yml -f dc-local-dev-container-backend.yml down

@@ -5,14 +5,18 @@
 - **dev**: bigger changes, has to work, for /dev domain
 - **main**: major changes, production branch, has CI and CD
 
+^^ will be changed in the future
+
 ## installation for dev purposes
 
 - clone the repository
 - checkout main|dev|feature branch
-- specify which settings you want to use (on bash): 
-    - for debugging: ```export DJANGO_SETTINGS_MODULE=backend_django.settings.debug```
-    - for debug_local: ```export DJANGO_SETTINGS_MODULE=backend_django.settings.debug_local```
-    - for production: ```export DJANGO_SETTINGS_MODULE=backend_django.settings.production```
-    - for development: ```export DJANGO_SETTINGS_MODULE=backend_django.settings.development```
-- generate an example env file via ```python manage.py generate_env``` and put the contents into a file named '.env' , fill it with your data (ask the team for credentials)
-- 
+- run ```python manage.py generate_env``` to output an example env file which you can copy into .env.local_container
+- edit .env.local_container for the external services (ask the team for credentials)
+- run ```start_local_dev.sh -m local_container or start_local_dev.bat -m local_container ``` to build and run the containers
+- a database will be created too
+- if you want to develop locally instead of in a container run ```start_local_dev.sh -m local or start_local_dev.bat -m local ``` to start the backend locally
+- stop all containers with ```stop_local_dev.sh or stop_local_dev.bat```
+
+
+- the other environments will be added later
