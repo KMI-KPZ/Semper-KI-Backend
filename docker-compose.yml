@@ -39,3 +39,48 @@ services:
     extra_hosts:
      - "host.docker.internal:host-gateway"
     command: --save 60 1 --loglevel warning --requirepass ${REDISPW}
+
+  celery-worker:
+    build:
+      context: .
+    container_name: celery-worker
+    entrypoint: celery
+    command: -A backend_django.celery worker --loglevel=info
+    volumes:
+    - .:/var/www/app/worker
+    links:
+    - files
+    depends_on:
+    - files
+
+  celery-beat:
+      build:
+        context: .
+      container_name: celery-beat
+      entrypoint: celery
+      command: -A backend_django.celery beat --loglevel=info
+      volumes:
+      - .:/var/www/app/beat
+      links:
+      - celery-worker
+      - files
+      depends_on:
+      - celery-worker
+      - files
+
+  flower:
+      image: mher/flower
+      container_name: flower
+      environment:
+      - CELERY_BROKER_URL=redis://:${REDISPW}@files:6379/0
+      - FLOWER_PORT=8888
+      ports:
+      - 8888:8888
+      links:
+      - files
+      - celery-worker
+      - celery-beat
+      depends_on:
+      - files
+      - celery-worker
+      - celery-beat

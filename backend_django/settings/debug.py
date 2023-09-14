@@ -18,3 +18,5 @@ BACKEND_SETTINGS= "debug"
 
 
 REDIS_HOST = "files"
+CELERY_BROKER_URL = "redis://:"+REDIS_PASSWORD+"@files:6379/0"
+CELERY_RESULT_BACKEND = "redis://:"+REDIS_PASSWORD+"@files:6379/0"

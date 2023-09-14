@@ -15,3 +15,6 @@ BACKEND_SETTINGS= "debug_local"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+
+CELERY_BROKER_URL = "redis://:"+REDIS_PASSWORD+"@host.docker.internal:6379/0"
+CELERY_RESULT_BACKEND = "redis://:"+REDIS_PASSWORD+"@host.docker.internal:6379/0"
