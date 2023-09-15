@@ -414,27 +414,27 @@ class OrderManagementBase():
 
         orderCollectionObj = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
         dictForEventsAsOutput[orderCollectionObj.client] = {"eventType": "orderEvent"}
-        dictForEventsAsOutput[orderCollectionObj.client]["subOrderID"] = []
+        dictForEventsAsOutput[orderCollectionObj.client]["subOrders"] = []
         dictForEventsAsOutput[orderCollectionObj.client]["orderID"] = orderCollectionID
         for subOrder in orderCollectionObj.orders.all():
             if orderCollectionObj.client != subOrder.client:
                 if subOrder.client not in dictForEventsAsOutput:
                     dictForEventsAsOutput[subOrder.client] = {"eventType": "orderEvent"}
-                    dictForEventsAsOutput[subOrder.client]["subOrderID"] = [{"orderID": subOrder.orderID, "status": 1, "messages": 0}]
+                    dictForEventsAsOutput[subOrder.client]["subOrders"] = [{"subOrderID": subOrder.orderID, "status": 1, "messages": 0}]
                     dictForEventsAsOutput[subOrder.client]["orderID"] = orderCollectionID
                 else:
-                    dictForEventsAsOutput[subOrder.client]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+                    dictForEventsAsOutput[subOrder.client]["subOrders"].append({"subOrderID": subOrder.orderID, "status": 1, "messages": 0})
             else:
-                dictForEventsAsOutput[orderCollectionObj.client]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+                dictForEventsAsOutput[orderCollectionObj.client]["subOrders"].append({"subOrderID": subOrder.orderID, "status": 1, "messages": 0})
             
             for contractor in subOrder.contractor:
                 if orderCollectionObj.client != contractor:
                     if contractor not in dictForEventsAsOutput:
                         dictForEventsAsOutput[contractor] = {"eventType": "orderEvent"}
-                        dictForEventsAsOutput[contractor]["subOrderID"] = [{"orderID": subOrder.orderID, "status": 1, "messages": 0}]
+                        dictForEventsAsOutput[contractor]["subOrders"] = [{"subOrderID": subOrder.orderID, "status": 1, "messages": 0}]
                         dictForEventsAsOutput[contractor]["orderID"] = orderCollectionID
                     else:
-                        dictForEventsAsOutput[contractor]["subOrderID"].append({"orderID": subOrder.orderID, "status": 1, "messages": 0})
+                        dictForEventsAsOutput[contractor]["subOrders"].append({"subOrderID": subOrder.orderID, "status": 1, "messages": 0})
 
         return dictForEventsAsOutput
 
@@ -794,7 +794,7 @@ class OrderManagementOrganization(OrderManagementBase):
                 currentOrderCollection["updated"] = receivedOrdersCollections[orderCollection]["updated"]
                 currentOrderCollection["state"] = receivedOrdersCollections[orderCollection]["state"]
                 currentOrderCollection["client"] = receivedOrdersCollections[orderCollection]["client"]
-                currentOrderCollection["details"] = receivedOrdersCollections[orderCollection]["details"]
+                #currentOrderCollection["details"] = receivedOrdersCollections[orderCollection]["details"]
                 currentOrderCollection["subOrderCount"] = receivedOrdersCollections[orderCollection]["subOrderCount"]
 
                 output.append(currentOrderCollection)

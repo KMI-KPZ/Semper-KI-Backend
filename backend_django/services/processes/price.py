@@ -8,6 +8,7 @@ Contains: BS Calculation of the price
 
 import  random
 from ...celery import app
+from celery.result import AsyncResult
 
 ################################################################################################
 #######################################################
@@ -25,3 +26,16 @@ def calculatePrice_Mock(items):
     
     return summedUpPrices, priceForEach
 
+#######################################################
+def getResults(id):
+    """
+    Return results via ID
+    """
+
+    result = AsyncResult(id, app=app)
+    if result.state == 'SUCCESS':
+        return result.get()
+    if result.state == 'FAILURE':
+        return Exception("Job failed")
+    return None # job is not finished yet
+    

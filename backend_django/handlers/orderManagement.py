@@ -22,7 +22,7 @@ from ..services.postgresDB import pgProfiles, pgOrders
 from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from ..services import redis, crypto, rights
-from ..services.processes import price
+from ..services.processes import price, collectAndSend
 
 logger = logging.getLogger(__name__)
 ################################################################################################
@@ -587,12 +587,16 @@ def verifyOrder(request):
         orderID = info["orderID"]
         sendToManufacturerAfterVerification = info["send"]
         subOrderIDArray = info["subOrderIDs"]
-        # TODO start services
-        call = price.calculatePrice_Mock.delay([1,2,3])
-        # save ID to database
-        # call.id
 
-        # TODO set status to verify
+        # TODO start services and set status to "verifying"
+        listOfCallIDsAndOrderIDs = []
+        for entry in subOrderIDArray:
+            pgOrders.OrderManagementBase.updateOrder(entry, pgOrders.EnumUpdates.status, 400)
+            call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
+            listOfCallIDsAndOrderIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
+
+        # start collecting process
+        collectAndSend.waitForResultAndSendOrder(listOfCallIDsAndOrderIDs, sendToManufacturerAfterVerification)
 
         # TODO Websocket Event
 
@@ -608,7 +612,7 @@ def verifyOrder(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
-def sendOrder(request, orderCollectionID, orderID):
+def sendOrder(request):
     """
     Retrieve Calculations and send order to manufacturer(s)
 
@@ -619,10 +623,13 @@ def sendOrder(request, orderCollectionID, orderID):
 
     """
     try:
-        # TODO collect results via saved celery ids
+        info = json.loads(request.body.decode("utf-8"))
+        orderID = info["orderID"]
+        subOrderIDArray = info["subOrderIDs"]
+        # TODO Check if order is verified
 
         # TODO send to manufacturer(s))
-        # TODO set status to send
+        # TODO set status to send/requested 600
         # TODO Websocket Events
         logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} sent their order at " + str(datetime.now()))
         
