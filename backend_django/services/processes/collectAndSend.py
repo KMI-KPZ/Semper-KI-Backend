@@ -5,12 +5,10 @@ Silvio Weging 2023
 
 Contains: Collect result, set state and send order
 """
-import enum
+import enum, time
 
 from ...celery import app
-from celery.result import AsyncResult
-
-from ..postgresDB import pgOrders 
+from celery.result import AsyncResult 
 
 ################################################################################################
 class EnumResultType(enum.Enum):
@@ -24,18 +22,20 @@ def waitForResultAndSendOrder(listOfIDsAndOrderIDs: list, sendOrder: bool):
     """
     Await all IDs from list, set status of orders and call sendOrder
     """
+    # outputObject (JSON)
+    output = {}
     for entry in listOfIDsAndOrderIDs:
         result = AsyncResult(entry[0])
         while result.state != "SUCCESS" or result.state != "FAILURE":
-            # sleep
+            # sleep as to not keep the cpu unecessarily busy
+            time.sleep(5)
             continue
         if result.state == "SUCCESS":
-            # Set Status 
-            pgOrders.OrderManagementBase.updateOrder(entry[1], pgOrders.EnumUpdates.status, 500)
+
             # Save results
             if entry[2] == EnumResultType.price:
                 summedUpPrice, individualPrices = result.get()
-                pgOrders.OrderManagementBase.updateOrder(entry[1], pgOrders.EnumUpdates.service, {"prices": {"sum": summedUpPrice, "individual": individualPrices}})
+                output["prices"] = {"sum": summedUpPrice, "individual": individualPrices}
             elif entry[2] == EnumResultType.logistics:
                 resultOfCalculation = result.get()
                 pass
@@ -51,6 +51,9 @@ def waitForResultAndSendOrder(listOfIDsAndOrderIDs: list, sendOrder: bool):
         # TODO Call send
         pass
     # Don't send
+    # TODO Set status to VERIFIED
+
+    return output
     
     
 

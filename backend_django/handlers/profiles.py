@@ -16,9 +16,6 @@ from django.utils import timezone
 from urllib.parse import unquote
 from django.views.decorators.http import require_http_methods
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
-
 from ..handlers import basics
 
 from ..services.postgresDB import pgProfiles
@@ -93,7 +90,7 @@ def updateDetailsOfOrganization(request):
 
     content = json.loads(request.body.decode("utf-8"))["data"]["content"]
     logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organization at " + str(datetime.datetime.now()))
-    flag = pgProfiles.ProfileManagementOrganization.updateDetails(request.session, content)
+    flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -119,35 +116,6 @@ def deleteOrganization(request):
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=500)
-
-##############################################
-@basics.checkIfUserIsLoggedIn()
-@require_http_methods(["DELETE"])
-def deleteOrganizationAsAdmin(request):
-    """
-    Deletes an entry in the database corresponding to orga id.
-
-    :param request: DELETE request
-    :type request: HTTP DELETE
-    :return: HTTP response
-    :rtype: HTTP status
-
-    """
-    if request.session["usertype"] == "admin":
-        content = json.loads(request.body.decode("utf-8"))
-        orgaID = content["hashedID"]
-        orgaName = content["name"]
-
-        flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session, orgaID)
-        if flag is True:
-            logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted organization {orgaName} at " + str(datetime.datetime.now()))
-            return HttpResponse("Worked")
-        else:
-            return HttpResponse("Failed", status=500)
-    else:
-        return HttpResponse("Not an admin!", status=401)
-
-##############################################################################################################
 
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)
@@ -183,7 +151,7 @@ def updateDetails(request):
 
     content = json.loads(request.body.decode("utf-8"))
     logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated their details to {content['details']} at " + str(datetime.datetime.now()))
-    flag = pgProfiles.ProfileManagementUser.updateDetails(request.session, content["details"])
+    flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -210,62 +178,6 @@ def deleteUser(request):
     else:
         return HttpResponse("Failed", status=500)
 
-##############################################
-@basics.checkIfUserIsLoggedIn()
-@require_http_methods(["DELETE"])
-def deleteUserAsAdmin(request):
-    """
-    Deletes an entry in the database corresponding to user id.
-
-    :param request: DELETE request
-    :type request: HTTP DELETE
-    :return: HTTP response
-    :rtype: HTTP status
-
-    """
-    if request.session["usertype"] == "admin":
-        content = json.loads(request.body.decode("utf-8"))
-        userHasedID = content["hashedID"]
-        userID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userHasedID)
-        userName = content["name"]
-        # websocket event for that user
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID), {
-                "type": "sendMessageJSON",
-                "dict": {"eventType": "accountEvent", "context": "deleteUser"},
-            })
-
-        flag = pgProfiles.ProfileManagementUser.deleteUser(request.session, userHasedID)
-        if flag is True:
-            logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted {userName} at " + str(datetime.datetime.now()))
-            return HttpResponse("Worked")
-        else:
-            return HttpResponse("Failed", status=500)
-    else:
-        return HttpResponse("Not an admin!", status=401)
-
-
-##############################################
-@basics.checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def getAll(request):
-    """
-    Drop all information (of the DB) about all users for admin view.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: JSON response containing all entries of users
-    :rtype: JSON Respone
-
-    """
-    if request.session["usertype"] == "admin":
-        # get all information if you're an admin
-        users, organizations = pgProfiles.ProfileManagementBase.getAll()
-        outLists = { "user" : users, "organizations": organizations }
-        logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all users and orgas at " + str(datetime.datetime.now()))
-        return JsonResponse(outLists, safe=False)
-    else:
-        return HttpResponse("Not an admin!", status=401)
 
 # ##############################################
 # def updateUser(request):

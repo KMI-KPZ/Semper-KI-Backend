@@ -109,6 +109,28 @@ class ProfileManagementBase():
             print(error)
 
         return IDOfUserOrOrga
+    
+    ##############################################
+    @staticmethod
+    def getUserViaHash(hashedID):
+        """
+        Retrieve User Object via Database and hashkey
+
+        :param hashedID: hashed ID
+        :type hashedID: str
+        :return: Dict from database
+        :rtype: Dict
+
+        """
+        ObjOfUserOrOrga = ""
+        try:
+            ObjOfUserOrOrga = Organization.objects.get(hashedID=hashedID)
+        except (ObjectDoesNotExist) as error:
+            ObjOfUserOrOrga = User.objects.get(hashedID=hashedID)
+        except (Exception) as error:
+            print(error)
+
+        return ObjOfUserOrOrga
 
     ##############################################
     @staticmethod
@@ -276,7 +298,7 @@ class ProfileManagementUser(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def updateDetails(session, details):
+    def updateContent(session, details, userID=""):
         """
         Update user details.
 
@@ -286,10 +308,17 @@ class ProfileManagementUser(ProfileManagementBase):
         :rtype: Bool
 
         """
-        userID = session["user"]["userinfo"]["sub"]
+        if userID == "":
+            subID = session["user"]["userinfo"]["sub"]
+        else:
+            subID = userID
         updated = timezone.now()
         try:
-            affected = User.objects.filter(subID=userID).update(details=details, updatedWhen=updated)
+            existingObj = User.objects.get(subID=subID)
+            existingInfo = {"name": existingObj.name, "details": existingObj.details, "email": existingObj.email}
+            for key in details:
+                existingInfo[key] = details[key]
+            affected = User.objects.filter(subID=subID).update(details=existingInfo["details"], name=existingInfo["name"], email=existingInfo["email"], updatedWhen=updated)
         except (Exception) as error:
             print(error)
             return False
@@ -429,9 +458,9 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def updateDetails(session, details):
+    def updateContent(session, details, orgaID=""):
         """
-        Update user details.
+        Update user details and more.
 
         :param session: GET request session
         :type session: Dictionary
@@ -439,10 +468,17 @@ class ProfileManagementOrganization(ProfileManagementBase):
         :rtype: Bool
 
         """
-        orgID = session["user"]["userinfo"]["org_id"]
+        if orgaID == "":
+            orgID = session["user"]["userinfo"]["org_id"]
+        else:
+            orgID = orgaID
         updated = timezone.now()
         try:
-            affected = Organization.objects.filter(subID=orgID).update(details=details["details"], canManufacture=details["canManufacture"], updatedWhen=updated)
+            existingObj = Organization.objects.get(subID=orgID)
+            existingInfo = {"details": existingObj.details, "canManufacturer": existingObj.canManufacture, "name": existingObj.name, "uri": existingObj.uri}
+            for key in details:
+                existingInfo[key] = details[key]
+            affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], canManufacture=existingInfo["canManufacture"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)
         except (Exception) as error:
             print(error)
             return False

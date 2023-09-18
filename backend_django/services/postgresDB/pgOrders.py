@@ -437,6 +437,42 @@ class OrderManagementBase():
                         dictForEventsAsOutput[contractor]["subOrders"].append({"subOrderID": subOrder.orderID, "status": 1, "messages": 0})
 
         return dictForEventsAsOutput
+    
+    ##############################################
+    @staticmethod
+    def getAllOCsFlat():
+        """
+        Return flat list of all orderCollections, for admins
+
+        :return: Json with all OrderCollections and their data
+        :rtype: JSON
+        """
+        outJSON = {}
+        allOCs = OrderCollection.objects.all()
+        for entry in allOCs:
+            currentOC = entry.toDict()
+            outJSON[currentOC["orderCollectionID"]] = currentOC
+            outJSON[currentOC["orderCollectionID"]]["subOrderCount"] = len(entry.orders.all())
+
+        return outJSON
+    
+    ##############################################
+    @staticmethod
+    def getOrderPerOCID(orderCollectionID):
+        """
+        Retrieve infos about one order collection, for admins
+
+        :param orderCollectionID: order collection of interest
+        :type orderCollectionID: str
+        :return: list of all orders of that OC
+        :rtype: list
+        """
+        outList = []
+        OCObject = OrderCollection.objects.get(orderCollectionID=orderCollectionID)
+        for entry in OCObject.orders.all():
+            outList.append(entry.toDict())
+        return outList
+
 
 ####################################################################################
 # Orders from User

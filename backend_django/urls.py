@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, orderManagement
+from .handlers import resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, orderManagement, admin
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -88,6 +88,10 @@ paths = {
     "adminGetAll": "public/admin/getAll/",
     "adminDelete": "public/admin/deleteUser/",
     "adminDeleteOrga": "public/admin/deleteOrganization/",
+    "adminUpdateUser": "public/admin/updateUser/",
+    "adminUpdateOrga": "public/admin/updateOrganization/",
+    "adminGetOrderCollections": "public/admin/getOrdersFlat/",
+    "adminGetOrders": "public/admin/getSubOrders/<orderCollectionID>/",
 
     "organizations_addUser": "public/organizations/addUser/",
     "organizations_getInviteLink": "public/organizations/getInviteLink/",
@@ -194,9 +198,13 @@ urlpatterns = [
     path(paths["updateDetailsOfOrga"], profiles.updateDetailsOfOrganization, name="updateDetailsOfOrganization"),
     path(paths["deleteOrganization"], profiles.deleteOrganization, name="deleteOrganization"),
 
-    path(paths["adminGetAll"], profiles.getAll, name="getAll"),
-    path(paths["adminDelete"], profiles.deleteUserAsAdmin, name="deleteUserAsAdmin"),
-    path(paths["adminDeleteOrga"], profiles.deleteOrganizationAsAdmin, name="deleteOrganizationAsAdmin"),
+    path(paths["adminGetAll"], admin.getAllAsAdmin, name="getAllAsAdmin"),
+    path(paths["adminDelete"], admin.deleteUserAsAdmin, name="deleteUserAsAdmin"),
+    path(paths["adminDeleteOrga"], admin.deleteOrganizationAsAdmin, name="deleteOrganizationAsAdmin"),
+    path(paths["adminUpdateUser"], admin.updateDetailsOfUserAsAdmin, name="updateDetailsOfUserAsAdmin"),
+    path(paths["adminUpdateOrga"], admin.updateDetailsOfOrganizationAsAdmin, name="updateDetailsOfOrganizationAsAdmin"),
+    path(paths["adminGetOrderCollections"], admin.getAllOrdersFlatAsAdmin, name="getAllOrdersFlatAsAdmin"),
+    path(paths["adminGetOrders"], admin.getSpecificOrderAsAdmin, name="getSpecificOrderAsAdmin"),
 
     path(paths["organizations_addUser"], organizations.organizations_addUser, name="organizations_addUser"),
     path(paths["organizations_fetchUsers"], organizations.organizations_fetchUsers, name="organizations_fetchUsers"),

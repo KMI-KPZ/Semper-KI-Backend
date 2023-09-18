@@ -595,7 +595,7 @@ def verifyOrder(request):
             call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             listOfCallIDsAndOrderIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
-        # start collecting process
+        # start collecting process, 
         collectAndSend.waitForResultAndSendOrder(listOfCallIDsAndOrderIDs, sendToManufacturerAfterVerification)
 
         # TODO Websocket Event

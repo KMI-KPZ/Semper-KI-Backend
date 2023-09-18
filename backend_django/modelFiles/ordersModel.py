@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Model for orders of a user
 """
-
+import json
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -27,6 +27,9 @@ class OrderCollection(models.Model):
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
+
+    def toDict(self):
+        return {"orderCollectionID": self.orderCollectionID, "status": self.status, "client": self.client, "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen }
 
 ###################################################
 class Orders(models.Model):
@@ -61,4 +64,17 @@ class Orders(models.Model):
     ###################################################
     def __str__(self):
         return ""
+    
+    def toDict(self):
+        return {"orderID": self.orderID, 
+                "orderCollectionID": str(self.orderCollectionKey), 
+                "userOrders": json.dumps(self.userOrders), 
+                "status": self.status,
+                "userCommunication": json.dumps(self.userCommunication),
+                "details": json.dumps(self.details),
+                "files": json.dumps(self.files),
+                "dates": json.dumps(self.dates),
+                "client": self.client,
+                "contractor": self.contractor,
+                "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
     

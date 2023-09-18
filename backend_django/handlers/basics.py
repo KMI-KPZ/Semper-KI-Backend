@@ -77,6 +77,38 @@ def checkIfUserIsLoggedIn(json=False):
 
     return decorator
 
+#################### DECORATOR ###################################
+def checkIfUserIsAdmin(json=False):
+    """
+    Check whether the current user is an admin or not
+
+    :param json: Controls if the output is in JSON Format or not
+    :type json: Bool
+    :return: Response whether the user is an admin or not. If so, call the function.
+    :rtype: HTTPRespone/JSONResponse, Func
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            if "user" in request.session:
+                if request.session["usertype"] == "admin":
+                    return func(request, *args, **kwargs)
+                else:
+                    if json:
+                        return JsonResponse({}, status=401)
+                    else:
+                        return HttpResponse("Not an admin!", status=401)
+            else:
+                if json:
+                    return JsonResponse({}, status=401)
+                else:
+                    return HttpResponse("Not logged in", status=401)
+            
+        return inner
+
+    return decorator
+
 #######################################################
 def handleTooManyRequestsError(callToAPI):
     """
@@ -116,6 +148,8 @@ def manualCheckIfRightsAreSufficient(session, funcName):
     :rtype: Bool
     """
     if "user" in session:
+        if session["usertype"] == "admin":
+            return True
         if rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
             return True
 
