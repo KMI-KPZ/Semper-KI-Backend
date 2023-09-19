@@ -445,16 +445,16 @@ class OrderManagementBase():
         Return flat list of all orderCollections, for admins
 
         :return: Json with all OrderCollections and their data
-        :rtype: JSON
+        :rtype: List of dicts
         """
-        outJSON = {}
+        outList = []
         allOCs = OrderCollection.objects.all()
         for entry in allOCs:
             currentOC = entry.toDict()
-            outJSON[currentOC["orderCollectionID"]] = currentOC
-            outJSON[currentOC["orderCollectionID"]]["subOrderCount"] = len(entry.orders.all())
+            currentOC["subOrderCount"] = len(entry.orders.all())
+            outList.append(currentOC)
 
-        return outJSON
+        return outList
     
     ##############################################
     @staticmethod

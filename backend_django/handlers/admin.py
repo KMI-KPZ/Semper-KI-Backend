@@ -166,10 +166,10 @@ def getAllOrdersFlatAsAdmin(request):
     """
     # get all orders if you're an admin
     orderCollections = pgOrders.OrderManagementBase.getAllOCsFlat()
-    for entry in orderCollections:
-        clientID = orderCollections[entry]["client"]
+    for idx, entry in enumerate(orderCollections):
+        clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
-        orderCollections[entry]["clientName"] = userObj.name
+        orderCollections[idx]["clientName"] = userObj.name
         
     logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all orders at " + str(datetime.datetime.now()))
     return JsonResponse(orderCollections, safe=False)
