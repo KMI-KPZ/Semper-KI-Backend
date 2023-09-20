@@ -10,7 +10,7 @@ from django.conf import settings
 from django.utils import timezone
 import random
 
-from backend_django.services import crypto
+from backend_django.utilities import crypto
 
 #######################################################
 class mockPicture():

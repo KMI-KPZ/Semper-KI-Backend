@@ -14,12 +14,14 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+from ..utilities import rights
+
 from ..services.postgresDB import pgProfiles
 
-from ..services import auth0, rights
-from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient
+from ..services import auth0
+from ..utilities.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient, Logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 #######################################################
 def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     """
@@ -137,7 +139,7 @@ def organizations_getInviteLink(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},invite,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} to {orgID}," + str(datetime.datetime.now()))
         return HttpResponse(response["invitation_url"])
     
     except Exception as e:
@@ -180,7 +182,7 @@ def organizations_addUser(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},invite,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} to {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -279,7 +281,7 @@ def organizations_deleteUser(request):
         if isinstance(response, Exception):
             raise response
         pgProfiles.ProfileManagement.deleteUser("", uID=userID)
-        logger.info(f"{userName} deleted the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},deleted,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} from {orgID}," + str(datetime.datetime.now()))
         
         # Send event to websocket
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "deleteUserFromOrganization", userID)
@@ -334,7 +336,7 @@ def organizations_createRole(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} created the role {roleName} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},role {roleName} in {orgID}," + str(datetime.datetime.now()))
         return JsonResponse(response, safe=False)
     
     except Exception as e:
@@ -387,7 +389,7 @@ def organizations_assignRole(request):
         if isinstance(retVal, Exception):
             raise retVal
         
-        logger.info(f"{userName} assigned the role {roleID} to {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DEFINED},assigned,{Logging.Object.OBJECT},role {roleID} to {emailAdressOfUserToBeAdded} in {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -436,7 +438,7 @@ def organizations_removeRole(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} removed the role {roleID} from {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},removed,{Logging.Object.OBJECT},role {roleID} from {emailAdressOfUserToBeAdded} in {orgID}," + str(datetime.datetime.now()))
         # retVal = sendEventViaWebsocket(orgID, baseURL, headers, "removeRole", result)
         # if isinstance(retVal, Exception):
         #     raise retVal
@@ -491,7 +493,7 @@ def organizations_editRole(request):
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "editRole", roleID)
         if isinstance(retVal, Exception):
             raise retVal
-        logger.info(f"{userName} edited the role {roleName} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.EDITED},edited,{Logging.Object.OBJECT},role {roleName} for {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -573,12 +575,13 @@ def organizations_deleteRole(request):
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         roleID = content["content"]["roleID"]
         userName = request.session["user"]["userinfo"]["nickname"]
+        orgID = request.session["user"]["userinfo"]["org_id"]
 
         response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=headers) )
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} deleted the role {roleID} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},role {roleID} from {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
         
     except Exception as e:
@@ -638,7 +641,7 @@ def organizations_setPermissionsForRole(request):
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "addPermissionsToRole", roleID)
         if isinstance(retVal, Exception):
             raise retVal
-        logger.info(f"{userName} set permissions of role {roleID} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DEFINED},set,{Logging.Object.OBJECT},permissions of role {roleID} in {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -782,7 +785,7 @@ def organizations_createNewOrganization(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"Semper-KI created organization {content['content']['name']} and invited the user {email} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.SYSTEM},Semper-KI,{Logging.Predicate.CREATED},created,{Logging.Object.ORGANISATION},{content['content']['name']} through user {email}," + str(datetime.datetime.now()))
         
         return HttpResponse("Success", status=200)
     

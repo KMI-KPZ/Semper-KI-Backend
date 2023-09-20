@@ -16,11 +16,11 @@ from django.utils import timezone
 from urllib.parse import unquote
 from django.views.decorators.http import require_http_methods
 
-from ..handlers import basics
+from ..utilities import basics
 
 from ..services.postgresDB import pgProfiles
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 ##############################################
 # @checkIfUserIsLoggedIn()
 # @require_http_methods(["GET"])
@@ -89,7 +89,7 @@ def updateDetailsOfOrganization(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))["data"]["content"]
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated details of their organization at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
@@ -110,7 +110,7 @@ def deleteOrganization(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']} at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
         return HttpResponse("Worked")
@@ -150,7 +150,7 @@ def updateDetails(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated their details to {content['details']} at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.SELF},details," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
@@ -171,7 +171,7 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} deleted themselves at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")

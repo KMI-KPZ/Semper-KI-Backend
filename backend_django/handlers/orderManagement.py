@@ -17,14 +17,16 @@ from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+from ..utilities import crypto, rights
+
 from ..services.postgresDB import pgProfiles, pgOrders
 
-from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging
 
-from ..services import redis, crypto, rights
+from ..services import redis
 from ..services.processes import price, collectAndSend
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 ################################################################################################
 # order collections aka orders
 
@@ -105,7 +107,7 @@ def updateOrderCollection(request):
                 #             "type": "sendMessageJSON",
                 #             "dict": outputDict,
                 #         })
-                logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated order {orderCollectionID} at " + str(datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},order {orderCollectionID}," + str(datetime.now()))
 
             else:
                 return HttpResponse("Not logged in", status=401)
@@ -288,7 +290,7 @@ def updateOrder(request):
                                 "type": "sendMessageJSON",
                                 "dict": values,
                             })
-                logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} updated subOrder {orderID} at " + str(datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},subOrder {orderID}," + str(datetime.now()))
 
             else:
                 return HttpResponse("Not logged in", status=401)
@@ -528,7 +530,7 @@ def saveOrderViaWebsocket(session):
                 error = pgOrders.OrderManagementUser.addOrderToDatabase(session)
             if isinstance(error, Exception):
                 raise error
-            logger.info(f"{pgProfiles.ProfileManagementBase.getUser(session)['name']} saved their order at " + str(datetime.now()))
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their orders," + str(datetime.now()))
         return None
     
     except (Exception) as error:
@@ -560,7 +562,7 @@ def saveOrder(request):
         if isinstance(error, Exception):
             raise error
 
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} saved their order at " + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their orders," + str(datetime.now()))
         return HttpResponse("Success")
     
     except (Exception) as error:
@@ -600,7 +602,7 @@ def verifyOrder(request):
 
         # TODO Websocket Event
 
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} wants to verify their order at " + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},order {orderID}," + str(datetime.now()))
 
         return HttpResponse("Success")
     
@@ -631,7 +633,7 @@ def sendOrder(request):
         # TODO send to manufacturer(s))
         # TODO set status to send/requested 600
         # TODO Websocket Events
-        logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} sent their order at " + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},order {orderID}," + str(datetime.now()))
         
         return HttpResponse("Success")
     

@@ -14,10 +14,10 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers import basics
+from ..utilities import basics
 from ..services.postgresDB import pgProfiles, pgOrders
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 
 # Profiles #############################################################################################################
 
@@ -38,7 +38,7 @@ def getAllAsAdmin(request):
     # get all information if you're an admin
     users, organizations = pgProfiles.ProfileManagementBase.getAll()
     outLists = { "user" : users, "organizations": organizations }
-    logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all users and orgas at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM}, all users and orgas," + str(datetime.datetime.now()))
     return JsonResponse(outLists, safe=False)
 
 ##############################################
@@ -59,7 +59,7 @@ def updateDetailsOfUserAsAdmin(request):
     userHasedID = content["hashedID"]
     userID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userHasedID)
     userName = content["name"]
-    logger.info(f"Admin {request.session['user']['userinfo']['nickname']} updated details of {userName} at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.USER},{userID}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content, userID)
     if flag is True:
         return HttpResponse("Worked")
@@ -85,7 +85,7 @@ def updateDetailsOfOrganizationAsAdmin(request):
     orgaHasedID = content["hashedID"]
     orgaID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(orgaHasedID)
     orgaName = content["name"]
-    logger.info(f"Admin {request.session['user']['userinfo']['nickname']} updated details of organization {orgaName} at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},{orgaID}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content, orgaID)
     if flag is True:
         return HttpResponse("Worked")
@@ -112,7 +112,7 @@ def deleteOrganizationAsAdmin(request):
 
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session, orgaID)
     if flag is True:
-        logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted organization {orgaName} at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},{orgaID}," + str(datetime.datetime.now()))
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=500)
@@ -144,7 +144,7 @@ def deleteUserAsAdmin(request):
 
     flag = pgProfiles.ProfileManagementUser.deleteUser(request.session, userHasedID)
     if flag is True:
-        logger.info(f"Admin {request.session['user']['userinfo']['nickname']} deleted {userName} at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.USER},{userID}," + str(datetime.datetime.now()))
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=500)
@@ -171,7 +171,7 @@ def getAllOrdersFlatAsAdmin(request):
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
         orderCollections[idx]["clientName"] = userObj.name
         
-    logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all orders at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},orders," + str(datetime.datetime.now()))
     return JsonResponse(orderCollections, safe=False)
 
 ##############################################
@@ -200,6 +200,5 @@ def getSpecificOrderAsAdmin(request, orderCollectionID):
             contractorObj = pgProfiles.ProfileManagementBase.getUserViaHash(contractorID)
             orders[idx]["contractorNames"].append(contractorObj.name)
 
-    
-    logger.info(f"Admin {request.session['user']['userinfo']['nickname']} fetched all subOrders from {orderCollectionID} at " + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},subOrders from {orderCollectionID}," + str(datetime.datetime.now()))
     return JsonResponse(orders, safe=False)

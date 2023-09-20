@@ -220,12 +220,22 @@ LOGGING = {
                 'class': 'logging.StreamHandler',
                 'formatter': 'detailed'
             },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': "logs/info.log",
+            },
     },
     'loggers': {
         '': {
             'handlers': ['console'],
             'propagate': False,
             'level': 'DEBUG',
+        },
+        'logToFile': { # the logger used in every handler, needs to be called manually
+            'handlers': ['file','console'],
+            'propagate': False,
+            'level': 'INFO',
         },
         'django': {
             'handlers': ['console'],

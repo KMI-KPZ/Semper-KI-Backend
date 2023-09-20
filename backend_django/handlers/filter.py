@@ -11,7 +11,9 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from ..services import cmem, mocks, crypto
+from ..utilities import crypto, mocks
+
+from ..services import cmem
 
 #######################################################
 @require_http_methods(["POST"])

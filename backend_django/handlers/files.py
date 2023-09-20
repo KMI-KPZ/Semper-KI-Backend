@@ -11,13 +11,15 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileRe
 import asyncio, json, logging
 from django.views.decorators.http import require_http_methods
 
+from ..utilities import crypto, mocks, stl
+
 from ..services.postgresDB import pgProfiles
 
-from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
 
-from ..services import crypto, redis, stl, mocks
+from ..services import redis
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 #######################################################
 @require_http_methods(["GET"])
 def testRedis(request):
@@ -166,7 +168,7 @@ def downloadFiles(request):
         if fileName == elem["filename"]:
             (contentOrError, Flag) = redis.retrieveContent(elem["path"])
             if Flag:
-                logger.info(f"{pgProfiles.ProfileManagementBase.getUser(request.session)['name']} downloaded file {fileName} at " + str(datetime.datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileName}," + str(datetime.datetime.now()))
                 return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
                 #return FileResponse(contentOrError[idx][3].seek(0)) #, content_type='multipart/form-data')
             else:

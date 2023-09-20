@@ -13,14 +13,16 @@ from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
+from ..utilities import basics
+
 from ..services.postgresDB import pgProfiles, pgOrders
-from ..handlers import basics, orderManagement
+from ..handlers import orderManagement
 from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, redis
     
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 #######################################################
 @require_http_methods(["GET"])
 def isLoggedIn(request):
@@ -335,8 +337,7 @@ def callbackLogin(request):
         if isinstance(userObj, Exception):
             raise userObj
         
-            
-        logger.info(f"{request.session['user']['userinfo']['nickname']} logged in at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.USER},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},login,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
     except Exception as e:
         returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
@@ -424,9 +425,9 @@ def logoutUser(request):
 
     user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
     if user != {}:
-        logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.USER},{user['name']},{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     else:
-        logger.info(f"Deleted user was logged out at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.SYSTEM},,{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.USER},DELETED," + str(datetime.datetime.now()))
 
 
     # Delete saved files from redis

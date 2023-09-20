@@ -6,13 +6,13 @@ Silvio Weging 2023
 Contains: Basic stuff that is imported everywhere
 """
 
-import datetime
+import datetime, enum
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
 from time import sleep
 
-from ..services import rights
+from ..utilities import rights
 
 #######################################################
 def checkIfTokenValid(token):
@@ -188,3 +188,28 @@ def checkIfRightsAreSufficient(json=False):
 
     return decorator    
         
+#######################################################
+# logging vocabulary
+class Logging():
+    class Subject(enum.StrEnum):
+        USER = enum.auto()
+        ADMIN = enum.auto()
+        ORGANISATION = enum.auto()
+        SYSTEM = enum.auto()
+        SUBJECT = enum.auto() # for everything else
+
+    class Predicate(enum.StrEnum):
+        CREATED = enum.auto()
+        DEFINED = enum.auto()
+        FETCHED = enum.auto()
+        EDITED = enum.auto()
+        DELETED = enum.auto()
+        PREDICATE = enum.auto() # for everything else
+
+    class Object(enum.StrEnum):
+        USER = enum.auto()
+        ADMIN = enum.auto()
+        ORGANISATION = enum.auto()
+        SYSTEM = enum.auto()
+        SELF = enum.auto()
+        OBJECT = enum.auto() # for everything else

@@ -14,13 +14,15 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+from ..utilities import crypto, mocks
+
 from ..services.postgresDB import pgProfiles, pgOrders
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..utilities.basics import checkIfUserIsLoggedIn
 
-from ..services import redis, mocks, crypto
+from ..services import redis
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 
 
 #######################################################

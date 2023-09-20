@@ -11,10 +11,12 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
+from backend_django.utilities import crypto
+
 from ...modelFiles.profileModel import User, Organization
 from ...modelFiles.ordersModel import Orders, OrderCollection
 
-from backend_django.services import crypto, redis
+from backend_django.services import redis
 
 #TODO: switch to async versions at some point
 

@@ -14,7 +14,7 @@ from asgiref.sync import sync_to_async, async_to_sync
 from channels.db import database_sync_to_async
 
 from backend_django.services.postgresDB import pgProfiles
-from backend_django.services import rights
+from backend_django.utilities import rights
 from backend_django.handlers.orderManagement import saveOrderViaWebsocket
 
 ###################################################

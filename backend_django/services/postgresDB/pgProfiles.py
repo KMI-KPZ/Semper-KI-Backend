@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from ...modelFiles.profileModel import User, Organization
 
-from backend_django.services import crypto
+from backend_django.utilities import crypto
 
 #TODO: switch to async versions at some point
 
