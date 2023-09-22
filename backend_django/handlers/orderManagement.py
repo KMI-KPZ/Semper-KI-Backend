@@ -176,7 +176,9 @@ def createOrderID(request, orderCollectionID):
 
         # else: it's in the database, fetch it from there
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderID"):
-            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session))
+            # get client ID
+            client = pgOrders.OrderManagementBase.getOrderCollectionObj(orderCollectionID).client
+            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, client)
             if isinstance(returnObj, Exception):
                 raise returnObj
 
@@ -437,7 +439,7 @@ def getMissedEvents(request):
     Show how many events (chat messages ...) were missed since last login.
 
     :param request: GET Request
-    :type request: HTTP GETF
+    :type request: HTTP GET
     :return: JSON Response with numbers for every order and orderCollection
     :rtype: JSON Response
 

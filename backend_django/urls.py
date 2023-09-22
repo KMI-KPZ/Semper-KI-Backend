@@ -128,7 +128,7 @@ paths = {
     "testQuery": "private/testquery/",
     "sendQuery": "private/sendQuery/",
     "testQuerySize": "private/query/",
-    "testCoypu": "private/coypu/",
+    "testCoypu": "public/coypu/",
 
     "testRedis": "private/testRedis/",
     "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
