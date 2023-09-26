@@ -148,9 +148,7 @@ def manualCheckIfRightsAreSufficient(session, funcName):
     :rtype: Bool
     """
     if "user" in session:
-        if session["usertype"] == "admin":
-            return True
-        if rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
+        if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
             return True
 
     return False
@@ -171,7 +169,7 @@ def checkIfRightsAreSufficient(json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session:
-                if rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
+                if request.session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
                     if json:
@@ -213,3 +211,4 @@ class Logging():
         SYSTEM = enum.auto()
         SELF = enum.auto()
         OBJECT = enum.auto() # for everything else
+
