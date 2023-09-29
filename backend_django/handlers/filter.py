@@ -11,7 +11,9 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from ..services import cmem, mocks, crypto
+from ..utilities import crypto, mocks
+
+from ..services import cmem
 
 #######################################################
 @require_http_methods(["POST"])
@@ -117,11 +119,10 @@ def getMaterials(request):
         filtersForSparql.append([entry["question"]["title"], entry["answer"]])
     #TODO ask via sparql with most general filter and then iteratively filter response
     resultsOfQueries = {"materials": []}
-    with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt") as materials:
-        materialsRes = cmem.sendQuery(materials.read())
-        for elem in materialsRes:
-            title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
+    materialsRes = cmem.getAllMaterials.sendQuery()
+    for elem in materialsRes:
+        title = elem["Material"]["value"]
+        resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
     # resultsOfQueries = {"materials": []}
     # with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
     #     onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())

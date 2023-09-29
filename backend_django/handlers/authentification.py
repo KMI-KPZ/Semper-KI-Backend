@@ -12,13 +12,17 @@ from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from ..handlers import basics
+
+from ..utilities import basics
+
+from ..services.postgresDB import pgProfiles, pgOrders
+from ..handlers import orderManagement
 from django.views.decorators.http import require_http_methods
 
-from ..services import auth0, redis, postgres
+from ..services import auth0, redis
     
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 #######################################################
 @require_http_methods(["GET"])
 def isLoggedIn(request):
@@ -101,18 +105,22 @@ def loginUser(request):
     isPartOfOrganization = False
     if "Usertype" not in request.headers:
         request.session["usertype"] = "user"
+        request.session["isPartOfOrganization"] = False
+        request.session["pgProfileClass"] = "user"
+        request.session["pgOrderClass"] = "user"
     else:
         userType = request.headers["Usertype"]
-        if userType == "contractor" or userType == "manufacturer":
-            request.session["usertype"] = userType
-            request.session["organizationType"] = "manufacturer"
-            isPartOfOrganization = True
-        elif userType == "stakeholder":
-            request.session["usertype"] = userType
-            request.session["organizationType"] = "stakeholder"
+        if userType == "organization" or userType == "manufacturer":
+            request.session["usertype"] = "organization"
+            request.session["isPartOfOrganization"] = True
+            request.session["pgProfileClass"] = "organization"
+            request.session["pgOrderClass"] = "organization"
             isPartOfOrganization = True
         else:
-            request.session["usertype"] = userType
+            request.session["usertype"] = "user"
+            request.session["isPartOfOrganization"] = False
+            request.session["pgProfileClass"] = "user"
+            request.session["pgOrderClass"] = "user"
 
     # set redirect url
     if settings.PRODUCTION:
@@ -177,7 +185,7 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         orgID = session["user"]["userinfo"]["org_id"]
-        userID = postgres.ProfileManagement.getUserKey(session)
+        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
 
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers) )
@@ -215,7 +223,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
             'Cache-Control': "no-cache"
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
-        userID = postgres.ProfileManagement.getUserKey(session)
+        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers) )
         if isinstance(response, Exception):
@@ -223,7 +231,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
         roles = response
 
         # set default role
-        if len(roles) == 0:
+        if len(roles) == 0 and session["usertype"] == "user":
             response = basics.handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers, json={"roles": ["rol_jG8PAa9b9LUlSz3q"]}))
             roles = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
         
@@ -251,28 +259,25 @@ def setRoleAndPermissionsOfUser(request):
 
     """
     try:
+          
+        # gather roles from organization if the user is in one
+        if "org_id" in request.session["user"]["userinfo"]:
+            resultDict = retrieveRolesAndPermissionsForMemberOfOrganization(request.session)
+            if isinstance(resultDict, Exception):
+                raise resultDict
+        else:
+            resultDict = retrieveRolesAndPermissionsForStandardUser(request.session)
+            if isinstance(resultDict, Exception):
+                raise resultDict
+
+        request.session["userRoles"] = resultDict["roles"]
+        request.session["userPermissions"] = {x["permission_name"]: "" for x in resultDict["permissions"] } # save only the permission names, the dict is for faster access
+
         # check if person is admin, global role so check works differently
         if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
             if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
                 if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
                     request.session["usertype"] = "admin"
-                    request.session["userRoles"] = ["semper-admin"]
-        
-        # now gather roles from organization if the user is in one
-        if "org_id" in request.session["user"]["userinfo"]:
-            resultDict = retrieveRolesAndPermissionsForMemberOfOrganization(request.session)
-            if isinstance(resultDict, Exception):
-                raise resultDict
-            else:
-                request.session["userRoles"] = resultDict["roles"]
-                request.session["userPermissions"] = resultDict["permissions"]
-        else:
-            resultDict = retrieveRolesAndPermissionsForStandardUser(request.session)
-            if isinstance(resultDict, Exception):
-                raise resultDict
-            else:
-                request.session["userRoles"] = resultDict["roles"]
-                request.session["userPermissions"] = resultDict["permissions"]
 
         return True
     except Exception as e:
@@ -283,6 +288,7 @@ def setRoleAndPermissionsOfUser(request):
 @require_http_methods(["POST", "GET"])
 def callbackLogin(request):
     """
+    TODO: Check if user really is part of an organization or not -> check if misclick at login, and set flags and instances here
     Get information back from Auth0.
     Add user to database if entry doesn't exist.
 
@@ -294,10 +300,20 @@ def callbackLogin(request):
     """
     try:
         # authorize callback token
-        if "organizationType" in request.session:
+        if request.session["isPartOfOrganization"]:
             token = auth0.authorizeTokenOrga(request)
         else:
             token = auth0.authorizeToken(request)
+
+        # email of user was not verified yet, tell them that!
+        if token["userinfo"]["email_verified"] == False:
+            if settings.PRODUCTION:
+                forward_url = 'https://www.semper-ki.org'
+            elif settings.DEVELOPMENT:
+                forward_url = 'https://dev.semper-ki.org'
+            else:
+                forward_url = 'http://127.0.0.1:3000'
+            return HttpResponseRedirect(forward_url+"/verifyEMail", status=401)
 
         # convert expiration time to the corresponding date and time
         now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
@@ -311,31 +327,22 @@ def callbackLogin(request):
             raise retVal
 
         # Get Data from Database or create entry in it for logged in User
-        postgres.ProfileManagement.addUser(request.session)
-            
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} logged in at " + str(datetime.datetime.now()))
+        orgaObj = None
+        if request.session["isPartOfOrganization"]:
+            orgaObj = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
+            if orgaObj == None:
+                raise Exception("Organization could not be found or created!")
+
+        userObj = pgProfiles.profileManagement[request.session["pgProfileClass"]].addUserIfNotExists(request.session, orgaObj)
+        if isinstance(userObj, Exception):
+            raise userObj
+        
+        logger.info(f"{basics.Logging.Subject.USER},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},login,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session["pathAfterLogin"])
     except Exception as e:
         returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
         returnObj.write(str(e))
         return returnObj
-    
-#######################################################
-@basics.checkIfUserIsLoggedIn(json=True)
-@require_http_methods(["GET"])
-def getAuthInformation(request):
-    """
-    Return details about user after login. 
-    Accesses the database and creates or gets user.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: User details
-    :rtype: Json
-
-    """
-    # Read user details from Database
-    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
 
 #######################################################
 @basics.checkIfUserIsLoggedIn(json=True)
@@ -374,7 +381,7 @@ def getPermissionsOfUser(request):
         if len(request.session["userPermissions"]) != 0:
             outArray = []
             for entry in request.session["userPermissions"]:
-                context, permission = entry["permission_name"].split(":")
+                context, permission = entry.split(":")
                 outArray.append({"context": context, "permission": permission})
 
             return JsonResponse(outArray, safe=False)
@@ -413,11 +420,14 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
-    user = postgres.ProfileManagement.getUser(request.session)
+    if "currentOrder" in request.session:
+        orderManagement.saveOrder(request)
+
+    user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
     if user != {}:
-        logger.info(f"{user['name']} logged out at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.USER},{user['name']},{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     else:
-        logger.info(f"Deleted user was logged out at " + str(datetime.datetime.now()))
+        logger.info(f"{basics.Logging.Subject.SYSTEM},,{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.USER},DELETED," + str(datetime.datetime.now()))
 
 
     # Delete saved files from redis

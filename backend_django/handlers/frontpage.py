@@ -5,7 +5,6 @@ Silvio Weging 2023
 
 Contains: Views for some backend websites
 """
-
 from django.shortcuts import render
 from django.conf import settings
 
@@ -97,3 +96,8 @@ def sparqlPage(request):
             #"pretty": json.dumps(request.session.get("user"), indent=4),
         #},
     )
+
+def getSettingsToken(request):
+    from django.conf import settings
+    from django.http.response import JsonResponse
+    return JsonResponse({"token": settings.BACKEND_SETTINGS})

@@ -16,74 +16,150 @@ from django.utils import timezone
 from urllib.parse import unquote
 from django.views.decorators.http import require_http_methods
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..utilities import basics
 
-from ..modelFiles.profile import User
+from ..services.postgresDB import pgProfiles
 
-from ..services import postgres
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("logToFile")
 ##############################################
-@checkIfUserIsLoggedIn()
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["GET"])
+# def addUserTest(request):
+#     """
+#     Same as addUser but for testing.
+
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: HTTP response
+#     :rtype: HTTP status
+
+#     """
+
+#     flag = request.session["pgProfileClass"].addUserIfNotExists(request.session)
+#     if flag is True:
+#         return HttpResponse("Worked")
+#     else:
+#         return HttpResponse("Failed", status=500)
+
+
+##############################################
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["GET"])
+# def getUserTest(request):
+#     """
+#     Same as getUser but for testing.
+
+#     :param request: GET request
+#     :type request: HTTP GET
+#     :return: User details from database
+#     :rtype: JSON
+
+#     """
+#     return JsonResponse(pgProfiles.ProfileManagement.getUser(request.session))
+
+#######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["GET"])
-def addUserTest(request):
+def getOrganizationDetails(request):
     """
-    Same as addUser but for testing.
+    Return details about organization. 
 
     :param request: GET request
     :type request: HTTP GET
+    :return: Organization details
+    :rtype: Json
+
+    """
+    # Read organization details from Database
+    return JsonResponse(pgProfiles.ProfileManagementBase.getOrganization(request.session))
+
+##############################################
+@basics.checkIfUserIsLoggedIn()
+@require_http_methods(["PATCH"])
+@basics.checkIfRightsAreSufficient()
+def updateDetailsOfOrganization(request):
+    """
+    Update details of organization of that user.
+
+    :param request: PATCH request
+    :type request: HTTP PATCH
     :return: HTTP response
     :rtype: HTTP status
 
     """
 
-    flag = postgres.ProfileManagement.addUser(request.session)
+    content = json.loads(request.body.decode("utf-8"))["data"]["content"]
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=500)
 
-
 ##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def getUserTest(request):
+@basics.checkIfUserIsLoggedIn()
+@require_http_methods(["DELETE"])
+@basics.checkIfRightsAreSufficient()
+def deleteOrganization(request):
     """
-    Same as getUser but for testing.
+    Deletes an entry in the database corresponding to user name.
+
+    :param request: DELETE request
+    :type request: HTTP DELETE
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
+    if flag is True:
+        return HttpResponse("Worked")
+    else:
+        return HttpResponse("Failed", status=500)
+
+#######################################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["GET"])
+def getUserDetails(request):
+    """
+    Return details about user. 
 
     :param request: GET request
     :type request: HTTP GET
-    :return: User details from database
-    :rtype: JSON
+    :return: User details
+    :rtype: Json
 
     """
-    return JsonResponse(postgres.ProfileManagement.getUser(request.session))
+    # Read user details from Database
+    userObj = pgProfiles.ProfileManagementBase.getUser(request.session)
+    userObj["usertype"] = request.session["usertype"]
+    return JsonResponse(userObj)
 
 ##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["PUT"])
-def updateName(request):
+@basics.checkIfUserIsLoggedIn()
+@require_http_methods(["PATCH"])
+def updateDetails(request):
     """
-    Update user name.
+    Update user details.
 
-    :param request: PUT request
-    :type request: HTTP PUT
+    :param request: PATCH request
+    :type request: HTTP PATCH
     :return: HTTP response
     :rtype: HTTP status
 
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} updated their name to {content['username']} at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.updateName(request.session, content["username"])
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.SELF},details," + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
     else:
         return HttpResponse("Failed", status=500)
-
+    
 
 ##############################################
-@checkIfUserIsLoggedIn()
+@basics.checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
 def deleteUser(request):
     """
@@ -95,8 +171,8 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} deleted themselves at " + str(datetime.datetime.now()))
-    flag = postgres.ProfileManagement.deleteUser(request.session)
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
+    flag = pgProfiles.ProfileManagementUser.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")
     else:
@@ -167,35 +243,6 @@ def deleteUser(request):
 #         else:
 #             return HttpResponse("Not logged in", status=401)
 #     return HttpResponse("Wrong method", status=405)
-
-##############################################
-# def getAll(request):
-#     """
-#     Drop all information (of the DB) about all users for admin view.
-
-#     :param request: GET request
-#     :type request: HTTP GET
-#     :return: JSON response containing all entries of users
-#     :rtype: JSON Respone
-
-#     """
-#     if "user" in request.session:
-#         userID = request.session["user"]["userinfo"]["sub"]
-#         try:
-#             obj = Profile.objects.get(subID=userID).toDict()
-#         except (Exception) as error:
-#             print(error)
-#             return HttpResponse("User not found", status=404)
-#         if obj["type"] == "admin":
-#             # get all information if you're an admin
-#             allEntries = Profile.objects.all()
-#             dictionaries = [ entry.toDict() for entry in allEntries ]
-#             dictionaries = { "userList" : dictionaries }
-#             return JsonResponse(dictionaries, safe=False)
-#         else:
-#             return HttpResponse("Not an admin!", status=401)
-#     else:
-#         return HttpResponse("Not logged in", status=401)
 
 
 # #############################################################

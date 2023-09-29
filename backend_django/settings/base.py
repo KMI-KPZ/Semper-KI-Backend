@@ -37,6 +37,8 @@ PRODUCTION=False
 DEVELOPMENT=False
 DEBUG = True
 
+BACKEND_SETTINGS= "base"
+
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', "dev.semper-ki.org", "semper-ki.org", "www.semper-ki.org", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "backend.semper-ki.org", "https://backend.semper-ki.org", "dev-backend.semper-ki.org", "https://dev-backend.semper-ki.org"]
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000","https://localhost:3000","https://127.0.0.1:3000","https://localhost:8000","https://127.0.0.1:8000", "https://dev.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org", "https://backend.semper-ki.org", "https://dev-backend.semper-ki.org"]
@@ -194,6 +196,8 @@ SPARQL_USERNAME = os.environ.get("SPARQLUSERNAME")
 SPARQL_PASSWORD = os.environ.get("SPARQLPW")
 CMEM_CLIENT_ID = os.environ.get("CMEMCLIENTID")
 CMEM_CLIENT_SECRET = os.environ.get("CMEMCLIENTSECRET")
+COYPU_CLIENTID = os.environ.get("COYPUCLIENTID")
+COYPU_PASSWORD = os.environ.get("COYPUPASSWORD")
 
 # Session cleanup
 CELERYBEAT_SCHEDULE = {
@@ -216,12 +220,22 @@ LOGGING = {
                 'class': 'logging.StreamHandler',
                 'formatter': 'detailed'
             },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': "logs/info.log",
+            },
     },
     'loggers': {
         '': {
             'handlers': ['console'],
             'propagate': False,
             'level': 'DEBUG',
+        },
+        'logToFile': { # the logger used in every handler, needs to be called manually
+            'handlers': ['file','console'],
+            'propagate': False,
+            'level': 'INFO',
         },
         'django': {
             'handlers': ['console'],

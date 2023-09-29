@@ -14,18 +14,37 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..services import auth0, postgres
-from ..handlers.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient
+from ..utilities import rights
 
-logger = logging.getLogger(__name__)
+from ..services.postgresDB import pgProfiles
+
+from ..services import auth0
+from ..utilities.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient, Logging
+
+logger = logging.getLogger("logToFile")
 #######################################################
 def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     """
+    Send events to the respective websockets.
+
+    :param orgID: ID of that organization
+    :type orgID: str
+    :param baseURL: stuff for Auth0
+    :type baseURL: str
+    :param baseHeader: stuff for Auth0
+    :type baseHeader: str
+    :param eventName: stuff for frontend
+    :type eventName: str
+    :param args: other arguments
+    :type args: str
+    :return: True or exception
+    :rtype: Bool or exception
     """
     try:
         channel_layer = get_channel_layer()
         if eventName == "assignRole" or eventName == "removeRole":
-            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+            groupName = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args)
+            async_to_sync(channel_layer.group_send)(groupName, {
                 "type": "sendMessageJSON",
                 "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
             })
@@ -42,15 +61,16 @@ def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
                 resp = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=baseHeader) )
                 if isinstance(resp, Exception):
                     raise resp    
+                groupName = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=userID)
                 for elem in resp:
                     if elem["id"] == args:
-                        async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
+                        async_to_sync(channel_layer.group_send)(groupName, {
                             "type": "sendMessageJSON",
                             "dict": {"eventType": "permissionEvent", "type": "roleChanged"},
                         })
 
         elif eventName == "deleteUserFromOrganization":
-            async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=args), {
+            async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=args), {
                 "type": "sendMessageJSON",
                 "dict": {"eventType": "orgaEvent", "type": "userDeleted"},
             })
@@ -89,8 +109,8 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_getInviteLink", json=False)
-def organisations_getInviteLink(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_getInviteLink(request):
     """
     Ask Auth0 API to invite someone via e-mail and retrieve the link
 
@@ -119,7 +139,7 @@ def organisations_getInviteLink(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},invite,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} to {orgID}," + str(datetime.datetime.now()))
         return HttpResponse(response["invitation_url"])
     
     except Exception as e:
@@ -132,8 +152,8 @@ def organisations_getInviteLink(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_addUser", json=False)
-def organisations_addUser(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_addUser(request):
     """
     Ask Auth0 API to invite someone via e-mail
 
@@ -162,7 +182,7 @@ def organisations_addUser(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} invited the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},invite,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} to {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -175,10 +195,10 @@ def organisations_addUser(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_fetchUsers", json=True)
-def organisations_fetchUsers(request):
+@checkIfRightsAreSufficient(json=True)
+def organizations_fetchUsers(request):
     """
-    Ask Auth0 API for all users of an organisation
+    Ask Auth0 API for all users of an organization
 
     :param request: Request with session in it
     :type request: HTTP GET
@@ -225,8 +245,8 @@ def organisations_fetchUsers(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_deleteUser", json=False)
-def organisations_deleteUser(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_deleteUser(request):
     """
     Ask Auth0 API to delete someone from an organization via their name
 
@@ -260,8 +280,8 @@ def organisations_deleteUser(request):
         response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/organizations/{orgID}/members', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
-        postgres.ProfileManagement.deleteUser("", uID=userID)
-        logger.info(f"{userName} deleted the user {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        pgProfiles.ProfileManagement.deleteUser("", uID=userID)
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},deleted,{Logging.Object.USER},user {emailAdressOfUserToBeAdded} from {orgID}," + str(datetime.datetime.now()))
         
         # Send event to websocket
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "deleteUserFromOrganization", userID)
@@ -280,8 +300,8 @@ def organisations_deleteUser(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_createRole", json=True)
-def organisations_createRole(request):
+@checkIfRightsAreSufficient(json=True)
+def organizations_createRole(request):
     """
     Ask Auth0 API to create a new role
 
@@ -316,7 +336,7 @@ def organisations_createRole(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} created the role {roleName} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},role {roleName} in {orgID}," + str(datetime.datetime.now()))
         return JsonResponse(response, safe=False)
     
     except Exception as e:
@@ -329,8 +349,8 @@ def organisations_createRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_assignRole", json=False)
-def organisations_assignRole(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_assignRole(request):
     """
     Assign a role to a person
 
@@ -369,7 +389,7 @@ def organisations_assignRole(request):
         if isinstance(retVal, Exception):
             raise retVal
         
-        logger.info(f"{userName} assigned the role {roleID} to {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DEFINED},assigned,{Logging.Object.OBJECT},role {roleID} to {emailAdressOfUserToBeAdded} in {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -382,8 +402,8 @@ def organisations_assignRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_removeRole", json=False)
-def organisations_removeRole(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_removeRole(request):
     """
     Remove a role from a person
 
@@ -418,7 +438,7 @@ def organisations_removeRole(request):
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} removed the role {roleID} from {emailAdressOfUserToBeAdded} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},removed,{Logging.Object.OBJECT},role {roleID} from {emailAdressOfUserToBeAdded} in {orgID}," + str(datetime.datetime.now()))
         # retVal = sendEventViaWebsocket(orgID, baseURL, headers, "removeRole", result)
         # if isinstance(retVal, Exception):
         #     raise retVal
@@ -434,8 +454,8 @@ def organisations_removeRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_editRole", json=False)
-def organisations_editRole(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_editRole(request):
     """
     Ask Auth0 API to edit a role
 
@@ -466,14 +486,14 @@ def organisations_editRole(request):
         roleDescription = content["content"]["roleDescription"]
 
         data = { "name": roleName, "description": roleDescription}
-        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}', headers=headers, json=data) )
+        response = handleTooManyRequestsError( lambda : requests.patch(f'{baseURL}/api/v2/roles/{roleID}', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
         
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "editRole", roleID)
         if isinstance(retVal, Exception):
             raise retVal
-        logger.info(f"{userName} edited the role {roleName} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.EDITED},edited,{Logging.Object.OBJECT},role {roleName} for {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -487,8 +507,8 @@ def organisations_editRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_getRoles", json=True)
-def organisations_getRoles(request):
+@checkIfRightsAreSufficient(json=True)
+def organizations_getRoles(request):
     """
     Fetch all roles for the organization
 
@@ -533,8 +553,8 @@ def organisations_getRoles(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_deleteRole", json=False)
-def organisations_deleteRole(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_deleteRole(request):
     """
     Delete role via ID
 
@@ -555,12 +575,13 @@ def organisations_deleteRole(request):
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         roleID = content["content"]["roleID"]
         userName = request.session["user"]["userinfo"]["nickname"]
+        orgID = request.session["user"]["userinfo"]["org_id"]
 
         response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}', headers=headers) )
         if isinstance(response, Exception):
             raise response
         
-        logger.info(f"{userName} deleted the role {roleID} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},role {roleID} from {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
         
     except Exception as e:
@@ -573,8 +594,8 @@ def organisations_deleteRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_setPermissionsForRole", json=False)
-def organisations_setPermissionsForRole(request):
+@checkIfRightsAreSufficient(json=False)
+def organizations_setPermissionsForRole(request):
     """
     Add Permissions to role
 
@@ -609,9 +630,10 @@ def organisations_setPermissionsForRole(request):
         permissionsToBeRemoved = {"permissions": []}
         for entry in response:
             permissionsToBeRemoved["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry["permission_name"]})
-        response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=permissionsToBeRemoved) )
-        if isinstance(response, Exception):
-            raise response
+        if len(permissionsToBeRemoved["permissions"]) > 0: # there are permissions that need removal
+            response = handleTooManyRequestsError( lambda : requests.delete(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=permissionsToBeRemoved) )
+            if isinstance(response, Exception):
+                raise response
         response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=data) )
         if isinstance(response, Exception):
             raise response
@@ -619,7 +641,7 @@ def organisations_setPermissionsForRole(request):
         retVal = sendEventViaWebsocket(orgID, baseURL, headers, "addPermissionsToRole", roleID)
         if isinstance(retVal, Exception):
             raise retVal
-        logger.info(f"{userName} set permissions of role {roleID} at " + str(datetime.datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.DEFINED},set,{Logging.Object.OBJECT},permissions of role {roleID} in {orgID}," + str(datetime.datetime.now()))
         return HttpResponse("Success", status=200)
 
     except Exception as e:
@@ -632,8 +654,8 @@ def organisations_setPermissionsForRole(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient("organisations_getPermissions", json=True)
-def organisations_getPermissions(request):
+@checkIfRightsAreSufficient(json=True)
+def organizations_getPermissions(request):
     """
     Get all Permissions
 
@@ -667,8 +689,8 @@ def organisations_getPermissions(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("organisations_getPermissionsForRole", json=True)
-def organisations_getPermissionsForRole(request):
+@checkIfRightsAreSufficient(json=True)
+def organizations_getPermissionsForRole(request):
     """
     Get Permissions of role
 
@@ -700,3 +722,77 @@ def organisations_getPermissionsForRole(request):
             return HttpResponse("Failed - " + str(e), status=429)
         else:
             return HttpResponse("Failed - " + str(e), status=500)
+
+#######################################################
+@checkIfUserIsLoggedIn
+@require_http_methods(["POST"])
+def organizations_createNewOrganization(request):
+    """
+    Create a new organization, create an admin role, invite a person via email as admin.
+    All via Auth0s API.
+
+    :param request: request with content as json
+    :type request: HTTP POST
+    :return: Successfull or not
+    :rtype: HTTPResponse
+    """    
+
+    try:
+        content = json.loads(request.body.decode("utf-8"))["data"]
+
+        auth0.apiToken.checkIfExpired()
+        headers = {
+            'authorization': f'Bearer {auth0.apiToken.accessToken}',
+            'content-Type': 'application/json',
+            "Cache-Control": "no-cache"
+        }
+        baseURL = f"https://{settings.AUTH0_DOMAIN}"
+
+        # create organization
+        data = { "name": content["content"]["name"], 
+                "display_name": content["content"]["display_name"], 
+                "branding":
+                    { "logo_url": content["content"]["logo_url"], 
+                     "colors": 
+                     { "primary": content["content"]["primary_color"], 
+                        "page_background": content["content"]["background_color"] }
+                    },
+                "metadata": content["content"]["metadata"],
+                "enabled_connections": [ { "connection_id": "con_t6i9YJzm5KLo4Jlf", "assign_membership_on_login": False } ] }
+
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations', headers=headers, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        
+        org_id = response["id"]
+        
+        # create admin role
+        roleName = content["content"]["name"] + "-" + "admin"
+        roleDescription = "admin"
+
+        data = { "name": roleName, "description": roleDescription}
+        response = handleTooManyRequestsError( lambda: requests.post(f'{baseURL}/api/v2/roles', headers=headers, json=data) )
+        if isinstance(response, Exception):
+            raise response
+        roleID = response["id"]
+
+        # invite person to organization as admin
+        email = content["content"]["email"]
+
+        data = { "inviter": { "name": "Semper-KI" }, "invitee": { "email": email }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "roles": [ roleID ], "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
+        
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{org_id}/invitations', headers=headers, json=data))
+        if isinstance(response, Exception):
+            raise response
+        
+        logger.info(f"{Logging.Subject.SYSTEM},Semper-KI,{Logging.Predicate.CREATED},created,{Logging.Object.ORGANISATION},{content['content']['name']} through user {email}," + str(datetime.datetime.now()))
+        
+        return HttpResponse("Success", status=200)
+    
+    except Exception as e:
+        print(f'Generic Exception: {e}')
+        if "many requests" in e.args[0]:
+            return HttpResponse("Failed - " + str(e), status=429)
+        else:
+            return HttpResponse("Failed - " + str(e), status=500)    
+

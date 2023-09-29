@@ -103,6 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.dev
 .venv
 env/
 venv/
@@ -137,3 +138,5 @@ backend_django/env_example.env
 /logs/*
 
 quickDebug.py
+
+Ontology/

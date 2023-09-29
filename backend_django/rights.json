@@ -6,11 +6,17 @@
             "permission": "read"
          },
          "elements": [
-            "Orders"
+            "Orders",
+            "HomeAuthorizedOrder",
+            "OrdersButton",
+            "OrderButtonSee"
          ],
          "paths": [
             "retrieveOrders",
-            "getMissedEvents"
+            "getMissedEvents",
+            "getOrder",
+            "getOrders",
+            "getFlatOrders"
          ]
       },
       {
@@ -19,10 +25,11 @@
             "permission": "files"
          },
          "elements": [
-            "OrderFile"
+             "OrderFile"
          ],
          "paths": [
-            "downloadFiles"
+            "downloadFiles",
+            "updateOrder"
          ]
       },
       {
@@ -32,7 +39,7 @@
          },
          "elements": [
             "Chat",
-            "ChatButton"
+            "SubOrderButtonChat"
          ],
          "paths": [
             "updateOrder"
@@ -44,13 +51,63 @@
             "permission": "edit"
          },
          "elements": [
-            "OrderButtons",
-            "OrderStatus"
+            "OrdersButtonNew",
+            "OrderButtonEdit",
+            "OrderButtonNew",
+            "OrderButtonContractorSelection",
+            "OrderButtonRequest",
+            "OrderButtonVerify",
+            "OrderButtonReOrder",
+            "OrderButtonConfirm",
+            "OrderButtonReject",
+            "OrderButtonVerify",
+            "OrderButtonEditName",
+            "SubOrderCheckout",
+            "SubOrderVerification",
+            "SubOrderContractorSelection",
+            "SubOrderServiceSelection",
+            "SubOrderButtonEdit",
+            "SubOrderButtonContractorSelection",
+            "SubOrderButtonRequest",
+            "SubOrderButtonReOrder",
+            "SubOrderButtonReject",
+            "SubOrderButtonConfirm",
+            "SubOrderButtonVerify"
          ],
          "paths": [
             "updateOrder",
+            "updateOrderCollection",
+            "getManufacturers",
+            "saveOrder",
+            "verifyOrder",
+            "createOrderID",
+            "createOrderCollectionID"
+         ]
+      },
+      {
+         "permission": {
+            "context": "orders",
+            "permission": "delete"
+         },
+         "elements": [
+            "OrderButtonDelete",
+            "SubOrderButtonDelete"
+         ],
+         "paths": [
             "deleteOrder",
             "deleteOrderCollection"
+         ]
+      },
+      {
+         "permission": {
+            "context": "orga",
+            "permission": "delete"
+         },
+         "elements": [
+            "OrganizationButtonDelete"
+         ],
+         "paths": [
+            "deleteOrganization"
          ]
       },
       {
@@ -59,19 +116,25 @@
             "permission": "edit"
          },
          "elements": [
-            "OrganizationRoles",
-            "ButtonChangeRole"
+            "OrganizationInvitation",
+            "OrganizationButtonEditOrga",
+            "OrganizationButtonEditUser",
+            "OrganizationButtonDeleteUser",
+            "OrganizationButtonCreateRole",
+            "OrganizationButtonEditRole",
+            "OrganizationButtonDeleteRole"
          ],
          "paths": [
-            "organisations_setPermissionsForRole",
-            "organisations_deleteRole",
-            "organisations_editRole",
-            "organisations_removeRole",
-            "organisations_assignRole",
-            "organisations_createRole",
-            "organisations_deleteUser",
-            "organisations_addUser",
-            "organisations_getInviteLink"
+            "organizations_setPermissionsForRole",
+            "organizations_deleteRole",
+            "organizations_editRole",
+            "organizations_removeRole",
+            "organizations_assignRole",
+            "organizations_createRole",
+            "organizations_deleteUser",
+            "organizations_addUser",
+            "organizations_getInviteLink",
+            "updateDetailsOfOrganization"
          ]
       },
       {
@@ -80,13 +143,15 @@
             "permission": "read"
          },
          "elements": [
-            "Organization"
+            "Organization",
+            "HomeAuthorizedOrganization",
+            "OrganizationRoles"
          ],
          "paths": [
-            "organisations_getPermissionsForRole",
-            "organisations_getPermissions",
-            "organisations_getRoles",
-            "organisations_fetchUsers"
+            "organizations_getPermissionsForRole",
+            "organizations_getPermissions",
+            "organizations_getRoles",
+            "organizations_fetchUsers"
          ]
       },
       {
@@ -95,7 +160,8 @@
             "permission": "read"
          },
          "elements": [
-            "Resouces"
+            "Resources",
+            "HomeAuthorizedResources"
          ],
          "paths": [
             "orga_getMaterials",
@@ -112,10 +178,10 @@
             "permission": "edit"
          },
          "elements": [
-            "ResourcesPrintersAddButton",
-            "ResourcesPrintersAdd",
             "ResourcesMaterialsForm",
-            "ResourcesMaterialsAddButton"
+            "ResourcesPrintersAdd",
+            "ResourcesButtonAddMaterial",
+            "ResourcesButtonAddPrinter"
          ],
          "paths": [
             "orga_removeMaterial",

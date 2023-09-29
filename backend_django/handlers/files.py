@@ -11,11 +11,15 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileRe
 import asyncio, json, logging
 from django.views.decorators.http import require_http_methods
 
-from ..handlers.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from ..utilities import crypto, mocks, stl
 
-from ..services import crypto, redis, stl, mocks, postgres
+from ..services.postgresDB import pgProfiles
 
-logger = logging.getLogger(__name__)
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
+
+from ..services import redis
+
+logger = logging.getLogger("logToFile")
 #######################################################
 @require_http_methods(["GET"])
 def testRedis(request):
@@ -144,7 +148,7 @@ def testGetUploadedFiles(request):
 #######################################################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
-@checkIfRightsAreSufficient("downloadFiles", json=False)
+@checkIfRightsAreSufficient(json=False)
 def downloadFiles(request):
     """
     Send file to user from temporary, later permanent storage
@@ -159,12 +163,12 @@ def downloadFiles(request):
     content = json.loads(request.body.decode("utf-8"))
     orderID = content["id"]
     fileName = content["filename"]
-    currentOrder = postgres.OrderManagement.getOrder(orderID)
+    currentOrder = pgProfiles.OrderManagement.getOrder(orderID)
     for idx, elem in enumerate(currentOrder.files):
         if fileName == elem["filename"]:
             (contentOrError, Flag) = redis.retrieveContent(elem["path"])
             if Flag:
-                logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} downloaded file {fileName} at " + str(datetime.datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileName}," + str(datetime.datetime.now()))
                 return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
                 #return FileResponse(contentOrError[idx][3].seek(0)) #, content_type='multipart/form-data')
             else:

@@ -14,73 +14,16 @@ from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..handlers.basics import checkIfUserIsLoggedIn
+from ..utilities import crypto, mocks
 
-from ..services import redis, mocks, postgres, crypto
+from ..services.postgresDB import pgProfiles, pgOrders
 
-logger = logging.getLogger(__name__)
-#######################################################
-@require_http_methods(["POST"])
-def updateCart(request):
-    """
-    Save selection of user into session
+from ..utilities.basics import checkIfUserIsLoggedIn
 
-    :param request: json containing selection
-    :type request: JSON
-    :return: Response if saving worked or not
-    :rtype: HTTP Response
+from ..services import redis
 
-    """
-    try:
-        selected = json.loads(request.body.decode("utf-8"))
-        request.session["selected"] = selected
-        return HttpResponse("Success")
-    except (Exception) as error:
-        print(error)
-        return HttpResponse("Failed",status=200)
+logger = logging.getLogger("logToFile")
 
-#######################################################
-@require_http_methods(["GET"])
-def getCart(request):
-    """
-    Retrieve selection from session
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: JSON cart
-    :rtype: JSON Response
-
-    """
-    if "selected" in request.session:
-        return JsonResponse(request.session["selected"])
-    else:
-        return JsonResponse({})
-
-##############################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def getManufacturers(request):
-    """
-    Get all suitable manufacturers.
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: List of manufacturers and some details
-    :rtype: JSON
-
-    """
-
-    manufacturerList = []
-    listOfAllManufacturers = postgres.ProfileManagement.getAllManufacturers(request.session)
-    # TODO Check suitability
-
-    # remove unnecessary information and add identifier
-    for idx, elem in enumerate(listOfAllManufacturers):
-        manufacturerList.append({})
-        manufacturerList[idx]["name"] = elem["name"]
-        manufacturerList[idx]["id"] = elem["hashedID"]
-
-    return JsonResponse(manufacturerList, safe=False)
 
 #######################################################
 @checkIfUserIsLoggedIn()
@@ -195,39 +138,3 @@ def checkLogistics(request):
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
 
-
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["GET"])
-def sendOrder(request):
-    """
-    Save order and send it to manufacturer
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: Response if sent successfully or not
-    :rtype: HTTP Response
-
-    """
-
-    try:
-        uID = postgres.ProfileManagement.getUserHashID(request.session)
-        selected = request.session["selected"]["cart"]
-        dictForEvents = postgres.OrderManagement.addOrder(uID, selected, request.session)
-        # Save picture and files in permanent storage
-
-
-        # send to websockets that are active, that a new message/status is available for that order
-        channel_layer = get_channel_layer()
-        for userID in dictForEvents:
-            values = dictForEvents[userID]
-            if userID != postgres.ProfileManagement.getUserKey(session=request.session):
-                async_to_sync(channel_layer.group_send)(postgres.ProfileManagement.getUserKeyWOSC(uID=userID), {
-                    "type": "sendMessageJSON",
-                    "dict": values,
-                })
-        logger.info(f"{postgres.ProfileManagement.getUser(request.session)['name']} ordered something at " + str(datetime.datetime.now()))
-        return HttpResponse("Success")
-    except (Exception) as error:
-        print(error)
-        return HttpResponse("Failed")

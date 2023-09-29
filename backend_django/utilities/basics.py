@@ -6,13 +6,13 @@ Silvio Weging 2023
 Contains: Basic stuff that is imported everywhere
 """
 
-import datetime
+import datetime, enum
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
-from anyio import sleep
+from time import sleep
 
-from ..services import rights
+from ..utilities import rights
 
 #######################################################
 def checkIfTokenValid(token):
@@ -28,6 +28,22 @@ def checkIfTokenValid(token):
     if datetime.datetime.now() > datetime.datetime.strptime(token["tokenExpiresOn"],"%Y-%m-%d %H:%M:%S+00:00"):
         return False
     return True
+
+#######################################################
+def manualCheckifLoggedIn(session):
+    """
+    Check whether a user is logged in or not.
+
+    :param session: Session of user
+    :type session: dict
+    :return: Response whether the user is logged in or not.
+    :rtype: Bool
+    """
+    if "user" in session:
+        if checkIfTokenValid(session["user"]):
+            return True
+
+    return False
 
 #################### DECORATOR ###################################
 def checkIfUserIsLoggedIn(json=False):
@@ -51,6 +67,38 @@ def checkIfUserIsLoggedIn(json=False):
                         return JsonResponse({}, status=401)
                     else:
                         return HttpResponse("Not logged in", status=401)
+            else:
+                if json:
+                    return JsonResponse({}, status=401)
+                else:
+                    return HttpResponse("Not logged in", status=401)
+            
+        return inner
+
+    return decorator
+
+#################### DECORATOR ###################################
+def checkIfUserIsAdmin(json=False):
+    """
+    Check whether the current user is an admin or not
+
+    :param json: Controls if the output is in JSON Format or not
+    :type json: Bool
+    :return: Response whether the user is an admin or not. If so, call the function.
+    :rtype: HTTPRespone/JSONResponse, Func
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            if "user" in request.session:
+                if request.session["usertype"] == "admin":
+                    return func(request, *args, **kwargs)
+                else:
+                    if json:
+                        return JsonResponse({}, status=401)
+                    else:
+                        return HttpResponse("Not an admin!", status=401)
             else:
                 if json:
                     return JsonResponse({}, status=401)
@@ -87,8 +135,27 @@ def handleTooManyRequestsError(callToAPI):
     else:
         return response.json()
 
+#######################################################
+def manualCheckIfRightsAreSufficient(session, funcName):
+    """
+    Check whether a user has the permissions to do something.
+
+    :param session: Session of user
+    :type session: dict
+    :param funcName: The function that called this
+    :type funcName: str
+    :return: Response whether the user is logged in or not.
+    :rtype: Bool
+    """
+    if "user" in session:
+        if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
+            return True
+
+    return False
+    
+
 #################### DECORATOR ###################################
-def checkIfRightsAreSufficient(funcName, json=False):
+def checkIfRightsAreSufficient(json=False):
     """
     Check whether a user has sufficient rights to call that function.
 
@@ -102,7 +169,7 @@ def checkIfRightsAreSufficient(funcName, json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session:
-                if rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], funcName):
+                if request.session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
                     if json:
@@ -119,3 +186,29 @@ def checkIfRightsAreSufficient(funcName, json=False):
 
     return decorator    
         
+#######################################################
+# logging vocabulary
+class Logging():
+    class Subject(enum.StrEnum):
+        USER = enum.auto()
+        ADMIN = enum.auto()
+        ORGANISATION = enum.auto()
+        SYSTEM = enum.auto()
+        SUBJECT = enum.auto() # for everything else
+
+    class Predicate(enum.StrEnum):
+        CREATED = enum.auto()
+        DEFINED = enum.auto()
+        FETCHED = enum.auto()
+        EDITED = enum.auto()
+        DELETED = enum.auto()
+        PREDICATE = enum.auto() # for everything else
+
+    class Object(enum.StrEnum):
+        USER = enum.auto()
+        ADMIN = enum.auto()
+        ORGANISATION = enum.auto()
+        SYSTEM = enum.auto()
+        SELF = enum.auto()
+        OBJECT = enum.auto() # for everything else
+

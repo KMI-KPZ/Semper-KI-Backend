@@ -14,7 +14,7 @@ import asyncio
 import time
 from functools import reduce
 
-from ..handlers.basics import checkIfTokenValid
+from ..utilities.basics import checkIfTokenValid
 
 ##############################################
 async def checkSession(session):
@@ -88,7 +88,7 @@ def getIpAdress(request):
         ip = request.META.get('REMOTE_ADDR')
     
     accessTime = timezone.now()
-    with open(str(settings.BASE_DIR) + "/logs/ip_log.txt", 'a') as ipLogFile:
+    with open(str(settings.BASE_DIR) + "/logs/ip_log.log", 'a') as ipLogFile:
         ipLogFile.write(str(accessTime) + "\t" + request.path + "\t" + ip + "\n")
         ipLogFile.close()
     
