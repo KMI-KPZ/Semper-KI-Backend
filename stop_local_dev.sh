@@ -1,3 +1,2 @@
 #!/bin/bash
-
-docker-compose -f dc-local-dev-services.yml -f dc-local-dev-container-backend.yml down
+docker-compose --env_file .env.local_container -f dc-local-dev-services.yml -f dc-local-dev-container-backend.yml down

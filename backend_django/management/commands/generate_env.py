@@ -27,11 +27,22 @@ class Command(BaseCommand):
             self.stdout.write(f'\n#INTERNAL SERVICES\n\n')
             for key, value in env_vars_internal:
                 val = os.environ.get(key,'') if options.get('print') else ( value["default"] if value["default"] else "" )
-                self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(f'{key}={val}') + f'# {"required " if value["required"] else ""}')
+                #self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(f'{key}={val}') + f'# {"required " if value["required"] else ""}')
+                self.writeVariable(key,value,val)
 
             env_vars_external = app.getEnvVarsExternal().items()
             self.stdout.write(f'\n#EXTERNAL SERVICES\n\n')
             for key, value in env_vars_external:
                 val = os.environ.get(key,'') if options.get('print') else ( value["default"] if value["default"] else "" )
-                self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(f'{key}={val}') + f'# {"required " if value["required"] else ""}')
+                #self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(f'{key}={val}') + f'# {"required " if value["required"] else ""}')
+                self.writeVariable(key,value,val)
+
+    def writeVariable(self,key,value: dict, val):
+        if value.get('type') == 'list' and type(val) != str:
+            print(str(type(val)))
+            val = ','.join(val)
+
+
+        self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(
+            f'{key}={val}') + f'# {"required " if value["required"] else ""}')
 

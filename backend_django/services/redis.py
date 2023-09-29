@@ -9,6 +9,7 @@ Contains: Services for using the key-value store in redis
 import redis, os, pickle
 from django.conf import settings
 
+print("USING REDIS PASSWORD: "+settings.REDIS_PASSWORD+ "\n")
 redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=settings.REDIS_PASSWORD)
 
 #######################################################

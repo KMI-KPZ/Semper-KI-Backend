@@ -15,12 +15,17 @@ class ManageToken:
     """
     Manage oauth token class.
     """
-    token = {}
+    _token = None
     client = OAuth2Session(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET,token_endpoint="https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token", token_endpoint_auth_method='client_secret_post')
 
     #######################################################
-    def __init__(self):
-        self.getAccessToken()
+    def __getattr__(self, item):
+        if item == "token":
+            if self._token is None:
+                self.getAccessToken()
+            return self._token
+        else:
+            raise AttributeError
     
     #######################################################
     def __del__(self):
@@ -31,7 +36,7 @@ class ManageToken:
         """
         Get initial token. Made as a function to be callable from outside. 
         """
-        self.token = self.client.fetch_token(grant_type='client_credentials')
+        self._token = self.client.fetch_token(grant_type='client_credentials')
     
     #######################################################
     def checkIfExpired(self):

@@ -7,7 +7,7 @@ from django.apps import AppConfig
 from .services import auth0
 
 from django.core.checks import register
-from .checks import Tags, checkEnv, checkDb
+from .checks import Tags, checkEnv, checkDb, checkRedis
 from .helper.classes import SemperKiConfigHelper
 
 #
@@ -22,7 +22,12 @@ from backend_django.settings.base import SemperKiConfigHelper, BackendDjangoConf
 
 class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
     name = 'backend_django'
-    checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env') }
+    checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
+
+    def __init__(self,app_name, app_module):
+        AppConfig.__init__(self,app_name, app_module)
+        BackendDjangoConfigHelper.__init__(self)
+
     def ready(self):
         from django.conf import settings
         print(f'\n\n********** BackendDjangoConfig.ready() **********\nSettings-Module: {settings.BACKEND_SETTINGS}\n')
@@ -31,6 +36,8 @@ class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
             register(checkEnv, Tags.env_check) # register check_env function with tag env_check
         if self.doCheck('check_db'):
             register(checkDb, Tags.db_check) # register check_db function with tag db_check
+        if self.doCheck('check_redis'):
+            register(checkRedis, Tags.redis_check)
         super(BackendDjangoConfig, self).ready()
 
     def __repr__(self):

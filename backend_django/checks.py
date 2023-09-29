@@ -11,6 +11,7 @@ from django.apps import apps
 class Tags(DjangoTags):
     env_check = 'env_check'
     db_check = 'db_check'
+    redis_check = 'redis_check'
 
 
 def checkEnv(app_configs=None, **kwargs):
@@ -44,7 +45,7 @@ def checkDb(app_configs=None, **kwargs):
                     errors.append(Info(f'connected to database with alias "{db_alias}" on "{db_conn.settings_dict["HOST"]}"\n db_name: "{db_name}"',id='db_check'))
                 except OperationalError:
                     connected = False
-                    errors.append(Error(f'could not connect to database with alias "{db_alias}" on "{settings.DATABASES[db_alias]["HOST"]}\n db_name: "{db_name}"',
+                    errors.append(Error(f'could not connect to database with alias "{db_alias}" on "{settings.DATABASES[db_alias]["HOST"]}"\n db_name: "{db_name}"',
                                         hint=f'Check your {os.environ.get("ENV_FILE",".env")} file and it\'s settings and check if database exists',
                                         id='db_check'))
                 else:
@@ -54,3 +55,23 @@ def checkDb(app_configs=None, **kwargs):
         print(f'all tables by models {str(tables)}\n')
 
     return errors
+
+
+def checkRedis(app_configs=None, **kwargs):
+    if app_configs is None:
+        app_configs = apps.get_app_configs()
+
+    for app in app_configs:
+        if issubclass(type(app), SemperKiConfigHelper):
+            from .services.redis import addContent, deleteKey, retrieveContent
+            try:
+                addContent("_test", "test")
+                value = retrieveContent("_test")
+                deleteKey("_test")
+                if value[0] != "test":
+                    return [Error(f'could not store and retrieve key', id='redis_check')]
+            except Exception as e:
+                return [Error(f'could not connect to redis', id='redis_check')]
+            return [Info(f'connected to redis and could store, retrieve and delete test-token', id='redis_check')]
+
+    return []

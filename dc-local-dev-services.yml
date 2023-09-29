@@ -14,6 +14,9 @@ services:
     image: dpage/pgadmin4
     env_file:
      - .env.local_container
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test@infai.org
+      - PGADMIN_DEFAULT_PASSWORD=asdf
     ports:
       - "8088:80"
     volumes:
@@ -29,9 +32,10 @@ services:
       - 127.0.0.1:6379:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
+      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
+    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: --save 60 1 --loglevel warning --requirepass ${REDISPW}
     networks:
       - semper-ki-dev-network
 
@@ -40,6 +44,8 @@ services:
       context: .
     container_name: celery-worker
     entrypoint: celery
+    environment:
+      - MODE=local_container
     command: -A backend_django.celery worker --loglevel=info
     volumes:
     - .:/var/www/app/worker
@@ -55,6 +61,8 @@ services:
         context: .
       container_name: celery-beat
       entrypoint: celery
+      environment:
+        - MODE=local_container
       command: -A backend_django.celery beat --loglevel=info
       volumes:
       - .:/var/www/app/beat
@@ -69,10 +77,16 @@ services:
 
   flower:
       image: mher/flower
+      env_file:
+        - .env.local_container
       container_name: flower
-      environment:
-      - CELERY_BROKER_URL=redis://:${REDISPW}@redis:6379/0
-      - FLOWER_PORT=8888
+      volumes:
+        - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
+      entrypoint: /usr/local/bin/dc-service-flower-start.sh
+      #command: ['celery', "--broker=redis://:asdf@files:6379/0", 'flower','--port=8888']
+#      environment:
+#      - CELERY_BROKER_URL=redis://:$${REDISPW}@redis:6379/0
+#      - FLOWER_PORT=8888
       ports:
       - 8888:8888
       links:
