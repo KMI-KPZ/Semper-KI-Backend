@@ -8,8 +8,8 @@
 ^^ will be changed in the future
 
 ## environments
-the backend currently supports the environment "--env <environment>" which will be interpreted as follows:
-- django settings file backend_django.settings.<environment>.py will be used
+the backend currently supports the environment ```--env <environment>``` which will be interpreted as follows:
+- django settings file ```backend_django.settings.<environment>.py``` will be used
 - .env.<environment> will be used for the environment variables
 - if the environment MODE=<environment> is set, in asgi application it will work as on ```python manage.py command --env <environment>``` has been set (used for backend docker container)
 
@@ -18,6 +18,7 @@ the backend currently supports the environment "--env <environment>" which will 
 
 - clone the repository
 - for clean initialization check that postgres folder is empty as well as redis folder
+- run ```python -m pip install -r requirements.txt```
 - run ```python manage.py generate_env``` to output an example env file which you should copy into project root folder .env.local_container
 - edit .env.local_container for the external services (ask the team for credentials) and change ENV_TOKEN to local_container to see which env file is being used in outputs
 - copy .env.local_container to .env.local and change internal services hosts (e.g. database, redis) to localhost as well as ENV_TOKEN to local to see which env file is being used in outputs
