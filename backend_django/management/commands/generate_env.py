@@ -8,7 +8,9 @@ class Command(BaseCommand):
     help = 'generates .env.example file from configured environment variables in apps.py'
     file_intro = ('# This is an example .env file for Semper-KI with following structure:\n'
                   '# ENV_VARNAME=[DEFAULT_VALUE|Nothing] # required? - comment'
-                  '\n# first part is for semper-ki internal things (i.e. services which run on internal docker containers) and could be used with default values for development\n, second part is for external services you need to fill in :\n')
+                  '\n# first part is for semper-ki internal things (i.e. services which run on internal docker containers)'
+                  '\n# and could be used with default values for development,'
+                  '\n# second part is for external services you need to fill in :\n')
     current_values = ('# Current values are:\n')
 
     def add_arguments(self, parser):
