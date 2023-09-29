@@ -6,22 +6,32 @@ Silvio Weging 2023
 Contains: Services for oauth verification
 """
 
+from ..helper.classes import LazyConnect
 from authlib.integrations.django_client import OAuth
 import datetime
 from django.conf import settings
 import requests
 
-oauth_auth0 = OAuth()
 
-oauth_auth0.register(
-    "auth0",
-    client_id=settings.AUTH0_CLIENT_ID,
-    client_secret=settings.AUTH0_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
-)
+class OAuthLazy(OAuth, metaclass=LazyConnect):
+    def __init__(self):
+        super().__init__()
+
+
+def auth0Register(instance):
+    from django.conf import settings
+    instance.register(
+        "auth0",
+        client_id=settings.AUTH0_CLIENT_ID,
+        client_secret=settings.AUTH0_CLIENT_SECRET,
+        client_kwargs={
+            "scope": "openid profile email",
+        },
+        server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
+    )
+oauth_auth0 = OAuthLazy()
+oauth_auth0.setLazyFn(auth0Register)
+
 
 #######################################################
 def authorizeToken(request):
@@ -55,17 +65,20 @@ def authorizeRedirect(request, callback):
     )
 
 #######################################################################################
-oauth_auth0_orga = OAuth()
 
-oauth_auth0_orga.register(
-    "auth0Orga",
-    client_id=settings.AUTH0_ORGA_CLIENT_ID,
-    client_secret=settings.AUTH0_ORGA_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
-)
+def auth0OrgaRegister(instance: OAuth):
+    from django.conf import settings
+    instance.register(
+        "auth0Orga",
+        client_id=settings.AUTH0_ORGA_CLIENT_ID,
+        client_secret=settings.AUTH0_ORGA_CLIENT_SECRET,
+        client_kwargs={
+            "scope": "openid profile email",
+        },
+        server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
+    )
+oauth_auth0_orga = OAuthLazy()
+oauth_auth0_orga.setLazyFn(auth0OrgaRegister)
 
 #######################################################
 def authorizeTokenOrga(request):
@@ -104,11 +117,17 @@ class ManageAPIToken:
     Manage oauth token class.
     """
     savedToken = {}
-    accessToken = ""
+    _accessToken = ""
+
 
     #######################################################
-    def __init__(self):
-        self.getAccessToken()
+    def __getattr__(self, item):
+        if item == "accessToken":
+            if self._accessToken == "":
+                self.getAccessToken()
+            return self._accessToken
+        else:
+            raise AttributeError
 
     #######################################################
     def getAccessToken(self):

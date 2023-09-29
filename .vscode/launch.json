@@ -5,7 +5,7 @@
             "type": "docker",
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
-            "serverReadyAction": {},
+            "postDebugTask": "docker-compose-down",            
             "python": {
                 "pathMappings": [
                     {

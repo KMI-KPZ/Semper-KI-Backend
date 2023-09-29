@@ -139,4 +139,8 @@ backend_django/env_example.env
 
 quickDebug.py
 
+.env.dev
+
 Ontology/
+
+/playground

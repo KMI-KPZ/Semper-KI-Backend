@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Further settings for production mode
 """
-
+print('loading production settings')
 
 from .base import *
 
@@ -21,20 +21,6 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_COOKIE_DOMAIN = '.semper-ki.org' 
 
-DATABASES = {
-    'default': {
-    #SQLITE
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-    # POSTGRESQL
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": "db-prod",  # "db" set in docker-compose.yml
-        "PORT": 5432,  # default postgres port
-    }
-}
 
 REDIS_HOST = "files-prod"
 CELERY_BROKER_URL = "redis://:"+REDIS_PASSWORD+"@files-prod:6380/0"
