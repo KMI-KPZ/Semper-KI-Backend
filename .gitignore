@@ -144,3 +144,4 @@ quickDebug.py
 Ontology/
 
 /playground
+.env.local_container
