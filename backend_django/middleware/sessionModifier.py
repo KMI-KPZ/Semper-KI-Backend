@@ -13,7 +13,7 @@ from asgiref.sync import _iscoroutinefunction_or_partial
 from django.utils.decorators import sync_and_async_middleware
 from asgiref.sync import sync_to_async
 
-from ..services.postgresDB import pgOrders, pgProfiles
+from ..services.postgresDB import pgProcesses, pgProfiles
 
 @sync_and_async_middleware
 def sessionModifierMiddleware(get_response):
@@ -35,10 +35,10 @@ def sessionModifierMiddleware(get_response):
             if "isPartOfOrganization" in session:
                 if session["isPartOfOrganization"]:
                     session["pgProfileClass"] = pgProfiles.pgPOrganization
-                    session["pgOrderClass"] = pgOrders.pgOOrganization
+                    session["pgOrderClass"] = pgProcesses.pgOOrganization
                 else:
                     session["pgProfileClass"] = pgProfiles.pgPUser
-                    session["pgOrderClass"] = pgOrders.pgOUser
+                    session["pgOrderClass"] = pgProcesses.pgOUser
             #await sync_to_async(setSession)(request, session)
             response = await get_response(request) # do everything else
             
@@ -57,10 +57,10 @@ def sessionModifierMiddleware(get_response):
             if "isPartOfOrganization" in request.session:
                 if request.session["isPartOfOrganization"]:
                     request.session["pgProfileClass"] = pgProfiles.pgPOrganization
-                    request.session["pgOrderClass"] = pgOrders.pgOOrganization
+                    request.session["pgOrderClass"] = pgProcesses.pgOOrganization
                 else:
                     request.session["pgProfileClass"] = pgProfiles.pgPUser
-                    request.session["pgOrderClass"] = pgOrders.pgOUser
+                    request.session["pgOrderClass"] = pgProcesses.pgOUser
 
             response = get_response(request)
             # What shall happen afterwards

@@ -15,7 +15,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from ..utilities import basics
-from ..services.postgresDB import pgProfiles, pgOrders
+from ..services.postgresDB import pgProcesses, pgProfiles
 
 logger = logging.getLogger("logToFile")
 
@@ -165,7 +165,7 @@ def getAllOrdersFlatAsAdmin(request):
     :rtype: JSONResponse
     """
     # get all orders if you're an admin
-    orderCollections = pgOrders.OrderManagementBase.getAllOCsFlat()
+    orderCollections = pgProcesses.ProcessManagementBase.getAllPsFlat()
     for idx, entry in enumerate(orderCollections):
         clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
@@ -189,7 +189,7 @@ def getSpecificOrderAsAdmin(request, orderCollectionID):
     :return: JSON response, list
     :rtype: JSONResponse
     """
-    orders = pgOrders.OrderManagementBase.getOrderPerOCID(orderCollectionID)
+    orders = pgProcesses.ProcessManagementBase.getProcessesPerPID(orderCollectionID)
     for idx, entry in enumerate(orders):
         clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)

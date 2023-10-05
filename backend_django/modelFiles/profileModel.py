@@ -9,7 +9,7 @@ import json
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from ..modelFiles import ordersModel
+from . import projectModels
 
 # Table for regular Users
 ###################################################
@@ -35,7 +35,7 @@ class User(models.Model):
     email = models.CharField(max_length=100)
     organizations = ArrayField(models.CharField(max_length=513))
     details = models.JSONField()
-    orders = models.ManyToManyField(ordersModel.OrderCollection)
+    projects = models.ManyToManyField(projectModels.Project)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
@@ -61,8 +61,8 @@ class Organization(models.Model):
     :details: Adress, tax id and so on
     :users: Link to users belonging to that organization
     :canManufacture: True if this organization can manufacture something
-    :ordersSubmitted: OrderCollections that this organization submitted
-    :ordersReceived: Orders that this organization received
+    :projectsSubmitted: OrderCollections that this organization submitted
+    :processesReceived: Orders that this organization received
     :uri: Representation link inside the knowledge graph
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated
@@ -74,8 +74,8 @@ class Organization(models.Model):
     details = models.JSONField()
     users = models.ManyToManyField(User)
     canManufacture = models.BooleanField(default=False)
-    ordersSubmitted = models.ManyToManyField(ordersModel.OrderCollection)
-    ordersReceived = models.ManyToManyField(ordersModel.Orders)
+    projectsSubmitted = models.ManyToManyField(projectModels.Project)
+    processesReceived = models.ManyToManyField(projectModels.Process)
     uri = models.CharField(max_length=200)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()

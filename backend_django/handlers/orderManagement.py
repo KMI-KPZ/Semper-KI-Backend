@@ -19,7 +19,7 @@ from channels.layers import get_channel_layer
 
 from ..utilities import crypto, rights
 
-from ..services.postgresDB import pgProfiles, pgOrders
+from ..services.postgresDB import pgProcesses, pgProfiles
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging
 
@@ -87,11 +87,11 @@ def updateOrderCollection(request):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "updateOrderCollection"):
                 if "state" in changes["changes"]:
-                    returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(orderCollectionID, pgProcesses.EnumUpdates.status, changes["changes"]["state"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 if "details" in changes["changes"]:
-                    returnVal = pgOrders.OrderManagementBase.updateOrderCollection(orderCollectionID, pgOrders.EnumUpdates.details, changes["changes"]["details"])
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(orderCollectionID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 
@@ -137,7 +137,7 @@ def deleteOrderCollection(request, orderCollectionID):
             request.session.modified = True
 
         elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrderCollection"):
-            pgOrders.OrderManagementBase.deleteOrderCollection(orderCollectionID)
+            pgProcesses.ProcessManagementBase.deleteProject(orderCollectionID)
         else:
             raise Exception("Not logged in or rights insufficient!")
 
@@ -177,8 +177,8 @@ def createOrderID(request, orderCollectionID):
         # else: it's in the database, fetch it from there
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "createOrderID"):
             # get client ID
-            client = pgOrders.OrderManagementBase.getOrderCollectionObj(orderCollectionID).client
-            returnObj = pgOrders.OrderManagementBase.addOrderTemplateToCollection(orderCollectionID, template, client)
+            client = pgProcesses.ProcessManagementBase.getProjectObj(orderCollectionID).client
+            returnObj = pgProcesses.ProcessManagementBase.addProcessTemplateToProject(orderCollectionID, template, client)
             if isinstance(returnObj, Exception):
                 raise returnObj
 
@@ -242,20 +242,20 @@ def updateOrder(request):
                     returnVal = True
                     if elem == "service": # service is a dict in itself
                         if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
-                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.service, {})
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.service, {})
                         else:        
-                            returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.service, changes["changes"]["service"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
                     elif elem == "chat":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.chat, changes["changes"]["chat"])
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.chat, changes["changes"]["chat"])
                     elif elem == "files":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.files, changes["changes"]["files"])
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
                     elif elem == "contractor":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.contractor, changes["changes"]["contractor"])
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
                     elif elem == "details":
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.details, changes["changes"]["details"])
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
                     else:
                         # state
-                        returnVal = pgOrders.OrderManagementBase.updateOrder(orderID, pgOrders.EnumUpdates.status, changes["changes"]["state"])
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(orderID, pgProcesses.EnumUpdates.status, changes["changes"]["state"])
 
                     if isinstance(returnVal, Exception):
                         raise returnVal
@@ -263,24 +263,24 @@ def updateOrder(request):
                     for elem in changes["deletions"]:
                         returnVal = True
                         if elem == "service": # service is a dict in itself      
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.service, changes["deletions"]["service"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.service, changes["deletions"]["service"])
                         elif elem == "chat":
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.chat, changes["deletions"]["chat"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.chat, changes["deletions"]["chat"])
                         elif elem == "files":
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.files, changes["deletions"]["files"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.files, changes["deletions"]["files"])
                         elif elem == "contractor":
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.contractor, changes["deletions"]["contractor"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.contractor, changes["deletions"]["contractor"])
                         elif elem == "details":
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.details, changes["deletions"]["details"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
                         else:
                             # state
-                            returnVal = pgOrders.OrderManagementBase.deleteFromOrder(orderID, pgOrders.EnumUpdates.status, changes["deletions"]["state"])
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(orderID, pgProcesses.EnumUpdates.status, changes["deletions"]["state"])
 
                         if isinstance(returnVal, Exception):
                             raise returnVal
                 
                 # websocket
-                dictForEvents = pgOrders.OrderManagementBase.getInfoAboutOrderForWebsocket(orderCollectionID)
+                dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(orderCollectionID)
                 channel_layer = get_channel_layer()
                 for userID in dictForEvents: # user/orga that is associated with that order
                     values = dictForEvents[userID] # message, formatted for frontend
@@ -324,7 +324,7 @@ def deleteOrder(request, orderCollectionID, orderID):
             request.session.modified = True
 
         elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "deleteOrder"):
-            pgOrders.OrderManagementBase.deleteOrder(orderID)
+            pgProcesses.ProcessManagementBase.deleteOrder(orderID)
         else:
             raise Exception("Not logged in or rights insufficient!")
         
@@ -365,7 +365,7 @@ def getFlatOrders(request):
         
         # From Database
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getFlatOrders"):
-            objFromDB = pgOrders.orderManagement[request.session["pgOrderClass"]].getOrdersFlat(request.session)
+            objFromDB = pgProcesses.processManagement[request.session["pgOrderClass"]].getOrdersFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["orders"].extend(objFromDB)
 
@@ -406,7 +406,7 @@ def getOrder(request, orderCollectionID):
                 return JsonResponse(outDict)
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, "getOrder"):
-            return JsonResponse(pgOrders.OrderManagementBase.getOrderCollection(orderCollectionID))
+            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(orderCollectionID))
 
         return JsonResponse(outDict)
     except (Exception) as error:
@@ -427,7 +427,7 @@ def retrieveOrders(request):
 
     """
 
-    return JsonResponse(pgOrders.orderManagement[request.session["pgOrderClass"]].getOrders(request.session), safe=False)
+    return JsonResponse(pgProcesses.processManagement[request.session["pgOrderClass"]].getOrders(request.session), safe=False)
     
 
 #######################################################
@@ -447,7 +447,7 @@ def getMissedEvents(request):
 
     user = pgProfiles.ProfileManagementBase.getUser(request.session)
     lastLogin = user["lastSeen"]
-    orderCollections = pgOrders.orderManagement[request.session["pgOrderClass"]].getOrders(request.session)
+    orderCollections = pgProcesses.processManagement[request.session["pgOrderClass"]].getOrders(request.session)
 
     output = {"eventType": "orderEvent", "events": []}
 
@@ -527,9 +527,9 @@ def saveOrderViaWebsocket(session):
     try:
         if manualCheckifLoggedIn(session) and manualCheckIfRightsAreSufficient(session, "saveOrder"):
             if session["isPartOfOrganization"]:
-                error = pgOrders.OrderManagementOrganization.addOrderToDatabase(session)
+                error = pgProcesses.ProcessManagementOrganization.addProjectToDatabase(session)
             else:
-                error = pgOrders.OrderManagementUser.addOrderToDatabase(session)
+                error = pgProcesses.ProcessManagementUser.addProjectToDatabase(session)
             if isinstance(error, Exception):
                 raise error
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their orders," + str(datetime.now()))
@@ -558,9 +558,9 @@ def saveOrder(request):
         # TODO Save picture and files in permanent storage, and change "files" field to urls
 
         if request.session["isPartOfOrganization"]:
-            error = pgOrders.OrderManagementOrganization.addOrderToDatabase(request.session)
+            error = pgProcesses.ProcessManagementOrganization.addProjectToDatabase(request.session)
         else:
-            error = pgOrders.OrderManagementUser.addOrderToDatabase(request.session)
+            error = pgProcesses.ProcessManagementUser.addProjectToDatabase(request.session)
         if isinstance(error, Exception):
             raise error
 
@@ -595,7 +595,7 @@ def verifyOrder(request):
         # TODO start services and set status to "verifying"
         listOfCallIDsAndOrderIDs = []
         for entry in subOrderIDArray:
-            pgOrders.OrderManagementBase.updateOrder(entry, pgOrders.EnumUpdates.status, 400)
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, 400)
             call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             listOfCallIDsAndOrderIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 

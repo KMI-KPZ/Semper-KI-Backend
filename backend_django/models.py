@@ -11,7 +11,7 @@ Contains: link to model files for django to handle
 #from django.db import models
 
 from .modelFiles.profileModel import *
-from .modelFiles.ordersModel import *
+from .modelFiles.projectModels import *
 
 #class BaseModel(models.Model):
 
