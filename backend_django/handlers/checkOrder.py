@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2023
 
-Contains: Handlers using simulation to check the orders
+Contains: Handlers using simulation to check the processes
 """
 
 import json, random, logging, datetime

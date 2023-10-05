@@ -145,3 +145,4 @@ Ontology/
 
 /playground
 .env.local_container
+.env.local

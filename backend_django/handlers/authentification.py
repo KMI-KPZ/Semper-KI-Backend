@@ -16,7 +16,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from ..utilities import basics
 
 from ..services.postgresDB import pgProcesses, pgProfiles
-from ..handlers import orderManagement
+from . import projectAndProcessManagement
 from django.views.decorators.http import require_http_methods
 
 from ..services import auth0, redis
@@ -107,20 +107,20 @@ def loginUser(request):
         request.session["usertype"] = "user"
         request.session["isPartOfOrganization"] = False
         request.session["pgProfileClass"] = "user"
-        request.session["pgOrderClass"] = "user"
+        request.session["pgProcessClass"] = "user"
     else:
         userType = request.headers["Usertype"]
         if userType == "organization" or userType == "manufacturer":
             request.session["usertype"] = "organization"
             request.session["isPartOfOrganization"] = True
             request.session["pgProfileClass"] = "organization"
-            request.session["pgOrderClass"] = "organization"
+            request.session["pgProcessClass"] = "organization"
             isPartOfOrganization = True
         else:
             request.session["usertype"] = "user"
             request.session["isPartOfOrganization"] = False
             request.session["pgProfileClass"] = "user"
-            request.session["pgOrderClass"] = "user"
+            request.session["pgProcessClass"] = "user"
 
     # set redirect url
     if settings.PRODUCTION:
@@ -420,8 +420,8 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
-    if "currentOrder" in request.session:
-        orderManagement.saveOrder(request)
+    if "currentProjects" in request.session:
+        projectAndProcessManagement.saveProjects(request)
 
     user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
     if user != {}:

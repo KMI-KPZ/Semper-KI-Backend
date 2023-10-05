@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2023
 
-Contains: Collect result, set state and send order
+Contains: Collect result, set state and send process
 """
 import enum, time
 
@@ -18,13 +18,13 @@ class EnumResultType(enum.Enum):
 
 #######################################################
 
-def waitForResultAndSendOrder(listOfIDsAndOrderIDs: list, sendOrder: bool):
+def waitForResultAndSendProcess(listOfIDsAndProcessesIDs: list, sendProcess: bool):
     """
-    Await all IDs from list, set status of orders and call sendOrder
+    Await all IDs from list, set status of processes and call sendProcess
     """
     # outputObject (JSON)
     output = {}
-    for entry in listOfIDsAndOrderIDs:
+    for entry in listOfIDsAndProcessesIDs:
         result = AsyncResult(entry[0])
         while result.state != "SUCCESS" or result.state != "FAILURE":
             # sleep as to not keep the cpu unecessarily busy
@@ -47,7 +47,7 @@ def waitForResultAndSendOrder(listOfIDsAndOrderIDs: list, sendOrder: bool):
         else: # FAILED
             # TODO 
             pass
-    if sendOrder:
+    if sendProcess:
         # TODO Call send
         pass
     # Don't send

@@ -21,17 +21,17 @@ from backend_django.services import redis
 #TODO: switch to async versions at some point
 
 ####################################################################################
-# Enum for updateOrder
+# Enum for updateProcess
 class EnumUpdates(enum.Enum):
     status = 1
-    chat = 2
+    messages = 2
     files = 3
     service = 4
     contractor = 5
     details = 6
 
 ####################################################################################
-# Orders general
+# Projects/Processes general
 class ProcessManagementBase():
     
     ##############################################
@@ -104,7 +104,7 @@ class ProcessManagementBase():
             output["details"] = projectObj.details
 
             processesOfThatProject = []
-            for entry in projectObj.orders.all():
+            for entry in projectObj.processes.all():
                 currentProcess = {}
                 currentProcess["client"] = entry.client
                 currentProcess["processID"] = entry.processID
@@ -183,7 +183,7 @@ class ProcessManagementBase():
         """
         Delete specific project.
 
-        :param projectID: unique order ID to be deleted
+        :param projectID: unique project ID to be deleted
         :type projectID: str
         :return: Flag if it worked or not
         :rtype: Bool
@@ -207,11 +207,11 @@ class ProcessManagementBase():
         """
         Change details of an project like its status. 
 
-        :param projectID: project ID that this order belongs to
+        :param projectID: project ID that this project belongs to
         :type projectID: str
-        :param updateType: changed order details
+        :param updateType: changed project details
         :type updateType: EnumUpdates
-        :param content: changed order, can be many stuff
+        :param content: changed project, can be many stuff
         :type content: json dict
         :return: Flag if it worked or not
         :rtype: Bool
@@ -224,11 +224,7 @@ class ProcessManagementBase():
                 currentProject.status = content
                 currentProject.updatedWhen = updated
                 currentProject.save()
-                # # update status for orders of that collection as well
-                # for order in currentOrderCollection.orders.all():
-                #     order.status = content
-                #     order.updatedWhen = updated
-                #     order.save()
+
             elif updateType == EnumUpdates.details:
                 currentProject = Project.objects.get(projectID=projectID)
                 for key in content:
@@ -244,13 +240,13 @@ class ProcessManagementBase():
     @staticmethod
     def updateProcess(processID, updateType: EnumUpdates, content):
         """
-        Change details of an order like its status, or save communication. 
+        Change details of a process like its status, or save communication. 
 
-        :param orderID: unique order ID to be edited
-        :type orderID: str
-        :param updateType: changed order details
+        :param processID: unique processID to be edited
+        :type processID: str
+        :param updateType: changed process details
         :type updateType: EnumUpdates
-        :param content: changed order, can be many stuff
+        :param content: changed process, can be many stuff
         :type content: json dict
         :return: Flag if it worked or not
         :rtype: Bool
@@ -261,26 +257,12 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == EnumUpdates.chat:
+            if updateType == EnumUpdates.messages:
                 currentProcess.messages["messages"].append(content)
             
             elif updateType == EnumUpdates.status:
                 currentProcess.status = content
                 
-                # # if at least one order is being processed, the collection is set to 'in process'
-                # respectiveOrderCollection = currentOrder.orderCollectionKey
-                # if respectiveOrderCollection.status == 0 and content != 0:
-                #     respectiveOrderCollection.status = 1
-                #     respectiveOrderCollection.save()
-                
-                # # if order is set to finished, check if the whole collection can be set to 'finished'
-                # finishedFlag = True
-                # for orderOfCollection in respectiveOrderCollection.orders.all():
-                #     if orderOfCollection.status != 6:
-                #         finishedFlag = False
-                #         break
-                # if finishedFlag:
-                #     respectiveOrderCollection.status = 3
             elif updateType == EnumUpdates.files:
                 currentProcess.files = content
                 
@@ -305,11 +287,11 @@ class ProcessManagementBase():
     @staticmethod
     def deleteFromProcess(processID, updateType: EnumUpdates, content):
         """
-        Delete details of an order like its status, or content. 
+        Delete details of a process like its status, or content. 
 
-        :param processID: unique order ID to be edited
+        :param processID: unique process ID to be edited
         :type processID: str
-        :param updateType: changed order details
+        :param updateType: changed process details
         :type updateType: EnumUpdates
         :param content: deletions
         :type content: json dict
@@ -322,26 +304,12 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == EnumUpdates.chat:
+            if updateType == EnumUpdates.messages:
                 currentProcess.messages["messages"].remove(content)
             
             elif updateType == EnumUpdates.status:
                 currentProcess.status = 0
                 
-                # # if at least one order is being processed, the collection is set to 'in process'
-                # respectiveOrderCollection = currentOrder.orderCollectionKey
-                # if respectiveOrderCollection.status == 0 and content != 0:
-                #     respectiveOrderCollection.status = 1
-                #     respectiveOrderCollection.save()
-                
-                # # if order is set to finished, check if the whole collection can be set to 'finished'
-                # finishedFlag = True
-                # for orderOfCollection in respectiveOrderCollection.orders.all():
-                #     if orderOfCollection.status != 6:
-                #         finishedFlag = False
-                #         break
-                # if finishedFlag:
-                #     respectiveOrderCollection.status = 3
             elif updateType == EnumUpdates.files:
                 currentProcess.files = []
                 
@@ -384,7 +352,7 @@ class ProcessManagementBase():
             # check if exists
             projectObj = Project.objects.get(projectID=projectID)
             
-            # if it does, create order
+            # if it does, create process
             selectedManufacturer = template["contractor"]
             processID = template["processID"]
             service = template["service"]
@@ -404,7 +372,7 @@ class ProcessManagementBase():
     @staticmethod
     def getInfoAboutProjectForWebsocket(projectID):
         """
-        Retrieve information about the users connected to the order from the database. 
+        Retrieve information about the users connected to the project from the database. 
 
         :param projectID: project ID to retrieve data from
         :type projectID: str
@@ -416,28 +384,28 @@ class ProcessManagementBase():
         dictForEventsAsOutput = {}
 
         projectObj = Project.objects.get(projectID=projectID)
-        dictForEventsAsOutput[projectObj.client] = {"eventType": "orderEvent"}
+        dictForEventsAsOutput[projectObj.client] = {"eventType": "projectEvent"}
         dictForEventsAsOutput[projectObj.client]["processes"] = []
         dictForEventsAsOutput[projectObj.client]["projectID"] = projectID
-        for process in projectObj.orders.all():
+        for process in projectObj.processes.all():
             if projectObj.client != process.client:
                 if process.client not in dictForEventsAsOutput:
-                    dictForEventsAsOutput[process.client] = {"eventType": "orderEvent"}
-                    dictForEventsAsOutput[process.client]["process"] = [{"processID": process.orderID, "status": 1, "messages": 0}]
+                    dictForEventsAsOutput[process.client] = {"eventType": "projectEvent"}
+                    dictForEventsAsOutput[process.client]["process"] = [{"processID": process.processID, "status": 1, "messages": 0}]
                     dictForEventsAsOutput[process.client]["projectID"] = projectID
                 else:
-                    dictForEventsAsOutput[process.client]["processes"].append({"processID": process.orderID, "status": 1, "messages": 0})
+                    dictForEventsAsOutput[process.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
             else:
-                dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.orderID, "status": 1, "messages": 0})
+                dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
             
             for contractor in process.contractor:
                 if projectObj.client != contractor:
                     if contractor not in dictForEventsAsOutput:
-                        dictForEventsAsOutput[contractor] = {"eventType": "orderEvent"}
-                        dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.orderID, "status": 1, "messages": 0}]
+                        dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
+                        dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, "status": 1, "messages": 0}]
                         dictForEventsAsOutput[contractor]["projectID"] = projectID
                     else:
-                        dictForEventsAsOutput[contractor]["processes"].append({"processID": process.orderID, "status": 1, "messages": 0})
+                        dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
 
         return dictForEventsAsOutput
     
@@ -513,7 +481,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 #     for entry in contentOrError:
                 #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
 
-                # save subOrders
+                # save processes
                 for entry in session["currentProjects"][projectID]["processes"]:
                     process = session["currentProjects"][projectID]["processes"][entry]
                     selectedManufacturer = process["contractor"]
@@ -616,7 +584,7 @@ class ProcessManagementUser(ProcessManagementBase):
                     if project.projectID in session["currentProjects"]:
                         continue
                 currentProject = {}
-                currentProject["orderID"] = project.projectID
+                currentProject["projectID"] = project.projectID
                 currentProject["created"] = str(project.createdWhen)
                 currentProject["updated"] = str(project.updatedWhen)
                 currentProject["state"] = project.status
@@ -635,7 +603,7 @@ class ProcessManagementUser(ProcessManagementBase):
         return []
 
 ####################################################################################
-# Orders from and for Organizations
+# Projects and processes from and for Organizations
 class ProcessManagementOrganization(ProcessManagementBase):
 
     ##############################################
@@ -656,10 +624,10 @@ class ProcessManagementOrganization(ProcessManagementBase):
             # first get organization
             client = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
 
-            # then go through order Collections
+            # then go through projects
             for projectID in session["currentProjects"]:
 
-                # order collection object
+                # project object
                 existingObj = session["currentProjects"][projectID]
                 projectObj, flag = Project.objects.get_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
@@ -669,7 +637,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 #     for entry in contentOrError:
                 #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
 
-                # save subOrders
+                # save processes
                 for entry in session["currentProjects"][projectID]["processes"]:
                     process = session["currentProjects"][projectID]["processes"][entry]
                     selectedManufacturer = process["contractor"]
@@ -688,7 +656,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                         contractorObj.processesReceived.add(processObj)
                         contractorObj.save()
             
-                # link OrderCollection to client
+                # link project to client
                 client.projectsSubmitted.add(projectObj)
                 client.save()
 

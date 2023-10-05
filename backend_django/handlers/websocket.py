@@ -15,7 +15,7 @@ from channels.db import database_sync_to_async
 
 from backend_django.services.postgresDB import pgProfiles
 from backend_django.utilities import rights
-from backend_django.handlers.orderManagement import saveOrderViaWebsocket
+from backend_django.handlers.projectAndProcessManagement import saveProjectsViaWebsocket
 
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
@@ -59,8 +59,8 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
         try:
             session = await sync_to_async(self.getSession)()
             if "user" in session:
-                if "currentOrder" in session:
-                    await sync_to_async(saveOrderViaWebsocket)(session)
+                if "currentProjects" in session:
+                    await sync_to_async(saveProjectsViaWebsocket)(session)
 
                 if "isPartOfOrganization" in session:
                     if session["isPartOfOrganization"]:

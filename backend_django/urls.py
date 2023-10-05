@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, orderManagement, admin
+from .handlers import projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, admin
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -170,20 +170,20 @@ urlpatterns = [
     path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
     path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
 
-    path(paths["getMissedEvents"], orderManagement.getMissedEvents, name='getMissedEvents'),
-    path(paths["getFlatOrders"], orderManagement.getFlatOrders, name="getFlatOrders"),
-    path(paths["retrieveOrders"], orderManagement.retrieveOrders, name='retrieveOrders'),
-    path(paths["createOrder"], orderManagement.createOrderCollectionID, name="createOrderCollectionID"),
-    path(paths["createSubOrder"], orderManagement.createOrderID, name="createOrderID"),
-    path(paths["getOrder"], orderManagement.getOrder, name="getOrder"),
-    path(paths["saveOrder"], orderManagement.saveOrder, name='saveOrder'),
-    path(paths["updateOrder"], orderManagement.updateOrder, name='updateOrder'),
-    path(paths["updateOrderCollection"], orderManagement.updateOrderCollection, name='updateOrderCollection'),
-    path(paths["deleteOrder"], orderManagement.deleteOrder, name='deleteOrder'),
-    path(paths["deleteOrderCollection"], orderManagement.deleteOrderCollection, name='deleteOrderCollection'),
-    path(paths["getManufacturers"], orderManagement.getManufacturers, name='getManufacturers'),
-    path(paths["verifyOrder"], orderManagement.verifyOrder, name="verifyOrder"),
-    path(paths["sendOrder"], orderManagement.sendOrder, name="sendOrder"),
+    path(paths["getMissedEvents"], projectAndProcessManagement.getMissedEvents, name='getMissedEvents'),
+    path(paths["getFlatOrders"], projectAndProcessManagement.getFlatProjects, name="getFlatOrders"),
+    path(paths["retrieveOrders"], projectAndProcessManagement.retrieveProcesses, name='retrieveOrders'),
+    path(paths["createOrder"], projectAndProcessManagement.createProjectID, name="createOrderCollectionID"),
+    path(paths["createSubOrder"], projectAndProcessManagement.createProcessID, name="createOrderID"),
+    path(paths["getOrder"], projectAndProcessManagement.getProcess, name="getOrder"),
+    path(paths["saveOrder"], projectAndProcessManagement.saveProjects, name='saveOrder'),
+    path(paths["updateOrder"], projectAndProcessManagement.updateProcess, name='updateOrder'),
+    path(paths["updateOrderCollection"], projectAndProcessManagement.updateProject, name='updateOrderCollection'),
+    path(paths["deleteOrder"], projectAndProcessManagement.deleteProcess, name='deleteOrder'),
+    path(paths["deleteOrderCollection"], projectAndProcessManagement.deleteProject, name='deleteOrderCollection'),
+    path(paths["getManufacturers"], projectAndProcessManagement.getManufacturers, name='getManufacturers'),
+    path(paths["verifyOrder"], projectAndProcessManagement.verifyProcess, name="verifyOrder"),
+    path(paths["sendOrder"], projectAndProcessManagement.sendProcess, name="sendOrder"),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
@@ -203,8 +203,8 @@ urlpatterns = [
     path(paths["adminDeleteOrga"], admin.deleteOrganizationAsAdmin, name="deleteOrganizationAsAdmin"),
     path(paths["adminUpdateUser"], admin.updateDetailsOfUserAsAdmin, name="updateDetailsOfUserAsAdmin"),
     path(paths["adminUpdateOrga"], admin.updateDetailsOfOrganizationAsAdmin, name="updateDetailsOfOrganizationAsAdmin"),
-    path(paths["adminGetOrderCollections"], admin.getAllOrdersFlatAsAdmin, name="getAllOrdersFlatAsAdmin"),
-    path(paths["adminGetOrders"], admin.getSpecificOrderAsAdmin, name="getSpecificOrderAsAdmin"),
+    path(paths["adminGetOrderCollections"], admin.getAllProjectsFlatAsAdmin, name="getAllOrdersFlatAsAdmin"),
+    path(paths["adminGetOrders"], admin.getSpecificProjectAsAdmin, name="getSpecificOrderAsAdmin"),
 
     path(paths["organizations_addUser"], organizations.organizations_addUser, name="organizations_addUser"),
     path(paths["organizations_fetchUsers"], organizations.organizations_fetchUsers, name="organizations_fetchUsers"),

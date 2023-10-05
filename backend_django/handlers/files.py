@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 
 from ..utilities import crypto, mocks, stl
 
-from ..services.postgresDB import pgProfiles
+from ..services.postgresDB import pgProfiles, pgProcesses
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
 
@@ -153,7 +153,7 @@ def downloadFiles(request):
     """
     Send file to user from temporary, later permanent storage
 
-    :param request: Request of user for a specific file of an order
+    :param request: Request of user for a specific file of a process
     :type request: HTTP POST
     :return: Saved content
     :rtype: HTTP Response
@@ -161,10 +161,10 @@ def downloadFiles(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    orderID = content["id"]
+    processID = content["processID"]
     fileName = content["filename"]
-    currentOrder = pgProfiles.OrderManagement.getOrder(orderID)
-    for idx, elem in enumerate(currentOrder.files):
+    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+    for idx, elem in enumerate(currentProcess.files):
         if fileName == elem["filename"]:
             (contentOrError, Flag) = redis.retrieveContent(elem["path"])
             if Flag:

@@ -149,56 +149,56 @@ def deleteUserAsAdmin(request):
     else:
         return HttpResponse("Failed", status=500)
     
-# Orders #############################################################################################################
+# Projects #############################################################################################################
 
 ##############################################
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @require_http_methods(["GET"])
-def getAllOrdersFlatAsAdmin(request):
+def getAllProjectsFlatAsAdmin(request):
     """
-    Get all Orders in flat format.
+    Get all Projects in flat format.
 
     :param request: GET request
     :type request: HTTP GET
     :return: JSON response
     :rtype: JSONResponse
     """
-    # get all orders if you're an admin
-    orderCollections = pgProcesses.ProcessManagementBase.getAllPsFlat()
-    for idx, entry in enumerate(orderCollections):
+    # get all projects if you're an admin
+    projects = pgProcesses.ProcessManagementBase.getAllPsFlat()
+    for idx, entry in enumerate(projects):
         clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
-        orderCollections[idx]["clientName"] = userObj.name
+        projects[idx]["clientName"] = userObj.name
         
-    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},orders," + str(datetime.datetime.now()))
-    return JsonResponse(orderCollections, safe=False)
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},projects," + str(datetime.datetime.now()))
+    return JsonResponse(projects, safe=False)
 
 ##############################################
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @require_http_methods(["GET"])
-def getSpecificOrderAsAdmin(request, orderCollectionID):
+def getSpecificProjectAsAdmin(request, projectID):
     """
-    Get all orders for specific order collection.
+    Get all processes for specific project.
 
     :param request: GET request
     :type request: HTTP GET
-    :param orderCollectionID: Order for which details are necessary
-    :type orderCollectionID: str
+    :param projectID: Project for which details are necessary
+    :type projectID: str
     :return: JSON response, list
     :rtype: JSONResponse
     """
-    orders = pgProcesses.ProcessManagementBase.getProcessesPerPID(orderCollectionID)
-    for idx, entry in enumerate(orders):
+    processes = pgProcesses.ProcessManagementBase.getProcessesPerPID(projectID)
+    for idx, entry in enumerate(processes):
         clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
-        orders[idx]["clientName"] = userObj.name
+        processes[idx]["clientName"] = userObj.name
         
-        orders[idx]["contractorNames"] = []
+        processes[idx]["contractorNames"] = []
         for contractorID in entry["contractor"]:
             contractorObj = pgProfiles.ProfileManagementBase.getUserViaHash(contractorID)
-            orders[idx]["contractorNames"].append(contractorObj.name)
+            processes[idx]["contractorNames"].append(contractorObj.name)
 
-    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},subOrders from {orderCollectionID}," + str(datetime.datetime.now()))
-    return JsonResponse(orders, safe=False)
+    logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},processes from {projectID}," + str(datetime.datetime.now()))
+    return JsonResponse(processes, safe=False)
