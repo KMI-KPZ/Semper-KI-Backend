@@ -7,8 +7,12 @@ Contains: Views for some backend websites
 """
 import threading
 
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
+
+from backend_django.services.auth0 import authorizeToken
+
 
 #######################################################
 def landingPage(request):
@@ -103,8 +107,5 @@ def sparqlPage(request):
     )
 
 def getSettingsToken(request):
-    from django.conf import settings
-    from django.http.response import JsonResponse
-    from ..services.postgresDB.pgProfiles import pgPBase
-    pgPBase.getAll()
+    value = authorizeToken(request)
     return JsonResponse({"token": settings.BACKEND_SETTINGS})
