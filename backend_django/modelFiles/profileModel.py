@@ -23,7 +23,7 @@ class User(models.Model):
     :email: E-Mail with which the user registered themselves
     :organizations: The organizations that the user belongs to
     :details: Adress, ...
-    :orders: The OrderCollections that this user submitted, only added if the user is not in an organization
+    :projects: The projects that this user submitted, only added if the user is not in an organization
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated
     :accessedWhen: Last date and time the user was fetched from the database, automatically set
@@ -61,8 +61,8 @@ class Organization(models.Model):
     :details: Adress, tax id and so on
     :users: Link to users belonging to that organization
     :canManufacture: True if this organization can manufacture something
-    :projectsSubmitted: OrderCollections that this organization submitted
-    :processesReceived: Orders that this organization received
+    :projectsSubmitted: Projects that this organization submitted
+    :processesReceived: Processes that this organization received
     :uri: Representation link inside the knowledge graph
     :createdWhen: Automatically assigned date and time(UTC+0) when the user first registered
     :updatedWhen: Date and time at which the entry was updated

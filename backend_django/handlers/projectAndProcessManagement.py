@@ -591,7 +591,7 @@ def verifyProcess(request):
         info = json.loads(request.body.decode("utf-8"))
         processID = info["processID"]
         sendToManufacturerAfterVerification = info["send"]
-        processesIDArray = info["processIDs"]
+        processesIDArray = info["processesIDs"]
 
         # TODO start services and set status to "verifying"
         listOfCallIDsAndProcessesIDs = []

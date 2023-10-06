@@ -93,7 +93,7 @@ class TestRedis(TestCase):
         response = json.loads(self.client.get("/"+paths["testRedis"]).content)
         self.assertIs(response["result"] == ["testvalue", True], True)
 
-class TestOrders(TestCase):
+class TestProjects(TestCase):
     testFile = io.BytesIO(b'binary stl file                                                                \x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x00\x80\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00')
     mockCart = {"cart": [{"title": "Cube_3d_printing_sample.stl", "model": {"id": "ceec76ddd0b621bb6d488aa5d6087320", "title": "Cube_3d_printing_sample.stl", "tags": [], "date": "2023-5-10", "license": "", "certificate": [], "URI": "", "createdBy": "user"}, "material": {"id": "a9ae8dcc04ef529de1153d5731c4d65c", "title": "PLA", "propList": ["Rigid", "Brittle", "Biodegradable"], "URI": "http://127.0.0.1:8000/public/static/public/media/testpicture.jpg"}, "postProcessings": [{"id": "d3c3ac57e13df2834f84f1f3d96546bf", "title": "postProcessing 0", "checked": True, "selectedValue": "", "valueList": ["selection2", "selection1"], "type": "selection", "URI": "http://127.0.0.1:8000/public/static/public/media/testpicture.jpg"}], "manufacturerID": "44f92f0d8186a77c2f88b7deb4a49004957734e5fd1c7ddab1932318d6d7f6eeb39c7b6f1b3e84035422d219bd3abdad665d07acb26a115a78dd34d612173407"}]}
     # not part of the tests!
@@ -105,7 +105,7 @@ class TestOrders(TestCase):
         mockSession["user"]["userinfo"]["nickname"] = "testmanufacturer"
         mockSession["user"]["userinfo"]["email"] = "testmanufacturer@test.de"
         mockSession["user"]["userinfo"]["org_id"] = "id123"
-        mockSession["userPermissions"] = [{"permission_name": "orders:read"},{"permission_name": "orders:files"},{"permission_name": "orders:chat"},{"permission_name": "orders:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
+        mockSession["userPermissions"] = [{"permission_name": "processes:read"},{"permission_name": "processes:files"},{"permission_name": "processes:chat"},{"permission_name": "processes:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
         mockSession["usertype"] = "manufacturer"
         mockSession["organizationName"] = "manufacturer"
         mockSession["organizationType"] = "manufacturer"
@@ -126,7 +126,7 @@ class TestOrders(TestCase):
         mockSession["user"]["userinfo"]["sub"] = "auth0|testuser"
         mockSession["user"]["userinfo"]["nickname"] = "testuser"
         mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
-        mockSession["userPermissions"] = [{"permission_name": "orders:read"},{"permission_name": "orders:files"},{"permission_name": "orders:chat"},{"permission_name": "orders:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
+        mockSession["userPermissions"] = [{"permission_name": "processes:read"},{"permission_name": "processes:files"},{"permission_name": "processes:chat"},{"permission_name": "processes:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
         mockSession["usertype"] = "user"
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
@@ -149,7 +149,7 @@ class TestOrders(TestCase):
         # upload model to redis
         #mockSession = self.client.session
         #self.client.post("/"+paths["uploadModels"], {'testfile.stl':self.testFile} )
-        # send post to getFileFromOrder
+        # send post to downloadFiles
 
         # if md5 of upload and download equal, it worked
         pass
@@ -215,7 +215,7 @@ class TestOrders(TestCase):
         # If answer an integer, it worked
         self.assertIs(int(returnMessage) > 0, True)
 
-    def testSendOrder(self):
+    def testSendProcess(self):
         # log in by creating a "user" token in session
         mockSession = self.client.session
         mockSession = self.createUserInSession(mockSession)
@@ -225,14 +225,14 @@ class TestOrders(TestCase):
 
         # create mock cart and save to session
         self.client.post("/"+paths["updateCart"], content_type="application/json", data=self.mockCart)
-        # call sendOrder
-        testRet = self.client.get("/"+paths["sendOrder"])
+        # call sendProcess
+        testRet = self.client.get("/"+paths["sendProcess"])
         self.assertIs(testRet.content == b"Success", True)
-        # call to database to get Order
-        returnedJson = self.client.get("/"+paths["retrieveOrders"])
-        # If Order is the same, it worked
+        # call to database to get processes
+        returnedJson = self.client.get("/"+paths["retrieveProcesses"])
+        # If Process is the same, it worked
         returnedJsonAsDict = json.loads(returnedJson.content)
-        self.assertIs(returnedJsonAsDict[0]["orders"][0]["item"]["model"]["id"] == self.mockCart["cart"][0]["model"]["id"], True)
+        self.assertIs(returnedJsonAsDict[0]["service"][0]["item"]["model"]["id"] == self.mockCart["cart"][0]["model"]["id"], True)
 
     #def testRetrieveOrders(self): redundant to testSendOrder
 

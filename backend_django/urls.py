@@ -25,7 +25,7 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, checkOrder, organizations, admin
+from .handlers import checkProcesses, projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, organizations, admin
 from Benchy.BenchyMcMarkface import startFromDjango
 from django.conf.urls.static import static
 
@@ -60,21 +60,20 @@ paths = {
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
     "checkLogistics": "public/checkLogistics/",
-    "saveOrder": "public/saveOrder/",
 
-    "retrieveOrders": "public/getOrders/",
+    "saveProjects": "public/saveProjects/",
+    "retrieveProcesses": "public/retrieveProcesses/",
     "getMissedEvents": "public/getMissedEvents/",
-
-    "getFlatOrders": "public/getFlatOrders/",
-    "createOrder": "public/createOrder/",
-    "getOrder": "public/getOrder/<orderCollectionID>/",
-    "createSubOrder": "public/createSubOrder/<orderCollectionID>/",
-    "updateOrder": "public/updateSubOrder/",
-    "updateOrderCollection": "public/updateOrder/",
-    "deleteOrder": "public/deleteSubOrder/<orderCollectionID>/<orderID>/",
-    "deleteOrderCollection": "public/deleteOrder/<orderCollectionID>/",
-    "verifyOrder": "public/verifyOrder/",
-    "sendOrder": "public/sendOrder/<orderCollectionID>/<orderID>/",
+    "getFlatProjects": "public/getFlatProjects/",
+    "createProjectID": "public/createProjectID/",
+    "getProcess": "public/getProcess/<projectID>/",
+    "createProcessID": "public/createProcessID/<projectID>/",
+    "updateProcess": "public/updateProcess/",
+    "updateProject": "public/updateProject/",
+    "deleteProcess": "public/deleteProcess/<projectID>/<processID>/",
+    "deleteProject": "public/deleteProject/<projectID>/",
+    "verifyProcess": "public/verifyProcess/",
+    "sendProcess": "public/sendProcess/<projectID>/<processID>/",
 
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
@@ -90,8 +89,8 @@ paths = {
     "adminDeleteOrga": "public/admin/deleteOrganization/",
     "adminUpdateUser": "public/admin/updateUser/",
     "adminUpdateOrga": "public/admin/updateOrganization/",
-    "adminGetOrderCollections": "public/admin/getOrdersFlat/",
-    "adminGetOrders": "public/admin/getSubOrders/<orderCollectionID>/",
+    "getAllProjectsFlatAsAdmin": "public/admin/getAllProjectsFlatAsAdmin/",
+    "getSpecificProjectAsAdmin": "public/admin/getSpecificProjectAsAdmin/<projectID>/",
 
     "organizations_addUser": "public/organizations/addUser/",
     "organizations_getInviteLink": "public/organizations/getInviteLink/",
@@ -133,7 +132,7 @@ paths = {
     "testRedis": "private/testRedis/",
     "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
     "retrieveFilesTEST": "private/retrieveFiles/",
-    "getFileFromOrder": "public/getFileFromOrder/",
+    "downloadFiles": "public/downloadFiles/",
 
     "statistics": "public/getStatistics/",
 }
@@ -166,24 +165,24 @@ urlpatterns = [
     path(paths["getMaterials"], filter.getMaterials, name='getMaterials'),
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
 
-    path(paths["checkPrintability"], checkOrder.checkPrintability, name='checkPrintability'),
-    path(paths["checkPrices"], checkOrder.checkPrice, name='checkPrice'),
-    path(paths["checkLogistics"], checkOrder.checkLogistics, name='checkLogistics'),
+    path(paths["checkPrintability"], checkProcesses.checkPrintability, name='checkPrintability'),
+    path(paths["checkPrices"], checkProcesses.checkPrice, name='checkPrice'),
+    path(paths["checkLogistics"], checkProcesses.checkLogistics, name='checkLogistics'),
 
     path(paths["getMissedEvents"], projectAndProcessManagement.getMissedEvents, name='getMissedEvents'),
-    path(paths["getFlatOrders"], projectAndProcessManagement.getFlatProjects, name="getFlatOrders"),
-    path(paths["retrieveOrders"], projectAndProcessManagement.retrieveProcesses, name='retrieveOrders'),
-    path(paths["createOrder"], projectAndProcessManagement.createProjectID, name="createOrderCollectionID"),
-    path(paths["createSubOrder"], projectAndProcessManagement.createProcessID, name="createOrderID"),
-    path(paths["getOrder"], projectAndProcessManagement.getProcess, name="getOrder"),
-    path(paths["saveOrder"], projectAndProcessManagement.saveProjects, name='saveOrder'),
-    path(paths["updateOrder"], projectAndProcessManagement.updateProcess, name='updateOrder'),
-    path(paths["updateOrderCollection"], projectAndProcessManagement.updateProject, name='updateOrderCollection'),
-    path(paths["deleteOrder"], projectAndProcessManagement.deleteProcess, name='deleteOrder'),
-    path(paths["deleteOrderCollection"], projectAndProcessManagement.deleteProject, name='deleteOrderCollection'),
+    path(paths["getFlatProjects"], projectAndProcessManagement.getFlatProjects, name="getFlatProjects"),
+    path(paths["retrieveProcesses"], projectAndProcessManagement.retrieveProcesses, name='retrieveProcesses'),
+    path(paths["createProjectID"], projectAndProcessManagement.createProjectID, name="createProjectID"),
+    path(paths["createProcessID"], projectAndProcessManagement.createProcessID, name="createProcessID"),
+    path(paths["getProcess"], projectAndProcessManagement.getProcess, name="getProcess"),
+    path(paths["saveProjects"], projectAndProcessManagement.saveProjects, name='saveProjects'),
+    path(paths["updateProcess"], projectAndProcessManagement.updateProcess, name='updateProcess'),
+    path(paths["updateProject"], projectAndProcessManagement.updateProject, name='updateProject'),
+    path(paths["deleteProcess"], projectAndProcessManagement.deleteProcess, name='deleteProcess'),
+    path(paths["deleteProject"], projectAndProcessManagement.deleteProject, name='deleteProject'),
     path(paths["getManufacturers"], projectAndProcessManagement.getManufacturers, name='getManufacturers'),
-    path(paths["verifyOrder"], projectAndProcessManagement.verifyProcess, name="verifyOrder"),
-    path(paths["sendOrder"], projectAndProcessManagement.sendProcess, name="sendOrder"),
+    path(paths["verifyProcess"], projectAndProcessManagement.verifyProcess, name="verifyProcess"),
+    path(paths["sendProcess"], projectAndProcessManagement.sendProcess, name="sendProcess"),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),
@@ -203,8 +202,8 @@ urlpatterns = [
     path(paths["adminDeleteOrga"], admin.deleteOrganizationAsAdmin, name="deleteOrganizationAsAdmin"),
     path(paths["adminUpdateUser"], admin.updateDetailsOfUserAsAdmin, name="updateDetailsOfUserAsAdmin"),
     path(paths["adminUpdateOrga"], admin.updateDetailsOfOrganizationAsAdmin, name="updateDetailsOfOrganizationAsAdmin"),
-    path(paths["adminGetOrderCollections"], admin.getAllProjectsFlatAsAdmin, name="getAllOrdersFlatAsAdmin"),
-    path(paths["adminGetOrders"], admin.getSpecificProjectAsAdmin, name="getSpecificOrderAsAdmin"),
+    path(paths["getAllProjectsFlatAsAdmin"], admin.getAllProjectsFlatAsAdmin, name="getAllProjectsFlatAsAdmin"),
+    path(paths["getSpecificProjectAsAdmin"], admin.getSpecificProjectAsAdmin, name="getSpecificProjectAsAdmin"),
 
     path(paths["organizations_addUser"], organizations.organizations_addUser, name="organizations_addUser"),
     path(paths["organizations_fetchUsers"], organizations.organizations_fetchUsers, name="organizations_fetchUsers"),
@@ -246,7 +245,7 @@ urlpatterns = [
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
-    path(paths["getFileFromOrder"], files.downloadFiles, name="getFileFromOrder"),
+    path(paths["downloadFiles"], files.downloadFiles, name="downloadFiles"),
     
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

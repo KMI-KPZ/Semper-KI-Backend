@@ -2,7 +2,7 @@
    "Rights": [
       {
          "permission": {
-            "context": "orders",
+            "context": "processes",
             "permission": "read"
          },
          "elements": [
@@ -12,16 +12,15 @@
             "OrderButtonSee"
          ],
          "paths": [
-            "retrieveOrders",
+            "retrieveProcesses",
             "getMissedEvents",
-            "getOrder",
-            "getOrders",
-            "getFlatOrders"
+            "getProcess",
+            "getFlatProjects"
          ]
       },
       {
          "permission": {
-            "context": "orders",
+            "context": "processes",
             "permission": "files"
          },
          "elements": [
@@ -29,25 +28,25 @@
          ],
          "paths": [
             "downloadFiles",
-            "updateOrder"
+            "updateProcess"
          ]
       },
       {
          "permission": {
-            "context": "orders",
-            "permission": "chat"
+            "context": "processes",
+            "permission": "messages"
          },
          "elements": [
             "Chat",
             "SubOrderButtonChat"
          ],
          "paths": [
-            "updateOrder"
+            "updateProcess"
          ]
       },
       {
          "permission": {
-            "context": "orders",
+            "context": "processes",
             "permission": "edit"
          },
          "elements": [
@@ -75,18 +74,18 @@
             "SubOrderButtonVerify"
          ],
          "paths": [
-            "updateOrder",
-            "updateOrderCollection",
+            "updateProcess",
+            "updateProject",
             "getManufacturers",
-            "saveOrder",
-            "verifyOrder",
-            "createOrderID",
-            "createOrderCollectionID"
+            "saveProjects",
+            "verifyProcess",
+            "createProcessID",
+            "createProjectID"
          ]
       },
       {
          "permission": {
-            "context": "orders",
+            "context": "processes",
             "permission": "delete"
          },
          "elements": [
@@ -94,8 +93,8 @@
             "SubOrderButtonDelete"
          ],
          "paths": [
-            "deleteOrder",
-            "deleteOrderCollection"
+            "deleteProcess",
+            "deleteProject"
          ]
       },
       {

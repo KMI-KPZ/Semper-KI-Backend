@@ -42,7 +42,7 @@ class Process(models.Model):
     :status: How everything is going in general
     :serviceStatus: How everything is going for the service
     :messages: What was said by whom to whom and when
-    :files: All URL Paths of files uploaded for an order
+    :files: All URL Paths of files uploaded for a process
     :client: Who started the process
     :contractor: Who gets to handle it
     :details: Name of the process and stuff
