@@ -104,6 +104,8 @@ celerybeat.pid
 # Environments
 .env
 .env.dev
+.env.local_container
+.env.local
 .venv
 env/
 venv/
@@ -144,4 +146,4 @@ quickDebug.py
 Ontology/
 
 /playground
-.env.local_container
+
