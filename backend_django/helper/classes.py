@@ -74,37 +74,3 @@ class SemperKiConfigHelper:
 
     def doCheck(self) -> bool:
         return True
-
-
-class LazyConnect(type):
-    def __new__(cls, name, bases, attrs):
-        new_attrs = {}
-        for key, value in attrs.items():
-            if callable(value):
-                # Wenn das Attribut eine Methode ist, wickle sie in einen Wrapper ein
-                new_attrs[key] = cls.wrap_method(value)
-            else:
-                new_attrs[key] = value
-
-        new_attrs["lazy_fn"] = None
-        new_attrs["lazy_fn_called"] = False
-        new_attrs['setLazyFn'] = cls.setLazyFn
-        return super().__new__(cls, name, bases, new_attrs)
-
-    @classmethod
-    def wrap_method(cls,method):
-        def wrapper(instance,*args, **kwargs):
-            # Hier wird deine zusätzliche Aufgabe ausgeführt
-            if method.__name__ not in ("setLazyFn", "__init__") and not instance.lazy_fn_called:
-                print(f"Initialisierung von {method.__name__}")
-                instance.lazy_fn(instance)
-                instance.lazy_fn_called = True
-
-            result = method(instance, *args, **kwargs)
-            # Hier wird die Originalmethode aufgerufen
-            print(f"Nach Ausführung von {method.__name__}")
-            return result
-        return wrapper
-
-    def setLazyFn(instance, func):
-        instance.lazy_fn = func
