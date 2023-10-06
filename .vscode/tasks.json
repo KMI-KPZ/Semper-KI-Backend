@@ -43,13 +43,14 @@
 				"docker-build"
 			],
 			"dockerRun": {
-				"customOptions": "-p 127.0.0.1:8000:8000",
+				"customOptions": "-p 8000:8000",
 				"volumes": [
 					{ "containerPath": "/app", "localPath": "${workspaceFolder}"}
 				],
 				"env": {
 					"MODE" :"local_container"
-				}
+				},
+				"network": "vs-code-dev-services_semper-ki-dev-network"
 			},
 			"python": {
 				"args": [
