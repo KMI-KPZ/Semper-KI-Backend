@@ -21,7 +21,7 @@ from ..utilities import crypto, rights
 
 from ..services.postgresDB import pgProcesses, pgProfiles
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, processState
 
 from ..services import redis
 from ..services.processes import price, collectAndSend
@@ -593,15 +593,15 @@ def verifyProcess(request):
         sendToManufacturerAfterVerification = info["send"]
         processesIDArray = info["processesIDs"]
 
-        # TODO start services and set status to "verifying"
-        listOfCallIDsAndProcessesIDs = []
+        # TODO start services and set status to "verifying" instead of verified
+        #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, 400)
-            call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
-            listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processState["VERIFIED"])
+            #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
+            #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
         # start collecting process, 
-        collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
+        #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
 
         # TODO Websocket Event
 
@@ -634,7 +634,10 @@ def sendProcess(request):
         # TODO Check if process is verified
 
         # TODO send to manufacturer(s))
-        # TODO set status to send/requested 600
+        # TODO set status to send/requested 
+        for entry in processesIDArray:
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processState["REQUESTED"])
+            # TODO save in db of received processes for manufacturer
         # TODO Websocket Events
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         

@@ -106,9 +106,8 @@ class TestProjects(TestCase):
         mockSession["user"]["userinfo"]["email"] = "testmanufacturer@test.de"
         mockSession["user"]["userinfo"]["org_id"] = "id123"
         mockSession["userPermissions"] = [{"permission_name": "processes:read"},{"permission_name": "processes:files"},{"permission_name": "processes:chat"},{"permission_name": "processes:edit"},{"permission_name": "orga:edit"},{"permission_name": "orga:read"},{"permission_name": "resources:read"},{"permission_name": "resources:edit"}]
-        mockSession["usertype"] = "manufacturer"
+        mockSession["usertype"] = "organization"
         mockSession["organizationName"] = "manufacturer"
-        mockSession["organizationType"] = "manufacturer"
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()

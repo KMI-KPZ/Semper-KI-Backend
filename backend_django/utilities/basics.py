@@ -6,9 +6,10 @@ Silvio Weging 2023
 Contains: Basic stuff that is imported everywhere
 """
 
-import datetime, enum
+import datetime, enum, json
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
+from django.conf import settings
 
 from time import sleep
 
@@ -212,3 +213,6 @@ class Logging():
         SELF = enum.auto()
         OBJECT = enum.auto() # for everything else
 
+#######################################################
+# status codes
+processState = json.load(open(str(settings.BASE_DIR) + "/backend_django/statusCodes.json"))
