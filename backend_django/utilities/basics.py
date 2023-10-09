@@ -148,7 +148,7 @@ def manualCheckIfRightsAreSufficient(session, funcName):
     :return: Response whether the user is logged in or not.
     :rtype: Bool
     """
-    if "user" in session:
+    if "user" in session and "userPermissions" in session:
         if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
             return True
 
@@ -169,7 +169,7 @@ def checkIfRightsAreSufficient(json=False):
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            if "user" in request.session:
+            if "user" in request.session and "userPermissions" in request.session:
                 if request.session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
