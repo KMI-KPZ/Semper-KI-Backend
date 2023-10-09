@@ -431,7 +431,7 @@ def logoutUser(request):
 
 
     # Delete saved files from redis
-    redis.deleteKey(request.session.session_key)
+    redis.RedisConnection().deleteKey(request.session.session_key)
 
     request.session.clear()
     request.session.flush()

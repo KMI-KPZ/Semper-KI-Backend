@@ -63,11 +63,12 @@ def checkRedis(app_configs=None, **kwargs):
 
     for app in app_configs:
         if issubclass(type(app), SemperKiConfigHelper):
-            from .services.redis import addContent, deleteKey, retrieveContent
+            from .services.redis import RedisConnection
             try:
-                addContent("_test", "test")
-                value = retrieveContent("_test")
-                deleteKey("_test")
+                redisConn = RedisConnection()
+                redisConn.addContent("_test", "test")
+                value = redisConn.retrieveContent("_test")
+                redisConn.deleteKey("_test")
                 if value[0] != "test":
                     return [Error(f'could not store and retrieve key', id='redis_check')]
             except Exception as e:

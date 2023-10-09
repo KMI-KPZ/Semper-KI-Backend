@@ -42,7 +42,7 @@ def checkPrintability(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
         model = contentOrError
@@ -81,7 +81,7 @@ def checkPrice(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
         model = contentOrError
@@ -119,7 +119,7 @@ def checkLogistics(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.retrieveContent(request.session.session_key)
+    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
     if Flag:
         # if a model has been uploaded, use that
         model = contentOrError

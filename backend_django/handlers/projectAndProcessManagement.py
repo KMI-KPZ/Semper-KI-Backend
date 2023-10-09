@@ -593,6 +593,21 @@ def verifyProcess(request):
         sendToManufacturerAfterVerification = info["send"]
         processesIDArray = info["processesIDs"]
 
+        # first save projects
+        if request.session["isPartOfOrganization"]:
+            error = pgProcesses.ProcessManagementOrganization.addProjectToDatabase(request.session)
+        else:
+            error = pgProcesses.ProcessManagementUser.addProjectToDatabase(request.session)
+        if isinstance(error, Exception):
+            raise error
+
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        
+        # then clear drafts from session
+        request.session["currentProjects"].clear()
+        del request.session["currentProjects"]
+
+
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
@@ -637,8 +652,25 @@ def sendProcess(request):
         # TODO set status to send/requested 
         for entry in processesIDArray:
             pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processState["REQUESTED"])
+            pgProcesses.ProcessManagementBase.sendProcess(entry)
+
             # TODO save in db of received processes for manufacturer
+            
         # TODO Websocket Events
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID)
+        channel_layer = get_channel_layer()
+        for userID in dictForEvents: # user/orga that is associated with that process
+            values = dictForEvents[userID] # message, formatted for frontend
+            subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+                userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                for permission in rights.rightsManagement.getPermissionsNeededForPath(__name__):
+                    async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                        "type": "sendMessageJSON",
+                        "dict": values,
+                    })
+
+
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         
         return HttpResponse("Success")

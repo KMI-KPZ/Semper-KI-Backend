@@ -32,9 +32,9 @@ def testRedis(request):
     :rtype: JSON
 
     """
-    redis.addContent("testkey", "testvalue")
+    redis.RedisConnection().addContent("testkey", "testvalue")
     if request.method == "GET":
-        result = redis.retrieveContent("testkey")
+        result = redis.RedisConnection().retrieveContent("testkey")
         response = {
             'result': result,
         }
@@ -68,7 +68,7 @@ def uploadFileTemporary(request):
         for name in fileNames:
             files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)[0]) )
 
-        returnVal = redis.addContent(key, files)
+        returnVal = redis.RedisConnection().addContent(key, files)
         if returnVal is True:
             return HttpResponse("Success", status=200)
         else:
@@ -115,7 +115,7 @@ def uploadModels(request):
             # stl.binToJpg(previews[idx])
 
             files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
-        returnVal = redis.addContent(key, files)
+        returnVal = redis.RedisConnection().addContent(key, files)
         if returnVal is not True:
             return HttpResponse(returnVal, status=500)
 
@@ -135,7 +135,7 @@ def getUploadedFiles(session_key):
     :rtype: tuple
 
     """
-    (contentOrError, Flag) = redis.retrieveContent(session_key)
+    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(session_key)
     if Flag is True:
         return contentOrError
     else:
@@ -166,7 +166,7 @@ def downloadFiles(request):
     currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
     for idx, elem in enumerate(currentProcess.files):
         if fileName == elem["filename"]:
-            (contentOrError, Flag) = redis.retrieveContent(elem["path"])
+            (contentOrError, Flag) = redis.RedisConnection().retrieveContent(elem["path"])
             if Flag:
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileName}," + str(datetime.datetime.now()))
                 return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')

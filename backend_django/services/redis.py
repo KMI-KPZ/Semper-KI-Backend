@@ -6,77 +6,135 @@ Silvio Weging 2023
 Contains: Services for using the key-value store in redis
 """
 
-import redis, os, pickle
+import redis, json, pickle
 from django.conf import settings
 
-print("USING REDIS PASSWORD: "+settings.REDIS_PASSWORD+ "\n")
-redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=settings.REDIS_PASSWORD)
+class RedisConnection():
 
-#######################################################
-def addContent(key, content):
-    """
-    Save a key and its content in redis.
+    redis_instance = ""
 
-    :param key: key, usually a session ID
-    :type key: String
-    :param content: The stuff that should be saved
-    :type content: Differs, will be set to binary here
-    :return: Either "true" if it worked or an error if not
-    :rtype: Bool
+    def __init__(self) -> None:
+        print("USING REDIS PASSWORD: "+settings.REDIS_PASSWORD+ "\n")
+        self.redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=settings.REDIS_PASSWORD)
 
-    """
+    #######################################################
+    def addContent(self, key, content, expire=False):
+        """
+        Save a key and its content in redis.
 
-    try:
-        redis_instance.set(key, pickle.dumps(content))
-        redis_instance.expire(key, 86400) # 24 hours until deletion of the file
+        :param key: key, usually a session ID
+        :type key: String
+        :param content: The stuff that should be saved
+        :type content: Differs, will be set to binary here
+        :return: Either "true" if it worked or an error if not
+        :rtype: Bool
+
+        """
+
+        try:
+            self.redis_instance.set(key, pickle.dumps(content))
+            if expire:
+                self.redis_instance.expire(key, 86400) # 24 hours until deletion of the data
+            return True
+        except (Exception) as error:
+            print(error)
+            return error
+        
+    #######################################################
+    def addContentJSON(self, key, content, expire=False):
+        """
+        Save a key and its content in redis.
+
+        :param key: key, usually a session ID
+        :type key: String
+        :param content: The stuff that should be saved
+        :type content: Differs, will be set to binary here
+        :return: Either "true" if it worked or an error if not
+        :rtype: Bool
+
+        """
+
+        try:
+            self.redis_instance.set(key, json.dumps(content))
+            if expire:
+                self.redis_instance.expire(key, 86400) # 24 hours until deletion of the file
+            return True
+        except (Exception) as error:
+            print(error)
+            return error
+
+    #######################################################
+    def deleteKey(self, key):
+        """
+        Delete key and value from redis by key.
+
+        :param key: key, usually a session ID
+        :type key: String
+        :return: Flag to show if it worked or not
+        :rtype: Bool
+
+        """
+        try:
+            self.redis_instance.delete(key)
+        except (Exception) as error:
+            print(error)
+            return False
         return True
-    except (Exception) as error:
-        print(error)
-        return error
 
-#######################################################
-def deleteKey(key):
-    """
-    Delete key and value from redis by key.
+    #######################################################
+    def retrieveContent(self, key, deleteOrNot=False):
+        """
+        Retrieve content from redis by key.
+        WARNING: This is not secure! It would be better to use JSON
 
-    :param key: key, usually a session ID
-    :type key: String
-    :return: Flag to show if it worked or not
-    :rtype: Bool
+        :param key: key, usually a session ID
+        :type key: String
+        :param deleteOrNot: Decides if the key:content pair should be deleted after retrieval
+        :type deleteOrNot: Bool
+        :return: content
+        :rtype: Differs, not binary
 
-    """
-    try:
-        redis_instance.delete(key)
-    except (Exception) as error:
-        print(error)
-        return False
-    return True
+        """
+        try:
+            retrievedContent = self.redis_instance.get(key)
+            if retrievedContent is not None:
+                content = pickle.loads(retrievedContent)
+            else:
+                return ("", False)
+        except (Exception) as error:
+            print(error)
+            return (error, False)
 
-#######################################################
-def retrieveContent(key, deleteOrNot=False):
-    """
-    Retrieve content from redis by key.
+        if deleteOrNot == True:
+            self.redis_instance.delete(key)
 
-    :param key: key, usually a session ID
-    :type key: String
-    :param deleteOrNot: Decides if the key:content pair should be deleted after retrieval
-    :type deleteOrNot: Bool
-    :return: content
-    :rtype: Differs, not binary
+        return (content, True)
 
-    """
-    try:
-        retrievedContent = redis_instance.get(key)
-        if retrievedContent is not None:
-            content = pickle.loads(retrievedContent)
-        else:
-            return ("", False)
-    except (Exception) as error:
-        print(error)
-        return (error, False)
+    #######################################################
+    def retrieveContentJSON(self, key, deleteOrNot=False):
+        """
+        Retrieve content from redis by key.
 
-    if deleteOrNot == True:
-        redis_instance.delete(key)
+        :param key: key, usually a session ID
+        :type key: String
+        :param deleteOrNot: Decides if the key:content pair should be deleted after retrieval
+        :type deleteOrNot: Bool
+        :return: content
+        :rtype: Differs, not binary
 
-    return (content, True)
+        """
+        try:
+            retrievedContent = self.redis_instance.get(key)
+            if retrievedContent is not None:
+                content = json.loads(retrievedContent)
+            else:
+                return ("", False)
+        except (Exception) as error:
+            print(error)
+            return (error, False)
+
+        if deleteOrNot == True:
+            self.redis_instance.delete(key)
+
+        return (content, True)
 

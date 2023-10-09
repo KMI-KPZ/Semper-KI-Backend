@@ -11,7 +11,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-from backend_django.utilities import crypto
+from backend_django.utilities import crypto, basics
 
 from ...modelFiles.profileModel import User, Organization
 from ...modelFiles.projectModels import Process, Project
@@ -285,6 +285,28 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
+    def sendProcess(processID):
+        """
+        Send process to contractor.
+
+        :param processID: ID of the process that is being sent
+        :type processID: str
+        :return: Nothing or an error
+        :rtype: None or error
+        """
+        try:
+            processObj = Process.objects.get(processID=processID)
+            for contractor in processObj.contractor:
+                contractorObj = Organization.objects.get(hashedID=contractor)
+                contractorObj.processesReceived.add(processObj)
+                contractorObj.save()
+            return None
+        except (Exception) as error:
+            print(error)
+            return error
+
+    ##############################################
+    @staticmethod
     def deleteFromProcess(processID, updateType: EnumUpdates, content):
         """
         Delete details of a process like its status, or content. 
@@ -398,14 +420,16 @@ class ProcessManagementBase():
             else:
                 dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
             
-            for contractor in process.contractor:
-                if projectObj.client != contractor:
-                    if contractor not in dictForEventsAsOutput:
-                        dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
-                        dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, "status": 1, "messages": 0}]
-                        dictForEventsAsOutput[contractor]["projectID"] = projectID
-                    else:
-                        dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
+            # only signal contractors that received the process 
+            if process.status >= basics.processState["REQUESTED"]:
+                for contractor in process.contractor:
+                    if projectObj.client != contractor:
+                        if contractor not in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
+                            dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, "status": 1, "messages": 0}]
+                            dictForEventsAsOutput[contractor]["projectID"] = projectID
+                        else:
+                            dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
 
         return dictForEventsAsOutput
     
@@ -473,7 +497,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 # if not, create a new entry
                 existingObj = session["currentProjects"][projectID]
 
-                projectObj, flag = Project.objects.get_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -484,7 +508,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 # save processes
                 for entry in session["currentProjects"][projectID]["processes"]:
                     process = session["currentProjects"][projectID]["processes"][entry]
-                    selectedManufacturer = process["contractor"]
+                    selectedContractor = process["contractor"]
                     processID = process["processID"]
                     service = process["service"]
                     status = process["state"]
@@ -492,16 +516,39 @@ class ProcessManagementUser(ProcessManagementBase):
                     messages = process["messages"]
                     files = process["files"]
                     details = process["details"]
-                    processObj, flag = Process.objects.get_or_create(processID=processID, defaults={"projectKey":projectObj, "service": service, "status": status, "messages": messages, "serviceStatus": serviceStatus, "details": details, "files": files, "client": client.hashedID, "contractor": selectedManufacturer, "updatedWhen": now})
-                    for contractor in selectedManufacturer:
-                        contractorObj = Organization.objects.get(hashedID=contractor)
-                        contractorObj.processesReceived.add(processObj)
-                        contractorObj.save()
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey":projectObj, "service": service, "status": status, "messages": messages, "serviceStatus": serviceStatus, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
+                    
+                    # for contractor in selectedContractor:
+                    #     contractorObj = Organization.objects.get(hashedID=contractor)
+                    #     contractorObj.processesReceived.add(processObj)
+                    #     contractorObj.save()
                     
                 # link project to client
                 client.projects.add(projectObj)
                 client.save()
 
+            return None
+        except (Exception) as error:
+            print(error)
+            return error
+
+    ##############################################
+    @staticmethod
+    def sendProcess(processID):
+        """
+        Send process to contractor.
+
+        :param processID: ID of the process that is being sent
+        :type processID: str
+        :return: Nothing or an error
+        :rtype: None or error
+        """
+        try:
+            processObj = Process.objects.get(processID=processID)
+            for contractor in processObj.contractor:
+                contractorObj = Organization.objects.get(hashedID=contractor)
+                contractorObj.processesReceived.add(processObj)
+                contractorObj.save()
             return None
         except (Exception) as error:
             print(error)
@@ -629,7 +676,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
 
                 # project object
                 existingObj = session["currentProjects"][projectID]
-                projectObj, flag = Project.objects.get_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -640,7 +687,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 # save processes
                 for entry in session["currentProjects"][projectID]["processes"]:
                     process = session["currentProjects"][projectID]["processes"][entry]
-                    selectedManufacturer = process["contractor"]
+                    selectedContractor = process["contractor"]
                     processID = process["processID"]
                     service = process["service"]
                     status = process["state"]
@@ -649,12 +696,12 @@ class ProcessManagementOrganization(ProcessManagementBase):
                     files = process["files"]
                     dates = {"created": process["created"], "updated": str(now)}
                     details = process["details"]
-                    processObj, flag = Process.objects.get_or_create(processID=processID, defaults={"projectKey": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedManufacturer, "updatedWhen": now})
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
 
-                    for contractor in selectedManufacturer:
-                        contractorObj = Organization.objects.get(hashedID=contractor)
-                        contractorObj.processesReceived.add(processObj)
-                        contractorObj.save()
+                    # for contractor in selectedManufacturer:
+                    #     contractorObj = Organization.objects.get(hashedID=contractor)
+                    #     contractorObj.processesReceived.add(processObj)
+                    #     contractorObj.save()
             
                 # link project to client
                 client.projectsSubmitted.add(projectObj)
@@ -664,7 +711,6 @@ class ProcessManagementOrganization(ProcessManagementBase):
         except (Exception) as error:
             print(error)
             return error
-    
 
     ##############################################
     @staticmethod

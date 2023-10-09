@@ -29,7 +29,7 @@ class Rights:
                         self.rightsDict[elem].add(permission)
                     else:
                         self.rightsDict[elem] = set([permission])
-    
+
     #######################################################
     def checkIfAllowed(self, permissions, path):
         """
