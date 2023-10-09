@@ -6,20 +6,33 @@ Silvio Weging 2023
 Contains: Services for oauth verification
 """
 
-from ..helper.classes import LazyConnect
 from authlib.integrations.django_client import OAuth
 import datetime
 from django.conf import settings
 import requests
 
 
-class OAuthLazy(OAuth, metaclass=LazyConnect):
+class OAuthLazy(OAuth):
+    lazy_fn = None
+    lazy_fn_called = False
+
     def __init__(self):
         super().__init__()
+
+    def __getattr__(self, item):
+        if self.lazy_fn not in (None, False) and item not in ('shape', '__len__', ) and not self.lazy_fn_called:
+            print(f"Initialisierung von Attribut {item}")
+            self.lazy_fn(self)
+            self.lazy_fn_called = True
+        return super().__getattr__(item)
+
+    def setLazyFn(self, fn):
+        self.lazy_fn = fn
 
 
 def auth0Register(instance):
     from django.conf import settings
+    print('initialisiere auth0')
     instance.register(
         "auth0",
         client_id=settings.AUTH0_CLIENT_ID,
