@@ -379,7 +379,7 @@ def getFlatProjects(request):
 
 #######################################################
 @require_http_methods(["GET"]) 
-def getProcess(request, projectID):
+def getProject(request, projectID):
     """
     Retrieve project and processes.
 
