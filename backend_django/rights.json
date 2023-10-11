@@ -6,10 +6,10 @@
             "permission": "read"
          },
          "elements": [
-            "Orders",
-            "HomeAuthorizedOrder",
-            "OrdersButton",
-            "OrderButtonSee"
+            "Projects",
+            "HomeAuthorizedProject",
+            "ProjectsButton",
+            "ProjectButtonSee"
          ],
          "paths": [
             "retrieveProcesses",
@@ -24,7 +24,7 @@
             "permission": "files"
          },
          "elements": [
-             "OrderFile"
+             "ProjectFile"
          ],
          "paths": [
             "downloadFiles",
@@ -38,7 +38,7 @@
          },
          "elements": [
             "Chat",
-            "SubOrderButtonChat"
+            "ProcessButtonChat"
          ],
          "paths": [
             "updateProcess"
@@ -50,28 +50,28 @@
             "permission": "edit"
          },
          "elements": [
-            "OrdersButtonNew",
-            "OrderButtonEdit",
-            "OrderButtonNew",
-            "OrderButtonContractorSelection",
-            "OrderButtonRequest",
-            "OrderButtonVerify",
-            "OrderButtonReOrder",
-            "OrderButtonConfirm",
-            "OrderButtonReject",
-            "OrderButtonVerify",
-            "OrderButtonEditName",
-            "SubOrderCheckout",
-            "SubOrderVerification",
-            "SubOrderContractorSelection",
-            "SubOrderServiceSelection",
-            "SubOrderButtonEdit",
-            "SubOrderButtonContractorSelection",
-            "SubOrderButtonRequest",
-            "SubOrderButtonReOrder",
-            "SubOrderButtonReject",
-            "SubOrderButtonConfirm",
-            "SubOrderButtonVerify"
+            "ProjectsButtonNew",
+            "ProjectButtonEdit",
+            "ProjectButtonNew",
+            "ProjectButtonContractorSelection",
+            "ProjectButtonRequest",
+            "ProjectButtonVerify",
+            "ProjectButtonReOrder",
+            "ProjectButtonConfirm",
+            "ProjectButtonReject",
+            "ProjectButtonVerify",
+            "ProjectButtonEditName",
+            "ProcessCheckout",
+            "ProcessVerification",
+            "ProcessContractorSelection",
+            "ProcessServiceSelection",
+            "ProcessButtonEdit",
+            "ProcessButtonContractorSelection",
+            "ProcessButtonRequest",
+            "ProcessButtonReOrder",
+            "ProcessButtonReject",
+            "ProcessButtonConfirm",
+            "ProcessButtonVerify"
          ],
          "paths": [
             "updateProcess",
@@ -89,8 +89,8 @@
             "permission": "delete"
          },
          "elements": [
-            "OrderButtonDelete",
-            "SubOrderButtonDelete"
+            "ProjectButtonDelete",
+            "ProcessButtonDelete"
          ],
          "paths": [
             "deleteProcess",
