@@ -47,7 +47,7 @@ def createProjectID(request):
     now = timezone.now()
 
     # login defines client
-    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
         template = {"projectID": projectID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
     else:
         template = {"projectID": projectID, "client": "", "state": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
@@ -85,7 +85,7 @@ def updateProject(request):
                     request.session["currentProjects"][projectID]["details"][elem] = changes["changes"]["details"][elem]
             request.session.modified = True
         else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
                 if "state" in changes["changes"]:
                     returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, pgProcesses.EnumUpdates.status, changes["changes"]["state"])
                     if isinstance(returnVal, Exception):
@@ -136,7 +136,7 @@ def deleteProject(request, projectID):
             del request.session["currentProjects"][projectID]
             request.session.modified = True
 
-        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProject.__name__):
             pgProcesses.ProcessManagementBase.deleteProject(projectID)
         else:
             raise Exception("Not logged in or rights insufficient!")
@@ -175,7 +175,7 @@ def createProcessID(request, projectID):
             return JsonResponse({"processID": processID})
 
         # else: it's in the database, fetch it from there
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProcessID.__name__):
             # get client ID
             client = pgProcesses.ProcessManagementBase.getProjectObj(projectID).client
             returnObj = pgProcesses.ProcessManagementBase.addProcessTemplateToProject(projectID, template, client)
@@ -237,7 +237,7 @@ def updateProcess(request):
             request.session.modified = True
         else:
             # database version
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
                 for elem in changes["changes"]:
                     returnVal = True
                     if elem == "service": # service is a dict in itself
@@ -323,7 +323,7 @@ def deleteProcess(request, projectID, processID):
             del request.session["currentProjects"][projectID]["processes"][processID]
             request.session.modified = True
 
-        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcess.__name__):
             pgProcesses.ProcessManagementBase.deleteProcess(processID)
         else:
             raise Exception("Not logged in or rights insufficient!")
@@ -357,7 +357,6 @@ def getFlatProjects(request):
                 tempDict["projectID"] = request.session["currentProjects"][entry]["projectID"]
                 tempDict["client"] = request.session["currentProjects"][entry]["client"]
                 tempDict["state"] =  request.session["currentProjects"][entry]["state"]
-                tempDict["serviceState"] = request.session["currentProjects"][entry]["serviceState"]
                 tempDict["created"] = request.session["currentProjects"][entry]["created"]
                 tempDict["updated"] = request.session["currentProjects"][entry]["updated"]
                 tempDict["details"] = request.session["currentProjects"][entry]["details"]
@@ -365,7 +364,7 @@ def getFlatProjects(request):
                 outDict["projects"].append(tempDict)
         
         # From Database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):
             objFromDB = pgProcesses.processManagement[request.session["pgProcessClass"]].getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
@@ -395,7 +394,7 @@ def getProject(request, projectID):
         outDict = {}
         if "currentProjects" in request.session:
             if projectID in request.session["currentProjects"]:
-                outDict["processID"] = request.session["currentProjects"][projectID]["processID"]
+                outDict["projectID"] = request.session["currentProjects"][projectID]["projectID"]
                 outDict["client"] = request.session["currentProjects"][projectID]["client"]
                 outDict["state"] =  request.session["currentProjects"][projectID]["state"]
                 outDict["created"] = request.session["currentProjects"][projectID]["created"]
@@ -406,7 +405,7 @@ def getProject(request, projectID):
                     outDict["processes"].append(request.session["currentProjects"][projectID]["processes"][elem])
                 return JsonResponse(outDict)
         
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, __name__):
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
             return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 
         return JsonResponse(outDict)

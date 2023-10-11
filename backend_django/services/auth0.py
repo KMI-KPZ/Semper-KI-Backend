@@ -171,7 +171,7 @@ class ManageAPIToken:
         Check if token has expired and if so, request a new one. 
         """
         # check if token has expired
-        if datetime.datetime.now() > self.savedToken["expires_at"]:
+        if "expired_at" in self.savedToken and datetime.datetime.now() > self.savedToken["expires_at"]:
             # it has, request new token
             self.getAccessToken()
 

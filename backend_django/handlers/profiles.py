@@ -89,7 +89,7 @@ def updateDetailsOfOrganization(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))["data"]["content"]
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
