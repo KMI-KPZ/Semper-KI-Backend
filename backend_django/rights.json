@@ -76,7 +76,7 @@
          "paths": [
             "updateProcess",
             "updateProject",
-            "getManufacturers",
+            "getContractors",
             "saveProjects",
             "verifyProcess",
             "createProcessID",
