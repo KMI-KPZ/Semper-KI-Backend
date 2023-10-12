@@ -663,7 +663,7 @@ def sendProject(request):
             subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
             if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
                 userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                for permission in rights.rightsManagement.getPermissionsNeededForPath(__name__):
+                for permission in rights.rightsManagement.getPermissionsNeededForPath(sendProject.__name__):
                     async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
                         "type": "sendMessageJSON",
                         "dict": values,
