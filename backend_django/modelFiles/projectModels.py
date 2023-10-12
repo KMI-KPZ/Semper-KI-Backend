@@ -40,7 +40,7 @@ class Process(models.Model):
     :projectKey: Signals django to link that process to a project
     :service: Service and details for that process
     :status: How everything is going in general
-    :serviceStatus: How everything is going for the service
+    :serviceState: How everything is going for the service
     :messages: What was said by whom to whom and when
     :files: All URL Paths of files uploaded for a process
     :client: Who started the process

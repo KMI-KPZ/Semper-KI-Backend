@@ -100,7 +100,7 @@ class ProcessManagementBase():
             output["created"] = str(projectObj.createdWhen)
             output["updated"] = str(projectObj.updatedWhen)
             output["client"] = projectObj.client
-            output["state"] = projectObj.status
+            output["status"] = projectObj.status
             output["details"] = projectObj.details
 
             processesOfThatProject = []
@@ -110,8 +110,8 @@ class ProcessManagementBase():
                 currentProcess["processID"] = entry.processID
                 currentProcess["contractor"] = entry.contractor
                 currentProcess["service"] = entry.service
-                currentProcess["serviceState"] = entry.serviceState
-                currentProcess["state"] = entry.status
+                currentProcess["serviceStatus"] = entry.serviceStatus
+                currentProcess["status"] = entry.status
                 currentProcess["created"] = str(entry.createdWhen)
                 currentProcess["updated"] = str(entry.updatedWhen)
                 currentProcess["messages"] = entry.messages
@@ -378,7 +378,7 @@ class ProcessManagementBase():
             selectedManufacturer = template["contractor"]
             processID = template["processID"]
             service = template["service"]
-            status = template["state"]
+            status = template["status"]
             serviceStatus = template["serviceStatus"]
             messages = template["messages"]
             files = template["files"]
@@ -421,7 +421,7 @@ class ProcessManagementBase():
                 dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
             
             # only signal contractors that received the process 
-            if process.status >= basics.processState["REQUESTED"]:
+            if process.status >= basics.processStatus["REQUESTED"]:
                 for contractor in process.contractor:
                     if projectObj.client != contractor:
                         if contractor not in dictForEventsAsOutput:
@@ -497,7 +497,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 # if not, create a new entry
                 existingObj = session["currentProjects"][projectID]
 
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["status"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -511,7 +511,7 @@ class ProcessManagementUser(ProcessManagementBase):
                     selectedContractor = process["contractor"]
                     processID = process["processID"]
                     service = process["service"]
-                    status = process["state"]
+                    status = process["status"]
                     serviceStatus = process["serviceStatus"]
                     messages = process["messages"]
                     files = process["files"]
@@ -579,7 +579,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 currentProject["created"] = str(project.createdWhen)
                 currentProject["updated"] = str(project.updatedWhen)
                 currentProject["client"] = project.client
-                currentProject["state"] = project.status
+                currentProject["status"] = project.status
                 currentProject["details"] = project.details
                 processesOfThatProject = []
                 for entry in project.processes.all():
@@ -588,8 +588,8 @@ class ProcessManagementUser(ProcessManagementBase):
                     currentProcess["processID"] = entry.processID
                     currentProcess["contractor"] = entry.contractor
                     currentProcess["service"] = entry.service
-                    currentProcess["state"] = entry.status
-                    currentProcess["serviceState"] = entry.serviceState
+                    currentProcess["status"] = entry.status
+                    currentProcess["serviceStatus"] = entry.serviceStatus
                     currentProcess["created"] = str(entry.createdWhen)
                     currentProcess["updated"] = str(entry.updatedWhen)
                     currentProcess["messages"] = entry.messages
@@ -634,7 +634,7 @@ class ProcessManagementUser(ProcessManagementBase):
                 currentProject["projectID"] = project.projectID
                 currentProject["created"] = str(project.createdWhen)
                 currentProject["updated"] = str(project.updatedWhen)
-                currentProject["state"] = project.status
+                currentProject["status"] = project.status
                 currentProject["client"] = project.client
                 currentProject["details"] = project.details
                 currentProject["processesCount"] = len(project.processes.all())
@@ -676,7 +676,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
 
                 # project object
                 existingObj = session["currentProjects"][projectID]
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["state"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["status"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
                 # retrieve files
                 # uploadedFiles = []
                 # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
@@ -690,7 +690,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                     selectedContractor = process["contractor"]
                     processID = process["processID"]
                     service = process["service"]
-                    status = process["state"]
+                    status = process["status"]
                     serviceStatus = process["serviceStatus"]
                     messages = process["chat"]
                     files = process["files"]
@@ -737,7 +737,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 currentProject["projectID"] = project.projectID
                 currentProject["created"] = str(project.createdWhen)
                 currentProject["updated"] = str(project.updatedWhen)
-                currentProject["state"] = project.status
+                currentProject["status"] = project.status
                 currentProject["client"] = project.client
                 currentProject["details"] = project.details
                 processesOfThatProject = []
@@ -747,8 +747,8 @@ class ProcessManagementOrganization(ProcessManagementBase):
                     currentProcess["contractor"] = entry.contractor
                     currentProcess["client"] = entry.client
                     currentProcess["service"] = entry.service
-                    currentProcess["state"] = entry.status
-                    currentProcess["serviceState"] = entry.serviceState
+                    currentProcess["status"] = entry.status
+                    currentProcess["serviceStatus"] = entry.serviceStatus
                     currentProcess["created"] = str(entry.createdWhen)
                     currentProcess["updated"] = str(entry.updatedWhen)
                     currentProcess["messages"] = entry.messages
@@ -766,15 +766,15 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 project = processEntry.projectKey
 
                 if project.projectID not in receivedProjects:
-                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "state": project.status, "processes": []}
+                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "status": project.status, "processes": []}
 
                 currentProcess = {}
                 currentProcess["processID"] = processEntry.processID
                 currentProcess["contractor"] = processEntry.contractor
                 currentProcess["client"] = processEntry.client
                 currentProcess["service"] = processEntry.service
-                currentProcess["state"] = processEntry.status
-                currentProcess["serviceState"] = processEntry.serviceState
+                currentProcess["status"] = processEntry.status
+                currentProcess["serviceStatus"] = processEntry.serviceStatus
                 currentProcess["created"] = str(processEntry.createdWhen)
                 currentProcess["updated"] = str(processEntry.updatedWhen)
                 currentProcess["messages"] = processEntry.messages
@@ -825,7 +825,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 currentProject["projectID"] = project.projectID
                 currentProject["created"] = str(project.createdWhen)
                 currentProject["updated"] = str(project.updatedWhen)
-                currentProject["state"] = project.status
+                currentProject["status"] = project.status
                 currentProject["client"] = project.client
                 currentProject["details"] = project.details
                 currentProject["processesCount"] = len(list(project.processes.all()))
@@ -840,7 +840,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 project = processEntry.projectKey
 
                 if project.projectID not in receivedProjects:
-                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "details": project.details, "state": project.status, "processesCount": 0}
+                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "details": project.details, "status": project.status, "processesCount": 0}
                 receivedProjects[project.projectID]["processesCount"] += 1
             
             # after collection the projects and their processes, we need to add them to the output
@@ -849,7 +849,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                 currentProject["projectID"] = receivedProjects[project]["projectID"]
                 currentProject["created"] = receivedProjects[project]["created"]
                 currentProject["updated"] = receivedProjects[project]["updated"]
-                currentProject["state"] = receivedProjects[project]["state"]
+                currentProject["status"] = receivedProjects[project]["status"]
                 currentProject["client"] = receivedProjects[project]["client"]
                 currentProject["details"] = receivedProjects[project]["details"]
                 currentProject["processesCount"] = receivedProjects[project]["processesCount"]

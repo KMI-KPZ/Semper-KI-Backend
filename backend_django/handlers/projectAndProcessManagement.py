@@ -21,7 +21,7 @@ from ..utilities import crypto, rights
 
 from ..services.postgresDB import pgProcesses, pgProfiles
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, processState
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, processStatus
 
 from ..services import redis
 from ..services.processes import price, collectAndSend
@@ -48,9 +48,9 @@ def createProjectID(request):
 
     # login defines client
     if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
-        template = {"projectID": projectID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "state": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
+        template = {"projectID": projectID, "client": pgProfiles.profileManagement[request.session["pgProfileClass"]].getClientID(request.session), "status": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
     else:
-        template = {"projectID": projectID, "client": "", "state": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
+        template = {"projectID": projectID, "client": "", "status": 0, "created": str(now), "updated": str(now), "details": {}, "processes": {}} 
     
     # save project template in session for now
     if "currentProjects" not in request.session:
@@ -78,16 +78,16 @@ def updateProject(request):
         projectID = changes["projectID"]
 
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
-            if "state" in changes["changes"]:
-                request.session["currentProjects"][projectID]["state"] = changes["changes"]["state"]
+            if "status" in changes["changes"]:
+                request.session["currentProjects"][projectID]["status"] = changes["changes"]["status"]
             elif "details" in changes["changes"]:
                 for elem in changes["changes"]["details"]:
                     request.session["currentProjects"][projectID]["details"][elem] = changes["changes"]["details"][elem]
             request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
-                if "state" in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, pgProcesses.EnumUpdates.status, changes["changes"]["state"])
+                if "status" in changes["changes"]:
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 if "details" in changes["changes"]:
@@ -166,7 +166,7 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        template = {"processID": processID, "contractor": [], "state": 0, "serviceState": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
+        template = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
 
         # save into respective project
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
@@ -210,7 +210,7 @@ def updateProcess(request):
             for elem in changes["changes"]:
                 if elem == "service": # service is a dict in itself
                     if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
-                            request.session["currentProjects"][projectID]["processes"][processID] = {"processID": processID, "contractor": [], "state": 0, "serviceState": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {}}
+                            request.session["currentProjects"][projectID]["processes"][processID] = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {}}
                     else:
                         for entry in changes["changes"]["service"]:
                             request.session["currentProjects"][projectID]["processes"][processID]["service"][entry] = changes["changes"]["service"][entry]
@@ -218,7 +218,7 @@ def updateProcess(request):
                     request.session["currentProjects"][projectID]["processes"][processID]["messages"]["messages"].append(changes["changes"]["messages"])
                 elif elem == "files":
                     request.session["currentProjects"][projectID]["processes"][processID]["files"]["files"] = changes["changes"]["files"]
-                    # state, contractor
+                    # status, contractor
                 elif elem == "details":
                     for entry in changes["changes"]["details"]:
                         request.session["currentProjects"][projectID]["processes"][processID]["details"][entry] = changes["changes"]["details"][entry]
@@ -254,8 +254,8 @@ def updateProcess(request):
                     elif elem == "details":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
                     else:
-                        # state
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["state"])
+                        # status
+                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
 
                     if isinstance(returnVal, Exception):
                         raise returnVal
@@ -273,8 +273,8 @@ def updateProcess(request):
                         elif elem == "details":
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
                         else:
-                            # state
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["state"])
+                            # status
+                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["status"])
 
                         if isinstance(returnVal, Exception):
                             raise returnVal
@@ -356,7 +356,7 @@ def getFlatProjects(request):
                 tempDict = {}
                 tempDict["projectID"] = request.session["currentProjects"][entry]["projectID"]
                 tempDict["client"] = request.session["currentProjects"][entry]["client"]
-                tempDict["state"] =  request.session["currentProjects"][entry]["state"]
+                tempDict["status"] =  request.session["currentProjects"][entry]["status"]
                 tempDict["created"] = request.session["currentProjects"][entry]["created"]
                 tempDict["updated"] = request.session["currentProjects"][entry]["updated"]
                 tempDict["details"] = request.session["currentProjects"][entry]["details"]
@@ -396,7 +396,7 @@ def getProject(request, projectID):
             if projectID in request.session["currentProjects"]:
                 outDict["projectID"] = request.session["currentProjects"][projectID]["projectID"]
                 outDict["client"] = request.session["currentProjects"][projectID]["client"]
-                outDict["state"] =  request.session["currentProjects"][projectID]["state"]
+                outDict["status"] =  request.session["currentProjects"][projectID]["status"]
                 outDict["created"] = request.session["currentProjects"][projectID]["created"]
                 outDict["updated"] = request.session["currentProjects"][projectID]["updated"]
                 outDict["details"] = request.session["currentProjects"][projectID]["details"]
@@ -610,7 +610,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processState["VERIFIED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["VERIFIED"])
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -650,7 +650,7 @@ def sendProject(request):
         # TODO send to manufacturer(s))
         # TODO set status to send/requested 
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processState["REQUESTED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["REQUESTED"])
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             # TODO save in db of received processes for manufacturer

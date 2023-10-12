@@ -216,4 +216,4 @@ class Logging():
 #######################################################
 # status codes
 # TODO: store this in redis and access it from there
-processState = json.load(open(str(settings.BASE_DIR) + "/backend_django/statusCodes.json"))
+processStatus = json.load(open(str(settings.BASE_DIR) + "/backend_django/statusCodes.json"))
