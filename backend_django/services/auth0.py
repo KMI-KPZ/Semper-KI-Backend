@@ -160,7 +160,7 @@ class ManageAPIToken:
         }
         response = requests.post(f'{base_url}/oauth/token', data=payload)
         oauth = response.json()
-        self.accessToken = oauth.get('access_token')
+        self._accessToken = oauth.get('access_token')
         self.savedToken = oauth
         now = datetime.datetime.now()
         self.savedToken["expires_at"] = now + datetime.timedelta(seconds=oauth["expires_in"])

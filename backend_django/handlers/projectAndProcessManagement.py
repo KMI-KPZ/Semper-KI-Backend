@@ -166,7 +166,7 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        template = {"processID": processID, "contractor": [], "state": 0, "serviceState": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {}}
+        template = {"processID": processID, "contractor": [], "state": 0, "serviceState": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
 
         # save into respective project
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:

@@ -41,21 +41,7 @@ class TestTestcalls(TestCase):
 
 class TestProfiles(TestCase):
 
-    def test_addUser(self):
-        mockSession = self.client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser"
-        mockSession["user"]["userinfo"]["nickname"] = "testuser"
-        mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
-        mockSession["usertype"] = "indefinite"
-        currentTime = datetime.datetime.now()
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
-        mockSession.save()
-        self.client.get("/"+paths["addUser"])
-        response = json.loads(self.client.get("/"+paths["getUser"]).content)
-        self.assertIs(response["name"] == "testuser" and response["email"] == "testuser@test.de", True)
-    
-    def test_updateUserName(self):
+    def test_userManagement(self):
         mockSession = self.client.session
         mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
         mockSession["user"]["userinfo"]["sub"] = "auth0|testuser2"
