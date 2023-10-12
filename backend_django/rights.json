@@ -14,7 +14,7 @@
          "paths": [
             "retrieveProcesses",
             "getMissedEvents",
-            "getProcess",
+            "getProject",
             "getFlatProjects"
          ]
       },

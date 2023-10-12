@@ -386,6 +386,9 @@ LOGGING = {
     }
 }
 
+# Session
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
 # Callers
 WSGI_APPLICATION = 'backend_django.wsgi.application'
 ASGI_APPLICATION = "backend_django.asgi.application"

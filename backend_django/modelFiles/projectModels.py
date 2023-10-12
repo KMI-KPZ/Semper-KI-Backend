@@ -61,8 +61,8 @@ class Process(models.Model):
     client = models.CharField(max_length=513)
     contractor = ArrayField(models.CharField(max_length=513))
     details = models.JSONField()
-    dependenciesIn = models.ManyToManyField("Process", symmetrical=False)
-    dependenciesOut = models.ForeignKey
+    dependenciesIn = models.ManyToManyField("self", symmetrical=False, related_name="processesIn")
+    dependenciesOut = models.ManyToManyField("self", symmetrical=False, related_name="processesOut")
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)

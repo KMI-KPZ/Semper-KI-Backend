@@ -21,3 +21,10 @@ BACKEND_SETTINGS= "local"
 # CELERY_RESULT_BACKEND = "redis://:"+REDIS_PASSWORD+"@localhost:6379/0"
 CELERY_BROKER_URL = CELERY_RESULT_BACKEND=  f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0'
 print("CELERY_BROKER_URL: "+CELERY_BROKER_URL)
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0",
+    }
+}
