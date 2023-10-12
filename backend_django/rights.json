@@ -78,7 +78,8 @@
             "updateProject",
             "getContractors",
             "saveProjects",
-            "verifyProcess",
+            "verifyProject",
+            "sendProject",
             "createProcessID",
             "createProjectID"
          ]

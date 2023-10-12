@@ -72,8 +72,8 @@ paths = {
     "updateProject": "public/updateProject/",
     "deleteProcess": "public/deleteProcess/<projectID>/<processID>/",
     "deleteProject": "public/deleteProject/<projectID>/",
-    "verifyProcess": "public/verifyProcess/",
-    "sendProcess": "public/sendProcess/<projectID>/<processID>/",
+    "verifyProject": "public/verifyProject/",
+    "sendProject": "public/sendProject/",
 
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
@@ -181,8 +181,8 @@ urlpatterns = [
     path(paths["deleteProcess"], projectAndProcessManagement.deleteProcess, name='deleteProcess'),
     path(paths["deleteProject"], projectAndProcessManagement.deleteProject, name='deleteProject'),
     path(paths["getContractors"], projectAndProcessManagement.getContractors, name='getContractors'),
-    path(paths["verifyProcess"], projectAndProcessManagement.verifyProcess, name="verifyProcess"),
-    path(paths["sendProcess"], projectAndProcessManagement.sendProcess, name="sendProcess"),
+    path(paths["verifyProject"], projectAndProcessManagement.verifyProject, name="verifyProject"),
+    path(paths["sendProject"], projectAndProcessManagement.sendProject, name="sendProject"),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
     #path("private/testDB/", profiles.checkConnection, name="checkConnection"),

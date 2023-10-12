@@ -575,7 +575,7 @@ def saveProjects(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
-def verifyProcess(request):
+def verifyProject(request):
     """
     Start calculations on server and set status accordingly
 
@@ -588,9 +588,9 @@ def verifyProcess(request):
     try:
         # get information
         info = json.loads(request.body.decode("utf-8"))
-        processID = info["processID"]
+        projectID = info["projectID"]
         sendToManufacturerAfterVerification = info["send"]
-        processesIDArray = info["processesIDs"]
+        processesIDArray = info["processIDs"]
 
         # first save projects
         if request.session["isPartOfOrganization"]:
@@ -619,7 +619,7 @@ def verifyProcess(request):
 
         # TODO Websocket Event
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
 
         return HttpResponse("Success")
     
@@ -631,7 +631,7 @@ def verifyProcess(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
-def sendProcess(request):
+def sendProject(request):
     """
     Retrieve Calculations and send process to manufacturer(s)
 
@@ -644,7 +644,7 @@ def sendProcess(request):
     try:
         info = json.loads(request.body.decode("utf-8"))
         projectID = info["projectID"]
-        processesIDArray = info["processesIDs"]
+        processesIDArray = info["processIDs"]
         # TODO Check if process is verified
 
         # TODO send to manufacturer(s))
