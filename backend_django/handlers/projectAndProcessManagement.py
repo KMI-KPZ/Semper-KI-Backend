@@ -490,7 +490,7 @@ def getMissedEvents(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
-def getManufacturers(request):
+def getContractors(request):
     """
     Get all suitable manufacturers.
 
@@ -500,9 +500,9 @@ def getManufacturers(request):
     :rtype: JSON
 
     """
-
+    # TODO filter by service
     manufacturerList = []
-    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllManufacturers()
+    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllContractors()
     # TODO Check suitability
 
     # remove unnecessary information and add identifier

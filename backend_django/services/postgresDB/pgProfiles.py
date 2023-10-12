@@ -342,11 +342,11 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def getAllManufacturers():
+    def getAllContractors():
         """
-        Get all manufacturers.
+        Get all contractors.
         
-        :return: All manufacturers
+        :return: All contractors
         :rtype: Dictionary
 
         """
@@ -475,7 +475,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
         updated = timezone.now()
         try:
             existingObj = Organization.objects.get(subID=orgID)
-            existingInfo = {"details": existingObj.details, "canManufacturer": existingObj.canManufacture, "name": existingObj.name, "uri": existingObj.uri}
+            existingInfo = {"details": existingObj.details, "canManufacture": existingObj.canManufacture, "name": existingObj.name, "uri": existingObj.uri}
             for key in details:
                 existingInfo[key] = details[key]
             affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], canManufacture=existingInfo["canManufacture"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)

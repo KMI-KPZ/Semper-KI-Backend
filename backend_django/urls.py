@@ -56,7 +56,7 @@ paths = {
 
     "updateCart": "public/updateCart/",
     "getCart": "public/getCart/",
-    "getManufacturers": "public/getManufacturers/",
+    "getContractors": "public/getContractors/",
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
     "checkLogistics": "public/checkLogistics/",
@@ -180,7 +180,7 @@ urlpatterns = [
     path(paths["updateProject"], projectAndProcessManagement.updateProject, name='updateProject'),
     path(paths["deleteProcess"], projectAndProcessManagement.deleteProcess, name='deleteProcess'),
     path(paths["deleteProject"], projectAndProcessManagement.deleteProject, name='deleteProject'),
-    path(paths["getManufacturers"], projectAndProcessManagement.getManufacturers, name='getManufacturers'),
+    path(paths["getContractors"], projectAndProcessManagement.getContractors, name='getContractors'),
     path(paths["verifyProcess"], projectAndProcessManagement.verifyProcess, name="verifyProcess"),
     path(paths["sendProcess"], projectAndProcessManagement.sendProcess, name="sendProcess"),
 
