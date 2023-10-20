@@ -14,6 +14,7 @@ from django.conf import settings
 from time import sleep
 
 from ..utilities import rights
+from ..services.redis import RedisConnection
 
 #######################################################
 def checkIfTokenValid(token):
@@ -216,4 +217,29 @@ class Logging():
 #######################################################
 # status codes
 # TODO: store this in redis and access it from there
-processStatus = json.load(open(str(settings.BASE_DIR) + "/backend_django/statusCodes.json"))
+class ProcessStatus():
+    """
+    Static class for the process status management
+
+    """
+
+    redisConn = RedisConnection()
+
+    @staticmethod
+    def getStatusCodeFor(entry:str) -> int:
+        """
+        Retrieve status codes from redis.
+
+        :param entry: String of the status e.g. VERIFIED  
+        :type entry: str
+        :return: Status code corresponding to the status string
+        :rtype: int
+
+        """
+        codes, exists = ProcessStatus.redisConn.retrieveContentJSON("processStatusCodes")
+        if not exists:
+            processStatus = json.load(open(str(settings.BASE_DIR) + "/backend_django/statusCodes.json"))
+            ProcessStatus.redisConn.addContentJSON("processStatusCodes", processStatus)
+            return processStatus[entry]
+        else:
+            return codes[entry]

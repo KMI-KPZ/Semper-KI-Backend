@@ -10,21 +10,28 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 import datetime
 
-
-endpoint = SPARQLWrapper("https://skynet.coypu.org/coypu-internal")
-endpoint.setCredentials(settings.COYPU_CLIENTID, settings.COYPU_PASSWORD)
+from .redis import RedisConnection
 
 class ManageQueries:
     """
     Contains query from file as object
 
     """
-    savedQuery = None
+    redisCon = RedisConnection()
 
     #######################################################
     def __init__(self, filePathAndName) -> None:
-        with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
-            self.savedQuery = queryFile.read()
+        self.endpoint = SPARQLWrapper("https://skynet.coypu.org/coypu-internal")
+        self.endpoint.setCredentials(settings.COYPU_CLIENTID, settings.COYPU_PASSWORD)
+
+        query, exists = self.redisCon.retrieveContentJSON("coypuQuery")
+        if not exists:
+            with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
+                queryFileContent = queryFile.read()
+                self.redisCon.addContentJSON("coypuQuery", {"coypu": queryFileContent})
+                self.savedQuery = queryFileContent
+        else:
+            self.savedQuery = query["coypu"]
 
     #######################################################
     def sendQuery(self):
@@ -38,7 +45,7 @@ class ManageQueries:
         """
 
         # maybe construct first, save that to redis and then search/filter from that
-        endpointCopy = endpoint
+        endpointCopy = self.endpoint
         endpointCopy.setReturnFormat(JSON)
         endpointCopy.setQuery(self.savedQuery)
 

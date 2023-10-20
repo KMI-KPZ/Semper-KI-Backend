@@ -392,7 +392,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID):
+    def getInfoAboutProjectForWebsocket(projectID, affectedProcessesIDs:list, event):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -410,26 +410,27 @@ class ProcessManagementBase():
         dictForEventsAsOutput[projectObj.client]["processes"] = []
         dictForEventsAsOutput[projectObj.client]["projectID"] = projectID
         for process in projectObj.processes.all():
-            if projectObj.client != process.client:
-                if process.client not in dictForEventsAsOutput:
-                    dictForEventsAsOutput[process.client] = {"eventType": "projectEvent"}
-                    dictForEventsAsOutput[process.client]["process"] = [{"processID": process.processID, "status": 1, "messages": 0}]
-                    dictForEventsAsOutput[process.client]["projectID"] = projectID
+            if process.processID in affectedProcessesIDs:
+                if projectObj.client != process.client:
+                    if process.client not in dictForEventsAsOutput:
+                        dictForEventsAsOutput[process.client] = {"eventType": "projectEvent"}
+                        dictForEventsAsOutput[process.client]["process"] = [{"processID": process.processID, event: 1}]
+                        dictForEventsAsOutput[process.client]["projectID"] = projectID
+                    else:
+                        dictForEventsAsOutput[process.client]["processes"].append({"processID": process.processID, event: 1})
                 else:
-                    dictForEventsAsOutput[process.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
-            else:
-                dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
-            
-            # only signal contractors that received the process 
-            if process.status >= basics.processStatus["REQUESTED"]:
-                for contractor in process.contractor:
-                    if projectObj.client != contractor:
-                        if contractor not in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
-                            dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, "status": 1, "messages": 0}]
-                            dictForEventsAsOutput[contractor]["projectID"] = projectID
-                        else:
-                            dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, "status": 1, "messages": 0})
+                    dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, event: 1})
+                
+                # only signal contractors that received the process 
+                if process.status >= basics.ProcessStatus.getStatusCodeFor("REQUESTED"):
+                    for contractor in process.contractor:
+                        if projectObj.client != contractor:
+                            if contractor not in dictForEventsAsOutput:
+                                dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
+                                dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, event: 1}]
+                                dictForEventsAsOutput[contractor]["projectID"] = projectID
+                            else:
+                                dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, event: 1})
 
         return dictForEventsAsOutput
     

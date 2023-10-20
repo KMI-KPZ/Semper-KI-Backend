@@ -11,6 +11,8 @@ from django.conf import settings
 import datetime
 from authlib.integrations.requests_client import OAuth2Session
 
+from .redis import RedisConnection
+
 class ManageToken:
     """
     Manage oauth token class.
@@ -35,6 +37,7 @@ class ManageToken:
     def getAccessToken(self):
         """
         Get initial token. Made as a function to be callable from outside. 
+        Reminder for me: It makes no sense to save this access token in redis because it expires much to quickly!
         """
         self._token = self.client.fetch_token(grant_type='client_credentials')
     
@@ -62,12 +65,19 @@ class ManageQueries:
     Contains query from file as object
 
     """
-    savedQuery = None
+    redisCon = RedisConnection()
 
     #######################################################
     def __init__(self, filePathAndName) -> None:
-        with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
-            self.savedQuery = queryFile.read()
+
+        query, exists = self.redisCon.retrieveContentJSON(filePathAndName)
+        if not exists:
+            with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
+                queryFileContent = queryFile.read()
+                self.redisCon.addContentJSON(filePathAndName, {"content": queryFileContent})
+                self.savedQuery = queryFileContent
+        else:
+            self.savedQuery = query["content"]
 
     #######################################################
     def sendQuery(self):

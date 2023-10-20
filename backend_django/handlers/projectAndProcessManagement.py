@@ -21,7 +21,7 @@ from ..utilities import crypto, rights
 
 from ..services.postgresDB import pgProcesses, pgProfiles
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, processStatus
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, ProcessStatus
 
 from ..services import redis
 from ..services.processes import price, collectAndSend
@@ -238,6 +238,7 @@ def updateProcess(request):
         else:
             # database version
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
+                eventList = []
                 for elem in changes["changes"]:
                     returnVal = True
                     if elem == "service": # service is a dict in itself
@@ -246,16 +247,20 @@ def updateProcess(request):
                         else:        
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
                     elif elem == "messages":
+                        eventList.append("messages")
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.messages, changes["changes"]["messages"])
                     elif elem == "files":
+                        eventList.append("files")
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
                     elif elem == "contractor":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
                     elif elem == "details":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
-                    else:
-                        # status
+                    elif elem == "status":
+                        eventList.append("status")
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
+                    else:
+                        raise Exception("updateProcess change " + elem + " not implemented")
 
                     if isinstance(returnVal, Exception):
                         raise returnVal
@@ -280,18 +285,21 @@ def updateProcess(request):
                             raise returnVal
                 
                 # websocket
-                dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID)
-                channel_layer = get_channel_layer()
-                for userID in dictForEvents: # user/orga that is associated with that process
-                    values = dictForEvents[userID] # message, formatted for frontend
-                    subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
-                        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                        for permission in rights.rightsManagement.getPermissionsNeededForPath(__name__):
-                            async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                                "type": "sendMessageJSON",
-                                "dict": values,
-                            })
+                for event in eventList:
+                    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, [processID], event)
+                    channel_layer = get_channel_layer()
+                    for userID in dictForEvents: # user/orga that is associated with that process
+                        values = dictForEvents[userID] # message, formatted for frontend
+                        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+                        if subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+                            userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                            for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+                                async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                                    "type": "sendMessageJSON",
+                                    "dict": values,
+                                })
+
+                # logging
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
             else:
@@ -610,7 +618,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["VERIFIED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("VERIFIED"))
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -650,18 +658,18 @@ def sendProject(request):
         # TODO send to manufacturer(s))
         # TODO set status to send/requested 
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["REQUESTED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("REQUESTED"))
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             # TODO save in db of received processes for manufacturer
             
         # TODO Websocket Events
-        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID)
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processesIDArray, "status")
         channel_layer = get_channel_layer()
         for userID in dictForEvents: # user/orga that is associated with that process
             values = dictForEvents[userID] # message, formatted for frontend
             subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+            if subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
                 userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
                 for permission in rights.rightsManagement.getPermissionsNeededForPath(sendProject.__name__):
                     async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
