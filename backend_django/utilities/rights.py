@@ -55,6 +55,27 @@ class Rights:
         return False
     
     #######################################################
+    def checkIfAllowedWithOperation(self, permissions, path, operation):
+        """
+        Check if permission is sufficient for that path and operation.
+
+        :param permissions: Permissions of that user
+        :type permissions: [str]
+        :param path: The name of the function (usually handlers)
+        :type path: Str
+        :param operation: Contains the operation (messages, files, ...) that should be checked
+        :type operation: Str
+        :return: True of permission sufficient, false if not.
+        :rtype: Bool
+        """
+
+        for elem in self.rightsDict[path]:
+            if elem in permissions and operation in elem:
+                return True
+        
+        return False
+    
+    #######################################################
     def getPermissionsNeededForPath(self, path):
         """
         Return list of permissions that correspond to the given path

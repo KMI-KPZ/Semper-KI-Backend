@@ -154,6 +154,24 @@ def manualCheckIfRightsAreSufficient(session, funcName):
             return True
 
     return False
+
+#######################################################
+def manualCheckIfRightsAreSufficientForSpecificOperation(session, funcName, operation):
+    """
+    Check whether a user has the permissions to do something.
+
+    :param session: Session of user
+    :type session: dict
+    :param funcName: The function that called this
+    :type funcName: str
+    :return: Response whether the user is logged in or not.
+    :rtype: Bool
+    """
+    if "user" in session and "userPermissions" in session:
+        if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowedWithOperation(session["userPermissions"],funcName, operation):
+            return True
+
+    return False
     
 
 #################### DECORATOR ###################################

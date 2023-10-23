@@ -12,7 +12,7 @@
             "ProjectButtonSee"
          ],
          "paths": [
-            "retrieveProcesses",
+            "retrieveProjects",
             "getMissedEvents",
             "getProject",
             "getFlatProjects"

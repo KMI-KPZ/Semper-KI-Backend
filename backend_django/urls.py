@@ -62,7 +62,7 @@ paths = {
     "checkLogistics": "public/checkLogistics/",
 
     "saveProjects": "public/saveProjects/",
-    "retrieveProcesses": "public/retrieveProcesses/",
+    "retrieveProjects": "public/retrieveProjects/",
     "getMissedEvents": "public/getMissedEvents/",
     "getFlatProjects": "public/getFlatProjects/",
     "createProjectID": "public/createProjectID/",
@@ -171,7 +171,7 @@ urlpatterns = [
 
     path(paths["getMissedEvents"], projectAndProcessManagement.getMissedEvents, name='getMissedEvents'),
     path(paths["getFlatProjects"], projectAndProcessManagement.getFlatProjects, name="getFlatProjects"),
-    path(paths["retrieveProcesses"], projectAndProcessManagement.retrieveProcesses, name='retrieveProcesses'),
+    path(paths["retrieveProjects"], projectAndProcessManagement.retrieveProjects, name='retrieveProjects'),
     path(paths["createProjectID"], projectAndProcessManagement.createProjectID, name="createProjectID"),
     path(paths["createProcessID"], projectAndProcessManagement.createProcessID, name="createProcessID"),
     path(paths["getProject"], projectAndProcessManagement.getProject, name="getProject"),

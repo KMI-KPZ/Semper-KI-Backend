@@ -535,29 +535,7 @@ class ProcessManagementUser(ProcessManagementBase):
 
     ##############################################
     @staticmethod
-    def sendProcess(processID):
-        """
-        Send process to contractor.
-
-        :param processID: ID of the process that is being sent
-        :type processID: str
-        :return: Nothing or an error
-        :rtype: None or error
-        """
-        try:
-            processObj = Process.objects.get(processID=processID)
-            for contractor in processObj.contractor:
-                contractorObj = Organization.objects.get(hashedID=contractor)
-                contractorObj.processesReceived.add(processObj)
-                contractorObj.save()
-            return None
-        except (Exception) as error:
-            print(error)
-            return error
-
-    ##############################################
-    @staticmethod
-    def getProcesses(session):
+    def getProjects(session):
         """
         Get all processes for that user.
 
@@ -715,7 +693,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
 
     ##############################################
     @staticmethod
-    def getProcesses(session):
+    def getProjects(session):
         """
         Get all processes for that organization.
 
@@ -786,7 +764,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
             
             # after collection the projects and their processes, we need to add them to the output
             for project in receivedProjects:
-                output.append(project)
+                output.append(receivedProjects[project])
 
 
             output = sorted(output, key=lambda x: 

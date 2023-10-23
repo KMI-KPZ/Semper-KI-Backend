@@ -151,6 +151,27 @@ class ProfileManagementBase():
             print(error)
 
         return userID
+    
+    ##############################################
+    @staticmethod
+    def getUserOrgaKey(session):
+        """
+        Retrieve User ID from Session
+
+        :param session: session
+        :type session: Dictionary
+        :return: User key from database
+        :rtype: Str
+
+        """
+        orgaID = ""
+        try:
+            if "org_id" in session["user"]["userinfo"]:
+                orgaID = session["user"]["userinfo"]["org_id"]
+        except (Exception) as error:
+            print(error)
+
+        return orgaID
 
     ##############################################
     @staticmethod
