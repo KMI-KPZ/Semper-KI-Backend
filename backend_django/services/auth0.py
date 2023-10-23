@@ -5,11 +5,12 @@ Silvio Weging 2023
 
 Contains: Services for oauth verification
 """
+import requests, datetime
 
 from authlib.integrations.django_client import OAuth
-import datetime
 from django.conf import settings
-import requests
+
+from .redis import RedisConnection
 
 
 class OAuthLazy(OAuth):
@@ -131,6 +132,8 @@ class ManageAPIToken:
     """
     savedToken = {}
     accessToken = ""
+    redisConn = RedisConnection()
+    redisKey = "auth0_access_token"
 
 
     #######################################################
@@ -143,37 +146,43 @@ class ManageAPIToken:
             raise AttributeError
 
     #######################################################
-    def getAccessToken(self):
+    def getAccessToken(self, expired=False):
         """
         Get initial token. Made as a function to be callable from outside. 
         """
-            # Configuration Values
-        audience = f'https://{settings.AUTH0_DOMAIN}/api/v2/'
+        alreadySavedToken, exists = self.redisConn.retrieveContentJSON(self.redisKey)
+        if not exists or expired: 
 
-        # Get an Access Token from Auth0
-        base_url = f"https://{settings.AUTH0_DOMAIN}"
-        payload =  { 
-            'grant_type': "client_credentials",
-            'client_id': settings.AUTH0_API_CLIENT_ID,
-            'client_secret': settings.AUTH0_API_CLIENT_SECRET,
-            'audience': audience
-        }
-        response = requests.post(f'{base_url}/oauth/token', data=payload)
-        oauth = response.json()
-        self.accessToken = oauth.get('access_token')
-        self.savedToken = oauth
-        now = datetime.datetime.now()
-        self.savedToken["expires_at"] = now + datetime.timedelta(seconds=oauth["expires_in"])
-    
+            # Configuration Values
+            audience = f'https://{settings.AUTH0_DOMAIN}/api/v2/'
+
+            # Get an Access Token from Auth0
+            base_url = f"https://{settings.AUTH0_DOMAIN}"
+            payload =  { 
+                'grant_type': "client_credentials",
+                'client_id': settings.AUTH0_API_CLIENT_ID,
+                'client_secret': settings.AUTH0_API_CLIENT_SECRET,
+                'audience': audience
+            }
+            response = requests.post(f'{base_url}/oauth/token', data=payload)
+            oauth = response.json()
+            self.accessToken = oauth.get('access_token')
+            self.savedToken = oauth
+            now = datetime.datetime.now()
+            self.savedToken["expires_at"] = str(now + datetime.timedelta(seconds=oauth["expires_in"]))
+            self.redisConn.addContentJSON(self.redisKey, {"accessToken": self.accessToken, "savedToken": self.savedToken})
+        else:
+            self.savedToken = alreadySavedToken["savedToken"]
+            self.accessToken = alreadySavedToken["accessToken"]
     #######################################################
     def checkIfExpired(self):
         """
         Check if token has expired and if so, request a new one. 
         """
         # check if token has expired
-        if "expired_at" not in self.savedToken or datetime.datetime.now() > self.savedToken["expires_at"]:
+        if "expires_at" not in self.savedToken or datetime.datetime.now() > datetime.datetime.strptime(self.savedToken["expires_at"],"%Y-%m-%d %H:%M:%S.%f"):
             # it has, request new token
-            self.getAccessToken()
+            self.getAccessToken(expired=True)
 
 #######################################################
 apiToken = ManageAPIToken()

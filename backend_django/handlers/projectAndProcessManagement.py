@@ -21,13 +21,49 @@ from ..utilities import crypto, rights
 
 from ..services.postgresDB import pgProcesses, pgProfiles
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, Logging, processStatus
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging, ProcessStatus
 
 from ..services import redis
 from ..services.processes import price, collectAndSend
 
 logger = logging.getLogger("logToFile")
 ################################################################################################
+
+#######################################################
+
+def fireWebsocketEvents(projectID, processID, session, event, operation=""):
+    """
+    Fire websocket event from a list for a specific project and process. 
+    If it should fire for only specific operations like messages or files, specify so.
+    
+    :param projectID: The project ID
+    :type projectID: Str
+    :param processID: The process ID
+    :type processID: Str
+    :param session: The session of the current user
+    :type session: Dict
+    :param event: The event to fire
+    :type event: Str
+    :param operation: Nothing or messages, files, ...
+    :type operation: Str
+    :return: Nothing
+    :rtype: None
+    """
+ 
+    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, [processID], event)
+    channel_layer = get_channel_layer()
+    for userID in dictForEvents: # user/orga that is associated with that process
+        values = dictForEvents[userID] # message, formatted for frontend
+        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+        if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
+            userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+            for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+                if operation=="" or operation in permission:
+                    async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                        "type": "sendMessageJSON",
+                        "dict": values,
+                    })
+
 # Projects
 
 #######################################################
@@ -245,17 +281,22 @@ def updateProcess(request):
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, {})
                         else:        
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
-                    elif elem == "messages":
+                        fireWebsocketEvents(projectID, processID, request.session, "service")
+                    elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.messages, changes["changes"]["messages"])
-                    elif elem == "files":
+                        fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
+                    elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
+                        fireWebsocketEvents(projectID, processID, request.session, "files", "files")
                     elif elem == "contractor":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
                     elif elem == "details":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
-                    else:
-                        # status
+                    elif elem == "status":
                         returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
+                        fireWebsocketEvents(projectID, processID, request.session, "status")
+                    else:
+                        raise Exception("updateProcess change " + elem + " not implemented")
 
                     if isinstance(returnVal, Exception):
                         raise returnVal
@@ -264,34 +305,22 @@ def updateProcess(request):
                         returnVal = True
                         if elem == "service": # service is a dict in itself      
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.service, changes["deletions"]["service"])
-                        elif elem == "messages":
+                        elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.messages, changes["deletions"]["messages"])
-                        elif elem == "files":
+                        elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.files, changes["deletions"]["files"])
                         elif elem == "contractor":
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.contractor, changes["deletions"]["contractor"])
                         elif elem == "details":
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
-                        else:
-                            # status
+                        elif elem == "status":
                             returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["status"])
-
+                        else:
+                            raise Exception("updateProcess delete " + elem + " not implemented")
                         if isinstance(returnVal, Exception):
                             raise returnVal
-                
-                # websocket
-                dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID)
-                channel_layer = get_channel_layer()
-                for userID in dictForEvents: # user/orga that is associated with that process
-                    values = dictForEvents[userID] # message, formatted for frontend
-                    subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-                    if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
-                        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                        for permission in rights.rightsManagement.getPermissionsNeededForPath(__name__):
-                            async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                                "type": "sendMessageJSON",
-                                "dict": values,
-                            })
+
+                # logging
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
             else:
@@ -416,18 +445,18 @@ def getProject(request, projectID):
 #######################################################
 @checkIfUserIsLoggedIn()
 @checkIfRightsAreSufficient(json=True)
-def retrieveProcesses(request):
+def retrieveProjects(request):
     """
-    Retrieve all saved processes.
+    Retrieve all saved projects with processes.
 
     :param request: GET Request
     :type request: HTTP GET
-    :return: JSON Response with processes of that user
+    :return: JSON Response with projects/processes of that user
     :rtype: JSON Response
 
     """
 
-    return JsonResponse(pgProcesses.processManagement[request.session["pgProcessClass"]].getProcesses(request.session), safe=False)
+    return JsonResponse(pgProcesses.processManagement[request.session["pgProcessClass"]].getProjects(request.session), safe=False)
     
 
 #######################################################
@@ -447,7 +476,7 @@ def getMissedEvents(request):
 
     user = pgProfiles.ProfileManagementBase.getUser(request.session)
     lastLogin = user["lastSeen"]
-    projects = pgProcesses.processManagement[request.session["pgProcessClass"]].getProcesses(request.session)
+    projects = pgProcesses.processManagement[request.session["pgProcessClass"]].getProjects(request.session)
 
     output = {"eventType": "projectEvent", "events": []}
 
@@ -461,7 +490,7 @@ def getMissedEvents(request):
             newMessagesCount = 0
             chat = process["messages"]["messages"]
             for messages in chat:
-                if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%d %H:%M:%S.%f+00:00')) and messages["userID"] != user["hashedID"]:
+                if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages["userID"] != user["hashedID"]:
                     newMessagesCount += 1
             if lastLogin < timezone.make_aware(datetime.strptime(process["updated"], '%Y-%m-%d %H:%M:%S.%f+00:00')):
                 status = 1
@@ -610,7 +639,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["VERIFIED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("VERIFIED"))
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -650,18 +679,18 @@ def sendProject(request):
         # TODO send to manufacturer(s))
         # TODO set status to send/requested 
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, processStatus["REQUESTED"])
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("REQUESTED"))
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             # TODO save in db of received processes for manufacturer
             
         # TODO Websocket Events
-        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID)
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processesIDArray, "status")
         channel_layer = get_channel_layer()
         for userID in dictForEvents: # user/orga that is associated with that process
             values = dictForEvents[userID] # message, formatted for frontend
             subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-            if userID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
+            if subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
                 userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
                 for permission in rights.rightsManagement.getPermissionsNeededForPath(sendProject.__name__):
                     async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
