@@ -122,7 +122,6 @@ def organizations_getInviteLink(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -165,7 +164,6 @@ def organizations_addUser(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -207,7 +205,6 @@ def organizations_fetchUsers(request):
     """
     try:
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -257,8 +254,6 @@ def organizations_deleteUser(request):
     """
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
-
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -313,7 +308,6 @@ def organizations_createRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -362,7 +356,6 @@ def organizations_assignRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -415,7 +408,6 @@ def organizations_removeRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -467,7 +459,6 @@ def organizations_editRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -518,7 +509,7 @@ def organizations_getRoles(request):
     :rtype: JSON or error
     """
     try:
-        auth0.apiToken.checkIfExpired()
+
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -566,7 +557,6 @@ def organizations_deleteRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -607,7 +597,6 @@ def organizations_setPermissionsForRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -665,7 +654,6 @@ def organizations_getPermissions(request):
     :rtype: JSON or error
     """ 
     try:
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -702,7 +690,6 @@ def organizations_getPermissionsForRole(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -740,7 +727,6 @@ def organizations_createNewOrganization(request):
     try:
         content = json.loads(request.body.decode("utf-8"))["data"]
 
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',

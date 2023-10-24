@@ -131,7 +131,7 @@ class ManageAPIToken:
     Manage oauth token class.
     """
     savedToken = {}
-    accessToken = ""
+    accessTokenString = ""
     redisConn = RedisConnection()
     redisKey = "auth0_access_token"
 
@@ -139,20 +139,24 @@ class ManageAPIToken:
     #######################################################
     def __getattr__(self, item):
         if item == "accessToken":
-            if self.accessToken == "":
+            if self.accessTokenString == "":
                 self.getAccessToken()
-            return self.accessToken
+            return self.accessTokenString
         else:
             raise AttributeError
 
     #######################################################
-    def getAccessToken(self, expired=False):
+    def getAccessToken(self):
         """
         Get initial token. Made as a function to be callable from outside. 
+
+        :return: Nothing
+        :rtype: None
+
         """
         alreadySavedToken, exists = self.redisConn.retrieveContentJSON(self.redisKey)
-        if not exists or expired: 
-
+        # check if token exists or has expired
+        if not exists or "expires_at" not in self.savedToken or datetime.datetime.now() > datetime.datetime.strptime(self.savedToken["expires_at"],"%Y-%m-%d %H:%M:%S.%f"):
             # Configuration Values
             audience = f'https://{settings.AUTH0_DOMAIN}/api/v2/'
 
@@ -166,23 +170,14 @@ class ManageAPIToken:
             }
             response = requests.post(f'{base_url}/oauth/token', data=payload)
             oauth = response.json()
-            self.accessToken = oauth.get('access_token')
+            self.accessTokenString = oauth.get('access_token')
             self.savedToken = oauth
             now = datetime.datetime.now()
             self.savedToken["expires_at"] = str(now + datetime.timedelta(seconds=oauth["expires_in"]))
-            self.redisConn.addContentJSON(self.redisKey, {"accessToken": self.accessToken, "savedToken": self.savedToken})
+            self.redisConn.addContentJSON(self.redisKey, {"accessToken": self.accessTokenString, "savedToken": self.savedToken})
         else:
             self.savedToken = alreadySavedToken["savedToken"]
-            self.accessToken = alreadySavedToken["accessToken"]
-    #######################################################
-    def checkIfExpired(self):
-        """
-        Check if token has expired and if so, request a new one. 
-        """
-        # check if token has expired
-        if "expires_at" not in self.savedToken or datetime.datetime.now() > datetime.datetime.strptime(self.savedToken["expires_at"],"%Y-%m-%d %H:%M:%S.%f"):
-            # it has, request new token
-            self.getAccessToken(expired=True)
+            self.accessTokenString = alreadySavedToken["accessToken"]
 
 #######################################################
 apiToken = ManageAPIToken()

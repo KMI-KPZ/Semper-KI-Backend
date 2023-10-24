@@ -240,88 +240,90 @@ def updateProcess(request):
         now = timezone.now()
         changes = json.loads(request.body.decode("utf-8"))
         projectID = changes["projectID"]
-        processID = changes["processID"]
+        processIDs = changes["processIDs"] # list of processIDs
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
             # changes
-            for elem in changes["changes"]:
-                if elem == "service": # service is a dict in itself
-                    if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
-                            request.session["currentProjects"][projectID]["processes"][processID] = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {}}
+            for processID in processIDs:
+                for elem in changes["changes"]:
+                    if elem == "service": # service is a dict in itself
+                        if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
+                                request.session["currentProjects"][projectID]["processes"][processID] = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {}}
+                        else:
+                            for entry in changes["changes"]["service"]:
+                                request.session["currentProjects"][projectID]["processes"][processID]["service"][entry] = changes["changes"]["service"][entry]
+                    elif elem == "messages":
+                        request.session["currentProjects"][projectID]["processes"][processID]["messages"]["messages"].append(changes["changes"]["messages"])
+                    elif elem == "files":
+                        request.session["currentProjects"][projectID]["processes"][processID]["files"]["files"] = changes["changes"]["files"]
+                        # status, contractor
+                    elif elem == "details":
+                        for entry in changes["changes"]["details"]:
+                            request.session["currentProjects"][projectID]["processes"][processID]["details"][entry] = changes["changes"]["details"][entry]
                     else:
-                        for entry in changes["changes"]["service"]:
-                            request.session["currentProjects"][projectID]["processes"][processID]["service"][entry] = changes["changes"]["service"][entry]
-                elif elem == "messages":
-                    request.session["currentProjects"][projectID]["processes"][processID]["messages"]["messages"].append(changes["changes"]["messages"])
-                elif elem == "files":
-                    request.session["currentProjects"][projectID]["processes"][processID]["files"]["files"] = changes["changes"]["files"]
-                    # status, contractor
-                elif elem == "details":
-                    for entry in changes["changes"]["details"]:
-                        request.session["currentProjects"][projectID]["processes"][processID]["details"][entry] = changes["changes"]["details"][entry]
-                else:
-                    request.session["currentProjects"][projectID]["processes"][processID][elem] = changes["changes"][elem]
-            # deletions
-            if "deletions" in changes:
-                for elem in changes["deletions"]:
-                    if len(changes["deletions"][elem]) > 0:
-                        for entry in changes["deletions"][elem]:
-                            del request.session["currentProjects"][projectID]["processes"][processID][elem][entry]
-                    else:
-                        del request.session["currentProjects"][projectID]["processes"][processID][elem]
+                        request.session["currentProjects"][projectID]["processes"][processID][elem] = changes["changes"][elem]
+                # deletions
+                if "deletions" in changes:
+                    for elem in changes["deletions"]:
+                        if len(changes["deletions"][elem]) > 0:
+                            for entry in changes["deletions"][elem]:
+                                del request.session["currentProjects"][projectID]["processes"][processID][elem][entry]
+                        else:
+                            del request.session["currentProjects"][projectID]["processes"][processID][elem]
             
-            request.session["currentProjects"][projectID]["processes"][processID]["updated"] = str(now)
+                request.session["currentProjects"][projectID]["processes"][processID]["updated"] = str(now)
+            
             request.session.modified = True
         else:
             # database version
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
-                for elem in changes["changes"]:
-                    returnVal = True
-                    if elem == "service": # service is a dict in itself
-                        if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, {})
-                        else:        
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
-                        fireWebsocketEvents(projectID, processID, request.session, "service")
-                    elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.messages, changes["changes"]["messages"])
-                        fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
-                    elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
-                        fireWebsocketEvents(projectID, processID, request.session, "files", "files")
-                    elif elem == "contractor":
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
-                    elif elem == "details":
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
-                    elif elem == "status":
-                        returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
-                        fireWebsocketEvents(projectID, processID, request.session, "status")
-                    else:
-                        raise Exception("updateProcess change " + elem + " not implemented")
-
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-                if "deletions" in changes:
-                    for elem in changes["deletions"]:
+                for processID in processIDs:
+                    for elem in changes["changes"]:
                         returnVal = True
-                        if elem == "service": # service is a dict in itself      
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.service, changes["deletions"]["service"])
+                        if elem == "service": # service is a dict in itself
+                            if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
+                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, {})
+                            else:        
+                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
+                            fireWebsocketEvents(projectID, processID, request.session, "service", "edit")
                         elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.messages, changes["deletions"]["messages"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.messages, changes["changes"]["messages"])
+                            fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
                         elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.files, changes["deletions"]["files"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
+                            fireWebsocketEvents(projectID, processID, request.session, "files", "files")
                         elif elem == "contractor":
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.contractor, changes["deletions"]["contractor"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
                         elif elem == "details":
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
                         elif elem == "status":
-                            returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["status"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
+                            fireWebsocketEvents(projectID, processID, request.session, "status", "edit")
                         else:
-                            raise Exception("updateProcess delete " + elem + " not implemented")
+                            raise Exception("updateProcess change " + elem + " not implemented")
+
                         if isinstance(returnVal, Exception):
                             raise returnVal
-
-                # logging
-                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+                    if "deletions" in changes:
+                        for elem in changes["deletions"]:
+                            returnVal = True
+                            if elem == "service": # service is a dict in itself      
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.service, changes["deletions"]["service"])
+                            elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.messages, changes["deletions"]["messages"])
+                            elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.files, changes["deletions"]["files"])
+                            elif elem == "contractor":
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.contractor, changes["deletions"]["contractor"])
+                            elif elem == "details":
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
+                            elif elem == "status":
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["status"])
+                            else:
+                                raise Exception("updateProcess delete " + elem + " not implemented")
+                            if isinstance(returnVal, Exception):
+                                raise returnVal
+                    # logging
+                    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
             else:
                 return HttpResponse("Not logged in", status=401)
@@ -435,7 +437,7 @@ def getProject(request, projectID):
                 return JsonResponse(outDict)
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
-            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID, pgProfiles.ProfileManagementBase.getUserHashID(request.session), pgProfiles.ProfileManagementBase.getOrgaHashID(request.session)))
 
         return JsonResponse(outDict)
     except (Exception) as error:
@@ -622,18 +624,20 @@ def verifyProject(request):
         processesIDArray = info["processIDs"]
 
         # first save projects
-        if request.session["isPartOfOrganization"]:
-            error = pgProcesses.ProcessManagementOrganization.addProjectToDatabase(request.session)
-        else:
-            error = pgProcesses.ProcessManagementUser.addProjectToDatabase(request.session)
-        if isinstance(error, Exception):
-            raise error
+        if "currentProjects" in request.session:
+            if request.session["isPartOfOrganization"]:
+                error = pgProcesses.ProcessManagementOrganization.addProjectToDatabase(request.session)
+            else:
+                error = pgProcesses.ProcessManagementUser.addProjectToDatabase(request.session)
+            if isinstance(error, Exception):
+                raise error
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
-        
-        # then clear drafts from session
-        request.session["currentProjects"].clear()
-        del request.session["currentProjects"]
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+            
+            # then clear drafts from session
+            
+            request.session["currentProjects"].clear()
+            del request.session["currentProjects"]
 
 
         # TODO start services and set status to "verifying" instead of verified
@@ -649,6 +653,9 @@ def verifyProject(request):
         # TODO Websocket Event
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
+
+        if sendToManufacturerAfterVerification:
+            sendProject(request)
 
         return HttpResponse("Success")
     
@@ -706,3 +713,5 @@ def sendProject(request):
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed")
+
+
