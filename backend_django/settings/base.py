@@ -68,6 +68,9 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'COYPUPASSWORD': {'var': 'COYPU_PASSWORD',
                           'hint': 'COYPU password for authentication services for management via m2m calls',
                           'default': None, 'required': True},
+        'AWS_ENDPOINT': {'var': 'AWS_ENDPOINT', 'hint': 'IP Adress of the AWS cloud storage', 'default': None, 'required': True},
+        'AWS_ACCESS_KEY': {'var': 'AWS_ACCESS_KEY', 'hint': 'AWS equivalent of user name', 'default': None, 'required': True},
+        'AWS_SECRET': {'var': 'AWS_SECRET', 'hint': 'AWS equivalent of password', 'default': None, 'required': True},
     }
 
     env_vars_internal = {
@@ -98,6 +101,9 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         #                    'hint': 'Celery result backend?', 'required': True},
 
         # Allowed hosts
+        'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Adress of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
+        'LOCALSTACK_ACCESS_KEY': {'var': 'LOCALSTACK_ACCESS_KEY', 'hint': 'AWS equivalent of user name, can be anything', 'default': 'test','required': True},
+        'LOCALSTACK_SECRET': {'var': 'LOCALSTACK_SECRET', 'hint': 'AWS equivalent of password, can be anything', 'default': 'test','required': True},
         'ALLOWED_HOSTS': {'var': 'ALLOWED_HOSTS', 'hint': 'Allowed hosts for the backend API calls, comma separated',
                           'type': 'list',
                           'default': 'localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},

@@ -6,10 +6,15 @@ Silvio Weging 2023
 Contains: File upload handling
 """
 
-import datetime
+import asyncio, json, logging, zipfile
+
+from datetime import datetime
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
-import asyncio, json, logging
+
+from io import BytesIO
 from django.views.decorators.http import require_http_methods
+
+from django.utils import timezone
 
 from ..utilities import crypto, mocks, stl
 
@@ -17,9 +22,190 @@ from ..services.postgresDB import pgProfiles, pgProcesses
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
 
-from ..services import redis
+from ..handlers.projectAndProcessManagement import updateProcessFunction
+
+from ..services import redis, aws
 
 logger = logging.getLogger("logToFile")
+
+#######################################################
+@require_http_methods(["POST"])
+def uploadModel(request):
+    """
+    File upload for 3D model
+
+    :param request: request
+    :type request: HTTP POST
+    :return: Response with information about the file
+    :rtype: JSONResponse
+
+    """
+    try:
+        info = json.loads(request.body.decode("utf-8"))
+        projectID = info["projectID"]
+        processID = info["processID"]
+        fileTags = info["model"]["tags"]
+        fileLicense = info["model"]["license"]
+        fileCertificates = info["model"]["certificate"]
+
+        fileName = list(request.FILES.keys())[0]
+        fileID = crypto.generateURLFriendlyRandomString()
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        
+        model = {"model": {}}
+        model["model"]["id"] = fileID
+        model["model"]["title"] = fileName
+        model["model"]["tags"] = fileTags
+        model["model"]["date"] = str(timezone.now())
+        model["model"]["license"] = fileLicense
+        model["model"]["certificate"] = fileCertificates
+        model["model"]["createdBy"] = userName
+
+        returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
+        if returnVal is not True:
+            return JsonResponse({}, status=500)
+        
+        # Save into files field of the process
+        changes = {"changes": {"files": [model]}}
+        message, flag = updateProcessFunction(request, changes, projectID, processID)
+        if flag is False:
+            return JsonResponse({}, status=401)
+        if isinstance(message, Exception):
+            raise message
+        
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},model {fileName},"+str(datetime.now()))
+        return JsonResponse(model)
+    except (Exception) as error:
+        print(error)
+        return JsonResponse({}, status=500)
+
+#######################################################
+@require_http_methods(["POST"])
+def uploadFiles(request):
+    """
+    Generic file upload for a process
+
+    :param request: Request with files in it
+    :type request: HTTP POST
+    :return: Successful or not
+    :rtype: HTTP Response
+    """
+    try:
+        info = json.loads(request.body.decode("utf-8"))
+        projectID = info["projectID"]
+        processID = info["processID"]
+        fileNames = list(request.FILES.keys())
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+
+        changes = {"changes": {"files": []}}
+        for fileName in fileNames:
+            fileDetails = {fileName: {}}
+            fileID = crypto.generateURLFriendlyRandomString()
+            fileDetails[fileName]["id"] = fileID
+            fileDetails[fileName]["title"] = fileName
+            fileDetails[fileName]["date"] = str(timezone.now())
+            fileDetails[fileName]["createdBy"] = userName
+
+            returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
+            if returnVal is not True:
+                return JsonResponse({}, status=500)
+
+            changes["changes"]["files"].append(fileDetails)
+        
+        # Save into files field of the process
+        message, flag = updateProcessFunction(request, changes, projectID, processID)
+        if flag is False:
+            return JsonResponse({}, status=401)
+        if isinstance(message, Exception):
+            raise message
+
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},files,"+str(datetime.now()))
+        return HttpResponse("Success")
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed", status=500)
+    
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+def downloadFile(request, processID, fileID):
+    """
+    Send file to user from storage
+
+    :param request: Request of user for a specific file of a process
+    :type request: HTTP POST
+    :param processID: process ID
+    :type processID: Str
+    :param fileID: file ID
+    :type fileID: Str
+    :return: Saved content
+    :rtype: FileResponse
+
+    """
+    try:
+        currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        for elem in currentProcess.files:
+            if elem["id"] == fileID:
+                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
+                if Flag is False:
+                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
+                    if Flag is False:
+                        return HttpResponse("Not found!", status=404)
+                    
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {elem['title']}," + str(datetime.now()))
+                    
+                return FileResponse(content, filename=elem["title"], as_attachment=True) #, content_type='multipart/form-data')
+    
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed", status=500)
+
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+def downloadFilesAsZip(request, processID):
+    """
+    Send files to user as zip
+
+    :param request: Request of user for all selected files of a process
+    :type request: HTTP POST
+    :param processID: process ID
+    :type processID: Str
+    :return: Saved content
+    :rtype: FileResponse
+
+    """
+    try:
+        fileIDs = request.get('fileIDs')
+        filesArray = []
+
+        currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        for elem in currentProcess.files:
+            if elem["id"] in fileIDs:
+                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+elem["id"])
+                if Flag is False:
+                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+elem["id"])
+                    if Flag is False:
+                        return HttpResponse("Not found!", status=404)
+                
+                filesArray.append( (elem["title"], content) )
+
+
+        zipFile = BytesIO()
+        with zipfile.ZipFile(zipFile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for f in filesArray:
+                zf.writestr(f[0], f[1])
+
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
+        return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')
+
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed", status=500)
+
+############################################################################################
 #######################################################
 @require_http_methods(["GET"])
 def testRedis(request):
@@ -49,130 +235,59 @@ def testRedis(request):
     #     }
     #     return JsonResponse(response, 201)
 
-#######################################################
-@require_http_methods(["POST"])
-def uploadFileTemporary(request):
-    """
-    File upload for temporary use, save into redis.
+# #######################################################
+# @require_http_methods(["POST"])
+# def uploadFileTemporary(request):
+#     """
+#     File upload for temporary use, save into redis.
 
-    :param request: request
-    :type request: HTTP POST
-    :return: Response with success or fail
-    :rtype: HTTPResponse
+#     :param request: request
+#     :type request: HTTP POST
+#     :return: Response with success or fail
+#     :rtype: HTTPResponse
 
-    """
-    if request.method == "POST":
-        key = request.session.session_key
-        fileNames = list(request.FILES.keys())[0]
-        files = []
-        for name in fileNames:
-            files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)[0]) )
+#     """
+#     if request.method == "POST":
+#         key = request.session.session_key
+#         fileNames = list(request.FILES.keys())[0]
+#         files = []
+#         for name in fileNames:
+#             files.append( (crypto.generateMD5(name + crypto.generateSalt()), name, request.FILES.getlist(name)[0]) )
 
-        returnVal = redis.RedisConnection().addContent(key, files)
-        if returnVal is True:
-            return HttpResponse("Success", status=200)
-        else:
-            return HttpResponse(returnVal, status=500)
+#         returnVal = redis.RedisConnection().addContent(key, files)
+#         if returnVal is True:
+#             return HttpResponse("Success", status=200)
+#         else:
+#             return HttpResponse(returnVal, status=500)
     
-    return HttpResponse("Wrong request method!", status=405)
+#     return HttpResponse("Wrong request method!", status=405)
 
 #######################################################
-async def createPreviewForOneFile(inMemoryFile):
-    return await stl.stlToBinJpg(inMemoryFile)
+# async def createPreviewForOneFile(inMemoryFile):
+#     return await stl.stlToBinJpg(inMemoryFile)
 
-async def createPreview(listOfFiles, fileNames):
-    return await asyncio.gather(*[createPreviewForOneFile(listOfFiles.getlist(fileName)[0]) for fileName in fileNames])
+# async def createPreview(listOfFiles, fileNames):
+#     return await asyncio.gather(*[createPreviewForOneFile(listOfFiles.getlist(fileName)[0]) for fileName in fileNames])
 
-@require_http_methods(["POST"])
-def uploadModels(request):
-    """
-    File(s) upload for temporary use, save into redis. File(s) are 3D models
 
-    :param request: request
-    :type request: HTTP POST
-    :return: Response with mock model of uploaded file
-    :rtype: HTTPResponse
+# #######################################################
+# def getUploadedFiles(session_key):
+#     """
+#     Retrieve temporary files from redis.
 
-    """
-    try:
-        key = request.session.session_key
-        fileNames = list(request.FILES.keys())
-        files = []
-        models = {"models": []}
+#     :param session_key: session_key of user
+#     :type session_key: string
+#     :return: Saved content
+#     :rtype: tuple
 
-        previews = asyncio.run(createPreview(request.FILES, fileNames))
+#     """
+#     #(contentOrError, Flag) = redis.RedisConnection().retrieveContent(session_key)
+#     contentOrError, Flag = aws.manageLocalAWS.downloadFile(session_key)
+#     if Flag is True:
+#         return contentOrError
+#     else:
+#         return None
 
-        for idx, name in enumerate(fileNames):
-            id = crypto.generateMD5(name + crypto.generateSalt())
-
-            model = mocks.getEmptyMockModel()
-            model["id"] = id
-            model["title"] = name
-            model["URI"] = str(previews[idx])
-            model["createdBy"] = "user"
-            models["models"].append(model)
-
-            # stl.binToJpg(previews[idx])
-
-            files.append( (id, name, previews[idx], request.FILES.getlist(name)[0]) )
-        returnVal = redis.RedisConnection().addContent(key, files)
-        if returnVal is not True:
-            return HttpResponse(returnVal, status=500)
-
-        return JsonResponse(models)
-    except (Exception) as error:
-        print(error)
-        return HttpResponse(error, status=500)
-
-#######################################################
-def getUploadedFiles(session_key):
-    """
-    Retrieve temporary files from redis.
-
-    :param session_key: session_key of user
-    :type session_key: string
-    :return: Saved content
-    :rtype: tuple
-
-    """
-    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(session_key)
-    if Flag is True:
-        return contentOrError
-    else:
-        return None
-
-#######################################################
-def testGetUploadedFiles(request):
-    return HttpResponse(getUploadedFiles(request.session.session_key), content_type='multipart/form-data')
-
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["POST"])
-@checkIfRightsAreSufficient(json=False)
-def downloadFiles(request):
-    """
-    Send file to user from temporary, later permanent storage
-
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
-    :return: Saved content
-    :rtype: HTTP Response
-
-    """
-
-    content = json.loads(request.body.decode("utf-8"))
-    processID = content["processID"]
-    fileName = content["filename"]
-    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-    for idx, elem in enumerate(currentProcess.files):
-        if fileName == elem["filename"]:
-            (contentOrError, Flag) = redis.RedisConnection().retrieveContent(elem["path"])
-            if Flag:
-                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileName}," + str(datetime.datetime.now()))
-                return HttpResponse(contentOrError[idx][3], content_type='multipart/form-data')
-                #return FileResponse(contentOrError[idx][3].seek(0)) #, content_type='multipart/form-data')
-            else:
-                return HttpResponse(contentOrError, status=500)
-    return HttpResponse("Not found!", status=404)
-
-    
+# #######################################################
+# def testGetUploadedFiles(request):
+#     return HttpResponse(getUploadedFiles(request.session.session_key), content_type='multipart/form-data')

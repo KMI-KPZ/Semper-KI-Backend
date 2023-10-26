@@ -89,7 +89,7 @@ def updateDetailsOfOrganization(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))["data"]["content"]
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserNamer(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
@@ -110,7 +110,7 @@ def deleteOrganization(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
         return HttpResponse("Worked")
@@ -150,7 +150,7 @@ def updateDetails(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.SELF},details," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.SELF},details," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Worked")
@@ -171,7 +171,7 @@ def deleteUser(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.deleteUser(request.session)
     if flag is True:
         return HttpResponse("Worked")

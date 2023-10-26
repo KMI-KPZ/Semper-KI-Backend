@@ -154,6 +154,24 @@ class ProcessManagementBase():
         except (Exception) as error:
             print(error)
         return []
+    
+    ##############################################
+    @staticmethod
+    def getProjectIDViaProcessID(processID):
+        """
+        Get Project ID from the Process ID
+
+        :param processID: unique process ID
+        :type processID: str
+        :return: project ID
+        :rtype: str
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            return currentProcess.projectKey.projectID
+        except (Exception) as error:
+            print(error)
+            return ""
 
     ##############################################
     @staticmethod
@@ -269,7 +287,8 @@ class ProcessManagementBase():
                 currentProcess.status = content
                 
             elif updateType == EnumUpdates.files:
-                currentProcess.files = content
+                for entry in content:
+                    currentProcess.files[entry] = content[entry]
                 
             elif updateType == EnumUpdates.service:
                 for entry in content:

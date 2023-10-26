@@ -32,7 +32,6 @@ class OAuthLazy(OAuth):
 
 
 def auth0Register(instance):
-    from django.conf import settings
     print('initialisiere auth0')
     instance.register(
         "auth0",
@@ -81,7 +80,6 @@ def authorizeRedirect(request, callback):
 #######################################################################################
 
 def auth0OrgaRegister(instance: OAuth):
-    from django.conf import settings
     instance.register(
         "auth0Orga",
         client_id=settings.AUTH0_ORGA_CLIENT_ID,

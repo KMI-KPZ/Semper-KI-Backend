@@ -27,8 +27,11 @@
              "ProjectFile"
          ],
          "paths": [
-            "downloadFiles",
-            "updateProcess"
+            "updateProcess",
+            "downloadFilesAsZip",
+            "downloadFile",
+            "uploadFiles",
+            "uploadModel"
          ]
       },
       {

@@ -45,6 +45,28 @@ class ProfileManagementBase():
             print(error)
 
         return obj
+ 
+        
+    ##############################################
+    @staticmethod
+    def getUserName(session):
+        """
+        Check whether a user exists or not and retrieve entry.
+
+        :param session: session
+        :type session: Dictionary
+        :return: User details from database
+        :rtype: Dictionary
+
+        """
+        if "user" in session and "userinfo" in session["user"]:
+            userID = session["user"]["userinfo"]["sub"]
+            try:
+                obj = User.objects.get(subID=userID).toDict()
+                return obj["name"]
+            except (Exception) as error:
+                print(error)
+        return "anonymous"
     
     ##############################################
     @staticmethod

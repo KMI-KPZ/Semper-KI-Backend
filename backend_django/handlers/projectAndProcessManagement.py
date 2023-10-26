@@ -143,7 +143,7 @@ def updateProject(request):
                 #             "type": "sendMessageJSON",
                 #             "dict": outputDict,
                 #         })
-                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
 
             else:
                 return HttpResponse("Not logged in", status=401)
@@ -225,22 +225,19 @@ def createProcessID(request, projectID):
         return JsonResponse({}, status=500)
 
 #######################################################
-@require_http_methods(["PATCH"])
-def updateProcess(request):
+def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
     """
-    Update stuff about the process
-
-    :param request: Request with content
-    :type request: HTTP PATCH
+    Update process logic
+    
+    :param projectID: Project ID
+    :type projectID: Str
+    :param projectID: Process ID
+    :type projectID: Str
     :return: Message if it worked or not
-    :rtype: HTTPResponse
-
+    :rtype: Str, bool or Error
     """
     try:
         now = timezone.now()
-        changes = json.loads(request.body.decode("utf-8"))
-        projectID = changes["projectID"]
-        processIDs = changes["processIDs"] # list of processIDs
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
             # changes
             for processID in processIDs:
@@ -254,7 +251,8 @@ def updateProcess(request):
                     elif elem == "messages":
                         request.session["currentProjects"][projectID]["processes"][processID]["messages"]["messages"].append(changes["changes"]["messages"])
                     elif elem == "files":
-                        request.session["currentProjects"][projectID]["processes"][processID]["files"]["files"] = changes["changes"]["files"]
+                        for entry in changes["changes"]["files"]:
+                            request.session["currentProjects"][projectID]["processes"][processID]["files"][entry] = changes["changes"]["files"][entry]
                         # status, contractor
                     elif elem == "details":
                         for entry in changes["changes"]["details"]:
@@ -323,10 +321,39 @@ def updateProcess(request):
                             if isinstance(returnVal, Exception):
                                 raise returnVal
                     # logging
-                    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+                    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
             else:
-                return HttpResponse("Not logged in", status=401)
+                return ("", False)
+            
+        return ("", True)
+    except (Exception) as error:
+        return (error, True)
+
+
+
+#######################################################
+@require_http_methods(["PATCH"])
+def updateProcess(request):
+    """
+    Update stuff about the process
+
+    :param request: Request with content
+    :type request: HTTP PATCH
+    :return: Message if it worked or not
+    :rtype: HTTPResponse
+
+    """
+    try:
+        changes = json.loads(request.body.decode("utf-8"))
+        projectID = changes["projectID"]
+        processIDs = changes["processIDs"] # list of processIDs
+        
+        message, flag = updateProcessFunction(request, changes, projectID, processIDs)
+        if flag is False:
+            return HttpResponse("Not logged in", status=401)
+        if isinstance(message, Exception):
+            raise message
 
         return HttpResponse("Success")
     except (Exception) as error:
@@ -337,27 +364,28 @@ def updateProcess(request):
 @require_http_methods(["DELETE"])
 def deleteProcess(request, projectID, processID):
     """
-    Delete one process
+    Delete one or more processes
 
     :param request: DELETE Request
     :type request: HTTP DELETE
     :param projectID: id of the project
     :type projectID: str
-    :param processID: id of the process
-    :type processID: str
     :return: Success or not
     :rtype: HTTPRespone
 
     """
     try:
-        if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
-            del request.session["currentProjects"][projectID]["processes"][processID]
-            request.session.modified = True
+        body = json.loads(request.body.decode("utf-8"))
+        processIDs = body["processIDs"]
+        for processID in processIDs:
+            if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
+                del request.session["currentProjects"][projectID]["processes"][processID]
+                request.session.modified = True
 
-        elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcess.__name__):
-            pgProcesses.ProcessManagementBase.deleteProcess(processID)
-        else:
-            raise Exception("Not logged in or rights insufficient!")
+            elif manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcess.__name__):
+                pgProcesses.ProcessManagementBase.deleteProcess(processID)
+            else:
+                raise Exception("Not logged in or rights insufficient!")
         
         return HttpResponse("Success")
     except (Exception) as error:
@@ -563,7 +591,7 @@ def saveProjectsViaWebsocket(session):
                 error = pgProcesses.ProcessManagementUser.addProjectToDatabase(session)
             if isinstance(error, Exception):
                 raise error
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         return None
     
     except (Exception) as error:
@@ -595,7 +623,7 @@ def saveProjects(request):
         if isinstance(error, Exception):
             raise error
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         return HttpResponse("Success")
     
     except (Exception) as error:
@@ -632,7 +660,7 @@ def verifyProject(request):
             if isinstance(error, Exception):
                 raise error
 
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
             
             # then clear drafts from session
             
@@ -652,7 +680,7 @@ def verifyProject(request):
 
         # TODO Websocket Event
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
 
         if sendToManufacturerAfterVerification:
             sendProject(request)
@@ -683,13 +711,10 @@ def sendProject(request):
         processesIDArray = info["processIDs"]
         # TODO Check if process is verified
 
-        # TODO send to manufacturer(s))
-        # TODO set status to send/requested 
         for entry in processesIDArray:
             pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("REQUESTED"))
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
-            # TODO save in db of received processes for manufacturer
             
         # TODO Websocket Events
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processesIDArray, "status")
@@ -706,7 +731,7 @@ def sendProject(request):
                     })
 
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         
         return HttpResponse("Success")
     

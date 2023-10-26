@@ -142,5 +142,7 @@ quickDebug.py
 
 Ontology/
 
+localstack/
+
 /playground
 

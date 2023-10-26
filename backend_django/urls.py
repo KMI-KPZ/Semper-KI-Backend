@@ -130,9 +130,11 @@ paths = {
     "testCoypu": "public/coypu/",
 
     "testRedis": "private/testRedis/",
-    "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
+    "uploadModel": "public/uploadModel/",
+    "uploadFiles": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
-    "downloadFiles": "public/downloadFiles/",
+    "downloadFile": "public/downloadFile/",
+    "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
 
     "statistics": "public/getStatistics/",
 }
@@ -242,10 +244,12 @@ urlpatterns = [
     path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
     path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
     
-    path(paths["testRedis"], files.testRedis, name="testRedis"),
-    path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
-    path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
-    path(paths["downloadFiles"], files.downloadFiles, name="downloadFiles"),
+    #path(paths["testRedis"], files.testRedis, name="testRedis"),
+    path(paths["uploadModel"], files.uploadModel, name="uploadModel"),
+    path(paths["uploadFiles"], files.uploadFiles, name="uploadFiles"),
+    #path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
+    path(paths["downloadFile"], files.downloadFile, name="downloadFile"),
+    path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
     
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
