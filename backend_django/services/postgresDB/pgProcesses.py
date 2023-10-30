@@ -16,7 +16,7 @@ from backend_django.utilities import crypto, basics
 from ...modelFiles.profileModel import User, Organization
 from ...modelFiles.projectModels import Process, Project
 
-from backend_django.services import redis
+from backend_django.services import redis, aws
 
 #TODO: switch to async versions at some point
 
@@ -188,6 +188,11 @@ class ProcessManagementBase():
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
+            # delete files as well
+            for entry in currentProcess.files:
+                aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, currentProcess.files[entry]["id"])
+            
+            # if that was the last process, delete the project as well
             if len(currentProcess.projectKey.processes.all()) == 1:
                 currentProcess.projectKey.delete()
             else:
@@ -216,6 +221,12 @@ class ProcessManagementBase():
         try:
             #currentUser = User.objects.get(hashedID=userID)
             currentProject = Project.objects.get(projectID=projectID)
+
+            # delete all files from every process as well
+            for process in currentProject.processes.all():
+                for entry in process.files:
+                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, process.files[entry]["id"])
+
             currentProject.delete()
             return True
         except (ObjectDoesNotExist) as error:
@@ -357,7 +368,9 @@ class ProcessManagementBase():
                 currentProcess.status = 0
                 
             elif updateType == EnumUpdates.files:
-                currentProcess.files = []
+                for entry in content:
+                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, currentProcess.files[entry]["id"])
+                    del currentProcess.files[entry]
                 
             elif updateType == EnumUpdates.service:
                 if len(content) > 0:
@@ -695,11 +708,10 @@ class ProcessManagementOrganization(ProcessManagementBase):
                     service = process["service"]
                     status = process["status"]
                     serviceStatus = process["serviceStatus"]
-                    messages = process["chat"]
+                    messages = process["messages"]
                     files = process["files"]
-                    dates = {"created": process["created"], "updated": str(now)}
                     details = process["details"]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "dates": dates, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
 
                     # for contractor in selectedManufacturer:
                     #     contractorObj = Organization.objects.get(hashedID=contractor)

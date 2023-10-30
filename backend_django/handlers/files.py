@@ -20,9 +20,9 @@ from ..utilities import crypto, mocks, stl
 
 from ..services.postgresDB import pgProfiles, pgProcesses
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
+from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
-from ..handlers.projectAndProcessManagement import updateProcessFunction
+from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessFromSession
 
 from ..services import redis, aws
 
@@ -41,33 +41,33 @@ def uploadModel(request):
 
     """
     try:
-        info = json.loads(request.body.decode("utf-8"))
+        info = request.POST 
         projectID = info["projectID"]
         processID = info["processID"]
-        fileTags = info["model"]["tags"]
-        fileLicense = info["model"]["license"]
-        fileCertificates = info["model"]["certificate"]
+        fileTags = info["tags"].split(",")
+        fileLicenses = info["license"].split(",")
+        fileCertificates = info["certificate"].split(",")
 
         fileName = list(request.FILES.keys())[0]
         fileID = crypto.generateURLFriendlyRandomString()
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
-        model = {"model": {}}
-        model["model"]["id"] = fileID
-        model["model"]["title"] = fileName
-        model["model"]["tags"] = fileTags
-        model["model"]["date"] = str(timezone.now())
-        model["model"]["license"] = fileLicense
-        model["model"]["certificate"] = fileCertificates
-        model["model"]["createdBy"] = userName
+        model = {fileName: {}}
+        model[fileName]["id"] = fileID
+        model[fileName]["title"] = fileName
+        model[fileName]["tags"] = fileTags
+        model[fileName]["date"] = str(timezone.now())
+        model[fileName]["licenses"] = fileLicenses
+        model[fileName]["certificates"] = fileCertificates
+        model[fileName]["createdBy"] = userName
 
         returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
         if returnVal is not True:
             return JsonResponse({}, status=500)
         
         # Save into files field of the process
-        changes = {"changes": {"files": [model]}}
-        message, flag = updateProcessFunction(request, changes, projectID, processID)
+        changes = {"changes": {"files": model}}
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
         if isinstance(message, Exception):
@@ -91,29 +91,27 @@ def uploadFiles(request):
     :rtype: HTTP Response
     """
     try:
-        info = json.loads(request.body.decode("utf-8"))
+        info = request.POST
         projectID = info["projectID"]
         processID = info["processID"]
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
 
-        changes = {"changes": {"files": []}}
+        changes = {"changes": {"files": {}}}
         for fileName in fileNames:
-            fileDetails = {fileName: {}}
+            changes["changes"]["files"][fileName] = {}
             fileID = crypto.generateURLFriendlyRandomString()
-            fileDetails[fileName]["id"] = fileID
-            fileDetails[fileName]["title"] = fileName
-            fileDetails[fileName]["date"] = str(timezone.now())
-            fileDetails[fileName]["createdBy"] = userName
+            changes["changes"]["files"][fileName]["id"] = fileID
+            changes["changes"]["files"][fileName]["title"] = fileName
+            changes["changes"]["files"][fileName]["date"] = str(timezone.now())
+            changes["changes"]["files"][fileName]["createdBy"] = userName
 
             returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
                 return JsonResponse({}, status=500)
-
-            changes["changes"]["files"].append(fileDetails)
         
         # Save into files field of the process
-        message, flag = updateProcessFunction(request, changes, projectID, processID)
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
         if isinstance(message, Exception):
@@ -126,9 +124,7 @@ def uploadFiles(request):
         return HttpResponse("Failed", status=500)
     
 #######################################################
-@checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient(json=False)
 def downloadFile(request, processID, fileID):
     """
     Send file to user from storage
@@ -144,27 +140,38 @@ def downloadFile(request, processID, fileID):
 
     """
     try:
-        currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-        for elem in currentProcess.files:
-            if elem["id"] == fileID:
+        # Retrieve the files infos from either the session or the database
+        filesOfThisProcess = {}
+        currentProcess = getProcessFromSession(request.session,processID)
+        if currentProcess != None:
+            filesOfThisProcess = currentProcess["files"]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
+                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                filesOfThisProcess = currentProcess.files
+            else:
+                return HttpResponse("Not logged in or rights insufficient!", status=401)
+
+        # retrieve the correct file and download it from aws to the user
+        for elem in filesOfThisProcess:
+            if "id" in filesOfThisProcess[elem] and filesOfThisProcess[elem]["id"] == fileID:
                 content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
                 if Flag is False:
                     content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
                     if Flag is False:
                         return HttpResponse("Not found!", status=404)
                     
-                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {elem['title']}," + str(datetime.now()))
+                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {filesOfThisProcess[elem]['title']}," + str(datetime.now()))
                     
-                return FileResponse(content, filename=elem["title"], as_attachment=True) #, content_type='multipart/form-data')
-    
+                return FileResponse(content, filename=filesOfThisProcess[elem]["title"], as_attachment=True) #, content_type='multipart/form-data')
+        
+        return HttpResponse("Not found!", status=404)
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed", status=500)
 
 #######################################################
-@checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient(json=False)
 def downloadFilesAsZip(request, processID):
     """
     Send files to user as zip
@@ -178,25 +185,42 @@ def downloadFilesAsZip(request, processID):
 
     """
     try:
-        fileIDs = request.get('fileIDs')
+        fileIDs = request.GET['fileIDs'].split(",")
         filesArray = []
 
-        currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-        for elem in currentProcess.files:
-            if elem["id"] in fileIDs:
-                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+elem["id"])
+        # Retrieve the files infos from either the session or the database
+        filesOfThisProcess = {}
+        currentProcess = getProcessFromSession(request.session,processID)
+        if currentProcess != None:
+            filesOfThisProcess = currentProcess["files"]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
+                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                filesOfThisProcess = currentProcess.files
+            else:
+                return HttpResponse("Not logged in or rights insufficient!", status=401)
+
+        # get files, download them from aws, put them in an array together with their name
+        for elem in filesOfThisProcess:
+            currentEntry = filesOfThisProcess[elem]
+            if "id" in currentEntry and currentEntry["id"] in fileIDs:
+                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+currentEntry["id"])
                 if Flag is False:
-                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+elem["id"])
+                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+currentEntry["id"])
                     if Flag is False:
                         return HttpResponse("Not found!", status=404)
                 
-                filesArray.append( (elem["title"], content) )
+                filesArray.append( (currentEntry["title"], content) )
 
-
+        if len(filesArray) == 0:
+            return HttpResponse("Not found!", status=404)
+        
+        # compress each file and put them in the same zip file, all in memory
         zipFile = BytesIO()
         with zipfile.ZipFile(zipFile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
             for f in filesArray:
-                zf.writestr(f[0], f[1])
+                zf.writestr(f[0], f[1].read())
+        zipFile.seek(0) # reset zip file
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
         return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')

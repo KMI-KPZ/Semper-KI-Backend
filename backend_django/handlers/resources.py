@@ -60,8 +60,8 @@ def onto_getPrinters(request):
     resultsOfQueries = {"printers": []}
     printersRes = cmem.getAllPrinters.sendQuery()
     for elem in printersRes:
-        title = elem["Printer"]["value"]
-        resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
+        title = elem["3DPrinter_name"]["value"]
+        resultsOfQueries["printers"].append({"title": title, "URI": elem["3DPrinter_name"]["value"]})
         
     return JsonResponse(resultsOfQueries)
 

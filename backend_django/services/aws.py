@@ -38,6 +38,7 @@ class ManageAWS():
         :type secret: Str
         """
         self.s3_client = boto3.client("s3", region_name='us-east-1', endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
+        #TODO: avoid this if they've already been created in localstack, avoid this at all costs in AWS
         self.createBucket("other")
         self.createBucket("models")
         self.createBucket("files")
@@ -61,7 +62,7 @@ class ManageAWS():
     #######################################################
     def uploadFile(self, bucketName, fileKey, file):
         """
-        Upload a binary in-memory file to local storage.
+        Upload a binary in-memory file to storage.
 
         :param bucketName: Name of the bucket
         :type bucketName: Str
@@ -82,7 +83,7 @@ class ManageAWS():
     #######################################################
     def downloadFile(self, bucketName, fileKey):
         """
-        Upload a binary in-memory file to local storage.
+        Upload a binary in-memory file to storage.
 
         :param bucketName: Name of the bucket
         :type bucketName: Str
@@ -98,6 +99,24 @@ class ManageAWS():
         if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
             return (output, False)
         return (output, True)
+    
+    #######################################################
+    def deleteFile(self, bucketName, fileKey):
+        """
+        Delete a file from storage.
+
+        :param bucketName: Name of the bucket
+        :type bucketName: Str
+        :param fileKey: The key with which to retrieve the file again later
+        :type fileKey: Str
+        :return: File or error
+        :rtype: BytesIO or Error
+        """
+
+        response = self.s3_client.delete_object(Bucket=bucketName, Key=fileKey)
+        # TODO: if response...
+
+        return True
 
 manageLocalAWS = ManageAWS(settings.LOCALSTACK_ENDPOINT, settings.LOCALSTACK_ACCESS_KEY, settings.LOCALSTACK_SECRET)
 manageRemoteAWS = ManageAWS(settings.AWS_ENDPOINT, settings.AWS_ACCESS_KEY, settings.AWS_SECRET)

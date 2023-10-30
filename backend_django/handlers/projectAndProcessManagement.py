@@ -23,7 +23,7 @@ from ..services.postgresDB import pgProcesses, pgProfiles
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging, ProcessStatus
 
-from ..services import redis
+from ..services import redis, aws
 from ..services.processes import price, collectAndSend
 
 logger = logging.getLogger("logToFile")
@@ -169,6 +169,10 @@ def deleteProject(request, projectID):
     """
     try:
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
+            for currentProjectID in request.session["currentProjects"]:
+                for currentProcess in request.session["currentProjects"][currentProjectID]["processes"]:
+                    for fileObj in request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"]:
+                        aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"][fileObj]["id"])
             del request.session["currentProjects"][projectID]
             request.session.modified = True
 
@@ -202,7 +206,7 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        template = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {"files" : []}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
+        template = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
 
         # save into respective project
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
@@ -331,6 +335,29 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
         return (error, True)
 
 
+#######################################################
+def getProcessFromSession(session, processID):
+    """
+    Retrieve a specific process from the current session instead of the database
+    
+    :param session: Session of the current user
+    :type session: Dict
+    :param projectID: Process ID
+    :type projectID: Str
+    :return: Process or None
+    :rtype: Dict or None
+    """
+    try:
+        if "currentProjects" in session:
+            for currentProjectID in session["currentProjects"]:
+                for currentProcessID in session["currentProjects"][currentProjectID]["processes"]:
+                    if currentProcessID == processID:
+                        return session["currentProjects"][currentProjectID]["processes"][currentProcessID]
+        return None
+    except (Exception) as error:
+        print(error)
+        return None
+
 
 #######################################################
 @require_http_methods(["PATCH"])
@@ -362,7 +389,7 @@ def updateProcess(request):
 
 #######################################################
 @require_http_methods(["DELETE"])
-def deleteProcess(request, projectID, processID):
+def deleteProcess(request, projectID):
     """
     Delete one or more processes
 
@@ -379,6 +406,9 @@ def deleteProcess(request, projectID, processID):
         processIDs = body["processIDs"]
         for processID in processIDs:
             if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
+                for fileObj in request.session["currentProjects"][projectID]["processes"][processID]["files"]:
+                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, request.session["currentProjects"][projectID]["processes"][processID]["files"][fileObj]["id"])
+                
                 del request.session["currentProjects"][projectID]["processes"][processID]
                 request.session.modified = True
 

@@ -70,7 +70,7 @@ paths = {
     "createProcessID": "public/createProcessID/<projectID>/",
     "updateProcess": "public/updateProcess/",
     "updateProject": "public/updateProject/",
-    "deleteProcess": "public/deleteProcess/<projectID>/<processID>/",
+    "deleteProcess": "public/deleteProcess/<projectID>/",
     "deleteProject": "public/deleteProject/<projectID>/",
     "verifyProject": "public/verifyProject/",
     "sendProject": "public/sendProject/",
@@ -133,7 +133,7 @@ paths = {
     "uploadModel": "public/uploadModel/",
     "uploadFiles": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
-    "downloadFile": "public/downloadFile/",
+    "downloadFile": "public/downloadFile/<processID>/<fileID>",
     "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
 
     "statistics": "public/getStatistics/",
