@@ -59,6 +59,7 @@ def uploadModel(request):
         model[fileName]["date"] = str(timezone.now())
         model[fileName]["licenses"] = fileLicenses
         model[fileName]["certificates"] = fileCertificates
+        model[fileName]["URI"] = ""
         model[fileName]["createdBy"] = userName
 
         returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
@@ -66,7 +67,7 @@ def uploadModel(request):
             return JsonResponse({}, status=500)
         
         # Save into files field of the process
-        changes = {"changes": {"files": model}}
+        changes = {"changes": {"files": model, "service": {"model": model}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
