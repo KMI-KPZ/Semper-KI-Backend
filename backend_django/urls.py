@@ -135,6 +135,7 @@ paths = {
     "retrieveFilesTEST": "private/retrieveFiles/",
     "downloadFile": "public/downloadFile/<processID>/<fileID>",
     "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
+    "deleteFile": "public/deleteFile/<processID>/<fileID>",
 
     "statistics": "public/getStatistics/",
 }
@@ -250,7 +251,8 @@ urlpatterns = [
     #path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
     path(paths["downloadFile"], files.downloadFile, name="downloadFile"),
     path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
-    
+    path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
+
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 

@@ -22,7 +22,7 @@ from ..services.postgresDB import pgProfiles, pgProcesses
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
-from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessFromSession
+from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
 from ..services import redis, aws
 
@@ -143,7 +143,7 @@ def downloadFile(request, processID, fileID):
     try:
         # Retrieve the files infos from either the session or the database
         filesOfThisProcess = {}
-        currentProcess = getProcessFromSession(request.session,processID)
+        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             filesOfThisProcess = currentProcess["files"]
         else:
@@ -191,7 +191,7 @@ def downloadFilesAsZip(request, processID):
 
         # Retrieve the files infos from either the session or the database
         filesOfThisProcess = {}
-        currentProcess = getProcessFromSession(request.session,processID)
+        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             filesOfThisProcess = currentProcess["files"]
         else:
@@ -226,6 +226,65 @@ def downloadFilesAsZip(request, processID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
         return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')
 
+    except (Exception) as error:
+        print(error)
+        return HttpResponse("Failed", status=500)
+
+
+#######################################################
+@require_http_methods(["DELETE"])
+def deleteFile(request, processID, fileID):
+    """
+    Delete a file from storage
+
+    :param request: Request of user for a specific file of a process
+    :type request: HTTP DELETE
+    :param processID: process ID
+    :type processID: Str
+    :param fileID: file ID
+    :type fileID: Str
+    :return: Successful or not
+    :rtype: HTTPResponse
+
+    """
+    try:
+
+        # Retrieve the files infos from either the session or the database
+        modelOfThisProcess = {}
+        filesOfThisProcess = {}
+        projectID = ""
+        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
+        if currentProcess != None:
+            modelOfThisProcess = currentProcess["service"]["model"]
+            filesOfThisProcess = currentProcess["files"]
+        else:
+            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
+                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                modelOfThisProcess = currentProcess.service["model"]
+                filesOfThisProcess = currentProcess.files
+            else:
+                return HttpResponse("Not logged in or rights insufficient!", status=401)
+
+        returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
+        if returnVal is not True:
+            raise Exception("Deletion of file" + fileID + " failed")
+        
+        deletions = {"changes": {}, "deletions": {}}
+        for entry in filesOfThisProcess:
+            if fileID == filesOfThisProcess[entry]["id"]:
+                deletions["deletions"]["files"] = {filesOfThisProcess[entry]["title"]: {}}
+                break
+        if fileID == modelOfThisProcess["id"]:
+            deletions["deletions"]["service"] = {"model": {}}
+        
+        message, flag = updateProcessFunction(request, deletions, currentProjectID, [processID])
+        if flag is False:
+            return HttpResponse("Not logged in", status=401)
+        if isinstance(message, Exception):
+            raise message
+
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
+        return HttpResponse("Success", status=500)
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed", status=500)

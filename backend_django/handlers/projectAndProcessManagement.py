@@ -336,7 +336,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
 
 
 #######################################################
-def getProcessFromSession(session, processID):
+def getProcessAndProjectFromSession(session, processID):
     """
     Retrieve a specific process from the current session instead of the database
     
@@ -352,7 +352,7 @@ def getProcessFromSession(session, processID):
             for currentProjectID in session["currentProjects"]:
                 for currentProcessID in session["currentProjects"][currentProjectID]["processes"]:
                     if currentProcessID == processID:
-                        return session["currentProjects"][currentProjectID]["processes"][currentProcessID]
+                        return (currentProjectID, session["currentProjects"][currentProjectID]["processes"][currentProcessID])
         return None
     except (Exception) as error:
         print(error)

@@ -31,7 +31,8 @@
             "downloadFilesAsZip",
             "downloadFile",
             "uploadFiles",
-            "uploadModel"
+            "uploadModel",
+            "deleteFile"
          ]
       },
       {
@@ -107,7 +108,8 @@
          ],
          "paths": [
             "deleteProcess",
-            "deleteProject"
+            "deleteProject",
+            "deleteFile"
          ]
       },
       {
