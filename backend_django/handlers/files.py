@@ -66,8 +66,8 @@ def uploadModel(request):
         if returnVal is not True:
             return JsonResponse({}, status=500)
         
-        # Save into files field of the process
-        changes = {"changes": {"files": model, "service": {"model": model}}}
+        # Save into files field of the process 
+        changes = {"changes": {"files": model, "service": {"model": model[fileName]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
