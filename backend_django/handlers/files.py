@@ -252,7 +252,6 @@ def deleteFile(request, processID, fileID):
         # Retrieve the files infos from either the session or the database
         modelOfThisProcess = {}
         filesOfThisProcess = {}
-        projectID = ""
         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             modelOfThisProcess = currentProcess["service"]["model"]
@@ -264,10 +263,6 @@ def deleteFile(request, processID, fileID):
                 filesOfThisProcess = currentProcess.files
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
-
-        returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
-        if returnVal is not True:
-            raise Exception("Deletion of file" + fileID + " failed")
         
         deletions = {"changes": {}, "deletions": {}}
         for entry in filesOfThisProcess:
@@ -282,9 +277,13 @@ def deleteFile(request, processID, fileID):
             return HttpResponse("Not logged in", status=401)
         if isinstance(message, Exception):
             raise message
+        
+        returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
+        if returnVal is not True:
+            raise Exception("Deletion of file" + fileID + " failed")
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
-        return HttpResponse("Success", status=500)
+        return HttpResponse("Success", status=200)
     except (Exception) as error:
         print(error)
         return HttpResponse("Failed", status=500)
