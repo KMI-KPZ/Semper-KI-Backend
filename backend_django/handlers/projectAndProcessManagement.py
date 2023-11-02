@@ -353,10 +353,10 @@ def getProcessAndProjectFromSession(session, processID):
                 for currentProcessID in session["currentProjects"][currentProjectID]["processes"]:
                     if currentProcessID == processID:
                         return (currentProjectID, session["currentProjects"][currentProjectID]["processes"][currentProcessID])
-        return None
+        return (None, None)
     except (Exception) as error:
         print(error)
-        return None
+        return (None, None)
 
 
 #######################################################

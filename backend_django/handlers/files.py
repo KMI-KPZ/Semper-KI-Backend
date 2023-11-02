@@ -252,6 +252,7 @@ def deleteFile(request, processID, fileID):
         # Retrieve the files infos from either the session or the database
         modelOfThisProcess = {}
         filesOfThisProcess = {}
+        liesInDatabase = False
         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             modelOfThisProcess = currentProcess["service"]["model"]
@@ -261,6 +262,7 @@ def deleteFile(request, processID, fileID):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
                 modelOfThisProcess = currentProcess.service["model"]
                 filesOfThisProcess = currentProcess.files
+                liesInDatabase = True
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
         
@@ -278,9 +280,10 @@ def deleteFile(request, processID, fileID):
         if isinstance(message, Exception):
             raise message
         
-        returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
-        if returnVal is not True:
-            raise Exception("Deletion of file" + fileID + " failed")
+        if not liesInDatabase: # file deletion in database already triggers file deletion in aws
+            returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
+            if returnVal is not True:
+                raise Exception("Deletion of file" + fileID + " failed")
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)
