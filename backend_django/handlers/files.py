@@ -62,7 +62,7 @@ def uploadModel(request):
         model[fileName]["URI"] = ""
         model[fileName]["createdBy"] = userName
 
-        returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
+        returnVal = aws.manageLocalAWS.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
         if returnVal is not True:
             return JsonResponse({}, status=500)
         
@@ -107,7 +107,7 @@ def uploadFiles(request):
             changes["changes"]["files"][fileName]["date"] = str(timezone.now())
             changes["changes"]["files"][fileName]["createdBy"] = userName
 
-            returnVal = aws.manageLocalAWS.uploadFile(aws.Buckets.FILES, processID+"/"+fileID, request.FILES.getlist(fileName)[0])
+            returnVal = aws.manageLocalAWS.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
                 return JsonResponse({}, status=500)
         
@@ -156,9 +156,9 @@ def downloadFile(request, processID, fileID):
         # retrieve the correct file and download it from aws to the user
         for elem in filesOfThisProcess:
             if "id" in filesOfThisProcess[elem] and filesOfThisProcess[elem]["id"] == fileID:
-                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
+                content, Flag = aws.manageLocalAWS.downloadFile(processID+"/"+fileID)
                 if Flag is False:
-                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+fileID)
+                    content, Flag = aws.manageRemoteAWS.downloadFile(processID+"/"+fileID)
                     if Flag is False:
                         return HttpResponse("Not found!", status=404)
                     
@@ -205,9 +205,9 @@ def downloadFilesAsZip(request, processID):
         for elem in filesOfThisProcess:
             currentEntry = filesOfThisProcess[elem]
             if "id" in currentEntry and currentEntry["id"] in fileIDs:
-                content, Flag = aws.manageLocalAWS.downloadFile(aws.Buckets.FILES, processID+"/"+currentEntry["id"])
+                content, Flag = aws.manageLocalAWS.downloadFile(processID+"/"+currentEntry["id"])
                 if Flag is False:
-                    content, Flag = aws.manageRemoteAWS.downloadFile(aws.Buckets.FILES, processID+"/"+currentEntry["id"])
+                    content, Flag = aws.manageRemoteAWS.downloadFile(processID+"/"+currentEntry["id"])
                     if Flag is False:
                         return HttpResponse("Not found!", status=404)
                 
@@ -255,12 +255,14 @@ def deleteFile(request, processID, fileID):
         liesInDatabase = False
         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
-            modelOfThisProcess = currentProcess["service"]["model"]
+            if "model" in currentProcess["service"]:
+                modelOfThisProcess = currentProcess["service"]["model"]
             filesOfThisProcess = currentProcess["files"]
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                modelOfThisProcess = currentProcess.service["model"]
+                if "model" in currentProcess.service:
+                    modelOfThisProcess = currentProcess.service["model"]
                 filesOfThisProcess = currentProcess.files
                 liesInDatabase = True
             else:
@@ -271,7 +273,7 @@ def deleteFile(request, processID, fileID):
             if fileID == filesOfThisProcess[entry]["id"]:
                 deletions["deletions"]["files"] = {filesOfThisProcess[entry]["title"]: {}}
                 break
-        if fileID == modelOfThisProcess["id"]:
+        if modelOfThisProcess != {} and fileID == modelOfThisProcess["id"]:
             deletions["deletions"]["service"] = {"model": {}}
         
         message, flag = updateProcessFunction(request, deletions, currentProjectID, [processID])
@@ -281,7 +283,7 @@ def deleteFile(request, processID, fileID):
             raise message
         
         if not liesInDatabase: # file deletion in database already triggers file deletion in aws
-            returnVal = aws.manageLocalAWS.deleteFile(aws.Buckets.FILES,processID+"/"+fileID)
+            returnVal = aws.manageLocalAWS.deleteFile(processID+"/"+fileID)
             if returnVal is not True:
                 raise Exception("Deletion of file" + fileID + " failed")
 

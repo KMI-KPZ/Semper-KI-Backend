@@ -27,7 +27,7 @@ from django.conf import settings
 
 from .handlers import checkProcesses, projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, organizations, admin
 from Benchy.BenchyMcMarkface import startFromDjango
-from django.conf.urls.static import static
+#from django.conf.urls.static import static
 
 paths = {
     "landingPage": "",
@@ -254,7 +254,7 @@ urlpatterns = [
     path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
 
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))

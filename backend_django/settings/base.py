@@ -68,9 +68,15 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'COYPUPASSWORD': {'var': 'COYPU_PASSWORD',
                           'hint': 'COYPU password for authentication services for management via m2m calls',
                           'default': None, 'required': True},
-        'AWS_ENDPOINT': {'var': 'AWS_ENDPOINT', 'hint': 'IP Adress of the AWS cloud storage', 'default': None, 'required': True},
-        'AWS_ACCESS_KEY': {'var': 'AWS_ACCESS_KEY', 'hint': 'AWS equivalent of user name', 'default': None, 'required': True},
-        'AWS_SECRET': {'var': 'AWS_SECRET', 'hint': 'AWS equivalent of password', 'default': None, 'required': True},
+        'AWS_ACCESS_KEY_ID': {'var': 'AWS_ACCESS_KEY_ID', 'hint': 'Key ID of the AWS Space', 'default': None, 'required': True},
+        'AWS_SECRET_ACCESS_KEY': {'var': 'AWS_SECRET_ACCESS_KEY', 'hint': 'Secret of the AWS Space', 'default': None, 'required': True},
+        'AWS_REGION_NAME': {'var': 'AWS_REGION_NAME', 'hint': 'Region of the chosen server', 'default': None, 'required': True},
+        'AWS_BUCKET_NAME': {'var': 'AWS_BUCKET_NAME', 'hint': 'The primary bucket which contains private files', 'default': None, 'required': True},
+        'AWS_STATICS_BUCKET_NAME': {'var': 'AWS_STATICS_BUCKET_NAME', 'hint': 'Bucket for public files', 'default': None, 'required': True},
+        'AWS_S3_ENDPOINT_URL': {'var': 'AWS_S3_ENDPOINT_URL', 'hint': 'Domain of the provider without https:// and region', 'default': '', 'required': True},
+        'AWS_CDN_ENDPOINT': {'var': 'AWS_CDN_ENDPOINT', 'hint': 'Same as domain, except for cdn. before the domain', 'default': None, 'required': True},
+        'AWS_LOCATION': {'var': 'AWS_LOCATION', 'hint': 'Usually the same as the bucket name but can be different', 'default': None, 'required': True},
+        'AWS_STATICS_LOCATION': {'var': 'AWS_STATICS_LOCATION', 'hint': 'Same but for the statics folder', 'default': None, 'required': True},
     }
 
     env_vars_internal = {
@@ -213,7 +219,8 @@ INSTALLED_APPS = [
     'corsheaders',
     # 'backend_django.apps.BackendDjangoConfig',
     'backend_django',
-    'session_cleanup'
+    'session_cleanup',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -298,12 +305,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'backend_django', 'static')
-STATIC_URL = 'public/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -402,3 +403,39 @@ ASGI_APPLICATION = "backend_django.asgi.application"
 settings_helper = BackendDjangoConfigHelper()
 settings_helper.loadEnvVars(sys.modules[__name__])
 settings_helper.configure_database(sys.modules[__name__])
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+STORAGES = {
+    "default":{
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": AWS_ACCESS_KEY_ID,
+            "secret_key": AWS_SECRET_ACCESS_KEY,
+            "bucket_name": AWS_BUCKET_NAME,
+            "object_parameters": {'CacheControl': 'max-age=86400'},
+            "default_acl": "private",
+            "location": AWS_LOCATION,
+            "region_name": AWS_REGION_NAME,
+            "endpoint_url": "https://"+AWS_REGION_NAME+AWS_S3_ENDPOINT_URL
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": AWS_ACCESS_KEY_ID,
+            "secret_key": AWS_SECRET_ACCESS_KEY,
+            "bucket_name": AWS_STATICS_BUCKET_NAME,
+            "object_parameters": {'CacheControl': 'max-age=86400'},
+            "default_acl": "public-read",
+            "location": AWS_STATICS_LOCATION,
+            "region_name": AWS_REGION_NAME,
+            "endpoint_url": "https://"+AWS_REGION_NAME+"."+AWS_S3_ENDPOINT_URL
+        }
+    }
+}
+
+
+STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
+MEDIA_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/media/"

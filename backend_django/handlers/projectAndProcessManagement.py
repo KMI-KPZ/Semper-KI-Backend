@@ -172,7 +172,7 @@ def deleteProject(request, projectID):
             for currentProjectID in request.session["currentProjects"]:
                 for currentProcess in request.session["currentProjects"][currentProjectID]["processes"]:
                     for fileObj in request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"]:
-                        aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"][fileObj]["id"])
+                        aws.manageLocalAWS.deleteFile(request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"][fileObj]["id"])
             del request.session["currentProjects"][projectID]
             request.session.modified = True
 
@@ -407,7 +407,7 @@ def deleteProcess(request, projectID):
         for processID in processIDs:
             if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
                 for fileObj in request.session["currentProjects"][projectID]["processes"][processID]["files"]:
-                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, request.session["currentProjects"][projectID]["processes"][processID]["files"][fileObj]["id"])
+                    aws.manageLocalAWS.deleteFile(request.session["currentProjects"][projectID]["processes"][processID]["files"][fileObj]["id"])
                 
                 del request.session["currentProjects"][projectID]["processes"][processID]
                 request.session.modified = True

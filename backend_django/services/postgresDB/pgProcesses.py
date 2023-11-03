@@ -190,7 +190,7 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             # delete files as well
             for entry in currentProcess.files:
-                aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, currentProcess.files[entry]["id"])
+                aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
             
             # if that was the last process, delete the project as well
             if len(currentProcess.projectKey.processes.all()) == 1:
@@ -225,7 +225,7 @@ class ProcessManagementBase():
             # delete all files from every process as well
             for process in currentProject.processes.all():
                 for entry in process.files:
-                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, process.files[entry]["id"])
+                    aws.manageLocalAWS.deleteFile(process.files[entry]["id"])
 
             currentProject.delete()
             return True
@@ -369,7 +369,7 @@ class ProcessManagementBase():
                 
             elif updateType == EnumUpdates.files:
                 for entry in content:
-                    aws.manageLocalAWS.deleteFile(aws.Buckets.FILES, currentProcess.files[entry]["id"])
+                    aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
                     del currentProcess.files[entry]
                 
             elif updateType == EnumUpdates.service:
