@@ -11,15 +11,15 @@ from io import BytesIO
 
 from django.conf import settings
 
-####################################################################################
-class ManageLocalStack():
+#####################################################################
+class ManageAWS():
     """
-    Class for managing access to localstack/local AWS
+    Class for managing access to local/remote AWS
 
     """
 
     #######################################################
-    def __init__(self, endpoint, key, secret) -> None:
+    def __init__(self, location, bucketName, endpoint, key, secret, local:bool) -> None:
         """
         Initialize instance with settings for either local or remote storage
 
@@ -30,14 +30,15 @@ class ManageLocalStack():
         :param secret: The secret/password
         :type secret: Str
         """
-        self.s3_client = boto3.client("s3", region_name='us-east-1', endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
-        self.createBucket("files")
-        self.bucketName = "files"
-
+        self.s3_client = boto3.client("s3", region_name=location, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
+        self.bucketName = bucketName
+        if local:
+            self.createBucket(bucketName) # has to be done every time lest localstack forgets it exists
+        
     #######################################################
     def createBucket(self, bucketName):
         """
-        Create a named bucket to put stuff in.
+        Create a named bucket to put stuff in. Should only be used freely for localstack!
 
         :param bucketName: Name of the bucket
         :type bucketName: Str
@@ -48,85 +49,7 @@ class ManageLocalStack():
         # TODO if response...
 
         return True
-
-
-    #######################################################
-    def uploadFile(self, fileKey, file):
-        """
-        Upload a binary in-memory file to storage.
-
-        :param fileKey: The key with which to retrieve the file again later
-        :type fileKey: Str
-        :param file: InMemory BytesIO object containing a file
-        :type file: BytesIO InMemoryFile
-        :return: Success or error
-        :rtype: Bool or Error
-        """
-
-        file.file.seek(0) # because read() is called and has to start at the front of the file
-        response = self.s3_client.upload_fileobj(file.file, self.bucketName, fileKey)
-        # TODO if response...
-
-        return True
-
-    #######################################################
-    def downloadFile(self, fileKey):
-        """
-        Upload a binary in-memory file to storage.
-
-        :param fileKey: The key with which to retrieve the file again later
-        :type fileKey: Str
-        :return: File or error
-        :rtype: BytesIO or Error
-        """
-
-        output = BytesIO()
-        fileObj = self.s3_client.download_fileobj(self.bucketName, fileKey, output)
-        output.seek(0)
-        if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
-            return (output, False)
-        return (output, True)
     
-    #######################################################
-    def deleteFile(self, fileKey):
-        """
-        Delete a file from storage.
-
-        :param bucketName: Name of the bucket
-        :type bucketName: Str
-        :param fileKey: The key with which to retrieve the file again later
-        :type fileKey: Str
-        :return: File or error
-        :rtype: BytesIO or Error
-        """
-
-        response = self.s3_client.delete_object(Bucket=self.bucketName, Key=fileKey)
-        # TODO: if response...
-
-        return True
-
-#####################################################################
-class ManageAWS():
-    """
-    Class for managing access to remote AWS
-
-    """
-
-    #######################################################
-    def __init__(self, endpoint, key, secret) -> None:
-        """
-        Initialize instance with settings for either local or remote storage
-
-        :param endpoint: IP Adress of storage
-        :type endpoint: URL Str
-        :param key: The access key
-        :type key: Str
-        :param secret: The secret/password
-        :type secret: Str
-        """
-        self.s3_client = boto3.client("s3", region_name=settings.AWS_LOCATION, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
-        self.bucketName = settings.AWS_BUCKET_NAME
-        
     #######################################################
     def uploadFile(self, fileKey, file):
         """
@@ -182,5 +105,5 @@ class ManageAWS():
 
 ##########################################################
 
-manageLocalAWS = ManageLocalStack(settings.LOCALSTACK_ENDPOINT, settings.LOCALSTACK_ACCESS_KEY, settings.LOCALSTACK_SECRET)
-manageRemoteAWS = ManageAWS(f"https://{settings.AWS_BUCKET_NAME}.{settings.AWS_REGION_NAME}.{settings.AWS_S3_ENDPOINT_URL}", settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+manageLocalAWS = ManageAWS('us-east-1','files',settings.LOCALSTACK_ENDPOINT, settings.LOCALSTACK_ACCESS_KEY, settings.LOCALSTACK_SECRET, True)
+manageRemoteAWS = ManageAWS(settings.AWS_LOCATION, settings.AWS_BUCKET_NAME, f"https://{settings.AWS_BUCKET_NAME}.{settings.AWS_REGION_NAME}.{settings.AWS_S3_ENDPOINT_URL}", settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, False)
