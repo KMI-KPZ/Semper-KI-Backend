@@ -128,6 +128,7 @@ paths = {
     "sendQuery": "private/sendQuery/",
     "testQuerySize": "private/query/",
     "testCoypu": "public/coypu/",
+    "testLogin": "private/mockLogin/",
 
     "testRedis": "private/testRedis/",
     "uploadModel": "public/uploadModel/",
@@ -152,6 +153,7 @@ urlpatterns = [
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
     path('private/test/', test_response.testResponse, name='test_response'),
     path('private/testWebsocket/', test_response.testCallToWebsocket, name='testCallToWebsocket'),
+    path(paths["testLogin"], authentification.mockLogin, name="mockLogin"),
 
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),

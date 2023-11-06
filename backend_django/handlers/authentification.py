@@ -453,3 +453,76 @@ def logoutUser(request):
         callbackString = request.build_absolute_uri('http://127.0.0.1:3000')
 
     return HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
+
+##############################################################################################
+# Mockups for Login
+
+#######################################################
+@require_http_methods(["GET"])
+def mockLogin(request):
+    """
+    Write token to the Session and therefore fake a Login.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: URL forwarding with success to frontend
+    :rtype: HTTP Link as redirect
+    
+    """
+    try:
+        # Set user type
+        if "Usertype" not in request.headers:
+            request.session["usertype"] = "user"
+            request.session["isPartOfOrganization"] = False
+            request.session["pgProfileClass"] = "user"
+            request.session["pgProcessClass"] = "user"
+        else:
+            userType = request.headers["Usertype"]
+            if userType == "organization" or userType == "manufacturer":
+                request.session["usertype"] = "organization"
+                request.session["isPartOfOrganization"] = True
+                request.session["pgProfileClass"] = "organization"
+                request.session["pgProcessClass"] = "organization"
+            elif userType == "admin":
+                request.session["usertype"] = "admin"
+                request.session["isPartOfOrganization"] = False
+                request.session["pgProfileClass"] = "user"
+                request.session["pgProcessClass"] = "user"
+            else:
+                request.session["usertype"] = "user"
+                request.session["isPartOfOrganization"] = False
+                request.session["pgProfileClass"] = "user"
+                request.session["pgProcessClass"] = "user"
+        
+        # Write fake token to Session together with  Roles and Permissions
+        request.session["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+        request.session["user"]["userinfo"]["sub"] = "auth0|testuser"
+        request.session["user"]["userinfo"]["nickname"] = "testuser"
+        request.session["user"]["userinfo"]["email"] = "testuser@test.de"
+        request.session["userRoles"] = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
+        request.session["userPermissions"] = {"processes:read": "", "processes:messages": "","processes:edit": "","processes:delete": "","processes:files": ""}
+        currentTime = datetime.datetime.now()
+        request.session["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        orgaObj = None
+        if request.session["isPartOfOrganization"]:
+            request.session["organizationName"] = "testOrganization"
+            request.session["user"]["userinfo"]["org_id"] = "id123"
+            request.session["userPermissions"].update({"orga:read": "", "orga:edit": "", "orga:delete": "", "resources:read": "", "resources:edit": ""})
+            orgaObj = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
+            if orgaObj == None:
+                raise Exception("Organization could not be found or created!")
+
+        # Create Database Entry if not already done
+        userObj = pgProfiles.profileManagement["user"].addUserIfNotExists(request.session, orgaObj)
+        if isinstance(userObj, Exception):
+            raise userObj
+
+        # Log
+        logger.info(f"{basics.Logging.Subject.USER},testuser,{basics.Logging.Predicate.FETCHED},login,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
+
+        # Return
+        return HttpResponseRedirect('http://127.0.0.1:3000')
+    except Exception as e:
+        returnObj = HttpResponseRedirect('http://127.0.0.1:3000')
+        returnObj.write(str(e))
+        return returnObj
