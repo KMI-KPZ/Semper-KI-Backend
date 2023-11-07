@@ -442,8 +442,21 @@ class ProfileManagementOrganization(ProfileManagementBase):
         userID = session["user"]["userinfo"]["sub"]
         try:
             # first get, then create
-            result = User.objects.get(subID=userID)
-            return result
+            existingUser = User.objects.get(subID=userID)
+            if organization.subID not in existingUser.organizations:
+                if len(existingUser.organizations) > 0:
+                    if existingUser.organizations[0] == "None":
+                        existingUser.organizations[0] = organization.subID
+                    else:
+                        existingUser.organizations.append(organization.subID)
+                else:
+                    existingUser.organizations = [organization.subID]
+                
+                if ProfileManagementOrganization.addUserToOrganization(existingUser, session["user"]["userinfo"]["org_id"]) == False:
+                    raise Exception(f"User could not be added to organization!, {existingUser}, {organization}")
+                existingUser.save()
+                
+            return existingUser
         except (ObjectDoesNotExist) as error:
             try:
                 userName = session["user"]["userinfo"]["nickname"]

@@ -120,6 +120,9 @@ def organizations_getInviteLink(request):
     :rtype: HTTPResponse
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+        
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -162,6 +165,9 @@ def organizations_addUser(request):
     :rtype: HTTPResponse
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -204,6 +210,8 @@ def organizations_fetchUsers(request):
     :rtype: Json or error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return JsonResponse({})
 
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
@@ -253,6 +261,9 @@ def organizations_deleteUser(request):
     :rtype: HTTPResponse or error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
@@ -306,6 +317,9 @@ def organizations_createRole(request):
     :rtype: JSON or Error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return JsonResponse({})
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -354,6 +368,9 @@ def organizations_assignRole(request):
     :rtype: HTTPResponse
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -406,6 +423,9 @@ def organizations_removeRole(request):
     :rtype: True or error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -457,6 +477,9 @@ def organizations_editRole(request):
     :rtype: Bool or error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -510,6 +533,9 @@ def organizations_getRoles(request):
     """
     try:
 
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return JsonResponse({})
+
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -555,6 +581,9 @@ def organizations_deleteRole(request):
     :rtype: HTTPResponse or error
     """
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -595,6 +624,9 @@ def organizations_setPermissionsForRole(request):
     :rtype: HTTPResponse or error
     """    
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -654,6 +686,9 @@ def organizations_getPermissions(request):
     :rtype: JSON or error
     """ 
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return JsonResponse({})
+
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -688,6 +723,9 @@ def organizations_getPermissionsForRole(request):
     :rtype: JSON or error
     """    
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return JsonResponse({})
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {
@@ -725,6 +763,9 @@ def organizations_createNewOrganization(request):
     """    
 
     try:
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            return HttpResponse("Mock")
+
         content = json.loads(request.body.decode("utf-8"))["data"]
 
         headers = {

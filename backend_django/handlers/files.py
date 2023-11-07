@@ -110,6 +110,7 @@ def uploadFiles(request):
             returnVal = aws.manageLocalAWS.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
                 return JsonResponse({}, status=500)
+            #returnVal = aws.manageRemoteAWS.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
         
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
