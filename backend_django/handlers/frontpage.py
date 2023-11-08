@@ -10,8 +10,9 @@ import threading
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
+from logging import getLogger
 
-from backend_django.services.auth0 import authorizeToken
+logger = getLogger("django")
 
 
 #######################################################
@@ -25,17 +26,15 @@ def landingPage(request):
     :rtype: None
 
     """
-    print("landingpage")
-    # print thread id
-    print('landing page in thread: '+ str(threading.get_ident()))
     return render(
         request,
-        "landingPage.html"#,
-        #context={
+        "landingPage.html"  # ,
+        # context={
         #    "session": request.session.get("user"),
-            #"pretty": json.dumps(request.session.get("user"), indent=4),
-        #},
+        # "pretty": json.dumps(request.session.get("user"), indent=4),
+        # },
     )
+
 
 #######################################################
 def benchyPage(request):
@@ -50,12 +49,13 @@ def benchyPage(request):
     """
     return render(
         request,
-        "benchy.html"#,
-        #context={
+        "benchy.html"  # ,
+        # context={
         #    "session": request.session.get("user"),
-            #"pretty": json.dumps(request.session.get("user"), indent=4),
-        #},
+        # "pretty": json.dumps(request.session.get("user"), indent=4),
+        # },
     )
+
 
 #######################################################
 def docPage(request):
@@ -68,23 +68,24 @@ def docPage(request):
     :rtype: None
 
     """
-    #response = HttpResponse()
+    # response = HttpResponse()
     # construct the file's path
-    #url=os.path.join(settings.BASE_DIR,'doc','build','html','index.html')
-    #response['Content-Type']=""
-    #response['X-Accel-Redirect'] = url
-    #return response
+    # url=os.path.join(settings.BASE_DIR,'doc','build','html','index.html')
+    # response['Content-Type']=""
+    # response['X-Accel-Redirect'] = url
+    # return response
     pathOfHtml = request.path.replace('public/doc/', '').replace('index.html', '')
-    print(pathOfHtml)
+    logger.info(pathOfHtml)
     if ("_static" in pathOfHtml):
         return render(
-        request,
-        settings.DOC_DIR + pathOfHtml)
+            request,
+            settings.DOC_DIR + pathOfHtml)
     else:
         return render(
             request,
             settings.DOC_DIR + pathOfHtml + "index.html"
         )
+
 
 #######################################################
 def sparqlPage(request):
@@ -99,13 +100,28 @@ def sparqlPage(request):
     """
     return render(
         request,
-        "sparql.html"#,
-        #context={
+        "sparql.html"  # ,
+        # context={
         #    "session": request.session.get("user"),
-            #"pretty": json.dumps(request.session.get("user"), indent=4),
-        #},
+        # "pretty": json.dumps(request.session.get("user"), indent=4),
+        # },
     )
 
-def getSettingsToken(request):
-    value = authorizeToken(request)
+
+def get_settings_token(request):
     return JsonResponse({"token": settings.BACKEND_SETTINGS})
+
+
+def send_contact_form(request):
+    from backend_django.services.mailer import KissMailer
+    import logging
+    import json
+    # log whole post request
+    logger = logging.getLogger('django')
+    logger.info(f'recieved contact form input: "{str(request.body)}')
+    data = json.loads(request.body.decode("utf-8"))
+    mailer = KissMailer()
+    msg = "Backendsettings: " + settings.BACKEND_SETTINGS + "\nName: " + data["name"] + "\n" + "Email: " + data[
+        "email"] + "\n" + "Message: " + data["message"]
+    result = mailer.sendmail(settings.EMAIL_ADDR_SUPPORT, data["subject"], msg)
+    return JsonResponse({"status": "ok", "result": result})
