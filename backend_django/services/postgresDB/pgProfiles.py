@@ -90,6 +90,28 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
+    def getOrgaHashID(session):
+        """
+        Retrieve hashed Organization ID from Session
+
+        :param session: session
+        :type session: Dictionary
+        :return: Hashed user key from database
+        :rtype: Str
+
+        """
+        hashID = ""
+        try:
+            if "org_id" in session["user"]["userinfo"]:
+                orgID = session["user"]["userinfo"]["org_id"]
+                hashID = Organization.objects.get(subID=orgID).hashedID
+        except (Exception) as error:
+            print(error)
+
+        return hashID
+    
+    ##############################################
+    @staticmethod
     def getUserKeyViaHash(hashedID):
         """
         Retrieve User ID via Database and hashkey

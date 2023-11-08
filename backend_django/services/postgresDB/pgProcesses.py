@@ -80,7 +80,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def getProject(projectID):
+    def getProject(projectID, currentUserHashID, currentOrgaHashID):
         """
         Get info about one project.
 
@@ -95,7 +95,8 @@ class ProcessManagementBase():
             projectObj = Project.objects.get(projectID=projectID)
 
             output = {}
-            
+            showProjectDetails = False # make sure nobody else sees this
+
             output["projectID"] = projectObj.projectID
             output["created"] = str(projectObj.createdWhen)
             output["updated"] = str(projectObj.updatedWhen)
@@ -105,27 +106,31 @@ class ProcessManagementBase():
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
-                currentProcess = {}
-                currentProcess["client"] = entry.client
-                currentProcess["processID"] = entry.processID
-                currentProcess["contractor"] = entry.contractor
-                currentProcess["service"] = entry.service
-                currentProcess["serviceStatus"] = entry.serviceStatus
-                currentProcess["status"] = entry.status
-                currentProcess["created"] = str(entry.createdWhen)
-                currentProcess["updated"] = str(entry.updatedWhen)
-                currentProcess["messages"] = entry.messages
-                currentProcess["details"] = entry.details
-                currentProcess["files"] = entry.files
-                processesOfThatProject.append(currentProcess)
+                if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID in entry.contractor): 
+                    currentProcess = {}
+                    currentProcess["client"] = entry.client
+                    currentProcess["processID"] = entry.processID
+                    currentProcess["contractor"] = entry.contractor
+                    currentProcess["service"] = entry.service
+                    currentProcess["serviceStatus"] = entry.serviceStatus
+                    currentProcess["status"] = entry.status
+                    currentProcess["created"] = str(entry.createdWhen)
+                    currentProcess["updated"] = str(entry.updatedWhen)
+                    currentProcess["messages"] = entry.messages
+                    currentProcess["details"] = entry.details
+                    currentProcess["files"] = entry.files
+                    processesOfThatProject.append(currentProcess)
+                    showProjectDetails = True
             output["processes"] = processesOfThatProject
             
-            return output
+            if showProjectDetails:
+                return output
 
         except (Exception) as error:
             print(error)
         
         return {}
+    
 
     ##############################################
     @staticmethod

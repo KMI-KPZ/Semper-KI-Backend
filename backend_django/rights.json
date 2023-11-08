@@ -71,7 +71,16 @@
             "ProcessButtonReOrder",
             "ProcessButtonReject",
             "ProcessButtonConfirm",
-            "ProcessButtonVerify"
+            "ProcessButtonVerify",
+            "ProcessButtonClarification",
+            "ProcessButtonRejectedByContractor",
+            "ProcessButtonConfirmedByContractor",
+            "ProcessButtonRejectedByClient",
+            "ProcessButtonConfirmedByClient",
+            "ProcessButtonProduction",
+            "ProcessButtonDelivery",
+            "ProcessButtonComplete",
+            "ProcessButtonReProject"
          ],
          "paths": [
             "updateProcess",

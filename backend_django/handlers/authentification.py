@@ -177,7 +177,6 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
     :rtype: Dict
     """
     try:
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
@@ -216,7 +215,6 @@ def retrieveRolesAndPermissionsForStandardUser(session):
     :rtype: Dict
     """
     try:
-        auth0.apiToken.checkIfExpired()
         headers = {
             'authorization': f'Bearer {auth0.apiToken.accessToken}',
             'content-Type': 'application/json',
