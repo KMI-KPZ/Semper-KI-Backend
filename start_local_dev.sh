@@ -17,7 +17,7 @@ done
 
 if [ "$MODE" = "local_container" ]; then
     echo "Starting services and backend in local container"
-    docker-compose -p semperki-local-dev -f dc-local-dev-services.yml -f dc-local-dev-container-backend.yml up -d
+    docker-compose -p semperki-local-dev -f dc-local-dev-services.yml -f dc-local-dev-container-backend.yml up -d --build backend
     echo "Local containers started"
 elif [ "$MODE" = "local" ]; then
     echo "Starting local services, you can use "
