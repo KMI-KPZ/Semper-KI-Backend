@@ -190,7 +190,8 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             # delete files as well
             for entry in currentProcess.files:
-                aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
+                if len(currentProcess.files[entry]) > 0:
+                    aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
             
             # if that was the last process, delete the project as well
             if len(currentProcess.projectKey.processes.all()) == 1:

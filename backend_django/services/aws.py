@@ -9,6 +9,8 @@ Contains: Services for aws cloud storage and file management
 import boto3, enum
 from io import BytesIO
 
+from ..utilities import crypto
+
 from django.conf import settings
 
 #####################################################################
@@ -19,7 +21,7 @@ class ManageAWS():
     """
 
     #######################################################
-    def __init__(self, location, bucketName, endpoint, key, secret, local:bool) -> None:
+    def __init__(self, aesKey, location, bucketName, endpoint, key, secret, local:bool) -> None:
         """
         Initialize instance with settings for either local or remote storage
 
@@ -32,6 +34,7 @@ class ManageAWS():
         """
         self.s3_client = boto3.client("s3", region_name=location, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
         self.bucketName = bucketName
+        self.aesEncryptionKey = aesKey
         if local:
             self.createBucket(bucketName) # has to be done every time lest localstack forgets it exists
         
@@ -62,9 +65,9 @@ class ManageAWS():
         :return: Success or error
         :rtype: Bool or Error
         """
-
         file.file.seek(0) # because read() is called and has to start at the front of the file
-        response = self.s3_client.upload_fileobj(file.file, self.bucketName, fileKey)
+        encryptedFile = crypto.encryptAES(self.aesEncryptionKey, file.file) # encrypt file
+        response = self.s3_client.upload_fileobj(encryptedFile, self.bucketName, fileKey)
         # TODO if response...
 
         return True
@@ -85,7 +88,9 @@ class ManageAWS():
         output.seek(0)
         if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
             return (output, False)
-        return (output, True)
+        decryptedFile = crypto.decryptAES(self.aesEncryptionKey, output)
+
+        return (decryptedFile, True)
     
     #######################################################
     def deleteFile(self, fileKey):
@@ -105,5 +110,5 @@ class ManageAWS():
 
 ##########################################################
 
-manageLocalAWS = ManageAWS('us-east-1','files',settings.LOCALSTACK_ENDPOINT, settings.LOCALSTACK_ACCESS_KEY, settings.LOCALSTACK_SECRET, True)
-manageRemoteAWS = ManageAWS(settings.AWS_LOCATION, settings.AWS_BUCKET_NAME, f"https://{settings.AWS_BUCKET_NAME}.{settings.AWS_REGION_NAME}.{settings.AWS_S3_ENDPOINT_URL}", settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, False)
+manageLocalAWS = ManageAWS(settings.AES_ENCRYPTION_KEY,'us-east-1','files',settings.LOCALSTACK_ENDPOINT, settings.LOCALSTACK_ACCESS_KEY, settings.LOCALSTACK_SECRET, True)
+manageRemoteAWS = ManageAWS(settings.AES_ENCRYPTION_KEY,settings.AWS_LOCATION, settings.AWS_BUCKET_NAME, f"https://{settings.AWS_BUCKET_NAME}.{settings.AWS_REGION_NAME}.{settings.AWS_S3_ENDPOINT_URL}", settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, False)

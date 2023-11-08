@@ -206,7 +206,8 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        template = {"processID": processID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
+        clientID = request.session["currentProjects"][projectID]["client"]
+        template = {"processID": processID, "client": clientID, "contractor": [], "status": 0, "serviceStatus": 0, "created": str(now), "updated": str(now), "files": {}, "details": {}, "messages": {"messages": []}, "service": {"type": 0}}
 
         # save into respective project
         if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
@@ -652,6 +653,10 @@ def saveProjects(request):
             error = pgProcesses.ProcessManagementUser.addProjectToDatabase(request.session)
         if isinstance(error, Exception):
             raise error
+
+        request.session["currentProjects"].clear()
+        del request.session["currentProjects"]
+        request.session.modified = True
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         return HttpResponse("Success")

@@ -110,6 +110,7 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Adress of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
         'LOCALSTACK_ACCESS_KEY': {'var': 'LOCALSTACK_ACCESS_KEY', 'hint': 'AWS equivalent of user name, can be anything', 'default': 'test','required': True},
         'LOCALSTACK_SECRET': {'var': 'LOCALSTACK_SECRET', 'hint': 'AWS equivalent of password, can be anything', 'default': 'test','required': True},
+        'AES_ENCRYPTION_KEY': {'var': 'AES_ENCRYPTION_KEY', 'hint': 'AES Key generated for encryption as base64 encoded string', 'default': None, 'required': True},
         'ALLOWED_HOSTS': {'var': 'ALLOWED_HOSTS', 'hint': 'Allowed hosts for the backend API calls, comma separated',
                           'type': 'list',
                           'default': 'localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},
