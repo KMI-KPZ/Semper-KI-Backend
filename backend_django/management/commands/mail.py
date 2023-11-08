@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         mailer = KissMailer()
-        mailer.sendMail(options['to'], 'test mail', 'this is a test mail')
+        mailer.sendmail(options['to'], 'test mail', 'this is a test mail')
 
 
 

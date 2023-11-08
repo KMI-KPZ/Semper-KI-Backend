@@ -119,6 +119,7 @@ def send_contact_form(request):
     # log whole post request
     logger = logging.getLogger('django')
     logger.info(f'recieved contact form input: "{str(request.body)}')
+    print("sending email")
     data = json.loads(request.body.decode("utf-8"))
     mailer = KissMailer()
     msg = "Backendsettings: " + settings.BACKEND_SETTINGS + "\nName: " + data["name"] + "\n" + "Email: " + data[

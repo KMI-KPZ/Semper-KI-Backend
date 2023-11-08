@@ -28,6 +28,6 @@ if "%MODE%" == "local_container" (
     echo Local containers started
 ) else if "%MODE%" == "local" (
     echo Starting local services
-    docker-compose -p semperki-local-dev -f dc-local-dev-services.yml up -d --build
+    docker-compose -p semperki-local-dev -f dc-local-dev-services.yml up -d
     echo Local started
 )
