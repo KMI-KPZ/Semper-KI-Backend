@@ -424,7 +424,7 @@ STORAGES = {
             "default_acl": "private",
             "location": AWS_LOCATION,
             "region_name": AWS_REGION_NAME,
-            "endpoint_url": "https://"+AWS_REGION_NAME+AWS_S3_ENDPOINT_URL
+            "endpoint_url": "https://"+ f'{AWS_REGION_NAME}{AWS_S3_ENDPOINT_URL}'
         }
     },
     "staticfiles": {
@@ -437,7 +437,7 @@ STORAGES = {
             "default_acl": "public-read",
             "location": AWS_STATICS_LOCATION,
             "region_name": AWS_REGION_NAME,
-            "endpoint_url": "https://"+AWS_REGION_NAME+"."+AWS_S3_ENDPOINT_URL
+            "endpoint_url": "https://"+f'{AWS_REGION_NAME}.{AWS_S3_ENDPOINT_URL}'
         }
     }
 }

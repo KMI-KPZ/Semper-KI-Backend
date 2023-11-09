@@ -1,0 +1,3 @@
+[submodule "Ontology"]
+	path = Ontology
+	url = https://github.com/KMI-KPZ/Ontology.git

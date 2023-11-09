@@ -25,7 +25,8 @@ from django.conf import settings
 ##############################################################################
 ### WSGI
 
-from .handlers import checkProcesses, projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, organizations, admin
+from .handlers import checkProcesses, projectAndProcessManagement, resources, test_response, authentification, profiles, \
+    filter, frontpage, sparqlQueries, files, statistics, organizations, admin, email
 from Benchy.BenchyMcMarkface import startFromDjango
 #from django.conf.urls.static import static
 
@@ -255,7 +256,7 @@ urlpatterns = [
     path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
     path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
 
-    path(paths["contactForm"], frontpage.send_contact_form, name="sendContactForm"),
+    path(paths["contactForm"], email.send_contact_form, name="sendContactForm"),
 
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
