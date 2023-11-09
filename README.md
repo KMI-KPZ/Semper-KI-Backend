@@ -31,10 +31,16 @@ the backend currently supports the environment ```--env <environment>``` which w
 
 watch exposed ports of the docker containers for services i.e. pg-admin (email/pw is in dc-local-dev-services.yml)
 
+## debug logging
+In order to have debug output in the console, in your .env.[MODE] file set ```DJANGO_LOG_LEVEL=DEBUG```.
+To log your messages use ```getLogger("django_debug").debug("your message")```
+
+
 ## commands
 - ```python manage.py generate_env``` to output an example env file with default values, use with "-p --env <environment>" to get see the values currently used in django
 - ```python manage.py create_db --env <environment>``` to create the database named in <environment> - which for now should be "local"
 - ```python manage.py check --env <environment>``` to check if the parameters are set, the database can be reached, redis can be reached
+- ```python manage.py mail --env <environment> email-address``` to send a test mail to the email-address
 
 - the other environments will be added later as well as the docker-compose files
 

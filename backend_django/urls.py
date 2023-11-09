@@ -134,8 +134,11 @@ paths = {
     "retrieveFilesTEST": "private/retrieveFiles/",
     "downloadFiles": "public/downloadFiles/",
 
+    "contactForm": "public/contact/",
+
     "statistics": "public/getStatistics/",
 }
+
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
@@ -241,17 +244,18 @@ urlpatterns = [
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
     path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
     path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
-    
+
     path(paths["testRedis"], files.testRedis, name="testRedis"),
     path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
     path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
     path(paths["downloadFiles"], files.downloadFiles, name="downloadFiles"),
-    
-    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+    path(paths["contactForm"], frontpage.send_contact_form, name="sendContactForm"),
 
+
+    path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
-    urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
+    urlpatterns.append(path('private/settings', frontpage.get_settings_token, name='getSettingsToken'))
 
 urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
 

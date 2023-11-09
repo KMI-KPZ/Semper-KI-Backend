@@ -42,14 +42,14 @@ class SemperKiConfigHelper:
         for env_name, env_value in self.getEnvVars().items():
             # parameter not given - no default value - required
             if (env_name not in os.environ
-                    and env_value['required'] is True
+                    and env_value.get('required',None) is True
                     and env_value['default'] is None):
                 remarks.append(Error(f'missing environment variable "{env_name}"',
                                      hint=env_value[
                                               'hint'] + "\n" + f' Check your {os.environ.get("ENV_FILE",".env")} file '
                                      , id='env_check'))
             # parameter not given - default value - required
-            elif (env_name not in os.environ and env_value['required'] is True
+            elif (env_name not in os.environ and env_value.get('required',None) is True
                   and env_value['default'] is not None):
                 remarks.append(Info(f'omitted environment variable "{env_name}"',
                                        hint= env_value[
@@ -65,6 +65,9 @@ class SemperKiConfigHelper:
                 setattr(target_module,self.env_vars[env_name]['var'],
                         os.environ.get(env_name, self.env_vars[env_name]['default']).split(','))
                 print(f'****************{env_name} : {getattr(target_module,self.env_vars[env_name]["var"])} ***********************')
+            elif self.env_vars[env_name].get('type',None) == 'bool':
+                setattr(target_module,self.env_vars[env_name]['var'],
+                        os.environ.get(env_name, self.env_vars[env_name]['default']) == 'True')
             else:
                 setattr(target_module,self.env_vars[env_name]['var'],
                                  os.environ.get(env_name, self.env_vars[env_name]['default']))
