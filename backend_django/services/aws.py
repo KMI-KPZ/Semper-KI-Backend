@@ -20,6 +20,18 @@ class ManageAWS():
 
     """
 
+
+    #######################################################
+    def __getattr__(self, item):
+        if item == "s3_client":
+            self.s3_client = self.initClient()
+            if self.local:
+                self.createBucket(self.bucketName) # has to be done every time lest localstack forgets it exists
+
+            return self.s3_client
+        else:
+            raise AttributeError
+
     #######################################################
     def __init__(self, aesKey, location, bucketName, endpoint, key, secret, local:bool) -> None:
         """
@@ -32,13 +44,12 @@ class ManageAWS():
         :param secret: The secret/password
         :type secret: Str
         """
-        self.s3_client = boto3.client("s3", region_name=location, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
+        # lazy loading of the boto client. Is stored in a function object that is called in __getattr__
+        self.initClient = lambda : boto3.client("s3", region_name=location, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
         self.bucketName = bucketName
         self.aesEncryptionKey = aesKey
         self.local = local
-        if local:
-            self.createBucket(bucketName) # has to be done every time lest localstack forgets it exists
-        
+
     #######################################################
     def createBucket(self, bucketName):
         """
