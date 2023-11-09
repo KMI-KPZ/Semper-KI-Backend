@@ -77,6 +77,14 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'AWS_CDN_ENDPOINT': {'var': 'AWS_CDN_ENDPOINT', 'hint': 'Same as domain, except for cdn. before the domain', 'default': None, 'required': True},
         'AWS_LOCATION': {'var': 'AWS_LOCATION', 'hint': 'Usually the same as the bucket name but can be different', 'default': None, 'required': True},
         'AWS_STATICS_LOCATION': {'var': 'AWS_STATICS_LOCATION', 'hint': 'Same but for the statics folder', 'default': None, 'required': True},
+
+        'EMAIL_HOST': {'var': 'EMAIL_HOST', 'hint': 'Email host for sending emails', 'default': 'localhost', 'required': False,},
+        'EMAIL_HOST_PASSWORD': {'var': 'EMAIL_HOST_PASSWORD', 'hint': 'Email host password for sending emails', 'default': '', 'required': False,},
+        'EMAIL_HOST_USER': {'var': 'EMAIL_HOST_USER', 'hint': 'Email host user for sending emails', 'default': '','required': False,},
+        'EMAIL_PORT': {'var': 'EMAIL_PORT', 'hint': 'Email port for sending emails', 'default': 25,'required': False,},
+        'EMAIL_USE_TLS': {'var': 'EMAIL_USE_TLS', 'hint': 'Email use tls for sending emails', 'default': False,'required': False, 'type': 'bool'},
+        'EMAIL_USE_SSL': {'var': 'EMAIL_USE_SSL', 'hint': 'Email use ssl for sending emails', 'default': False,'required': False, 'type': 'bool'},
+        'EMAIL_ADDR_SUPPORT' : {'var': 'EMAIL_ADDR_SUPPORT', 'hint': 'Email address for support, i.e. for contact form', 'default': 'semper-ki@infai.org'},
     }
 
     env_vars_internal = {
@@ -113,7 +121,7 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         'AES_ENCRYPTION_KEY': {'var': 'AES_ENCRYPTION_KEY', 'hint': 'AES Key generated for encryption as base64 encoded string', 'default': None, 'required': True},
         'ALLOWED_HOSTS': {'var': 'ALLOWED_HOSTS', 'hint': 'Allowed hosts for the backend API calls, comma separated',
                           'type': 'list',
-                          'default': 'localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},
+                          'default': '127.0.0.1,localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},
         'ENV_TOKEN': {'var': 'ENV_TOKEN', 'hint': 'A token with which you can check which env is used',
                    'default': 'DEFAULT_ENV', 'required': False},
 
@@ -124,7 +132,6 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
         super().__init__()
 
     def configure_database(self, module):
-        print('************* configuring database: thread: ' + str(threading.current_thread().ident) + ' *************')
         setattr(module, 'DATABASES', {
 
             'default': {
@@ -136,13 +143,9 @@ class BackendDjangoConfigHelper(SemperKiConfigHelper):
                 "PORT": module.POSTGRES_PORT,
             }
         })
-        print(str(module.DATABASES))
 
-
-print("hier sind die base settings")
 # Load environment definition file
 
-print(f'###########{os.environ.get("ENV_FILE")} ###########')
 file_base = os.environ.get("ENV_FILE")
 if file_base is None:
     file_base = ".env"
@@ -150,10 +153,7 @@ if file_base is None:
 else:
     ENV_FILE = find_dotenv(filename=os.environ.get("ENV_FILE"))
 
-print(f'###########{ENV_FILE} mode: {os.environ.get("ENV_FILE", ".env")} ###########')
-
 if ENV_FILE:
-    print(f'Loading environment variables from {ENV_FILE}')
     load_dotenv(ENV_FILE)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -375,6 +375,11 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
             'level': 'INFO',
+        },
+        'django_debug': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
         },
         # django.template and django.backends must not use DEBUG-level, since it is buggy
         'django.template': {

@@ -137,8 +137,11 @@ paths = {
     "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
     "deleteFile": "public/deleteFile/<processID>/<fileID>",
 
+    "contactForm": "public/contact/",
+
     "statistics": "public/getStatistics/",
 }
+
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
@@ -252,11 +255,13 @@ urlpatterns = [
     path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
     path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
 
+    path(paths["contactForm"], frontpage.send_contact_form, name="sendContactForm"),
+
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
 if settings.DEBUG:
-    urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
+    urlpatterns.append(path('private/settings', frontpage.get_settings_token, name='getSettingsToken'))
 
 urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
 
