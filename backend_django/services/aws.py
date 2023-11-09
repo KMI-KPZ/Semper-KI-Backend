@@ -35,6 +35,7 @@ class ManageAWS():
         self.s3_client = boto3.client("s3", region_name=location, endpoint_url=endpoint, aws_access_key_id=key, aws_secret_access_key=secret)
         self.bucketName = bucketName
         self.aesEncryptionKey = aesKey
+        self.local = local
         if local:
             self.createBucket(bucketName) # has to be done every time lest localstack forgets it exists
         
@@ -66,8 +67,10 @@ class ManageAWS():
         :rtype: Bool or Error
         """
         file.file.seek(0) # because read() is called and has to start at the front of the file
-        encryptedFile = crypto.encryptAES(self.aesEncryptionKey, file.file) # encrypt file
-        response = self.s3_client.upload_fileobj(encryptedFile, self.bucketName, fileKey)
+        fileToBeUploaded = file.file
+        if self.local is False:
+            fileToBeUploaded = crypto.encryptAES(self.aesEncryptionKey, file.file) # encrypt file for remote AWS
+        response = self.s3_client.upload_fileobj(fileToBeUploaded, self.bucketName, fileKey)
         # TODO if response...
 
         return True
@@ -88,9 +91,11 @@ class ManageAWS():
         output.seek(0)
         if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
             return (output, False)
-        decryptedFile = crypto.decryptAES(self.aesEncryptionKey, output)
-
-        return (decryptedFile, True)
+        if self.local is False: # remote aws files are encrypted
+            decryptedFile = crypto.decryptAES(self.aesEncryptionKey, output)
+            return (decryptedFile, True)
+        else:
+            return (output, True)
     
     #######################################################
     def deleteFile(self, fileKey):
