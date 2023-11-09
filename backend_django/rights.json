@@ -27,8 +27,12 @@
              "ProjectFile"
          ],
          "paths": [
-            "downloadFiles",
-            "updateProcess"
+            "updateProcess",
+            "downloadFilesAsZip",
+            "downloadFile",
+            "uploadFiles",
+            "uploadModel",
+            "deleteFile"
          ]
       },
       {
@@ -104,7 +108,8 @@
          ],
          "paths": [
             "deleteProcess",
-            "deleteProject"
+            "deleteProject",
+            "deleteFile"
          ]
       },
       {

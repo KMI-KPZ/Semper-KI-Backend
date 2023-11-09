@@ -105,8 +105,8 @@ class ManageQueries:
 
 ########################################
 # list of objects
-getAllMaterials = ManageQueries("/backend_django/SPARQLQueries/Materials/GetAllMaterials.txt")
-getAllPrinters = ManageQueries("/backend_django/SPARQLQueries/Printer/GetAll3DPrinters.txt")
+getAllMaterials = ManageQueries("/Ontology/queries/material_Hannes")
+getAllPrinters = ManageQueries("/Ontology/queries/printer_Hannes")
     
 
 #######################################################

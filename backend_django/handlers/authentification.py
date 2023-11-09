@@ -80,26 +80,32 @@ def loginUser(request):
     :rtype: HTTP Link as str
 
     """
+    # Check if Login is mocked
+    mocked = False
+    if "Usertype" in request.headers and (request.headers["Usertype"] == "fakeUser" or request.headers["Usertype"] == "fakeAdmin" or request.headers["Usertype"] == "fakeOrganization"):
+        mocked = True
 
     # disable login in production as of now (19.7.2023)
     if settings.PRODUCTION:
+        mocked = False
         return HttpResponse("Currently, logging in is not allowed. Sorry.", status=403)
 
     # check number of login attempts
-    if "numOfLoginAttempts" in request.session:
-        if (datetime.datetime.now() - datetime.datetime.strptime(request.session["lastLoginAttempt"],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
-            request.session["numOfLoginAttempts"] = 0
-            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
-        else:
-            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+    if mocked is False:
+        if "numOfLoginAttempts" in request.session:
+            if (datetime.datetime.now() - datetime.datetime.strptime(request.session["lastLoginAttempt"],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
+                request.session["numOfLoginAttempts"] = 0
+                request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+            else:
+                request.session["lastLoginAttempt"] = str(datetime.datetime.now())
 
-        if request.session["numOfLoginAttempts"] > 10:
-            return HttpResponse("Too many login attempts! Please wait 5 Minutes.", status=429)
+            if request.session["numOfLoginAttempts"] > 10:
+                return HttpResponse("Too many login attempts! Please wait 5 Minutes.", status=429)
+            else:
+                request.session["numOfLoginAttempts"] += 1
         else:
-            request.session["numOfLoginAttempts"] += 1
-    else:
-        request.session["numOfLoginAttempts"] = 1
-        request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+            request.session["numOfLoginAttempts"] = 1
+            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
 
     # set type of user
     isPartOfOrganization = False
@@ -110,12 +116,17 @@ def loginUser(request):
         request.session["pgProcessClass"] = "user"
     else:
         userType = request.headers["Usertype"]
-        if userType == "organization" or userType == "manufacturer":
+        if userType == "organization" or userType == "manufacturer" or userType == "fakeOrganization":
             request.session["usertype"] = "organization"
             request.session["isPartOfOrganization"] = True
             request.session["pgProfileClass"] = "organization"
             request.session["pgProcessClass"] = "organization"
             isPartOfOrganization = True
+        elif userType == "fakeAdmin" and mocked is True:
+            request.session["usertype"] = "admin"
+            request.session["isPartOfOrganization"] = False
+            request.session["pgProfileClass"] = "user"
+            request.session["pgProcessClass"] = "user"
         else:
             request.session["usertype"] = "user"
             request.session["isPartOfOrganization"] = False
@@ -136,16 +147,21 @@ def loginUser(request):
         request.session["pathAfterLogin"] = forward_url + request.headers["Path"]
         
     register = ""
-    if "Register" in request.headers:
+    if "Register" in request.headers and mocked is False:
         if request.headers["Register"] == "true":
             register = "&screen_hint=signup"
 
-    if isPartOfOrganization:
-        uri = auth0.authorizeRedirectOrga(request, reverse("callbackLogin"))
+    request.session.modified = True
+    if mocked:
+        request.session["mockedLogin"] = True
+        return HttpResponse("http://127.0.0.1:8000"+reverse("callbackLogin"))
     else:
-        uri = auth0.authorizeRedirect(request, reverse("callbackLogin"))
-    # return uri and redirect to register if desired
-    return HttpResponse(uri.url + register)
+        if isPartOfOrganization:
+            uri = auth0.authorizeRedirectOrga(request, reverse("callbackLogin"))
+        else:
+            uri = auth0.authorizeRedirect(request, reverse("callbackLogin"))
+        # return uri and redirect to register if desired
+        return HttpResponse(uri.url + register)
 
 #######################################################
 def setOrganizationName(request):
@@ -297,14 +313,28 @@ def callbackLogin(request):
 
     """
     try:
-        # authorize callback token
-        if request.session["isPartOfOrganization"]:
-            token = auth0.authorizeTokenOrga(request)
+        # Check if mocked
+        mocked = False
+        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+            mocked = True
+
+        # authorize callback token or write fake data
+        if not mocked:
+            if request.session["isPartOfOrganization"]:
+                token = auth0.authorizeTokenOrga(request)
+            else:
+                token = auth0.authorizeToken(request)
         else:
-            token = auth0.authorizeToken(request)
+            request.session["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "type": ""}}
+            request.session["user"]["userinfo"]["sub"] = "auth0|testuser"
+            request.session["user"]["userinfo"]["nickname"] = "testuser"
+            request.session["user"]["userinfo"]["email"] = "testuser@test.de"
+            request.session["userRoles"] = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
+            request.session["userPermissions"] = {"processes:read": "", "processes:messages": "","processes:edit": "","processes:delete": "","processes:files": ""}
+            
 
         # email of user was not verified yet, tell them that!
-        if token["userinfo"]["email_verified"] == False:
+        if not mocked and token["userinfo"]["email_verified"] == False:
             if settings.PRODUCTION:
                 forward_url = 'https://www.semper-ki.org'
             elif settings.DEVELOPMENT:
@@ -314,15 +344,25 @@ def callbackLogin(request):
             return HttpResponseRedirect(forward_url+"/verifyEMail", status=401)
 
         # convert expiration time to the corresponding date and time
-        now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
-        request.session["user"] = token
-        request.session["user"]["tokenExpiresOn"] = str(now)
+        if not mocked:
+            now = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=token["expires_at"])
+            request.session["user"] = token
+            request.session["user"]["tokenExpiresOn"] = str(now)
+        else:
+            currentTime = datetime.datetime.now()
+            request.session["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        
 
         # get roles and permissions
-        setOrganizationName(request)
-        retVal = setRoleAndPermissionsOfUser(request)
-        if isinstance(retVal, Exception):
-            raise retVal
+        if not mocked:
+            setOrganizationName(request)
+            retVal = setRoleAndPermissionsOfUser(request)
+            if isinstance(retVal, Exception):
+                raise retVal
+        elif request.session["isPartOfOrganization"]:
+                request.session["organizationName"] = "testOrganization"
+                request.session["user"]["userinfo"]["org_id"] = "id123"
+                request.session["userPermissions"].update({"orga:read": "", "orga:edit": "", "orga:delete": "", "resources:read": "", "resources:edit": ""})
 
         # Get Data from Database or create entry in it for logged in User
         orgaObj = None
@@ -418,6 +458,10 @@ def logoutUser(request):
     :rtype: HTTP URL
 
     """
+    mock = False
+    if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        mock = True
+
     if "currentProjects" in request.session:
         projectAndProcessManagement.saveProjects(request)
 
@@ -445,11 +489,16 @@ def logoutUser(request):
     #         quote_via=quote_plus,
     #     ),
     # )
+
+    
     if settings.PRODUCTION:
         callbackString = request.build_absolute_uri('https://www.semper-ki.org')
     elif settings.DEVELOPMENT:
         callbackString = request.build_absolute_uri('https://dev.semper-ki.org')
     else:
         callbackString = request.build_absolute_uri('http://127.0.0.1:3000')
-
-    return HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
+    
+    if not mock:    
+        return HttpResponse(f"https://{settings.AUTH0_DOMAIN}/v2/logout?" + urlencode({"returnTo": request.build_absolute_uri(callbackString),"client_id": settings.AUTH0_CLIENT_ID,},quote_via=quote_plus,))
+    else:
+        return HttpResponse(callbackString)

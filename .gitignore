@@ -60,6 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+static/
 
 # Flask stuff:
 instance/
@@ -141,6 +142,8 @@ quickDebug.py
 .env.dev
 
 Ontology/
+
+localstack/
 
 /playground
 

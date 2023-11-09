@@ -99,6 +99,21 @@ services:
       - celery-beat
       networks:
           - semper-ki-dev-network
+    
+  localstack:
+      image: localstack/localstack
+      container_name: localstack-aws
+      volumes:
+        - ./localstack/:/var/lib/localstack
+      env_file:
+        - .env.local_container
+      environment:
+        - DOCKER_HOST=unix:///var/run/docker.sock
+        - LOCALSTACK_PERSISTENCE=1
+      ports:
+        - "127.0.0.1:4566:4566"
+      networks:
+          - semper-ki-dev-network
 
 networks:
   semper-ki-dev-network:

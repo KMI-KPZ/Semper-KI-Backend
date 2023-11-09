@@ -60,8 +60,8 @@ def onto_getPrinters(request):
     resultsOfQueries = {"printers": []}
     printersRes = cmem.getAllPrinters.sendQuery()
     for elem in printersRes:
-        title = elem["Printer"]["value"]
-        resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
+        title = elem["3DPrinter_name"]["value"]
+        resultsOfQueries["printers"].append({"title": title, "URI": elem["3DPrinter_name"]["value"]})
         
     return JsonResponse(resultsOfQueries)
 
@@ -169,7 +169,7 @@ def orga_addPrinter(request):
     orgaName = body["organization"]
     printerName = body["printer"]
 
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.DEFINED},added,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DEFINED},added,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -194,7 +194,7 @@ def orga_addPrinterEdit(request):
     printerName = body["printer"]
     props = body["properties"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},added/edited,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},added/edited,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -219,7 +219,7 @@ def orga_createPrinter(request):
     printerName = body["printer"]
     props = body["properties"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -243,7 +243,7 @@ def orga_removePrinter(request):
     orgaName = body["organization"]
     printerName = body["printer"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.DELETED},removed,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},removed,{Logging.Object.OBJECT},printer {printerName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 
@@ -267,7 +267,7 @@ def orga_addMaterial(request):
     orgaName = body["organization"]
     materialName = body["material"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.DEFINED},added,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DEFINED},added,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
     
@@ -292,7 +292,7 @@ def orga_addMaterialEdit(request):
     materialName = body["material"]
     props = body["properties"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.EDITED},added/edited,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},added/edited,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 #######################################################
@@ -316,7 +316,7 @@ def orga_createMaterial(request):
     materialName = body["material"]
     props = body["properties"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 #######################################################
@@ -339,7 +339,7 @@ def orga_removeMaterial(request):
     orgaName = body["organization"]
     materialName = body["material"]
     
-    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUser(request.session)['name']},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},material {materialName} to the ontology," + str(datetime.datetime.now()))
     return HttpResponse("Success", status=200)
 
 

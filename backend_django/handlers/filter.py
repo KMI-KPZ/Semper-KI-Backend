@@ -60,7 +60,7 @@ def getUploadedModel(files):
         model["id"] = entry[0]
         model["title"] = entry[1]
         model["URI"] = str(entry[2])
-        model["CreatedBy"] = "user"
+        model["createdBy"] = "user"
 
         models["models"].append(model)
     return model

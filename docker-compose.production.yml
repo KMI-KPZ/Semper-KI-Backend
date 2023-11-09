@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile_new
+    command: ["-e prod"]
     ports:
       - 127.0.0.1:8001:8000
     volumes:
@@ -13,22 +14,85 @@ services:
     depends_on:
       - db-prod
       - files-prod
+
   db-prod:
     image: postgres:15
     env_file:
-     - .env
+     - .env.prod
     ports:
       - 127.0.0.1:5433:5432
     volumes:
       - ./postgres/data/:/var/lib/postgresql/data/
+
   files-prod:
     image: redis:7
     env_file:
-    - .env
-    volumes:
-      - ./redis/data/:/var/lib/redis/data/
-    extra_hosts:
-     - "host.docker.internal:host-gateway"
+      - .env.prod
     ports:
       - 127.0.0.1:6380:6379
-    command: --save 60 1 --loglevel warning --requirepass ${REDISPW}
+    volumes:
+      - ./redis/data/:/var/lib/redis/data/
+      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
+    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  celery-worker-prod:
+    build:
+      context: .
+    entrypoint: celery
+    environment:
+      - MODE=prod
+    command: -A backend_django.celery worker --loglevel=info
+    volumes:
+      - .:/var/www/app/worker
+    links:
+      - files-prod
+    depends_on:
+      - files-prod
+
+  celery-beat-prod:
+    build:
+      context: .
+    entrypoint: celery
+    environment:
+      - MODE=prod
+    command: -A backend_django.celery beat --loglevel=info
+    volumes:
+      - .:/var/www/app/beat
+    links:
+      - celery-worker-prod
+      - files-prod
+    depends_on:
+      - celery-worker-prod
+      - files-prod
+
+  flower-prod:
+    image: mher/flower
+    env_file:
+      - .env.prod
+    volumes:
+      - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
+    entrypoint: /usr/local/bin/dc-service-flower-start.sh
+    ports:
+      - 8889:8888
+    links:
+      - files-prod
+      - celery-worker-prod
+      - celery-beat-prod
+    depends_on:
+      - files-prod
+      - celery-worker-prod
+      - celery-beat-prod
+
+  localstack-prod:
+    image: localstack/localstack
+    volumes:
+      - ./localstack/:/var/lib/localstack
+    env_file:
+      - .env.prod
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_PERSISTENCE=1
+    ports:
+      - "127.0.0.1:4567:4566"

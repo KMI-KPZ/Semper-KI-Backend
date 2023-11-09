@@ -27,7 +27,7 @@ from django.conf import settings
 
 from .handlers import checkProcesses, projectAndProcessManagement, resources, test_response, authentification, profiles, filter, frontpage, sparqlQueries, files, statistics, organizations, admin
 from Benchy.BenchyMcMarkface import startFromDjango
-from django.conf.urls.static import static
+#from django.conf.urls.static import static
 
 paths = {
     "landingPage": "",
@@ -70,7 +70,7 @@ paths = {
     "createProcessID": "public/createProcessID/<projectID>/",
     "updateProcess": "public/updateProcess/",
     "updateProject": "public/updateProject/",
-    "deleteProcess": "public/deleteProcess/<projectID>/<processID>/",
+    "deleteProcess": "public/deleteProcess/<projectID>/",
     "deleteProject": "public/deleteProject/<projectID>/",
     "verifyProject": "public/verifyProject/",
     "sendProject": "public/sendProject/",
@@ -130,9 +130,12 @@ paths = {
     "testCoypu": "public/coypu/",
 
     "testRedis": "private/testRedis/",
-    "uploadModels": "public/uploadModels/", #uploadModels uploadFiles
+    "uploadModel": "public/uploadModel/",
+    "uploadFiles": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
-    "downloadFiles": "public/downloadFiles/",
+    "downloadFile": "public/downloadFile/<processID>/<fileID>",
+    "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
+    "deleteFile": "public/deleteFile/<processID>/<fileID>",
 
     "contactForm": "public/contact/",
 
@@ -152,7 +155,6 @@ urlpatterns = [
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
     path('private/test/', test_response.testResponse, name='test_response'),
     path('private/testWebsocket/', test_response.testCallToWebsocket, name='testCallToWebsocket'),
-
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),
@@ -244,16 +246,20 @@ urlpatterns = [
     path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
     path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
     path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
+    
+    #path(paths["testRedis"], files.testRedis, name="testRedis"),
+    path(paths["uploadModel"], files.uploadModel, name="uploadModel"),
+    path(paths["uploadFiles"], files.uploadFiles, name="uploadFiles"),
+    #path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
+    path(paths["downloadFile"], files.downloadFile, name="downloadFile"),
+    path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
+    path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
 
-    path(paths["testRedis"], files.testRedis, name="testRedis"),
-    path(paths["uploadModels"], files.uploadModels, name="uploadModels"),
-    path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
-    path(paths["downloadFiles"], files.downloadFiles, name="downloadFiles"),
     path(paths["contactForm"], frontpage.send_contact_form, name="sendContactForm"),
 
-
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.get_settings_token, name='getSettingsToken'))
 

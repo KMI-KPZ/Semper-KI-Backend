@@ -85,3 +85,16 @@ services:
       - files-stage
       - celery-worker-stage
       - celery-beat-stage
+  
+  localstack-stage:
+    image: localstack/localstack
+    container_name: localstack-aws-stage
+    volumes:
+      - ./localstack/:/var/lib/localstack
+    env_file:
+      - .env.stage
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_PERSISTENCE=1
+    ports:
+      - "127.0.0.1:4566:4566"
