@@ -19,6 +19,8 @@ The backend currently supports the environment ```--env <environment>``` which w
 
 - check, that you have at least Python 3.11 installed (via Terminal/Powershell and `python --version`) and correctly linked in your system environment variables (see: https://realpython.com/add-python-to-path/)
 - clone the repository via SSH (in VS Code preferably)
+- run ```git submodule init``` to initialize your local configuration file, and 
+- run ```git submodule update``` to fetch all the data from that project and check out the appropriate commit listed in your superproject.
 - for clean initialization check that postgres folder is empty as well as redis folder
 - call ```python -m pip install -r requirements.txt``` to install packages to your local machine
 - to run the backend, you need at least one ".env" file, either you ask your team to send it to you, or you can generate one yourself. To do the latter, do as follows:

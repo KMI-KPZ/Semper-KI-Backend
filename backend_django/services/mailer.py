@@ -15,7 +15,7 @@ class KissMailer():
     def sendmail(self, to, subject, message):
         import logging
         logger = logging.getLogger("django_debug")
-        logger.info(f'creating mail to {to} with subject {subject} and message {message}')
+        logger.debug(f'creating mail to {to} with subject {subject} and message {message}')
         try:
             connection = mail.get_connection()
             email = mail.send_mail(

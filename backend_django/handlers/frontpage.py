@@ -111,18 +111,3 @@ def sparqlPage(request):
 def get_settings_token(request):
     return JsonResponse({"token": settings.BACKEND_SETTINGS})
 
-
-def send_contact_form(request):
-    from backend_django.services.mailer import KissMailer
-    import logging
-    import json
-    # log whole post request
-    logger = logging.getLogger('django')
-    logger.info(f'recieved contact form input: "{str(request.body)}')
-    print("sending email")
-    data = json.loads(request.body.decode("utf-8"))
-    mailer = KissMailer()
-    msg = "Backendsettings: " + settings.BACKEND_SETTINGS + "\nName: " + data["name"] + "\n" + "Email: " + data[
-        "email"] + "\n" + "Message: " + data["message"]
-    result = mailer.sendmail(settings.EMAIL_ADDR_SUPPORT, data["subject"], msg)
-    return JsonResponse({"status": "ok", "result": result})
