@@ -14,7 +14,7 @@ from backend_django.services.mailer import KissMailer
 from django.conf import settings
 from logging import getLogger
 
-logger = getLogger("django")
+logger = getLogger("django_debug")
 
 
 @require_http_methods(["POST"])

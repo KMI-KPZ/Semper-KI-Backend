@@ -13,7 +13,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot
 import numpy as np
 from PIL import Image
-import base64 
+import base64
+from logging import getLogger
+
+logger = getLogger("django")
 
 
 # def find_mins_maxs(obj):
@@ -65,7 +68,7 @@ async def stlToBinJpg(file) -> str:
         img.save(convertedJpg, format="jpeg")
         return base64.b64encode(convertedJpg.getvalue())
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while converting stl to jpg: {str(error)}")
         return base64.b64encode(error)
 
 #######################################################

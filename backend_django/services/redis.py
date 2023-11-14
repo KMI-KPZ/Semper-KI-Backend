@@ -5,16 +5,19 @@ Silvio Weging 2023
 
 Contains: Services for using the key-value store in redis
 """
+import logging
 
 import redis, json, pickle
 from django.conf import settings
+
+logger = logging.getLogger("django_debug")
 
 class RedisConnection():
 
     redis_instance = ""
 
     def __init__(self) -> None:
-        print("USING REDIS PASSWORD: "+settings.REDIS_PASSWORD+ "\n")
+        logger.debug(f"USING REDIS PASSWORD: {settings.REDIS_PASSWORD}")
         self.redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, password=settings.REDIS_PASSWORD)
 
     #######################################################
@@ -37,7 +40,7 @@ class RedisConnection():
                 self.redis_instance.expire(key, 86400) # 24 hours until deletion of the data
             return True
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not add content to redis: {str(error)}')
             return error
         
     #######################################################
@@ -60,7 +63,7 @@ class RedisConnection():
                 self.redis_instance.expire(key, 86400) # 24 hours until deletion of the file
             return True
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not add content to redis: {str(error)}')
             return error
 
     #######################################################
@@ -77,7 +80,7 @@ class RedisConnection():
         try:
             self.redis_instance.delete(key)
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not delete key from redis: {str(error)}')
             return False
         return True
 
@@ -102,7 +105,7 @@ class RedisConnection():
             else:
                 return ("", False)
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not retrieve content from redis: {str(error)}')
             return (error, False)
 
         if deleteOrNot == True:
@@ -130,7 +133,7 @@ class RedisConnection():
             else:
                 return ("", False)
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not retrieve content from redis: {str(error)}')
             return (error, False)
 
         if deleteOrNot == True:

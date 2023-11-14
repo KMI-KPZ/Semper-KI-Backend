@@ -5,12 +5,15 @@ Silvio Weging 2023
 
 Contains: Services for oauth verification
 """
+import logging
+
 import requests, datetime
 
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
-
 from .redis import RedisConnection
+
+logger = logging.getLogger("django_debug")
 
 
 class OAuthLazy(OAuth):
@@ -22,7 +25,6 @@ class OAuthLazy(OAuth):
 
     def __getattr__(self, item):
         if self.lazy_fn not in (None, False) and item not in ('shape', '__len__', ) and not self.lazy_fn_called:
-            print(f"Initialisierung von Attribut {item}")
             self.lazy_fn(self)
             self.lazy_fn_called = True
         return super().__getattr__(item)
@@ -32,7 +34,7 @@ class OAuthLazy(OAuth):
 
 
 def auth0Register(instance):
-    print('initialisiere auth0')
+    logger.debug('initialisiere auth0')
     instance.register(
         "auth0",
         client_id=settings.AUTH0_CLIENT_ID,

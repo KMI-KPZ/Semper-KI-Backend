@@ -2,10 +2,11 @@ import os
 import threading
 
 from django.core.checks import Tags as DjangoTags, Error, Info
-from django.core.checks import register
 from .helper.classes import SemperKiConfigHelper
 from django.db import connections, OperationalError
 from django.apps import apps
+from logging import getLogger
+logger = getLogger("django_debug")
 
 
 class Tags(DjangoTags):
@@ -15,27 +16,26 @@ class Tags(DjangoTags):
 
 
 def checkEnv(app_configs=None, **kwargs):
-    print('checking environment variables in thread: '+ str(threading.get_ident()))
+    logger.debug(f'checking environment variables in thread: {str(threading.get_ident())}')
     errors = []
     if app_configs is None:
         app_configs = apps.get_app_configs()
 
     for app in app_configs:
         if issubclass(type(app), SemperKiConfigHelper):
-            print(f'checking environment variables for {str(app)}\n')
             errors.extend(app.checkEnvVars())
     return errors
 
 
 def checkDb(app_configs=None, **kwargs):
-    print('checking databases in thread: '+ str(threading.get_ident()))
+    logger.debug(f'checking databases in thread: {str(threading.get_ident())}')
     errors = []
     if app_configs is None:
         app_configs = apps.get_app_configs()
 
     for app in app_configs:
         if issubclass(type(app), SemperKiConfigHelper):
-            print(f'checking databases for {str(app)}\n')
+            logger.debug(f'checking databases for {str(app)}\n')
             for db_alias in app.getDbAliases():
                 db_conn = connections[db_alias]
                 from django.conf import settings
@@ -52,7 +52,7 @@ def checkDb(app_configs=None, **kwargs):
                     connected = True
     if len(errors) == 0:
         tables = [m._meta.db_table for c in apps.get_app_configs() for m in c.get_models()]
-        print(f'all tables by models {str(tables)}\n')
+        logger.debug(f'all tables by models {str(tables)}\n')
 
     return errors
 
