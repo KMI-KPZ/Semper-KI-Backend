@@ -6,10 +6,8 @@ Silvio Weging 2023
 Contains: Handlers managing the projects and processes
 """
 
-import json, random, logging
+import json, logging
 from datetime import datetime
-from django.utils import timezone
-from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -23,8 +21,7 @@ from ..services.postgresDB import pgProcesses, pgProfiles
 
 from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging, ProcessStatus
 
-from ..services import redis, aws
-from ..services.processes import price, collectAndSend
+from ..services import aws
 
 logger = logging.getLogger("logToFile")
 ################################################################################################
@@ -150,7 +147,7 @@ def updateProject(request):
 
         return HttpResponse("Success")
     except (Exception) as error:
-        print(error)
+        logger.error(f"updateProject: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 #######################################################
@@ -183,7 +180,7 @@ def deleteProject(request, projectID):
 
         return HttpResponse("Success")
     except (Exception) as error:
-        print(error)
+        logger.error(f"deleteProject: {str(error)}")
         return HttpResponse("Failed",status=500)
 ################################################################################################
 # Processes
@@ -226,7 +223,7 @@ def createProcessID(request, projectID):
         # return just the generated ID for frontend
         return JsonResponse({"processID": processID})
     except (Exception) as error:
-        print(error)
+        logger.error(f"createProcessID: {str(error)}")
         return JsonResponse({}, status=500)
 
 #######################################################
@@ -356,7 +353,7 @@ def getProcessAndProjectFromSession(session, processID):
                         return (currentProjectID, session["currentProjects"][currentProjectID]["processes"][currentProcessID])
         return (None, None)
     except (Exception) as error:
-        print(error)
+        logger.error(f"getProcessAndProjectFromSession: {str(error)}")
         return (None, None)
 
 
@@ -385,7 +382,7 @@ def updateProcess(request):
 
         return HttpResponse("Success")
     except (Exception) as error:
-        print(error)
+        logger.error(f"updateProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 #######################################################
@@ -420,7 +417,7 @@ def deleteProcess(request, projectID):
         
         return HttpResponse("Success")
     except (Exception) as error:
-        print(error)
+        logger.error(f"deleteProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 ################################################################################################
@@ -462,7 +459,7 @@ def getFlatProjects(request):
         return JsonResponse(outDict)
     
     except (Exception) as error:
-        print(error)
+        logger.error(f"getFlatProjects: {str(error)}")
         
     return JsonResponse({"projects": []})
 
@@ -500,7 +497,8 @@ def getProject(request, projectID):
 
         return JsonResponse(outDict)
     except (Exception) as error:
-            print(error)
+        logger.error(f"getProject: {str(error)}")
+
     return JsonResponse({})
 
 #######################################################
@@ -626,7 +624,7 @@ def saveProjectsViaWebsocket(session):
         return None
     
     except (Exception) as error:
-        print(error)
+        logger.error(f"saveProjectsViaWebsocket: {str(error)}")
         return error
 
 #######################################################
@@ -662,7 +660,7 @@ def saveProjects(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        print(error)
+        logger.error(f"saveProjects: {str(error)}")
         return HttpResponse("Failed")
     
 #######################################################
@@ -723,7 +721,7 @@ def verifyProject(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        print(error)
+        logger.error(f"verifyProject: {str(error)}")
         return HttpResponse("Failed")
     
 #######################################################
@@ -771,7 +769,7 @@ def sendProject(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        print(error)
+        logger.error(f"sendProject: {str(error)}")
         return HttpResponse("Failed")
 
 

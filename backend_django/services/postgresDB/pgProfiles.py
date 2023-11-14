@@ -7,13 +7,13 @@ Contains: Services for database calls to manage a user/organization profile
 """
 import types, json, enum, re
 
-from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-
 from ...modelFiles.profileModel import User, Organization
-
 from backend_django.utilities import crypto
+from logging import getLogger
+
+logger = getLogger("django")
 
 #TODO: switch to async versions at some point
 
@@ -42,7 +42,7 @@ class ProfileManagementBase():
                     for idx, elem in enumerate(obj["organizations"]):
                         obj["organizations"][idx] = Organization.objects.get(subID=elem).hashedID
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user: {str(error)}")
 
         return obj
  
@@ -65,7 +65,7 @@ class ProfileManagementBase():
                 obj = User.objects.get(subID=userID).toDict()
                 return obj["name"]
             except (Exception) as error:
-                print(error)
+                logger.error(f"Error getting user: {str(error)}")
         return "anonymous"
     
     ##############################################
@@ -85,7 +85,7 @@ class ProfileManagementBase():
         try:
             obj = Organization.objects.get(subID=orgaID).toDict()
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting organization: {str(error)}")
 
         return obj
 
@@ -106,7 +106,7 @@ class ProfileManagementBase():
             userID = session["user"]["userinfo"]["sub"]
             hashID = User.objects.get(subID=userID).hashedID
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user hash: {str(error)}")
 
         return hashID
     
@@ -128,7 +128,7 @@ class ProfileManagementBase():
                 orgID = session["user"]["userinfo"]["org_id"]
                 hashID = Organization.objects.get(subID=orgID).hashedID
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting orga hash: {str(error)}")
 
         return hashID
     
@@ -150,7 +150,7 @@ class ProfileManagementBase():
         except (ObjectDoesNotExist) as error:
             IDOfUserOrOrga = User.objects.get(hashedID=hashedID).subID
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user key via hash: {str(error)}")
 
         return IDOfUserOrOrga
     
@@ -172,7 +172,7 @@ class ProfileManagementBase():
         except (ObjectDoesNotExist) as error:
             ObjOfUserOrOrga = User.objects.get(hashedID=hashedID)
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user via hash: {str(error)}")
 
         return ObjOfUserOrOrga
 
@@ -192,7 +192,7 @@ class ProfileManagementBase():
         try:
             userID = session["user"]["userinfo"]["sub"]
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user key: {str(error)}")
 
         return userID
     
@@ -213,7 +213,7 @@ class ProfileManagementBase():
             if "org_id" in session["user"]["userinfo"]:
                 orgaID = session["user"]["userinfo"]["org_id"]
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user key: {str(error)}")
 
         return orgaID
 
@@ -237,7 +237,7 @@ class ProfileManagementBase():
                 userID = uID
             userID = re.sub(r"[^a-zA-Z0-9]", "", userID)
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting user key WOSC: {str(error)}")
 
         return userID
     
@@ -275,7 +275,7 @@ class ProfileManagementBase():
             else:
                 affected = User.objects.filter(subID=session["user"]["userinfo"]["sub"]).delete()
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error deleting user: {str(error)}")
             return False
         return True
     
@@ -298,7 +298,7 @@ class ProfileManagementBase():
                 affected = Organization.objects.filter(subID=session["user"]["userinfo"]["org_id"]).delete()
             
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error deleting organization: {str(error)}")
             return False
         return True
     
@@ -358,7 +358,7 @@ class ProfileManagementUser(ProfileManagementBase):
 
                 return createdUser
             except (Exception) as error:
-                print(error)
+                logger.error(f"Error adding user : {str(error)}")
                 return error
 
     ##############################################
@@ -385,7 +385,7 @@ class ProfileManagementUser(ProfileManagementBase):
                 existingInfo[key] = details[key]
             affected = User.objects.filter(subID=subID).update(details=existingInfo["details"], name=existingInfo["name"], email=existingInfo["email"], updatedWhen=updated)
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error updating user details: {str(error)}")
             return False
         return True
     
@@ -422,7 +422,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
             for entry in listOfManufacturers:
                 returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "details": entry.details})
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting all contractors: {str(error)}")
 
         return returnValue
 
@@ -473,7 +473,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
                 
                 return createdUser
             except (Exception) as error:
-                print(error)
+                logger.error(f"Error adding user : {str(error)}")
                 return error
 
     ##############################################
@@ -494,7 +494,8 @@ class ProfileManagementOrganization(ProfileManagementBase):
             result = Organization.objects.get(subID=organizationID)
             result.users.add(userToBeAdded)
         except (ObjectDoesNotExist) as error:
-            print("Organization doesn't exist!", error)
+            logger.error(f"Error adding user to organization, organization does not exist: {str(error)}")
+
             return False
 
         return True
@@ -528,10 +529,10 @@ class ProfileManagementOrganization(ProfileManagementBase):
                 resultObj = Organization.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, details=orgaDetails, uri=uri, updatedWhen=updated) 
                 return resultObj
             except (Exception) as error:
-                print(error)
+                logger.error(f"Error adding organization: {str(error)}")
                 return None
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error getting or adding organization: {str(error)}")
             return None
 
     ##############################################
@@ -558,7 +559,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
                 existingInfo[key] = details[key]
             affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], canManufacture=existingInfo["canManufacture"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)
         except (Exception) as error:
-            print(error)
+            logger.error(f"Error updating organization details: {str(error)}")
             return False
         return True
 

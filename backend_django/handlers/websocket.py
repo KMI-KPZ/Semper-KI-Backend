@@ -5,17 +5,17 @@ Silvio Weging 2023
 
 Contains: Websocket for various stuff
 """
-
-from django.http import HttpResponse
+import logging
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.exceptions import StopConsumer
-from asgiref.sync import sync_to_async, async_to_sync
-from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 
 from backend_django.services.postgresDB import pgProfiles
 from backend_django.utilities import rights
 from backend_django.handlers.projectAndProcessManagement import saveProjectsViaWebsocket
+
+logger = logging.getLogger("django_debug")
 
 ###################################################
 class GeneralWebSocket(AsyncJsonWebsocketConsumer):
@@ -52,7 +52,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                     await self.channel_layer.group_add(uID+entry, self.channel_name)
                 await self.accept()
         except Exception as e:
-            print(e)
+            logger.error(f'could not connect websocket: {str(e)}')
 
     ##########################
     async def disconnect(self, code):
@@ -74,7 +74,7 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                     await self.channel_layer.group_discard(uID+entry, self.channel_name)
                 raise StopConsumer("Connection closed")
         except Exception as e:
-            print(e)
+            logger.error(f'could not disconnect websocket: {str(e)}')
 
     
     ##########################

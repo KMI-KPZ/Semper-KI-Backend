@@ -1,14 +1,8 @@
-import os
-import signal
-import threading
-
 from django.apps import AppConfig
-
-from .services import auth0
-
 from django.core.checks import register
 from .checks import Tags, checkEnv, checkDb, checkRedis
-from .helper.classes import SemperKiConfigHelper
+from logging import getLogger
+logger = getLogger("django_debug")
 
 #
 #
@@ -30,8 +24,6 @@ class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
 
     def ready(self):
         from django.conf import settings
-        print(f'\n\n********** BackendDjangoConfig.ready() **********\nSettings-Module: {settings.BACKEND_SETTINGS}\n')
-
         if self.doCheck('check_env'):
             register(checkEnv, Tags.env_check) # register check_env function with tag env_check
         if self.doCheck('check_db'):
@@ -44,10 +36,18 @@ class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
         return self.name
 
     def doCheck(self, check_name):
+        """
+        determine if check should be executed
+        :param check_name:
+        :type check_name: str
+        :return: True if check should be executed
+        :rtype: bool
+        """
+
         import sys
         for tokens in sys.argv:
             if tokens in self.checks_disable[check_name]:
-                print(f'check {check_name} will be skipped')
+                logger.info(f'check {check_name} will be skipped')
                 return False
-        print(f'check {check_name} will be executed')
+        logger.info(f'check {check_name} will be executed')
         return True

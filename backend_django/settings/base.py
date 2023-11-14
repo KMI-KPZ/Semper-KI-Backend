@@ -364,7 +364,7 @@ LOGGING = {
         '': {
             'handlers': ['console'],
             'propagate': False,
-            'level': 'DEBUG',
+            'level': 'WARNING',
         },
         'logToFile': { # the logger used in every handler, needs to be called manually
             'handlers': ['file','console'],
@@ -444,4 +444,3 @@ STORAGES = {
 
 
 STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
-MEDIA_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/media/"

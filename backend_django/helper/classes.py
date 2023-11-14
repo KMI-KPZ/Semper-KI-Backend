@@ -1,22 +1,9 @@
-from asgiref.local import Local
-from asgiref.sync import sync_to_async
-from channels.db import database_sync_to_async
-from django.apps import AppConfig
-from django.core.checks import Warning, Error, Info
-from django.conf import LazySettings
-# from django.db import ConnectionHandler
+
+from django.core.checks import Error, Info
 import os
+import logging
 
-# def setup_dbs_in_connection_handler(db_configs, connection_handler_original: ConnectionHandler):
-#     import threading
-#     print('setting up databases in connection handler for thread ' + str(threading.current_thread().ident))
-#     connection_handler = ConnectionHandler(db_configs)
-#     for alias in db_configs:
-#         print(f'creating connection for {alias}')
-#         sync_to_async(connection_handler.__setitem__(alias,connection_handler.create_connection(alias)), thread_sensitive=True)
-#
-#     connection_handler_original._connections = connection_handler._connections
-
+logger = logging.getLogger("django_debug")
 
 class SemperKiConfigHelper:
     env_vars = {}
@@ -59,12 +46,9 @@ class SemperKiConfigHelper:
 
     def loadEnvVars(self, target_module):
         for env_name in self.env_vars:
-            #print(f'{env_name} : {os.environ.get(env_name, self.env_vars[env_name]["default"])}')
             if self.env_vars[env_name].get('type',None) == 'list':
-                print(f'****************{env_name} : {os.environ.get(env_name, self.env_vars[env_name]["default"]).split(",")} ***********************')
                 setattr(target_module,self.env_vars[env_name]['var'],
                         os.environ.get(env_name, self.env_vars[env_name]['default']).split(','))
-                print(f'****************{env_name} : {getattr(target_module,self.env_vars[env_name]["var"])} ***********************')
             elif self.env_vars[env_name].get('type',None) == 'bool':
                 setattr(target_module,self.env_vars[env_name]['var'],
                         os.environ.get(env_name, self.env_vars[env_name]['default']) == 'True')

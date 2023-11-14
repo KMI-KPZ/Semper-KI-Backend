@@ -5,7 +5,6 @@ Silvio Weging 2023
 
 Contains: Further settings for production mode
 """
-print('loading production settings')
 
 from .base import *
 

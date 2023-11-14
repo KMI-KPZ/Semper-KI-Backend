@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
-
 from backend_django.services.mailer import KissMailer
+from logging import getLogger
+logging = getLogger("django_debug")
 
 class Command(BaseCommand):
     """
@@ -30,7 +31,9 @@ class Command(BaseCommand):
         :return: None
         :rtype: None
         """
+
         mailer = KissMailer()
+        logging.info(f'sending test mail to {options["to"]}')
         mailer.sendmail(options['to'], 'test mail', 'this is a test mail')
 
 

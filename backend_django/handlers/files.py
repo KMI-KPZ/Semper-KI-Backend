@@ -6,21 +6,21 @@ Silvio Weging 2023
 Contains: File upload handling
 """
 
-import asyncio, json, logging, zipfile
+import logging, zipfile
 
 from datetime import datetime
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 
 from io import BytesIO
 from django.views.decorators.http import require_http_methods
 
 from django.utils import timezone
 
-from ..utilities import crypto, mocks, stl
+from ..utilities import crypto
 
 from ..services.postgresDB import pgProfiles, pgProcesses
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from ..utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
@@ -77,7 +77,7 @@ def uploadModel(request):
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},model {fileName},"+str(datetime.now()))
         return JsonResponse(model)
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while uploading model: {str(error)}")
         return JsonResponse({}, status=500)
 
 #######################################################
@@ -122,7 +122,7 @@ def uploadFiles(request):
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},files,"+str(datetime.now()))
         return HttpResponse("Success")
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while uploading files: {str(error)}")
         return HttpResponse("Failed", status=500)
     
 #######################################################
@@ -169,7 +169,7 @@ def downloadFile(request, processID, fileID):
         
         return HttpResponse("Not found!", status=404)
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while downloading file: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 #######################################################
@@ -228,7 +228,7 @@ def downloadFilesAsZip(request, processID):
         return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')
 
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while downloading files as zip: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 
@@ -291,7 +291,7 @@ def deleteFile(request, processID, fileID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)
     except (Exception) as error:
-        print(error)
+        logger.error(f"Error while deleting file: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 ############################################################################################
