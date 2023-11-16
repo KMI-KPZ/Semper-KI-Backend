@@ -10,6 +10,8 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+import code_General.modelFiles.organizationModel as orgaModel #must be imported that way to avoid cyclic imports
+
 # Table for regular Users
 ###################################################
 class User(models.Model):
@@ -29,7 +31,7 @@ class User(models.Model):
     subID = models.CharField(primary_key=True,max_length=100)
     hashedID = models.CharField(max_length=513)
     name = models.CharField(max_length=100)
-    organizations = ArrayField(models.CharField(max_length=513))
+    organizations = models.ManyToManyField(orgaModel.Organization)
     details = models.JSONField()
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField(default=timezone.now())
@@ -42,4 +44,4 @@ class User(models.Model):
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "organizations": self.organizations, "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}
+        return {"hashedID": self.hashedID, "name": self.name, "organizations": ','.join(orga.name for orga in self.organizations.all()), "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}

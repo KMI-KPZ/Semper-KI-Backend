@@ -10,7 +10,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project
-from .organizationModel import Organization
+from code_General.modelFiles.organizationModel import Organization
 
 ###################################################
 class Process(models.Model):
@@ -65,6 +65,6 @@ class Process(models.Model):
                 "serviceStatus": self.serviceStatus,
                 "processDetails": json.dumps(self.processDetails),
                 "client": self.client,
-                "contractor": self.contractor,
+                "contractor": self.contractor.name,
                 "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
     

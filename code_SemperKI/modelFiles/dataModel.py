@@ -23,6 +23,7 @@ class Data(models.Model):
     :data: The data itself
     :details: Meta data and other information
     :createdBy: Who created this data
+    :contentID: ID of a file for example, makes searching easier
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
     :updatedWhen: Date and time at which the entry was updated
     :accessedWhen: Last date and time the data was fetched from the database, automatically set
@@ -35,6 +36,7 @@ class Data(models.Model):
     data = models.JSONField()
     details = models.JSONField()
     createdBy = models.CharField(max_length=513)
+    contentID = models.CharField(max_length=513)
 
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
@@ -44,7 +46,9 @@ class Data(models.Model):
     class Meta:
         ordering = ["createdWhen"]
         indexes = [
-            models.Index(fields=["process","type"], name="process_dataType_idx")
+            models.Index(fields=["process"], name="process_idx"),
+            models.Index(fields=["process","type"], name="process_dataType_idx"),
+            models.Index(fields=["process","contentID"], name="process_dataID_idx")
         ]
     ###################################################
     def __str__(self):
@@ -57,5 +61,6 @@ class Data(models.Model):
                 "data": json.dumps(self.data),
                 "details": json.dumps(self.details), 
                 "createdBy": self.createdBy,
+                "contentID": self.contentID,
                 "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
     

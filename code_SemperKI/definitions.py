@@ -31,11 +31,7 @@ class ProcessStatus(enum.Enum):
     FAILED =  1400,
     CANCELED =  1500
 
-###################################################
-# Services
-class ServiceType(enum.Enum):
-    ADDITIVE_MANUFACTURING = 1,
-    CREATE_3D_MODEL = 2
+
 
 ###################################################
 # Data Types
@@ -43,3 +39,15 @@ class DataType(enum.Enum):
     STATUS = 1,
     MESSAGE = 2,
     FILE = 3
+
+###################################################
+# File Object
+class FileObject():
+    id = ""
+    title = ""
+    tags = []
+    date = ""
+    licenses = []
+    certificates = []
+    URI = ""
+    createdBy = ""

@@ -9,10 +9,12 @@ import types, json, enum, re
 
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from code_General.modelFiles.organizationModel import Organization
-from code_General.modelFiles.userModel import User
-from code_General.utilities import crypto
+from ...modelFiles.organizationModel import Organization
+from ...modelFiles.userModel import User
+from ...utilities import crypto
 from logging import getLogger
+
+from ...definitions import ServiceType
 
 logger = getLogger("django")
 
@@ -37,11 +39,7 @@ class ProfileManagementBase():
         obj = {}
         try:
             obj = User.objects.get(subID=userID).toDict()
-
-            if len(obj["organizations"]) !=0:
-                if obj["organizations"][0] != "None":
-                    for idx, elem in enumerate(obj["organizations"]):
-                        obj["organizations"][idx] = Organization.objects.get(subID=elem).hashedID
+                
         except (Exception) as error:
             logger.error(f"Error getting user: {str(error)}")
 
@@ -63,8 +61,8 @@ class ProfileManagementBase():
         if "user" in session and "userinfo" in session["user"]:
             userID = session["user"]["userinfo"]["sub"]
             try:
-                obj = User.objects.get(subID=userID).toDict()
-                return obj["name"]
+                name = User.objects.get(subID=userID).name
+                return name
             except (Exception) as error:
                 logger.error(f"Error getting user: {str(error)}")
         return "anonymous"
@@ -246,7 +244,7 @@ class ProfileManagementBase():
     @staticmethod
     def setLoginTime(userIDHash):
         """
-        Sets the las login Time to now. Used for 'Last Login'.
+        Sets the last login Time to now. Used for 'Last Login'.
 
         :param session: userID
         :type session: str
@@ -350,12 +348,12 @@ class ProfileManagementUser(ProfileManagementBase):
             try:
                 userName = session["user"]["userinfo"]["nickname"]
                 userEmail = session["user"]["userinfo"]["email"]
-                details = {}
+                details = {"email": userEmail}
                 updated = timezone.now()
                 lastSeen = timezone.now()
                 idHash = crypto.generateSecureID(userID)
                  
-                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=["None"], details=details, updatedWhen=updated, lastSeen=lastSeen)
+                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, details=details, updatedWhen=updated, lastSeen=lastSeen)
 
                 return createdUser
             except (Exception) as error:
@@ -381,10 +379,10 @@ class ProfileManagementUser(ProfileManagementBase):
         updated = timezone.now()
         try:
             existingObj = User.objects.get(subID=subID)
-            existingInfo = {"name": existingObj.name, "details": existingObj.details, "email": existingObj.email}
+            existingInfo = {"name": existingObj.name, "details": existingObj.details}
             for key in details:
                 existingInfo[key] = details[key]
-            affected = User.objects.filter(subID=subID).update(details=existingInfo["details"], name=existingInfo["name"], email=existingInfo["email"], updatedWhen=updated)
+            affected = User.objects.filter(subID=subID).update(details=existingInfo["details"], name=existingInfo["name"], updatedWhen=updated)
         except (Exception) as error:
             logger.error(f"Error updating user details: {str(error)}")
             return False
@@ -408,7 +406,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def getAllContractors():
+    def getAllContractors(selectedService:ServiceType):
         """
         Get all contractors.
         
@@ -416,11 +414,10 @@ class ProfileManagementOrganization(ProfileManagementBase):
         :rtype: Dictionary
 
         """
-        obj = {}
         try:
-            listOfManufacturers = Organization.objects.filter(canManufacture=True)
+            listOfSuitableContractors = Organization.objects.filter(supportedServices__contains=[selectedService])
             returnValue = []
-            for entry in listOfManufacturers:
+            for entry in listOfSuitableContractors:
                 returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "details": entry.details})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")
@@ -442,40 +439,31 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
         userID = session["user"]["userinfo"]["sub"]
         try:
-            # first get, then create
+            # first get, if it fails, create
             existingUser = User.objects.get(subID=userID)
-            if organization.subID not in existingUser.organizations:
-                if len(existingUser.organizations) > 0:
-                    if existingUser.organizations[0] == "None":
-                        existingUser.organizations[0] = organization.subID
-                    else:
-                        existingUser.organizations.append(organization.subID)
-                else:
-                    existingUser.organizations = [organization.subID]
-                
-                if ProfileManagementOrganization.addUserToOrganization(existingUser, session["user"]["userinfo"]["org_id"]) == False:
-                    raise Exception(f"User could not be added to organization!, {existingUser}, {organization}")
-                existingUser.save()
-                
-            return existingUser
         except (ObjectDoesNotExist) as error:
             try:
                 userName = session["user"]["userinfo"]["nickname"]
                 userEmail = session["user"]["userinfo"]["email"]
-                details = {}
+                details = {"email": userEmail}
                 updated = timezone.now()
                 lastSeen = timezone.now()
                 idHash = crypto.generateSecureID(userID)
                  
-
-                createdUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, email=userEmail, organizations=[organization.subID], details=details, updatedWhen=updated, lastSeen=lastSeen)
-                if ProfileManagementOrganization.addUserToOrganization(createdUser, session["user"]["userinfo"]["org_id"]) == False:
-                    raise Exception(f"User could not be added to organization!, {createdUser}, {organization}")
-                
-                return createdUser
+                existingUser = User.objects.create(subID=userID, hashedID=idHash, name=userName, details=details, updatedWhen=updated, lastSeen=lastSeen)
             except (Exception) as error:
                 logger.error(f"Error adding user : {str(error)}")
                 return error
+        try:
+            existingUser.organizations.add(organization)
+            if ProfileManagementOrganization.addUserToOrganization(existingUser, session["user"]["userinfo"]["org_id"]) == False:
+                raise Exception(f"User could not be added to organization!, {existingUser}, {organization}")
+            existingUser.save()
+                
+            return existingUser
+        except (Exception) as error:
+            logger.error(f"Error adding user : {str(error)}")
+            return error
 
     ##############################################
     @staticmethod
@@ -538,7 +526,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def updateContent(session, details, orgaID=""):
+    def updateContent(session, content, orgaID=""):
         """
         Update user details and more.
 
@@ -555,10 +543,13 @@ class ProfileManagementOrganization(ProfileManagementBase):
         updated = timezone.now()
         try:
             existingObj = Organization.objects.get(subID=orgID)
-            existingInfo = {"details": existingObj.details, "canManufacture": existingObj.supportedServices, "name": existingObj.name, "uri": existingObj.uri}
-            for key in details:
-                existingInfo[key] = details[key]
-            affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], canManufacture=existingInfo["canManufacture"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)
+            existingInfo = {"details": existingObj.details, "supportedServices": existingObj.supportedServices, "name": existingObj.name, "uri": existingObj.uri}
+            for key in content:
+                if key == "canManufacture" or "supportedServices":
+                    existingInfo["supportedServices"].extend(content[key])
+                else:
+                    existingInfo[key] = content[key]
+            affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], supportedServices=existingInfo["supportedServices"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)
         except (Exception) as error:
             logger.error(f"Error updating organization details: {str(error)}")
             return False

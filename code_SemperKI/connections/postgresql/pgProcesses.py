@@ -20,6 +20,9 @@ from ...modelFiles.processModel import Process
 from ...modelFiles.dataModel import Data
 
 from code_General.connections import s3
+from code_General.utilities import crypto
+
+from ...definitions import DataType, ProcessStatus, FileObject
 
 import logging
 logger = logging.getLogger("django_debug")
@@ -40,6 +43,132 @@ class EnumUpdates(enum.Enum):
 # Projects/Processes general
 class ProcessManagementBase():
     
+    ##############################################
+    @staticmethod
+    def getData(processID):
+        """
+        Get all files.
+
+        :param processID: process ID for a process
+        :type processID: str
+        :return: list of all data
+        :rtype: list
+        
+        """
+
+        try:
+            processObj = Process.objects.filter(processID=processID)
+            dates = processObj.data.all()
+            outList = []
+            for datum in dates:
+                outList.append(datum.toDict())
+            return outList
+        except (Exception) as error:
+            logger.error(f'Generic error in getData: {str(error)}')
+
+        return []
+    
+    ##############################################
+    @staticmethod
+    def getDataWithID(processID, IDofData):
+        """
+        Get one file in particular.
+
+        :param processID: process ID for a process
+        :type processID: str
+        :param IDofData: ID for a datum
+        :type IDofData: str
+        :return: this datum
+        :rtype: dict
+        
+        """
+
+        try:
+            processObj = Process.objects.filter(processID=processID)
+            date = processObj.data.filter(contentID=IDofData)
+            return date.toDict()
+        except (Exception) as error:
+            logger.error(f'Generic error in getDataWithID: {str(error)}')
+
+        return {}
+    
+    ##############################################
+    @staticmethod
+    def getDataByType(processID, typeOfData:DataType):
+        """
+        Get one file in particular.
+
+        :param processID: process ID for a process
+        :type processID: str
+        :param typeOfData: type of this data
+        :type typeOfData: DataType
+        :return: all results
+        :rtype: list
+        
+        """
+
+        try:
+            processObj = Process.objects.filter(processID=processID)
+            dates = processObj.data.filter(type=typeOfData)
+            outList = []
+            for datum in dates:
+                outList.append(datum.toDict())
+            return outList
+        except (Exception) as error:
+            logger.error(f'Generic error in getDataByType: {str(error)}')
+
+        return []
+
+    ##############################################
+    @staticmethod
+    def createDataEntry(data, dataID, processID, typeOfData:DataType, createdBy, details={}, IDofData=""):
+        """
+        Create an entry in the Data table
+
+        :param data: The data itself
+        :type data: Dict in JSON
+        :param dataID: The ID of that date
+        :type dataID: Str
+        :param processID: process it belongs to
+        :type processID: str
+        :param typeOfData: The type of this data
+        :type typeOfData: DataType
+        :param createdBy: Who created it (hashed ID)
+        :type createdBy: Str
+        :param details: Some metadata
+        :type details: JSON Dict
+        :param IDofData: If the data has an id, save it
+        :type IDofData: Str
+        :return: Nothing
+        :rtype: None
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            createdDataEntry = Data.objects.create(dataID=dataID, process=currentProcess, type=typeOfData, data=data, details=details, createdBy=createdBy, contentID=IDofData, updatedWhen=timezone.now())
+
+        except (Exception) as error:
+            logger.error(f'could not create data entry: {str(error)}')
+        
+        return None
+    
+    ##############################################
+    @staticmethod
+    def deleteDataEntry(dataID):
+        """
+        Delete a specific data entry
+
+        :param dataID: The primary key of that datum
+        :type dataID: str
+        :return: Nothing
+        :rtype: None
+        """
+        try:
+            createdDataEntry = Data.objects.delete(dataID=dataID)
+        except (Exception) as error:
+            logger.error(f'could not delete data entry: {str(error)}')
+        
+        return None
+
     ##############################################
     @staticmethod
     def getProcessObj(processID):
@@ -116,15 +245,15 @@ class ProcessManagementBase():
                     currentProcess = {}
                     currentProcess["client"] = entry.client
                     currentProcess["processID"] = entry.processID
-                    currentProcess["contractor"] = entry.contractor
-                    currentProcess["service"] = entry.service
+                    currentProcess["contractor"] = entry.contractor.name
+                    currentProcess["serviceType"] = entry.serviceType
+                    currentProcess["serviceDetails"] = entry.serviceDetails
                     currentProcess["serviceStatus"] = entry.serviceStatus
-                    currentProcess["status"] = entry.status
+                    currentProcess["processStatus"] = entry.processStatus
+                    currentProcess["processStatus"] = entry.processStatus
                     currentProcess["created"] = str(entry.createdWhen)
                     currentProcess["updated"] = str(entry.updatedWhen)
-                    currentProcess["messages"] = entry.messages
-                    currentProcess["details"] = entry.details
-                    currentProcess["files"] = entry.files
+                    currentProcess["processDetails"] = entry.processDetails
                     processesOfThatProject.append(currentProcess)
                     showProjectDetails = True
             output["processes"] = processesOfThatProject
@@ -174,7 +303,7 @@ class ProcessManagementBase():
         """
         try:
             currentProcess = Process.objects.get(processID=processID)
-            return currentProcess.projectKey.projectID
+            return currentProcess.project.projectID
         except (Exception) as error:
             logger.error(f'could not get project ID via process ID: {str(error)}')
             return ""
@@ -194,16 +323,16 @@ class ProcessManagementBase():
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
+            allFiles = ProcessManagementBase.getDataByType(processID, DataType.FILE)
             # delete files as well
-            for entry in currentProcess.files:
-                if len(currentProcess.files[entry]) > 0:
-                    s3.manageLocalS3.deleteFile(currentProcess.files[entry]["id"])
+            for entry in allFiles:
+                s3.manageLocalS3.deleteFile(entry["id"])
             
             # if that was the last process, delete the project as well
-            if len(currentProcess.projectKey.processes.all()) == 1:
-                currentProcess.projectKey.delete()
+            if len(currentProcess.project.processes.all()) == 1:
+                currentProcess.project.delete()
             else:
-                currentProcess.projectKey.updatedWhen = updated
+                currentProcess.project.updatedWhen = updated
                 currentProcess.delete()
             return True
         except (ObjectDoesNotExist) as error:
@@ -231,8 +360,7 @@ class ProcessManagementBase():
 
             # delete all files from every process as well
             for process in currentProject.processes.all():
-                for entry in process.files:
-                    s3.manageLocalS3.deleteFile(process.files[entry]["id"])
+                ProcessManagementBase.deleteProcess(process.processID)
 
             currentProject.delete()
             return True
@@ -293,6 +421,7 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
+        # TODO
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
@@ -336,12 +465,13 @@ class ProcessManagementBase():
         :return: Nothing or an error
         :rtype: None or error
         """
+        # TODO
         try:
             processObj = Process.objects.get(processID=processID)
             for contractor in processObj.contractor:
                 contractorObj = Organization.objects.get(hashedID=contractor)
-                contractorObj.processesReceived.add(processObj)
-                contractorObj.save()
+                processObj.contractor = contractorObj
+
             return None
         except (Exception) as error:
             logger.error(f'could not send process: {str(error)}')
@@ -363,6 +493,7 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
+        #TODO
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
@@ -419,7 +550,7 @@ class ProcessManagementBase():
             projectObj = Project.objects.get(projectID=projectID)
             
             # if it does, create process
-            selectedManufacturer = template["contractor"]
+            selectedContractor = template["contractor"]
             processID = template["processID"]
             service = template["service"]
             status = template["status"]
@@ -427,7 +558,7 @@ class ProcessManagementBase():
             messages = template["messages"]
             files = template["files"]
             details = template["details"]
-            processObj = Process.objects.create(processID=processID, projectKey=projectObj, service=service, status=status, serviceStatus=serviceStatus, messages=messages, details=details, files=files, client=clientID, contractor=selectedManufacturer, updatedWhen=timezone.now())
+            processObj = Process.objects.create(processID=processID, project=projectObj, service=service, status=status, serviceStatus=serviceStatus, messages=messages, details=details, files=files, client=clientID, contractor=selectedContractor, updatedWhen=timezone.now())
             return None
         except (Exception) as error:
             logger.error(f'could not add process template to project: {str(error)}')
@@ -561,7 +692,7 @@ class ProcessManagementUser(ProcessManagementBase):
                     messages = process["messages"]
                     files = process["files"]
                     details = process["details"]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey":projectObj, "service": service, "status": status, "messages": messages, "serviceStatus": serviceStatus, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"project":projectObj, "service": service, "status": status, "messages": messages, "serviceStatus": serviceStatus, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
                     
                     # for contractor in selectedContractor:
                     #     contractorObj = Organization.objects.get(hashedID=contractor)
@@ -718,7 +849,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
                     messages = process["messages"]
                     files = process["files"]
                     details = process["details"]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"projectKey": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"project": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
 
                     # for contractor in selectedManufacturer:
                     #     contractorObj = Organization.objects.get(hashedID=contractor)
@@ -785,7 +916,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
             # since multiple processes could have been received within the same project, we need to collect those
             receivedProjects = {}
             for processEntry in receivedProcesses:
-                project = processEntry.projectKey
+                project = processEntry.project
 
                 if project.projectID not in receivedProjects:
                     receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "status": project.status, "processes": []}
@@ -859,7 +990,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
             # since multiple processes could have been received within the same project, we need to collect those
             receivedProjects = {}
             for processEntry in receivedProcesses:
-                project = processEntry.projectKey
+                project = processEntry.project
 
                 if project.projectID not in receivedProjects:
                     receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "details": project.details, "status": project.status, "processesCount": 0}

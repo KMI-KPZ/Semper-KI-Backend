@@ -25,6 +25,8 @@ from ..definitions import ProcessStatus
 
 from code_General.connections import s3
 
+from code_General.definitions import ServiceType
+
 logger = logging.getLogger("logToFile")
 ################################################################################################
 
@@ -582,17 +584,17 @@ def getMissedEvents(request):
 @checkIfRightsAreSufficient(json=True)
 def getContractors(request):
     """
-    Get all suitable manufacturers.
+    Get all suitable Contractors.
 
     :param request: GET request
     :type request: HTTP GET
-    :return: List of manufacturers and some details
+    :return: List of contractors and some details
     :rtype: JSON
 
     """
     # TODO filter by service
     contractorList = []
-    listOfAllContractors = pgProfiles.ProfileManagementOrganization.getAllContractors()
+    listOfAllContractors = pgProfiles.ProfileManagementOrganization.getAllContractors(ServiceType.ADDITIVE_MANUFACTURING)
     # TODO Check suitability
 
     # remove unnecessary information and add identifier
@@ -683,7 +685,7 @@ def verifyProject(request):
         # get information
         info = json.loads(request.body.decode("utf-8"))
         projectID = info["projectID"]
-        sendToManufacturerAfterVerification = info["send"]
+        sendToContractorAfterVerification = info["send"]
         processesIDArray = info["processIDs"]
 
         # first save projects
@@ -717,7 +719,7 @@ def verifyProject(request):
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
 
-        if sendToManufacturerAfterVerification:
+        if sendToContractorAfterVerification:
             sendProject(request)
 
         return HttpResponse("Success")
@@ -732,7 +734,7 @@ def verifyProject(request):
 @checkIfRightsAreSufficient(json=False)
 def sendProject(request):
     """
-    Retrieve Calculations and send process to manufacturer(s)
+    Retrieve Calculations and send process to contractor(s)
 
     :param request: GET Request
     :type request: HTTP GET
