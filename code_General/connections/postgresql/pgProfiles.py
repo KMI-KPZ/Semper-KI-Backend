@@ -9,8 +9,9 @@ import types, json, enum, re
 
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from ...modelFiles.profileModel import User, Organization
-from backend_django.utilities import crypto
+from code_General.modelFiles.organizationModel import Organization
+from code_General.modelFiles.userModel import User
+from code_General.utilities import crypto
 from logging import getLogger
 
 logger = getLogger("django")

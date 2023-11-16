@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from django.apps import apps
 
-from backend_django.helper.classes import SemperKiConfigHelper
+from code_General.helper.classes import ConfigHelper
 
 class Command(BaseCommand):
     help = 'generates .env.example file from configured environment variables in apps.py'
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         print(str(options))
         s= "POSTGRES_HOST"
         print(f'\n\n{s} -> os says {os.environ.get(s)} and settings says {settings.__getattr__(s)}\n\n')
-        semper_ki_cfgs = [app_cfg for app_cfg in apps.get_app_configs() if issubclass(type(app_cfg), SemperKiConfigHelper)]
+        semper_ki_cfgs = [app_cfg for app_cfg in apps.get_app_configs() if issubclass(type(app_cfg), ConfigHelper)]
         self.stdout.write (self.file_intro if not options['print'] else self.current_values)
         for app in semper_ki_cfgs:
             env_vars_internal = app.getEnvVarsInternal().items()

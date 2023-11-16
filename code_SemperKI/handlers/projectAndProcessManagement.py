@@ -15,13 +15,15 @@ from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from ..utilities import crypto, rights
+from code_General.utilities import crypto, rights
 
-from ..services.postgresDB import pgProcesses, pgProfiles
+from ..connections.postgresql import pgProcesses
+from code_General.connections.postgresql import pgProfiles
 
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging, ProcessStatus
+from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from ..definitions import ProcessStatus
 
-from ..services import aws
+from code_General.connections import s3
 
 logger = logging.getLogger("logToFile")
 ################################################################################################
@@ -169,7 +171,7 @@ def deleteProject(request, projectID):
             for currentProjectID in request.session["currentProjects"]:
                 for currentProcess in request.session["currentProjects"][currentProjectID]["processes"]:
                     for fileObj in request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"]:
-                        aws.manageLocalAWS.deleteFile(request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"][fileObj]["id"])
+                        s3.manageLocalS3.deleteFile(request.session["currentProjects"][currentProjectID]["processes"][currentProcess]["files"][fileObj]["id"])
             del request.session["currentProjects"][projectID]
             request.session.modified = True
 
@@ -405,7 +407,7 @@ def deleteProcess(request, projectID):
         for processID in processIDs:
             if "currentProjects" in request.session and projectID in request.session["currentProjects"]:
                 for fileObj in request.session["currentProjects"][projectID]["processes"][processID]["files"]:
-                    aws.manageLocalAWS.deleteFile(request.session["currentProjects"][projectID]["processes"][processID]["files"][fileObj]["id"])
+                    s3.manageLocalS3.deleteFile(request.session["currentProjects"][projectID]["processes"][processID]["files"][fileObj]["id"])
                 
                 del request.session["currentProjects"][projectID]["processes"][processID]
                 request.session.modified = True
@@ -589,17 +591,17 @@ def getContractors(request):
 
     """
     # TODO filter by service
-    manufacturerList = []
-    listOfAllManufacturers = pgProfiles.ProfileManagementOrganization.getAllContractors()
+    contractorList = []
+    listOfAllContractors = pgProfiles.ProfileManagementOrganization.getAllContractors()
     # TODO Check suitability
 
     # remove unnecessary information and add identifier
-    for idx, elem in enumerate(listOfAllManufacturers):
-        manufacturerList.append({})
-        manufacturerList[idx]["name"] = elem["name"]
-        manufacturerList[idx]["id"] = elem["hashedID"]
+    for idx, elem in enumerate(listOfAllContractors):
+        contractorList.append({})
+        contractorList[idx]["name"] = elem["name"]
+        contractorList[idx]["id"] = elem["hashedID"]
 
-    return JsonResponse(manufacturerList, safe=False)
+    return JsonResponse(contractorList, safe=False)
 
 #######################################################
 def saveProjectsViaWebsocket(session):
@@ -704,7 +706,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("VERIFIED"))
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.VERIFIED)
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -745,7 +747,7 @@ def sendProject(request):
         # TODO Check if process is verified
 
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.getStatusCodeFor("REQUESTED"))
+            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.REQUESTED)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             

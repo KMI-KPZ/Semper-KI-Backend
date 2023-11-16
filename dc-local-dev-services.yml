@@ -10,6 +10,7 @@ services:
       - ./postgres/data/:/var/lib/postgresql/data/
     networks:
       - semper-ki-dev-network
+      
   pgadmin:
     image: dpage/pgadmin4
     env_file:
@@ -23,6 +24,7 @@ services:
       - ./docker-pg-admin.json:/pgadmin4/servers.json
     networks:
       - semper-ki-dev-network
+
   files:
     image: redis:7
     container_name: redis
@@ -38,67 +40,6 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - semper-ki-dev-network
-
-  celery-worker:
-    build:
-      context: .
-    container_name: celery-worker
-    entrypoint: celery
-    environment:
-      - MODE=local_container
-    command: -A backend_django.celery worker --loglevel=info
-    volumes:
-    - .:/var/www/app/worker
-    links:
-    - files
-    depends_on:
-    - files
-    networks:
-        - semper-ki-dev-network
-
-  celery-beat:
-      build:
-        context: .
-      container_name: celery-beat
-      entrypoint: celery
-      environment:
-        - MODE=local_container
-      command: -A backend_django.celery beat --loglevel=info
-      volumes:
-      - .:/var/www/app/beat
-      links:
-      - celery-worker
-      - files
-      depends_on:
-      - celery-worker
-      - files
-      networks:
-        - semper-ki-dev-network
-
-  flower:
-      image: mher/flower
-      env_file:
-        - .env.local_container
-      container_name: flower
-      volumes:
-        - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
-      entrypoint: /usr/local/bin/dc-service-flower-start.sh
-      #command: ['celery', "--broker=redis://:asdf@files:6379/0", 'flower','--port=8888']
-#      environment:
-#      - CELERY_BROKER_URL=redis://:$${REDISPW}@redis:6379/0
-#      - FLOWER_PORT=8888
-      ports:
-      - 8888:8888
-      links:
-      - files
-      - celery-worker
-      - celery-beat
-      depends_on:
-      - files
-      - celery-worker
-      - celery-beat
-      networks:
-          - semper-ki-dev-network
     
   localstack:
       image: localstack/localstack

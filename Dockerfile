@@ -20,7 +20,7 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /app
 COPY . /app
 
-# RUN chmod +x app/backend_django/*.sh
+# RUN chmod +x app/*/*.sh
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
@@ -28,4 +28,4 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend_django.asgi", "--reload", "--capture-output", "--log-level", "debug", "--env", "DJANGO_SETTINGS_MODULE=backend_django.settings.debug", "-k", "uvicorn.workers.UvicornWorker", "--workers",  "16", "--threads", "16", "--timeout", "12000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "code_General.asgi", "--reload", "--capture-output", "--log-level", "debug", "--env", "DJANGO_SETTINGS_MODULE=code_General.settings.debug", "-k", "uvicorn.workers.UvicornWorker", "--workers",  "16", "--threads", "16", "--timeout", "12000"]

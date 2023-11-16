@@ -11,16 +11,16 @@ logger = getLogger("django_debug")
 # # then belows AppConfig Child's ready function is called and the environment variables are loaded
 # # and the real database connection will be set up
 # #
-from backend_django.settings.base import SemperKiConfigHelper, BackendDjangoConfigHelper
+from code_General.settings.base import ConfigHelper, BackendConfigHelper
 
 
-class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
-    name = 'backend_django'
+class BackendDjangoConfig(AppConfig, BackendConfigHelper):
+    name = 'backend'
     checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
 
     def __init__(self,app_name, app_module):
         AppConfig.__init__(self,app_name, app_module)
-        BackendDjangoConfigHelper.__init__(self)
+        BackendConfigHelper.__init__(self)
 
     def ready(self):
         from django.conf import settings

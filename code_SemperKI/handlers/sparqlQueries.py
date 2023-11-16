@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 
-from ..services import cmem, coypu
+from ..connections import cmem, coypu
 
 #######################################################
 def sendQuery(request):
@@ -23,7 +23,7 @@ def sendQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.sendQuery(request.POST["query"])
+    results = cmem.sendGeneralQuery(request.POST["query"])
     
     return JsonResponse(results, safe=False)
 
@@ -62,6 +62,6 @@ def sendTestQuery(request):
     :rtype: JSONResponse
 
     """
-    results = cmem.sendQuery("SELECT * where {?s ?p ?o} LIMIT 100")
+    results = cmem.sendGeneralQuery("SELECT * where {?s ?p ?o} LIMIT 100")
     
     return JsonResponse(results, safe=False)

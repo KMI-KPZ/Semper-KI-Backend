@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-from backend_django.settings import SemperKiManagement, set_settings
+from code_General.settings.base import BackendManagement, set_settings
 import sys
 
 
 
 def main():
     #"""Run administrative tasks."""
-    #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_django.settings.development')
+    #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'code_General.settings.development')
     #print("SETTING FILE USED: " + os.environ['DJANGO_SETTINGS_MODULE'], flush=True)
 
     try:
@@ -19,7 +19,7 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     set_settings()
-    utility = SemperKiManagement(sys.argv)
+    utility = BackendManagement(sys.argv)
     utility.execute()
 
 

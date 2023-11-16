@@ -7,7 +7,7 @@
 
 ## Environments
 The backend currently supports the environment ```--env <environment>``` which will be interpreted as follows:
-- django settings file ```backend_django.settings.<environment>.py``` will be used
+- django settings file ```code_General.settings.<environment>.py``` will be used
 - .env.\<environment> will be used for the environment variables
 - if the environment MODE=\<environment> is set, in asgi application it will work as on ```python manage.py command --env <environment>``` has been set (used for backend docker container)
 
@@ -25,16 +25,16 @@ The backend currently supports the environment ```--env <environment>``` which w
 - call ```python -m pip install -r requirements.txt``` to install packages to your local machine
 - to run the backend, you need at least one ".env" file, either you ask your team to send it to you, or you can generate one yourself. To do the latter, do as follows:
   - call ```python manage.py generate_env``` to output how the env file should look (scroll down a bit). The output should be copied into a file lying in your project root folder. Name it .env.local_container
-  - edit .env.local_container for the external services (ask the team for credentials) and change ENV_TOKEN to local_container to see which env file is being used in outputs
-  - copy .env.local_container to .env.local and change internal services hosts (e.g. database, redis) to localhost as well as ENV_TOKEN to local to see which env file is being used in outputs
+  - edit .env.local_container for the external connections (ask the team for credentials) and change ENV_TOKEN to local_container to see which env file is being used in outputs
+  - copy .env.local_container to .env.local and change internal connections hosts (e.g. database, redis) to localhost as well as ENV_TOKEN to local to see which env file is being used in outputs
 - create the folder `logs` if it doesn't exist in the root directory of the project, as well as the files `info.log` and `ip_log.log` inside it. Open your WSL/Terminal and call `sudo chown -R 5678 logs/` on it from the WSL
-- call ```start_local_dev.bat -m local ``` to build and run only the containers with background services (database, redis, celery)
+- call ```start_local_dev.bat -m local ``` to build and run only the containers with background connections (database, redis, ...)
 - call ```python manage.py create_db --env local``` to create the database named in .env.local (which should be the same as in .env.local_container)
 - call ```python manage.py migrate --env local``` to migrate the database to the latest state
 - now you can call ```python manage.py runserver --env local``` to start the backend locally and edit or you can run all in a container (including the backend) with ```start_local_dev.bat -m local_container``` 
 - or use VS Code and RUN->Start Debugging but beforehand, stop all containers with ```stop_local_dev.bat```
 
-watch exposed ports of the docker containers for services i.e. pg-admin (email/pw is in dc-local-dev-services.yml)
+watch exposed ports of the docker containers for connections i.e. pg-admin (email/pw is in dc-local-dev-services.yml)
 
 ## Debug logging
 In order to have debug output in the console, in your .env.[MODE] file set ```DJANGO_LOG_LEVEL=DEBUG```.

@@ -11,9 +11,10 @@ from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from ..utilities import crypto, mocks
+from code_General.utilities import crypto
+from ..utilities import mocks
 
-from ..services import cmem
+from ..connections import cmem
 
 #######################################################
 @require_http_methods(["POST"])
@@ -124,7 +125,7 @@ def getMaterials(request):
         title = elem["Material"]["value"]
         resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
     # resultsOfQueries = {"materials": []}
-    # with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
+    # with open(str(settings.BASE_DIR) + "/code_SemperKI/SPARQLQueries/Materials/Onto4Add.txt") as onto4AddMaterials:
     #     onto4AddResults = cmem.sendQuery(onto4AddMaterials.read())
     #     for elem in onto4AddResults:
     #         title = elem["s"]["value"].replace("http://www.onto4additive.com/onto4add#","")

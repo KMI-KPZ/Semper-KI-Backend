@@ -13,8 +13,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from ..services.postgresDB import pgProfiles
-from ..services import auth0
+from ..connections.postgresql import pgProfiles
+from ..connections import auth0
 from ..utilities.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient, Logging
 
 logger = logging.getLogger("logToFile")

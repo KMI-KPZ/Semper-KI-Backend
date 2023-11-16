@@ -11,8 +11,9 @@ from django.conf import settings
 import datetime
 from authlib.integrations.requests_client import OAuth2Session
 
-from .redis import RedisConnection
+from code_General.connections.redis import RedisConnection
 
+########################################################################
 class ManageToken:
     """
     Manage oauth token class.
@@ -60,6 +61,7 @@ class ManageToken:
 endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
 oauthToken = ManageToken()
 
+##################################################################
 class ManageQueries:
     """
     Contains query from file as object
@@ -103,12 +105,6 @@ class ManageQueries:
         return results["results"]["bindings"]
 
 
-########################################
-# list of objects
-getAllMaterials = ManageQueries("/Ontology/queries/material_Hannes")
-getAllPrinters = ManageQueries("/Ontology/queries/printer_Hannes")
-    
-
 #######################################################
 def sendGeneralQuery(query):
     """
@@ -131,3 +127,8 @@ def sendGeneralQuery(query):
 
     results = endpointCopy.queryAndConvert()
     return results["results"]["bindings"]
+
+
+#######################################################
+# import from other services
+import services.code_service_3DPrint.connections.cmem 

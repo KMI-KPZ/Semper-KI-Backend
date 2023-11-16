@@ -13,11 +13,11 @@ from django.http import HttpResponse, JsonResponse
 
 from ..utilities import mocks
 
-from ..services.postgresDB import pgProfiles
-from ..utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
+from code_General.connections.postgresql import pgProfiles
+from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
 from django.views.decorators.http import require_http_methods
 
-from ..services import cmem
+from ..connections import cmem
 
 logger = logging.getLogger("logToFile")
 
@@ -84,7 +84,7 @@ def onto_getPrinter(request):
 
     printerName = json.loads(request.body.decode("utf-8"))["printer"]
     resultsOfQueries = {"properties": []}
-    #with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Printer/<>.txt") as printer:
+    #with open(str(settings.BASE_DIR) + "/code_SemperKI/SPARQLQueries/Printer/<>.txt") as printer:
     #    printersRes = cmem.sendQuery(printer.read())
     #    for elem in printersRes:
     #        title = elem["Printer"]["value"]
@@ -112,7 +112,7 @@ def onto_getMaterial(request):
 
     printerName = json.loads(request.body.decode("utf-8"))["material"]
     resultsOfQueries = {"properties": []}
-    #with open(str(settings.BASE_DIR) + "/backend_django/SPARQLQueries/Printer/<>.txt") as printer:
+    #with open(str(settings.BASE_DIR) + "/code_SemperKI/SPARQLQueries/Printer/<>.txt") as printer:
     #    printersRes = cmem.sendQuery(printer.read())
     #    for elem in printersRes:
     #        title = elem["Printer"]["value"]

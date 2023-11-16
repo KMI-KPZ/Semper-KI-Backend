@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from backend_django.services.mailer import KissMailer
+from code_General.connections.mailer import KissMailer
 from logging import getLogger
 logging = getLogger("django_debug")
 

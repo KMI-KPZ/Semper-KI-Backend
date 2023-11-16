@@ -11,11 +11,10 @@ import datetime, json, logging
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 
-from ..utilities import basics
-from ..services.postgresDB import pgProcesses, pgProfiles
+from code_General.utilities import basics
+from ..connections.postgresql import pgProcesses
+from code_General.connections.postgresql import pgProfiles
 
 logger = logging.getLogger("logToFile")
 

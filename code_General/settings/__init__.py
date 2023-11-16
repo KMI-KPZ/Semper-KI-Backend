@@ -2,7 +2,7 @@ import os, sys
 from django.core.management import ManagementUtility
 ###########################################################
 
-class SemperKiManagement(ManagementUtility):
+class BackendManagement(ManagementUtility):
     def main_help_text(self, commands_only=False):
         """
         Returns the script's main help text, as a string.
@@ -18,7 +18,7 @@ class SemperKiManagement(ManagementUtility):
 def set_settings():
     # parse command line arguments
     import argparse
-    base = 'backend_django.settings.'
+    base = 'code_General.settings.'
     default = base + 'production'
     settings = default
 

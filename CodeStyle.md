@@ -24,7 +24,7 @@ We use [Camel case](https://en.wikipedia.org/wiki/Camel_case) for almost everyth
 ## Folder structure
 - `backend`: Contains docker files, .env files and files necessary for git.
   - `.vscode`: Contains the settings for the local debug configuration
-  - `backend_django`: Contains source code
+  - `code_*`: Contains source code
     - `handlers`: Files with functions that handle requests from the frontend
     - `middleware`: Custom middleware goes here
     - `migrations`: Rule set for django that defines the content of the database(s). Will be created automatically so no editing!
@@ -55,6 +55,7 @@ Contains: Handlers using simulation to check the orders
 
 Followed by all the imports. The order of those should be:
 python, django, packages, local files of the backend, logger
+Where local files of that module are imported via `.` and those of other module via `<modulename>.`
 ```
 import json, logging
 from django.conf import settings
@@ -63,7 +64,7 @@ from channels.layers import get_channel_layer
 
 from ..utilities import basics
 
-from ..services import redis
+from code_General.connections import redis
 
 logger = logging.getLogger("logToFile")
 ################################################################################################

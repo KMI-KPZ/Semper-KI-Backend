@@ -11,11 +11,10 @@ from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from ..utilities import basics
-from ..services.postgresDB import pgProfiles
-from . import projectAndProcessManagement
+from ..utilities import basics, rights
+from ..connections.postgresql import pgProfiles
 from django.views.decorators.http import require_http_methods
-from ..services import auth0, redis
+from ..connections import auth0, redis
 
 
 logger = logging.getLogger("logToFile")
@@ -56,13 +55,11 @@ def provideRightsFile(request):
     :rtype: JSONResponse
 
     """
-    with open(str(settings.BASE_DIR) + "/backend_django/rights.json") as rightsFile:
-        rightsFileJSON = json.load(rightsFile)
-        for elem in rightsFileJSON["Rights"]:
-            elem.pop("paths")
-        return JsonResponse(rightsFileJSON, safe=False)
-
-            
+    
+    rightsFileJSON = rights.rightsManagement.getFile()
+    for elem in rightsFileJSON["Rights"]:
+        elem.pop("paths")
+    return JsonResponse(rightsFileJSON, safe=False)
 
 #######################################################
 @require_http_methods(["GET"])
@@ -458,8 +455,9 @@ def logoutUser(request):
     if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
         mock = True
 
-    if "currentProjects" in request.session:
-        projectAndProcessManagement.saveProjects(request)
+    # TODO: Send signal to other apps that logout is occuring
+    # if "currentProjects" in request.session:
+    #     projectAndProcessManagement.saveProjects(request)
 
     user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
     if user != {}:

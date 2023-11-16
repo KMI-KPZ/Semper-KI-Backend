@@ -10,8 +10,9 @@ Contains: link to model files for django to handle
 
 #from django.db import models
 
-from .modelFiles.profileModel import *
-from .modelFiles.projectModels import *
+from .modelFiles.processModel import *
+from .modelFiles.projectModel import *
+from .modelFiles.dataModel import *
 
 #class BaseModel(models.Model):
 

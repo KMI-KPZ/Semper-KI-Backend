@@ -10,7 +10,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 import datetime
 
-from .redis import RedisConnection
+from code_General.connections.redis import RedisConnection
 
 class ManageQueries:
     """
@@ -55,4 +55,4 @@ class ManageQueries:
 
 ########################################
 # list of objects
-getExampleNews = ManageQueries("/backend_django/SPARQLQueries/Coypu/Example.txt")
+getExampleNews = ManageQueries("/code_SemperKI/SPARQLQueries/Coypu/Example.txt")

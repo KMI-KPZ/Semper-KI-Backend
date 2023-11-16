@@ -2,7 +2,7 @@ import os
 import threading
 
 from django.core.checks import Tags as DjangoTags, Error, Info
-from .helper.classes import SemperKiConfigHelper
+from .helper.classes import ConfigHelper
 from django.db import connections, OperationalError
 from django.apps import apps
 from logging import getLogger
@@ -22,7 +22,7 @@ def checkEnv(app_configs=None, **kwargs):
         app_configs = apps.get_app_configs()
 
     for app in app_configs:
-        if issubclass(type(app), SemperKiConfigHelper):
+        if issubclass(type(app), ConfigHelper):
             errors.extend(app.checkEnvVars())
     return errors
 
@@ -34,7 +34,7 @@ def checkDb(app_configs=None, **kwargs):
         app_configs = apps.get_app_configs()
 
     for app in app_configs:
-        if issubclass(type(app), SemperKiConfigHelper):
+        if issubclass(type(app), ConfigHelper):
             logger.debug(f'checking databases for {str(app)}\n')
             for db_alias in app.getDbAliases():
                 db_conn = connections[db_alias]
@@ -62,8 +62,8 @@ def checkRedis(app_configs=None, **kwargs):
         app_configs = apps.get_app_configs()
 
     for app in app_configs:
-        if issubclass(type(app), SemperKiConfigHelper):
-            from .services.redis import RedisConnection
+        if issubclass(type(app), ConfigHelper):
+            from .connections.redis import RedisConnection
             try:
                 redisConn = RedisConnection()
                 redisConn.addContent("_test", "test")

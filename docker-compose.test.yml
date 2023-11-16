@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: ["bash", "backend_django/runtests.sh"]
+    command: ["bash", "code_General/runtests.sh"]
     ports:
       - 127.0.0.1:8001:8000
     volumes:

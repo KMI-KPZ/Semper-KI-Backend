@@ -11,9 +11,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.exceptions import StopConsumer
 from asgiref.sync import sync_to_async
 
-from backend_django.services.postgresDB import pgProfiles
-from backend_django.utilities import rights
-from backend_django.handlers.projectAndProcessManagement import saveProjectsViaWebsocket
+from ..connections.postgresql import pgProfiles
+from ..utilities import rights
 
 logger = logging.getLogger("django_debug")
 
@@ -59,8 +58,9 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
         try:
             session = await sync_to_async(self.getSession)()
             if "user" in session:
-                if "currentProjects" in session:
-                    await sync_to_async(saveProjectsViaWebsocket)(session)
+                # TODO: Signal
+                # if "currentProjects" in session:
+                #     await sync_to_async(saveProjectsViaWebsocket)(session)
 
                 if "isPartOfOrganization" in session:
                     if session["isPartOfOrganization"]:

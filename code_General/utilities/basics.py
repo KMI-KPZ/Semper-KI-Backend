@@ -14,7 +14,7 @@ from django.conf import settings
 from time import sleep
 
 from ..utilities import rights
-from ..services.redis import RedisConnection
+from ..connections.redis import RedisConnection
 
 #######################################################
 def checkIfTokenValid(token):

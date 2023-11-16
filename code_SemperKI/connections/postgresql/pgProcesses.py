@@ -11,12 +11,15 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-from backend_django.utilities import  basics
+from code_General.utilities import basics
 
-from ...modelFiles.profileModel import User, Organization
-from ...modelFiles.projectModels import Process, Project
+from code_General.modelFiles.userModel import User
+from code_General.modelFiles.organizationModel import Organization
+from ...modelFiles.projectModel import Project
+from ...modelFiles.processModel import Process
+from ...modelFiles.dataModel import Data
 
-from backend_django.services import  aws
+from code_General.connections import s3
 
 import logging
 logger = logging.getLogger("django_debug")
@@ -194,7 +197,7 @@ class ProcessManagementBase():
             # delete files as well
             for entry in currentProcess.files:
                 if len(currentProcess.files[entry]) > 0:
-                    aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
+                    s3.manageLocalS3.deleteFile(currentProcess.files[entry]["id"])
             
             # if that was the last process, delete the project as well
             if len(currentProcess.projectKey.processes.all()) == 1:
@@ -229,7 +232,7 @@ class ProcessManagementBase():
             # delete all files from every process as well
             for process in currentProject.processes.all():
                 for entry in process.files:
-                    aws.manageLocalAWS.deleteFile(process.files[entry]["id"])
+                    s3.manageLocalS3.deleteFile(process.files[entry]["id"])
 
             currentProject.delete()
             return True
@@ -373,7 +376,7 @@ class ProcessManagementBase():
                 
             elif updateType == EnumUpdates.files:
                 for entry in content:
-                    aws.manageLocalAWS.deleteFile(currentProcess.files[entry]["id"])
+                    s3.manageLocalS3.deleteFile(currentProcess.files[entry]["id"])
                     del currentProcess.files[entry]
                 
             elif updateType == EnumUpdates.service:

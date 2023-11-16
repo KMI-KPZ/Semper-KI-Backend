@@ -36,8 +36,8 @@ echo "...Waiting for postgres..."
 SLEEP 10
 
 if [ $CHECKS -eq 1 ]; then
-  echo "running python manage.py check backend_django --env $ENV"
-  python manage.py check backend_django --env "$ENV"
+  echo "running python manage.py check code_General --env $ENV"
+  python manage.py check code_General --env "$ENV"
   if [ $? -ne 0 ]; then
     #perhaps db does not exist?
     echo "DJANGO CHECK FAILED - TRYING TO CREATE DB"
@@ -47,8 +47,8 @@ if [ $CHECKS -eq 1 ]; then
       exit 2
     fi
 
-    echo "running again python manage.py check backend_django --env $ENV"
-    python manage.py check backend_django --env "$ENV"
+    echo "running again python manage.py check code_General --env $ENV"
+    python manage.py check code_General --env "$ENV"
     if [ $? -ne 0 ]; then
       echo "DJANGO CHECK FAILED AGAIN - ABORTING"
       exit 3
@@ -60,16 +60,16 @@ if [ $MIGRATIONS -eq 1 ]; then
   echo -e "\nrunning python manage.py makemigrations --env $ENV"
   python manage.py makemigrations --env $ENV
   echo -e "\nrunning python manage.py migrate --env $ENV"
-  python manage.py makemigrations backend_django --env $ENV
+  python manage.py makemigrations code_General --env $ENV
   echo -e "\nrunning python manage.py migrate --env $ENV"
-  python manage.py migrate backend_django --env $ENV
+  python manage.py migrate code_General --env $ENV
   echo -e "\nrunning python manage.py migrate --env $ENV"
   python manage.py migrate --env $ENV
 fi
 
 if [ $DEBUG -eq 1 ]; then
   echo -e "\nrunning python manage.py runserver"
-  exec backend_django.asgi:application --reload --reload-include *.* --reload-dir ./backend_django --log-level info --env-file $ENV --host 0.0.0.0 --port 8000
+  exec code_General.asgi:application --reload --reload-include *.* --reload-dir ./ --log-level info --env-file $ENV --host 0.0.0.0 --port 8000
 fi
 
-exec gunicorn --bind 0.0.0.0:8000 backend_django.asgi --reload --forwarded-allow-ips="*" --env MODE="$ENV"  --capture-output  -k uvicorn.workers.UvicornWorker --workers 16 --threads 16 --timeout 12000
+exec gunicorn --bind 0.0.0.0:8000 code_General.asgi --reload --forwarded-allow-ips="*" --env MODE="$ENV"  --capture-output  -k uvicorn.workers.UvicornWorker --workers 16 --threads 16 --timeout 12000

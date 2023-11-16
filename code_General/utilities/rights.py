@@ -16,11 +16,13 @@ class Rights:
     """
     rightsDict = {}
     rightsList = []
+    rightsFile = {}
 
     #######################################################
     def __init__(self):
-        with open(str(settings.BASE_DIR) + "/backend_django/rights.json") as rightsFile:
+        with open(str(settings.BASE_DIR) + "/rights.json") as rightsFile:
             tempDict = json.load(rightsFile)
+            self.rightsFile = tempDict
             for entry in tempDict["Rights"]:
                 permission = entry["permission"]["context"]+":"+entry["permission"]["permission"]
                 self.rightsList.append(entry["permission"]["context"]+entry["permission"]["permission"])
@@ -29,6 +31,16 @@ class Rights:
                         self.rightsDict[elem].add(permission)
                     else:
                         self.rightsDict[elem] = set([permission])
+
+    #######################################################
+    def getFile(self):
+        """
+        Serves the file as it is (usually for frontend)
+        
+        :return: File in JSON Format
+        :rtype: JSON Object
+        """
+        return self.rightsFile
 
     #######################################################
     def checkIfAllowed(self, permissions, path):
