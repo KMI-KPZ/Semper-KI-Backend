@@ -62,3 +62,37 @@ def docPage(request):
             request,
             settings.DOC_DIR + pathOfHtml + "index.html"
         )
+    
+
+#######################################################
+def benchyPage(request):
+    """
+    Landing page for the benchmark tool
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: Rendered page
+    :rtype: HTTPResponse
+
+    """
+    return render(
+        request,
+        "benchy.html"  # ,
+        # context={
+        #    "session": request.session.get("user"),
+        # "pretty": json.dumps(request.session.get("user"), indent=4),
+        # },
+    )
+
+
+#######################################################
+def getSettingsToken(request):
+    """
+    Return Settings of django
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: JSON with Settings
+    :rtype: JSONResponse
+    """
+    return JsonResponse({"token": settings.BACKEND_SETTINGS})

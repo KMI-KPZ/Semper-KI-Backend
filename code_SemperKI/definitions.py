@@ -33,6 +33,13 @@ class ProcessStatus(enum.Enum):
 
 ###################################################
 # Services
+class ServiceType(enum.Enum):
+    ADDITIVE_MANUFACTURING = 1,
+    CREATE_3D_MODEL = 2
 
 ###################################################
 # Data Types
+class DataType(enum.Enum):
+    STATUS = 1,
+    MESSAGE = 2,
+    FILE = 3
