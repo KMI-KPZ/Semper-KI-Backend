@@ -21,7 +21,7 @@ from ..connections.postgresql import pgProcesses
 from code_General.connections.postgresql import pgProfiles
 
 from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
-from ..definitions import ProcessStatus
+from ..definitions import ProcessStatus, ProcessUpdates, ProcessDetails
 
 from code_General.connections import s3
 
@@ -124,11 +124,11 @@ def updateProject(request):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
                 if "status" in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProcessUpdates.STATUS, changes["changes"]["status"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 if "details" in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProcessUpdates.DETAILS, changes["changes"]["details"])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 
@@ -285,22 +285,22 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         returnVal = True
                         if elem == "service": # service is a dict in itself
                             if "type" in changes["changes"]["service"] and changes["changes"]["service"]["type"] == 0:
-                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, {})
+                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.SERVICE, {})
                             else:        
-                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.service, changes["changes"]["service"])
+                                returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.SERVICE, changes["changes"]["service"])
                             fireWebsocketEvents(projectID, processID, request.session, "service", "edit")
                         elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.messages, changes["changes"]["messages"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.MESSAGES, changes["changes"]["messages"])
                             fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
                         elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.files, changes["changes"]["files"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.FILES, changes["changes"]["files"])
                             fireWebsocketEvents(projectID, processID, request.session, "files", "files")
                         elif elem == "contractor":
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.contractor, changes["changes"]["contractor"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.CONTRACTOR, changes["changes"]["contractor"])
                         elif elem == "details":
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.details, changes["changes"]["details"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.DETAILS, changes["changes"]["details"])
                         elif elem == "status":
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, pgProcesses.EnumUpdates.status, changes["changes"]["status"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.STATUS, changes["changes"]["status"])
                             fireWebsocketEvents(projectID, processID, request.session, "status", "edit")
                         else:
                             raise Exception("updateProcess change " + elem + " not implemented")
@@ -311,17 +311,17 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         for elem in changes["deletions"]:
                             returnVal = True
                             if elem == "service": # service is a dict in itself      
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.service, changes["deletions"]["service"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.SERVICE, changes["deletions"]["service"])
                             elif elem == "messages" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.messages, changes["deletions"]["messages"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.MESSAGES, changes["deletions"]["messages"])
                             elif elem == "files" and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.files, changes["deletions"]["files"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.FILES, changes["deletions"]["files"])
                             elif elem == "contractor":
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.contractor, changes["deletions"]["contractor"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.CONTRACTOR, changes["deletions"]["contractor"])
                             elif elem == "details":
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.details, changes["deletions"]["details"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.DETAILS, changes["deletions"]["details"])
                             elif elem == "status":
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, pgProcesses.EnumUpdates.status, changes["deletions"]["status"])
+                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.STATUS, changes["deletions"]["status"])
                             else:
                                 raise Exception("updateProcess delete " + elem + " not implemented")
                             if isinstance(returnVal, Exception):
@@ -708,7 +708,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.VERIFIED)
+            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.STATUS, ProcessStatus.VERIFIED)
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -749,7 +749,7 @@ def sendProject(request):
         # TODO Check if process is verified
 
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, pgProcesses.EnumUpdates.status, ProcessStatus.REQUESTED)
+            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.STATUS, ProcessStatus.REQUESTED)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             

@@ -22,22 +22,14 @@ from ...modelFiles.dataModel import Data
 from code_General.connections import s3
 from code_General.utilities import crypto
 
-from ...definitions import DataType, ProcessStatus, FileObject
+from ...definitions import DataType, ProcessStatus, FileObject, ProcessUpdates, ProcessDetails
 
 import logging
 logger = logging.getLogger("django_debug")
 
 #TODO: switch to async versions at some point
 
-####################################################################################
-# Enum for updateProcess
-class EnumUpdates(enum.Enum):
-    status = 1
-    messages = 2
-    files = 3
-    service = 4
-    contractor = 5
-    details = 6
+
 
 ####################################################################################
 # Projects/Processes general
@@ -163,7 +155,7 @@ class ProcessManagementBase():
         :rtype: None
         """
         try:
-            createdDataEntry = Data.objects.delete(dataID=dataID)
+            affectedEntries = Data.objects.delete(dataID=dataID)
         except (Exception) as error:
             logger.error(f'could not delete data entry: {str(error)}')
         
@@ -226,35 +218,17 @@ class ProcessManagementBase():
 
         """
         try:
+            # TODO - remove stuff for frontend etc
             # get project
             projectObj = Project.objects.get(projectID=projectID)
 
-            output = {}
+            output = projectObj.toDict()
             showProjectDetails = False # make sure nobody else sees this
-
-            output["projectID"] = projectObj.projectID
-            output["created"] = str(projectObj.createdWhen)
-            output["updated"] = str(projectObj.updatedWhen)
-            output["client"] = projectObj.client
-            output["status"] = projectObj.status
-            output["details"] = projectObj.details
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
-                if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID in entry.contractor): 
-                    currentProcess = {}
-                    currentProcess["client"] = entry.client
-                    currentProcess["processID"] = entry.processID
-                    currentProcess["contractor"] = entry.contractor.name
-                    currentProcess["serviceType"] = entry.serviceType
-                    currentProcess["serviceDetails"] = entry.serviceDetails
-                    currentProcess["serviceStatus"] = entry.serviceStatus
-                    currentProcess["processStatus"] = entry.processStatus
-                    currentProcess["processStatus"] = entry.processStatus
-                    currentProcess["created"] = str(entry.createdWhen)
-                    currentProcess["updated"] = str(entry.updatedWhen)
-                    currentProcess["processDetails"] = entry.processDetails
-                    processesOfThatProject.append(currentProcess)
+                if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID == entry.contractor.hashedID): 
+                    processesOfThatProject.append(entry.toDict())
                     showProjectDetails = True
             output["processes"] = processesOfThatProject
             
@@ -284,7 +258,7 @@ class ProcessManagementBase():
 
             users = list(User.objects.filter(hashedID=currentProcess.client).all())
             users.extend(list(Organization.objects.filter(hashedID=currentProcess.client).all()))
-            users.extend(list(Organization.objects.filter(hashedID=currentProcess.contractor).all()))
+            users.extend([currentProcess.contractor])
             return users
         except (Exception) as error:
             logger.error(f'could not get all users of process: {str(error)}')
@@ -310,7 +284,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def deleteProcess(processID):
+    def deleteProcess(processID, processObj=None):
         """
         Delete specific process.
 
@@ -322,18 +296,23 @@ class ProcessManagementBase():
         """
         updated = timezone.now()
         try:
-            currentProcess = Process.objects.get(processID=processID)
+            if processObj != None:
+                currentProcess = processObj
+            else:
+                currentProcess = Process.objects.get(processID=processID)
+
             allFiles = ProcessManagementBase.getDataByType(processID, DataType.FILE)
             # delete files as well
             for entry in allFiles:
                 s3.manageLocalS3.deleteFile(entry["id"])
             
             # if that was the last process, delete the project as well
-            if len(currentProcess.project.processes.all()) == 1:
-                currentProcess.project.delete()
-            else:
-                currentProcess.project.updatedWhen = updated
-                currentProcess.delete()
+            # if len(currentProcess.project.processes.all()) == 1:
+            #     currentProcess.project.delete()
+            # else:
+            currentProcess.project.updatedWhen = updated
+            currentProcess.delete()
+            currentProcess.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
@@ -360,9 +339,10 @@ class ProcessManagementBase():
 
             # delete all files from every process as well
             for process in currentProject.processes.all():
-                ProcessManagementBase.deleteProcess(process.processID)
+                ProcessManagementBase.deleteProcess(process.processID, processObj=process)
 
             currentProject.delete()
+            currentProject.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
@@ -372,7 +352,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def updateProject(projectID, updateType: EnumUpdates, content):
+    def updateProject(projectID, updateType: ProcessUpdates, content):
         """
         Change details of an project like its status. 
 
@@ -388,13 +368,13 @@ class ProcessManagementBase():
         """
         updated = timezone.now()
         try:
-            if updateType == EnumUpdates.status:
+            if updateType == ProcessUpdates.STATUS:
                 currentProject = Project.objects.get(projectID=projectID)
                 currentProject.status = content
                 currentProject.updatedWhen = updated
                 currentProject.save()
 
-            elif updateType == EnumUpdates.details:
+            elif updateType == ProcessUpdates.DETAILS:
                 currentProject = Project.objects.get(projectID=projectID)
                 for key in content:
                     currentProject.details[key] = content[key]
@@ -407,7 +387,7 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def updateProcess(processID, updateType: EnumUpdates, content):
+    def updateProcess(processID, updateType: ProcessUpdates, content, updatedBy):
         """
         Change details of a process like its status, or save communication. 
 
@@ -427,26 +407,26 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == EnumUpdates.messages:
-                currentProcess.messages["messages"].append(content)
+            if updateType == ProcessUpdates.MESSAGES:
+                ProcessManagementBase.createDataEntry(content, crypto.generateURLFriendlyRandomString(), processID, DataType.MESSAGE, updatedBy)
             
-            elif updateType == EnumUpdates.status:
-                currentProcess.status = content
+            elif updateType == ProcessUpdates.STATUS:
+                currentProcess.processStatus = content
                 
-            elif updateType == EnumUpdates.files:
+            elif updateType == ProcessUpdates.FILES:
                 for entry in content:
-                    currentProcess.files[entry] = content[entry]
+                    ProcessManagementBase.createDataEntry(content[entry], crypto.generateURLFriendlyRandomString(), processID, DataType.FILE, updatedBy, {}, content[entry]["id"])
                 
-            elif updateType == EnumUpdates.service:
+            elif updateType == ProcessUpdates.SERVICE:
                 for entry in content:
-                    currentProcess.service[entry] = content[entry]
+                    currentProcess.serviceDetails[entry] = content[entry]
 
-            elif updateType == EnumUpdates.contractor:
-                currentProcess.contractor = content
+            elif updateType == ProcessUpdates.CONTRACTOR:
+                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
 
-            elif updateType == EnumUpdates.details:
+            elif updateType == ProcessUpdates.DETAILS:
                 for entry in content:
-                    currentProcess.details[entry] = content[entry]
+                    currentProcess.processDetails[entry] = content[entry]
 
             currentProcess.save()
             return True
@@ -468,9 +448,9 @@ class ProcessManagementBase():
         # TODO
         try:
             processObj = Process.objects.get(processID=processID)
-            for contractor in processObj.contractor:
-                contractorObj = Organization.objects.get(hashedID=contractor)
-                processObj.contractor = contractorObj
+            
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR])
+            processObj.contractor = contractorObj
 
             return None
         except (Exception) as error:
@@ -479,7 +459,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def deleteFromProcess(processID, updateType: EnumUpdates, content):
+    def deleteFromProcess(processID, updateType: ProcessUpdates, content, deletedBy):
         """
         Delete details of a process like its status, or content. 
 
@@ -499,30 +479,30 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == EnumUpdates.messages:
-                currentProcess.messages["messages"].remove(content)
+            if updateType == ProcessUpdates.MESSAGES:
+                ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
             
-            elif updateType == EnumUpdates.status:
-                currentProcess.status = 0
+            elif updateType == ProcessUpdates.STATUS:
+                currentProcess.processStatus = ProcessStatus.DRAFT
                 
-            elif updateType == EnumUpdates.files:
+            elif updateType == ProcessUpdates.FILES:
                 for entry in content:
-                    s3.manageLocalS3.deleteFile(currentProcess.files[entry]["id"])
-                    del currentProcess.files[entry]
+                    s3.manageLocalS3.deleteFile(entry["id"])
+                    ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                 
-            elif updateType == EnumUpdates.service:
+            elif updateType == ProcessUpdates.SERVICE:
                 if len(content) > 0:
                     for entry in content:
-                        del currentProcess.service[entry]
+                        del currentProcess.serviceDetails[entry]
                 else:
-                    currentProcess.service = {}
+                    currentProcess.serviceDetails = {}
 
-            elif updateType == EnumUpdates.contractor:
-                currentProcess.contractor = []
+            elif updateType == ProcessUpdates.CONTRACTOR:
+                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""
 
-            elif updateType == EnumUpdates.details:
+            elif updateType == ProcessUpdates.DETAILS:
                 for key in content:
-                    del currentProcess.details[key]
+                    del currentProcess.processDetails[key]
 
             currentProcess.save()
             return True

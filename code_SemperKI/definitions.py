@@ -10,6 +10,9 @@ import enum
 ###################################################
 # Statuscodes
 class ProcessStatus(enum.Enum):
+    """
+    Defines all statuus for the process (independent of the selected service)
+    """
     DRAFT = 0,
     WAITING_FOR_OTHER_PROCESS =  100,
     SERVICE_READY =  200,
@@ -36,13 +39,22 @@ class ProcessStatus(enum.Enum):
 ###################################################
 # Data Types
 class DataType(enum.Enum):
+    """
+    Defines the types of data that are saved in the database of the same name
+    
+    """
     STATUS = 1,
     MESSAGE = 2,
-    FILE = 3
+    FILE = 3,
+    DELETION = 4
 
 ###################################################
 # File Object
 class FileObject():
+    """
+    How should a file Object look like?
+
+    """
     id = ""
     title = ""
     tags = []
@@ -51,3 +63,27 @@ class FileObject():
     certificates = []
     URI = ""
     createdBy = ""
+
+####################################################################################
+# Enum for updateProcess
+class ProcessUpdates(enum.Enum):
+    """
+    What types of updates are there for a process? 
+    
+    """
+    STATUS = 1
+    MESSAGES = 2
+    FILES = 3
+    SERVICE = 4
+    CONTRACTOR = 5
+    DETAILS = 6
+
+####################################################################################
+# Enum for processDetails
+class ProcessDetails(enum.StrEnum):
+    """
+    What Details can a Process have?
+    
+    """
+    NAME = enum.auto()
+    PROVISIONAL_CONTRACTOR = enum.auto()

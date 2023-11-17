@@ -59,9 +59,9 @@ paths_SemperKI = {
     "uploadModel": "public/uploadModel/",
     "uploadFiles": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
-    "downloadFile": "public/downloadFile/<processID>/<fileID>",
-    "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>",
-    "deleteFile": "public/deleteFile/<processID>/<fileID>",
+    "downloadFile": "public/downloadFile/<processID>/<fileID>/",
+    "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>/",
+    "deleteFile": "public/deleteFile/<processID>/<fileID>/",
 
 }
 
