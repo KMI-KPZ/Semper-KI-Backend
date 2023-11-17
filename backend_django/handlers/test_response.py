@@ -117,5 +117,5 @@ def testCallToWebsocket(request):
 
 ###################################################
 def dynamic(request):
-    dynamicObject = {"Buttons:" [{"title": "Test", "icon": "Edit", "action": "public/dynamic/", "payload": {"number": 1}},{"title": "Test2", "icon": "Delete", "action": "public/dynamic/", "payload": {"number": 2}}]}
+    dynamicObject = {"Buttons": [{"title": "Test", "icon": "Edit", "action": "public/dynamic/", "payload": {"number": 1}},{"title": "Test2", "icon": "Delete", "action": "public/dynamic/", "payload": {"number": 2}}]}
     return JsonResponse(dynamicObject)
