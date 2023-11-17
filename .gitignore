@@ -138,7 +138,7 @@ quickDebug.py
 
 .env.dev
 
-
+backend.code-workspace
 
 localstack/
 
