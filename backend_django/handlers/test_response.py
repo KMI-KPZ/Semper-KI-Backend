@@ -114,8 +114,29 @@ def testCallToWebsocket(request):
         return HttpResponse("Success", status=200)
     return HttpResponse("Not Logged In", status=401)
 
+class Counter():
+    counter = 1
+counter = Counter
 
 ###################################################
 def dynamic(request):
-    dynamicObject = {"Buttons": [{"title": "Test", "icon": "Edit", "action": "public/dynamic/", "payload": {"number": 1}},{"title": "Test2", "icon": "Delete", "action": "public/dynamic/", "payload": {"number": 2}}]}
-    return JsonResponse(dynamicObject)
+    templateEdit = {"title": "Test", "icon": "Edit", "action": "public/dynamic/", "payload": {"number": counter.counter, "Context": "Add"}}
+    templateDelete = {"title": "Test", "icon": "Delete", "action": "public/dynamic/", "payload": {"number": counter.counter, "Context": "Delete"}}
+    dynamicObject = {"Buttons": []}
+    if request.method == "GET":
+        dynamicObject["Buttons"].append(templateDelete)
+        if counter.counter == 0:
+            counter.counter = 1
+        for i in range(counter.counter):
+            dynamicObject["Buttons"].append(templateEdit)
+        return JsonResponse(dynamicObject)
+    else:
+        content = json.loads(request.body.decode("utf-8"))
+        if content["payload"]["Context"] == "Add":
+            counter.counter += 1
+        else:
+            counter.counter -= 1
+        for i in range(counter.counter):
+            templateEdit["payload"]["number"] += 1
+            dynamicObject["Buttons"].append(templateEdit)
+        return JsonResponse(dynamicObject)
