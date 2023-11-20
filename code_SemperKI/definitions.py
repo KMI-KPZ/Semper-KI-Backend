@@ -48,22 +48,6 @@ class DataType(enum.Enum):
     FILE = 3,
     DELETION = 4
 
-###################################################
-# File Object
-class FileObject():
-    """
-    How should a file Object look like?
-
-    """
-    id = ""
-    title = ""
-    tags = []
-    date = ""
-    licenses = []
-    certificates = []
-    URI = ""
-    createdBy = ""
-
 ####################################################################################
 # Enum for updateProcess
 class ProcessUpdates(enum.Enum):
@@ -71,12 +55,13 @@ class ProcessUpdates(enum.Enum):
     What types of updates are there for a process? 
     
     """
-    STATUS = 1
-    MESSAGES = 2
-    FILES = 3
-    SERVICE = 4
-    CONTRACTOR = 5
-    DETAILS = 6
+    STATUS = 1,
+    MESSAGES = 2,
+    FILES = 3,
+    SERVICE = 4,
+    SERVICE_TYPE = 5,
+    CONTRACTOR = 6,
+    DETAILS = 7
 
 ####################################################################################
 # Enum for processDetails
@@ -85,5 +70,6 @@ class ProcessDetails(enum.StrEnum):
     What Details can a Process have?
     
     """
-    NAME = enum.auto()
+    NAME = enum.auto(),
     PROVISIONAL_CONTRACTOR = enum.auto()
+

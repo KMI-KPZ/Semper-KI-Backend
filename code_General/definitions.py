@@ -8,7 +8,17 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 import enum
 
 ###################################################
-# Services
-class ServiceType(enum.Enum):
-    ADDITIVE_MANUFACTURING = 1,
-    CREATE_3D_MODEL = 2
+# File Object
+class FileObject():
+    """
+    How should a file Object look like?
+
+    """
+    id = ""
+    title = ""
+    tags = []
+    date = ""
+    licenses = []
+    certificates = []
+    URI = ""
+    createdBy = ""

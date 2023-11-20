@@ -24,6 +24,8 @@ from code_General.utilities import crypto
 
 from ...definitions import DataType, ProcessStatus, FileObject, ProcessUpdates, ProcessDetails
 
+from ...services import services, ServiceTypes, ServicesDictionaryStructure
+
 import logging
 logger = logging.getLogger("django_debug")
 
@@ -417,9 +419,15 @@ class ProcessManagementBase():
                 for entry in content:
                     ProcessManagementBase.createDataEntry(content[entry], crypto.generateURLFriendlyRandomString(), processID, DataType.FILE, updatedBy, {}, content[entry]["id"])
                 
+            elif updateType == ProcessUpdates.SERVICE_TYPE:
+                # TODO
+                if content == ServiceTypes.ADDITIVE_MANUFACTURING:
+                    currentProcess.serviceType = ServiceTypes.ADDITIVE_MANUFACTURING
+                elif content == ServiceTypes.CREATE_MODEL:
+                    currentProcess.serviceType = ServiceTypes.CREATE_MODEL
+            
             elif updateType == ProcessUpdates.SERVICE:
-                for entry in content:
-                    currentProcess.serviceDetails[entry] = content[entry]
+                currentProcess.serviceDetails = services[currentProcess.serviceType][ServicesDictionaryStructure.CONNECTIONS].updateServiceDetails(currentProcess.serviceDetails, content)
 
             elif updateType == ProcessUpdates.CONTRACTOR:
                 currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
@@ -491,11 +499,7 @@ class ProcessManagementBase():
                     ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                 
             elif updateType == ProcessUpdates.SERVICE:
-                if len(content) > 0:
-                    for entry in content:
-                        del currentProcess.serviceDetails[entry]
-                else:
-                    currentProcess.serviceDetails = {}
+                currentProcess.serviceDetails = services[currentProcess.serviceType][ServicesDictionaryStructure.CONNECTIONS].deleteServiceDetails(currentProcess.serviceDetails, content)
 
             elif updateType == ProcessUpdates.CONTRACTOR:
                 currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""

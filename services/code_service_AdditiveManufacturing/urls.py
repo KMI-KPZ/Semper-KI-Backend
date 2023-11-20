@@ -23,7 +23,7 @@ from django.urls import path
 
 from .handlers import checkService, filter, resources
 
-paths_service_3DPrint = {
+paths_service_AdditiveManufacturing = {
     "getProcessData": 'public/getProcessData/',
     "getModels": 'public/getModels/',
     "getFilters": 'public/getFilters/',
@@ -50,7 +50,7 @@ paths_service_3DPrint = {
     "orga_removeMaterial": "public/orga/removeMaterial/",
 }
 
-urlpatterns_service_3DPrint = [
+urlpatterns_service_AdditiveManufacturing = [
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),

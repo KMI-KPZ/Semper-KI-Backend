@@ -30,7 +30,7 @@ from .handlers import admin, authentification, email, files, frontpage, organiza
 from Benchy.BenchyMcMarkface import startFromDjango
 
 from code_SemperKI.urls import paths_SemperKI, urlpatterns_SemperKI
-from services.code_service_3DPrint.urls import paths_service_3DPrint, urlpatterns_service_3DPrint
+from services.code_service_AdditiveManufacturing.urls import paths_service_AdditiveManufacturing, urlpatterns_service_AdditiveManufacturing
 
 paths = {
     "landingPage": "",
@@ -87,7 +87,7 @@ paths = {
 }
 
 paths.update(paths_SemperKI)
-paths.update(paths_service_3DPrint)
+paths.update(paths_service_AdditiveManufacturing)
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
@@ -147,7 +147,7 @@ urlpatterns = [
 ]
 
 urlpatterns.append(urlpatterns_SemperKI)
-urlpatterns.append(urlpatterns_service_3DPrint)
+urlpatterns.append(urlpatterns_service_AdditiveManufacturing)
 
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
