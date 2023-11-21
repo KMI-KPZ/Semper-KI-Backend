@@ -15,6 +15,6 @@ class ServiceDetails(enum.StrEnum):
     What does the service consists of 
 
     """
-    MODEL = enum.auto(),
-    MATERIAL = enum.auto(),
+    MODEL = enum.auto()
+    MATERIAL = enum.auto()
     POST_PROCESSING = enum.auto()

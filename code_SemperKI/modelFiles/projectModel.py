@@ -5,9 +5,24 @@ Silvio Weging 2023
 
 Contains: Model for projects
 """
-import json
+import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+###################################################
+class ProjectDescription(enum.StrEnum):
+    """
+    What does a project consists of?
+
+    """
+    projectID = enum.auto()
+    status = enum.auto()
+    client = enum.auto()
+    details = enum.auto()
+    createdWhen = enum.auto()
+    updatedWhen = enum.auto()
+    accessedWhen = enum.auto()
+
 
 ###################################################
 class Project(models.Model):
@@ -29,5 +44,5 @@ class Project(models.Model):
     accessedWhen = models.DateTimeField(auto_now=True)
 
     def toDict(self):
-        return {"projectID": self.projectID, "status": self.status, "client": self.client, "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen }
+        return {ProjectDescription.projectID: self.projectID, ProjectDescription.status: self.status, ProjectDescription.client: self.client, ProjectDescription.details: json.dumps(self.details), ProjectDescription.createdWhen: self.createdWhen, ProjectDescription.updatedWhen: self.updatedWhen, ProjectDescription.accessedWhen: self.accessedWhen }
 

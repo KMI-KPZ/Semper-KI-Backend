@@ -5,12 +5,29 @@ Silvio Weging 2023
 
 Contains: Model for user
 """
-import json
+import json, enum
 from django.utils import timezone
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 import code_General.modelFiles.organizationModel as orgaModel #must be imported that way to avoid cyclic imports
+
+###################################################
+class UserDescription(enum.StrEnum):
+    """
+    What does a user consists of?
+    
+    """
+    subID = enum.auto()
+    hashedID = enum.auto()
+    name = enum.auto()
+    organizations = enum.auto()
+    details = enum.auto()
+    createdWhen = enum.auto()
+    updatedWhen = enum.auto()
+    accessedWhen = enum.auto()
+    lastSeen = enum.auto()
+
 
 # Table for regular Users
 ###################################################

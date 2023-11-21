@@ -11,7 +11,6 @@ import logging
 logger = logging.getLogger("django_debug")
 
 ####################################################################################
-
 def updateServiceDetails(existingContent, newContent):
     """
     Update the content of the current service in the process
@@ -20,6 +19,21 @@ def updateServiceDetails(existingContent, newContent):
     :type existingContent: Dict
     :param newContent: What the user changed
     :type newContent: Dict
+    :return: New service Instance
+    :rtype: Dict
+    """
+    # TODO
+    return existingContent
+
+####################################################################################
+def deleteServiceDetails(existingContent, deletedContent):
+    """
+    Update the content of the current service in the process
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :param deletedContent: What the user wants deleted
+    :type deletedContent: Dict
     :return: New service Instance
     :rtype: Dict
     """

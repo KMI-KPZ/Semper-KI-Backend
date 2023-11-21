@@ -6,11 +6,32 @@ Silvio Weging 2023
 Contains: Models for data
 """
 
-import json
+import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .processModel import Process
+
+###################################################
+class DataDescription(enum.StrEnum):
+    """
+    What does a data entry consists of?
+
+    """
+    dataID = enum.auto()
+    process = enum.auto()
+    
+    type = enum.auto()
+    data = enum.auto()
+    details = enum.auto()
+    createdBy = enum.auto()
+    contentID = enum.auto()
+
+    createdWhen = enum.auto()
+    updatedWhen = enum.auto()
+    accessedWhen = enum.auto()
+
+
 
 ###################################################
 class Data(models.Model):

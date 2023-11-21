@@ -5,11 +5,28 @@ Silvio Weging 2023
 
 Contains: Model for organizations
 """
-import json
+import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .userModel import User
+
+###################################################
+class OrganizationDescription(enum.StrEnum):
+    """
+    What does an Organization consists of?
+
+    """
+    subID =enum.auto()
+    hashedID = enum.auto()
+    name = enum.auto()
+    details = enum.auto()
+    users = enum.auto()
+    supportedServices = enum.auto()
+    uri = enum.auto()
+    createdWhen = enum.auto()
+    updatedWhen = enum.auto()
+    accessedWhen = enum.auto()
 
 #Table for Organizations
 ###################################################

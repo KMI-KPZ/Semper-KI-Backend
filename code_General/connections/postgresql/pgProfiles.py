@@ -318,6 +318,22 @@ class ProfileManagementBase():
         for orga in Organization.objects.all():
             orgaList.append(orga.toDict())
         return userList, orgaList
+    
+    ##############################################
+    @staticmethod
+    def checkIfUserIsInOrganization(session):
+        """
+        Check if a user is in an organization or not. Can be used to decide if additional code specific for orgas should be run
+
+        :param session: GET request session
+        :type session: Dictionary
+        :return: True if User is in organization, False if not
+        :rtype: bool
+        
+        """
+        if "user" in session and "org_id" in session["user"]["userinfo"]:
+            return True
+        return False
 
 ####################################################################################
 class ProfileManagementUser(ProfileManagementBase):

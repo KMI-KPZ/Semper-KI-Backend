@@ -5,12 +5,40 @@ Silvio Weging 2023
 
 Contains: Model for processes
 """
-import json
+import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project
 from code_General.modelFiles.organizationModel import Organization
+
+
+###################################################
+class ProcessDescription(enum.StrEnum):
+    """
+    What makes up a process object for creation in the database
+
+    """
+    processID = enum.auto()
+    project = enum.auto()
+
+    processDetails = enum.auto()
+    processStatus = enum.auto()
+
+    serviceDetails = enum.auto()
+    serviceStatus = enum.auto()
+    serviceType = enum.auto()
+
+    client = enum.auto()
+    contractor = enum.auto()
+
+    dependenciesIn = enum.auto()
+    dependenciesOut = enum.auto()
+
+    createdWhen = enum.auto()
+    updatedWhen = enum.auto()
+    accessedWhen = enum.auto()
+
 
 ###################################################
 class Process(models.Model):
@@ -57,14 +85,14 @@ class Process(models.Model):
         return ""
     
     def toDict(self):
-        return {"processID": self.processID, 
-                "project": str(self.project), 
-                "serviceDetails": json.dumps(self.serviceDetails), 
-                "processStatus": self.processStatus,
-                "serviceType": self.serviceType,
-                "serviceStatus": self.serviceStatus,
-                "processDetails": json.dumps(self.processDetails),
-                "client": self.client,
-                "contractor": self.contractor.name,
-                "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
+        return {ProcessDescription.processID: self.processID, 
+                ProcessDescription.project: json.dumps(self.project.toDict()), 
+                ProcessDescription.serviceDetails: json.dumps(self.serviceDetails), 
+                ProcessDescription.processStatus: self.processStatus,
+                ProcessDescription.serviceType: self.serviceType,
+                ProcessDescription.serviceStatus: self.serviceStatus,
+                ProcessDescription.processDetails: json.dumps(self.processDetails),
+                ProcessDescription.client: self.client,
+                ProcessDescription.contractor: self.contractor.name,
+                ProcessDescription.createdWhen: self.createdWhen, ProcessDescription.updatedWhen: self.updatedWhen, ProcessDescription.accessedWhen: self.accessedWhen}
     

@@ -7,20 +7,10 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.services as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails
+from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails
 
 ###################################################
-class CreateModel_Handler(Semper.Services_Handler):
-    """
-    All handlers of this service
-
-    """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
-
-###################################################
-class CreateModel_Connections(Semper.Services_Connections):
+class CreateModel(Semper.ServiceBase):
     """
     All connections of this service that Semper-KI should know about
     
@@ -36,7 +26,16 @@ class CreateModel_Connections(Semper.Services_Connections):
 
         """
 
-        return updateServiceDetails(existingContent, newContent)
+        return CM_updateServiceDetails(existingContent, newContent)
+    
+    ###################################################
+    def deleteServiceDetails(self, existingContent, newContent):
+        """
+        Run service specific update of service details
+
+        """
+
+        return CM_deleteServiceDetails(existingContent, newContent)
     
 
-Semper.services[Semper.ServiceTypes.CREATE_MODEL] = {Semper.ServicesDictionaryStructure.HANDLER: CreateModel_Handler(), Semper.ServicesDictionaryStructure.CONNECTIONS: CreateModel_Connections()}
+Semper.serviceManager.register(Semper.ServiceTypes.CREATE_MODEL, CreateModel)

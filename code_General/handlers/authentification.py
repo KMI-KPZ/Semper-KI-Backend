@@ -15,6 +15,7 @@ from ..utilities import basics, rights
 from ..connections.postgresql import pgProfiles
 from django.views.decorators.http import require_http_methods
 from ..connections import auth0, redis
+from ..definitions import SessionContent
 
 
 logger = logging.getLogger("logToFile")
@@ -30,8 +31,8 @@ def isLoggedIn(request):
     :rtype: Bool
     """
     # Initialize session if not done already to generate session key
-    if "initialized" not in request.session:
-        request.session["initialized"] = True
+    if SessionContent.INITIALIZED not in request.session:
+        request.session[SessionContent.INITIALIZED] = True
 
     # Check if user is already logged in
     if "user" in request.session:
@@ -85,46 +86,42 @@ def loginUser(request):
 
     # check number of login attempts
     if mocked is False:
-        if "numOfLoginAttempts" in request.session:
-            if (datetime.datetime.now() - datetime.datetime.strptime(request.session["lastLoginAttempt"],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
-                request.session["numOfLoginAttempts"] = 0
-                request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+        if SessionContent.NUMBER_OF_LOGIN_ATTEMPTS in request.session:
+            if (datetime.datetime.now() - datetime.datetime.strptime(request.session[SessionContent.LAST_LOGIN_ATTEMPT],"%Y-%m-%d %H:%M:%S.%f")).seconds > 300:
+                request.session[SessionContent.NUMBER_OF_LOGIN_ATTEMPTS] = 0
+                request.session[SessionContent.LAST_LOGIN_ATTEMPT] = str(datetime.datetime.now())
             else:
-                request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+                request.session[SessionContent.LAST_LOGIN_ATTEMPT] = str(datetime.datetime.now())
 
-            if request.session["numOfLoginAttempts"] > 10:
+            if request.session[SessionContent.NUMBER_OF_LOGIN_ATTEMPTS] > 10:
                 return HttpResponse("Too many login attempts! Please wait 5 Minutes.", status=429)
             else:
-                request.session["numOfLoginAttempts"] += 1
+                request.session[SessionContent.NUMBER_OF_LOGIN_ATTEMPTS] += 1
         else:
-            request.session["numOfLoginAttempts"] = 1
-            request.session["lastLoginAttempt"] = str(datetime.datetime.now())
+            request.session[SessionContent.NUMBER_OF_LOGIN_ATTEMPTS] = 1
+            request.session[SessionContent.LAST_LOGIN_ATTEMPT] = str(datetime.datetime.now())
 
     # set type of user
     isPartOfOrganization = False
     if "Usertype" not in request.headers:
-        request.session["usertype"] = "user"
-        request.session["isPartOfOrganization"] = False
-        request.session["pgProfileClass"] = "user"
-        request.session["pgProcessClass"] = "user"
+        request.session[SessionContent.USER_TYPE] = "user"
+        request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
+        request.session[SessionContent.PG_PROFILE_CLASS] = "user"
     else:
         userType = request.headers["Usertype"]
         if userType == "organization" or userType == "manufacturer" or userType == "fakeOrganization":
-            request.session["usertype"] = "organization"
-            request.session["isPartOfOrganization"] = True
-            request.session["pgProfileClass"] = "organization"
-            request.session["pgProcessClass"] = "organization"
+            request.session[SessionContent.USER_TYPE] = "organization"
+            request.session[SessionContent.IS_PART_OF_ORGANIZATION] = True
+            request.session[SessionContent.PG_PROFILE_CLASS] = "organization"
             isPartOfOrganization = True
         elif userType == "fakeAdmin" and mocked is True:
-            request.session["usertype"] = "admin"
-            request.session["isPartOfOrganization"] = False
-            request.session["pgProfileClass"] = "user"
-            request.session["pgProcessClass"] = "user"
+            request.session[SessionContent.USER_TYPE] = "admin"
+            request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
+            request.session[SessionContent.PG_PROFILE_CLASS] = "user"
         else:
-            request.session["usertype"] = "user"
-            request.session["isPartOfOrganization"] = False
-            request.session["pgProfileClass"] = "user"
-            request.session["pgProcessClass"] = "user"
+            request.session[SessionContent.USER_TYPE] = "user"
+            request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
+            request.session[SessionContent.PG_PROFILE_CLASS] = "user"
 
     # set redirect url
     if settings.PRODUCTION:
@@ -135,9 +132,9 @@ def loginUser(request):
         forward_url = 'http://127.0.0.1:3000'
     
     if "Path" not in request.headers:
-        request.session["pathAfterLogin"] = forward_url
+        request.session[SessionContent.PATH_AFTER_LOGIN] = forward_url
     else:
-        request.session["pathAfterLogin"] = forward_url + request.headers["Path"]
+        request.session[SessionContent.PATH_AFTER_LOGIN] = forward_url + request.headers["Path"]
         
     register = ""
     if "Register" in request.headers and mocked is False:
@@ -146,7 +143,7 @@ def loginUser(request):
 
     request.session.modified = True
     if mocked:
-        request.session["mockedLogin"] = True
+        request.session[SessionContent.MOCKED_LOGIN] = True
         return HttpResponse("http://127.0.0.1:8000"+reverse("callbackLogin"))
     else:
         if isPartOfOrganization:
@@ -169,11 +166,11 @@ def setOrganizationName(request):
     """
     if "https://auth.semper-ki.org/claims/organization" in request.session["user"]["userinfo"]:
         if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"]) != 0:
-            request.session["organizationName"] = request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"].capitalize()
+            request.session[SessionContent.ORGANIZATION_NAME] = request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"].capitalize()
         else:
-            request.session["organizationName"] = ""
+            request.session[SessionContent.ORGANIZATION_NAME] = ""
     else:
-        request.session["organizationName"] = ""
+        request.session[SessionContent.ORGANIZATION_NAME] = ""
 
 #######################################################
 def retrieveRolesAndPermissionsForMemberOfOrganization(session):
@@ -193,7 +190,7 @@ def retrieveRolesAndPermissionsForMemberOfOrganization(session):
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
         orgID = session["user"]["userinfo"]["org_id"]
-        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
+        userID = pgProfiles.profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getUserKey(session)
 
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}/members/{userID}/roles', headers=headers) )
@@ -230,7 +227,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
             'Cache-Control': "no-cache"
         }
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
-        userID = pgProfiles.profileManagement[session["pgProfileClass"]].getUserKey(session)
+        userID = pgProfiles.profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getUserKey(session)
         
         response = basics.handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers) )
         if isinstance(response, Exception):
@@ -238,7 +235,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
         roles = response
 
         # set default role
-        if len(roles) == 0 and session["usertype"] == "user":
+        if len(roles) == 0 and session[SessionContent.USER_TYPE] == "user":
             response = basics.handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers, json={"roles": ["rol_jG8PAa9b9LUlSz3q"]}))
             roles = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
         
@@ -277,14 +274,14 @@ def setRoleAndPermissionsOfUser(request):
             if isinstance(resultDict, Exception):
                 raise resultDict
 
-        request.session["userRoles"] = resultDict["roles"]
-        request.session["userPermissions"] = {x["permission_name"]: "" for x in resultDict["permissions"] } # save only the permission names, the dict is for faster access
+        request.session[SessionContent.USER_ROLES] = resultDict["roles"]
+        request.session[SessionContent.USER_PERMISSIONS] = {x["permission_name"]: "" for x in resultDict["permissions"] } # save only the permission names, the dict is for faster access
 
         # check if person is admin, global role so check works differently
         if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
             if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
                 if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
-                    request.session["usertype"] = "admin"
+                    request.session[SessionContent.USER_TYPE] = "admin"
 
         return True
     except Exception as e:
@@ -308,12 +305,12 @@ def callbackLogin(request):
     try:
         # Check if mocked
         mocked = False
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             mocked = True
 
         # authorize callback token or write fake data
         if not mocked:
-            if request.session["isPartOfOrganization"]:
+            if request.session[SessionContent.IS_PART_OF_ORGANIZATION]:
                 token = auth0.authorizeTokenOrga(request)
             else:
                 token = auth0.authorizeToken(request)
@@ -322,8 +319,8 @@ def callbackLogin(request):
             request.session["user"]["userinfo"]["sub"] = "auth0|testuser"
             request.session["user"]["userinfo"]["nickname"] = "testuser"
             request.session["user"]["userinfo"]["email"] = "testuser@test.de"
-            request.session["userRoles"] = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
-            request.session["userPermissions"] = {"processes:read": "", "processes:messages": "","processes:edit": "","processes:delete": "","processes:files": ""}
+            request.session[SessionContent.USER_ROLES] = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
+            request.session[SessionContent.USER_PERMISSIONS] = {"processes:read": "", "processes:messages": "","processes:edit": "","processes:delete": "","processes:files": ""}
             
 
         # email of user was not verified yet, tell them that!
@@ -352,26 +349,26 @@ def callbackLogin(request):
             retVal = setRoleAndPermissionsOfUser(request)
             if isinstance(retVal, Exception):
                 raise retVal
-        elif request.session["isPartOfOrganization"]:
-                request.session["organizationName"] = "testOrganization"
+        elif request.session[SessionContent.IS_PART_OF_ORGANIZATION]:
+                request.session[SessionContent.ORGANIZATION_NAME] = "testOrganization"
                 request.session["user"]["userinfo"]["org_id"] = "id123"
-                request.session["userPermissions"].update({"orga:read": "", "orga:edit": "", "orga:delete": "", "resources:read": "", "resources:edit": ""})
+                request.session[SessionContent.USER_PERMISSIONS].update({"orga:read": "", "orga:edit": "", "orga:delete": "", "resources:read": "", "resources:edit": ""})
 
         # Get Data from Database or create entry in it for logged in User
         orgaObj = None
-        if request.session["isPartOfOrganization"]:
+        if request.session[SessionContent.IS_PART_OF_ORGANIZATION]:
             orgaObj = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
             if orgaObj == None:
                 raise Exception("Organization could not be found or created!")
 
-        userObj = pgProfiles.profileManagement[request.session["pgProfileClass"]].addUserIfNotExists(request.session, orgaObj)
+        userObj = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].addUserIfNotExists(request.session, orgaObj)
         if isinstance(userObj, Exception):
             raise userObj
         
         logger.info(f"{basics.Logging.Subject.USER},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},login,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
-        return HttpResponseRedirect(request.session["pathAfterLogin"])
+        return HttpResponseRedirect(request.session[SessionContent.PATH_AFTER_LOGIN])
     except Exception as e:
-        returnObj = HttpResponseRedirect(request.session["pathAfterLogin"])
+        returnObj = HttpResponseRedirect(request.session[SessionContent.PATH_AFTER_LOGIN])
         returnObj.write(str(e))
         return returnObj
 
@@ -408,10 +405,10 @@ def getPermissionsOfUser(request):
     :return: List of roles
     :rtype: JSONResponse
     """
-    if "userPermissions" in request.session:
-        if len(request.session["userPermissions"]) != 0:
+    if SessionContent.USER_PERMISSIONS in request.session:
+        if len(request.session[SessionContent.USER_PERMISSIONS]) != 0:
             outArray = []
-            for entry in request.session["userPermissions"]:
+            for entry in request.session[SessionContent.USER_PERMISSIONS]:
                 context, permission = entry.split(":")
                 outArray.append({"context": context, "permission": permission})
 
@@ -452,14 +449,14 @@ def logoutUser(request):
 
     """
     mock = False
-    if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+    if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
         mock = True
 
     # TODO: Send signal to other apps that logout is occuring
     # if "currentProjects" in request.session:
     #     projectAndProcessManagement.saveProjects(request)
 
-    user = pgProfiles.profileManagement[request.session["pgProfileClass"]].getUser(request.session)
+    user = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getUser(request.session)
     if user != {}:
         logger.info(f"{basics.Logging.Subject.USER},{user['name']},{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     else:

@@ -15,6 +15,7 @@ from code_General.utilities import basics
 
 from code_General.modelFiles.userModel import User
 from code_General.modelFiles.organizationModel import Organization
+from code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from ...modelFiles.projectModel import Project
 from ...modelFiles.processModel import Process
 from ...modelFiles.dataModel import Data
@@ -22,9 +23,10 @@ from ...modelFiles.dataModel import Data
 from code_General.connections import s3
 from code_General.utilities import crypto
 
-from ...definitions import DataType, ProcessStatus, FileObject, ProcessUpdates, ProcessDetails
+from code_General.definitions import FileObject
+from ...definitions import *
 
-from ...services import services, ServiceTypes, ServicesDictionaryStructure
+from ...services import serviceManager, ServiceTypes 
 
 import logging
 logger = logging.getLogger("django_debug")
@@ -427,7 +429,7 @@ class ProcessManagementBase():
                     currentProcess.serviceType = ServiceTypes.CREATE_MODEL
             
             elif updateType == ProcessUpdates.SERVICE:
-                currentProcess.serviceDetails = services[currentProcess.serviceType][ServicesDictionaryStructure.CONNECTIONS].updateServiceDetails(currentProcess.serviceDetails, content)
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
 
             elif updateType == ProcessUpdates.CONTRACTOR:
                 currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
@@ -499,7 +501,7 @@ class ProcessManagementBase():
                     ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                 
             elif updateType == ProcessUpdates.SERVICE:
-                currentProcess.serviceDetails = services[currentProcess.serviceType][ServicesDictionaryStructure.CONNECTIONS].deleteServiceDetails(currentProcess.serviceDetails, content)
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
 
             elif updateType == ProcessUpdates.CONTRACTOR:
                 currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""
@@ -534,15 +536,14 @@ class ProcessManagementBase():
             projectObj = Project.objects.get(projectID=projectID)
             
             # if it does, create process
-            selectedContractor = template["contractor"]
-            processID = template["processID"]
-            service = template["service"]
-            status = template["status"]
-            serviceStatus = template["serviceStatus"]
-            messages = template["messages"]
-            files = template["files"]
-            details = template["details"]
-            processObj = Process.objects.create(processID=processID, project=projectObj, service=service, status=status, serviceStatus=serviceStatus, messages=messages, details=details, files=files, client=clientID, contractor=selectedContractor, updatedWhen=timezone.now())
+            processID = template[ProcessDescription.processID]
+            serviceType = template[ProcessDescription.serviceType]
+            processStatus = template[ProcessDescription.processStatus]
+            serviceStatus = template[ProcessDescription.serviceStatus]
+            serviceDetails = template[ProcessDescription.serviceDetails]
+            processDetails = template[ProcessDescription.processDetails]
+            client = clientID
+            processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, updatedWhen=timezone.now())
             return None
         except (Exception) as error:
             logger.error(f'could not add process template to project: {str(error)}')
@@ -581,15 +582,15 @@ class ProcessManagementBase():
                     dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, event: 1})
                 
                 # only signal contractors that received the process 
-                if process.status >= basics.ProcessStatus.getStatusCodeFor("REQUESTED"):
-                    for contractor in process.contractor:
-                        if projectObj.client != contractor:
-                            if contractor not in dictForEventsAsOutput:
-                                dictForEventsAsOutput[contractor] = {"eventType": "projectEvent"}
-                                dictForEventsAsOutput[contractor]["processes"] = [{"processID": process.processID, event: 1}]
-                                dictForEventsAsOutput[contractor]["projectID"] = projectID
-                            else:
-                                dictForEventsAsOutput[contractor]["processes"].append({"processID": process.processID, event: 1})
+                if process.processStatus >= ProcessStatus.REQUESTED:
+                    contractorID = process.contractor.hashedID
+                    if projectObj.client != contractorID:
+                        if contractorID not in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractorID] = {"eventType": "projectEvent"}
+                            dictForEventsAsOutput[contractorID]["processes"] = [{"processID": process.processID, event: 1}]
+                            dictForEventsAsOutput[contractorID]["projectID"] = projectID
+                        else:
+                            dictForEventsAsOutput[contractorID]["processes"].append({"processID": process.processID, event: 1})
 
         return dictForEventsAsOutput
     
@@ -629,9 +630,8 @@ class ProcessManagementBase():
         return outList
 
 
-####################################################################################
-# Processes/Projects from User
-class ProcessManagementUser(ProcessManagementBase):
+    ####################################################################################
+    # Processes/Projects from User
     ##############################################
     @staticmethod
     def addProjectToDatabase(session):
@@ -647,46 +647,28 @@ class ProcessManagementUser(ProcessManagementBase):
         now = timezone.now()
         try:
             # first get user
-            client = User.objects.get(subID=session["user"]["userinfo"]["sub"])
+            clientID = ProfileManagementBase.getUserHashID(session)
 
             # then go through projects
-            for projectID in session["currentProjects"]:
+            for projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
 
                 # project object
                 # check if obj already exists in database and overwrite it
                 # if not, create a new entry
-                existingObj = session["currentProjects"][projectID]
+                existingObj = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
 
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["status"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
-                # retrieve files
-                # uploadedFiles = []
-                # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
-                # if Flag:
-                #     for entry in contentOrError:
-                #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
-
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.status: existingObj[ProjectDescription.status], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.details: existingObj[ProjectDescription.details]})
                 # save processes
-                for entry in session["currentProjects"][projectID]["processes"]:
-                    process = session["currentProjects"][projectID]["processes"][entry]
-                    selectedContractor = process["contractor"]
-                    processID = process["processID"]
-                    service = process["service"]
-                    status = process["status"]
-                    serviceStatus = process["serviceStatus"]
-                    messages = process["messages"]
-                    files = process["files"]
-                    details = process["details"]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"project":projectObj, "service": service, "status": status, "messages": messages, "serviceStatus": serviceStatus, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
+                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]["processes"]:
+                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]["processes"][entry]
+                    processID = process[ProcessDescription.processID]
+                    serviceType = process[ProcessDescription.serviceType]
+                    serviceStatus = process[ProcessDescription.serviceStatus]
+                    serviceDetails = process[ProcessDescription.serviceDetails]
+                    processStatus = process[ProcessDescription.processStatus]
+                    processDetails = process[ProcessDescription.processDetails]
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.updatedWhen: now})
                     
-                    # for contractor in selectedContractor:
-                    #     contractorObj = Organization.objects.get(hashedID=contractor)
-                    #     contractorObj.processesReceived.add(processObj)
-                    #     contractorObj.save()
-                    
-                # link project to client
-                client.projects.add(projectObj)
-                client.save()
-
             return None
         except (Exception) as error:
             logger.error(f'could not add project to database: {str(error)}')
@@ -705,39 +687,39 @@ class ProcessManagementUser(ProcessManagementBase):
 
         """
         try:
-            # get user
-            currentUser = User.objects.get(subID=session["user"]["userinfo"]["sub"])
-            projects = currentUser.projects.all()
             # get associated projects
+            projects = Project.objects.filter(client=ProfileManagementBase.getUserHashID(session))
+            
             output = []
             
             for project in projects:
-                currentProject = {}
-                currentProject["projectID"] = project.projectID
-                currentProject["created"] = str(project.createdWhen)
-                currentProject["updated"] = str(project.updatedWhen)
-                currentProject["client"] = project.client
-                currentProject["status"] = project.status
-                currentProject["details"] = project.details
+                currentProject = project.toDict()
                 processesOfThatProject = []
                 for entry in project.processes.all():
-                    currentProcess = {}
-                    currentProcess["client"] = entry.client
-                    currentProcess["processID"] = entry.processID
-                    currentProcess["contractor"] = entry.contractor
-                    currentProcess["service"] = entry.service
-                    currentProcess["status"] = entry.status
-                    currentProcess["serviceStatus"] = entry.serviceStatus
-                    currentProcess["created"] = str(entry.createdWhen)
-                    currentProcess["updated"] = str(entry.updatedWhen)
-                    currentProcess["messages"] = entry.messages
-                    currentProcess["details"] = entry.details
-                    currentProcess["files"] = entry.files
+                    currentProcess = entry.toDict()
                     processesOfThatProject.append(currentProcess)
                 currentProject["processes"] = processesOfThatProject
                 output.append(currentProject)
+
+            if ProfileManagementBase.checkIfUserIsInOrganization(session):
+                # Code specific for orgas
+                # Add projects where the organization is registered as contractor
+                organizationObj = Organization.objects.get(hashedID=ProfileManagementBase.getOrgaHashID(session))
+                receivedProjects = {}
+                for processAsContractor in organizationObj.asContractor.all():
+                    project = processAsContractor.project
+
+                    if project.projectID not in receivedProjects:
+                        receivedProjects[project.projectID] = project.toDict()
+                        receivedProjects[project.projectID]["processes"] = []
+
+                    receivedProjects[project.projectID]["processes"].append(processAsContractor.toDict())
+                
+                for project in receivedProjects:
+                    output.append(receivedProjects[project])
+
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:
@@ -759,248 +741,42 @@ class ProcessManagementUser(ProcessManagementBase):
         """
         try:
             # get user
-            currentUser = User.objects.get(subID=session["user"]["userinfo"]["sub"])
-            projects = currentUser.projects.all()
+            projects = Project.objects.filter(client=ProfileManagementBase.getUserHashID(session))
             # get associated projects
             output = []
             
             for project in projects:
-                if "currentProjects" in session:
-                    if project.projectID in session["currentProjects"]:
+                if SessionContentSemperKI.CURRENT_PROJECTS in session:
+                    if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
                         continue
-                currentProject = {}
-                currentProject["projectID"] = project.projectID
-                currentProject["created"] = str(project.createdWhen)
-                currentProject["updated"] = str(project.updatedWhen)
-                currentProject["status"] = project.status
-                currentProject["client"] = project.client
-                currentProject["details"] = project.details
+                currentProject = project.toDict()
                 currentProject["processesCount"] = len(project.processes.all())
                     
                 output.append(currentProject)
+            
+            if ProfileManagementBase.checkIfUserIsInOrganization(session):
+                # Code specific for orgas
+                # Add projects where the organization is registered as contractor
+                organizationObj = Organization.objects.get(hashedID=ProfileManagementBase.getOrgaHashID(session))
+                receivedProjects = {}
+                for processAsContractor in organizationObj.asContractor.all():
+                    project = processAsContractor.project
+
+                    if project.projectID not in receivedProjects:
+                        receivedProjects[project.projectID] = project.toDict()
+                        receivedProjects[project.projectID]["processesCount"] = 0
+
+                    receivedProjects[project.projectID]["processesCount"] += 1
+                
+                for project in receivedProjects:
+                    output.append(receivedProjects[project])
+            
+            
             output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:
             logger.error(f'could not get projects flat: {str(error)}')
         
         return []
-
-####################################################################################
-# Projects and processes from and for Organizations
-class ProcessManagementOrganization(ProcessManagementBase):
-
-    ##############################################
-    @staticmethod
-    def addProjectToDatabase(session):
-        """
-        Add project and processes to database for that organization. 
-
-        :param session: session of user
-        :type session: session dict
-        :return: None
-        :rtype: None or Exception
-
-        """
-        now = timezone.now()
-        try:
-
-            # first get organization
-            client = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
-
-            # then go through projects
-            for projectID in session["currentProjects"]:
-
-                # project object
-                existingObj = session["currentProjects"][projectID]
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={"status": existingObj["status"], "updatedWhen": now, "client": client.hashedID, "details": existingObj["details"]})
-                # retrieve files
-                # uploadedFiles = []
-                # (contentOrError, Flag) = redis.retrieveContent(session.session_key)
-                # if Flag:
-                #     for entry in contentOrError:
-                #         uploadedFiles.append({"filename":entry[1], "path": session.session_key})
-
-                # save processes
-                for entry in session["currentProjects"][projectID]["processes"]:
-                    process = session["currentProjects"][projectID]["processes"][entry]
-                    selectedContractor = process["contractor"]
-                    processID = process["processID"]
-                    service = process["service"]
-                    status = process["status"]
-                    serviceStatus = process["serviceStatus"]
-                    messages = process["messages"]
-                    files = process["files"]
-                    details = process["details"]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={"project": projectObj, "service": service, "status": status, "serviceStatus": serviceStatus, "messages": messages, "details": details, "files": files, "client": client.hashedID, "contractor": selectedContractor, "updatedWhen": now})
-
-                    # for contractor in selectedManufacturer:
-                    #     contractorObj = Organization.objects.get(hashedID=contractor)
-                    #     contractorObj.processesReceived.add(processObj)
-                    #     contractorObj.save()
-            
-                # link project to client
-                client.projectsSubmitted.add(projectObj)
-                client.save()
-
-            return None
-        except (Exception) as error:
-            logger.error(f'could not add project to database: {str(error)}')
-            return error
-
-    ##############################################
-    @staticmethod
-    def getProjects(session):
-        """
-        Get all processes for that organization.
-
-        :param session: session of that user
-        :type session: dict
-        :return: list of processes
-        :rtype: list
-
-        """
-        try:
-            # get organization
-            currentUser = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
-            projects = currentUser.projectsSubmitted.all()
-
-            # get associated projects for submitted processes
-            output = []
-            
-            for project in projects:
-                currentProject = {}
-                currentProject["projectID"] = project.projectID
-                currentProject["created"] = str(project.createdWhen)
-                currentProject["updated"] = str(project.updatedWhen)
-                currentProject["status"] = project.status
-                currentProject["client"] = project.client
-                currentProject["details"] = project.details
-                processesOfThatProject = []
-                for entry in project.processes.all():
-                    currentProcess = {}
-                    currentProcess["processID"] = entry.processID
-                    currentProcess["contractor"] = entry.contractor
-                    currentProcess["client"] = entry.client
-                    currentProcess["service"] = entry.service
-                    currentProcess["status"] = entry.status
-                    currentProcess["serviceStatus"] = entry.serviceStatus
-                    currentProcess["created"] = str(entry.createdWhen)
-                    currentProcess["updated"] = str(entry.updatedWhen)
-                    currentProcess["messages"] = entry.messages
-                    currentProcess["details"] = entry.details
-                    currentProcess["files"] = entry.files
-                    processesOfThatProject.append(currentProcess)
-                currentProject["processes"] = processesOfThatProject
-                output.append(currentProject)
-
-            # get received processes
-            receivedProcesses = currentUser.processesReceived.all()
-            # since multiple processes could have been received within the same project, we need to collect those
-            receivedProjects = {}
-            for processEntry in receivedProcesses:
-                project = processEntry.project
-
-                if project.projectID not in receivedProjects:
-                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "status": project.status, "processes": []}
-
-                currentProcess = {}
-                currentProcess["processID"] = processEntry.processID
-                currentProcess["contractor"] = processEntry.contractor
-                currentProcess["client"] = processEntry.client
-                currentProcess["service"] = processEntry.service
-                currentProcess["status"] = processEntry.status
-                currentProcess["serviceStatus"] = processEntry.serviceStatus
-                currentProcess["created"] = str(processEntry.createdWhen)
-                currentProcess["updated"] = str(processEntry.updatedWhen)
-                currentProcess["messages"] = processEntry.messages
-                currentProcess["details"] = processEntry.details
-                currentProcess["files"] = processEntry.files
-
-                receivedProjects[project.projectID]["processes"].append(currentProcess)
-            
-            # after collection the projects and their processes, we need to add them to the output
-            for project in receivedProjects:
-                output.append(receivedProjects[project])
-
-
-            output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
-            return output
-
-        except (Exception) as error:
-            logger.error(f'could not get projects: {str(error)}')
-        
-        return []
-    
-    ##############################################
-    @staticmethod
-    def getProjectsFlat(session):
-        """
-        Get all projects for that organization with little information.
-
-        :param session: session of that user
-        :type session: dict
-        :return: sorted list 
-        :rtype: list
-
-        """
-        try:
-            # get organization
-            currentUser = Organization.objects.get(subID=session["user"]["userinfo"]["org_id"])
-            projects = currentUser.projectsSubmitted.all()
-
-            # get associated projects for submitted processes
-            output = []
-            
-            for project in projects:
-                if "currentProjects" in session:
-                    if project.projectID in session["currentProjects"]:
-                        continue
-                currentProject = {}
-                currentProject["projectID"] = project.projectID
-                currentProject["created"] = str(project.createdWhen)
-                currentProject["updated"] = str(project.updatedWhen)
-                currentProject["status"] = project.status
-                currentProject["client"] = project.client
-                currentProject["details"] = project.details
-                currentProject["processesCount"] = len(list(project.processes.all()))
-
-                output.append(currentProject)
-
-            # get received processes
-            receivedProcesses = currentUser.processesReceived.all()
-            # since multiple processes could have been received within the same project, we need to collect those
-            receivedProjects = {}
-            for processEntry in receivedProcesses:
-                project = processEntry.project
-
-                if project.projectID not in receivedProjects:
-                    receivedProjects[project.projectID] = {"projectID": project.projectID, "client": project.client, "created": str(project.createdWhen), "updated": str(project.updatedWhen), "details": project.details, "status": project.status, "processesCount": 0}
-                receivedProjects[project.projectID]["processesCount"] += 1
-            
-            # after collection the projects and their processes, we need to add them to the output
-            for project in receivedProjects:
-                currentProject = {}
-                currentProject["projectID"] = receivedProjects[project]["projectID"]
-                currentProject["created"] = receivedProjects[project]["created"]
-                currentProject["updated"] = receivedProjects[project]["updated"]
-                currentProject["status"] = receivedProjects[project]["status"]
-                currentProject["client"] = receivedProjects[project]["client"]
-                currentProject["details"] = receivedProjects[project]["details"]
-                currentProject["processesCount"] = receivedProjects[project]["processesCount"]
-
-                output.append(currentProject)
-
-
-            output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x["created"], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
-            return output
-
-        except (Exception) as error:
-            logger.error(f'could not get projects: {str(error)}')
-        
-        return []
-    
-processManagement= {"user": ProcessManagementUser(), "organization": ProcessManagementOrganization()}
