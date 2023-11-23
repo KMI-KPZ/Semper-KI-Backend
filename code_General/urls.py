@@ -29,7 +29,7 @@ from django.conf import settings
 from .handlers import admin, authentification, email, files, frontpage, organizations, profiles, statistics, websocket, testResponse
 from Benchy.BenchyMcMarkface import startFromDjango
 
-paths = {
+paths = { 
     "landingPage": "",
     "benchyPage": "private/benchy/",
     "benchyMcMarkface": "private/benchyMcMarkface/",
