@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-from code_General.settings.base import BackendManagement, set_settings
+from code_General.settings import BackendManagement, set_settings
 import sys
 
 

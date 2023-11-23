@@ -411,4 +411,4 @@ STORAGES = {
 STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
 
 # import from other apps
-from ...code_SemperKI.settings.base import *
+import code_SemperKI.settings.base

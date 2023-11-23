@@ -15,7 +15,7 @@ from code_General.settings.base import ConfigHelper, BackendConfigHelper
 
 
 class BackendDjangoConfig(AppConfig, BackendConfigHelper):
-    name = 'backend'
+    name = 'code_General'
     checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
 
     def __init__(self,app_name, app_module):

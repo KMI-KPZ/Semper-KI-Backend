@@ -131,4 +131,4 @@ def sendGeneralQuery(query):
 
 #######################################################
 # import from other services
-import services.code_service_3DPrint.connections.cmem 
+import services.code_service_AdditiveManufacturing.connections.cmem 

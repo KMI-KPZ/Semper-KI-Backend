@@ -21,13 +21,14 @@ Including another URLconf
 
 from django.urls import path
 from django.conf import settings
+from code_General.urls import paths, urlpatterns
 
 ##############################################################################
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin
 
-paths_SemperKI = {
+paths.update({
 
     "getContractors": "public/getContractors/<processID>/",
     
@@ -63,10 +64,10 @@ paths_SemperKI = {
     "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>/",
     "deleteFile": "public/deleteFile/<processID>/<fileID>/",
 
-}
+})
 
 # The name must remain "oath" as the content is included in the urls.py in code_General
-urlpatterns_SemperKI = [
+urlpatterns.extend([
     path(paths["getMissedEvents"], projectAndProcessManagement.getMissedEvents, name='getMissedEvents'),
     path(paths["getFlatProjects"], projectAndProcessManagement.getFlatProjects, name="getFlatProjects"),
     path(paths["retrieveProjects"], projectAndProcessManagement.retrieveProjects, name='retrieveProjects'),
@@ -101,7 +102,7 @@ urlpatterns_SemperKI = [
     path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
 
     
-] #+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+])
 
 
 

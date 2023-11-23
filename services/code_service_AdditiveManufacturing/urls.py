@@ -23,7 +23,9 @@ from django.urls import path
 
 from .handlers import checkService, filter, resources
 
-paths_service_AdditiveManufacturing = {
+from code_SemperKI.urls import paths, urlpatterns
+
+paths.update({
     "getProcessData": 'public/getProcessData/',
     "getModels": 'public/getModels/',
     "getFilters": 'public/getFilters/',
@@ -48,9 +50,9 @@ paths_service_AdditiveManufacturing = {
     "orga_addMaterialEdit": "public/orga/addMaterial/",
     "orga_createMaterial": "public/orga/createMaterial/",
     "orga_removeMaterial": "public/orga/removeMaterial/",
-}
+})
 
-urlpatterns_service_AdditiveManufacturing = [
+urlpatterns.extend([
 
     path(paths["getProcessData"], filter.getProcessData, name='getProcessData'),
     path(paths["getModels"], filter.getModels, name='getModels'),
@@ -76,4 +78,4 @@ urlpatterns_service_AdditiveManufacturing = [
     path(paths["orga_createMaterial"], resources.orga_createMaterial, name="orga_createMaterial"),
     path(paths["orga_removeMaterial"], resources.orga_removeMaterial, name="orga_removeMaterial"),
     path(paths["orga_getMaterials"], resources.orga_getMaterials, name="orga_getMaterials"),
-]
+])

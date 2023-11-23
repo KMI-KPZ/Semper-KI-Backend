@@ -9,8 +9,6 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .userModel import User
-
 ###################################################
 class OrganizationDescription(enum.StrEnum):
     """
@@ -49,7 +47,7 @@ class Organization(models.Model):
     hashedID = models.CharField(max_length=513)
     name = models.CharField(max_length=100)
     details = models.JSONField()
-    users = models.ManyToManyField(User)
+    users = models.ManyToManyField("User")
     supportedServices = ArrayField(models.IntegerField())
     uri = models.CharField(max_length=200)
     createdWhen = models.DateTimeField(auto_now_add=True)

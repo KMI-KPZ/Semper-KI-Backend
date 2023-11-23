@@ -29,9 +29,6 @@ from django.conf import settings
 from .handlers import admin, authentification, email, files, frontpage, organizations, profiles, statistics, websocket, testResponse
 from Benchy.BenchyMcMarkface import startFromDjango
 
-from code_SemperKI.urls import paths_SemperKI, urlpatterns_SemperKI
-from services.code_service_AdditiveManufacturing.urls import paths_service_AdditiveManufacturing, urlpatterns_service_AdditiveManufacturing
-
 paths = {
     "landingPage": "",
     "benchyPage": "private/benchy/",
@@ -85,9 +82,6 @@ paths = {
 
     "contactForm": "public/contact/",
 }
-
-paths.update(paths_SemperKI)
-paths.update(paths_service_AdditiveManufacturing)
 
 urlpatterns = [
     path(paths["landingPage"], frontpage.landingPage, name="landingPage"),
@@ -145,9 +139,6 @@ urlpatterns = [
 
     path(paths["statistics"], statistics.getNumberOfUsers, name="statistics")
 ]
-
-urlpatterns.append(urlpatterns_SemperKI)
-urlpatterns.append(urlpatterns_service_AdditiveManufacturing)
 
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
