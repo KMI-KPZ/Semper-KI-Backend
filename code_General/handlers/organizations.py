@@ -16,6 +16,7 @@ from channels.layers import get_channel_layer
 from ..connections.postgresql import pgProfiles
 from ..connections import auth0
 from ..utilities.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError, checkIfRightsAreSufficient, Logging
+from ..definitions import SessionContent
 
 logger = logging.getLogger("logToFile")
 #######################################################
@@ -91,9 +92,9 @@ def getOrganizationName(session, orgID, baseURL, baseHeader):
     :rtype: str or error
     """
     try:
-        if "organizationName" in session:
-            if session["organizationName"] != "":
-                return session["organizationName"]
+        if SessionContent.ORGANIZATION_NAME in session:
+            if session[SessionContent.ORGANIZATION_NAME] != "":
+                return session[SessionContent.ORGANIZATION_NAME]
         
         res = handleTooManyRequestsError(lambda : requests.get(f'{baseURL}/api/v2/organizations/{orgID}', headers=baseHeader))
         if isinstance(res, Exception):
@@ -116,7 +117,7 @@ def organizations_getInviteLink(request):
     :rtype: HTTPResponse
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
         
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -161,7 +162,7 @@ def organizations_addUser(request):
     :rtype: HTTPResponse
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -206,7 +207,7 @@ def organizations_fetchUsers(request):
     :rtype: Json or error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return JsonResponse({})
 
         headers = {
@@ -257,7 +258,7 @@ def organizations_deleteUser(request):
     :rtype: HTTPResponse or error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -313,7 +314,7 @@ def organizations_createRole(request):
     :rtype: JSON or Error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return JsonResponse({})
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -364,7 +365,7 @@ def organizations_assignRole(request):
     :rtype: HTTPResponse
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -419,7 +420,7 @@ def organizations_removeRole(request):
     :rtype: True or error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -473,7 +474,7 @@ def organizations_editRole(request):
     :rtype: Bool or error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -529,7 +530,7 @@ def organizations_getRoles(request):
     """
     try:
 
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return JsonResponse({})
 
         headers = {
@@ -577,7 +578,7 @@ def organizations_deleteRole(request):
     :rtype: HTTPResponse or error
     """
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -620,7 +621,7 @@ def organizations_setPermissionsForRole(request):
     :rtype: HTTPResponse or error
     """    
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -682,7 +683,7 @@ def organizations_getPermissions(request):
     :rtype: JSON or error
     """ 
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return JsonResponse({})
 
         headers = {
@@ -719,7 +720,7 @@ def organizations_getPermissionsForRole(request):
     :rtype: JSON or error
     """    
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return JsonResponse({})
 
         content = json.loads(request.body.decode("utf-8"))["data"]
@@ -759,7 +760,7 @@ def organizations_createNewOrganization(request):
     """    
 
     try:
-        if "mockedLogin" in request.session and request.session["mockedLogin"] is True:
+        if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
             return HttpResponse("Mock")
 
         content = json.loads(request.body.decode("utf-8"))["data"]

@@ -34,7 +34,7 @@ The backend currently supports the environment ```--env <environment>``` which w
 - now you can call ```python manage.py runserver --env local``` to start the backend locally and edit or you can run all in a container (including the backend) with ```start_local_dev.bat -m local_container``` 
 - or use VS Code and RUN->Start Debugging but beforehand, stop all containers with ```stop_local_dev.bat```
 
-watch exposed ports of the docker containers for connections i.e. pg-admin (email/pw is in dc-local-dev-services.yml)
+watch exposed ports of the docker containers for connections i.e. pg-admin (email/pw is in docker-local-dev-services.yml)
 
 ## Debug logging
 In order to have debug output in the console, in your .env.[MODE] file set ```DJANGO_LOG_LEVEL=DEBUG```.

@@ -50,6 +50,7 @@ class ServiceTypes(enum.StrEnum):
     This must be known here, since enums can't be extended!
     
     """
+    NONE = enum.auto()
     ADDITIVE_MANUFACTURING = enum.auto()
     CREATE_MODEL = enum.auto()
 

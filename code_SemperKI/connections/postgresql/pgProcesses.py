@@ -23,7 +23,7 @@ from ...modelFiles.dataModel import Data
 from code_General.connections import s3
 from code_General.utilities import crypto
 
-from code_General.definitions import FileObject
+from code_General.definitions import FileObject, OrganizationDescription
 from ...definitions import *
 
 from ...services import serviceManager, ServiceTypes 
@@ -117,7 +117,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def createDataEntry(data, dataID, processID, typeOfData:DataType, createdBy, details={}, IDofData=""):
+    def createDataEntry(data, dataID, processID, typeOfData:DataType, createdBy:str, details={}, IDofData=""):
         """
         Create an entry in the Data table
 
@@ -234,7 +234,7 @@ class ProcessManagementBase():
                 if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID == entry.contractor.hashedID): 
                     processesOfThatProject.append(entry.toDict())
                     showProjectDetails = True
-            output["processes"] = processesOfThatProject
+            output[SessionContentSemperKI.CURRENT_PROCESSES] = processesOfThatProject
             
             if showProjectDetails:
                 return output
@@ -356,7 +356,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def updateProject(projectID, updateType: ProcessUpdates, content):
+    def updateProject(projectID, updateType: ProjectUpdates, content):
         """
         Change details of an project like its status. 
 
@@ -372,13 +372,13 @@ class ProcessManagementBase():
         """
         updated = timezone.now()
         try:
-            if updateType == ProcessUpdates.STATUS:
+            if updateType == ProjectUpdates.STATUS:
                 currentProject = Project.objects.get(projectID=projectID)
                 currentProject.status = content
                 currentProject.updatedWhen = updated
                 currentProject.save()
 
-            elif updateType == ProcessUpdates.DETAILS:
+            elif updateType == ProjectUpdates.DETAILS:
                 currentProject = Project.objects.get(projectID=projectID)
                 for key in content:
                     currentProject.details[key] = content[key]
@@ -405,7 +405,7 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
-        # TODO
+        # TODO - create data entries for everything that's happening
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
@@ -414,29 +414,28 @@ class ProcessManagementBase():
             if updateType == ProcessUpdates.MESSAGES:
                 ProcessManagementBase.createDataEntry(content, crypto.generateURLFriendlyRandomString(), processID, DataType.MESSAGE, updatedBy)
             
-            elif updateType == ProcessUpdates.STATUS:
-                currentProcess.processStatus = content
-                
             elif updateType == ProcessUpdates.FILES:
                 for entry in content:
                     ProcessManagementBase.createDataEntry(content[entry], crypto.generateURLFriendlyRandomString(), processID, DataType.FILE, updatedBy, {}, content[entry]["id"])
+
+            elif updateType == ProcessUpdates.PROCESS_STATUS:
+                currentProcess.processStatus = content
                 
-            elif updateType == ProcessUpdates.SERVICE_TYPE:
-                # TODO
-                if content == ServiceTypes.ADDITIVE_MANUFACTURING:
-                    currentProcess.serviceType = ServiceTypes.ADDITIVE_MANUFACTURING
-                elif content == ServiceTypes.CREATE_MODEL:
-                    currentProcess.serviceType = ServiceTypes.CREATE_MODEL
-            
-            elif updateType == ProcessUpdates.SERVICE:
-                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
-
-            elif updateType == ProcessUpdates.CONTRACTOR:
-                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
-
-            elif updateType == ProcessUpdates.DETAILS:
+            elif updateType == ProcessUpdates.PROCESS_DETAILS:
                 for entry in content:
                     currentProcess.processDetails[entry] = content[entry]
+
+            elif updateType == ProcessUpdates.SERVICE_TYPE:
+                currentProcess.serviceType = content
+                      
+            elif updateType == ProcessUpdates.SERVICE_STATUS:
+                currentProcess.serviceStatus = content
+
+            elif updateType == ProcessUpdates.SERVICE_DETAILS:
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
+
+            elif updateType == ProcessUpdates.PROVISIONAL_CONTRACTOR:
+                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
 
             currentProcess.save()
             return True
@@ -455,7 +454,7 @@ class ProcessManagementBase():
         :return: Nothing or an error
         :rtype: None or error
         """
-        # TODO
+        #TODO - create data entries for everything that's happening
         try:
             processObj = Process.objects.get(processID=processID)
             
@@ -483,7 +482,7 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
-        #TODO
+        #TODO - create data entries for everything that's happening
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
@@ -492,23 +491,29 @@ class ProcessManagementBase():
             if updateType == ProcessUpdates.MESSAGES:
                 ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
             
-            elif updateType == ProcessUpdates.STATUS:
-                currentProcess.processStatus = ProcessStatus.DRAFT
-                
             elif updateType == ProcessUpdates.FILES:
                 for entry in content:
                     s3.manageLocalS3.deleteFile(entry["id"])
                     ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
+
+            elif updateType == ProcessUpdates.PROCESS_STATUS:
+                currentProcess.processStatus = ProcessStatus.DRAFT
                 
-            elif updateType == ProcessUpdates.SERVICE:
-                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
-
-            elif updateType == ProcessUpdates.CONTRACTOR:
-                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""
-
-            elif updateType == ProcessUpdates.DETAILS:
+            elif updateType == ProcessUpdates.PROCESS_DETAILS:
                 for key in content:
                     del currentProcess.processDetails[key]
+
+            elif updateType == ProcessUpdates.SERVICE_DETAILS:
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
+
+            elif updateType == ProcessUpdates.SERVICE_STATUS:
+                currentProcess.serviceStatus = 0 #TODO
+
+            elif updateType == ProcessUpdates.SERVICE_TYPE:
+                currentProcess.serviceType = ServiceTypes.NONE
+
+            elif updateType == ProcessUpdates.PROVISIONAL_CONTRACTOR:
+                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""
 
             currentProcess.save()
             return True
@@ -659,8 +664,8 @@ class ProcessManagementBase():
 
                 projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.status: existingObj[ProjectDescription.status], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.details: existingObj[ProjectDescription.details]})
                 # save processes
-                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]["processes"]:
-                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]["processes"][entry]
+                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.CURRENT_PROCESSES]:
+                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.CURRENT_PROCESSES][entry]
                     processID = process[ProcessDescription.processID]
                     serviceType = process[ProcessDescription.serviceType]
                     serviceStatus = process[ProcessDescription.serviceStatus]
@@ -698,7 +703,7 @@ class ProcessManagementBase():
                 for entry in project.processes.all():
                     currentProcess = entry.toDict()
                     processesOfThatProject.append(currentProcess)
-                currentProject["processes"] = processesOfThatProject
+                currentProject[SessionContentSemperKI.CURRENT_PROCESSES] = processesOfThatProject
                 output.append(currentProject)
 
             if ProfileManagementBase.checkIfUserIsInOrganization(session):
@@ -711,9 +716,9 @@ class ProcessManagementBase():
 
                     if project.projectID not in receivedProjects:
                         receivedProjects[project.projectID] = project.toDict()
-                        receivedProjects[project.projectID]["processes"] = []
+                        receivedProjects[project.projectID][SessionContentSemperKI.CURRENT_PROCESSES] = []
 
-                    receivedProjects[project.projectID]["processes"].append(processAsContractor.toDict())
+                    receivedProjects[project.projectID][SessionContentSemperKI.CURRENT_PROCESSES].append(processAsContractor.toDict())
                 
                 for project in receivedProjects:
                     output.append(receivedProjects[project])
@@ -780,3 +785,23 @@ class ProcessManagementBase():
             logger.error(f'could not get projects flat: {str(error)}')
         
         return []
+    
+    ##############################################
+    @staticmethod
+    def getAllContractors(selectedService:ServiceTypes):
+        """
+        Get all contractors.
+        
+        :return: All contractors
+        :rtype: Dictionary
+
+        """
+        try:
+            listOfSuitableContractors = Organization.objects.filter(supportedServices__contains=[selectedService])
+            returnValue = []
+            for entry in listOfSuitableContractors:
+                returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: entry.details})
+        except (Exception) as error:
+            logger.error(f"Error getting all contractors: {str(error)}")
+
+        return returnValue

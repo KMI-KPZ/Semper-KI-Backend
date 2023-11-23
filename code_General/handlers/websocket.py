@@ -14,6 +14,8 @@ from asgiref.sync import sync_to_async
 from ..connections.postgresql import pgProfiles
 from ..utilities import rights
 
+from ..definitions import SessionContent
+
 logger = logging.getLogger("django_debug")
 
 ###################################################
@@ -35,8 +37,8 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
             session = await sync_to_async(self.getSession)()
             if "user" in session:
                 # Then gather the user ID or organization id from the session user token and create room from that
-                if "isPartOfOrganization" in session:
-                    if session["isPartOfOrganization"]:
+                if SessionContent.IS_PART_OF_ORGANIZATION in session:
+                    if session[SessionContent.IS_PART_OF_ORGANIZATION]:
                         # in other function send to that "group"/"channel"
                         orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=session["user"]["userinfo"]["org_id"])
                         await self.channel_layer.group_add(orgaIDWOSC, self.channel_name)
@@ -62,8 +64,8 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                 # if "currentProjects" in session:
                 #     await sync_to_async(saveProjectsViaWebsocket)(session)
 
-                if "isPartOfOrganization" in session:
-                    if session["isPartOfOrganization"]:
+                if SessionContent.IS_PART_OF_ORGANIZATION in session:
+                    if session[SessionContent.IS_PART_OF_ORGANIZATION]:
                         orgaIDWOSC = await sync_to_async(pgProfiles.ProfileManagementBase.getUserKeyWOSC)(uID=session["user"]["userinfo"]["org_id"])
                         await self.channel_layer.group_discard(orgaIDWOSC, self.channel_name)
                         for entry in rights.rightsManagement.getRightsList():

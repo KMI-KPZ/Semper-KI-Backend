@@ -57,9 +57,21 @@ class Organization(models.Model):
     accessedWhen = models.DateTimeField(auto_now=True)
 
     ###################################################
+    class Meta:
+        indexes = [
+            models.Index(fields=["hashedID"], name="organization_idx"),
+        ]
+
+    ###################################################
     def __str__(self):
         return self.hashedID + " " + self.name + " " + json.dumps(self.details) + " " + "supportedServices: " + str(self.supportedServices) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "details": json.dumps(self.details), "supportedServices": self.supportedServices, "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
+        return {OrganizationDescription.hashedID: self.hashedID, 
+                OrganizationDescription.name: self.name, 
+                OrganizationDescription.details: json.dumps(self.details), 
+                OrganizationDescription.supportedServices: self.supportedServices, 
+                OrganizationDescription.createdWhen: self.createdWhen, 
+                OrganizationDescription.updatedWhen: self.updatedWhen, 
+                OrganizationDescription.accessedWhen: self.accessedWhen}

@@ -15,6 +15,8 @@ from ..utilities import basics
 
 from ..connections.postgresql import pgProfiles
 
+from ..definitions import SessionContent
+
 logger = logging.getLogger("logToFile")
 ##############################################
 # @checkIfUserIsLoggedIn()
@@ -127,7 +129,7 @@ def getUserDetails(request):
     """
     # Read user details from Database
     userObj = pgProfiles.ProfileManagementBase.getUser(request.session)
-    userObj["usertype"] = request.session["usertype"]
+    userObj[SessionContent.USER_TYPE] = request.session[SessionContent.USER_TYPE]
     return JsonResponse(userObj)
 
 ##############################################

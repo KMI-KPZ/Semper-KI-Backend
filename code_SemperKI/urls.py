@@ -29,7 +29,7 @@ from .handlers import projectAndProcessManagement, testResponse, frontpage, spar
 
 paths_SemperKI = {
 
-    "getContractors": "public/getContractors/",
+    "getContractors": "public/getContractors/<processID>/",
     
     "saveProjects": "public/saveProjects/",
     "retrieveProjects": "public/retrieveProjects/",

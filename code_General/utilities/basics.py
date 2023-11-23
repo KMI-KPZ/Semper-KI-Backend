@@ -15,6 +15,7 @@ from time import sleep
 
 from ..utilities import rights
 from ..connections.redis import RedisConnection
+from ..definitions import SessionContent
 
 #######################################################
 def checkIfTokenValid(token):
@@ -94,7 +95,7 @@ def checkIfUserIsAdmin(json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session:
-                if request.session["usertype"] == "admin":
+                if request.session[SessionContent.USER_TYPE] == "admin":
                     return func(request, *args, **kwargs)
                 else:
                     if json:
@@ -149,8 +150,8 @@ def manualCheckIfRightsAreSufficient(session, funcName):
     :return: Response whether the user is logged in or not.
     :rtype: Bool
     """
-    if "user" in session and "userPermissions" in session:
-        if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(session["userPermissions"],funcName):
+    if "user" in session and SessionContent.USER_PERMISSIONS in session:
+        if session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowed(session[SessionContent.USER_PERMISSIONS],funcName):
             return True
 
     return False
@@ -167,8 +168,8 @@ def manualCheckIfRightsAreSufficientForSpecificOperation(session, funcName, oper
     :return: Response whether the user is logged in or not.
     :rtype: Bool
     """
-    if "user" in session and "userPermissions" in session:
-        if session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowedWithOperation(session["userPermissions"],funcName, operation):
+    if "user" in session and SessionContent.USER_PERMISSIONS in session:
+        if session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowedWithOperation(session[SessionContent.USER_PERMISSIONS],funcName, operation):
             return True
 
     return False
@@ -188,8 +189,8 @@ def checkIfRightsAreSufficient(json=False):
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            if "user" in request.session and "userPermissions" in request.session:
-                if request.session["usertype"] == "admin" or rights.rightsManagement.checkIfAllowed(request.session["userPermissions"], func.__name__):
+            if "user" in request.session and SessionContent.USER_PERMISSIONS in request.session:
+                if request.session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowed(request.session[SessionContent.USER_PERMISSIONS], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
                     if json:

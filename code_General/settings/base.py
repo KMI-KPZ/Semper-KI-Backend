@@ -204,7 +204,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'code_General',
-    "code_SemperKI"
+    "code_SemperKI",
     'storages'
 ]
 

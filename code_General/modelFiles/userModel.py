@@ -56,9 +56,22 @@ class User(models.Model):
     lastSeen = models.DateTimeField(default=timezone.now())
 
     ###################################################
+    class Meta:
+        indexes = [
+            models.Index(fields=["hashedID"], name="user_idx"),
+        ]
+
+    ###################################################
     def __str__(self):
         return self.hashedID + " " + self.name + " " + str(self.organizations) + " " + json.dumps(self.details) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen) + " " + str(self.lastSeen)
 
     ###################################################
     def toDict(self):
-        return {"hashedID": self.hashedID, "name": self.name, "organizations": ','.join(orga.name for orga in self.organizations.all()), "details": json.dumps(self.details), "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen, "lastSeen": self.lastSeen}
+        return {UserDescription.hashedID: self.hashedID, 
+                UserDescription.name: self.name, 
+                UserDescription.organizations: ','.join(orga.name for orga in self.organizations.all()), 
+                UserDescription.details: json.dumps(self.details), 
+                UserDescription.createdWhen: self.createdWhen, 
+                UserDescription.updatedWhen: self.updatedWhen, 
+                UserDescription.accessedWhen: self.accessedWhen, 
+                UserDescription.lastSeen: self.lastSeen}

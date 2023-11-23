@@ -14,7 +14,7 @@ from ...modelFiles.userModel import User
 from ...utilities import crypto
 from logging import getLogger
 
-from ...definitions import ServiceType
+from ...definitions import SessionContent
 
 logger = getLogger("django")
 
@@ -422,26 +422,6 @@ class ProfileManagementOrganization(ProfileManagementBase):
 
     ##############################################
     @staticmethod
-    def getAllContractors(selectedService:ServiceType):
-        """
-        Get all contractors.
-        
-        :return: All contractors
-        :rtype: Dictionary
-
-        """
-        try:
-            listOfSuitableContractors = Organization.objects.filter(supportedServices__contains=[selectedService])
-            returnValue = []
-            for entry in listOfSuitableContractors:
-                returnValue.append({"hashedID": entry.hashedID, "name": entry.name, "details": entry.details})
-        except (Exception) as error:
-            logger.error(f"Error getting all contractors: {str(error)}")
-
-        return returnValue
-
-    ##############################################
-    @staticmethod
     def addUserIfNotExists(session, organization):
         """
         Add user if the entry doesn't already exists.
@@ -527,7 +507,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
             return resultObj
         except (ObjectDoesNotExist) as error:
             try:
-                orgaName = session["organizationName"]
+                orgaName = session[SessionContent.ORGANIZATION_NAME]
                 orgaDetails = {"email": "", "adress": "", "taxID": ""}
                 idHash = crypto.generateSecureID(orgaID)
                 uri = ""

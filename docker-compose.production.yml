@@ -5,7 +5,7 @@ services:
     image: backend-prod
     build:
       context: .
-      dockerfile: ./Dockerfile_new
+      dockerfile: ./Dockerfile
     command: ["-e prod"]
     ports:
       - 127.0.0.1:8001:8000
@@ -32,8 +32,8 @@ services:
       - 127.0.0.1:6380:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
-      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
-    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

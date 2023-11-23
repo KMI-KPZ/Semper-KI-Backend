@@ -27,6 +27,18 @@ class FileObject():
     createdBy = ""
 
 ###################################################
+# File object content as enum
+class FileObjectContent(enum.StrEnum):
+    id = enum.auto()
+    title = enum.auto()
+    tags = enum.auto()
+    date = enum.auto()
+    licenses = enum.auto()
+    certificates = enum.auto()
+    URI = enum.auto()
+    createdBy = enum.auto()
+
+###################################################
 # Enum for session content
 class SessionContent(enum.StrEnum):
     """

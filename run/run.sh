@@ -64,6 +64,10 @@ if [ $MIGRATIONS -eq 1 ]; then
   echo -e "\nrunning python manage.py migrate --env $ENV"
   python manage.py migrate code_General --env $ENV
   echo -e "\nrunning python manage.py migrate --env $ENV"
+    python manage.py makemigrations code_SemperKI --env $ENV
+  echo -e "\nrunning python manage.py migrate --env $ENV"
+  python manage.py migrate code_SemperKI --env $ENV
+  echo -e "\nrunning python manage.py migrate --env $ENV"
   python manage.py migrate --env $ENV
 fi
 

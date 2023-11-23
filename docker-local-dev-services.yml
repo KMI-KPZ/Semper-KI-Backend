@@ -34,8 +34,8 @@ services:
       - 127.0.0.1:6379:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
-      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
-    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

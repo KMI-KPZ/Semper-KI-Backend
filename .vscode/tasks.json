@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command" :"docker-compose",
 			"args": [
-				"-p", "vs-code-dev-services", "-f", "./dc-local-dev-services.yml","up","-d"
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","up","-d"
 			],
 			"group": {
 				"kind":"build",
@@ -28,7 +28,7 @@
 			"platform": "python",
 			"dockerBuild": {
 				"tag": "backend:latest",
-				"dockerfile": "${workspaceFolder}/Dockerfile_new",
+				"dockerfile": "${workspaceFolder}/Dockerfile",
 				"context": "${workspaceFolder}",
 				"pull": true
 			},
@@ -65,7 +65,7 @@
 			"type": "shell",
 			"command": "docker-compose",
 			"args": [
-				"-p", "vs-code-dev-services", "-f", "./dc-local-dev-services.yml","down"
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","down"
 			],
 			"group": {
 				"kind":"build",

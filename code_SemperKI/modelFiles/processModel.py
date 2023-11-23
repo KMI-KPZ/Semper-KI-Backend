@@ -80,6 +80,13 @@ class Process(models.Model):
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
+
+    ###################################################
+    class Meta:
+        indexes = [
+            models.Index(fields=["processID"], name="processIDs_idx"),
+        ]
+
     ###################################################
     def __str__(self):
         return ""

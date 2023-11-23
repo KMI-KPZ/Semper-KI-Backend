@@ -54,18 +54,29 @@ class DataType(enum.Enum):
 
 ####################################################################################
 # Enum for updateProcess
-class ProcessUpdates(enum.Enum):
+class ProjectUpdates(enum.Enum):
+    """
+    What types of updates are there for a project?
+
+    """
+    STATUS = enum.auto()
+    DETAILS = enum.auto()
+
+####################################################################################
+# Enum for updateProcess
+class ProcessUpdates(enum.StrEnum):
     """
     What types of updates are there for a process? 
     
     """
-    STATUS = 1
-    MESSAGES = 2
-    FILES = 3
-    SERVICE = 4
-    SERVICE_TYPE = 5
-    CONTRACTOR = 6
-    DETAILS = 7
+    MESSAGES = enum.auto()
+    FILES = enum.auto()
+    SERVICE_DETAILS = enum.auto()
+    SERVICE_TYPE = enum.auto()
+    SERVICE_STATUS = enum.auto()
+    PROCESS_DETAILS = enum.auto()
+    PROCESS_STATUS = enum.auto()
+    PROVISIONAL_CONTRACTOR = enum.auto()
 
 ####################################################################################
 # Enum for processDetails
@@ -85,3 +96,4 @@ class SessionContentSemperKI(enum.StrEnum):
     
     """
     CURRENT_PROJECTS = enum.auto()
+    CURRENT_PROCESSES = enum.auto()

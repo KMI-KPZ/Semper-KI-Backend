@@ -25,6 +25,8 @@ from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manual
 from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
 from ..connections.postgresql import pgProcesses
+from ..definitions import ProcessUpdates, DataType, ProcessDescription
+from code_General.definitions import FileObjectContent
 
 from code_General.connections import s3
 
@@ -46,30 +48,31 @@ def uploadModel(request):
         info = request.POST 
         projectID = info["projectID"]
         processID = info["processID"]
-        fileTags = info["tags"].split(",")
-        fileLicenses = info["license"].split(",")
-        fileCertificates = info["certificate"].split(",")
+        fileTags = info[FileObjectContent.tags].split(",")
+        fileLicenses = info[FileObjectContent.licenses].split(",")
+        fileCertificates = info[FileObjectContent.certificates].split(",")
 
         fileName = list(request.FILES.keys())[0]
         fileID = crypto.generateURLFriendlyRandomString()
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
         model = {fileName: {}}
-        model[fileName]["id"] = fileID
-        model[fileName]["title"] = fileName
-        model[fileName]["tags"] = fileTags
-        model[fileName]["date"] = str(timezone.now())
-        model[fileName]["licenses"] = fileLicenses
-        model[fileName]["certificates"] = fileCertificates
-        model[fileName]["URI"] = ""
-        model[fileName]["createdBy"] = userName
+        model[fileName][FileObjectContent.id] = fileID
+        model[fileName][FileObjectContent.title] = fileName
+        model[fileName][FileObjectContent.tags] = fileTags
+        model[fileName][FileObjectContent.date] = str(timezone.now())
+        model[fileName][FileObjectContent.licenses] = fileLicenses
+        model[fileName][FileObjectContent.certificates] = fileCertificates
+        model[fileName][FileObjectContent.URI] = ""
+        model[fileName][FileObjectContent.createdBy] = userName
 
         returnVal = s3.manageLocalS3.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
         if returnVal is not True:
             return JsonResponse({}, status=500)
         
         # Save into files field of the process 
-        changes = {"changes": {"files": model, "service": {"model": model[fileName]}}}
+        # TODO!!!
+        changes = {"changes": {ProcessUpdates.FILES: model, ProcessUpdates.SERVICE_DETAILS: {"MODEL": model[fileName]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
@@ -100,14 +103,14 @@ def uploadFiles(request):
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
 
-        changes = {"changes": {"files": {}}}
+        changes = {"changes": {ProcessUpdates.FILES: {}}}
         for fileName in fileNames:
-            changes["changes"]["files"][fileName] = {}
+            changes["changes"][ProcessUpdates.FILES][fileName] = {}
             fileID = crypto.generateURLFriendlyRandomString()
-            changes["changes"]["files"][fileName]["id"] = fileID
-            changes["changes"]["files"][fileName]["title"] = fileName
-            changes["changes"]["files"][fileName]["date"] = str(timezone.now())
-            changes["changes"]["files"][fileName]["createdBy"] = userName
+            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.id] = fileID
+            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.title] = fileName
+            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.date] = str(timezone.now())
+            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.createdBy] = userName
 
             returnVal = s3.manageLocalS3.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
@@ -151,13 +154,13 @@ def downloadFile(request, processID, fileID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                filesOfThisProcess = currentProcess.files
+                filesOfThisProcess = pgProcesses.ProcessManagementBase.getDataByType(currentProcess.processID, DataType.FILE)
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
         # retrieve the correct file and download it from aws to the user
         for elem in filesOfThisProcess:
-            if "id" in filesOfThisProcess[elem] and filesOfThisProcess[elem]["id"] == fileID:
+            if FileObjectContent.id in filesOfThisProcess[elem] and filesOfThisProcess[elem][FileObjectContent.id] == fileID:
                 content, Flag = s3.manageLocalS3.downloadFile(processID+"/"+fileID)
                 if Flag is False:
                     content, Flag = s3.manageRemoteS3.downloadFile(processID+"/"+fileID)
@@ -166,7 +169,7 @@ def downloadFile(request, processID, fileID):
                     
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {filesOfThisProcess[elem]['title']}," + str(datetime.now()))
                     
-                return FileResponse(content, filename=filesOfThisProcess[elem]["title"], as_attachment=True) #, content_type='multipart/form-data')
+                return FileResponse(content, filename=filesOfThisProcess[elem][FileObjectContent.title], as_attachment=True) #, content_type='multipart/form-data')
         
         return HttpResponse("Not found!", status=404)
     except (Exception) as error:
@@ -199,21 +202,21 @@ def downloadFilesAsZip(request, processID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                filesOfThisProcess = currentProcess.files
+                filesOfThisProcess = pgProcesses.ProcessManagementBase.getDataByType(currentProcess.processID, DataType.FILE)
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
         # get files, download them from aws, put them in an array together with their name
         for elem in filesOfThisProcess:
             currentEntry = filesOfThisProcess[elem]
-            if "id" in currentEntry and currentEntry["id"] in fileIDs:
-                content, Flag = s3.manageLocalS3.downloadFile(processID+"/"+currentEntry["id"])
+            if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
+                content, Flag = s3.manageLocalS3.downloadFile(processID+"/"+currentEntry[FileObjectContent.id])
                 if Flag is False:
-                    content, Flag = s3.manageRemoteS3.downloadFile(processID+"/"+currentEntry["id"])
+                    content, Flag = s3.manageRemoteS3.downloadFile(processID+"/"+currentEntry[FileObjectContent.id])
                     if Flag is False:
                         return HttpResponse("Not found!", status=404)
                 
-                filesArray.append( (currentEntry["title"], content) )
+                filesArray.append( (currentEntry[FileObjectContent.title], content) )
 
         if len(filesArray) == 0:
             return HttpResponse("Not found!", status=404)
@@ -257,26 +260,26 @@ def deleteFile(request, processID, fileID):
         liesInDatabase = False
         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
-            if "model" in currentProcess["service"]:
-                modelOfThisProcess = currentProcess["service"]["model"]
+            if "model" in currentProcess[ProcessDescription.serviceDetails]:
+                modelOfThisProcess = currentProcess[ProcessDescription.serviceDetails]["model"]
             filesOfThisProcess = currentProcess["files"]
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                if "model" in currentProcess.service:
-                    modelOfThisProcess = currentProcess.service["model"]
-                filesOfThisProcess = currentProcess.files
+                if "model" in currentProcess.serviceDetails:
+                    modelOfThisProcess = currentProcess.serviceDetails["model"]
+                filesOfThisProcess = pgProcesses.ProcessManagementBase.getDataByType(currentProcess.processID, DataType.FILE)
                 liesInDatabase = True
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
         
         deletions = {"changes": {}, "deletions": {}}
         for entry in filesOfThisProcess:
-            if fileID == filesOfThisProcess[entry]["id"]:
-                deletions["deletions"]["files"] = {filesOfThisProcess[entry]["title"]: {}}
+            if fileID == filesOfThisProcess[entry][FileObjectContent.id]:
+                deletions["deletions"][ProcessUpdates.FILES] = {filesOfThisProcess[entry][FileObjectContent.title]: {}}
                 break
-        if modelOfThisProcess != {} and fileID == modelOfThisProcess["id"]:
-            deletions["deletions"]["service"] = {"model": {}}
+        if modelOfThisProcess != {} and fileID == modelOfThisProcess[FileObjectContent.id]:
+            deletions["deletions"][ProcessUpdates.SERVICE_DETAILS] = {"model": {}}
         
         message, flag = updateProcessFunction(request, deletions, currentProjectID, [processID])
         if flag is False:
