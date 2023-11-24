@@ -55,7 +55,7 @@ class ServiceTypes(enum.StrEnum):
     CREATE_MODEL = enum.auto()
 
 ######################################################
-class ServicesManager():
+class _ServicesManager():
     """
     The class handling the services
 
@@ -93,7 +93,7 @@ class ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[name] = serviceClass(kwargs)
+        self._services[name] = serviceClass()
 
     ###################################################
     # def __getattr__(self, name):
@@ -111,4 +111,4 @@ class ServicesManager():
     #         raise AttributeError(f'No such service: {name}')
 
 ###################################################
-serviceManager = ServicesManager()
+serviceManager = _ServicesManager()

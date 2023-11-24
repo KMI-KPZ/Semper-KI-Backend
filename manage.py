@@ -19,9 +19,9 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     set_settings()
+
     utility = BackendManagement(sys.argv)
     utility.execute()
-
 
 if __name__ == '__main__':
     main()

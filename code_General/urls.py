@@ -143,7 +143,7 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
 
-urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
+#urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
 
 ##############################################################################
 ### ASGI

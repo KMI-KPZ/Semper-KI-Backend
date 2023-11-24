@@ -35,3 +35,7 @@ application = ProtocolTypeRouter(
         "websocket": AllowedHostsOriginValidator(SessionMiddlewareStack(URLRouter(websockets))),
     }
 )
+
+##########################################################################
+# This is fucking bullshit but I can think of no other way to solve this shitty problem
+import code_General.modules 
