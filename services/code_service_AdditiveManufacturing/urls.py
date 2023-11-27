@@ -21,7 +21,7 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers import checkService, filter, resources
+from .handlers import checkService, filter, resources, model
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -31,6 +31,8 @@ paths.update({
     "getFilters": 'public/getFilters/',
     "getMaterials": 'public/getMaterials/',
     "getPostProcessing": 'public/getPostProcessing/',
+
+    "uploadModel": "public/uploadModel/",
 
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
@@ -59,6 +61,8 @@ urlpatterns.extend([
     path(paths["getFilters"], filter.getFilters, name='getFilters'),
     path(paths["getMaterials"], filter.getMaterials, name='getMaterials'),
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
+
+    path(paths["uploadModel"], model.uploadModel, name="uploadModel"),
 
     path(paths["checkPrintability"], checkService.checkPrintability, name='checkPrintability'),
     path(paths["checkPrices"], checkService.checkPrice, name='checkPrice'),

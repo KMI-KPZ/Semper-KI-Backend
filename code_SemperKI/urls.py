@@ -57,7 +57,6 @@ paths.update({
     "testCoypu": "public/coypu/",
 
     "testRedis": "private/testRedis/",
-    "uploadModel": "public/uploadModel/",
     "uploadFiles": "public/uploadFiles/",
     "retrieveFilesTEST": "private/retrieveFiles/",
     "downloadFile": "public/downloadFile/<processID>/<fileID>/",
@@ -94,7 +93,6 @@ urlpatterns.extend([
     path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
     
     #path(paths["testRedis"], files.testRedis, name="testRedis"),
-    path(paths["uploadModel"], files.uploadModel, name="uploadModel"),
     path(paths["uploadFiles"], files.uploadFiles, name="uploadFiles"),
     #path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
     path(paths["downloadFile"], files.downloadFile, name="downloadFile"),

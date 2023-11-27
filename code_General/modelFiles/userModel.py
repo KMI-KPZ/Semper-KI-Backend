@@ -51,9 +51,9 @@ class User(models.Model):
     organizations = models.ManyToManyField(orgaModel.Organization)
     details = models.JSONField()
     createdWhen = models.DateTimeField(auto_now_add=True)
-    updatedWhen = models.DateTimeField(default=timezone.now())
+    updatedWhen = models.DateTimeField(default=timezone.now)
     accessedWhen = models.DateTimeField(auto_now=True)
-    lastSeen = models.DateTimeField(default=timezone.now())
+    lastSeen = models.DateTimeField(default=timezone.now)
 
     ###################################################
     class Meta:
