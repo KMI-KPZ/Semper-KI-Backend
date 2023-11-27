@@ -51,14 +51,14 @@ def uploadFiles(request):
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
 
-        changes = {"changes": {ProcessUpdates.FILES: {}}}
+        changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
-            changes["changes"][ProcessUpdates.FILES][fileName] = {}
+            changes["changes"][ProcessUpdates.files][fileName] = {}
             fileID = crypto.generateURLFriendlyRandomString()
-            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.id] = fileID
-            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.title] = fileName
-            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.date] = str(timezone.now())
-            changes["changes"][ProcessUpdates.FILES][fileName][FileObjectContent.createdBy] = userName
+            changes["changes"][ProcessUpdates.files][fileName][FileObjectContent.id] = fileID
+            changes["changes"][ProcessUpdates.files][fileName][FileObjectContent.title] = fileName
+            changes["changes"][ProcessUpdates.files][fileName][FileObjectContent.date] = str(timezone.now())
+            changes["changes"][ProcessUpdates.files][fileName][FileObjectContent.createdBy] = userName
 
             returnVal = s3.manageLocalS3.uploadFile(processID+"/"+fileID, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
@@ -224,10 +224,10 @@ def deleteFile(request, processID, fileID):
         deletions = {"changes": {}, "deletions": {}}
         for entry in filesOfThisProcess:
             if fileID == filesOfThisProcess[entry][FileObjectContent.id]:
-                deletions["deletions"][ProcessUpdates.FILES] = {filesOfThisProcess[entry][FileObjectContent.title]: {}}
+                deletions["deletions"][ProcessUpdates.files] = {filesOfThisProcess[entry][FileObjectContent.title]: {}}
                 break
         if modelOfThisProcess != {} and fileID == modelOfThisProcess[FileObjectContent.id]:
-            deletions["deletions"][ProcessUpdates.SERVICE_DETAILS] = {"model": {}}
+            deletions["deletions"][ProcessUpdates.serviceDetails] = {"model": {}}
         
         message, flag = updateProcessFunction(request, deletions, currentProjectID, [processID])
         if flag is False:

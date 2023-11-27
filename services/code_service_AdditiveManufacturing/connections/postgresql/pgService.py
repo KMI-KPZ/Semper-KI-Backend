@@ -27,12 +27,12 @@ def updateServiceDetails(existingContent, newContent):
 
     try:
         for entry in newContent:
-            if entry == ServiceDetails.MODEL:
-                existingContent[ServiceDetails.MODEL] = entry
-            elif entry == ServiceDetails.MATERIAL:
-                existingContent[ServiceDetails.MATERIAL] = entry
-            elif entry == ServiceDetails.POST_PROCESSING:
-                existingContent[ServiceDetails.POST_PROCESSING] = entry
+            if entry == ServiceDetails.model:
+                existingContent[ServiceDetails.model] = entry
+            elif entry == ServiceDetails.material:
+                existingContent[ServiceDetails.material] = entry
+            elif entry == ServiceDetails.postProcessings:
+                existingContent[ServiceDetails.postProcessings] = entry
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -56,12 +56,12 @@ def deleteServiceDetails(existingContent, deletedContent):
 
     try:
         for entry in deletedContent:
-            if entry == ServiceDetails.MODEL:
-                existingContent[ServiceDetails.MODEL] = FileObject()
-            elif entry == ServiceDetails.MATERIAL:
-                existingContent[ServiceDetails.MATERIAL] = ""
-            elif entry == ServiceDetails.POST_PROCESSING:
-                existingContent[ServiceDetails.POST_PROCESSING] = ""
+            if entry == ServiceDetails.model:
+                existingContent[ServiceDetails.model] = FileObject()
+            elif entry == ServiceDetails.material:
+                existingContent[ServiceDetails.material] = ""
+            elif entry == ServiceDetails.postProcessings:
+                existingContent[ServiceDetails.postProcessings] = ""
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 

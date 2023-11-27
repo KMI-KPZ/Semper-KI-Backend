@@ -104,22 +104,22 @@ def loginUser(request):
     # set type of user
     isPartOfOrganization = False
     if "Usertype" not in request.headers:
-        request.session[SessionContent.USER_TYPE] = "user"
+        request.session[SessionContent.usertype] = "user"
         request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
         request.session[SessionContent.PG_PROFILE_CLASS] = "user"
     else:
         userType = request.headers["Usertype"]
         if userType == "organization" or userType == "manufacturer" or userType == "fakeOrganization":
-            request.session[SessionContent.USER_TYPE] = "organization"
+            request.session[SessionContent.usertype] = "organization"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = True
             request.session[SessionContent.PG_PROFILE_CLASS] = "organization"
             isPartOfOrganization = True
         elif userType == "fakeAdmin" and mocked is True:
-            request.session[SessionContent.USER_TYPE] = "admin"
+            request.session[SessionContent.usertype] = "admin"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
             request.session[SessionContent.PG_PROFILE_CLASS] = "user"
         else:
-            request.session[SessionContent.USER_TYPE] = "user"
+            request.session[SessionContent.usertype] = "user"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
             request.session[SessionContent.PG_PROFILE_CLASS] = "user"
 
@@ -235,7 +235,7 @@ def retrieveRolesAndPermissionsForStandardUser(session):
         roles = response
 
         # set default role
-        if len(roles) == 0 and session[SessionContent.USER_TYPE] == "user":
+        if len(roles) == 0 and session[SessionContent.usertype] == "user":
             response = basics.handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/users/{userID}/roles', headers=headers, json={"roles": ["rol_jG8PAa9b9LUlSz3q"]}))
             roles = [{"id":"rol_jG8PAa9b9LUlSz3q"}]
         
@@ -281,7 +281,7 @@ def setRoleAndPermissionsOfUser(request):
         if "https://auth.semper-ki.org/claims/roles" in request.session["user"]["userinfo"]:
             if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]) != 0:
                 if "semper-admin" in request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/roles"]:
-                    request.session[SessionContent.USER_TYPE] = "admin"
+                    request.session[SessionContent.usertype] = "admin"
 
         return True
     except Exception as e:

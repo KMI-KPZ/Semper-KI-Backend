@@ -234,7 +234,7 @@ class ProcessManagementBase():
                 if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID == entry.contractor.hashedID): 
                     processesOfThatProject.append(entry.toDict())
                     showProjectDetails = True
-            output[SessionContentSemperKI.CURRENT_PROCESSES] = processesOfThatProject
+            output[SessionContentSemperKI.processes] = processesOfThatProject
             
             if showProjectDetails:
                 return output
@@ -372,13 +372,13 @@ class ProcessManagementBase():
         """
         updated = timezone.now()
         try:
-            if updateType == ProjectUpdates.STATUS:
+            if updateType == ProjectUpdates.status:
                 currentProject = Project.objects.get(projectID=projectID)
                 currentProject.status = content
                 currentProject.updatedWhen = updated
                 currentProject.save()
 
-            elif updateType == ProjectUpdates.DETAILS:
+            elif updateType == ProjectUpdates.details:
                 currentProject = Project.objects.get(projectID=projectID)
                 for key in content:
                     currentProject.details[key] = content[key]
@@ -411,31 +411,31 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == ProcessUpdates.MESSAGES:
+            if updateType == ProcessUpdates.messages:
                 ProcessManagementBase.createDataEntry(content, crypto.generateURLFriendlyRandomString(), processID, DataType.MESSAGE, updatedBy)
             
-            elif updateType == ProcessUpdates.FILES:
+            elif updateType == ProcessUpdates.files:
                 for entry in content:
                     ProcessManagementBase.createDataEntry(content[entry], crypto.generateURLFriendlyRandomString(), processID, DataType.FILE, updatedBy, {}, content[entry]["id"])
 
-            elif updateType == ProcessUpdates.PROCESS_STATUS:
+            elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
                 
-            elif updateType == ProcessUpdates.PROCESS_DETAILS:
+            elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     currentProcess.processDetails[entry] = content[entry]
 
-            elif updateType == ProcessUpdates.SERVICE_TYPE:
+            elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
                       
-            elif updateType == ProcessUpdates.SERVICE_STATUS:
+            elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
 
-            elif updateType == ProcessUpdates.SERVICE_DETAILS:
+            elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
 
-            elif updateType == ProcessUpdates.PROVISIONAL_CONTRACTOR:
-                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = content
+            elif updateType == ProcessUpdates.provisionalContractor:
+                currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
 
             currentProcess.save()
             return True
@@ -458,7 +458,7 @@ class ProcessManagementBase():
         try:
             processObj = Process.objects.get(processID=processID)
             
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR])
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
             processObj.contractor = contractorObj
 
             return None
@@ -488,32 +488,32 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
 
-            if updateType == ProcessUpdates.MESSAGES:
+            if updateType == ProcessUpdates.messages:
                 ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
             
-            elif updateType == ProcessUpdates.FILES:
+            elif updateType == ProcessUpdates.files:
                 for entry in content:
                     s3.manageLocalS3.deleteFile(entry["id"])
                     ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 
-            elif updateType == ProcessUpdates.PROCESS_STATUS:
+            elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = ProcessStatus.DRAFT
                 
-            elif updateType == ProcessUpdates.PROCESS_DETAILS:
+            elif updateType == ProcessUpdates.processDetails:
                 for key in content:
                     del currentProcess.processDetails[key]
 
-            elif updateType == ProcessUpdates.SERVICE_DETAILS:
+            elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
 
-            elif updateType == ProcessUpdates.SERVICE_STATUS:
+            elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = 0 #TODO
 
-            elif updateType == ProcessUpdates.SERVICE_TYPE:
+            elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = ServiceTypes.NONE
 
-            elif updateType == ProcessUpdates.PROVISIONAL_CONTRACTOR:
-                currentProcess.processDetails[ProcessDetails.PROVISIONAL_CONTRACTOR] = ""
+            elif updateType == ProcessUpdates.provisionalContractor:
+                currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
 
             currentProcess.save()
             return True
@@ -664,8 +664,8 @@ class ProcessManagementBase():
 
                 projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.status: existingObj[ProjectDescription.status], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.details: existingObj[ProjectDescription.details]})
                 # save processes
-                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.CURRENT_PROCESSES]:
-                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.CURRENT_PROCESSES][entry]
+                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
+                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][entry]
                     processID = process[ProcessDescription.processID]
                     serviceType = process[ProcessDescription.serviceType]
                     serviceStatus = process[ProcessDescription.serviceStatus]
@@ -703,7 +703,7 @@ class ProcessManagementBase():
                 for entry in project.processes.all():
                     currentProcess = entry.toDict()
                     processesOfThatProject.append(currentProcess)
-                currentProject[SessionContentSemperKI.CURRENT_PROCESSES] = processesOfThatProject
+                currentProject[SessionContentSemperKI.processes] = processesOfThatProject
                 output.append(currentProject)
 
             if ProfileManagementBase.checkIfUserIsInOrganization(session):
@@ -716,9 +716,9 @@ class ProcessManagementBase():
 
                     if project.projectID not in receivedProjects:
                         receivedProjects[project.projectID] = project.toDict()
-                        receivedProjects[project.projectID][SessionContentSemperKI.CURRENT_PROCESSES] = []
+                        receivedProjects[project.projectID][SessionContentSemperKI.processes] = []
 
-                    receivedProjects[project.projectID][SessionContentSemperKI.CURRENT_PROCESSES].append(processAsContractor.toDict())
+                    receivedProjects[project.projectID][SessionContentSemperKI.processes].append(processAsContractor.toDict())
                 
                 for project in receivedProjects:
                     output.append(receivedProjects[project])

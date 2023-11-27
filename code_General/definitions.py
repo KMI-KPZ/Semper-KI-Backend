@@ -7,6 +7,8 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 import enum
 
+from .utilities.customStrEnum import StrEnumExactylAsDefined
+
 from .modelFiles.organizationModel import OrganizationDescription
 from .modelFiles.userModel import UserDescription
 
@@ -28,7 +30,7 @@ class FileObject():
 
 ###################################################
 # File object content as enum
-class FileObjectContent(enum.StrEnum):
+class FileObjectContent(StrEnumExactylAsDefined):
     id = enum.auto()
     title = enum.auto()
     tags = enum.auto()
@@ -40,7 +42,7 @@ class FileObjectContent(enum.StrEnum):
 
 ###################################################
 # Enum for session content
-class SessionContent(enum.StrEnum):
+class SessionContent(StrEnumExactylAsDefined):
     """
     What is saved into the session?
 
@@ -50,7 +52,7 @@ class SessionContent(enum.StrEnum):
     NUMBER_OF_LOGIN_ATTEMPTS = enum.auto()
     LAST_LOGIN_ATTEMPT = enum.auto()
 
-    USER_TYPE = enum.auto()
+    usertype = enum.auto()
     IS_PART_OF_ORGANIZATION = enum.auto()
     PG_PROFILE_CLASS = enum.auto()
     PATH_AFTER_LOGIN = enum.auto()

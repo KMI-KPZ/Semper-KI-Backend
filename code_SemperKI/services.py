@@ -7,6 +7,8 @@ Contains: Metaclass that handles the services
 """
 import enum
 
+from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+
 from abc import ABC, abstractmethod
 
 ###################################################
@@ -44,7 +46,7 @@ class ServiceBase(ABC):
 
 ###################################################
 # Enum of Services
-class ServiceTypes(enum.StrEnum):
+class ServiceTypes(StrEnumExactylAsDefined):
     """
     Which services does the platform offer. 
     This must be known here, since enums can't be extended!
@@ -53,6 +55,56 @@ class ServiceTypes(enum.StrEnum):
     NONE = enum.auto()
     ADDITIVE_MANUFACTURING = enum.auto()
     CREATE_MODEL = enum.auto()
+
+###################################################
+# Class of Services
+class _ServiceTypesConversion():
+    """
+    Same as above but converts between string representation and integer representation
+    
+    """
+    ######################
+    _asInt = {ServiceTypes.NONE: 0, ServiceTypes.ADDITIVE_MANUFACTURING: 1, ServiceTypes.CREATE_MODEL: 2}
+    _asStr = [ServiceTypes.NONE, ServiceTypes.ADDITIVE_MANUFACTURING, ServiceTypes.CREATE_MODEL]
+
+    ######################
+    def toInt(self, serviceName:str) -> int:
+        """
+        Convert the service name to its integer representation
+
+        :param serviceName: Name of the service as given in ServiceTypes
+        :type serviceName: Str
+        :return: Integer Code of that service
+        :rtype: Int
+        """
+        return self._asInt[serviceName]
+    
+    ######################
+    def toStr(self, index:int) -> str:
+        """
+        Convert the service name to its string representation
+
+        :param serviceName: Int code of the service
+        :type serviceName: int
+        :return: Str Code of that service as given in ServiceTypes
+        :rtype: Str
+        """
+        return self._asStr[index]
+    
+    ######################
+    def getServices(self) -> dict:
+        """
+        Get all defined services of this plattform
+
+        :return: Dict of Services
+        :rtype: dict in JSON Format
+
+        """
+        return self._asInt
+
+    
+###################################################
+translateServiceType = _ServiceTypesConversion()
 
 ######################################################
 class _ServicesManager():

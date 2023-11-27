@@ -6,6 +6,7 @@ Silvio Weging 2023
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
 """
 import enum
+from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
 from .modelFiles.processModel import ProcessDescription
@@ -59,41 +60,41 @@ class ProjectUpdates(enum.Enum):
     What types of updates are there for a project?
 
     """
-    STATUS = enum.auto()
-    DETAILS = enum.auto()
+    status = enum.auto()
+    details = enum.auto()
 
 ####################################################################################
 # Enum for updateProcess
-class ProcessUpdates(enum.StrEnum):
+class ProcessUpdates(StrEnumExactylAsDefined):
     """
     What types of updates are there for a process? 
     
     """
-    MESSAGES = enum.auto()
-    FILES = enum.auto()
-    SERVICE_DETAILS = enum.auto()
-    SERVICE_TYPE = enum.auto()
-    SERVICE_STATUS = enum.auto()
-    PROCESS_DETAILS = enum.auto()
-    PROCESS_STATUS = enum.auto()
-    PROVISIONAL_CONTRACTOR = enum.auto()
+    messages = enum.auto()
+    files = enum.auto()
+    serviceDetails = enum.auto()
+    serviceType = enum.auto()
+    serviceStatus = enum.auto()
+    processDetails = enum.auto()
+    processStatus = enum.auto()
+    provisionalContractor = enum.auto()
 
 ####################################################################################
 # Enum for processDetails
-class ProcessDetails(enum.StrEnum):
+class ProcessDetails(StrEnumExactylAsDefined):
     """
     What Details can a Process have?
     
     """
-    NAME = enum.auto()
-    PROVISIONAL_CONTRACTOR = enum.auto()
+    name = enum.auto()
+    provisionalContractor = enum.auto()
 
 ####################################################################################
 # Enum for session content
-class SessionContentSemperKI(enum.StrEnum):
+class SessionContentSemperKI(StrEnumExactylAsDefined):
     """
     Name of all added keys to the session for uniform naming
     
     """
     CURRENT_PROJECTS = enum.auto()
-    CURRENT_PROCESSES = enum.auto()
+    processes = enum.auto()

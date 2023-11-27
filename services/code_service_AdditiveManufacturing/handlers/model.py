@@ -22,6 +22,8 @@ from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manual
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction #TODO
 
+from ..definitions import ServiceDetails
+
 logger = logging.getLogger("logToFile")
 
 #######################################################
@@ -64,7 +66,7 @@ def uploadModel(request):
         
         # Save into files field of the process 
         # TODO!!!
-        changes = {"changes": {ProcessUpdates.FILES: model, ProcessUpdates.SERVICE_DETAILS: {"MODEL": model[fileName]}}}
+        changes = {"changes": {ProcessUpdates.files: model, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileName]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)

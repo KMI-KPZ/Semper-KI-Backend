@@ -26,7 +26,7 @@ from code_General.urls import paths, urlpatterns
 ##############################################################################
 ### WSGI
 
-from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin
+from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
 
 paths.update({
 
@@ -41,10 +41,12 @@ paths.update({
     "createProcessID": "public/createProcessID/<projectID>/",
     "updateProcess": "public/updateProcess/",
     "updateProject": "public/updateProject/",
-    "deleteProcess": "public/deleteProcess/<projectID>/",
-    "deleteProject": "public/deleteProject/<projectID>/",
+    "deleteProcesses": "public/deleteProcesses/<projectID>/",
+    "deleteProjects": "public/deleteProjects/",
     "verifyProject": "public/verifyProject/",
     "sendProject": "public/sendProject/",
+
+    "getServices": "public/getServices/",
 
     "getAllProjectsFlatAsAdmin": "public/admin/getAllProjectsFlatAsAdmin/",
     "getSpecificProjectAsAdmin": "public/admin/getSpecificProjectAsAdmin/<projectID>/",
@@ -76,11 +78,13 @@ urlpatterns.extend([
     path(paths["saveProjects"], projectAndProcessManagement.saveProjects, name='saveProjects'),
     path(paths["updateProcess"], projectAndProcessManagement.updateProcess, name='updateProcess'),
     path(paths["updateProject"], projectAndProcessManagement.updateProject, name='updateProject'),
-    path(paths["deleteProcess"], projectAndProcessManagement.deleteProcess, name='deleteProcess'),
-    path(paths["deleteProject"], projectAndProcessManagement.deleteProject, name='deleteProject'),
+    path(paths["deleteProcesses"], projectAndProcessManagement.deleteProcesses, name='deleteProcesses'),
+    path(paths["deleteProjects"], projectAndProcessManagement.deleteProjects, name='deleteProjects'),
     path(paths["getContractors"], projectAndProcessManagement.getContractors, name='getContractors'),
     path(paths["verifyProject"], projectAndProcessManagement.verifyProject, name="verifyProject"),
     path(paths["sendProject"], projectAndProcessManagement.sendProject, name="sendProject"),
+
+    path(paths["getServices"], manageServices.getServices, name="getServices"),
 
     path(paths["getAllProjectsFlatAsAdmin"], admin.getAllProjectsFlatAsAdmin, name="getAllProjectsFlatAsAdmin"),
     path(paths["getSpecificProjectAsAdmin"], admin.getSpecificProjectAsAdmin, name="getSpecificProjectAsAdmin"),

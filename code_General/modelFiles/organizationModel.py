@@ -9,8 +9,10 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from ..utilities.customStrEnum import StrEnumExactylAsDefined
+
 ###################################################
-class OrganizationDescription(enum.StrEnum):
+class OrganizationDescription(StrEnumExactylAsDefined):
     """
     What does an Organization consists of?
 

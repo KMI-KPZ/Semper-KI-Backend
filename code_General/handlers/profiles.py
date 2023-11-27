@@ -129,7 +129,7 @@ def getUserDetails(request):
     """
     # Read user details from Database
     userObj = pgProfiles.ProfileManagementBase.getUser(request.session)
-    userObj[SessionContent.USER_TYPE] = request.session[SessionContent.USER_TYPE]
+    userObj[SessionContent.usertype] = request.session[SessionContent.usertype]
     return JsonResponse(userObj)
 
 ##############################################

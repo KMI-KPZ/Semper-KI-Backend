@@ -14,6 +14,7 @@ from django.conf import settings
 from time import sleep
 
 from ..utilities import rights
+from ..utilities.customStrEnum import StrEnumExactylAsDefined
 from ..connections.redis import RedisConnection
 from ..definitions import SessionContent
 
@@ -95,7 +96,7 @@ def checkIfUserIsAdmin(json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session:
-                if request.session[SessionContent.USER_TYPE] == "admin":
+                if request.session[SessionContent.usertype] == "admin":
                     return func(request, *args, **kwargs)
                 else:
                     if json:
@@ -151,7 +152,7 @@ def manualCheckIfRightsAreSufficient(session, funcName):
     :rtype: Bool
     """
     if "user" in session and SessionContent.USER_PERMISSIONS in session:
-        if session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowed(session[SessionContent.USER_PERMISSIONS],funcName):
+        if session[SessionContent.usertype] == "admin" or rights.rightsManagement.checkIfAllowed(session[SessionContent.USER_PERMISSIONS],funcName):
             return True
 
     return False
@@ -169,7 +170,7 @@ def manualCheckIfRightsAreSufficientForSpecificOperation(session, funcName, oper
     :rtype: Bool
     """
     if "user" in session and SessionContent.USER_PERMISSIONS in session:
-        if session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowedWithOperation(session[SessionContent.USER_PERMISSIONS],funcName, operation):
+        if session[SessionContent.usertype] == "admin" or rights.rightsManagement.checkIfAllowedWithOperation(session[SessionContent.USER_PERMISSIONS],funcName, operation):
             return True
 
     return False
@@ -190,7 +191,7 @@ def checkIfRightsAreSufficient(json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if "user" in request.session and SessionContent.USER_PERMISSIONS in request.session:
-                if request.session[SessionContent.USER_TYPE] == "admin" or rights.rightsManagement.checkIfAllowed(request.session[SessionContent.USER_PERMISSIONS], func.__name__):
+                if request.session[SessionContent.usertype] == "admin" or rights.rightsManagement.checkIfAllowed(request.session[SessionContent.USER_PERMISSIONS], func.__name__):
                     return func(request, *args, **kwargs)
                 else:
                     if json:
@@ -210,14 +211,14 @@ def checkIfRightsAreSufficient(json=False):
 #######################################################
 # logging vocabulary
 class Logging():
-    class Subject(enum.StrEnum):
+    class Subject(StrEnumExactylAsDefined):
         USER = enum.auto()
         ADMIN = enum.auto()
         ORGANISATION = enum.auto()
         SYSTEM = enum.auto()
         SUBJECT = enum.auto() # for everything else
 
-    class Predicate(enum.StrEnum):
+    class Predicate(StrEnumExactylAsDefined):
         CREATED = enum.auto()
         DEFINED = enum.auto()
         FETCHED = enum.auto()
@@ -225,7 +226,7 @@ class Logging():
         DELETED = enum.auto()
         PREDICATE = enum.auto() # for everything else
 
-    class Object(enum.StrEnum):
+    class Object(StrEnumExactylAsDefined):
         USER = enum.auto()
         ADMIN = enum.auto()
         ORGANISATION = enum.auto()

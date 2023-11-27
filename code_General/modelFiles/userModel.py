@@ -10,10 +10,12 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from ..utilities.customStrEnum import StrEnumExactylAsDefined
+
 import code_General.modelFiles.organizationModel as orgaModel #must be imported that way to avoid cyclic imports
 
 ###################################################
-class UserDescription(enum.StrEnum):
+class UserDescription(StrEnumExactylAsDefined):
     """
     What does a user consists of?
     

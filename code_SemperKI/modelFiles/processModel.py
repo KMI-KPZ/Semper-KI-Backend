@@ -11,10 +11,10 @@ from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project
 from code_General.modelFiles.organizationModel import Organization
-
+from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
-class ProcessDescription(enum.StrEnum):
+class ProcessDescription(StrEnumExactylAsDefined):
     """
     What makes up a process object for creation in the database
 
