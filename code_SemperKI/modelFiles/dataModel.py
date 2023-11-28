@@ -78,12 +78,12 @@ class Data(models.Model):
         return f"{self.dataID},{self.process},{self.type},{self.data},{self.details},{self.createdBy},{self.createdWhen},{self.updatedWhen},{self.accessedWhen}"
     
     def toDict(self):
-        return {"dataID": self.dataID, 
-                "process": str(self.process), 
-                "type": json.dumps(self.type), 
-                "data": json.dumps(self.data),
-                "details": json.dumps(self.details), 
-                "createdBy": self.createdBy,
-                "contentID": self.contentID,
-                "created": self.createdWhen, "updated": self.updatedWhen, "accessed": self.accessedWhen}
+        return {DataDescription.dataID: self.dataID, 
+                DataDescription.process: self.process.toDict(), 
+                DataDescription.type: self.type, 
+                DataDescription.data: self.data,
+                DataDescription.details: self.details, 
+                DataDescription.createdBy: self.createdBy,
+                DataDescription.contentID: self.contentID,
+                DataDescription.createdWhen: str(self.createdWhen), DataDescription.updatedWhen: str(self.updatedWhen), DataDescription.accessedWhen: str(self.accessedWhen)}
     

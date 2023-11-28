@@ -69,3 +69,4 @@ def deleteServiceDetails(existingContent, deletedContent):
         logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
     
     return existingContent
+

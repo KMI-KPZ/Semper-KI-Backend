@@ -20,7 +20,8 @@ class FileObject():
 
     """
     id = ""
-    title = ""
+    path = ""
+    fileName = ""
     tags = []
     date = ""
     licenses = []
@@ -32,7 +33,8 @@ class FileObject():
 # File object content as enum
 class FileObjectContent(StrEnumExactylAsDefined):
     id = enum.auto()
-    title = enum.auto()
+    path = enum.auto()
+    fileName = enum.auto()
     tags = enum.auto()
     date = enum.auto()
     licenses = enum.auto()

@@ -23,10 +23,10 @@ from ...modelFiles.dataModel import Data
 from code_General.connections import s3
 from code_General.utilities import crypto
 
-from code_General.definitions import FileObject, OrganizationDescription
+from code_General.definitions import FileObjectContent, OrganizationDescription
 from ...definitions import *
 
-from ...services import serviceManager, ServiceTypes 
+from ...services import serviceManager 
 
 import logging
 logger = logging.getLogger("django_debug")
@@ -66,12 +66,34 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def getDataWithID(processID, IDofData):
+    def getDataWithContentID(processID, IDofContent):
         """
-        Get one file in particular.
+        Get one datum in particular but use the content ID.
 
         :param processID: process ID for a process
         :type processID: str
+        :param IDofContent: ID for a datum
+        :type IDofContent: str
+        :return: this datum
+        :rtype: dict
+        
+        """
+
+        try:
+            processObj = Process.objects.filter(processID=processID)
+            date = processObj.data.filter(contentID=IDofContent)
+            return date.toDict()
+        except (Exception) as error:
+            logger.error(f'Generic error in getDataWithID: {str(error)}')
+
+        return {}
+    
+    ##############################################
+    @staticmethod
+    def getDataWithID(IDofData):
+        """
+        Get one datum in particular.
+
         :param IDofData: ID for a datum
         :type IDofData: str
         :return: this datum
@@ -80,8 +102,7 @@ class ProcessManagementBase():
         """
 
         try:
-            processObj = Process.objects.filter(processID=processID)
-            date = processObj.data.filter(contentID=IDofData)
+            date = Data.objects.get(dataID=IDofData)
             return date.toDict()
         except (Exception) as error:
             logger.error(f'Generic error in getDataWithID: {str(error)}')
@@ -92,7 +113,7 @@ class ProcessManagementBase():
     @staticmethod
     def getDataByType(processID, typeOfData:DataType):
         """
-        Get one file in particular.
+        Get all data of a certain type for a process.
 
         :param processID: process ID for a process
         :type processID: str
@@ -308,7 +329,7 @@ class ProcessManagementBase():
             allFiles = ProcessManagementBase.getDataByType(processID, DataType.FILE)
             # delete files as well
             for entry in allFiles:
-                s3.manageLocalS3.deleteFile(entry["id"])
+                s3.manageLocalS3.deleteFile(entry[FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -412,11 +433,15 @@ class ProcessManagementBase():
             currentProcess.updatedWhen = updated
 
             if updateType == ProcessUpdates.messages:
-                ProcessManagementBase.createDataEntry(content, crypto.generateURLFriendlyRandomString(), processID, DataType.MESSAGE, updatedBy)
-            
+                dataID = crypto.generateURLFriendlyRandomString()
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
+                currentProcess.messages[content] = dataID
+
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    ProcessManagementBase.createDataEntry(content[entry], crypto.generateURLFriendlyRandomString(), processID, DataType.FILE, updatedBy, {}, content[entry]["id"])
+                    dataID = crypto.generateURLFriendlyRandomString()
+                    ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
+                    currentProcess.files[content[entry][FileObjectContent.id]] = dataID
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
@@ -490,11 +515,13 @@ class ProcessManagementBase():
 
             if updateType == ProcessUpdates.messages:
                 ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
-            
+                del currentProcess.messages[content]
+
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    s3.manageLocalS3.deleteFile(entry["id"])
+                    s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
+                    del currentProcess.files[content[entry][FileObjectContent.id]]
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = ProcessStatus.DRAFT
@@ -510,7 +537,7 @@ class ProcessManagementBase():
                 currentProcess.serviceStatus = 0 #TODO
 
             elif updateType == ProcessUpdates.serviceType:
-                currentProcess.serviceType = ServiceTypes.NONE
+                currentProcess.serviceType = serviceManager.getNone()
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
@@ -547,8 +574,10 @@ class ProcessManagementBase():
             serviceStatus = template[ProcessDescription.serviceStatus]
             serviceDetails = template[ProcessDescription.serviceDetails]
             processDetails = template[ProcessDescription.processDetails]
+            files = template[ProcessDescription.files]
+            messages = template[ProcessDescription.messages]
             client = clientID
-            processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, updatedWhen=timezone.now())
+            processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, files=files, messages=messages, updatedWhen=timezone.now())
             return None
         except (Exception) as error:
             logger.error(f'could not add process template to project: {str(error)}')
@@ -601,7 +630,7 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def getAllPsFlat():
+    def getAllProjectsFlat():
         """
         Return flat list of all projects, for admins
 
@@ -649,6 +678,7 @@ class ProcessManagementBase():
         :rtype: Dict
 
         """
+        # TODO for all files & messages: generate data and message entries and refill "files" and "messages" to link to that ID
         now = timezone.now()
         try:
             # first get user
@@ -672,7 +702,9 @@ class ProcessManagementBase():
                     serviceDetails = process[ProcessDescription.serviceDetails]
                     processStatus = process[ProcessDescription.processStatus]
                     processDetails = process[ProcessDescription.processDetails]
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.updatedWhen: now})
+                    files = process[ProcessDescription.files]
+                    messages = process[ProcessDescription.messages]
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
                     
             return None
         except (Exception) as error:
@@ -788,7 +820,7 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def getAllContractors(selectedService:ServiceTypes):
+    def getAllContractors(selectedService:int):
         """
         Get all contractors.
         

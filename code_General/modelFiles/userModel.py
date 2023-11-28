@@ -72,8 +72,8 @@ class User(models.Model):
         return {UserDescription.hashedID: self.hashedID, 
                 UserDescription.name: self.name, 
                 UserDescription.organizations: ','.join(orga.name for orga in self.organizations.all()), 
-                UserDescription.details: json.dumps(self.details), 
-                UserDescription.createdWhen: self.createdWhen, 
-                UserDescription.updatedWhen: self.updatedWhen, 
-                UserDescription.accessedWhen: self.accessedWhen, 
-                UserDescription.lastSeen: self.lastSeen}
+                UserDescription.details: self.details, 
+                UserDescription.createdWhen: str(self.createdWhen), 
+                UserDescription.updatedWhen: str(self.updatedWhen), 
+                UserDescription.accessedWhen: str(self.accessedWhen), 
+                UserDescription.lastSeen: str(self.lastSeen)}

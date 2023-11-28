@@ -38,4 +38,4 @@ class CreateModel(Semper.ServiceBase):
         return CM_deleteServiceDetails(existingContent, newContent)
     
 
-Semper.serviceManager.register(Semper.ServiceTypes.CREATE_MODEL, CreateModel)
+Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())

@@ -8,7 +8,7 @@ Contains: Handlers for managing the services
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 
-from ..services import translateServiceType
+from ..services import serviceManager
 
 ###################################################
 @require_http_methods(["GET"])
@@ -23,4 +23,4 @@ def getServices(request):
     
     """
 
-    return JsonResponse(translateServiceType.getServices())
+    return JsonResponse(serviceManager.getAllServices())

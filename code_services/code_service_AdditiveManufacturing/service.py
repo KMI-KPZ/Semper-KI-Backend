@@ -33,4 +33,4 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         return AM_deleteServiceDetails(existingContent, deletedContent)
 
-Semper.serviceManager.register(Semper.ServiceTypes.ADDITIVE_MANUFACTURING, AdditiveManufacturing)
+Semper.serviceManager.register("ADDITIVE_MANUFACTURING", 1, AdditiveManufacturing())

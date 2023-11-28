@@ -34,7 +34,7 @@ def getAllProjectsFlatAsAdmin(request):
     :rtype: JSONResponse
     """
     # get all projects if you're an admin
-    projects = pgProcesses.ProcessManagementBase.getAllPsFlat()
+    projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
     for idx, entry in enumerate(projects):
         clientID = entry["client"]
         userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)

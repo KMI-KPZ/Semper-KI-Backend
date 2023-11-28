@@ -33,6 +33,7 @@ paths.update({
     "getPostProcessing": 'public/getPostProcessing/',
 
     "uploadModel": "public/uploadModel/",
+    "deleteMOdel": "public/deleteModel/<processID>/",
 
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",
@@ -63,6 +64,7 @@ urlpatterns.extend([
     path(paths["getPostProcessing"], filter.getPostProcessing, name='getPostProcessing'),
 
     path(paths["uploadModel"], model.uploadModel, name="uploadModel"),
+    path(paths["deleteModel"], model.deleteModel, name='deleteModel'),
 
     path(paths["checkPrintability"], checkService.checkPrintability, name='checkPrintability'),
     path(paths["checkPrices"], checkService.checkPrice, name='checkPrice'),

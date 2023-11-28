@@ -22,7 +22,7 @@ from code_General.connections.postgresql import pgProfiles
 
 from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from ..definitions import *
-from ..services import ServiceTypes, serviceManager
+from ..services import serviceManager
 
 from code_General.connections import s3
 
@@ -177,8 +177,8 @@ def deleteProjects(request, projectID):
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 for currentProjectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                     for currentProcess in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
-                        for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess]["files"]:
-                            s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess]["files"][fileObj]["id"])
+                        for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files]:
+                            s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files][fileObj]["id"])
                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
                 request.session.modified = True
 
@@ -219,12 +219,12 @@ def createProcessID(request, projectID):
                     ProcessDescription.processStatus: 0, 
                     ProcessDescription.processDetails: {},
                     ProcessDescription.serviceStatus: 0, 
-                    ProcessDescription.serviceType: ServiceTypes.NONE, 
+                    ProcessDescription.serviceType: serviceManager.getNone(), 
                     ProcessDescription.serviceDetails: {},
                     ProcessDescription.createdWhen: str(now), 
                     ProcessDescription.updatedWhen: str(now), 
-                    "files": {}, 
-                    "messages": {"messages": []} 
+                    ProcessDescription.files: {}, 
+                    ProcessDescription.messages: {"messages": []} 
                     } # the last ones are just for in-session storage
 
         # save into respective project
@@ -267,23 +267,30 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                 for elem in changes["changes"]:
                     if elem == ProcessUpdates.messages:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]["messages"]["messages"].append(changes["changes"][ProcessUpdates.messages])
+                    
                     elif elem == ProcessUpdates.files:
                         for entry in changes["changes"][ProcessUpdates.files]:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]["files"][entry] = changes["changes"][ProcessUpdates.files][entry]
+                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry] = changes["changes"][ProcessUpdates.files][entry]
+                    
                     elif elem == ProcessUpdates.serviceType:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = changes["changes"][ProcessUpdates.serviceType]
+                    
                     elif elem == ProcessUpdates.serviceDetails:
                         serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
-                        if serviceType != ServiceTypes.NONE:
+                        if serviceType != serviceManager.getNone():
                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["changes"][ProcessUpdates.serviceDetails])
                         # status, contractor
+                    
                     elif elem == ProcessUpdates.serviceStatus:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = changes["changes"][ProcessUpdates.serviceStatus]
+                    
                     elif elem == ProcessUpdates.processDetails:
                         for entry in changes["changes"][ProcessUpdates.processDetails]:
                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry] = changes["changes"][ProcessDescription.processDetails][entry]
+                    
                     elif elem == ProcessUpdates.processStatus:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = changes["changes"][ProcessUpdates.processStatus]
+                    
                     elif elem == ProcessUpdates.provisionalContractor:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.contractor] = changes["changes"][ProcessDescription.contractor]
 
@@ -309,21 +316,28 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         if elem == ProcessUpdates.serviceType:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessDescription.serviceType], userID)
                             fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.serviceType, "edit")
+                        
                         elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"]["messages"], userID)
                             fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
+                        
                         elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files", userID):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"]["files"])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessDescription.files])
                             fireWebsocketEvents(projectID, processID, request.session, "files", "files")
+                        
                         elif elem == ProcessUpdates.serviceDetails:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessDescription.serviceDetails], userID)
+                        
                         elif elem == ProcessUpdates.processDetails:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessDescription.processDetails], userID)
+                        
                         elif elem == ProcessUpdates.processStatus:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessDescription.processStatus], userID)
                             fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.processStatus, "edit")
+                        
                         elif elem == ProcessUpdates.serviceStatus:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessDescription.serviceStatus], userID)
+                        
                         elif elem == ProcessUpdates.provisionalContractor:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessDescription.contractor], userID)
                         
@@ -440,8 +454,8 @@ def deleteProcesses(request, projectID):
         loggedIn = False # check rights only once
         for processID in processIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]["files"]:
-                    s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]["files"][fileObj]["id"])
+                for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files]:
+                    s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][fileObj]["id"])
                 
                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
                 request.session.modified = True

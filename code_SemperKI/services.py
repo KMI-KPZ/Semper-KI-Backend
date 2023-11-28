@@ -44,68 +44,6 @@ class ServiceBase(ABC):
         """
         pass
 
-###################################################
-# Enum of Services
-class ServiceTypes(StrEnumExactylAsDefined):
-    """
-    Which services does the platform offer. 
-    This must be known here, since enums can't be extended!
-    
-    """
-    NONE = enum.auto()
-    ADDITIVE_MANUFACTURING = enum.auto()
-    CREATE_MODEL = enum.auto()
-
-###################################################
-# Class of Services
-class _ServiceTypesConversion():
-    """
-    Same as above but converts between string representation and integer representation
-    
-    """
-    ######################
-    _asInt = {ServiceTypes.NONE: 0, ServiceTypes.ADDITIVE_MANUFACTURING: 1, ServiceTypes.CREATE_MODEL: 2}
-    _asStr = [ServiceTypes.NONE, ServiceTypes.ADDITIVE_MANUFACTURING, ServiceTypes.CREATE_MODEL]
-
-    ######################
-    def toInt(self, serviceName:str) -> int:
-        """
-        Convert the service name to its integer representation
-
-        :param serviceName: Name of the service as given in ServiceTypes
-        :type serviceName: Str
-        :return: Integer Code of that service
-        :rtype: Int
-        """
-        return self._asInt[serviceName]
-    
-    ######################
-    def toStr(self, index:int) -> str:
-        """
-        Convert the service name to its string representation
-
-        :param serviceName: Int code of the service
-        :type serviceName: int
-        :return: Str Code of that service as given in ServiceTypes
-        :rtype: Str
-        """
-        return self._asStr[index]
-    
-    ######################
-    def getServices(self) -> dict:
-        """
-        Get all defined services of this plattform
-
-        :return: Dict of Services
-        :rtype: dict in JSON Format
-
-        """
-        return self._asInt
-
-    
-###################################################
-translateServiceType = _ServiceTypesConversion()
-
 ######################################################
 class _ServicesManager():
     """
@@ -113,27 +51,25 @@ class _ServicesManager():
 
     """
 
-    ####################################################################################
-    @property
-    def getService(self, savedService : str) -> ServiceBase:
+    ###################################################
+    class _Structure(StrEnumExactylAsDefined):
         """
-        Depending on the service, select the correct Service class
+        How the services dictionary is structures
 
-        :param savedService: The selected service saved in the database as named in ServiceTypes
-        :type savedService: str
-        :return: The respective Service class
-        :rtype: Derived class of ServiceBase
         """
-
-        return self._services[savedService]
-
-
+        object = enum.auto()
+        name = enum.auto()
+        identifier = enum.auto()
+    
     ###################################################
     def __init__(self) -> None:
-        self._services = {} # To be filled with the other classes 
+        # To be filled with the other classes 
+        self._defaultName = "None"
+        self._defaultIdx = 0
+        self._services = {_ServicesManager._Structure.object: None, _ServicesManager._Structure.name: self._defaultName, _ServicesManager._Structure.identifier: self._defaultIdx} 
 
     ###################################################
-    def register(self, name, serviceClass, **kwargs):
+    def register(self, name:str, identifier:int, serviceClassObject):
         """
         Registers a new service class
         
@@ -145,7 +81,75 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[name] = serviceClass()
+        self._services[name] = {_ServicesManager._Structure.object: serviceClassObject, _ServicesManager._Structure.name: name, _ServicesManager._Structure.identifier: identifier}
+
+    ###################################################
+    def getNone(self) -> int:
+        """
+        Return default object idx
+        
+        :return: Idx of none
+        :rtype: int
+        """
+        return self._defaultIdx
+
+    ###################################################
+    def getService(self, savedService : str) -> ServiceBase:
+        """
+        Depending on the service, select the correct Service class
+
+        :param savedService: The selected service saved in the database as named in ServiceTypes
+        :type savedService: str
+        :return: The respective Service class
+        :rtype: Derived class of ServiceBase
+        """
+
+        return self._services[savedService][_ServicesManager._Structure.object]
+
+    ####################################################################################
+    def getAllServices(self):
+        """
+        Return all registered services as dict
+        
+        :return: all registered services as dict
+        :rtype: dict
+        """
+        outDict = dict(self._services)
+        for elem in outDict: #remove objects
+            outDict[elem].pop(_ServicesManager._Structure.object)
+
+        return outDict
+
+
+    ######################
+    def toInt(self, serviceName:str) -> int:
+        """
+        Convert the service name to its integer representation
+
+        :param serviceName: Name of the service as given in ServiceTypes
+        :type serviceName: Str
+        :return: Integer Code of that service
+        :rtype: Int
+        """
+        return self._services[serviceName][_ServicesManager._Structure.identifier]
+    
+    ######################
+    def toStr(self, index:int) -> str:
+        """
+        Convert the service name to its string representation
+
+        :param serviceName: Int code of the service
+        :type serviceName: int
+        :return: Str Code of that service as given in ServiceTypes
+        :rtype: Str
+        """
+        outStr = ""
+        for elem in self._services:
+            if self._services[elem][_ServicesManager._Structure.identifier] == index:
+                outStr = self._services[elem][_ServicesManager._Structure.name]
+                break
+
+        return outStr
 
     ###################################################
     # def __getattr__(self, name):

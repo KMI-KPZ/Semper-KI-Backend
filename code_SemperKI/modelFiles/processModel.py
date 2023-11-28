@@ -32,6 +32,9 @@ class ProcessDescription(StrEnumExactylAsDefined):
     client = enum.auto()
     contractor = enum.auto()
 
+    files = enum.auto()
+    messages = enum.auto()
+
     dependenciesIn = enum.auto()
     dependenciesOut = enum.auto()
 
@@ -54,6 +57,8 @@ class Process(models.Model):
     :serviceType: Which service it is
     :client: Who started the process
     :contractor: Who gets to handle it
+    :files: Registrar keeping check, which files are currently there, link to Data model
+    :messages: same as files but for chat messages
     :dependenciesIn: Which process this one depends on
     :dependenciesOut: Which processes depend on this one
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
@@ -74,6 +79,9 @@ class Process(models.Model):
     client = models.CharField(max_length=513)
     contractor = models.ForeignKey(Organization, null=True, blank=True, on_delete=models.SET_NULL, related_name="asContractor")
     
+    files = models.JSONField()
+    messages = models.JSONField()
+
     dependenciesIn = models.ManyToManyField("self", symmetrical=False, related_name="processesIn")
     dependenciesOut = models.ManyToManyField("self", symmetrical=False, related_name="processesOut")
     
@@ -93,13 +101,15 @@ class Process(models.Model):
     
     def toDict(self):
         return {ProcessDescription.processID: self.processID, 
-                ProcessDescription.project: json.dumps(self.project.toDict()), 
-                ProcessDescription.serviceDetails: json.dumps(self.serviceDetails), 
+                ProcessDescription.project: self.project.toDict(), 
+                ProcessDescription.serviceDetails: self.serviceDetails, 
                 ProcessDescription.processStatus: self.processStatus,
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,
-                ProcessDescription.processDetails: json.dumps(self.processDetails),
+                ProcessDescription.processDetails: self.processDetails,
                 ProcessDescription.client: self.client,
                 ProcessDescription.contractor: self.contractor.name,
-                ProcessDescription.createdWhen: self.createdWhen, ProcessDescription.updatedWhen: self.updatedWhen, ProcessDescription.accessedWhen: self.accessedWhen}
+                ProcessDescription.files: self.files,
+                ProcessDescription.messages: self.messages,
+                ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
     

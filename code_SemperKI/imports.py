@@ -10,4 +10,4 @@ Contains: Modules that need to be imported
 
 from code_SemperKI import services, settings, urls
 
-import services.imports
+import code_services.imports

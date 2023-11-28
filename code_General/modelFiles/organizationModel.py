@@ -64,14 +64,14 @@ class Organization(models.Model):
 
     ###################################################
     def __str__(self):
-        return self.hashedID + " " + self.name + " " + json.dumps(self.details) + " " + "supportedServices: " + str(self.supportedServices) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
+        return self.hashedID + " " + self.name + " " + json.dumps(self.details) + " " + " " + str(self.supportedServices) + " " + str(self.createdWhen) + " " + str(self.updatedWhen) + " " + str(self.accessedWhen)
 
     ###################################################
     def toDict(self):
         return {OrganizationDescription.hashedID: self.hashedID, 
                 OrganizationDescription.name: self.name, 
-                OrganizationDescription.details: json.dumps(self.details), 
+                OrganizationDescription.details: self.details, 
                 OrganizationDescription.supportedServices: self.supportedServices, 
-                OrganizationDescription.createdWhen: self.createdWhen, 
-                OrganizationDescription.updatedWhen: self.updatedWhen, 
-                OrganizationDescription.accessedWhen: self.accessedWhen}
+                OrganizationDescription.createdWhen: str(self.createdWhen), 
+                OrganizationDescription.updatedWhen: str(self.updatedWhen), 
+                OrganizationDescription.accessedWhen: str(self.accessedWhen)}
