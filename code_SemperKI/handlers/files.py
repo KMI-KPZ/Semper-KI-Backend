@@ -54,9 +54,9 @@ def uploadFiles(request):
 
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
-            changes["changes"][ProcessUpdates.files][fileID] = {}
             fileID = crypto.generateURLFriendlyRandomString()
             filePath = processID+"/"+fileID
+            changes["changes"][ProcessUpdates.files][fileID] = {}
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())

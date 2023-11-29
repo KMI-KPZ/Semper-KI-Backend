@@ -66,7 +66,8 @@ class _ServicesManager():
         # To be filled with the other classes 
         self._defaultName = "None"
         self._defaultIdx = 0
-        self._services = {_ServicesManager._Structure.object: None, _ServicesManager._Structure.name: self._defaultName, _ServicesManager._Structure.identifier: self._defaultIdx} 
+        self._services = {}
+        self._services[self._defaultIdx] = {_ServicesManager._Structure.object: None, _ServicesManager._Structure.name: self._defaultName, _ServicesManager._Structure.identifier: self._defaultIdx} 
 
     ###################################################
     def register(self, name:str, identifier:int, serviceClassObject):
