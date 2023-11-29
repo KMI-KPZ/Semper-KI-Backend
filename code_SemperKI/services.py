@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Metaclass that handles the services
 """
-import enum
+import enum, copy
 
 from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
@@ -81,7 +81,7 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[name] = {_ServicesManager._Structure.object: serviceClassObject, _ServicesManager._Structure.name: name, _ServicesManager._Structure.identifier: identifier}
+        self._services[identifier] = {_ServicesManager._Structure.object: serviceClassObject, _ServicesManager._Structure.name: name, _ServicesManager._Structure.identifier: identifier}
 
     ###################################################
     def getNone(self) -> int:
@@ -94,12 +94,12 @@ class _ServicesManager():
         return self._defaultIdx
 
     ###################################################
-    def getService(self, savedService : str) -> ServiceBase:
+    def getService(self, savedService : int) -> ServiceBase:
         """
         Depending on the service, select the correct Service class
 
-        :param savedService: The selected service saved in the database as named in ServiceTypes
-        :type savedService: str
+        :param savedService: The selected service saved in the dictionary _services
+        :type savedService: int
         :return: The respective Service class
         :rtype: Derived class of ServiceBase
         """
@@ -114,7 +114,7 @@ class _ServicesManager():
         :return: all registered services as dict
         :rtype: dict
         """
-        outDict = dict(self._services)
+        outDict = copy.deepcopy(self._services)
         for elem in outDict: #remove objects
             outDict[elem].pop(_ServicesManager._Structure.object)
 
@@ -131,7 +131,12 @@ class _ServicesManager():
         :return: Integer Code of that service
         :rtype: Int
         """
-        return self._services[serviceName][_ServicesManager._Structure.identifier]
+        outIdx = 0
+        for elem in self._services:
+            if self._services[elem][_ServicesManager._Structure.name] == serviceName:
+                outIdx = self._services[elem][_ServicesManager._Structure.identifier]
+                break
+        return outIdx
     
     ######################
     def toStr(self, index:int) -> str:
@@ -143,13 +148,7 @@ class _ServicesManager():
         :return: Str Code of that service as given in ServiceTypes
         :rtype: Str
         """
-        outStr = ""
-        for elem in self._services:
-            if self._services[elem][_ServicesManager._Structure.identifier] == index:
-                outStr = self._services[elem][_ServicesManager._Structure.name]
-                break
-
-        return outStr
+        return self._services[index][_ServicesManager._Structure.name]
 
     ###################################################
     # def __getattr__(self, name):

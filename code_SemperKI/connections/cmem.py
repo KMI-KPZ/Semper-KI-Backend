@@ -127,8 +127,3 @@ def sendGeneralQuery(query):
 
     results = endpointCopy.queryAndConvert()
     return results["results"]["bindings"]
-
-
-#######################################################
-# import from other services
-import services.code_service_AdditiveManufacturing.connections.cmem 

@@ -57,10 +57,7 @@ def provideRightsFile(request):
 
     """
     
-    rightsFileJSON = rights.rightsManagement.getFile()
-    for elem in rightsFileJSON["Rights"]:
-        elem.pop("paths")
-    return JsonResponse(rightsFileJSON, safe=False)
+    return JsonResponse(rights.rightsManagement.getFile(), safe=False)
 
 #######################################################
 @require_http_methods(["GET"])

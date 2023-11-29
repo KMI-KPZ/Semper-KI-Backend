@@ -33,7 +33,7 @@ paths.update({
     "getPostProcessing": 'public/getPostProcessing/',
 
     "uploadModel": "public/uploadModel/",
-    "deleteMOdel": "public/deleteModel/<processID>/",
+    "deleteModel": "public/deleteModel/<processID>/",
 
     "checkPrintability": "public/checkPrintability/",
     "checkPrices": "public/checkPrices/",

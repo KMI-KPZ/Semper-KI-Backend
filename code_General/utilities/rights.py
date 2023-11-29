@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Service for rights management
 """
 
-import json
+import json, copy
 from django.conf import settings
 
 #######################################################
@@ -30,7 +30,7 @@ class Rights:
                     if elem in self.rightsDict:
                         self.rightsDict[elem].add(permission)
                     else:
-                        self.rightsDict[elem] = set([permission])
+                        self.rightsDict[elem] = set([permission]) 
 
     #######################################################
     def getFile(self):
@@ -40,7 +40,10 @@ class Rights:
         :return: File in JSON Format
         :rtype: JSON Object
         """
-        return self.rightsFile
+        outCopy = copy.deepcopy(self.rightsFile)
+        for elem in outCopy["Rights"]:
+            elem.pop("paths")
+        return outCopy
 
     #######################################################
     def checkIfAllowed(self, permissions, path):

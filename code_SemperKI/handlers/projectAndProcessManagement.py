@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Handlers managing the projects and processes
 """
 
-import json, logging
+import json, logging, copy
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -527,7 +527,7 @@ def getProject(request, projectID):
         outDict = {}
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
             if projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                outDict = dict(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]) # copy the content
+                outDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]) # copy the content
                 outDict[SessionContentSemperKI.processes] = [outDict[SessionContentSemperKI.processes][process] for process in outDict[SessionContentSemperKI.processes]]
                 return JsonResponse(outDict)
         
