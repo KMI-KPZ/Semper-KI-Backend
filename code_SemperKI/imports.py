@@ -8,6 +8,6 @@ Contains: Modules that need to be imported
 """
 
 
-from code_SemperKI import services, settings, urls
-
-import code_services.imports
+from code_SemperKI import services, urls
+from code_SemperKI.settings import base
+import code_services.services
