@@ -8,5 +8,3 @@ Contains: Modules that need to be imported
 """
 
 from code_General import urls
-
-import code_SemperKI.imports
