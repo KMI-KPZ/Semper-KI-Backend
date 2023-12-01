@@ -157,7 +157,7 @@ def updateProject(request):
 
 #######################################################
 @require_http_methods(["DELETE"])
-def deleteProjects(request, projectID):
+def deleteProjects(request):
     """
     Delete the whole project
 
@@ -266,7 +266,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             for processID in processIDs:
                 for elem in changes["changes"]:
                     if elem == ProcessUpdates.messages:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]["messages"]["messages"].append(changes["changes"][ProcessUpdates.messages])
+                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"].append(changes["changes"][ProcessUpdates.messages])
                     
                     elif elem == ProcessUpdates.files:
                         for entry in changes["changes"][ProcessUpdates.files]:
@@ -292,7 +292,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = changes["changes"][ProcessUpdates.processStatus]
                     
                     elif elem == ProcessUpdates.provisionalContractor:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.contractor] = changes["changes"][ProcessDescription.contractor]
+                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = changes["changes"][ProcessUpdates.provisionalContractor]
 
                 # deletions
                 if "deletions" in changes:
@@ -314,32 +314,32 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                     for elem in changes["changes"]:
                         returnVal = True
                         if elem == ProcessUpdates.serviceType:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessDescription.serviceType], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessUpdates.serviceType], userID)
                             fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.serviceType, "edit")
                         
                         elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"]["messages"], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
                             fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
                         
                         elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files", userID):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessDescription.files])
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files])
                             fireWebsocketEvents(projectID, processID, request.session, "files", "files")
                         
                         elif elem == ProcessUpdates.serviceDetails:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessDescription.serviceDetails], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessUpdates.serviceDetails], userID)
                         
                         elif elem == ProcessUpdates.processDetails:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessDescription.processDetails], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessUpdates.processDetails], userID)
                         
                         elif elem == ProcessUpdates.processStatus:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessDescription.processStatus], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessUpdates.processStatus], userID)
                             fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.processStatus, "edit")
                         
                         elif elem == ProcessUpdates.serviceStatus:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessDescription.serviceStatus], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessUpdates.serviceStatus], userID)
                         
                         elif elem == ProcessUpdates.provisionalContractor:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessDescription.contractor], userID)
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessUpdates.provisionalContractor], userID)
                         
                         else:
                             raise Exception("updateProcess change " + elem + " not implemented")
@@ -491,7 +491,7 @@ def getFlatProjects(request):
         # From session
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
             for entry in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                tempDict = request.session[SessionContentSemperKI.CURRENT_PROJECTS][entry]
+                tempDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][entry])
                 tempDict["processesCount"] = len(tempDict[SessionContentSemperKI.processes])
                 del tempDict[SessionContentSemperKI.processes] # frontend doesn't need that
                 outDict["projects"].append(tempDict)
@@ -587,11 +587,11 @@ def getMissedEvents(request):
             currentProcess = {}
             currentProcess[ProcessDescription.processID] = process[ProcessDescription.processID]
             newMessagesCount = 0
-            chat = process["messages"]["messages"]
+            chat = process[ProcessDescription.messages]["messages"]
             for messages in chat:
-                if lastLogin < timezone.make_aware(datetime.strptime(messages["date"], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages["userID"] != user[UserDescription.hashedID]:
+                if lastLogin < timezone.make_aware(datetime.strptime(messages[MessageContent.date], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages[MessageContent.userID] != user[UserDescription.hashedID]:
                     newMessagesCount += 1
-            if lastLogin < timezone.make_aware(datetime.strptime(process["updated"], '%Y-%m-%d %H:%M:%S.%f+00:00')):
+            if lastLogin < timezone.make_aware(datetime.strptime(process[ProcessDescription.updatedWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')):
                 status = 1
             else:
                 status = 0
@@ -704,8 +704,8 @@ def verifyProject(request):
     """
     Start calculations on server and set status accordingly
 
-    :param request: GET Request
-    :type request: HTTP GET
+    :param request: PATCH Request
+    :type request: HTTP PATCH
     :return: Response if processes are started successfully
     :rtype: HTTP Response
 
@@ -762,8 +762,8 @@ def sendProject(request):
     """
     Retrieve Calculations and send process to contractor(s)
 
-    :param request: GET Request
-    :type request: HTTP GET
+    :param request: PATCH Request
+    :type request: HTTP PATCH
     :return: Response if processes are started successfully
     :rtype: HTTP Response
 

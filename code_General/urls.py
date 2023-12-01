@@ -50,6 +50,7 @@ paths = {
 
     "deleteUser": "public/profileDeleteUser/",
     "addUser": "private/profile_addUser/",
+    "addOrga": "private/profile_addOrga/",
     "getUserTest": "private/profile_getUser/",
     "getUser": "public/getUser/",
     "getOrganization": "public/getOrganization/",
@@ -106,7 +107,8 @@ urlpatterns = [
     path(paths["getPermissionsFile"], authentification.provideRightsFile, name="getPermissionsFile"),
 
     path(paths["deleteUser"], profiles.deleteUser, name="deleteUser"),
-    #path(paths["addUser"], profiles.addUserTest, name="addUser"),
+    path(paths["addUser"], profiles.addUserTest, name="addUser"),
+    path(paths["addOrga"], profiles.addOrganizationTest, name="addOrgaTest"),
     #path(paths["getUserTest"], profiles.getUserTest, name="getUserTest"),
     path(paths["updateDetails"], profiles.updateDetails, name="updateDetails"),
     path(paths["getUser"], profiles.getUserDetails, name="getUserDetails"),

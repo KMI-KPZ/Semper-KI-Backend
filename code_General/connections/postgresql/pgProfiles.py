@@ -14,7 +14,7 @@ from ...modelFiles.userModel import User
 from ...utilities import crypto
 from logging import getLogger
 
-from ...definitions import SessionContent
+from ...definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
 
 logger = getLogger("django")
 
@@ -85,6 +85,27 @@ class ProfileManagementBase():
             obj = Organization.objects.get(subID=orgaID).toDict()
         except (Exception) as error:
             logger.error(f"Error getting organization: {str(error)}")
+
+        return obj
+    
+    ##############################################
+    @staticmethod
+    def getOrganizationObject(session):
+        """
+        Check whether an organization exists or not and retrieve the object.
+
+        :param session: session
+        :type session: Dictionary
+        :return: Organization object
+        :rtype: Database object
+
+        """
+        orgaID = session["user"]["userinfo"]["org_id"]
+        obj = {}
+        try:
+            obj = Organization.objects.get(subID=orgaID)
+        except (Exception) as error:
+            logger.error(f"Error getting organization object: {str(error)}")
 
         return obj
 
@@ -395,10 +416,10 @@ class ProfileManagementUser(ProfileManagementBase):
         updated = timezone.now()
         try:
             existingObj = User.objects.get(subID=subID)
-            existingInfo = {"name": existingObj.name, "details": existingObj.details}
+            existingInfo = {UserDescription.name: existingObj.name, UserDescription.details: existingObj.details}
             for key in details:
                 existingInfo[key] = details[key]
-            affected = User.objects.filter(subID=subID).update(details=existingInfo["details"], name=existingInfo["name"], updatedWhen=updated)
+            affected = User.objects.filter(subID=subID).update(details=existingInfo[UserDescription.details], name=existingInfo[UserDescription.name], updatedWhen=updated)
         except (Exception) as error:
             logger.error(f"Error updating user details: {str(error)}")
             return False
@@ -511,7 +532,8 @@ class ProfileManagementOrganization(ProfileManagementBase):
                 orgaDetails = {"email": "", "adress": "", "taxID": ""}
                 idHash = crypto.generateSecureID(orgaID)
                 uri = ""
-                resultObj = Organization.objects.create(subID=orgaID, hashedID=idHash, name=orgaName, details=orgaDetails, uri=uri, updatedWhen=updated) 
+                supportedServices = [0]
+                resultObj = Organization.objects.create(subID=orgaID, hashedID=idHash, supportedServices=supportedServices, name=orgaName, details=orgaDetails, uri=uri, updatedWhen=updated) 
                 return resultObj
             except (Exception) as error:
                 logger.error(f"Error adding organization: {str(error)}")
@@ -539,13 +561,13 @@ class ProfileManagementOrganization(ProfileManagementBase):
         updated = timezone.now()
         try:
             existingObj = Organization.objects.get(subID=orgID)
-            existingInfo = {"details": existingObj.details, "supportedServices": existingObj.supportedServices, "name": existingObj.name, "uri": existingObj.uri}
+            existingInfo = {OrganizationDescription.details: existingObj.details, OrganizationDescription.supportedServices: existingObj.supportedServices, OrganizationDescription.name: existingObj.name, OrganizationDescription.uri: existingObj.uri}
             for key in content:
-                if key == "canManufacture" or "supportedServices":
-                    existingInfo["supportedServices"].extend(content[key])
+                if key == OrganizationDescription.supportedServices:
+                    existingInfo[OrganizationDescription.supportedServices].extend(content[key])
                 else:
                     existingInfo[key] = content[key]
-            affected = Organization.objects.filter(subID=orgID).update(details=existingInfo["details"], supportedServices=existingInfo["supportedServices"], name=existingInfo["name"], uri=existingInfo["uri"], updatedWhen=updated)
+            affected = Organization.objects.filter(subID=orgID).update(details=existingInfo[OrganizationDescription.details], supportedServices=existingInfo[OrganizationDescription.supportedServices], name=existingInfo[OrganizationDescription.name], uri=existingInfo[OrganizationDescription.uri], updatedWhen=updated)
         except (Exception) as error:
             logger.error(f"Error updating organization details: {str(error)}")
             return False
@@ -562,6 +584,6 @@ class ProfileManagementOrganization(ProfileManagementBase):
         :rtype: String
 
         """
-        return ProfileManagementBase.getOrganization(session)["hashedID"]
+        return ProfileManagementBase.getOrganization(session)[OrganizationDescription.hashedID]
 
-profileManagement= {"user": ProfileManagementUser(), "organization": ProfileManagementOrganization()}
+profileManagement= {ProfileClasses.user: ProfileManagementUser(), ProfileClasses.organization: ProfileManagementOrganization()}

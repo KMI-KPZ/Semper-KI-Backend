@@ -7,10 +7,6 @@ pwd
 
 export DJANGO_SETTINGS_MODULE=code_General.settings.production
 python manage.py makemigrations
-python manage.py makemigrations code_General
-python manage.py migrate code_General
-python manage.py makemigrations code_SemperKI
-python manage.py migrate code_SemperKI
 python manage.py migrate
 
 echo "***************************************************************

@@ -33,7 +33,7 @@ echo "CHECKS: $CHECKS"
 echo "DEBUG: $DEBUG"
 
 echo "...Waiting for postgres..."
-SLEEP 10
+sleep 10
 
 if [ $CHECKS -eq 1 ]; then
   echo "running python manage.py check code_General --env $ENV"

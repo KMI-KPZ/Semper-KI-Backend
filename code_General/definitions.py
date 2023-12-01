@@ -62,3 +62,10 @@ class SessionContent(StrEnumExactylAsDefined):
     ORGANIZATION_NAME = enum.auto()
     USER_ROLES = enum.auto()
     USER_PERMISSIONS = enum.auto()
+
+class ProfileClasses(StrEnumExactylAsDefined):
+    """
+    Which classes exist?
+    """
+    user = enum.auto()
+    organization = enum.auto()

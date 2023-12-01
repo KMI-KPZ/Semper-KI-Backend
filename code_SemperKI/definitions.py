@@ -90,6 +90,18 @@ class ProcessDetails(StrEnumExactylAsDefined):
     provisionalContractor = enum.auto()
 
 ####################################################################################
+# Enum for messages
+class MessageContent(StrEnumExactylAsDefined):
+    """
+    What does a message consists of?
+    
+    """
+    date = enum.auto()
+    userID = enum.auto()
+    userName = enum.auto()
+    text = enum.auto()
+
+####################################################################################
 # Enum for session content
 class SessionContentSemperKI(StrEnumExactylAsDefined):
     """

@@ -15,29 +15,62 @@ from ..utilities import basics
 
 from ..connections.postgresql import pgProfiles
 
-from ..definitions import SessionContent
+from ..definitions import SessionContent, ProfileClasses
 
 logger = logging.getLogger("logToFile")
 ##############################################
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["GET"])
-# def addUserTest(request):
-#     """
-#     Same as addUser but for testing.
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["POST"])
+def addUserTest(request):
+    """
+    For testing.
 
-#     :param request: GET request
-#     :type request: HTTP GET
-#     :return: HTTP response
-#     :rtype: HTTP status
+    :param request: GET request
+    :type request: HTTP GET
+    :return: HTTP response
+    :rtype: HTTP status
 
-#     """
+    """
+    try:
 
-#     flag = request.session["pgProfileClass"].addUserIfNotExists(request.session)
-#     if flag is True:
-#         return HttpResponse("Worked")
-#     else:
-#         return HttpResponse("Failed", status=500)
+        if request.session[SessionContent.PG_PROFILE_CLASS] == ProfileClasses.organization:
+            orgaObj = pgProfiles.ProfileManagementBase.getOrganizationObject(request.session)
+            returnVal = pgProfiles.ProfileManagementOrganization.addUserIfNotExists(request.session, orgaObj)
+            if isinstance(returnVal, Exception):
+                raise returnVal
+        else:
+            returnVal = pgProfiles.ProfileManagementUser.addUserIfNotExists(request.session)
+            if isinstance(returnVal, Exception):
+                raise returnVal
 
+        return HttpResponse("Worked")
+  
+    except (Exception) as exc:
+        logger.error(f"Error creating user: {str(exc)}")
+        return HttpResponse("Failed", status=500)
+    
+##############################################
+@basics.checkIfUserIsLoggedIn(json=True)
+@require_http_methods(["POST"])
+def addOrganizationTest(request):
+    """
+    For testing.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: HTTP response
+    :rtype: HTTP status
+
+    """
+    try:
+        returnVal = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
+        if returnVal is not None:
+            return HttpResponse("Worked")
+        else:
+            return HttpResponse("Failed", status=500)
+    except (Exception) as exc:
+        logger.error(f"Error creating organization: {str(exc)}")
+        return HttpResponse("Failed", status=500)
 
 ##############################################
 # @checkIfUserIsLoggedIn()

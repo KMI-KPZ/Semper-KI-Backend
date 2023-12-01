@@ -108,8 +108,8 @@
             "ProcessButtonDelete"
          ],
          "paths": [
-            "deleteProcess",
-            "deleteProject",
+            "deleteProcesses",
+            "deleteProjects",
             "deleteFile",
             "deleteModel"
          ]

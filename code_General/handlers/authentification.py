@@ -15,7 +15,7 @@ from ..utilities import basics, rights
 from ..connections.postgresql import pgProfiles
 from django.views.decorators.http import require_http_methods
 from ..connections import auth0, redis
-from ..definitions import SessionContent
+from ..definitions import SessionContent, ProfileClasses
 
 
 logger = logging.getLogger("logToFile")
@@ -79,7 +79,7 @@ def loginUser(request):
     # disable login in production as of now (19.7.2023)
     if settings.PRODUCTION:
         mocked = False
-        return HttpResponse("Currently, logging in is not allowed. Sorry.", status=403)
+        #return HttpResponse("Currently, logging in is not allowed. Sorry.", status=403)
 
     # check number of login attempts
     if mocked is False:
@@ -109,16 +109,16 @@ def loginUser(request):
         if userType == "organization" or userType == "manufacturer" or userType == "fakeOrganization":
             request.session[SessionContent.usertype] = "organization"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = True
-            request.session[SessionContent.PG_PROFILE_CLASS] = "organization"
+            request.session[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.organization
             isPartOfOrganization = True
         elif userType == "fakeAdmin" and mocked is True:
             request.session[SessionContent.usertype] = "admin"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
-            request.session[SessionContent.PG_PROFILE_CLASS] = "user"
+            request.session[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.user
         else:
             request.session[SessionContent.usertype] = "user"
             request.session[SessionContent.IS_PART_OF_ORGANIZATION] = False
-            request.session[SessionContent.PG_PROFILE_CLASS] = "user"
+            request.session[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.user
 
     # set redirect url
     if settings.PRODUCTION:
@@ -286,7 +286,7 @@ def setRoleAndPermissionsOfUser(request):
         return e
 
 #######################################################
-@require_http_methods(["POST", "GET"])
+@require_http_methods(["POST"])
 def callbackLogin(request):
     """
     TODO: Check if user really is part of an organization or not -> check if misclick at login, and set flags and instances here
