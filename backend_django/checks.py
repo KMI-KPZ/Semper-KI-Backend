@@ -57,22 +57,22 @@ def checkDb(app_configs=None, **kwargs):
     return errors
 
 
-def checkRedis(app_configs=None, **kwargs):
-    if app_configs is None:
-        app_configs = apps.get_app_configs()
+# def checkRedis(app_configs=None, **kwargs):
+#     if app_configs is None:
+#         app_configs = apps.get_app_configs()
 
-    for app in app_configs:
-        if issubclass(type(app), SemperKiConfigHelper):
-            from .services.redis import RedisConnection
-            try:
-                redisConn = RedisConnection()
-                redisConn.addContent("_test", "test")
-                value = redisConn.retrieveContent("_test")
-                redisConn.deleteKey("_test")
-                if value[0] != "test":
-                    return [Error(f'could not store and retrieve key', id='redis_check')]
-            except Exception as e:
-                return [Error(f'could not connect to redis', id='redis_check')]
-            return [Info(f'connected to redis and could store, retrieve and delete test-token', id='redis_check')]
+#     for app in app_configs:
+#         if issubclass(type(app), SemperKiConfigHelper):
+#             from .services.redis import RedisConnection
+#             try:
+#                 redisConn = RedisConnection()
+#                 redisConn.addContent("_test", "test")
+#                 value = redisConn.retrieveContent("_test")
+#                 redisConn.deleteKey("_test")
+#                 if value[0] != "test":
+#                     return [Error(f'could not store and retrieve key', id='redis_check')]
+#             except Exception as e:
+#                 return [Error(f'could not connect to redis', id='redis_check')]
+#             return [Info(f'connected to redis and could store, retrieve and delete test-token', id='redis_check')]
 
     return []

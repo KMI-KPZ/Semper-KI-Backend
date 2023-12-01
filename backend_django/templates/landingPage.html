@@ -1,9 +1,98 @@
 <html>
-  <head>
+<head>
     <meta charset="utf-8" />
     <title>SEMPER-KI Backend</title>
-  </head>
-  <body>
+</head>
+<body>
     <h1>Nothing to see here, go away!</h1>
-  </body>
+    <h1>{{ result }}</h1>
+
+</body>
 </html>
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>SEMPER-KI Backend</title>
+    <style>
+        /* Style for the result box */
+        #resultBox {
+            display: none; /* Initially hide the result box */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nothing to see here, go away!</h1>
+
+    <!-- Input fields for specifying the task parameters -->
+    <label for="x">Enter value for x:</label>
+    <input type="number" id="x" placeholder="Enter value for x">
+
+    <label for="y">Enter value for y:</label>
+    <input type="number" id="y" placeholder="Enter value for y">
+
+    <!-- Button to start a task -->
+    <button onclick="startTask()">Start a Task</button>
+
+    <!-- Button to trigger the check result -->
+    <button onclick="checkResult()">Check Result</button>
+
+    <!-- Result display box -->
+    <div id="resultBox">
+        <p id="resultText">No result available yet.</p>
+    </div>
+
+    <!-- JavaScript to handle the button clicks -->
+    <script>
+        var finalresult
+        function startTask() {
+            // You can add JavaScript logic here to start a task
+            var x = document.getElementById("x").value;
+            var y = document.getElementById("y").value;
+            // Constructing the payload in JSON format
+            var payload = {
+                args: [parseInt(x), parseInt(y)] // Assuming the arguments are integers
+                // Add any other parameters or data needed for starting a task
+            };
+
+            // For simplicity, I'll use a placeholder URL
+            // var startTaskUrl = 'http://localhost:8888/api/task/send-task/';
+
+            // You can customize this based on your server API
+            // For example, using fetch or XMLHttpRequest
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            var raw = JSON.stringify(payload);
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+            fetch("http://flower:8888/api/task/send-task/trialtask", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+                console.log(result);
+                finalResult = result;  // Store the result in the global variable
+                checkResult();  // Call checkResult after obtaining the result
+            })
+            .catch(error => console.log('error', error));
+            
+        }
+
+        function checkResult() {
+            // You can add JavaScript logic here if needed
+            // For simplicity, I'm just displaying a static result
+            var resultText = finalresult; // You should replace this with the actual result from your server
+
+            // Show the result box and update the result text
+            document.getElementById("resultBox").style.display = "block";
+            document.getElementById("resultText").innerText = resultText;
+        }
+    </script>
+</body>
+</html>
+ -->

@@ -5,36 +5,39 @@ Silvio Weging 2023
 
 Contains: Views for some backend websites
 """
+from multiprocessing.pool import AsyncResult
 import threading
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
 
+from django.http import HttpResponse
+from django.shortcuts import render
+import requests
+import json
+import time
+from django.utils.decorators import sync_and_async_middleware
+from requeststest import CeleryTaskManager
+
 from backend_django.services.auth0 import authorizeToken
+##########################################################
 
-
-#######################################################
 def landingPage(request):
-    """
-    Landing page for the backend
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: Rendered page
-    :rtype: None
-
-    """
     print("landingpage")
     # print thread id
     print('landing page in thread: '+ str(threading.get_ident()))
+    data = {
+    "args": [4, 2]
+     }
+    task_start = CeleryTaskManager(taskname='trialtask', data=data,)
+    result = task_start.check_status()
     return render(
         request,
-        "landingPage.html"#,
-        #context={
-        #    "session": request.session.get("user"),
-            #"pretty": json.dumps(request.session.get("user"), indent=4),
-        #},
+        "landingPage.html",
+        context={
+            'result':result,
+        }
     )
 
 #######################################################

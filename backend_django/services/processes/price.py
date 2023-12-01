@@ -7,12 +7,12 @@ Contains: BS Calculation of the price
 """
 
 import  random
-from ...celery import app
-from celery.result import AsyncResult
+# from ...celery import app
+# from celery.result import AsyncResult
 
 ################################################################################################
 #######################################################
-@app.task
+# @app.task
 def calculatePrice_Mock(items):
     """
     Random prices calculation

@@ -7,7 +7,7 @@ from django.apps import AppConfig
 from .services import auth0
 
 from django.core.checks import register
-from .checks import Tags, checkEnv, checkDb, checkRedis
+from .checks import Tags, checkEnv, checkDb
 from .helper.classes import SemperKiConfigHelper
 
 #
@@ -36,8 +36,8 @@ class BackendDjangoConfig(AppConfig, BackendDjangoConfigHelper):
             register(checkEnv, Tags.env_check) # register check_env function with tag env_check
         if self.doCheck('check_db'):
             register(checkDb, Tags.db_check) # register check_db function with tag db_check
-        if self.doCheck('check_redis'):
-            register(checkRedis, Tags.redis_check)
+        # if self.doCheck('check_redis'):
+        #     register(checkRedis, Tags.redis_check)
         super(BackendDjangoConfig, self).ready()
 
     def __repr__(self):
