@@ -574,7 +574,7 @@ def getMissedEvents(request):
     """
 
     user = pgProfiles.ProfileManagementBase.getUser(request.session)
-    lastLogin = user[UserDescription.lastSeen]
+    lastLogin = timezone.make_aware(datetime.strptime(user[UserDescription.lastSeen], '%Y-%m-%d %H:%M:%S.%f+00:00'))
     projects = pgProcesses.ProcessManagementBase.getProjects(request.session)
 
     output = {"eventType": "projectEvent", "events": []}
@@ -629,17 +629,30 @@ def getContractors(request, processID):
 
     """
     # TODO filter 
-    processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-    listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(processObj.serviceType)
-    # TODO Check suitability
+    try:
+        projectObj, processObj = getProcessAndProjectFromSession(request.session,processID)
+        if processObj == None:
+            processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+            if processObj == None:
+                raise Exception("Process ID not found in session or db")
+            else: # db
+                serviceType = processObj.serviceType
+        else: # session
+            serviceType = processObj[ProcessDescription.serviceType]
 
-    # remove unnecessary information and add identifier
-    # for idx, elem in enumerate(listOfAllContractors):
-    #     contractorList.append({})
-    #     contractorList[idx]["name"] = elem["name"]
-    #     contractorList[idx]["id"] = elem["hashedID"]
+        listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
+        # TODO Check suitability
 
-    return JsonResponse(listOfAllContractors, safe=False)
+        # remove unnecessary information and add identifier
+        # for idx, elem in enumerate(listOfAllContractors):
+        #     contractorList.append({})
+        #     contractorList[idx]["name"] = elem["name"]
+        #     contractorList[idx]["id"] = elem["hashedID"]
+
+        return JsonResponse(listOfAllContractors, safe=False)
+    except (Exception) as error:
+        logger.error(f"getContractors: {str(error)}")
+        return error
 
 #######################################################
 def saveProjectsViaWebsocket(session):
@@ -716,6 +729,7 @@ def verifyProject(request):
         projectID = info["projectID"]
         sendToContractorAfterVerification = info["send"]
         processesIDArray = info["processIDs"]
+        userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
 
         # first save projects
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
@@ -734,7 +748,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED)
+            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED, userID)
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -772,10 +786,11 @@ def sendProject(request):
         info = json.loads(request.body.decode("utf-8"))
         projectID = info["projectID"]
         processesIDArray = info["processIDs"]
+        userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         # TODO Check if process is verified
-
+        
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED)
+            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
             

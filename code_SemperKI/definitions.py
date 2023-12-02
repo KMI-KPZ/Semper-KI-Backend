@@ -14,7 +14,7 @@ from .modelFiles.projectModel import ProjectDescription
 
 ###################################################
 # Statuscodes
-class ProcessStatus(enum.Enum):
+class ProcessStatus(enum.IntEnum):
     """
     Defines all statuus for the process (independent of the selected service)
     """
@@ -43,7 +43,7 @@ class ProcessStatus(enum.Enum):
 
 ###################################################
 # Data Types
-class DataType(enum.Enum):
+class DataType(enum.IntEnum):
     """
     Defines the types of data that are saved in the database of the same name
     
@@ -55,7 +55,7 @@ class DataType(enum.Enum):
 
 ####################################################################################
 # Enum for updateProcess
-class ProjectUpdates(enum.Enum):
+class ProjectUpdates(StrEnumExactylAsDefined):
     """
     What types of updates are there for a project?
 

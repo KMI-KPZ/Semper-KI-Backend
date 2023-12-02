@@ -111,7 +111,7 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def getDataByType(processID, typeOfData:DataType):
+    def getDataByType(typeOfData:DataType, processID, processObject = None):
         """
         Get all data of a certain type for a process.
 
@@ -125,7 +125,10 @@ class ProcessManagementBase():
         """
 
         try:
-            processObj = Process.objects.filter(processID=processID)
+            if processObject != None:
+                processObj = processObject
+            else:
+                processObj = Process.objects.get(processID=processID)
             dates = processObj.data.filter(type=typeOfData)
             outList = []
             for datum in dates:
@@ -248,7 +251,7 @@ class ProcessManagementBase():
             projectObj = Project.objects.get(projectID=projectID)
 
             output = projectObj.toDict()
-            showProjectDetails = False # make sure nobody else sees this
+            showProjectDetails = True if projectObj.client == currentUserHashID else False # make sure nobody else sees this
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
@@ -326,7 +329,7 @@ class ProcessManagementBase():
             else:
                 currentProcess = Process.objects.get(processID=processID)
 
-            allFiles = ProcessManagementBase.getDataByType(processID, DataType.FILE)
+            allFiles = ProcessManagementBase.getDataByType(DataType.FILE, processID, processObj)
             # delete files as well
             for entry in allFiles:
                 s3.manageLocalS3.deleteFile(entry[FileObjectContent.path])
@@ -337,7 +340,7 @@ class ProcessManagementBase():
             # else:
             currentProcess.project.updatedWhen = updated
             currentProcess.delete()
-            currentProcess.save()
+            #currentProcess.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
@@ -367,7 +370,7 @@ class ProcessManagementBase():
                 ProcessManagementBase.deleteProcess(process.processID, processObj=process)
 
             currentProject.delete()
-            currentProject.save()
+            #currentProject.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
@@ -485,6 +488,7 @@ class ProcessManagementBase():
             
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
             processObj.contractor = contractorObj
+            processObj.save()
 
             return None
         except (Exception) as error:

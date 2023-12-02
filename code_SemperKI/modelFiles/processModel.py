@@ -108,7 +108,7 @@ class Process(models.Model):
                 ProcessDescription.serviceStatus: self.serviceStatus,
                 ProcessDescription.processDetails: self.processDetails,
                 ProcessDescription.client: self.client,
-                ProcessDescription.contractor: self.contractor.name,
+                ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}

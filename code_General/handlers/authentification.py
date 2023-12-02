@@ -286,7 +286,7 @@ def setRoleAndPermissionsOfUser(request):
         return e
 
 #######################################################
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "GET"])
 def callbackLogin(request):
     """
     TODO: Check if user really is part of an organization or not -> check if misclick at login, and set flags and instances here

@@ -45,7 +45,8 @@ class TestProfiles(TestCase):
 
     #######################################################
     @staticmethod
-    def createUserInSession(mockSession, sub="", name=""):
+    def createUser(client:Client, sub="", name=""):
+        mockSession = client.session
         mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": ""}}
         mockSession["user"]["userinfo"]["sub"] = "auth0|testuser" if sub == "" else sub
         mockSession["user"]["userinfo"]["nickname"] = "testuser" if name == "" else name
@@ -57,13 +58,14 @@ class TestProfiles(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
+        client.post("/"+paths["addUser"])
         return mockSession
 
     # TESTS!
     #######################################################
     def test_updateUser(self):
         client =  Client()
-        self.createUserInSession(client.session)
+        self.createUser(client)
         client.post("/"+paths["addUser"])
         client.patch("/"+paths["updateDetails"], '{"name": "testuser2TEST"}')
         response = json.loads(client.get("/"+paths["getUser"]).content)
@@ -72,7 +74,7 @@ class TestProfiles(TestCase):
     #######################################################
     def test_deleteUser(self):
         client =  Client()
-        self.createUserInSession(client.session, sub="auth0|deleteDude", name="deleteDude")
+        self.createUser(client, sub="auth0|deleteDude", name="deleteDude")
         client.post("/"+paths["addUser"])
         delResponse = client.delete("/"+paths["deleteUser"])
         self.assertIs(delResponse.status_code == 200, True)

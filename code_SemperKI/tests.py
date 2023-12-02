@@ -46,7 +46,8 @@ class TestProjects(TestCase):
 
     #######################################################
     @staticmethod
-    def createUserInSession(mockSession, sub="", name=""):
+    def createUser(client:Client, sub="", name=""):
+        mockSession = client.session
         mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": ""}}
         mockSession["user"]["userinfo"]["sub"] = "auth0|testuser" if sub == "" else sub
         mockSession["user"]["userinfo"]["nickname"] = "testuser" if name == "" else name
@@ -58,6 +59,7 @@ class TestProjects(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
+        client.post("/"+paths["addUser"])
         return mockSession
     
     #######################################################
@@ -80,7 +82,7 @@ class TestProjects(TestCase):
     #######################################################
     def test_getProject(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_getProject.__name__)
+        self.createUser(client, self.test_getProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         getProjPathSplit = paths["getProject"].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
@@ -97,7 +99,7 @@ class TestProjects(TestCase):
     #######################################################
     def test_getFlatProjects(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_getFlatProjects.__name__)
+        self.createUser(client, self.test_getFlatProjects.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         response = json.loads(client.get("/"+paths["getFlatProjects"]).content)
         self.assertIs(response["projects"][0][ProjectDescription.projectID] == projectObj[ProjectDescription.projectID], True)
@@ -109,7 +111,7 @@ class TestProjects(TestCase):
     #######################################################
     def test_updateProject(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_updateProject.__name__)
+        self.createUser(client, self.test_updateProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.details + '": {"name": "test"} } }'
         client.patch("/"+paths["updateProject"], changes)
@@ -127,35 +129,35 @@ class TestProjects(TestCase):
     #######################################################
     def test_deleteProjects(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_deleteProjects.__name__)
+        self.createUser(client, self.test_deleteProjects.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
-        response = client.delete("/"+paths["deleteProjects"], '{ "projectIDs": [' + projectObj[ProjectDescription.projectID] + '] }')
+        deletions = { "projectIDs": [projectObj[ProjectDescription.projectID]] }
+        response = client.delete("/"+paths["deleteProjects"], json.dumps(deletions))
         self.assertIs(response.status_code == 200, True)
-        
         response = json.loads(client.get("/"+paths["getFlatProjects"]).content)
-        self.assertIs(response == {}, True)
+        self.assertIs(response["projects"] == [], True)
 
         projectObj, processObj = self.createProjectAndProcess(client)
         client.get("/"+paths["saveProjects"])
-        response = client.delete("/"+paths["deleteProjects"], '{ "projectIDs": [' + projectObj[ProjectDescription.projectID] + '] }')
+        deletions = { "projectIDs": [projectObj[ProjectDescription.projectID]] }
+        response = client.delete("/"+paths["deleteProjects"], json.dumps(deletions))
         self.assertIs(response.status_code == 200, True)
-        
         response = json.loads(client.get("/"+paths["getFlatProjects"]).content)
-        self.assertIs(response == {}, True)
+        self.assertIs(response["projects"] == [], True)
 
 
     #######################################################
     def test_updateProcess(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_updateProcess.__name__)
+        self.createUser(client, self.test_updateProcess.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
-        changes = '{ "' + ProjectDescription.projectID + '": ' + projectObj[ProjectDescription.projectID] + ', "processIDs": ['+ processObj[ProcessDescription.processID] + '], "changes": { "' + ProcessUpdates.serviceType + '": 1} }'
-        response = client.patch("/"+paths["updateProcess"], changes)
+        changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
+        response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
         client.get("/"+paths["saveProjects"])
-        changes = '{ "' + ProjectDescription.projectID + '": ' + projectObj[ProjectDescription.projectID] + ', "processIDs": ['+ processObj[ProcessDescription.processID] + '], "changes": { "' + ProcessUpdates.processStatus + '": 1} }'
-        response = client.patch("/"+paths["updateProcess"], changes)
+        changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "processStatus": 1} }
+        response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
         getProjPathSplit = paths["getProject"].split("/")
@@ -167,11 +169,12 @@ class TestProjects(TestCase):
     #######################################################
     def test_deleteProcesses(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_deleteProcesses.__name__)
+        self.createUser(client, self.test_deleteProcesses.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         deletePathSplit = paths["deleteProcesses"].split("/")
         deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
-        response = client.delete("/"+deletePath, '{ "processIDs": [' + processObj[ProcessDescription.processID] + '] }')
+        deletions = { "processIDs": [processObj[ProcessDescription.processID]] }
+        response = client.delete("/"+deletePath, json.dumps(deletions))        
         self.assertIs(response.status_code == 200, True)
         getProjPathSplit = paths["getProject"].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
@@ -180,9 +183,10 @@ class TestProjects(TestCase):
 
         projectObj, processObj = self.createProjectAndProcess(client)
         client.get("/"+paths["saveProjects"])
-        response = client.delete("/"+deletePath, '{ "processIDs": [' + processObj[ProcessDescription.processID] + '] }')
+        deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
+        deletions = { "processIDs": [processObj[ProcessDescription.processID]] }
+        response = client.delete("/"+deletePath, json.dumps(deletions))
         self.assertIs(response.status_code == 200, True)
-        getProjPathSplit = paths["getProject"].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
         self.assertIs(len(response[SessionContentSemperKI.processes]) == 0, True)
@@ -190,7 +194,7 @@ class TestProjects(TestCase):
     #######################################################
     def test_uploadAndDownloadFile(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_uploadAndDownloadFile.__name__)
+        self.createUser(client, self.test_uploadAndDownloadFile.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile}
         response = client.post("/"+paths["uploadFiles"], uploadBody )
@@ -205,8 +209,8 @@ class TestProjects(TestCase):
         response = client.get("/"+downloadPath)
         with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
             loaded_response_content = buf_bytes.read()
-            contentOfTestFile = self.testFile.read()
             self.testFile.seek(0)
+            contentOfTestFile = self.testFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True)
 
         # TODO repeat for saved stuff
@@ -214,33 +218,34 @@ class TestProjects(TestCase):
     #######################################################
     def test_sendProject(self):
         client = Client()
-        self.createUserInSession(client.session, self.test_sendProject.__name__)
+        self.createUser(client, self.test_sendProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
 
         # set serviceType
-        changes = '{ "' + ProjectDescription.projectID + '": ' + projectObj[ProjectDescription.projectID] + ', "processIDs": ['+ processObj[ProcessDescription.processID] + '], "changes": { "' + ProcessUpdates.serviceType + '": 1} }'
-        response = client.patch("/"+paths["updateProcess"], changes)
+        changes = { ProjectDescription.projectID: projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID] ], "changes": { ProcessUpdates.serviceType: 1} }
+        response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
-        # get Contractors for that service type
+        # # get Contractors for that service type
         getContractorsPathSplit = paths["getContractors"].split("/")
         getContractorsPath = getContractorsPathSplit[0] + "/" + getContractorsPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/" + getContractorsPath).content)
         self.assertIs(len(response) > 0, True)
 
-        # set contractor
-        changes = '{ "' + ProjectDescription.projectID + '": ' + projectObj[ProjectDescription.projectID] + ', "processIDs": ['+ processObj[ProcessDescription.processID] + '], "changes": { "' + ProcessUpdates.provisionalContractor + '": ' + response[0][OrganizationDescription.hashedID] + '} }'
-        response = client.patch("/"+paths["updateProcess"], changes)
+        # # set contractor
+        changes = { ProjectDescription.projectID: projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { ProcessUpdates.provisionalContractor: response[0][OrganizationDescription.hashedID]} }
+        response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
-        # verify and send
+        # # verify and send
         body = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], "send": True, "processIDs": [processObj[ProcessDescription.processID]]}
-        response = client.patch("/"+paths["verifyProject"], body)
+        response = client.patch("/"+paths["verifyProject"], json.dumps(body))
         self.assertIs(response.status_code == 200, True)
 
-        # get missed events of contractor
+        # # get missed events of contractor
         response = json.loads(self.orgaClient.get("/"+paths["getMissedEvents"]).content)
-        self.assertIs(response["events"][0][SessionContentSemperKI.processes]["status"] > 0, True)
+        print(response)
+        self.assertIs(response["events"][0][SessionContentSemperKI.processes][0]["status"] > 0, True)
 
 
 # class TestFilters(TestCase):
