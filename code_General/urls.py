@@ -89,7 +89,7 @@ urlpatterns = [
     path(paths["benchyPage"], frontpage.benchyPage, name="benchy"),
     path(paths["benchyMcMarkface"], startFromDjango, name="benchyMcMarkface"),
 
-    re_path(r'^public/doc', frontpage.docPage, name="docPage"),
+    re_path(r'^private/doc', frontpage.docPage, name="docPage"),
     
     path(paths["test"], testResponse.testResponse, name='test_response'),
     path(paths["csrfTest"], testResponse.testResponseCsrf, name='test_response_csrf'),

@@ -11,6 +11,7 @@ from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 ###################################################
 from .modelFiles.processModel import ProcessDescription
 from .modelFiles.projectModel import ProjectDescription
+from .modelFiles.dataModel import DataDescription
 
 ###################################################
 # Statuscodes

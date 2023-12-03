@@ -321,8 +321,8 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
                             fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
                         
-                        elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files", userID):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files])
+                        elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
+                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files], userID)
                             fireWebsocketEvents(projectID, processID, request.session, "files", "files")
                         
                         elif elem == ProcessUpdates.serviceDetails:
@@ -818,3 +818,35 @@ def sendProject(request):
         return HttpResponse("Failed")
 
 
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"]) 
+@checkIfRightsAreSufficient(json=True)
+def getProcessHistory(request, processID):
+    """
+    See who has done what and when
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param processID: The process of interest
+    :type processID: str
+    :return: JSON of process history
+    :rtype: JSON Response
+
+    """
+    try:
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        
+        # TODO: Check if user is allowed to see this!
+
+        if processObj == None:
+            raise Exception("Process not found in DB!")
+        
+        listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
+        outObj = {"history": listOfData}
+
+        return JsonResponse(outObj)
+    
+    except (Exception) as error:
+        logger.error(f"viewProcessHistory: {str(error)}")
+        return JsonResponse({})

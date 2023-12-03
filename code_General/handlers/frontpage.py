@@ -51,7 +51,7 @@ def docPage(request):
     # response['Content-Type']=""
     # response['X-Accel-Redirect'] = url
     # return response
-    pathOfHtml = request.path.replace('public/doc/', '').replace('index.html', '')
+    pathOfHtml = request.path.replace('private/doc/', '').replace('index.html', '')
     logger.info(pathOfHtml)
     if ("_static" in pathOfHtml):
         return render(

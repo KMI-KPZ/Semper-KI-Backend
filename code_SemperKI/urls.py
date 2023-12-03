@@ -45,6 +45,7 @@ paths.update({
     "deleteProjects": "public/deleteProjects/",
     "verifyProject": "public/verifyProject/",
     "sendProject": "public/sendProject/",
+    "getProcessHistory": "public/getProcessHistory/<processID>/",
 
     "getServices": "public/getServices/",
 
@@ -83,6 +84,7 @@ urlpatterns.extend([
     path(paths["getContractors"], projectAndProcessManagement.getContractors, name='getContractors'),
     path(paths["verifyProject"], projectAndProcessManagement.verifyProject, name="verifyProject"),
     path(paths["sendProject"], projectAndProcessManagement.sendProject, name="sendProject"),
+    path(paths["getProcessHistory"], projectAndProcessManagement.getProcessHistory, name="getProcessHistory"),
 
     path(paths["getServices"], manageServices.getServices, name="getServices"),
 

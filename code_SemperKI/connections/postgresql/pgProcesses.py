@@ -41,7 +41,7 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def getData(processID):
+    def getData(processID, processObject=None):
         """
         Get all files.
 
@@ -53,7 +53,10 @@ class ProcessManagementBase():
         """
 
         try:
-            processObj = Process.objects.filter(processID=processID)
+            if processObject != None:
+                processObj = processObject
+            else:
+                processObj = Process.objects.filter(processID=processID)
             dates = processObj.data.all()
             outList = []
             for datum in dates:

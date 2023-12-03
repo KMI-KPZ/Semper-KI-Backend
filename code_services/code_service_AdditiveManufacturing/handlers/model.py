@@ -19,7 +19,7 @@ from code_General.connections import s3
 from code_General.definitions import FileObjectContent
 from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
-from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType
+from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType, DataDescription
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 from code_SemperKI.connections.postgresql import pgProcesses
 from code_SemperKI.handlers.files import deleteFile
@@ -110,7 +110,7 @@ def deleteModel(request, processID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteModel.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                modelOfThisProcess = pgProcesses.ProcessManagementBase.getDataWithID(currentProcess.serviceDetails[ServiceDetails.model][FileObjectContent.id]) # this returns the file object but with extra steps
+                modelOfThisProcess = pgProcesses.ProcessManagementBase.getDataWithID(currentProcess.serviceDetails[ServiceDetails.model][FileObjectContent.id])[DataDescription.data] # this returns the file object but with extra steps
                 if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
                     modelExistsAsFile = True              
             else:

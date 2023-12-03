@@ -79,7 +79,7 @@ class Data(models.Model):
     
     def toDict(self):
         return {DataDescription.dataID: self.dataID, 
-                DataDescription.process: self.process.toDict(), 
+                #DataDescription.process: self.process.toDict(), 
                 DataDescription.type: self.type, 
                 DataDescription.data: self.data,
                 DataDescription.details: self.details, 

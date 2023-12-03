@@ -15,7 +15,8 @@
             "retrieveProjects",
             "getMissedEvents",
             "getProject",
-            "getFlatProjects"
+            "getFlatProjects",
+            "getProcessHistory"
          ]
       },
       {

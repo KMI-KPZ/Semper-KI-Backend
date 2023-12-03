@@ -15,7 +15,7 @@ from ..utilities import basics, rights
 from ..connections.postgresql import pgProfiles
 from django.views.decorators.http import require_http_methods
 from ..connections import auth0, redis
-from ..definitions import SessionContent, ProfileClasses
+from ..definitions import SessionContent, ProfileClasses, UserDescription
 
 
 logger = logging.getLogger("logToFile")
@@ -455,6 +455,7 @@ def logoutUser(request):
 
     user = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getUser(request.session)
     if user != {}:
+        pgProfiles.ProfileManagementBase.setLoginTime(user[UserDescription.hashedID])
         logger.info(f"{basics.Logging.Subject.USER},{user['name']},{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     else:
         logger.info(f"{basics.Logging.Subject.SYSTEM},,{basics.Logging.Predicate.PREDICATE},logout,{basics.Logging.Object.USER},DELETED," + str(datetime.datetime.now()))
