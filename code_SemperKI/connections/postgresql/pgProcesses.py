@@ -432,41 +432,45 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
-        # TODO - create data entries for everything that's happening
         updated = timezone.now()
         try:
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
+            dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
-                dataID = crypto.generateURLFriendlyRandomString()
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 currentProcess.messages[content] = dataID
-
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
+                
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    dataID = crypto.generateURLFriendlyRandomString()
-                    ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     currentProcess.files[content[entry][FileObjectContent.id]] = dataID
+                    ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
                 
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     currentProcess.processDetails[entry] = content[entry]
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.serviceType: ""})
                       
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy, {ProcessUpdates.serviceStatus: ""})
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy, {ProcessUpdates.serviceDetails: ""})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
 
             currentProcess.save()
             return True
@@ -493,6 +497,9 @@ class ProcessManagementBase():
             processObj.contractor = contractorObj
             processObj.save()
 
+            #TODO change Status
+            # updateProcess
+
             return None
         except (Exception) as error:
             logger.error(f'could not send process: {str(error)}')
@@ -514,40 +521,46 @@ class ProcessManagementBase():
         :rtype: Bool
 
         """
-        #TODO - create data entries for everything that's happening
-        updated = timezone.now()
         try:
+            updated = timezone.now()
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
+            dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
-                ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
                 del currentProcess.messages[content]
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
-                    ProcessManagementBase.createDataEntry({},crypto.generateURLFriendlyRandomString(), processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = ProcessStatus.DRAFT
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
                 
             elif updateType == ProcessUpdates.processDetails:
                 for key in content:
                     del currentProcess.processDetails[key]
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DETAILS, "content": ProcessUpdates.processDetails})
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DETAILS, "content": ProcessUpdates.serviceDetails})
 
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = 0 #TODO
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.serviceStatus})
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = serviceManager.getNone()
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             currentProcess.save()
             return True
@@ -712,7 +725,7 @@ class ProcessManagementBase():
                     files = process[ProcessDescription.files]
                     messages = process[ProcessDescription.messages]
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
-                    
+                    ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
             return None
         except (Exception) as error:
             logger.error(f'could not add project to database: {str(error)}')

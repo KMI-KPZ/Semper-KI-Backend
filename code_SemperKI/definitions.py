@@ -49,10 +49,13 @@ class DataType(enum.IntEnum):
     Defines the types of data that are saved in the database of the same name
     
     """
-    STATUS = 1
-    MESSAGE = 2
-    FILE = 3
-    DELETION = 4
+    CREATION = 1
+    STATUS = 2
+    MESSAGE = 3
+    FILE = 4
+    DELETION = 5
+    DETAILS = 6
+    OTHER = 7
 
 ####################################################################################
 # Enum for updateProcess

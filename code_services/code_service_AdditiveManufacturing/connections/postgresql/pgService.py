@@ -28,11 +28,11 @@ def updateServiceDetails(existingContent, newContent):
     try:
         for entry in newContent:
             if entry == ServiceDetails.model:
-                existingContent[ServiceDetails.model] = entry
+                existingContent[ServiceDetails.model] = newContent[entry]
             elif entry == ServiceDetails.material:
-                existingContent[ServiceDetails.material] = entry
+                existingContent[ServiceDetails.material] = newContent[entry]
             elif entry == ServiceDetails.postProcessings:
-                existingContent[ServiceDetails.postProcessings] = entry
+                existingContent[ServiceDetails.postProcessings] = newContent[entry]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 

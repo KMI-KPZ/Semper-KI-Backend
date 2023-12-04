@@ -14,11 +14,14 @@ RUN apt-get update \
     && apt-get -y install libpq-dev gcc bash iputils-ping curl gawk
 # Install pip requirements
 WORKDIR /app
+
+COPY requirements.txt /app/
+RUN --mount=type=cache,target=/root/.cache \
+    pip install -r requirements.txt
+
 COPY . /app
-RUN python -m pip install -r requirements.txt
 
-
-# RUN chmod +x app/*/*.sh
+RUN find /app/*.sh -type f -exec chmod +x {} \;
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers

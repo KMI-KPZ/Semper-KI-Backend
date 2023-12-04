@@ -170,8 +170,7 @@ def deleteProjects(request):
 
     """
     try:
-        content = json.loads(request.body.decode("utf-8"))
-        projectIDs = content["projectIDs"]
+        projectIDs = request.GET['projectIDs'].split(",")
         loggedIn = False # don't check rights in every iteration
         for projectID in projectIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
@@ -449,8 +448,7 @@ def deleteProcesses(request, projectID):
 
     """
     try:
-        body = json.loads(request.body.decode("utf-8"))
-        processIDs = body["processIDs"]
+        processIDs = request.GET['processIDs'].split(",")
         loggedIn = False # check rights only once
         for processID in processIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
