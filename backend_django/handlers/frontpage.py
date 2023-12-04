@@ -27,17 +27,17 @@ def landingPage(request):
     print("landingpage")
     # print thread id
     print('landing page in thread: '+ str(threading.get_ident()))
-    data = {
-    "args": [4, 2]
-     }
-    task_start = CeleryTaskManager(taskname='trialtask', data=data,)
-    result = task_start.check_status()
+    # data = {
+    # "args": [4, 2]
+    #  }
+    # task_start = CeleryTaskManager(taskname='trialtask', data=data,)
+    # result = task_start.check_status()
     return render(
         request,
         "landingPage.html",
-        context={
-            'result':result,
-        }
+        # context={
+        #     'result':result,
+        #}
     )
 
 #######################################################
