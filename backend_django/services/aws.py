@@ -87,7 +87,7 @@ class ManageAWS():
         return True
 
     #######################################################
-    def downloadFile(self, fileKey):
+    def downloadFile(self, fileKey) -> (BytesIO, bool):
         """
         Upload a binary in-memory file to storage.
 
@@ -98,15 +98,15 @@ class ManageAWS():
         """
 
         output = BytesIO()
-        fileObj = self.s3_client.download_fileobj(self.bucketName, fileKey, output)
+        self.s3_client.download_fileobj(self.bucketName, fileKey, output)
         output.seek(0)
         if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
-            return (output, False)
+            return output, False
         if self.local is False: # remote aws files are encrypted
-            decryptedFile = crypto.decryptAES(self.aesEncryptionKey, output)
-            return (decryptedFile, True)
+            decrypted_file = crypto.decryptAES(self.aesEncryptionKey, output)
+            return decrypted_file, True
         else:
-            return (output, True)
+            return output, True
     
     #######################################################
     def deleteFile(self, fileKey):
