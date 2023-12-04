@@ -1,0 +1,89 @@
+# """
+# Part of Semper-KI software
+
+# Akshay NS 2023
+
+# Contains: configuration for different containers, (redis, redis insight, flower, celery worker, celery beat, flower), that are required for Async tasks processing and monitoring.
+
+# """
+version: '3.4'
+services:
+  redis-broker:
+    image:  redis:7
+    container_name: redis
+    ports:
+    - 127.0.0.1:6380:6379
+    networks:
+    -  MSQ  
+
+  redis_insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis_insight
+    restart: always
+    ports:
+      - 8001:8001
+    volumes:
+      - ./redis_insight_volume_data:/db   
+    networks:
+      - MSQ  
+
+  celery-worker:
+    build:
+      context: .
+    container_name: celery-worker
+    entrypoint: celery
+    env_file:
+    - .env
+    command: -A module.celery worker --loglevel=info
+    volumes:
+    - ./module:/var/www/app/worker
+    - .:/app
+    links:
+    - redis-broker
+    depends_on:
+    - redis-broker
+    networks:
+        - MSQ
+
+  celery-beat:
+      build:
+        context: .
+      container_name: celery-beat
+      entrypoint: celery
+      env_file:
+          - .env
+      command: -A module.celery beat --loglevel=info
+      volumes:
+      - ./module:/var/www/app/beat
+      links:
+      - celery-worker
+      - redis-broker
+      depends_on:
+      - celery-worker
+      - redis-broker
+      networks:
+        - MSQ
+
+  flower:
+      image: mher/flower
+      env_file:
+        - .env
+      container_name: flower
+      volumes:
+        - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
+      entrypoint: /usr/local/bin/dc-service-flower-start.sh
+      ports:
+      - 8888:8888
+      links:
+      - redis-broker
+      - celery-worker
+      - celery-beat
+      depends_on:
+      - redis-broker
+      - celery-worker
+      - celery-beat
+      networks:
+          - MSQ
+networks:
+  MSQ:
+
