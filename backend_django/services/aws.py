@@ -101,12 +101,12 @@ class ManageAWS():
         self.s3_client.download_fileobj(self.bucketName, fileKey, output)
         output.seek(0)
         if output.getbuffer().nbytes == 0: # is empty so no file has been downloaded
-            return output, False
+            return (output, False)
         if self.local is False: # remote aws files are encrypted
             decrypted_file = crypto.decryptAES(self.aesEncryptionKey, output)
-            return decrypted_file, True
+            return (decrypted_file, True)
         else:
-            return output, True
+            return (output, True)
     
     #######################################################
     def deleteFile(self, fileKey):

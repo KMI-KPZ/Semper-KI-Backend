@@ -7,7 +7,6 @@ Contains: File upload handling
 """
 
 import logging, zipfile
-import os
 
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse, FileResponse
@@ -26,6 +25,7 @@ from ..utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRigh
 from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
 from ..services import redis, aws
+from ..utilities.files import createFileResponse
 
 logger = logging.getLogger("logToFile")
 
@@ -166,7 +166,7 @@ def downloadFile(request, processID, fileID):
                     
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {filesOfThisProcess[elem]['title']}," + str(datetime.now()))
                     
-                return create_file_response(content, filename=filesOfThisProcess[elem]["title"]) #, content_type='multipart/form-data')
+                return createFileResponse(content, filename=filesOfThisProcess[elem]["title"]) #, content_type='multipart/form-data')
         
         return HttpResponse("Not found!", status=404)
     except (Exception) as error:
@@ -226,7 +226,7 @@ def downloadFilesAsZip(request, processID):
         zipFile.seek(0) # reset zip file
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
-        return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')
+        return createFileResponse(zipFile, filename=processID + ".zip") #, content_type='multipart/form-data')
 
     except (Exception) as error:
         logger.error(f"Error while downloading files as zip: {str(error)}")
@@ -381,62 +381,3 @@ def testRedis(request):
 # #######################################################
 # def testGetUploadedFiles(request):
 #     return HttpResponse(getUploadedFiles(request.session.session_key), content_type='multipart/form-data')
-
-
-def sync_bytesio_iterator(bytesio, chunk_size=8192):
-    """
-    Synchronous iterator for bytesio
-
-    :param bytesio:
-    :type bytesio: BytesIO
-    :param chunk_size:
-    :type chunk_size: int
-    :return: sync iterator
-    :rtype: iterator
-
-    """
-
-    while True:
-        chunk = bytesio.read(chunk_size)
-        if not chunk:
-            break
-        yield chunk
-
-async def async_bytesio_iterator(bytesio, chunk_size=8192):
-    """
-    Asynchronous iterator for bytesio
-
-    :param bytesio:
-    :type bytesio: BytesIO
-    :param chunk_size: sie of iterator chunks
-    :type chunk_size: int
-    :return: async iterator
-    :rtype: iterator
-
-    """
-
-    while True:
-        chunk = bytesio.read(chunk_size)
-        if not chunk:
-            break
-        yield chunk
-
-def create_file_response(bytesio, filename) -> FileResponse:
-    """
-    Create a file response for a given file and sync/async context
-
-    :param bytesio:
-    :type bytesio: BytesIO
-    :param filename:
-    :type filename: str
-    :return: FileResponse
-    :rtype: FileResponse
-
-    """
-
-    if os.environ.get("SERVER_GATEWAY_INTERFACE", 'wsgi') == 'asgi':
-        # async context
-        return FileResponse(async_bytesio_iterator(bytesio), as_attachment=True, filename=filename)
-    else:
-        # sync context
-        return FileResponse(sync_bytesio_iterator(bytesio), as_attachment=True, filename=filename)
