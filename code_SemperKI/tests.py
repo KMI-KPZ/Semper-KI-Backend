@@ -131,16 +131,14 @@ class TestProjects(TestCase):
         client = Client()
         self.createUser(client, self.test_deleteProjects.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
-        deletions = { "projectIDs": [projectObj[ProjectDescription.projectID]] }
-        response = client.delete("/"+paths["deleteProjects"], json.dumps(deletions))
+        response = client.delete("/"+paths["deleteProjects"]+"?projectIDs="+projectObj[ProjectDescription.projectID])
         self.assertIs(response.status_code == 200, True)
         response = json.loads(client.get("/"+paths["getFlatProjects"]).content)
         self.assertIs(response["projects"] == [], True)
 
         projectObj, processObj = self.createProjectAndProcess(client)
         client.get("/"+paths["saveProjects"])
-        deletions = { "projectIDs": [projectObj[ProjectDescription.projectID]] }
-        response = client.delete("/"+paths["deleteProjects"], json.dumps(deletions))
+        response = client.delete("/"+paths["deleteProjects"]+"?projectIDs="+projectObj[ProjectDescription.projectID])
         self.assertIs(response.status_code == 200, True)
         response = json.loads(client.get("/"+paths["getFlatProjects"]).content)
         self.assertIs(response["projects"] == [], True)
@@ -172,9 +170,8 @@ class TestProjects(TestCase):
         self.createUser(client, self.test_deleteProcesses.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         deletePathSplit = paths["deleteProcesses"].split("/")
-        deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
-        deletions = { "processIDs": [processObj[ProcessDescription.processID]] }
-        response = client.delete("/"+deletePath, json.dumps(deletions))        
+        deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/?processIDs=" + processObj[ProcessDescription.processID]
+        response = client.delete("/"+deletePath)      
         self.assertIs(response.status_code == 200, True)
         getProjPathSplit = paths["getProject"].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
@@ -183,9 +180,8 @@ class TestProjects(TestCase):
 
         projectObj, processObj = self.createProjectAndProcess(client)
         client.get("/"+paths["saveProjects"])
-        deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
-        deletions = { "processIDs": [processObj[ProcessDescription.processID]] }
-        response = client.delete("/"+deletePath, json.dumps(deletions))
+        deletePath = deletePathSplit[0]+"/"+deletePathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/?processIDs=" + processObj[ProcessDescription.processID]
+        response = client.delete("/"+deletePath)
         self.assertIs(response.status_code == 200, True)
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)

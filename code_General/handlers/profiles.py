@@ -15,7 +15,7 @@ from ..utilities import basics
 
 from ..connections.postgresql import pgProfiles
 
-from ..definitions import SessionContent, ProfileClasses
+from ..definitions import SessionContent, ProfileClasses, UserDescription, OrganizationDescription
 
 logger = logging.getLogger("logToFile")
 ##############################################
@@ -163,6 +163,16 @@ def getUserDetails(request):
     # Read user details from Database
     userObj = pgProfiles.ProfileManagementBase.getUser(request.session)
     userObj[SessionContent.usertype] = request.session[SessionContent.usertype]
+    # show only the current organization
+    if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+        organizationsOfUser = userObj[UserDescription.organizations].split(",")
+        del userObj[UserDescription.organizations]
+        currentOrganizationOfUser = pgProfiles.ProfileManagementBase.getOrganization(request.session)
+        for elem in organizationsOfUser:
+            if elem == currentOrganizationOfUser[OrganizationDescription.hashedID]:
+                userObj["organization"] = elem
+                break
+    
     return JsonResponse(userObj)
 
 ##############################################

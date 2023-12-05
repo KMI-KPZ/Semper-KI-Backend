@@ -71,7 +71,7 @@ class User(models.Model):
     def toDict(self):
         return {UserDescription.hashedID: self.hashedID, 
                 UserDescription.name: self.name, 
-                UserDescription.organizations: ','.join(orga.name for orga in self.organizations.all()), 
+                UserDescription.organizations: ','.join(orga.hashedID for orga in self.organizations.all()), 
                 UserDescription.details: self.details, 
                 UserDescription.createdWhen: str(self.createdWhen), 
                 UserDescription.updatedWhen: str(self.updatedWhen), 
