@@ -332,7 +332,7 @@ class ProcessManagementBase():
             else:
                 currentProcess = Process.objects.get(processID=processID)
 
-            allFiles = ProcessManagementBase.getDataByType(DataType.FILE, processID, processObj)
+            allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
                 s3.manageLocalS3.deleteFile(entry[FileObjectContent.path])
@@ -439,12 +439,12 @@ class ProcessManagementBase():
             dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
-                currentProcess.messages[content] = dataID
+                currentProcess.messages["messages"].append(content)
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    currentProcess.files[content[entry][FileObjectContent.id]] = dataID
+                    currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
 
             elif updateType == ProcessUpdates.processStatus:
@@ -722,25 +722,18 @@ class ProcessManagementBase():
                     serviceDetails = process[ProcessDescription.serviceDetails]
                     processStatus = process[ProcessDescription.processStatus]
                     processDetails = process[ProcessDescription.processDetails]
+                    files = process[ProcessDescription.files]
+                    messages = process[ProcessDescription.messages]
 
-                    # generate data entries instead of saving them here
-                    files = {}
+                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
+                    ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
+
+                    # generate entries in data
                     for elem in process[ProcessDescription.files]:
                         fileEntry = process[ProcessDescription.files][elem]
                         dataID = crypto.generateURLFriendlyRandomString()
-                        ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, clientID, {}, elem)
-                        files[elem] = dataID
+                        ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
 
-                    # generate messages as data entries instead of saving them here
-                    messages = {}
-                    for elem in process[ProcessDescription.messages]:
-                        messageEntry = process[ProcessDescription.messages]
-                        dataID = crypto.generateURLFriendlyRandomString()
-                        ProcessManagementBase.createDataEntry(messageEntry, dataID, processID, DataType.FILE, clientID, {}, elem)
-                        messages[elem] = dataID
-                    
-                    processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
-                    ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
             return None
         except (Exception) as error:
             logger.error(f'could not add project to database: {str(error)}')

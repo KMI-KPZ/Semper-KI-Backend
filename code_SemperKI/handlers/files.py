@@ -101,13 +101,13 @@ def downloadFile(request, processID, fileID):
         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             if fileID in currentProcess[ProcessDescription.files]:
-                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID] # this returns the file object directly
+                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
             else:
                 return HttpResponse("Not found!", status=404)
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                fileOfThisProcess = pgProcesses.ProcessManagementBase.getDataWithID(currentProcess.files[fileID])[DataDescription.data] # this returns the file object but with extra steps
+                fileOfThisProcess = currentProcess.files[fileID]
                 if len(fileOfThisProcess) == 0:
                     return HttpResponse("Not found!", status=404)
             else:
@@ -154,9 +154,7 @@ def downloadFilesAsZip(request, processID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                processFiles = currentProcess.files
-                for entry in processFiles:
-                    filesOfThisProcess[entry] = pgProcesses.ProcessManagementBase.getDataWithID(entry)[DataDescription.data]
+                filesOfThisProcess = currentProcess.files
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
@@ -220,7 +218,7 @@ def deleteFile(request, processID, fileID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                fileOfThisProcess = pgProcesses.ProcessManagementBase.getDataWithID(currentProcess.files[fileID])[DataDescription.data] # this returns the file object but with extra steps
+                fileOfThisProcess = currentProcess.files[fileID]
                 if len(fileOfThisProcess) == 0:
                     return HttpResponse("Not found!", status=404)                
                 liesInDatabase = True

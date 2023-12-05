@@ -71,7 +71,7 @@ def uploadModel(request):
         
         # Save into files field of the process 
         # TODO!!!
-        changes = {"changes": {ProcessUpdates.files: model, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileID]}}}
+        changes = {"changes": {ProcessUpdates.files: model, ProcessUpdates.serviceDetails: {ServiceDetails.model: model}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)
@@ -110,7 +110,7 @@ def deleteModel(request, processID):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteModel.__name__):
                 currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                modelOfThisProcess = pgProcesses.ProcessManagementBase.getDataWithID(currentProcess.serviceDetails[ServiceDetails.model][FileObjectContent.id])[DataDescription.data] # this returns the file object but with extra steps
+                modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
                 if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
                     modelExistsAsFile = True              
             else:
