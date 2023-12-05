@@ -71,7 +71,7 @@ def uploadModel(request):
         
         # Save into files field of the process 
         # TODO!!!
-        changes = {"changes": {ProcessUpdates.files: model, ProcessUpdates.serviceDetails: {ServiceDetails.model: model}}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileID]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return JsonResponse({}, status=401)

@@ -26,7 +26,7 @@ from ..services import serviceManager
 
 from code_General.connections import s3
 
-from code_General.definitions import SessionContent, FileObject, OrganizationDescription, UserDescription
+from code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
 
 logger = logging.getLogger("logToFile")
 ################################################################################################
@@ -212,7 +212,7 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        clientID = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.client]
+        clientID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         template = {ProcessDescription.processID: processID, 
                     ProcessDescription.client: clientID, 
                     ProcessDescription.processStatus: 0, 
@@ -453,7 +453,7 @@ def deleteProcesses(request, projectID):
         for processID in processIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files]:
-                    s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][fileObj]["id"])
+                    s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][fileObj][FileObjectContent.id])
                 
                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
                 request.session.modified = True

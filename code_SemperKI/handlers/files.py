@@ -226,7 +226,7 @@ def deleteFile(request, processID, fileID):
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
         
         deletions = {"changes": {}, "deletions": {}}
-        deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: {}}
+        deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
         
         # TODO send deletion to service, should the deleted file be the model for example
         

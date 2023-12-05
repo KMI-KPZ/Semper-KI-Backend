@@ -335,7 +335,7 @@ class ProcessManagementBase():
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                s3.manageLocalS3.deleteFile(entry[FileObjectContent.path])
+                s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
