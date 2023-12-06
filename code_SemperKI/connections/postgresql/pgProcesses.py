@@ -701,6 +701,10 @@ class ProcessManagementBase():
         # TODO for all files & messages: generate data and message entries and refill "files" and "messages" to link to that ID
         now = timezone.now()
         try:
+            # Check if there's anything to save
+            if SessionContentSemperKI.CURRENT_PROJECTS not in session:
+                return None
+            
             # first get user
             clientID = ProfileManagementBase.getUserHashID(session)
 

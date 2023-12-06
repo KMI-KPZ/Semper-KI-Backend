@@ -11,7 +11,7 @@ from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from ..utilities import basics, rights
+from ..utilities import basics, rights, signals
 from ..connections.postgresql import pgProfiles
 from django.views.decorators.http import require_http_methods
 from ..connections import auth0, redis
@@ -362,6 +362,9 @@ def callbackLogin(request):
         if isinstance(userObj, Exception):
             raise userObj
         
+        # communicate that user is logged in to other apps
+        signals.signalDispatcher.userLoggedIn.send(None,request=request)
+
         logger.info(f"{basics.Logging.Subject.USER},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},login,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
         return HttpResponseRedirect(request.session[SessionContent.PATH_AFTER_LOGIN])
     except Exception as e:
@@ -449,9 +452,8 @@ def logoutUser(request):
     if SessionContent.MOCKED_LOGIN in request.session and request.session[SessionContent.MOCKED_LOGIN] is True:
         mock = True
 
-    # TODO: Send signal to other apps that logout is occuring
-    # if "currentProjects" in request.session:
-    #     projectAndProcessManagement.saveProjects(request)
+    # Send signal to other apps that logout is occuring
+    signals.signalDispatcher.userLoggedOut.send(None,request=request)
 
     user = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getUser(request.session)
     if user != {}:

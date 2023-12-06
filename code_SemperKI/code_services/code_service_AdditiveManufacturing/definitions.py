@@ -20,3 +20,5 @@ class ServiceDetails(StrEnumExactylAsDefined):
     model = enum.auto()
     material = enum.auto()
     postProcessings = enum.auto()
+
+# TODO: Service Status Codes

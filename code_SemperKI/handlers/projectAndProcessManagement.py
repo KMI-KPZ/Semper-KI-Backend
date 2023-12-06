@@ -87,14 +87,22 @@ def createProjectID(request):
     # login defines client
     template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.status: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.details: {}, SessionContentSemperKI.processes: {}} 
 
-    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
-        template[ProcessDescription.client] = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-    
-    # save project template in session for now
     if SessionContentSemperKI.CURRENT_PROJECTS not in request.session:
         request.session[SessionContentSemperKI.CURRENT_PROJECTS] = {}
-    request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
-    request.session.modified = True
+
+    # if User is logged in, everything is database backend. For anonymous users, the cache suffices
+    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
+        template[ProcessDescription.client] = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        # save template only temporary in session and then in database
+        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
+        pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+        request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+        del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
+
+    else:
+        # save project template in session for now
+        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
+        request.session.modified = True
 
     #return just the id for the frontend
     return JsonResponse({ProjectDescription.projectID: projectID})
@@ -278,7 +286,8 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
                         if serviceType != serviceManager.getNone():
                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["changes"][ProcessUpdates.serviceDetails])
-                        # status, contractor
+                        else:
+                            raise Exception("No Service chosen!")
                     
                     elif elem == ProcessUpdates.serviceStatus:
                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = changes["changes"][ProcessUpdates.serviceStatus]
@@ -296,12 +305,36 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                 # deletions
                 if "deletions" in changes:
                     for elem in changes["deletions"]:
-                        if len(changes["deletions"][elem]) > 0:
-                            for entry in changes["deletions"][elem]:
-                                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][elem][entry]
-                        else:
-                            del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][elem]
-            
+                        if elem == ProcessUpdates.messages:
+                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"] = []
+                    
+                        elif elem == ProcessUpdates.files:
+                            for entry in changes["deletions"][ProcessUpdates.files]:
+                                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry]
+                        
+                        elif elem == ProcessUpdates.serviceType:
+                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = serviceManager.getNone()
+                        
+                        elif elem == ProcessUpdates.serviceDetails:
+                            serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
+                            if serviceType != serviceManager.getNone():
+                                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["deletions"][ProcessUpdates.serviceDetails])
+                            else:
+                                raise Exception("No Service chosen!")
+                        
+                        elif elem == ProcessUpdates.serviceStatus:
+                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = 0
+                        
+                        elif elem == ProcessUpdates.processDetails:
+                            for entry in changes["deletions"][ProcessUpdates.processDetails]:
+                                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry]
+                        
+                        elif elem == ProcessUpdates.processStatus:
+                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = ProcessStatus.DRAFT
+                        
+                        elif elem == ProcessUpdates.provisionalContractor:
+                            del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
+
                 request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.updatedWhen] = str(now)
             
             request.session.modified = True
@@ -664,10 +697,15 @@ def saveProjectsViaWebsocket(session):
 
     """
     try:
-        if manualCheckifLoggedIn(session) and manualCheckIfRightsAreSufficient(session, "saveProjects"):
+        if SessionContentSemperKI.CURRENT_PROJECTS in session and manualCheckifLoggedIn(session) and manualCheckIfRightsAreSufficient(session, "saveProjects"):
             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(session)
             if isinstance(error, Exception):
                 raise error
+            
+            session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+            del session[SessionContentSemperKI.CURRENT_PROJECTS]
+            #session.modified = True
+
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         return None
     
@@ -691,16 +729,18 @@ def saveProjects(request):
     """
 
     try:
-        # TODO Save picture and files in permanent storage, and change "files" field to urls
-        error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-        if isinstance(error, Exception):
-            raise error
+        if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
+            # TODO Save picture and files in permanent storage, and change "files" field to urls
+            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+            if isinstance(error, Exception):
+                raise error
 
-        request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-        del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
-        request.session.modified = True
+            request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+            del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
+            request.session.modified = True
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        
         return HttpResponse("Success")
     
     except (Exception) as error:

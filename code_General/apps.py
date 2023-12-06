@@ -1,3 +1,12 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging & Thomas Skodawessely 2023
+
+Contains: Modules that need to be imported
+
+"""
+import os, importlib, sys
 from django.apps import AppConfig
 from django.core.checks import register
 from .checks import Tags, checkEnv, checkDb, checkRedis
@@ -13,32 +22,70 @@ logger = getLogger("django_debug")
 # #
 from code_General.settings.base import ConfigHelper, BackendConfigHelper
 
-
+#######################################################
 class BackendDjangoConfig(AppConfig, BackendConfigHelper):
+    """
+    Readying the main app
+    
+    """
     name = 'code_General'
     checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
 
+    #######################################################
     def __init__(self,app_name, app_module):
         AppConfig.__init__(self,app_name, app_module)
         BackendConfigHelper.__init__(self)
 
+    #######################################################
+    def collectAllImports(self):
+        """
+        Collect all "imports.py" files and imports content
+
+        """
+        currentDirectory = os.getcwd()  # current working directory
+
+        for root, dirs, files in os.walk(currentDirectory):
+            if 'imports.py' in files:
+                serviceFilePath = os.path.join(root, 'imports.py')
+
+                # create module name by replacing the path separator with dots
+                moduleName = os.path.relpath(serviceFilePath, currentDirectory).replace(os.sep, '.').rstrip('.py')
+
+                # import the module
+                spec = importlib.util.spec_from_file_location(moduleName, serviceFilePath)
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[moduleName] = module
+                spec.loader.exec_module(module)
+
+                print(f"Imported module {moduleName}")
+
+    #######################################################
     def ready(self):
+        """
+        Start app
+
+        """
         from django.conf import settings
+        self.collectAllImports()
+
         if self.doCheck('check_env'):
             register(checkEnv, Tags.env_check) # register check_env function with tag env_check
         if self.doCheck('check_db'):
             register(checkDb, Tags.db_check) # register check_db function with tag db_check
         if self.doCheck('check_redis'):
             register(checkRedis, Tags.redis_check)
+
         super(BackendDjangoConfig, self).ready()
 
+    #######################################################
     def __repr__(self):
         return self.name
 
+    #######################################################
     def doCheck(self, check_name):
         """
         determine if check should be executed
-        :param check_name:
+        :param check_name: Name of the check
         :type check_name: str
         :return: True if check should be executed
         :rtype: bool

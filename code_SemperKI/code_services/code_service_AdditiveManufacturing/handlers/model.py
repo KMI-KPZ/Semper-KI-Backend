@@ -119,7 +119,12 @@ def deleteModel(request, processID):
         if modelExistsAsFile:
             deleteFile(request, processID, modelOfThisProcess[FileObjectContent.id])
         
-        pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, {ServiceDetails.model: ""}, pgProfiles.ProfileManagementBase.getUserHashID(request.session))
+        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.model: modelOfThisProcess[FileObjectContent.id]}}}
+        message, flag = updateProcessFunction(request, changes, currentProjectID, [processID])
+        if flag is False:
+            return JsonResponse({}, status=401)
+        if isinstance(message, Exception):
+            raise message
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},model {modelOfThisProcess[FileObjectContent.id]}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)

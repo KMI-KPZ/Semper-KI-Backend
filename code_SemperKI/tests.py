@@ -208,8 +208,29 @@ class TestProjects(TestCase):
             self.testFile.seek(0)
             contentOfTestFile = self.testFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True)
+        
+        self.testFile.seek(0)
+        # saved stuff
+        projectObj, processObj = self.createProjectAndProcess(client)
+        client.get("/"+paths["saveProjects"])
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile}
+        response = client.post("/"+paths["uploadFiles"], uploadBody )
+        self.assertIs(response.status_code == 200, True)
+        getProjPathSplit = paths["getProject"].split("/")
+        getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
+        response = json.loads(client.get("/"+getProjPath).content)
+        fileID = list(response[SessionContentSemperKI.processes][0][ProcessDescription.files].keys())[0]
 
-        # TODO repeat for saved stuff
+        downloadPathSplit = paths["downloadFile"].split("/")
+        downloadPath = downloadPathSplit[0] + "/" + downloadPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
+        response = client.get("/"+downloadPath)
+        with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
+            loaded_response_content = buf_bytes.read()
+            self.testFile.seek(0)
+            contentOfTestFile = self.testFile.read()
+            self.assertIs(loaded_response_content == contentOfTestFile, True)
+
+        
         
     #######################################################
     def test_sendProject(self):
@@ -222,25 +243,24 @@ class TestProjects(TestCase):
         response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
-        # # get Contractors for that service type
+        # get Contractors for that service type
         getContractorsPathSplit = paths["getContractors"].split("/")
         getContractorsPath = getContractorsPathSplit[0] + "/" + getContractorsPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/" + getContractorsPath).content)
         self.assertIs(len(response) > 0, True)
 
-        # # set contractor
+        # set contractor
         changes = { ProjectDescription.projectID: projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { ProcessUpdates.provisionalContractor: response[0][OrganizationDescription.hashedID]} }
         response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
-        # # verify and send
+        # verify and send
         body = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], "send": True, "processIDs": [processObj[ProcessDescription.processID]]}
         response = client.patch("/"+paths["verifyProject"], json.dumps(body))
         self.assertIs(response.status_code == 200, True)
 
-        # # get missed events of contractor
+        # get missed events of contractor
         response = json.loads(self.orgaClient.get("/"+paths["getMissedEvents"]).content)
-        print(response)
         self.assertIs(response["events"][0][SessionContentSemperKI.processes][0]["status"] > 0, True)
 
 

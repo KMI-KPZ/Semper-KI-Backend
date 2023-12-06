@@ -57,7 +57,7 @@ def deleteServiceDetails(existingContent, deletedContent):
     try:
         for entry in deletedContent:
             if entry == ServiceDetails.model:
-                existingContent[ServiceDetails.model] = FileObject()
+                existingContent[ServiceDetails.model] = {}
             elif entry == ServiceDetails.material:
                 existingContent[ServiceDetails.material] = ""
             elif entry == ServiceDetails.postProcessings:

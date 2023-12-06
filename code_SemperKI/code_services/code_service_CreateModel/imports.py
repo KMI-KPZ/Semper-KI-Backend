@@ -7,4 +7,4 @@ Contains: Modules that need to be imported
 
 """
 
-import code_services.code_service_CreateModel.service
+import code_SemperKI.code_services.code_service_CreateModel.service

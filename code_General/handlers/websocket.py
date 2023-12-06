@@ -12,7 +12,7 @@ from channels.exceptions import StopConsumer
 from asgiref.sync import sync_to_async
 
 from ..connections.postgresql import pgProfiles
-from ..utilities import rights
+from ..utilities import rights, signals
 
 from ..definitions import SessionContent
 
@@ -51,6 +51,10 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
                 # add rights
                 for entry in rights.rightsManagement.getRightsList():
                     await self.channel_layer.group_add(uID+entry, self.channel_name)
+
+                # Send signal to other apps that websocket has been connected
+                await sync_to_async(signals.signalDispatcher.websocketConnected.send)(None,session=session)
+
                 await self.accept()
         except Exception as e:
             logger.error(f'could not connect websocket: {str(e)}')
@@ -60,9 +64,8 @@ class GeneralWebSocket(AsyncJsonWebsocketConsumer):
         try:
             session = await sync_to_async(self.getSession)()
             if "user" in session:
-                # TODO: Signal
-                # if "currentProjects" in session:
-                #     await sync_to_async(saveProjectsViaWebsocket)(session)
+                # Send signal to other apps that websocket has been disconnected
+                await sync_to_async(signals.signalDispatcher.websocketDisconnected.send)(None,session=session)
 
                 if SessionContent.IS_PART_OF_ORGANIZATION in session:
                     if session[SessionContent.IS_PART_OF_ORGANIZATION]:
