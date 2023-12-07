@@ -22,6 +22,7 @@ Including another URLconf
 
 from django.urls import path, re_path
 from django.conf import settings
+from django.conf.urls import handler404
 
 ##############################################################################
 ### WSGI
@@ -145,7 +146,8 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns.append(path('private/settings', frontpage.getSettingsToken, name='getSettingsToken'))
 
-#urlpatterns.append(re_path(r'^.*', statistics.getIpAdress, name="everythingElse"))
+# any illegitimate requests are given a fu and their ip will be logged. Works only if DEBUG=False
+handler404 = statistics.getIpAdress
 
 ##############################################################################
 ### ASGI

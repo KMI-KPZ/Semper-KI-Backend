@@ -71,7 +71,7 @@ def getNumberOfUsers(request):
 
 
 ##############################################
-def getIpAdress(request):
+def getIpAdress(request, *args, **kwargs):
     """
     Get the IP Adress of any illegit request and write it to a log file
 

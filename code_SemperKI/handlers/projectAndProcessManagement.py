@@ -881,6 +881,15 @@ def getProcessHistory(request, processID):
             raise Exception("Process not found in DB!")
         
         listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
+        # parse for frontend
+        for index, entry in enumerate(listOfData):
+            outDatum = {}
+            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserViaHash(entry[DataDescription.createdBy]).name
+            outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
+            outDatum[DataDescription.type] = entry[DataDescription.type]
+            outDatum[DataDescription.data] = entry[DataDescription.data]
+            listOfData[index] = outDatum # overwrite
+
         outObj = {"history": listOfData}
 
         return JsonResponse(outObj)

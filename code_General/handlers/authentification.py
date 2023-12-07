@@ -163,7 +163,7 @@ def setOrganizationName(request):
     """
     if "https://auth.semper-ki.org/claims/organization" in request.session["user"]["userinfo"]:
         if len(request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"]) != 0:
-            request.session[SessionContent.ORGANIZATION_NAME] = request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"].capitalize()
+            request.session[SessionContent.ORGANIZATION_NAME] = request.session["user"]["userinfo"]["https://auth.semper-ki.org/claims/organization"]
         else:
             request.session[SessionContent.ORGANIZATION_NAME] = ""
     else:

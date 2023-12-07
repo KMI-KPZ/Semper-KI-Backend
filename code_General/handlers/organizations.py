@@ -131,8 +131,9 @@ def organizations_getInviteLink(request):
         orgID = request.session["user"]["userinfo"]["org_id"]
         userName = request.session["user"]["userinfo"]["nickname"]
         emailAdressOfUserToBeAdded = content["content"]["email"]
+        roleID = content["content"]["roleID"]
 
-        data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": False }
+        data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "roles": [roleID], "send_invitation_email": False }
         
         response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
@@ -176,8 +177,9 @@ def organizations_addUser(request):
         orgID = request.session["user"]["userinfo"]["org_id"]
         userName = request.session["user"]["userinfo"]["nickname"]
         emailAdressOfUserToBeAdded = content["content"]["email"]
+        roleID = content["content"]["roleID"]
 
-        data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "send_invitation_email": True }
+        data = { "inviter": { "name": userName }, "invitee": { "email": emailAdressOfUserToBeAdded }, "client_id": settings.AUTH0_ORGA_CLIENT_ID, "connection_id": "con_t6i9YJzm5KLo4Jlf", "ttl_sec": 0, "roles":[roleID], "send_invitation_email": True }
         
         response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations/{orgID}/invitations', headers=headers, json=data))
         if isinstance(response, Exception):
@@ -746,7 +748,6 @@ def organizations_getPermissionsForRole(request):
             return HttpResponse("Failed - " + str(e), status=500)
 
 #######################################################
-@checkIfUserIsLoggedIn
 @require_http_methods(["POST"])
 def organizations_createNewOrganization(request):
     """
@@ -773,6 +774,7 @@ def organizations_createNewOrganization(request):
         baseURL = f"https://{settings.AUTH0_DOMAIN}"
 
         # create organization
+        metadata = {} if "metadata" not in content["content"] else content["content"]["metadata"]
         data = { "name": content["content"]["name"], 
                 "display_name": content["content"]["display_name"], 
                 "branding":
@@ -781,7 +783,7 @@ def organizations_createNewOrganization(request):
                      { "primary": content["content"]["primary_color"], 
                         "page_background": content["content"]["background_color"] }
                     },
-                "metadata": content["content"]["metadata"],
+                "metadata": metadata,
                 "enabled_connections": [ { "connection_id": "con_t6i9YJzm5KLo4Jlf", "assign_membership_on_login": False } ] }
 
         response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/organizations', headers=headers, json=data) )
@@ -791,7 +793,7 @@ def organizations_createNewOrganization(request):
         org_id = response["id"]
         
         # create admin role
-        roleName = content["content"]["name"] + "-" + "admin"
+        roleName = content["content"]["display_name"] + "-" + "admin"
         roleDescription = "admin"
 
         data = { "name": roleName, "description": roleDescription}
@@ -799,6 +801,19 @@ def organizations_createNewOrganization(request):
         if isinstance(response, Exception):
             raise response
         roleID = response["id"]
+
+        # connect admin role with permissions
+        response = handleTooManyRequestsError( lambda : requests.get(f'{baseURL}/api/v2/resource-servers/back.semper-ki.org', headers=headers) )
+        if isinstance(response, Exception):
+            raise response
+
+        data = {"permissions": []}
+        for entry in response["scopes"]:
+            data["permissions"].append({"resource_server_identifier": "back.semper-ki.org", "permission_name": entry["value"]})
+
+        response = handleTooManyRequestsError( lambda : requests.post(f'{baseURL}/api/v2/roles/{roleID}/permissions', headers=headers, json=data) )
+        if isinstance(response, Exception):
+            raise response
 
         # invite person to organization as admin
         email = content["content"]["email"]
