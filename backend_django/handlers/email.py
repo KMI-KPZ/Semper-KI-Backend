@@ -8,22 +8,27 @@ Contains: handlers for sending emails out of different front end forms
 
 import json
 from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from backend_django.services.mailer import KissMailer
 from django.conf import settings
 from logging import getLogger
 
-logger = getLogger("django")
+logger = getLogger("django_debug")
+
 
 @require_http_methods(["POST"])
+@ensure_csrf_cookie
 def send_contact_form(request):
     """
     Send an email from the contact form from the front end
     :param request: HTTP POST request
+    :type request: HttpRequest
     :return: JSON to front end having a status and result field with the email count or False
+    :rtype: JsonResponse
     """
 
-    #TODO check if logging is necessary
+    # TODO check if logging is necessary
     logger.info(f'received contact form input: "{str(request.body)}')
     data = json.loads(request.body.decode("utf-8"))
     # check if all fields are present

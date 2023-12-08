@@ -11,12 +11,15 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-from backend_django.utilities import crypto, basics
+from backend_django.utilities import  basics
 
 from ...modelFiles.profileModel import User, Organization
 from ...modelFiles.projectModels import Process, Project
 
-from backend_django.services import redis, aws
+from backend_django.services import  aws
+
+import logging
+logger = logging.getLogger("django_debug")
 
 #TODO: switch to async versions at some point
 
@@ -52,7 +55,7 @@ class ProcessManagementBase():
         except (ObjectDoesNotExist) as error:
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get process object: {str(error)}')
         
         return None
     
@@ -74,7 +77,7 @@ class ProcessManagementBase():
         except (ObjectDoesNotExist) as error:
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get project object: {str(error)}')
         
         return None
 
@@ -127,7 +130,7 @@ class ProcessManagementBase():
                 return output
 
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get project: {str(error)}')
         
         return {}
     
@@ -152,7 +155,7 @@ class ProcessManagementBase():
             users.extend(list(Organization.objects.filter(hashedID=currentProcess.contractor).all()))
             return users
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get all users of process: {str(error)}')
         return []
     
     ##############################################
@@ -170,7 +173,7 @@ class ProcessManagementBase():
             currentProcess = Process.objects.get(processID=processID)
             return currentProcess.projectKey.projectID
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get project ID via process ID: {str(error)}')
             return ""
 
     ##############################################
@@ -199,11 +202,12 @@ class ProcessManagementBase():
             else:
                 currentProcess.projectKey.updatedWhen = updated
                 currentProcess.delete()
+                currentProcess.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not delete process: {str(error)}')
         return False
     
     ##############################################
@@ -229,11 +233,12 @@ class ProcessManagementBase():
                     aws.manageLocalAWS.deleteFile(process.files[entry]["id"])
 
             currentProject.delete()
+            currentProject.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not delete project: {str(error)}')
         return False
 
     ##############################################
@@ -268,7 +273,7 @@ class ProcessManagementBase():
                 currentProject.save()
             return True
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not update project: {str(error)}')
             return error
     
     ##############################################
@@ -316,7 +321,7 @@ class ProcessManagementBase():
             currentProcess.save()
             return True
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not update process: {str(error)}')
             return error
     
     ##############################################
@@ -338,7 +343,7 @@ class ProcessManagementBase():
                 contractorObj.save()
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not send process: {str(error)}')
             return error
 
     ##############################################
@@ -390,7 +395,7 @@ class ProcessManagementBase():
             currentProcess.save()
             return True
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not delete from process: {str(error)}')
             return error
 
     ##############################################
@@ -424,7 +429,7 @@ class ProcessManagementBase():
             processObj = Process.objects.create(processID=processID, projectKey=projectObj, service=service, status=status, serviceStatus=serviceStatus, messages=messages, details=details, files=files, client=clientID, contractor=selectedManufacturer, updatedWhen=timezone.now())
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not add process template to project: {str(error)}')
             return error
 
 
@@ -568,7 +573,7 @@ class ProcessManagementUser(ProcessManagementBase):
 
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not add project to database: {str(error)}')
             return error
 
     ##############################################
@@ -620,7 +625,7 @@ class ProcessManagementUser(ProcessManagementBase):
             return output
 
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get projects: {str(error)}')
         
         return []
     
@@ -662,7 +667,7 @@ class ProcessManagementUser(ProcessManagementBase):
             return output
 
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get projects flat: {str(error)}')
         
         return []
 
@@ -725,7 +730,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
 
             return None
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not add project to database: {str(error)}')
             return error
 
     ##############################################
@@ -809,7 +814,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
             return output
 
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get projects: {str(error)}')
         
         return []
     
@@ -878,7 +883,7 @@ class ProcessManagementOrganization(ProcessManagementBase):
             return output
 
         except (Exception) as error:
-            print(error)
+            logger.error(f'could not get projects: {str(error)}')
         
         return []
     

@@ -7,20 +7,16 @@ Contains: Authentification handling using Auth0
 """
 
 import json, datetime, requests, logging
-from anyio import sleep
 from django.conf import settings
 from django.urls import reverse
 from urllib.parse import quote_plus, urlencode
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-
 from ..utilities import basics
-
-from ..services.postgresDB import pgProcesses, pgProfiles
+from ..services.postgresDB import pgProfiles
 from . import projectAndProcessManagement
 from django.views.decorators.http import require_http_methods
-
 from ..services import auth0, redis
-    
+
 
 logger = logging.getLogger("logToFile")
 #######################################################
@@ -295,7 +291,7 @@ def setRoleAndPermissionsOfUser(request):
 
         return True
     except Exception as e:
-        print(f'Generic Exception: {e}')
+        logger.error(f'Generic Exception: {e}')
         return e
 
 #######################################################

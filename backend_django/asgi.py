@@ -6,36 +6,26 @@ It exposes the ASGI callable as a module-level variable named ``application``.
 For more information on this file, see
 https://docs.djangoproject.com/en/4.1/howto/deployment/asgi/
 """
-
-# import os
+import os
 
 # from django.core.asgi import get_asgi_application
-
 # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend_django.settings')
-
 # application = get_asgi_application()
 
 
-import os
-import sys
-
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
 from channels.sessions import SessionMiddlewareStack
 
 from .settings import set_settings
 
-#print sys.argv to console
-print(f'ASGI: {str(sys.argv)}')
 set_settings()
 
 django_asgi_app = get_asgi_application()
 
 from .urls import websockets
-#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend_django.settings.base")
-
+os.environ.setdefault('SERVER_GATEWAY_INTERFACE', 'asgi')
 
 application = ProtocolTypeRouter(
     {
