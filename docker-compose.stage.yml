@@ -5,7 +5,7 @@ services:
     image: backend-stage
     build:
       context: .
-      dockerfile: ./Dockerfile_new
+      dockerfile: ./Dockerfile
     command: ["-e stage"]
     ports:
       - 127.0.0.1:8000:8000
@@ -30,61 +30,10 @@ services:
       - 127.0.0.1:6379:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
-      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
-    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  celery-worker-stage:
-    build:
-      context: .
-    container_name: celery-worker-stage
-    entrypoint: celery
-    environment:
-      - MODE=stage
-    command: -A backend_django.celery worker --loglevel=info
-    volumes:
-      - .:/var/www/app/worker
-    links:
-      - files-stage
-    depends_on:
-      - files-stage
-
-  celery-beat-stage:
-    build:
-      context: .
-    container_name: celery-beat
-    entrypoint: celery
-    environment:
-      - MODE=stage
-    command: -A backend_django.celery beat --loglevel=info
-    volumes:
-      - .:/var/www/app/beat
-    links:
-      - celery-worker-stage
-      - files-stage
-    depends_on:
-      - celery-worker-stage
-      - files-stage
-
-  flower-stage:
-    image: mher/flower
-    env_file:
-      - .env.stage
-    container_name: flower-stage
-    volumes:
-      - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
-    entrypoint: /usr/local/bin/dc-service-flower-start.sh
-    ports:
-      - 8888:8888
-    links:
-      - files-stage
-      - celery-worker-stage
-      - celery-beat-stage
-    depends_on:
-      - files-stage
-      - celery-worker-stage
-      - celery-beat-stage
   
   localstack-stage:
     image: localstack/localstack

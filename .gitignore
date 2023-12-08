@@ -95,9 +95,6 @@ ipython_config.py
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
@@ -135,13 +132,13 @@ backend_django/env_example.env
 
 #doc/build/html/
 
-/logs/*
+/logs/*.txt
 
 quickDebug.py
 
 .env.dev
 
-
+backend.code-workspace
 
 localstack/
 

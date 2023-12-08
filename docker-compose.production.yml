@@ -5,7 +5,7 @@ services:
     image: backend-prod
     build:
       context: .
-      dockerfile: ./Dockerfile_new
+      dockerfile: ./Dockerfile
     command: ["-e prod"]
     ports:
       - 127.0.0.1:8001:8000
@@ -32,58 +32,10 @@ services:
       - 127.0.0.1:6380:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
-      - ./docker/dc-service-redis-start.sh:/usr/local/bin/dc-service-redis-start.sh
-    entrypoint: /usr/local/bin/dc-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  celery-worker-prod:
-    build:
-      context: .
-    entrypoint: celery
-    environment:
-      - MODE=prod
-    command: -A backend_django.celery worker --loglevel=info
-    volumes:
-      - .:/var/www/app/worker
-    links:
-      - files-prod
-    depends_on:
-      - files-prod
-
-  celery-beat-prod:
-    build:
-      context: .
-    entrypoint: celery
-    environment:
-      - MODE=prod
-    command: -A backend_django.celery beat --loglevel=info
-    volumes:
-      - .:/var/www/app/beat
-    links:
-      - celery-worker-prod
-      - files-prod
-    depends_on:
-      - celery-worker-prod
-      - files-prod
-
-  flower-prod:
-    image: mher/flower
-    env_file:
-      - .env.prod
-    volumes:
-      - ./docker/dc-service-flower-start.sh:/usr/local/bin/dc-service-flower-start.sh
-    entrypoint: /usr/local/bin/dc-service-flower-start.sh
-    ports:
-      - 8889:8888
-    links:
-      - files-prod
-      - celery-worker-prod
-      - celery-beat-prod
-    depends_on:
-      - files-prod
-      - celery-worker-prod
-      - celery-beat-prod
 
   localstack-prod:
     image: localstack/localstack

@@ -1,0 +1,76 @@
+:py:mod:`code_General.helper.classes`
+=====================================
+
+.. py:module:: code_General.helper.classes
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   code_General.helper.classes.ConfigHelper
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   code_General.helper.classes.logger
+
+
+.. py:data:: logger
+   
+
+   
+
+.. py:class:: ConfigHelper
+
+   .. py:attribute:: env_vars
+      
+
+      
+
+   .. py:attribute:: env_vars_internal
+      
+
+      
+
+   .. py:attribute:: env_vars_external
+      
+
+      
+
+   .. py:attribute:: dbs
+      :annotation: = []
+
+      
+
+   .. py:method:: getEnvVars()
+
+
+   .. py:method:: getEnvVarsInternal()
+
+
+   .. py:method:: getEnvVarsExternal()
+
+
+   .. py:method:: checkEnvVars()
+
+
+   .. py:method:: loadEnvVars(target_module)
+
+
+   .. py:method:: getDbAliases() -> tuple
+
+
+   .. py:method:: doCheck() -> bool
+
+
+

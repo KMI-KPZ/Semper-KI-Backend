@@ -1,7 +1,7 @@
 {
     "name": "Python 3",
     //"context": "..",
-    "dockerComposeFile": ["../dc-local-dev-services.yml"], // You need to point it your `docker-compose.yml` file with proper path.
+    "dockerComposeFile": ["../docker-local-dev-services.yml"], // You need to point it your `docker-compose.yml` file with proper path.
     // Uncomment the next line if you want to publish any ports.
     "devPort": 8000,
     // Uncomment the next line to run commands after the container is created.

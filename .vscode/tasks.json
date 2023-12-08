@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command" :"docker-compose",
 			"args": [
-				"-p", "vs-code-dev-services", "-f", "./dc-local-dev-services.yml","up","-d"
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","up","-d"
 			],
 			"group": {
 				"kind":"build",
@@ -28,7 +28,7 @@
 			"platform": "python",
 			"dockerBuild": {
 				"tag": "backend:latest",
-				"dockerfile": "${workspaceFolder}/Dockerfile_new",
+				"dockerfile": "${workspaceFolder}/Dockerfile",
 				"context": "${workspaceFolder}",
 				"pull": true
 			},
@@ -54,7 +54,7 @@
 			},
 			"python": {
 				"args": [
-					"backend_django.asgi:application --reload --reload-include *.* --reload-exclude  *.log  --reload-dir ./backend_django --log-level info --env-file ./.env.dev --host 0.0.0.0 --port 8000 "
+					"code_General.asgi:application --reload --reload-include *.* --reload-exclude  *.log  --reload-dir ./code_General --log-level info --env-file ./.env.dev --host 0.0.0.0 --port 8000 "
 				],
 
 				"module":"uvicorn"
@@ -65,7 +65,7 @@
 			"type": "shell",
 			"command": "docker-compose",
 			"args": [
-				"-p", "vs-code-dev-services", "-f", "./dc-local-dev-services.yml","down"
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","down"
 			],
 			"group": {
 				"kind":"build",
