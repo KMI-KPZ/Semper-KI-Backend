@@ -1,9 +1,18 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: File upload helpers
+"""
+
+
 import os
 from io import BytesIO
 
 from django.http import FileResponse
 
-
+#######################################################
 def syncBytesioIterator(bytesio: BytesIO, chunk_size: int = 8192):
     """
     Synchronous iterator for bytesio
@@ -23,7 +32,7 @@ def syncBytesioIterator(bytesio: BytesIO, chunk_size: int = 8192):
             break
         yield chunk
 
-
+#######################################################
 async def asyncBytesioIterator(bytesio: BytesIO, chunk_size: int = 8192):
     """
     Asynchronous iterator for bytesio
@@ -43,7 +52,7 @@ async def asyncBytesioIterator(bytesio: BytesIO, chunk_size: int = 8192):
             break
         yield chunk
 
-
+#######################################################
 def createFileResponse(bytesio: BytesIO, filename: str) -> FileResponse:
     """
     Create a file response for a given file and sync/async context

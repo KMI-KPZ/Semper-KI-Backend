@@ -6,7 +6,9 @@ Silvio Weging 2023
 Contains: Handling test calls and getting a csrf cookie
 """
 
-from django.http import HttpResponse
+import json
+
+from django.http import HttpResponse, JsonResponse
 
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 
@@ -72,12 +74,17 @@ def testCallToWebsocket(request):
         return HttpResponse("Success", status=200)
     return HttpResponse("Not Logged In", status=401)
 
+###################################################
 class Counter():
     counter = 1
 counter = Counter
 
 ###################################################
 def dynamic(request):
+    """
+    Dynamically generate buttons just for fun
+    
+    """
     templateEdit = {"title": "Test", "icon": "Edit", "action": "public/dynamic/", "payload": {"number": counter.counter, "Context": "Add"}}
     templateDelete = {"title": "Test", "icon": "Delete", "action": "public/dynamic/", "payload": {"number": counter.counter, "Context": "Delete"}}
     dynamicObject = {"Buttons": []}
