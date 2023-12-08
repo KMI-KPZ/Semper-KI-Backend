@@ -25,6 +25,7 @@ from ..utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRigh
 from ..handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
 from ..services import redis, aws
+from ..utilities.files import createFileResponse
 
 logger = logging.getLogger("logToFile")
 
@@ -165,7 +166,7 @@ def downloadFile(request, processID, fileID):
                     
                 logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {filesOfThisProcess[elem]['title']}," + str(datetime.now()))
                     
-                return FileResponse(content, filename=filesOfThisProcess[elem]["title"], as_attachment=True) #, content_type='multipart/form-data')
+                return createFileResponse(content, filename=filesOfThisProcess[elem]["title"]) #, content_type='multipart/form-data')
         
         return HttpResponse("Not found!", status=404)
     except (Exception) as error:
@@ -225,7 +226,7 @@ def downloadFilesAsZip(request, processID):
         zipFile.seek(0) # reset zip file
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
-        return FileResponse(zipFile, filename=processID+".zip", as_attachment=True) #, content_type='multipart/form-data')
+        return createFileResponse(zipFile, filename=processID + ".zip") #, content_type='multipart/form-data')
 
     except (Exception) as error:
         logger.error(f"Error while downloading files as zip: {str(error)}")
