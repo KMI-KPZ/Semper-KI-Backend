@@ -16,7 +16,7 @@ from backend_django.utilities import crypto
 class mockPicture():
 
     def __init__(self):
-        self.mockPicturePath = settings.STATIC_URL+"/media/testpicture.jpg"
+        self.mockPicturePath = settings.STATIC_URL+"media/testpicture.jpg"
 
 testpicture = mockPicture()
 

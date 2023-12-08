@@ -38,6 +38,7 @@ paths = {
     "test": 'public/test/',
     "csrfTest": 'public/testCsrf/',
     "csrfCookie": 'public/csrfCookie/',
+    "dynamicTest": 'public/dynamic/',
 
     "login" : "public/login/",
     "logout": "public/logout/",
@@ -156,6 +157,8 @@ urlpatterns = [
     path(paths["csrfCookie"], test_response.testResponseCsrf, name='test_response_csrf'),
     path('private/test/', test_response.testResponse, name='test_response'),
     path('private/testWebsocket/', test_response.testCallToWebsocket, name='testCallToWebsocket'),
+    path(paths["dynamicTest"], test_response.dynamic, name='dynamic'),
+
     path(paths["login"], authentification.loginUser, name="loginUser"),
     path(paths["logout"], authentification.logoutUser, name="logoutUser"),
     path(paths["callback"], authentification.callbackLogin, name="callbackLogin"),

@@ -202,6 +202,7 @@ class ProcessManagementBase():
             else:
                 currentProcess.projectKey.updatedWhen = updated
                 currentProcess.delete()
+                currentProcess.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
@@ -232,6 +233,7 @@ class ProcessManagementBase():
                     aws.manageLocalAWS.deleteFile(process.files[entry]["id"])
 
             currentProject.delete()
+            currentProject.save()
             return True
         except (ObjectDoesNotExist) as error:
             return None
