@@ -9,17 +9,6 @@ Contains: Handlers for interacting with Celery tasks using Flower API
 
 ###################################################################
 
-# 1. send tasks with arguments
-#     and obtain the taskid
-# 2. get the status of the task from the taskid
-# 3. show the results of the task from the taskid.
-
-# APIs to communicate with flower to perform the above tasks
-# https://flower.readthedocs.io/en/latest/api.html
-#POST http://flower:8888/api/task/send-task/taskname
-#GET  http://flower:8888/api/task/result/taskid
- ###################################################################
-
 import requests
 
 import time
@@ -99,14 +88,20 @@ class CeleryTaskManager:
 
 
 ########################################################################################
-    
+# 1. send tasks with arguments
+#     and obtain the taskid
+# 2. get the status of the task from the taskid
+# 3. show the results of the task from the taskid.
 
-# # Example usage
+# APIs to communicate with flower to perform the above tasks
+# https://flower.readthedocs.io/en/latest/api.html
+#POST http://flower:8888/api/task/send-task/taskname
+#GET  http://flower:8888/api/task/result/taskid
+   
+# Example usage
 # data = {
 #     "args": [4, 77]
 # }
-# Specify the callback URL when creating the CeleryTaskManager instance
-
 # task_manager = CeleryTaskManager(taskname='trialtask', data=data)
 # task_manager.check_status()
 
