@@ -900,8 +900,6 @@ def getProcessHistory(request, processID):
     """
     try:
         processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-        
-        # TODO: Check if user is allowed to see this!
 
         if processObj == None:
             raise Exception("Process not found in DB!")
@@ -922,4 +920,5 @@ def getProcessHistory(request, processID):
     
     except (Exception) as error:
         loggerError.error(f"viewProcessHistory: {str(error)}")
-        return JsonResponse({})
+        return JsonResponse({}, status=500)
+    

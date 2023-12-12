@@ -16,7 +16,8 @@
             "getMissedEvents",
             "getProject",
             "getFlatProjects",
-            "getProcessHistory"
+            "getProcessHistory",
+            "downloadProcessHistory"
          ]
       },
       {
@@ -34,7 +35,8 @@
             "uploadFiles",
             "uploadModel",
             "deleteFile",
-            "deleteModel"
+            "deleteModel",
+            "downloadProcessHistory"
          ]
       },
       {

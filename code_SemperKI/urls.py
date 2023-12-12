@@ -65,7 +65,7 @@ paths.update({
     "downloadFile": "public/downloadFile/<processID>/<fileID>/",
     "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>/",
     "deleteFile": "public/deleteFile/<processID>/<fileID>/",
-
+    "downloadProcessHistory": "public/downloadProcessHistory/<processID>/",
 })
 
 # The name must remain "oath" as the content is included in the urls.py in code_General
@@ -104,7 +104,7 @@ urlpatterns.extend([
     path(paths["downloadFile"], files.downloadFile, name="downloadFile"),
     path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
     path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
-
+    path(paths["downloadProcessHistory"], files.downloadProcessHistory, name="downloadProcessHistory")
     
 ])
 

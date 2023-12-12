@@ -57,11 +57,11 @@ def deleteServiceDetails(existingContent, deletedContent):
     try:
         for entry in deletedContent:
             if entry == ServiceDetails.model:
-                existingContent[ServiceDetails.model] = {}
+                del existingContent[ServiceDetails.model]
             elif entry == ServiceDetails.material:
-                existingContent[ServiceDetails.material] = ""
+                del existingContent[ServiceDetails.material]
             elif entry == ServiceDetails.postProcessings:
-                existingContent[ServiceDetails.postProcessings] = ""
+                del existingContent[ServiceDetails.postProcessings]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 

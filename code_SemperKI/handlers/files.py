@@ -9,6 +9,10 @@ Contains: File upload handling
 import logging, zipfile
 from io import BytesIO
 from datetime import datetime
+import math
+
+from reportlab.pdfgen import canvas
+from reportlab.lib import pagesizes
 
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_http_methods
@@ -16,7 +20,7 @@ from django.utils import timezone
 
 from code_General.utilities import crypto
 from code_General.connections.postgresql import pgProfiles
-from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from code_General.utilities.files import createFileResponse
 from code_General.definitions import FileObjectContent
 from code_General.connections import s3
@@ -25,6 +29,7 @@ from .projectAndProcessManagement import updateProcessFunction, getProcessAndPro
 
 from ..connections.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription
+from ..utilities.basics import checkIfUserMaySeeProcess
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -183,6 +188,78 @@ def downloadFilesAsZip(request, processID):
     except (Exception) as error:
         loggerError.error(f"Error while downloading files as zip: {str(error)}")
         return HttpResponse("Failed", status=500)
+
+#######################################################
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"]) 
+@checkIfRightsAreSufficient(json=False)
+@checkIfUserMaySeeProcess(json=False)
+def downloadProcessHistory(request, processID):
+    """
+    See who has done what and when and download this as pdf
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param processID: The process of interest
+    :type processID: str
+    :return: PDF of process history
+    :rtype: Fileresponse
+
+    """
+    try:
+        # get Project
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        if processObj == None:
+            raise Exception("Process not found in DB!")
+
+        # gather interesting info
+        listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
+        
+        # TODO delete this
+        while len(listOfData) < 90:
+            listOfData.extend(listOfData)
+        
+        fontsize = 12.0
+        maxEntriesPerPage = math.floor(pagesizes.A4[1]/fontsize)
+        numberOfPages = math.ceil(len(listOfData)/(pagesizes.A4[1]/fontsize))
+
+        # create file like object
+        outPDFBuffer = BytesIO()
+        outPDF = canvas.Canvas(outPDFBuffer, pagesize=pagesizes.A4, bottomup=0, initialFontSize=fontsize)
+        
+        # make pretty
+        defaultY = pagesizes.A4[1]-fontsize
+        x = 0
+        y = defaultY
+        pageNumber = 1
+        for idx, entry in enumerate(listOfData):
+            createdBy = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            createdWhen = entry[DataDescription.createdWhen]
+            typeOfData = entry[DataDescription.type]
+            dataContent = entry[DataDescription.data]
+            outString = f"{idx},{createdBy},{createdWhen},{typeOfData},{dataContent}"
+            outPDF.drawString(x,y,outString)
+            y -= fontsize
+            if idx > maxEntriesPerPage*pageNumber:
+                # render pdf page
+                outPDF.showPage()
+                pageNumber += 1
+                y = defaultY
+
+
+        # save pdf
+        outPDF.showPage()
+        outPDF.save()
+        outPDFBuffer.seek(0)
+
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},history as pdf," + str(datetime.now()))
+
+        # return file
+        return createFileResponse(outPDFBuffer, filename=processID+".pdf")
+    
+    except (Exception) as error:
+        loggerError.error(f"viewProcessHistory: {str(error)}")
+        return HttpResponse("Error!", status=500)
 
 
 #######################################################
