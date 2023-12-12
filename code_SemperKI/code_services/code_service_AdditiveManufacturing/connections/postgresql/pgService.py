@@ -10,7 +10,7 @@ from code_General.definitions import FileObject
 
 from ...definitions import ServiceDetails
 import logging
-logger = logging.getLogger("django_debug")
+logger = logging.getLogger("errors")
 
 ####################################################################################
 def updateServiceDetails(existingContent, newContent):

@@ -16,7 +16,7 @@ from logging import getLogger
 
 from ...definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
 
-logger = getLogger("django")
+logger = getLogger("errors")
 
 #TODO: switch to async versions at some point
 
@@ -124,7 +124,9 @@ class ProfileManagementBase():
         hashID = ""
         try:
             userID = session["user"]["userinfo"]["sub"]
-            hashID = User.objects.get(subID=userID).hashedID
+            userObj = User.objects.get(subID=userID)
+            if userObj != None:
+                hashID = userObj.hashedID
         except (Exception) as error:
             logger.error(f"Error getting user hash: {str(error)}")
 
@@ -182,8 +184,32 @@ class ProfileManagementBase():
 
         :param hashedID: hashed ID
         :type hashedID: str
-        :return: Dict from database
-        :rtype: Dict
+        :return: Object from database and whether it's an orga(True) or not
+        :rtype: Tuple of Object and bool
+
+        """
+        ObjOfUserOrOrga = None
+        organizationOrNot = True
+        try:
+            ObjOfUserOrOrga = Organization.objects.get(hashedID=hashedID)
+        except (ObjectDoesNotExist) as error:
+            ObjOfUserOrOrga = User.objects.get(hashedID=hashedID)
+            organizationOrNot = False
+        except (Exception) as error:
+            logger.error(f"Error getting user via hash: {str(error)}")
+
+        return (ObjOfUserOrOrga, organizationOrNot)
+    
+    ##############################################
+    @staticmethod
+    def getUserNameViaHash(hashedID):
+        """
+        Retrieve User Object via Database and hashkey
+
+        :param hashedID: hashed ID
+        :type hashedID: str
+        :return: Name of user/orga from database
+        :rtype: Str
 
         """
         ObjOfUserOrOrga = ""
@@ -194,7 +220,7 @@ class ProfileManagementBase():
         except (Exception) as error:
             logger.error(f"Error getting user via hash: {str(error)}")
 
-        return ObjOfUserOrOrga
+        return ObjOfUserOrOrga.name
 
     ##############################################
     @staticmethod

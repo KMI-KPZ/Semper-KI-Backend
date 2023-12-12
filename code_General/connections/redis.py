@@ -10,8 +10,9 @@ import logging
 import redis, json, pickle
 from django.conf import settings
 
-logger = logging.getLogger("django_debug")
+logger = logging.getLogger("errors")
 
+####################################################################################
 class RedisConnection():
 
     redis_instance = ""

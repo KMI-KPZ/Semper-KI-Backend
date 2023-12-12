@@ -1,16 +1,29 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: Writing Mails
+"""
+import logging
+
 from django.core import mail
 from django.conf import settings
 
+loggerDebug = logging.getLogger("django_debug")
+loggerError = logging.getLogger("errors")
 
-
+####################################################################################
 class KissMailer():
     """
-        later add some other stuff and configuration things as well as perhaps a html template.
-        for now just send a mail via default django smtp sendmail
+    later add some other stuff and configuration things as well as perhaps a html template.
+    For now just send a mail via default django smtp sendmail
     """
 
     def sendmail(self, to, subject, message):
         """
+        Send a mail
+
         :param self: mailer object
         :type self: KissMailer
         :param to: recipient email address (1 only)
@@ -22,9 +35,8 @@ class KissMailer():
         :return: number of sent emails or False on failure
         :rtype: int or bool
         """
-        import logging
-        logger = logging.getLogger("django_debug")
-        logger.debug(f'creating mail to {to} with subject {subject} and message {message}')
+
+        loggerDebug.debug(f'creating mail to {to} with subject {subject} and message {message}')
         try:
             connection = mail.get_connection()
             email = mail.send_mail(
@@ -35,5 +47,5 @@ class KissMailer():
                 connection=connection)
             return email
         except Exception as e:
-            logging.error(f'error sending mail: {e}')
+            loggerError.error(f'error sending mail: {e}')
             return False

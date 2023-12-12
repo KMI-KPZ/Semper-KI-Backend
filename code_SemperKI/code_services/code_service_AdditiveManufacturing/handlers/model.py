@@ -28,6 +28,7 @@ from ..definitions import ServiceDetails
 from ..connections.postgresql import pgService
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
 
 #######################################################
 @require_http_methods(["POST"])
@@ -81,7 +82,7 @@ def uploadModel(request):
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},model {fileName},"+str(datetime.now()))
         return JsonResponse(model)
     except (Exception) as error:
-        logger.error(f"Error while uploading model: {str(error)}")
+        loggerError.error(f"Error while uploading model: {str(error)}")
         return JsonResponse({}, status=500)
     
 
@@ -129,5 +130,5 @@ def deleteModel(request, processID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},model {modelOfThisProcess[FileObjectContent.id]}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)
     except (Exception) as error:
-        logger.error(f"Error while deleting file: {str(error)}")
+        loggerError.error(f"Error while deleting file: {str(error)}")
         return HttpResponse("Failed", status=500)

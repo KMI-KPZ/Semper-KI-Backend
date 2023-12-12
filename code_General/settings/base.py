@@ -331,6 +331,11 @@ LOGGING = {
             'propagate': False,
             'level': 'WARNING',
         },
+        'errors': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'ERROR'
+        },
         'logToFile': { # the logger used in every handler, needs to be called manually
             'handlers': ['file','console'],
             'propagate': False,

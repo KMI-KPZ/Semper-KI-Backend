@@ -1,14 +1,25 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: 
+"""
+
 from django.core.management.base import BaseCommand
 from code_General.connections.mailer import KissMailer
 from logging import getLogger
 logging = getLogger("django_debug")
 
+####################################################################################
 class Command(BaseCommand):
     """
-    sends a test mail to see if config is correct
+    Sends a test mail to see if config is correct
+    
     """
     help = 'sends a test mail to see if config is correct'
 
+    ##############################################
     def add_arguments(self, parser):
         """
         :param self: Command object
@@ -20,6 +31,7 @@ class Command(BaseCommand):
         """
         parser.add_argument('to', type=str, help='the mail address to send the test mail to')
 
+    ##############################################
     def handle(self, *args, **options):
         """
         :param self: Command object

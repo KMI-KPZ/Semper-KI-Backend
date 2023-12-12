@@ -16,19 +16,18 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from code_General.utilities import crypto, rights
-
-from ..connections.postgresql import pgProcesses
+from code_General.connections import s3
+from code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
+from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from code_General.connections.postgresql import pgProfiles
 
-from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from ..connections.postgresql import pgProcesses
 from ..definitions import *
 from ..services import serviceManager
-
-from code_General.connections import s3
-
-from code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
+from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
 ################################################################################################
 
 #######################################################
@@ -132,6 +131,10 @@ def updateProject(request):
             request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
+                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+                if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+                    return HttpResponse("Not allowed!", status=401)
+                
                 if ProjectDescription.status in changes["changes"]:
                     returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.status, changes["changes"][ProjectDescription.status])
                     if isinstance(returnVal, Exception):
@@ -160,7 +163,7 @@ def updateProject(request):
 
         return HttpResponse("Success")
     except (Exception) as error:
-        logger.error(f"updateProject: {str(error)}")
+        loggerError.error(f"updateProject: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 #######################################################
@@ -180,6 +183,7 @@ def deleteProjects(request):
     try:
         projectIDs = request.GET['projectIDs'].split(",")
         loggedIn = False # don't check rights in every iteration
+        
         for projectID in projectIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 for currentProjectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
@@ -191,13 +195,17 @@ def deleteProjects(request):
 
             elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProjects.__name__)):
                 loggedIn = True
+                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+                if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+                    return HttpResponse("Not allowed!", status=401)
+                
                 pgProcesses.ProcessManagementBase.deleteProject(projectID)
             else:
                 raise Exception("Not logged in or rights insufficient!")
 
         return HttpResponse("Success")
     except (Exception) as error:
-        logger.error(f"deleteProject: {str(error)}")
+        loggerError.error(f"deleteProject: {str(error)}")
         return HttpResponse("Failed",status=500)
 ################################################################################################
 # Processes
@@ -220,9 +228,8 @@ def createProcessID(request, projectID):
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
         now = timezone.now()
-        clientID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         template = {ProcessDescription.processID: processID, 
-                    ProcessDescription.client: clientID, 
+                    ProcessDescription.client: "", 
                     ProcessDescription.processStatus: 0, 
                     ProcessDescription.processDetails: {},
                     ProcessDescription.serviceStatus: 0, 
@@ -251,7 +258,7 @@ def createProcessID(request, projectID):
         # return just the generated ID for frontend
         return JsonResponse({ProcessDescription.processID: processID})
     except (Exception) as error:
-        logger.error(f"createProcessID: {str(error)}")
+        loggerError.error(f"createProcessID: {str(error)}")
         return JsonResponse({}, status=500)
 
 #######################################################
@@ -341,8 +348,12 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
         else:
             # database version
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+
                 for processID in processIDs:
+                    if manualCheckIfUserMaySeeProcess(userID, processID) == False:
+                        return ("", False) # user may not change this process
+        
                     for elem in changes["changes"]:
                         returnVal = True
                         if elem == ProcessUpdates.serviceType:
@@ -434,7 +445,7 @@ def getProcessAndProjectFromSession(session, processID):
                         return (currentProjectID, session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcessID])
         return (None, None)
     except (Exception) as error:
-        logger.error(f"getProcessAndProjectFromSession: {str(error)}")
+        loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
         return (None, None)
 
 
@@ -463,7 +474,7 @@ def updateProcess(request):
 
         return HttpResponse("Success")
     except (Exception) as error:
-        logger.error(f"updateProcess: {str(error)}")
+        loggerError.error(f"updateProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 #######################################################
@@ -493,13 +504,16 @@ def deleteProcesses(request, projectID):
 
             elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcesses.__name__)):
                 loggedIn = True
+                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+                if manualCheckIfUserMaySeeProcess(userID, processID) == False:
+                    raise Exception("Not logged in or rights insufficient!")
                 pgProcesses.ProcessManagementBase.deleteProcess(processID)
             else:
                 raise Exception("Not logged in or rights insufficient!")
         
         return HttpResponse("Success")
     except (Exception) as error:
-        logger.error(f"deleteProcess: {str(error)}")
+        loggerError.error(f"deleteProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
 
 ################################################################################################
@@ -528,7 +542,7 @@ def getFlatProjects(request):
                 outDict["projects"].append(tempDict)
         
         # From Database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):           
             objFromDB = pgProcesses.ProcessManagementBase.getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
@@ -536,7 +550,7 @@ def getFlatProjects(request):
         return JsonResponse(outDict)
     
     except (Exception) as error:
-        logger.error(f"getFlatProjects: {str(error)}")
+        loggerError.error(f"getFlatProjects: {str(error)}")
         
     return JsonResponse({"projects": []})
 
@@ -563,13 +577,16 @@ def getProject(request, projectID):
                 return JsonResponse(outDict)
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
-            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID, pgProfiles.ProfileManagementBase.getUserHashID(request.session), pgProfiles.ProfileManagementBase.getOrgaHashID(request.session)))
+            userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+            if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+                return JsonResponse({}, status=401)
+            
+            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 
         return JsonResponse(outDict)
     except (Exception) as error:
-        logger.error(f"getProject: {str(error)}")
-
-    return JsonResponse({})
+        loggerError.error(f"getProject: {str(error)}")
+        return JsonResponse({}, status=500)
 
 #######################################################
 @checkIfUserIsLoggedIn()
@@ -649,6 +666,7 @@ def getMissedEvents(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
+@checkIfUserMaySeeProcess(json=True)
 def getContractors(request, processID):
     """
     Get all suitable Contractors.
@@ -682,7 +700,7 @@ def getContractors(request, processID):
 
         return JsonResponse(listOfAllContractors, safe=False)
     except (Exception) as error:
-        logger.error(f"getContractors: {str(error)}")
+        loggerError.error(f"getContractors: {str(error)}")
         return error
 
 #######################################################
@@ -710,7 +728,7 @@ def saveProjectsViaWebsocket(session):
         return None
     
     except (Exception) as error:
-        logger.error(f"saveProjectsViaWebsocket: {str(error)}")
+        loggerError.error(f"saveProjectsViaWebsocket: {str(error)}")
         return error
 
 #######################################################
@@ -744,7 +762,7 @@ def saveProjects(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        logger.error(f"saveProjects: {str(error)}")
+        loggerError.error(f"saveProjects: {str(error)}")
         return HttpResponse("Failed")
     
 #######################################################
@@ -767,7 +785,10 @@ def verifyProject(request):
         projectID = info["projectID"]
         sendToContractorAfterVerification = info["send"]
         processesIDArray = info["processIDs"]
-        userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+
+        if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+            return HttpResponse("Not allowed!", status=401)
 
         # first save projects
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
@@ -803,7 +824,7 @@ def verifyProject(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        logger.error(f"verifyProject: {str(error)}")
+        loggerError.error(f"verifyProject: {str(error)}")
         return HttpResponse("Failed")
     
 #######################################################
@@ -824,7 +845,11 @@ def sendProject(request):
         info = json.loads(request.body.decode("utf-8"))
         projectID = info["projectID"]
         processesIDArray = info["processIDs"]
-        userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        
+        if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+            return HttpResponse("Not allowed!", status=401)
+        
         # TODO Check if process is verified
         
         for entry in processesIDArray:
@@ -852,7 +877,7 @@ def sendProject(request):
         return HttpResponse("Success")
     
     except (Exception) as error:
-        logger.error(f"sendProject: {str(error)}")
+        loggerError.error(f"sendProject: {str(error)}")
         return HttpResponse("Failed")
 
 
@@ -860,6 +885,7 @@ def sendProject(request):
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"]) 
 @checkIfRightsAreSufficient(json=True)
+@checkIfUserMaySeeProcess(json=True)
 def getProcessHistory(request, processID):
     """
     See who has done what and when
@@ -884,7 +910,7 @@ def getProcessHistory(request, processID):
         # parse for frontend
         for index, entry in enumerate(listOfData):
             outDatum = {}
-            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserViaHash(entry[DataDescription.createdBy]).name
+            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
             outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
             outDatum[DataDescription.type] = entry[DataDescription.type]
             outDatum[DataDescription.data] = entry[DataDescription.data]
@@ -895,5 +921,5 @@ def getProcessHistory(request, processID):
         return JsonResponse(outObj)
     
     except (Exception) as error:
-        logger.error(f"viewProcessHistory: {str(error)}")
+        loggerError.error(f"viewProcessHistory: {str(error)}")
         return JsonResponse({})

@@ -6,7 +6,6 @@ Thomas Skodawessely 2023
 Contains: File upload helpers
 """
 
-
 import os
 from io import BytesIO
 

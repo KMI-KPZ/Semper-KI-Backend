@@ -1,9 +1,21 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: generate info about environment variables
+"""
+import os
+
+from django.conf import settings
+        
 from django.core.management.base import BaseCommand
 
 from django.apps import apps
 
 from code_General.helper.classes import ConfigHelper
 
+####################################################################################
 class Command(BaseCommand):
     help = 'generates .env.example file from configured environment variables in apps.py'
     file_intro = ('# This is an example .env file for Semper-KI with following structure:\n'
@@ -13,11 +25,12 @@ class Command(BaseCommand):
                   '\n# second part is for external services you need to fill in :\n')
     current_values = ('# Current values are:\n')
 
+    ##############################################
     def add_arguments(self, parser):
         parser.add_argument('-p','--print',action="store_true", help='Should current parameters be printed?')
+
+    ##############################################
     def handle(self, *args, **options):
-        from django.conf import settings
-        import os
         print('Current options:')
         print(str(options))
         s= "POSTGRES_HOST"
@@ -39,6 +52,7 @@ class Command(BaseCommand):
                 #self.stdout.write('{: <30}'.format(f'#{key} -- {value["hint"]} \n') + '{: <100}'.format(f'{key}={val}') + f'# {"required " if value["required"] else ""}')
                 self.writeVariable(key,value,val)
 
+    ##############################################
     def writeVariable(self,key,value: dict, val):
         if value.get('type') == 'list' and type(val) != str:
             print(str(type(val)))

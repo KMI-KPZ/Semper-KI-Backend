@@ -18,6 +18,7 @@ from ..connections.postgresql import pgProfiles
 from ..definitions import SessionContent, ProfileClasses, UserDescription, OrganizationDescription
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
 ##############################################
 @basics.checkIfUserIsLoggedIn(json=True)
 @require_http_methods(["POST"])
@@ -46,7 +47,7 @@ def addUserTest(request):
         return HttpResponse("Worked")
   
     except (Exception) as exc:
-        logger.error(f"Error creating user: {str(exc)}")
+        loggerError.error(f"Error creating user: {str(exc)}")
         return HttpResponse("Failed", status=500)
     
 ##############################################
@@ -69,7 +70,7 @@ def addOrganizationTest(request):
         else:
             return HttpResponse("Failed", status=500)
     except (Exception) as exc:
-        logger.error(f"Error creating organization: {str(exc)}")
+        loggerError.error(f"Error creating organization: {str(exc)}")
         return HttpResponse("Failed", status=500)
 
 ##############################################

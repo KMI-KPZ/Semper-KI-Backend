@@ -1,6 +1,15 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: ?
+"""
+
 from django.core.management import BaseCommand
 from ...services import serviceManager
 
+####################################################################################
 class Command(BaseCommand):
     help = 'list all SemperKI services'
 

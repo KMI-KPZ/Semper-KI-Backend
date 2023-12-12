@@ -8,11 +8,14 @@ Contains: Custom StrEnum Class for representation of String Enum variables exact
 
 import enum
 
+####################################################################################
 class StrEnumExactylAsDefined(str, enum.ReprEnum):
     """
     Enum where members are also (and must be) strings and are represented exacty as defined in the enum
+    
     """
 
+    ##############################################
     def __new__(cls, *values):
         "values must already be of type `str`"
         if len(values) > 3:
@@ -34,8 +37,10 @@ class StrEnumExactylAsDefined(str, enum.ReprEnum):
         member._value_ = value
         return member
 
+    ##############################################
     def _generate_next_value_(name, start, count, last_values):
         """
         Return the member name.
+
         """
         return name

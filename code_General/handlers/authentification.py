@@ -19,6 +19,8 @@ from ..definitions import SessionContent, ProfileClasses, UserDescription
 
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
+
 #######################################################
 @require_http_methods(["GET"])
 def isLoggedIn(request):
@@ -282,7 +284,7 @@ def setRoleAndPermissionsOfUser(request):
 
         return True
     except Exception as e:
-        logger.error(f'Generic Exception: {e}')
+        loggerError.error(f'Generic Exception: {e}')
         return e
 
 #######################################################

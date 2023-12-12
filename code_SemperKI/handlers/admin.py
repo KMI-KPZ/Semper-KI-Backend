@@ -37,8 +37,8 @@ def getAllProjectsFlatAsAdmin(request):
     projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
     for idx, entry in enumerate(projects):
         clientID = entry["client"]
-        userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
-        projects[idx]["clientName"] = userObj.name
+        userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
+        projects[idx]["clientName"] = userName
         
     logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},projects," + str(datetime.datetime.now()))
     return JsonResponse(projects, safe=False)
@@ -61,13 +61,13 @@ def getSpecificProjectAsAdmin(request, projectID):
     processes = pgProcesses.ProcessManagementBase.getProcessesPerPID(projectID)
     for idx, entry in enumerate(processes):
         clientID = entry["client"]
-        userObj = pgProfiles.ProfileManagementBase.getUserViaHash(clientID)
-        processes[idx]["clientName"] = userObj.name
+        userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
+        processes[idx]["clientName"] = userName
         
         processes[idx]["contractorNames"] = []
         for contractorID in entry["contractor"]:
-            contractorObj = pgProfiles.ProfileManagementBase.getUserViaHash(contractorID)
-            processes[idx]["contractorNames"].append(contractorObj.name)
+            contractorName = pgProfiles.ProfileManagementBase.getUserNameViaHash(contractorID)
+            processes[idx]["contractorNames"].append(contractorName)
 
     logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},processes from {projectID}," + str(datetime.datetime.now()))
     return JsonResponse(processes, safe=False)

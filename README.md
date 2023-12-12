@@ -38,7 +38,7 @@ The backend currently supports the environment ```--env <environment>``` which w
 
 INFO: you can watch exposed ports of the docker containers for connections i.e. pg-admin (email/pw is in docker-local-dev-services.yml)
 
-INFO: The documentation can be seen via the public/doc path
+INFO: The documentation can be seen via the private/doc path
 
 ## Debug logging
 In order to have debug output in the console, in your .env.[MODE] file set ```DJANGO_LOG_LEVEL=DEBUG```.

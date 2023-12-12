@@ -1,3 +1,11 @@
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: Checks
+"""
+
 import os
 import threading
 
@@ -8,13 +16,14 @@ from django.apps import apps
 from logging import getLogger
 logger = getLogger("django_debug")
 
-
+####################################################################################
+##############################################
 class Tags(DjangoTags):
     env_check = 'env_check'
     db_check = 'db_check'
     redis_check = 'redis_check'
 
-
+##############################################
 def checkEnv(app_configs=None, **kwargs):
     logger.debug(f'checking environment variables in thread: {str(threading.get_ident())}')
     errors = []
@@ -26,7 +35,7 @@ def checkEnv(app_configs=None, **kwargs):
             errors.extend(app.checkEnvVars())
     return errors
 
-
+##############################################
 def checkDb(app_configs=None, **kwargs):
     logger.debug(f'checking databases in thread: {str(threading.get_ident())}')
     errors = []
@@ -56,7 +65,7 @@ def checkDb(app_configs=None, **kwargs):
 
     return errors
 
-
+##############################################
 def checkRedis(app_configs=None, **kwargs):
     if app_configs is None:
         app_configs = apps.get_app_configs()

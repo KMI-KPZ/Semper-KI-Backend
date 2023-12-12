@@ -19,6 +19,7 @@ from ..utilities.basics import checkIfUserIsLoggedIn, handleTooManyRequestsError
 from ..definitions import SessionContent
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
 #######################################################
 def sendEventViaWebsocket(orgID, baseURL, baseHeader, eventName, args):
     """
@@ -143,7 +144,7 @@ def organizations_getInviteLink(request):
         return HttpResponse(response["invitation_url"])
     
     except Exception as e:
-        logger.error(f'Generic Exception while obtaining invite link: {e}')
+        loggerError.error(f'Generic Exception while obtaining invite link: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -189,7 +190,7 @@ def organizations_addUser(request):
         return HttpResponse("Success", status=200)
 
     except Exception as e:
-        logger.error(f'Generic Exception while adding user: {e}')
+        loggerError.error(f'Generic Exception while adding user: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -240,7 +241,7 @@ def organizations_fetchUsers(request):
 
         return JsonResponse(responseDict, safe=False)
     except Exception as e:
-        logger.error(f'Generic Exception while fetching users: {e}')
+        loggerError.error(f'Generic Exception while fetching users: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -296,7 +297,7 @@ def organizations_deleteUser(request):
         return HttpResponse("Success", status=200)
 
     except Exception as e:
-        logger.error(f'Generic Exception while deleting user: {e}')
+        loggerError.error(f'Generic Exception while deleting user: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -347,7 +348,7 @@ def organizations_createRole(request):
         return JsonResponse(response, safe=False)
     
     except Exception as e:
-        logger.error(f'Generic Exception while creating role: {e}')
+        loggerError.error(f'Generic Exception while creating role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -402,7 +403,7 @@ def organizations_assignRole(request):
         return HttpResponse("Success", status=200)
 
     except Exception as e:
-        logger.error(f'Generic Exception while assigning role: {e}')
+        loggerError.error(f'Generic Exception while assigning role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -456,7 +457,7 @@ def organizations_removeRole(request):
         return HttpResponse("Success", status=200)
         
     except Exception as e:
-        logger.error(f'Generic Exception while removing role: {e}')
+        loggerError.error(f'Generic Exception while removing role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -510,7 +511,7 @@ def organizations_editRole(request):
         return HttpResponse("Success", status=200)
 
     except Exception as e:
-        logger.error(f'Generic Exception while editing role: {e}')
+        loggerError.error(f'Generic Exception while editing role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -560,7 +561,7 @@ def organizations_getRoles(request):
         return JsonResponse(rolesOut, safe=False)
     
     except Exception as e:
-        logger.error(f'Generic Exception while fetching roles: {e}')
+        loggerError.error(f'Generic Exception while fetching roles: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -603,7 +604,7 @@ def organizations_deleteRole(request):
         return HttpResponse("Success", status=200)
         
     except Exception as e:
-        logger.error(f'Generic Exception while deleting role: {e}')
+        loggerError.error(f'Generic Exception while deleting role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -665,7 +666,7 @@ def organizations_setPermissionsForRole(request):
         return HttpResponse("Success", status=200)
 
     except Exception as e:
-        logger.error(f'Generic Exception while setting permissions for role: {e}')
+        loggerError.error(f'Generic Exception while setting permissions for role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -702,7 +703,7 @@ def organizations_getPermissions(request):
         return JsonResponse(response["scopes"],safe=False)
 
     except Exception as e:
-        logger.error(f'Generic Exception while fetching permissions: {e}')
+        loggerError.error(f'Generic Exception while fetching permissions: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -741,7 +742,7 @@ def organizations_getPermissionsForRole(request):
         return JsonResponse(response,safe=False)
 
     except Exception as e:
-        logger.error(f'Generic Exception while fetching permissions for role: {e}')
+        loggerError.error(f'Generic Exception while fetching permissions for role: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:
@@ -829,7 +830,7 @@ def organizations_createNewOrganization(request):
         return HttpResponse("Success", status=200)
     
     except Exception as e:
-        logger.error(f'Generic Exception while creating organization: {e}')
+        loggerError.error(f'Generic Exception while creating organization: {e}')
         if "many requests" in e.args[0]:
             return HttpResponse("Failed - " + str(e), status=429)
         else:

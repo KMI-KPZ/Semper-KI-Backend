@@ -12,6 +12,7 @@ import datetime
 
 from code_General.connections.redis import RedisConnection
 
+####################################################################################
 class ManageQueries:
     """
     Contains query from file as object

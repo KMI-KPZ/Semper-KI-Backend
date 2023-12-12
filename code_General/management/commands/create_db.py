@@ -1,8 +1,18 @@
-from django.core.management.base import BaseCommand
+"""
+Part of Semper-KI software
+
+Thomas Skodawessely 2023
+
+Contains: Manual creation of db
+"""
+
 import logging
+
+from django.core.management.base import BaseCommand
 
 logger = logging.getLogger("django_debug")
 
+####################################################################################
 class Command(BaseCommand):
     help = 'creates database from configured environment variables in apps.py if not exists'
 

@@ -27,6 +27,7 @@ from ..connections.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription
 
 logger = logging.getLogger("logToFile")
+loggerError = logging.getLogger("errors")
 
 
 #######################################################
@@ -72,7 +73,7 @@ def uploadFiles(request):
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},files,"+str(datetime.now()))
         return HttpResponse("Success")
     except (Exception) as error:
-        logger.error(f"Error while uploading files: {str(error)}")
+        loggerError.error(f"Error while uploading files: {str(error)}")
         return HttpResponse("Failed", status=500)
     
 #######################################################
@@ -121,7 +122,7 @@ def downloadFile(request, processID, fileID):
         return createFileResponse(content, filename=fileOfThisProcess[FileObjectContent.fileName])
 
     except (Exception) as error:
-        logger.error(f"Error while downloading file: {str(error)}")
+        loggerError.error(f"Error while downloading file: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 #######################################################
@@ -180,7 +181,7 @@ def downloadFilesAsZip(request, processID):
         return createFileResponse(zipFile, filename=processID+".zip")
 
     except (Exception) as error:
-        logger.error(f"Error while downloading files as zip: {str(error)}")
+        loggerError.error(f"Error while downloading files as zip: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 
@@ -240,7 +241,7 @@ def deleteFile(request, processID, fileID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)
     except (Exception) as error:
-        logger.error(f"Error while deleting file: {str(error)}")
+        loggerError.error(f"Error while deleting file: {str(error)}")
         return HttpResponse("Failed", status=500)
 
 ############################################################################################

@@ -12,24 +12,24 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from code_General.utilities import basics
-
 from code_General.modelFiles.userModel import User
 from code_General.modelFiles.organizationModel import Organization
-from code_General.connections.postgresql.pgProfiles import ProfileManagementBase
+from code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
+from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent
+from code_General.connections import s3
+from code_General.utilities import crypto
+
+
 from ...modelFiles.projectModel import Project
 from ...modelFiles.processModel import Process
 from ...modelFiles.dataModel import Data
 
-from code_General.connections import s3
-from code_General.utilities import crypto
-
-from code_General.definitions import FileObjectContent, OrganizationDescription
 from ...definitions import *
 
 from ...services import serviceManager 
 
 import logging
-logger = logging.getLogger("django_debug")
+logger = logging.getLogger("errors")
 
 #TODO: switch to async versions at some point
 
@@ -238,7 +238,7 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def getProject(projectID, currentUserHashID, currentOrgaHashID):
+    def getProject(projectID):
         """
         Get info about one project.
 
@@ -254,46 +254,79 @@ class ProcessManagementBase():
             projectObj = Project.objects.get(projectID=projectID)
 
             output = projectObj.toDict()
-            showProjectDetails = True if projectObj.client == currentUserHashID else False # make sure nobody else sees this
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
-                if entry.client == currentUserHashID or (currentOrgaHashID != "" and currentOrgaHashID == entry.contractor.hashedID): 
                     processesOfThatProject.append(entry.toDict())
-                    showProjectDetails = True
+
             output[SessionContentSemperKI.processes] = processesOfThatProject
             
-            if showProjectDetails:
-                return output
+            return output
 
         except (Exception) as error:
             logger.error(f'could not get project: {str(error)}')
         
         return {}
     
+    ##############################################
+    @staticmethod
+    def getAllUsersOfProject(projectID):
+        """
+        Get all user IDs that are connected to that project.
+
+        :param projectID: unique project ID
+        :type projectID: str
+        :return: Set of all user IDs
+        :rtype: Set
+
+        """
+        try:
+            currentProject = Project.objects.get(projectID=projectID)
+            users = set()
+            userObj, orgaOrUser = ProfileManagementBase.getUserViaHash(currentProject.client)
+            if userObj != None:
+                if orgaOrUser:
+                    # Is organization, add all people
+                    for user in userObj.users.all():
+                        users.update({user.hashedID})
+                users.update({userObj.hashedID})
+
+            return users
+        except (Exception) as error:
+            logger.error(f'could not get all users of project: {str(error)}')
+        return set()
 
     ##############################################
     @staticmethod
     def getAllUsersOfProcess(processID):
         """
-        Get all users that are connected to that processID.
+        Get all user IDs that are connected to that processID.
 
         :param processID: unique process ID
         :type processID: str
-        :return: List of all userIDs
-        :rtype: List
+        :return: Set of all user IDs
+        :rtype: Set
 
         """
         try:
             currentProcess = Process.objects.get(processID=processID)
+            users = set()
+            userObj, orgaOrUser = ProfileManagementBase.getUserViaHash(currentProcess.client)
+            if userObj != None:
+                if orgaOrUser:
+                    # Is organization, add all people
+                    for user in userObj.users.all():
+                        users.update({user.hashedID})
+                users.update({userObj.hashedID})
+            if currentProcess.contractor != None:
+                for user in currentProcess.contractor.users.all():
+                    users.update({user.hashedID})
+                users.update({currentProcess.contractor.hashedID})
 
-            users = list(User.objects.filter(hashedID=currentProcess.client).all())
-            users.extend(list(Organization.objects.filter(hashedID=currentProcess.client).all()))
-            users.extend([currentProcess.contractor])
             return users
         except (Exception) as error:
             logger.error(f'could not get all users of process: {str(error)}')
-        return []
+        return set()
     
     ##############################################
     @staticmethod
@@ -705,7 +738,7 @@ class ProcessManagementBase():
                 return None
             
             # first get user
-            clientID = ProfileManagementBase.getUserHashID(session)
+            clientID = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
 
             # then go through projects
             for projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
@@ -756,7 +789,8 @@ class ProcessManagementBase():
         """
         try:
             # get associated projects
-            projects = Project.objects.filter(client=ProfileManagementBase.getUserHashID(session))
+            currentClient = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
+            projects = Project.objects.filter(client=currentClient)
             
             output = []
             
@@ -809,7 +843,8 @@ class ProcessManagementBase():
         """
         try:
             # get user
-            projects = Project.objects.filter(client=ProfileManagementBase.getUserHashID(session))
+            currentClient = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
+            projects = Project.objects.filter(client=currentClient)
             # get associated projects
             output = []
             
