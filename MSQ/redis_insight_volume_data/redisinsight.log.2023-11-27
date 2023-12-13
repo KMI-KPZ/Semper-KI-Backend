@@ -1,0 +1,40 @@
+WARNING 2023-11-27 08:35:28,410 django.request Bad Request: /api/instance/
+WARNING 2023-11-27 08:39:29,319 django.request Bad Request: /api/instance/eb87b4ef-0831-45eb-a5e3-4db77f261101/redisgraph/check-module-loaded/
+ERROR 2023-11-27 08:39:30,645 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 224, in scripts_view
+  File "./redisinsight/redisai/services.py", line 206, in list_scripts
+  File "./redisinsight/redisai/services.py", line 185, in _list_scripts
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._SCRIPTSCAN', with args beginning with: 
+ERROR 2023-11-27 08:39:30,646 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 85, in models_view
+  File "./redisinsight/redisai/services.py", line 181, in list_models
+  File "./redisinsight/redisai/services.py", line 157, in _list_models
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._MODELSCAN', with args beginning with: 
+ERROR 2023-11-27 08:39:30,647 django.request Unknown Status Code: /api/instance/eb87b4ef-0831-45eb-a5e3-4db77f261101/redisai/scripts/
+ERROR 2023-11-27 08:39:30,653 django.request Unknown Status Code: /api/instance/eb87b4ef-0831-45eb-a5e3-4db77f261101/redisai/models/
+WARNING 2023-11-27 08:39:31,280 django.request Bad Request: /api/instance/eb87b4ef-0831-45eb-a5e3-4db77f261101/redistimeseries/module-info/
+WARNING 2023-11-27 08:39:31,699 django.request Bad Request: /api/instance/eb87b4ef-0831-45eb-a5e3-4db77f261101/check-redisearch-module-loaded/

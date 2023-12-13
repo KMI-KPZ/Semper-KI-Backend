@@ -1,0 +1,171 @@
+WARNING 2023-11-24 11:17:40,645 django.request Bad Request: /api/instance/
+WARNING 2023-11-24 11:19:08,185 django.request Bad Request: /api/instance/
+WARNING 2023-11-24 11:27:06,028 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/rewrite-config/
+WARNING 2023-11-24 11:27:09,339 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/rewrite-config/
+WARNING 2023-11-24 11:27:13,299 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/rewrite-config/
+WARNING 2023-11-24 11:27:21,121 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/rewrite-config/
+WARNING 2023-11-24 11:27:30,440 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisgraph/check-module-loaded/
+WARNING 2023-11-24 11:27:36,443 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/check-redisearch-module-loaded/
+WARNING 2023-11-24 11:27:36,915 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redistimeseries/module-info/
+ERROR 2023-11-24 11:27:37,299 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 85, in models_view
+  File "./redisinsight/redisai/services.py", line 181, in list_models
+  File "./redisinsight/redisai/services.py", line 157, in _list_models
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._MODELSCAN', with args beginning with: 
+ERROR 2023-11-24 11:27:37,301 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisai/models/
+ERROR 2023-11-24 11:27:37,306 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 224, in scripts_view
+  File "./redisinsight/redisai/services.py", line 206, in list_scripts
+  File "./redisinsight/redisai/services.py", line 185, in _list_scripts
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._SCRIPTSCAN', with args beginning with: 
+ERROR 2023-11-24 11:27:37,307 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisai/scripts/
+WARNING 2023-11-24 11:27:38,746 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisgraph/check-module-loaded/
+WARNING 2023-11-24 11:27:41,112 django.request Bad Request: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redistimeseries/module-info/
+ERROR 2023-11-24 11:27:41,553 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 85, in models_view
+  File "./redisinsight/redisai/services.py", line 181, in list_models
+  File "./redisinsight/redisai/services.py", line 157, in _list_models
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._MODELSCAN', with args beginning with: 
+ERROR 2023-11-24 11:27:41,553 redisinsight Unknown command error from redis instance:
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/redisai/views.py", line 40, in _wrapped_view
+  File "./redisinsight/redisai/views.py", line 224, in scripts_view
+  File "./redisinsight/redisai/services.py", line 206, in list_scripts
+  File "./redisinsight/redisai/services.py", line 185, in _list_scripts
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+redis.exceptions.ResponseError: unknown command 'AI._SCRIPTSCAN', with args beginning with: 
+ERROR 2023-11-24 11:27:41,554 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisai/models/
+ERROR 2023-11-24 11:27:41,559 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redisai/scripts/
+ERROR 2023-11-24 11:29:06,004 redisinsight Connection error while connecting to redis instance: Authentication required.
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/monitoring/views.py", line 161, in get_overview_info
+  File "./redisinsight/monitoring/views.py", line 131, in _get_metrics
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 1304, in info
+    return self.execute_command('INFO')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 739, in read_response
+    response = self._parser.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 484, in read_response
+    raise response
+redis.exceptions.AuthenticationError: Authentication required.
+ERROR 2023-11-24 11:29:06,006 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redis-info/
+ERROR 2023-11-24 11:29:09,660 redisinsight Connection error while connecting to redis instance: Authentication required.
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/monitoring/views.py", line 161, in get_overview_info
+  File "./redisinsight/monitoring/views.py", line 131, in _get_metrics
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 1304, in info
+    return self.execute_command('INFO')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 739, in read_response
+    response = self._parser.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 484, in read_response
+    raise response
+redis.exceptions.AuthenticationError: Authentication required.
+ERROR 2023-11-24 11:29:09,661 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redis-info/
+ERROR 2023-11-24 11:29:32,295 redisinsight Connection error while connecting to redis instance: Authentication required.
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/monitoring/views.py", line 161, in get_overview_info
+  File "./redisinsight/monitoring/views.py", line 131, in _get_metrics
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 1304, in info
+    return self.execute_command('INFO')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 739, in read_response
+    response = self._parser.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 484, in read_response
+    raise response
+redis.exceptions.AuthenticationError: Authentication required.
+ERROR 2023-11-24 11:29:32,296 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redis-info/
+ERROR 2023-11-24 11:29:33,018 redisinsight Connection error while connecting to redis instance: Authentication required.
+Traceback (most recent call last):
+  File "./redisinsight/utils/__init__.py", line 199, in _wrapped_view
+  File "./redisinsight/core/views/decorators.py", line 21, in wrapped_view
+  File "./redisinsight/monitoring/views.py", line 161, in get_overview_info
+  File "./redisinsight/monitoring/views.py", line 131, in _get_metrics
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 1304, in info
+    return self.execute_command('INFO')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 739, in read_response
+    response = self._parser.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 484, in read_response
+    raise response
+redis.exceptions.AuthenticationError: Authentication required.
+ERROR 2023-11-24 11:29:33,019 django.request Unknown Status Code: /api/instance/3c505ece-b4ab-4b42-92b9-8f5751aea191/redis-info/

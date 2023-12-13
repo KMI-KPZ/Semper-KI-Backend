@@ -1,16 +1,5 @@
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>SEMPER-KI Backend</title>
-</head>
-<body>
-    <h1>Nothing to see here, go away!</h1>
-    <h1>{{ result }}</h1>
-
-</body>
-</html>
-<!-- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>SEMPER-KI Backend</title>
@@ -27,7 +16,7 @@
 <body>
     <h1>Nothing to see here, go away!</h1>
 
-    <!-- Input fields for specifying the task parameters -->
+    <p>Input fields for specifying the task parameters</p>
     <label for="x">Enter value for x:</label>
     <input type="number" id="x" placeholder="Enter value for x">
 
@@ -47,7 +36,9 @@
 
     <!-- JavaScript to handle the button clicks -->
     <script>
-        var finalresult
+        var taskId; // Global variable to store the task ID
+        
+    
         function startTask() {
             // You can add JavaScript logic here to start a task
             var x = document.getElementById("x").value;
@@ -57,10 +48,10 @@
                 args: [parseInt(x), parseInt(y)] // Assuming the arguments are integers
                 // Add any other parameters or data needed for starting a task
             };
-
+    
             // For simplicity, I'll use a placeholder URL
             // var startTaskUrl = 'http://localhost:8888/api/task/send-task/';
-
+    
             // You can customize this based on your server API
             // For example, using fetch or XMLHttpRequest
             var myHeaders = new Headers();
@@ -72,27 +63,49 @@
                 body: raw,
                 redirect: 'follow'
             };
-            fetch("http://flower:8888/api/task/send-task/trialtask", requestOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                finalResult = result;  // Store the result in the global variable
-                checkResult();  // Call checkResult after obtaining the result
+            fetch("http://localhost:8888/api/task/send-task/trialtask", requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                taskId = data["task-id"];
+                document.getElementById("resultText").innerText = `task started successfuly with ID. ${taskId}`;
+                console.log(`task started successfuly with ID. ${taskId}`);
+
             })
             .catch(error => console.log('error', error));
-            
         }
-
+    
         function checkResult() {
-            // You can add JavaScript logic here if needed
-            // For simplicity, I'm just displaying a static result
-            var resultText = finalresult; // You should replace this with the actual result from your server
-
-            // Show the result box and update the result text
-            document.getElementById("resultBox").style.display = "block";
-            document.getElementById("resultText").innerText = resultText;
+            // Check if the task ID is available
+            if (taskId) {
+                // You can add JavaScript logic here if needed
+                // For example, using fetch or XMLHttpRequest to get the result
+                var resultUrl = `http://localhost:8888/api/task/info/${taskId}`;
+    
+                fetch(resultUrl)
+                .then(response => response.json())
+                .then(taskInfo => {
+                    var state = taskInfo.state;
+                    if (state === 'SUCCESS') {
+                        var result = taskInfo.result;
+                        console.log(`Task completed successfully. Result: ${result}`);
+                        
+                        // Show the result box and update the result text
+                        document.getElementById("resultBox").style.display = "block";
+                        document.getElementById("resultText").innerText = result;
+                    } else if (state === 'PENDING') {
+                        var eta = taskInfo.eta;
+                        console.log(`Task is still pending. ETA: ${eta}`);
+                    } else {
+                        console.log(`Task is in state: ${state}`);
+                    }
+                })
+                .catch(error => console.log('error', error));
+            } else {
+                console.log('Task ID is not available. Make sure the task is started.');
+            }
         }
     </script>
+    
 </body>
 </html>
- -->
