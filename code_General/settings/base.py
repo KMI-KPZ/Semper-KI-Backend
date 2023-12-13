@@ -46,26 +46,22 @@ class BackendConfigHelper(ConfigHelper):
         'AUTH0_API_CLIENT_SECRET': {'var': 'AUTH0_API_CLIENT_SECRET',
                                     'hint': 'Auth0 client secret for authentication services for management via m2m calls',
                                     'default': None, 'required': True},
-        # SPARQL
-        'SPARQLUSERNAME': {'var': 'SPARQL_USERNAME', 'hint': 'Sparql username for querying the triple store',
-                           'default': None, 'required': True},
-        'SPARQLPW': {'var': 'SPARQL_PASSWORD', 'hint': 'Sparql password for querying the triple store', 'default': None,
-                     'required': True},
-
         # CMEM
-        'CMEMCLIENTID': {'var': 'CMEM_CLIENT_ID',
+        'CMEM_CLIENT_ID': {'var': 'CMEM_CLIENT_ID',
                          'hint': 'CMEM client id for authentication services for management via m2m calls',
                          'default': None, 'required': True},
-        'CMEMCLIENTSECRET': {'var': 'CMEM_CLIENT_SECRET',
+        'CMEM_CLIENT_SECRET': {'var': 'CMEM_CLIENT_SECRET',
                              'hint': 'CMEM client secret for authentication services for management via m2m calls',
                              'default': None, 'required': True},
-
-        'COYPUCLIENTID': {'var': 'COYPU_CLIENTID',
+        'CMEM_SPARQL_ENDPOINT': {'var': 'CMEM_SPARQL_ENDPOINT', 'hint': 'Cmem sparql endpoint url', 'default': None, 'required': True},
+        'CMEM_TOKEN_ENDPOINT': {'var': 'CMEM_TOKEN_ENDPOINT', 'hint': 'Oauth Endpoint from cmem', 'default': None, 'required': True},
+        'COYPU_CLIENT_ID': {'var': 'COYPU_CLIENT_ID',
                           'hint': 'COYPU client id for authentication services for management via m2m calls',
                           'default': None, 'required': True},
-        'COYPUPASSWORD': {'var': 'COYPU_PASSWORD',
+        'COYPU_PASSWORD': {'var': 'COYPU_PASSWORD',
                           'hint': 'COYPU password for authentication services for management via m2m calls',
                           'default': None, 'required': True},
+        'COYPU_SPARQL_ENDPOINT': {'var': 'COYPU_SPARQL_ENDPOINT', 'hint': 'Coypu sparql endpoint url', 'default': None, 'required': True},
         'AWS_ACCESS_KEY_ID': {'var': 'AWS_ACCESS_KEY_ID', 'hint': 'Key ID of the AWS Space', 'default': None, 'required': True},
         'AWS_SECRET_ACCESS_KEY': {'var': 'AWS_SECRET_ACCESS_KEY', 'hint': 'Secret of the AWS Space', 'default': None, 'required': True},
         'AWS_REGION_NAME': {'var': 'AWS_REGION_NAME', 'hint': 'Region of the chosen server', 'default': None, 'required': True},
@@ -106,7 +102,7 @@ class BackendConfigHelper(ConfigHelper):
         'REDIS_HOST': {'var': 'REDIS_HOST', 'hint': 'Redis host for caching', 'default': 'files',
                        'required': False},
         'REDIS_PORT': {'var': 'REDIS_PORT', 'hint': 'Redis port for caching', 'default': '6379', 'required': False},
-        'REDISPW': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': "redis_pw", 'required': True},
+        'REDIS_PASSWORD': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': "redis_pw", 'required': True},
 
         # Allowed hosts
         'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Adress of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
@@ -118,6 +114,8 @@ class BackendConfigHelper(ConfigHelper):
                           'default': '127.0.0.1,localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},
         'ENV_TOKEN': {'var': 'ENV_TOKEN', 'hint': 'A token with which you can check which env is used',
                    'default': 'DEFAULT_ENV', 'required': False},
+        'PGADMIN_DEFAULT_EMAIL': {'var': 'PGADMIN_DEFAULT_EMAIL', 'hint': 'Email for postgresadmin', 'default': 'test@infai.org', 'required': True},
+        'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True}
 
     }
 

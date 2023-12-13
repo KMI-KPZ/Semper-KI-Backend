@@ -145,3 +145,5 @@ localstack/
 /playground
 
 backend.code-workspace
+
+redis/data*

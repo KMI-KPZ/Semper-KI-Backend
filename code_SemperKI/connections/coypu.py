@@ -22,8 +22,8 @@ class ManageQueries:
 
     #######################################################
     def __init__(self, filePathAndName) -> None:
-        self.endpoint = SPARQLWrapper("https://skynet.coypu.org/coypu-internal")
-        self.endpoint.setCredentials(settings.COYPU_CLIENTID, settings.COYPU_PASSWORD)
+        self.endpoint = SPARQLWrapper(settings.COYPU_SPARQL_ENDPOINT)
+        self.endpoint.setCredentials(settings.COYPU_CLIENT_ID, settings.COYPU_PASSWORD)
 
         query, exists = self.redisCon.retrieveContentJSON("coypuQuery")
         if not exists:

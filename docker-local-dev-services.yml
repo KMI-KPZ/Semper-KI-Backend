@@ -15,9 +15,6 @@ services:
     image: dpage/pgadmin4
     env_file:
      - .env.local_container
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=test@infai.org
-      - PGADMIN_DEFAULT_PASSWORD=asdf
     ports:
       - "8088:80"
     volumes:

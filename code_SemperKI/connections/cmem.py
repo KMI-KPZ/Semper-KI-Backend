@@ -19,7 +19,7 @@ class ManageToken:
     Manage oauth token class.
     """
     _token = None
-    client = OAuth2Session(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET,token_endpoint="https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token", token_endpoint_auth_method='client_secret_post')
+    client = OAuth2Session(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET,token_endpoint=settings.CMEM_TOKEN_ENDPOINT, token_endpoint_auth_method='client_secret_post')
 
     #######################################################
     def __getattr__(self, item):
@@ -56,9 +56,9 @@ class ManageToken:
                 self.getAccessToken()
             else:
                 # it has not, ask for refresh token
-                self.token = self.client.refresh_token("https://cmem.semper-ki.org/auth/realms/cmem/protocol/openid-connect/token", refresh_token=self.token["refresh_token"])
+                self.token = self.client.refresh_token(settings.CMEM_TOKEN_ENDPOINT, refresh_token=self.token["refresh_token"])
 
-endpoint = SPARQLWrapper("https://cmem.semper-ki.org/dataplatform/proxy/default/sparql")
+endpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
 oauthToken = ManageToken()
 
 ##################################################################
