@@ -58,6 +58,7 @@
             "permission": "edit"
          },
          "elements": [
+            "ProjectButtonEditName",
             "ProjectsButtonNew",
             "ProjectButtonEdit",
             "ProjectButtonNew",
