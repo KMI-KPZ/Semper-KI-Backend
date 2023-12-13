@@ -28,7 +28,7 @@ from code_General.connections import s3
 from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
 from ..connections.postgresql import pgProcesses
-from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription
+from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
 from ..utilities.basics import checkIfUserMaySeeProcess
 
 logger = logging.getLogger("logToFile")
@@ -220,31 +220,38 @@ def downloadProcessHistory(request, processID):
             listOfData.extend(listOfData)
         
         fontsize = 12.0
-        maxEntriesPerPage = math.floor(pagesizes.A4[1]/fontsize)
+        maxEntriesPerPage = math.floor(pagesizes.A4[1]/fontsize) -1
         numberOfPages = math.ceil(len(listOfData)/(pagesizes.A4[1]/fontsize))
 
         # create file like object
         outPDFBuffer = BytesIO()
-        outPDF = canvas.Canvas(outPDFBuffer, pagesize=pagesizes.A4, bottomup=0, initialFontSize=fontsize)
+        outPDF = canvas.Canvas(outPDFBuffer, pagesize=pagesizes.A4, bottomup=1, initialFontSize=fontsize)
         
         # make pretty
         defaultY = pagesizes.A4[1]-fontsize
         x = 0
         y = defaultY
         pageNumber = 1
+        # first line
+        outPDF.drawString(x,y,"Index,CreatedBy,CreatedWhen,Type,Content")
+        y -= fontsize
         for idx, entry in enumerate(listOfData):
-            createdBy = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
-            createdWhen = entry[DataDescription.createdWhen]
-            typeOfData = entry[DataDescription.type]
-            dataContent = entry[DataDescription.data]
-            outString = f"{idx},{createdBy},{createdWhen},{typeOfData},{dataContent}"
-            outPDF.drawString(x,y,outString)
-            y -= fontsize
-            if idx > maxEntriesPerPage*pageNumber:
+            if idx >= maxEntriesPerPage*pageNumber:
                 # render pdf page
                 outPDF.showPage()
                 pageNumber += 1
                 y = defaultY
+                outPDF.drawString(x,y,"Index,CreatedBy,CreatedWhen,Type,Content")
+                y -= fontsize
+            createdBy = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            createdWhen = timezone.make_aware(datetime.strptime(entry[DataDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')).strftime("%Y-%m-%d %H:%M:%S")
+            typeOfData = dataTypeToString(entry[DataDescription.type])
+            dataContent = entry[DataDescription.data]
+            if entry[DataDescription.type] == DataType.FILE:
+                dataContent = entry[DataDescription.data][FileObjectContent.fileName]
+            outString = f"{idx},{createdBy},{createdWhen},{typeOfData},{dataContent}"
+            outPDF.drawString(x,y,outString)
+            y -= fontsize
 
 
         # save pdf

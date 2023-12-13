@@ -58,6 +58,29 @@ class DataType(enum.IntEnum):
     OTHER = 7
 
 ####################################################################################
+def dataTypeToString(dataType:DataType):
+    """
+    Convert integer to string
+    
+    """
+
+    if dataType == DataType.CREATION:
+        return "CREATION"
+    elif dataType == DataType.STATUS:
+        return "STATUS"
+    elif dataType == DataType.MESSAGE:
+        return "MESSAGE"
+    elif dataType == DataType.FILE:
+        return "FILE"
+    elif dataType == DataType.DELETION:
+        return "DELETION"
+    elif dataType == DataType.DETAILS:
+        return "DETAILS"
+    elif dataType == DataType.OTHER:
+        return "OTHER"
+    return ""
+
+####################################################################################
 # Enum for updateProcess
 class ProjectUpdates(StrEnumExactylAsDefined):
     """
