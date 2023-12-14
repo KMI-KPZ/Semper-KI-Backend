@@ -10,7 +10,7 @@ version: '3.4'
 services:
   redis-broker:
     image:  redis:7
-    container_name: redis
+    container_name: redis-broker
     ports:
     - 127.0.0.1:6380:6379
     networks:
