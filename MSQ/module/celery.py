@@ -12,8 +12,8 @@ from celery import Celery
 ############################################
 
 app = Celery('module',
-             broker='redis://redis:6379/0',
-             backend='redis://redis:6379/0',
+             broker='redis://redis-broker:6379/0',
+             backend='redis://redis-broker:6379/0',
              include=['module.tasks'])
 
 if __name__ == '__main__':
