@@ -17,7 +17,7 @@ release = '0.1'
 extensions = ['sphinx.ext.autodoc','sphinx.ext.autosummary','autoapi.extension',]
 
 autoapi_type = 'python'
-autoapi_dirs = ['../../backend_django']
+autoapi_dirs = ['../../']
 
 templates_path = ['_templates']
 exclude_patterns = []
