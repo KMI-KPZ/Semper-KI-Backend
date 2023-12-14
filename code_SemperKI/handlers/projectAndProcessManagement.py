@@ -132,7 +132,7 @@ def updateProject(request):
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
                 userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-                if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+                if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
                     return HttpResponse("Not allowed!", status=401)
                 
                 if ProjectDescription.status in changes["changes"]:
@@ -196,7 +196,7 @@ def deleteProjects(request):
             elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProjects.__name__)):
                 loggedIn = True
                 userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-                if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+                if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
                     return HttpResponse("Not allowed!", status=401)
                 
                 pgProcesses.ProcessManagementBase.deleteProject(projectID)
@@ -578,7 +578,7 @@ def getProject(request, projectID):
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
             userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-            if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+            if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
                 return JsonResponse({}, status=401)
             
             return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
@@ -787,7 +787,7 @@ def verifyProject(request):
         processesIDArray = info["processIDs"]
         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
 
-        if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
             return HttpResponse("Not allowed!", status=401)
 
         # first save projects
@@ -847,7 +847,7 @@ def sendProject(request):
         processesIDArray = info["processIDs"]
         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
         
-        if manualCheckIfUserMaySeeProject(userID, projectID) == False:
+        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
             return HttpResponse("Not allowed!", status=401)
         
         # TODO Check if process is verified

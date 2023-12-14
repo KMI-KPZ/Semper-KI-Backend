@@ -120,7 +120,7 @@ def updateDetailsOfOrganization(request):
     """
 
     content = json.loads(request.body.decode("utf-8"))["data"]["content"]
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)[OrganizationDescription.name]}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
         return HttpResponse("Success")
@@ -141,7 +141,7 @@ def deleteOrganization(request):
     :rtype: HTTP status
 
     """
-    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)[OrganizationDescription.name]}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
         return HttpResponse("Success")

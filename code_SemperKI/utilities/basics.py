@@ -16,7 +16,7 @@ from code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from ..connections.postgresql.pgProcesses import ProcessManagementBase
 
 #######################################################
-def manualCheckIfUserMaySeeProject(userID:str,projectID:str) -> bool:
+def manualCheckIfUserMaySeeProject(session, userID:str,projectID:str) -> bool:
     """
     Look for all users of the project and check if they are allowed to see it
 
@@ -28,6 +28,8 @@ def manualCheckIfUserMaySeeProject(userID:str,projectID:str) -> bool:
     :rtype: Bool
 
     """
+    if session[SessionContent.usertype] == "admin":
+        return True
     users = ProcessManagementBase.getAllUsersOfProject(projectID)
     if userID in users:
         return True

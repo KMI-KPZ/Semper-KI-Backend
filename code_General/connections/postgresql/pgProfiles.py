@@ -134,25 +134,23 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
-    def getOrgaHashID(session):
+    def getOrganizationName(hashedID:str):
         """
-        Retrieve hashed Organization ID from Session
+        Retrieve Organization name via hashID
 
         :param session: session
-        :type session: Dictionary
-        :return: Hashed user key from database
+        :type session: Str
+        :return: Name of the organization
         :rtype: Str
 
         """
-        hashID = ""
+        orgaName = ""
         try:
-            if "org_id" in session["user"]["userinfo"]:
-                orgID = session["user"]["userinfo"]["org_id"]
-                hashID = Organization.objects.get(subID=orgID).hashedID
+            orgaName = Organization.objects.get(hashedID=hashedID).name
         except (Exception) as error:
             logger.error(f"Error getting orga hash: {str(error)}")
 
-        return hashID
+        return orgaName
     
     ##############################################
     @staticmethod
@@ -361,7 +359,13 @@ class ProfileManagementBase():
         userList = []
         orgaList = []
         for user in User.objects.all():
-            userList.append(user.toDict())
+            userAsDict = user.toDict()
+            userAsDict["organizationNames"] = ""
+            for orga in user.organizations.all():
+                orgaName = ProfileManagementBase.getOrganizationName(orga.hashedID)
+                userAsDict["organizationNames"] += orgaName + ","
+            userAsDict["organizationNames"] = userAsDict["organizationNames"].rstrip(',')
+            userList.append(userAsDict)
         for orga in Organization.objects.all():
             orgaList.append(orga.toDict())
         return userList, orgaList
