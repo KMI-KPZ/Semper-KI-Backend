@@ -590,7 +590,7 @@ class ProfileManagementOrganization(ProfileManagementBase):
             existingInfo = {OrganizationDescription.details: existingObj.details, OrganizationDescription.supportedServices: existingObj.supportedServices, OrganizationDescription.name: existingObj.name, OrganizationDescription.uri: existingObj.uri}
             for key in content:
                 if key == OrganizationDescription.supportedServices:
-                    existingInfo[OrganizationDescription.supportedServices].extend(content[key])
+                    existingInfo[OrganizationDescription.supportedServices] = content[key]
                 else:
                     existingInfo[key] = content[key]
             affected = Organization.objects.filter(subID=orgID).update(details=existingInfo[OrganizationDescription.details], supportedServices=existingInfo[OrganizationDescription.supportedServices], name=existingInfo[OrganizationDescription.name], uri=existingInfo[OrganizationDescription.uri], updatedWhen=updated)

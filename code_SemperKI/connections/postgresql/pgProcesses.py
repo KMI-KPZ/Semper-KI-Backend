@@ -670,14 +670,20 @@ class ProcessManagementBase():
                 
                 # only signal contractors that received the process 
                 if process.processStatus >= ProcessStatus.REQUESTED:
-                    contractorID = process.contractor.hashedID
-                    if projectObj.client != contractorID:
-                        if contractorID not in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractorID] = {"eventType": "projectEvent"}
-                            dictForEventsAsOutput[contractorID]["processes"] = [{"processID": process.processID, event: 1}]
-                            dictForEventsAsOutput[contractorID]["projectID"] = projectID
-                        else:
-                            dictForEventsAsOutput[contractorID]["processes"].append({"processID": process.processID, event: 1})
+                    contractorID = ""
+                    if process.contractor != None:
+                        contractorID = process.contractor.hashedID
+                    elif ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
+                        contractorID = process.processDetails[ProcessDetails.provisionalContractor]
+                    
+                    if contractorID != "":
+                        if projectObj.client != contractorID:
+                            if contractorID not in dictForEventsAsOutput:
+                                dictForEventsAsOutput[contractorID] = {"eventType": "projectEvent"}
+                                dictForEventsAsOutput[contractorID]["processes"] = [{"processID": process.processID, event: 1}]
+                                dictForEventsAsOutput[contractorID]["projectID"] = projectID
+                            else:
+                                dictForEventsAsOutput[contractorID]["processes"].append({"processID": process.processID, event: 1})
 
         return dictForEventsAsOutput
     

@@ -63,7 +63,7 @@ def updateDetailsOfUserAsAdmin(request):
     logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.USER},{userID}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content, userID)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
     
@@ -89,7 +89,7 @@ def updateDetailsOfOrganizationAsAdmin(request):
     logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},{orgaID}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content, orgaID)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
 
@@ -114,7 +114,7 @@ def deleteOrganizationAsAdmin(request):
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session, orgaID)
     if flag is True:
         logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},{orgaID}," + str(datetime.datetime.now()))
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
 
@@ -146,7 +146,7 @@ def deleteUserAsAdmin(request):
     flag = pgProfiles.ProfileManagementUser.deleteUser(request.session, userHasedID)
     if flag is True:
         logger.info(f"{basics.Logging.Subject.ADMIN},{request.session['user']['userinfo']['nickname']},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.USER},{userID}," + str(datetime.datetime.now()))
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
     

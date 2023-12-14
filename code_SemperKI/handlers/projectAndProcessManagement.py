@@ -470,7 +470,7 @@ def updateProcess(request):
         if flag is False:
             return HttpResponse("Not logged in", status=401)
         if isinstance(message, Exception):
-            raise message
+            raise Exception(message)
 
         return HttpResponse("Success")
     except (Exception) as error:

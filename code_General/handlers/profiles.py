@@ -44,7 +44,7 @@ def addUserTest(request):
             if isinstance(returnVal, Exception):
                 raise returnVal
 
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
   
     except (Exception) as exc:
         loggerError.error(f"Error creating user: {str(exc)}")
@@ -66,7 +66,7 @@ def addOrganizationTest(request):
     try:
         returnVal = pgProfiles.ProfileManagementOrganization.addOrGetOrganization(request.session)
         if returnVal is not None:
-            return HttpResponse("Worked")
+            return HttpResponse("Success")
         else:
             return HttpResponse("Failed", status=500)
     except (Exception) as exc:
@@ -123,7 +123,7 @@ def updateDetailsOfOrganization(request):
     logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.ORGANISATION},details of {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementOrganization.updateContent(request.session, content)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
 
@@ -144,7 +144,7 @@ def deleteOrganization(request):
     logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.ORGANISATION},organization {pgProfiles.ProfileManagementOrganization.getOrganization(request.session)['name']}," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementBase.deleteOrganization(request.session)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
 
@@ -194,7 +194,7 @@ def updateDetails(request):
     logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.EDITED},updated,{basics.Logging.Object.SELF},details," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.updateContent(request.session, content)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
     
@@ -215,6 +215,6 @@ def deleteUser(request):
     logger.info(f"{basics.Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.DELETED},deleted,{basics.Logging.Object.SELF},," + str(datetime.datetime.now()))
     flag = pgProfiles.ProfileManagementUser.deleteUser(request.session)
     if flag is True:
-        return HttpResponse("Worked")
+        return HttpResponse("Success")
     else:
         return HttpResponse("Failed", status=500)
