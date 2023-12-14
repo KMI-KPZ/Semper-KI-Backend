@@ -23,7 +23,7 @@ services:
     ports:
       - 8001:8001
     volumes:
-      - ./redis_insight_volume_data:/db   
+      - ./redis_insight:/db   
     networks:
       - MSQ  
 
