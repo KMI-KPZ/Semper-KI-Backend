@@ -351,7 +351,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                 userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
 
                 for processID in processIDs:
-                    if manualCheckIfUserMaySeeProcess(userID, processID) == False:
+                    if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
                         return ("", False) # user may not change this process
         
                     for elem in changes["changes"]:
@@ -505,7 +505,7 @@ def deleteProcesses(request, projectID):
             elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcesses.__name__)):
                 loggedIn = True
                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(userID, processID) == False:
+                if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
                     raise Exception("Not logged in or rights insufficient!")
                 pgProcesses.ProcessManagementBase.deleteProcess(processID)
             else:

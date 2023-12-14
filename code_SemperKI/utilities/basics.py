@@ -36,7 +36,7 @@ def manualCheckIfUserMaySeeProject(userID:str,projectID:str) -> bool:
 
 
 #######################################################
-def manualCheckIfUserMaySeeProcess(userID:str,processID:str) -> bool:
+def manualCheckIfUserMaySeeProcess(session, userID:str,processID:str) -> bool:
     """
     Look for all users of the process and check if they are allowed to see it
 
@@ -48,6 +48,8 @@ def manualCheckIfUserMaySeeProcess(userID:str,processID:str) -> bool:
     :rtype: Bool
 
     """
+    if session[SessionContent.usertype] == "admin":
+        return True
     users = ProcessManagementBase.getAllUsersOfProcess(processID)
     if userID in users:
         return True
@@ -70,7 +72,7 @@ def checkIfUserMaySeeProcess(json=False):
         @wraps(func)
         def inner(request, *args, **kwargs):
             userID = profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-            if manualCheckIfUserMaySeeProcess(userID,kwargs["processID"]):
+            if manualCheckIfUserMaySeeProcess(request.session, userID, kwargs["processID"]):
                 return func(request, *args, **kwargs)
             else:
                 if json:
