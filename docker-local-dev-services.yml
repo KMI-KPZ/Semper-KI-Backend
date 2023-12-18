@@ -55,4 +55,3 @@ services:
 
 networks:
   semper-ki-dev-network:
-
