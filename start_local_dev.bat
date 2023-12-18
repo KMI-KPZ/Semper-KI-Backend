@@ -40,7 +40,3 @@ if "%MODE%" == "local_container" (
     START "FRONTEND" CMD /C yarn --cwd %FRONTEND_DIR% start
 )
 EXIT /B 0
-
-
-
-
