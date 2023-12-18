@@ -29,7 +29,7 @@ from .projectAndProcessManagement import updateProcessFunction, getProcessAndPro
 
 from ..connections.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
-from ..utilities.basics import checkIfUserMaySeeProcess
+from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -39,7 +39,7 @@ loggerError = logging.getLogger("errors")
 @require_http_methods(["POST"])
 def uploadFiles(request):
     """
-    Generic file upload for a process
+    File upload for a process
 
     :param request: Request with files in it
     :type request: HTTP POST
@@ -66,12 +66,12 @@ def uploadFiles(request):
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
             returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
-                return JsonResponse({}, status=500)
+                return HttpResponse("Failed", status=500)
         
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
-            return JsonResponse({}, status=401)
+            return HttpResponse("Unsufficient rights!", status=401)
         if isinstance(message, Exception):
             raise message
 
@@ -108,10 +108,14 @@ def downloadFile(request, processID, fileID):
                 return HttpResponse("Not found!", status=404)
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
-                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                fileOfThisProcess = currentProcess.files[fileID]
-                if len(fileOfThisProcess) == 0:
-                    return HttpResponse("Not found!", status=404)
+                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    fileOfThisProcess = currentProcess.files[fileID]
+                    if len(fileOfThisProcess) == 0:
+                        return HttpResponse("Not found!", status=404)
+                else:
+                    return HttpResponse("Not allowed to see process!", status=401)
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
@@ -155,8 +159,12 @@ def downloadFilesAsZip(request, processID):
             filesOfThisProcess = currentProcess[ProcessDescription.files]
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
-                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                filesOfThisProcess = currentProcess.files
+                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    filesOfThisProcess = currentProcess.files
+                else:
+                    return HttpResponse("Not allowed to see process!", status=401)
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
@@ -298,11 +306,15 @@ def deleteFile(request, processID, fileID):
                 return HttpResponse("Not found!", status=404)
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
-                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                fileOfThisProcess = currentProcess.files[fileID]
-                if len(fileOfThisProcess) == 0:
-                    return HttpResponse("Not found!", status=404)                
-                liesInDatabase = True
+                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    fileOfThisProcess = currentProcess.files[fileID]
+                    if len(fileOfThisProcess) == 0:
+                        return HttpResponse("Not found!", status=404)                
+                    liesInDatabase = True
+                else:
+                    return HttpResponse("Not allowed to see process!", status=401)
             else:
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
         
@@ -327,24 +339,3 @@ def deleteFile(request, processID, fileID):
     except (Exception) as error:
         loggerError.error(f"Error while deleting file: {str(error)}")
         return HttpResponse("Failed", status=500)
-
-############################################################################################
-# #######################################################
-# @require_http_methods(["GET"])
-# def testRedis(request):
-#     """
-#     Save a key:value in redis and retrieve it to test if it works.
-
-#     :param request: request
-#     :type request: HTTP GET
-#     :return: Response with results of "search"
-#     :rtype: JSON
-
-#     """
-#     redis.RedisConnection().addContent("testkey", "testvalue")
-#     if request.method == "GET":
-#         result = redis.RedisConnection().retrieveContent("testkey")
-#         response = {
-#             'result': result,
-#         }
-#         return JsonResponse(response, status=200)

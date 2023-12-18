@@ -39,8 +39,8 @@ class TestProfiles(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
-        client.post("/"+paths["addOrga"])
-        client.post("/"+paths["addUser"])
+        client.post("/"+paths["addOrga"][0])
+        client.post("/"+paths["addUser"][0])
         return mockSession
 
     #######################################################
@@ -58,7 +58,7 @@ class TestProfiles(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
-        client.post("/"+paths["addUser"])
+        client.post("/"+paths["addUser"][0])
         return mockSession
 
     # TESTS!
@@ -66,36 +66,36 @@ class TestProfiles(TestCase):
     def test_updateUser(self):
         client =  Client()
         self.createUser(client)
-        client.post("/"+paths["addUser"])
-        client.patch("/"+paths["updateDetails"], '{"name": "testuser2TEST"}')
-        response = json.loads(client.get("/"+paths["getUser"]).content)
+        client.post("/"+paths["addUser"][0])
+        client.patch("/"+paths["updateDetails"][0], '{"name": "testuser2TEST"}')
+        response = json.loads(client.get("/"+paths["getUser"][0]).content)
         self.assertIs(response["name"] == "testuser2TEST", True)
     
     #######################################################
     def test_deleteUser(self):
         client =  Client()
         self.createUser(client, sub="auth0|deleteDude", name="deleteDude")
-        client.post("/"+paths["addUser"])
-        delResponse = client.delete("/"+paths["deleteUser"])
+        client.post("/"+paths["addUser"][0])
+        delResponse = client.delete("/"+paths["deleteUser"][0])
         self.assertIs(delResponse.status_code == 200, True)
     
     #######################################################
     def test_getOrganization(self):
         client = Client()
         self.createOrganization(client)
-        response = json.loads(client.get("/"+paths["getOrganization"]).content)
+        response = json.loads(client.get("/"+paths["getOrganization"][0]).content)
         self.assertIs(response["name"] == "testOrga", True)
     
     #######################################################
     def test_updateOrganization(self):
         client = Client()
         self.createOrganization(client, "updateOrga", "auth0|updateUser")
-        response = client.patch("/"+paths["updateDetailsOfOrga"], '{"data": {"content": { "supportedServices": [1] } } }')
+        response = client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }')
         self.assertIs(response.status_code == 200, True)
 
     #######################################################
     def test_deleteOrganization(self):
         client = Client()
         self.createOrganization(client, "orgaDeletion", "auth0|deleteOrga")
-        response = client.delete("/"+paths["deleteOrganization"])
+        response = client.delete("/"+paths["deleteOrganization"][0])
         self.assertIs(response.status_code == 200, True)

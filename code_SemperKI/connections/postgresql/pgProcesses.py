@@ -812,7 +812,7 @@ class ProcessManagementBase():
             if ProfileManagementBase.checkIfUserIsInOrganization(session):
                 # Code specific for orgas
                 # Add projects where the organization is registered as contractor
-                organizationObj = Organization.objects.get(hashedID=ProfileManagementBase.getOrgaHashID(session))
+                organizationObj = ProfileManagementBase.getOrganizationObject(session)
                 receivedProjects = {}
                 for processAsContractor in organizationObj.asContractor.all():
                     project = processAsContractor.project

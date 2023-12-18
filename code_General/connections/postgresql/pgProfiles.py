@@ -134,7 +134,7 @@ class ProfileManagementBase():
     
     ##############################################
     @staticmethod
-    def getOrganizationName(hashedID:str):
+    def getOrganizationHashID(session):
         """
         Retrieve Organization name via hashID
 
@@ -144,11 +144,32 @@ class ProfileManagementBase():
         :rtype: Str
 
         """
+        hashedID = ""
+        orgaID = session["user"]["userinfo"]["org_id"]
+        try:
+            hashedID = Organization.objects.get(subID=orgaID).hashedID
+        except (Exception) as error:
+            logger.error(f"Error getting orga hash: {str(error)}")
+
+        return hashedID
+    
+    ##############################################
+    @staticmethod
+    def getOrganizationName(hashedID:str):
+        """
+        Retrieve Organization name via hashID
+
+        :param hashedID: ID of the organization
+        :type hashedID: Str
+        :return: Name of the organization
+        :rtype: Str
+
+        """
         orgaName = ""
         try:
             orgaName = Organization.objects.get(hashedID=hashedID).name
         except (Exception) as error:
-            logger.error(f"Error getting orga hash: {str(error)}")
+            logger.error(f"Error getting orga name: {str(error)}")
 
         return orgaName
     

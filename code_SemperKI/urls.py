@@ -28,85 +28,53 @@ from code_General.urls import paths, urlpatterns
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
 
-paths.update({
+newPaths= {
 
-    "getContractors": "public/getContractors/<processID>/",
+    "getContractors": ("public/getContractors/<processID>/",projectAndProcessManagement.getContractors),
     
-    "saveProjects": "public/saveProjects/",
-    "retrieveProjects": "public/retrieveProjects/",
-    "getMissedEvents": "public/getMissedEvents/",
-    "getFlatProjects": "public/getFlatProjects/",
-    "createProjectID": "public/createProjectID/",
-    "getProject": "public/getProject/<projectID>/",
-    "createProcessID": "public/createProcessID/<projectID>/",
-    "updateProcess": "public/updateProcess/",
-    "updateProject": "public/updateProject/",
-    "deleteProcesses": "public/deleteProcesses/<projectID>/",
-    "deleteProjects": "public/deleteProjects/",
-    "verifyProject": "public/verifyProject/",
-    "sendProject": "public/sendProject/",
-    "getProcessHistory": "public/getProcessHistory/<processID>/",
+    "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),
+    "retrieveProjects": ("public/retrieveProjects/",projectAndProcessManagement.retrieveProjects),
+    "getMissedEvents": ("public/getMissedEvents/",projectAndProcessManagement.getMissedEvents),
+    "getFlatProjects": ("public/getFlatProjects/",projectAndProcessManagement.getFlatProjects),
+    "createProjectID": ("public/createProjectID/",projectAndProcessManagement.createProjectID),
+    "getProject": ("public/getProject/<projectID>/",projectAndProcessManagement.getProject),
+    "createProcessID": ("public/createProcessID/<projectID>/",projectAndProcessManagement.createProcessID),
+    "updateProcess": ("public/updateProcess/",projectAndProcessManagement.updateProcess),
+    "updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
+    "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
+    "deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
+    "verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
+    "sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
+    "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
 
-    "getServices": "public/getServices/",
+    "getServices": ("public/getServices/",manageServices.getServices),
 
-    "getAllProjectsFlatAsAdmin": "public/admin/getAllProjectsFlatAsAdmin/",
-    "getSpecificProjectAsAdmin": "public/admin/getSpecificProjectAsAdmin/<projectID>/",
+    "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
+    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
 
-    "isMagazineUp": "public/isMagazineUp/",
+    "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 
-    "testQuery": "private/testquery/",
-    "sendQuery": "private/sendQuery/",
-    "testQuerySize": "private/query/",
-    "testCoypu": "public/coypu/",
+    "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
+    "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
+    "testQuerySize": ("private/query/",frontpage.sparqlPage),
+    "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
 
-    "testRedis": "private/testRedis/",
-    "uploadFiles": "public/uploadFiles/",
-    "retrieveFilesTEST": "private/retrieveFiles/",
-    "downloadFile": "public/downloadFile/<processID>/<fileID>/",
-    "downloadFilesAsZip": "public/downloadFilesAsZip/<processID>/",
-    "deleteFile": "public/deleteFile/<processID>/<fileID>/",
-    "downloadProcessHistory": "public/downloadProcessHistory/<processID>/",
-})
+    "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
+    "downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<processID>/",files.downloadFilesAsZip),
+    "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
+    "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
+}
 
-# The name must remain "oath" as the content is included in the urls.py in code_General
-urlpatterns.extend([
-    path(paths["getMissedEvents"], projectAndProcessManagement.getMissedEvents, name='getMissedEvents'),
-    path(paths["getFlatProjects"], projectAndProcessManagement.getFlatProjects, name="getFlatProjects"),
-    path(paths["retrieveProjects"], projectAndProcessManagement.retrieveProjects, name='retrieveProjects'),
-    path(paths["createProjectID"], projectAndProcessManagement.createProjectID, name="createProjectID"),
-    path(paths["createProcessID"], projectAndProcessManagement.createProcessID, name="createProcessID"),
-    path(paths["getProject"], projectAndProcessManagement.getProject, name="getProject"),
-    path(paths["saveProjects"], projectAndProcessManagement.saveProjects, name='saveProjects'),
-    path(paths["updateProcess"], projectAndProcessManagement.updateProcess, name='updateProcess'),
-    path(paths["updateProject"], projectAndProcessManagement.updateProject, name='updateProject'),
-    path(paths["deleteProcesses"], projectAndProcessManagement.deleteProcesses, name='deleteProcesses'),
-    path(paths["deleteProjects"], projectAndProcessManagement.deleteProjects, name='deleteProjects'),
-    path(paths["getContractors"], projectAndProcessManagement.getContractors, name='getContractors'),
-    path(paths["verifyProject"], projectAndProcessManagement.verifyProject, name="verifyProject"),
-    path(paths["sendProject"], projectAndProcessManagement.sendProject, name="sendProject"),
-    path(paths["getProcessHistory"], projectAndProcessManagement.getProcessHistory, name="getProcessHistory"),
 
-    path(paths["getServices"], manageServices.getServices, name="getServices"),
+# add paths
+for entry in newPaths:
+    key = entry
+    pathTuple = newPaths[entry]
+    pathItself = pathTuple[0]
+    handler = pathTuple[1]
+    urlpatterns.append(path(pathItself, handler, name=key))
 
-    path(paths["getAllProjectsFlatAsAdmin"], admin.getAllProjectsFlatAsAdmin, name="getAllProjectsFlatAsAdmin"),
-    path(paths["getSpecificProjectAsAdmin"], admin.getSpecificProjectAsAdmin, name="getSpecificProjectAsAdmin"),
-
-    path(paths["isMagazineUp"], testResponse.isMagazineUp, name="isMagazineUp"),
-
-    path(paths["testQuery"], sparqlQueries.sendTestQuery, name="testQuery"),
-    path(paths["testQuerySize"], frontpage.sparqlPage, name="testQueryPage"),
-    path(paths["sendQuery"], sparqlQueries.sendQuery, name="sendQuery"),
-    path(paths["testCoypu"], sparqlQueries.sendQueryCoypu, name="Coypu"),
-    
-    #path(paths["testRedis"], files.testRedis, name="testRedis"),
-    path(paths["uploadFiles"], files.uploadFiles, name="uploadFiles"),
-    #path(paths["retrieveFilesTEST"], files.testGetUploadedFiles, name="getUploadedFiles"),
-    path(paths["downloadFile"], files.downloadFile, name="downloadFile"),
-    path(paths["downloadFilesAsZip"], files.downloadFilesAsZip, name="downloadFilesAsZip"),
-    path(paths["deleteFile"], files.deleteFile, name="deleteFile"),
-    path(paths["downloadProcessHistory"], files.downloadProcessHistory, name="downloadProcessHistory")
-    
-])
-
+paths.update(newPaths)
 
 

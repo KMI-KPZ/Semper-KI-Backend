@@ -40,9 +40,9 @@ class TestAdditiveManufacturing(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
-        client.post("/"+paths["addOrga"])
-        client.post("/"+paths["addUser"])
-        client.patch("/"+paths["updateDetailsOfOrga"], '{"data": {"content": { "supportedServices": [1] } } }')
+        client.post("/"+paths["addOrga"][0])
+        client.post("/"+paths["addUser"][0])
+        client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }')
         return mockSession
 
     #######################################################
@@ -60,14 +60,14 @@ class TestAdditiveManufacturing(TestCase):
         currentTime = datetime.datetime.now()
         mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
         mockSession.save()
-        client.post("/"+paths["addUser"])
+        client.post("/"+paths["addUser"][0])
         return mockSession
     
     #######################################################
     @staticmethod
     def createProjectAndProcess(client:Client):
-        projectObj = json.loads(client.get("/"+paths["createProjectID"]).content)
-        processPathSplit = paths["createProcessID"].split("/")
+        projectObj = json.loads(client.get("/"+paths["createProjectID"][0]).content)
+        processPathSplit = paths["createProcessID"][0].split("/")
         processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
         processObj = json.loads(client.get("/"+processPath).content)
         return (projectObj, processObj)
@@ -88,20 +88,20 @@ class TestAdditiveManufacturing(TestCase):
 
         # set service type
         changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
-        response = client.patch("/"+paths["updateProcess"], json.dumps(changes))
+        response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes))
         self.assertIs(response.status_code == 200, True)
 
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], FileObjectContent.tags: "", FileObjectContent.licenses: "", FileObjectContent.certificates: "", "attachment": self.testFile}
-        response = client.post("/"+paths["uploadModel"], uploadBody )
+        response = client.post("/"+paths["uploadModel"][0], uploadBody )
         self.assertIs(response.status_code == 200, True)
-        getProjPathSplit = paths["getProject"].split("/")
+        getProjPathSplit = paths["getProject"][0].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
         self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.model]) > 0, True)
 
-        deleteModelPathSplit = paths["deleteModel"].split("/")
+        deleteModelPathSplit = paths["deleteModel"][0].split("/")
         deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True)
         response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.model]) == 0, True)
+        self.assertIs(ServiceDetails.model not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)
