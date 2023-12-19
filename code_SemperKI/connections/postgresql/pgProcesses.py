@@ -41,6 +41,36 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
+    def checkIfUserIsClient(userHashID, projectID="", processID=""):
+        """
+        See if the user is the client of either the project or the process
+
+        :param userHashID: The hashed ID of the user/organization
+        :type userHashID: Str
+        :param projectID: The ID of the project
+        :type projectID: Str
+        :param processID: The ID of the process
+        :type processID: Str
+        :return: True if user is client, false if not
+        :rtype: Bool
+        
+        """
+        if projectID != "":
+            projectObj = Project.objects.get(projectID=projectID)
+            if projectObj.client == userHashID:
+                return True
+            else: 
+                return False
+        if processID != "":
+            processObj = Process.objects.get(processID=processID)
+            if processObj.client == userHashID:
+                return True
+            else:
+                return False
+        return False
+
+    ##############################################
+    @staticmethod
     def getData(processID, processObject=None):
         """
         Get all files.
@@ -257,6 +287,41 @@ class ProcessManagementBase():
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
+                processesOfThatProject.append(entry.toDict())
+
+            output[SessionContentSemperKI.processes] = processesOfThatProject
+            
+            return output
+
+        except (Exception) as error:
+            logger.error(f'could not get project: {str(error)}')
+        
+        return {}
+
+    ##############################################
+    @staticmethod
+    def getProjectForContractor(projectID, contractorHashID):
+        """
+        Get info about one project for an organization as a contractor.
+
+        :param projectID: ID of the project
+        :type projectID: str
+        :param contractorHashID: The ID of the contractor
+        :type contractorHashID: str
+        :return: dict with info about that project
+        :rtype: dict
+
+        """
+        try:
+            # TODO - remove stuff for frontend etc
+            # get project
+            projectObj = Project.objects.get(projectID=projectID)
+
+            output = projectObj.toDict()
+
+            processesOfThatProject = []
+            for entry in projectObj.processes.all():
+                if entry.contractor != None and entry.contractor.hashedID == contractorHashID:
                     processesOfThatProject.append(entry.toDict())
 
             output[SessionContentSemperKI.processes] = processesOfThatProject

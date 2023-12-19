@@ -578,12 +578,15 @@ def getProject(request, projectID):
         
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
             userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-            if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-                return JsonResponse({}, status=401)
-            
-            return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+            if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
+                return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+            else:
+                if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+                    return JsonResponse(pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID))
+                else:
+                    return JsonResponse({}, status=401)
 
-        return JsonResponse(outDict)
+        return JsonResponse({})
     except (Exception) as error:
         loggerError.error(f"getProject: {str(error)}")
         return JsonResponse({}, status=500)
