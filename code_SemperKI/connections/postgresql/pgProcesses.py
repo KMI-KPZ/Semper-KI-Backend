@@ -15,7 +15,7 @@ from code_General.utilities import basics
 from code_General.modelFiles.userModel import User
 from code_General.modelFiles.organizationModel import Organization
 from code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent
+from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails
 from code_General.connections import s3
 from code_General.utilities import crypto
 
@@ -904,7 +904,10 @@ class ProcessManagementBase():
             listOfSuitableContractors = Organization.objects.filter(supportedServices__contains=[selectedService])
             returnValue = []
             for entry in listOfSuitableContractors:
-                returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: entry.details})
+                detailsOfOrganization = {}
+                if OrganizationDetails.adress in entry.details:
+                    detailsOfOrganization[OrganizationDetails.adress] = entry.details[OrganizationDetails.adress]
+                returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: detailsOfOrganization})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")
 
