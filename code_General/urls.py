@@ -42,7 +42,7 @@ paths = {
 
     "login" : ("public/login/",authentification.loginUser),
     "logout": ("public/logout/",authentification.logoutUser),
-    "callback": ("public/callback/",authentification.callbackLogin),
+    "callbackLogin": ("public/callback/",authentification.callbackLogin),
     "isLoggedIn": ("public/isLoggedIn/",authentification.isLoggedIn),
     "getRoles": ("public/getRoles/",authentification.getRolesOfUser),
     "getPermissions": ("public/getPermissions/",authentification.getPermissionsOfUser),
