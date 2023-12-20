@@ -15,7 +15,7 @@ from code_General.utilities import basics
 from code_General.modelFiles.userModel import User
 from code_General.modelFiles.organizationModel import Organization
 from code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails
+from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults
 from code_General.connections import s3
 from code_General.utilities import crypto
 
@@ -838,6 +838,8 @@ class ProcessManagementBase():
                     # generate entries in data
                     for elem in process[ProcessDescription.files]:
                         fileEntry = process[ProcessDescription.files][elem]
+                        if fileEntry[FileObjectContent.createdBy] == GlobalDefaults.anonymous:
+                            fileEntry[FileObjectContent.createdBy] = clientID
                         dataID = crypto.generateURLFriendlyRandomString()
                         ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
 

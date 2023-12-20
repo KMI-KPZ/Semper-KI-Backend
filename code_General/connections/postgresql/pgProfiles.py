@@ -14,7 +14,7 @@ from ...modelFiles.userModel import User
 from ...utilities import crypto
 from logging import getLogger
 
-from ...definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
+from ...definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses, GlobalDefaults
 
 logger = getLogger("errors")
 
@@ -54,8 +54,8 @@ class ProfileManagementBase():
 
         :param session: session
         :type session: Dictionary
-        :return: User details from database
-        :rtype: Dictionary
+        :return: User Name from database
+        :rtype: Str
 
         """
         if "user" in session and "userinfo" in session["user"]:
@@ -65,7 +65,7 @@ class ProfileManagementBase():
                 return name
             except (Exception) as error:
                 logger.error(f"Error getting user: {str(error)}")
-        return "anonymous"
+        return str(GlobalDefaults.anonymous)
     
     ##############################################
     @staticmethod

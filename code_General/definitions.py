@@ -82,3 +82,12 @@ class OrganizationDetails(StrEnumExactylAsDefined):
     adress = enum.auto()
     email = enum.auto()
     taxID = enum.auto()
+
+###################################################
+# Class for default strings
+class GlobalDefaults(StrEnumExactylAsDefined):
+    """
+    Some things need to be defined globally in name
+
+    """
+    anonymous = enum.auto() # default user name for not logged in users
