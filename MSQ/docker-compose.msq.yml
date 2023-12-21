@@ -34,7 +34,7 @@ services:
     entrypoint: celery
     env_file:
     - .env
-    command: -A module.celery worker --loglevel=info
+    command: -A module.celery worker --loglevel=info --concurrency=5
     volumes:
     - ./module:/var/www/app/worker
     - .:/app
