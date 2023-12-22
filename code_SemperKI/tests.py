@@ -113,18 +113,18 @@ class TestProjects(TestCase):
         client = Client()
         self.createUser(client, self.test_updateProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
-        changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.details + '": {"name": "test"} } }'
+        changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.projectDetails + '": {"name": "test"} } }'
         client.patch("/"+paths["updateProject"][0], changes)
 
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
-        self.assertIs(response["projects"][0][ProjectDescription.details]["name"] == "test", True)
+        self.assertIs(response["projects"][0][ProjectDescription.projectDetails]["name"] == "test", True)
 
         client.get("/"+paths["saveProjects"][0])
 
-        changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.details + '": {"name": "test2"} } }'
+        changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.projectDetails + '": {"name": "test2"} } }'
         client.patch("/"+paths["updateProject"][0], changes)
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
-        self.assertIs(response["projects"][0][ProjectDescription.details]["name"] == "test2", True)
+        self.assertIs(response["projects"][0][ProjectDescription.projectDetails]["name"] == "test2", True)
 
     #######################################################
     def test_deleteProjects(self):

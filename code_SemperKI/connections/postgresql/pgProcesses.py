@@ -497,16 +497,16 @@ class ProcessManagementBase():
         """
         updated = timezone.now()
         try:
-            if updateType == ProjectUpdates.status:
+            if updateType == ProjectUpdates.projectStatus:
                 currentProject = Project.objects.get(projectID=projectID)
-                currentProject.status = content
+                currentProject.projectStatus = content
                 currentProject.updatedWhen = updated
                 currentProject.save()
 
-            elif updateType == ProjectUpdates.details:
+            elif updateType == ProjectUpdates.projectDetails:
                 currentProject = Project.objects.get(projectID=projectID)
                 for key in content:
-                    currentProject.details[key] = content[key]
+                    currentProject.projectDetails[key] = content[key]
                 currentProject.updatedWhen = updated
                 currentProject.save()
             return True
@@ -819,7 +819,7 @@ class ProcessManagementBase():
                 # if not, create a new entry
                 existingObj = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
 
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.status: existingObj[ProjectDescription.status], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.details: existingObj[ProjectDescription.details]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: existingObj[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: existingObj[ProjectDescription.projectDetails]})
                 # save processes
                 for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
                     process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][entry]

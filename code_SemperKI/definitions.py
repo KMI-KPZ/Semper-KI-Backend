@@ -87,8 +87,8 @@ class ProjectUpdates(StrEnumExactylAsDefined):
     What types of updates are there for a project?
 
     """
-    status = enum.auto()
-    details = enum.auto()
+    projectStatus = enum.auto()
+    projectDetails = enum.auto()
 
 ####################################################################################
 # Enum for updateProcess

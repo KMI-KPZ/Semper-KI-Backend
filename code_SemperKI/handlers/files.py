@@ -223,10 +223,6 @@ def downloadProcessHistory(request, processID):
         # gather interesting info
         listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
         
-        # TODO delete this
-        while len(listOfData) < 90:
-            listOfData.extend(listOfData)
-        
         fontsize = 12.0
         maxEntriesPerPage = math.floor(pagesizes.A4[1]/fontsize) -1
         numberOfPages = math.ceil(len(listOfData)/(pagesizes.A4[1]/fontsize))

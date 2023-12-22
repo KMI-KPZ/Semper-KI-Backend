@@ -84,7 +84,7 @@ def createProjectID(request):
     now = timezone.now()
 
     # login defines client
-    template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.status: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.details: {}, SessionContentSemperKI.processes: {}} 
+    template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.projectStatus: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.projectDetails: {}, SessionContentSemperKI.processes: {}} 
 
     if SessionContentSemperKI.CURRENT_PROJECTS not in request.session:
         request.session[SessionContentSemperKI.CURRENT_PROJECTS] = {}
@@ -123,11 +123,11 @@ def updateProject(request):
         projectID = changes[ProjectDescription.projectID]
 
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-            if ProjectDescription.status in changes["changes"]:
-                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.status] = changes["changes"][ProjectDescription.status]
-            elif ProjectDescription.details in changes["changes"]:
-                for elem in changes["changes"][ProjectDescription.details]:
-                    request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.details][elem] = changes["changes"][ProjectDescription.details][elem]
+            if ProjectDescription.projectStatus in changes["changes"]:
+                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.projectStatus] = changes["changes"][ProjectDescription.projectStatus]
+            elif ProjectDescription.projectDetails in changes["changes"]:
+                for elem in changes["changes"][ProjectDescription.projectDetails]:
+                    request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.projectDetails][elem] = changes["changes"][ProjectDescription.projectDetails][elem]
             request.session.modified = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
@@ -135,12 +135,12 @@ def updateProject(request):
                 if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
                     return HttpResponse("Not allowed!", status=401)
                 
-                if ProjectDescription.status in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.status, changes["changes"][ProjectDescription.status])
+                if ProjectDescription.projectStatus in changes["changes"]:
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.projectStatus, changes["changes"][ProjectDescription.projectStatus])
                     if isinstance(returnVal, Exception):
                         raise returnVal
-                if ProjectDescription.details in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.details, changes["changes"][ProjectDescription.details])
+                if ProjectDescription.projectDetails in changes["changes"]:
+                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.projectDetails, changes["changes"][ProjectDescription.projectDetails])
                     if isinstance(returnVal, Exception):
                         raise returnVal
                 
@@ -649,8 +649,8 @@ def getMissedEvents(request):
             
             # if something changed, save it. If not, discard
             if status !=0 or newMessagesCount != 0: 
-                currentProcess["status"] = status
-                currentProcess["messages"] = newMessagesCount
+                currentProcess[ProcessDescription.processStatus] = status
+                currentProcess[ProcessDescription.messages] = newMessagesCount
 
                 processArray.append(currentProcess)
         if len(processArray):
@@ -751,7 +751,6 @@ def saveProjects(request):
 
     try:
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
-            # TODO Save picture and files in permanent storage, and change "files" field to urls
             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
             if isinstance(error, Exception):
                 raise error
@@ -859,7 +858,8 @@ def sendProject(request):
             pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
-            
+        # TODO send local files to remote
+
         # TODO Websocket Events
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processesIDArray, "status")
         channel_layer = get_channel_layer()
