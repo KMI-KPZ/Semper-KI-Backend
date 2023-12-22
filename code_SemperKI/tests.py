@@ -262,7 +262,7 @@ class TestProjects(TestCase):
         # get missed events of contractor
         response = json.loads(self.orgaClient.get("/"+paths["getMissedEvents"][0]).content)
         print(response)
-        self.assertIs(response["events"][0][SessionContentSemperKI.processes][0]["status"] > 0, True)
+        self.assertIs(response["events"][0][SessionContentSemperKI.processes][0][ProcessDescription.processStatus] > 0, True)
 
 
 # class TestFilters(TestCase):
