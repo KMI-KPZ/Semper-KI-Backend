@@ -32,15 +32,15 @@ loggerError = logging.getLogger("errors")
 
 #######################################################
 
-def fireWebsocketEvents(projectID, processID, session, event, operation=""):
+def fireWebsocketEvents(projectID, processIDArray, session, event, operation=""):
     """
     Fire websocket event from a list for a specific project and process. 
     If it should fire for only specific operations like messages or files, specify so.
     
     :param projectID: The project ID
     :type projectID: Str
-    :param processID: The process ID
-    :type processID: Str
+    :param processIDArray: The process IDs
+    :type processIDArray: list(Str)
     :param session: The session of the current user
     :type session: Dict
     :param event: The event to fire
@@ -51,7 +51,7 @@ def fireWebsocketEvents(projectID, processID, session, event, operation=""):
     :rtype: None
     """
  
-    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, [processID], event)
+    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
     channel_layer = get_channel_layer()
     for userID in dictForEvents: # user/orga that is associated with that process
         values = dictForEvents[userID] # message, formatted for frontend
@@ -358,15 +358,15 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         returnVal = True
                         if elem == ProcessUpdates.serviceType:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessUpdates.serviceType], userID)
-                            fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.serviceType, "edit")
+                            fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.serviceType, "edit")
                         
                         elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
-                            fireWebsocketEvents(projectID, processID, request.session, "messages", "messages")
+                            fireWebsocketEvents(projectID, [processID], request.session, "messages", "messages")
                         
                         elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files], userID)
-                            fireWebsocketEvents(projectID, processID, request.session, "files", "files")
+                            fireWebsocketEvents(projectID, [processID], request.session, "files", "files")
                         
                         elif elem == ProcessUpdates.serviceDetails:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessUpdates.serviceDetails], userID)
@@ -376,7 +376,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         
                         elif elem == ProcessUpdates.processStatus:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessUpdates.processStatus], userID)
-                            fireWebsocketEvents(projectID, processID, request.session, ProcessDescription.processStatus, "edit")
+                            fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.processStatus, "edit")
                         
                         elif elem == ProcessUpdates.serviceStatus:
                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessUpdates.serviceStatus], userID)
@@ -860,20 +860,8 @@ def sendProject(request):
 
         # TODO send local files to remote
 
-        # TODO Websocket Events
-        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processesIDArray, "status")
-        channel_layer = get_channel_layer()
-        for userID in dictForEvents: # user/orga that is associated with that process
-            values = dictForEvents[userID] # message, formatted for frontend
-            subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-            if subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session): # don't show a message for the user that changed it
-                userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                for permission in rights.rightsManagement.getPermissionsNeededForPath(sendProject.__name__):
-                    async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                        "type": "sendMessageJSON",
-                        "dict": values,
-                    })
-
+        # websocket event
+        fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         
