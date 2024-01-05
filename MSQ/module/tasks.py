@@ -10,27 +10,38 @@ from __future__ import absolute_import
 
 from .celery import app
 
-from celery.signals import task_prerun, task_postrun
+from celery.signals import task_success
+
 
 import time
 
 ####################################################################################
 @app.task(name='trialtask')
 def dummy_task(x, y):
-    time.sleep(30)
+    time.sleep(10)
     # logger.info('Executing dummy_task')  # runs on the celery worker
     result = x+y
-    # logger.info('Finished dummy_task')  # runs on the celery worker
-    return (result,'The celery task is working!')  # will be returned to the backend
+    task_id = dummy_task.request.id  # Extract task ID from request
+    return result, task_id
 
-@task_prerun.connect(sender=dummy_task)
-def task_prerun_notifier(sender=None, **kwargs):
-    print("From task_prerun_notifier =======================================================> Running just before dummy_task() executes")
+@task_success.connect(sender=dummy_task)
+def task_success_handler(sender=None, result=None, **kwargs):
+    task_id = result[1] if isinstance(result, tuple) and len(result) > 1 else None
+    success_message = f"Task with (ID: {task_id}) has succeeded. Result: {result}"
 
-@task_postrun.connect(sender=dummy_task)
-def task_postrun_notifier(sender=None, **kwargs):
+    # Store task ID and result in a text file
+    with open('successful_tasks.txt', 'a') as file:
+        file.write(success_message + '\n')
 
-    print("From task_postrun_notifier ======================================================> OK DONE!")    
+    print(success_message)
+    # if kwargs.json == 'SUCCESS':
+    #      taskid = kwargs.get('task-id')
+    #      print(f"Task {sender.name} (ID: {taskid}) has succeeded.")
+    # else:
+    #     print(f"Task {sender.name} (ID: {taskid}) has failed.")
+
+
+      
 
 
 ####################################################################################
