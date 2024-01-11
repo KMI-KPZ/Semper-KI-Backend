@@ -1,6 +1,6 @@
 [submodule "Ontology"]
 	path = Ontology
 	url = https://github.com/KMI-KPZ/Ontology.git
-[submodule "FRONTEND"]
-	path = FRONTEND
-	url = https://github.com/KMI-KPZ/Frontend.git
+[submodule "Generic_Backend"]
+	path = Generic_Backend
+	url = git@github.com:KMI-KPZ/Generic_Backend.git

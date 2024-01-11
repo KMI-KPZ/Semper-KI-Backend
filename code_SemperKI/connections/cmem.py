@@ -11,7 +11,7 @@ from django.conf import settings
 import datetime
 from authlib.integrations.requests_client import OAuth2Session
 
-from code_General.connections.redis import RedisConnection
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
 ########################################################################
 class ManageToken:

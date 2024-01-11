@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
 """
 import enum
-from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
 from .modelFiles.processModel import ProcessDescription
@@ -137,3 +137,16 @@ class SessionContentSemperKI(StrEnumExactylAsDefined):
     """
     CURRENT_PROJECTS = enum.auto()
     processes = enum.auto()
+
+####################################################################################
+# Enum for events
+class EventsDescription(StrEnumExactylAsDefined):
+    """
+    Websocket events and missed events should be in the same format
+
+    """
+    eventType = enum.auto()
+    events = enum.auto()
+    projectEvent = enum.auto()
+    orgaEvent = enum.auto()
+    

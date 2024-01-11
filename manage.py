@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-from code_General.settings import BackendManagement, set_settings
+from main.settings import BackendManagement, set_settings
 import sys
 
 
 
 def main():
     #"""Run administrative tasks."""
-    #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'code_General.settings.development')
+    #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings.development')
     #print("SETTING FILE USED: " + os.environ['DJANGO_SETTINGS_MODULE'], flush=True)
 
     try:
@@ -18,7 +18,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    set_settings()
+    set_settings('main.settings.')
 
     utility = BackendManagement(sys.argv)
     utility.execute() 

@@ -18,12 +18,12 @@ from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 
-from code_General.utilities import crypto
-from code_General.connections.postgresql import pgProfiles
-from code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
-from code_General.utilities.files import createFileResponse
-from code_General.definitions import FileObjectContent
-from code_General.connections import s3
+from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.files import createFileResponse
+from Generic_Backend.code_General.definitions import FileObjectContent
+from Generic_Backend.code_General.connections import s3
 
 from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 

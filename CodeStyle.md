@@ -40,7 +40,7 @@ We use [Camel case](https://en.wikipedia.org/wiki/Camel_case) for almost everyth
   - `postgres`: Contains the database(s) for the postgres container
   - `redis`: Contains snapshots of redis
 
-The `code_General` folder is the main application with mostly generic code usable by all (future) web-apps. `code_SemperKI` contains all code specific for our purpose including the `code_services` with code that is specific to certain services used in the Semper KI like Additive Manufacturing and so on.
+The `Generic_Backend/code_General` folder is the main application with mostly generic code usable by all (future) web-apps. `code_SemperKI` contains all code specific for our purpose including the `code_services` with code that is specific to certain services used in the Semper KI like Additive Manufacturing and so on.
 
 ## File structure
 Every file should start with a header like this:
@@ -56,7 +56,7 @@ Contains: Handlers using simulation to check the orders
 
 Followed by all the imports. The order of those should be:
 python, django, packages, local files of the backend, logger
-Where local files of that module are imported via `.` and those of other module via `<modulename>.`. Imports must be hierarchical! That means imports from files inside `code_General` are allowed but no stuff from `code_SemperKI`. You can import stuff from `code_General` in `code_SemperKI` though. This avoids spaghetti code.
+Where local files of that module are imported via `.` and those of other module via `<modulename>.`. Imports must be hierarchical! That means imports from files inside `Generic_Backend/code_General` are allowed but no stuff from `code_SemperKI`. You can import stuff from `Generic_Backend/code_General` in `code_SemperKI` though. This avoids spaghetti code.
 ```
 import json, logging
 from django.conf import settings
@@ -65,7 +65,7 @@ from channels.layers import get_channel_layer
 
 from ..utilities import basics
 
-from code_General.connections import redis
+from Generic_Backend.code_General.connections import redis
 
 logger = logging.getLogger("logToFile")
 ################################################################################################

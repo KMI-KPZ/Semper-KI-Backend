@@ -7,7 +7,7 @@ Contains: ?
 """
 
 from django.core.management import BaseCommand
-from ...services import serviceManager
+from ...serviceManager import serviceManager
 
 ####################################################################################
 class Command(BaseCommand):

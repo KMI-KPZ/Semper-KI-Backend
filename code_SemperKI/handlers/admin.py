@@ -12,8 +12,8 @@ import datetime, json, logging
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from code_General.utilities import basics
-from code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities import basics
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.postgresql import pgProcesses
 from ..definitions import ProcessDescription

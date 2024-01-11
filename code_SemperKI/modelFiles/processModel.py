@@ -10,8 +10,8 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project
-from code_General.modelFiles.organizationModel import Organization
-from code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.modelFiles.organizationModel import Organization
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
 class ProcessDescription(StrEnumExactylAsDefined):

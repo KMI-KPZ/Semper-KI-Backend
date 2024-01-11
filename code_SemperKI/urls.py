@@ -21,7 +21,7 @@ Including another URLconf
 
 from django.urls import path
 from django.conf import settings
-from code_General.urls import paths, urlpatterns
+from Generic_Backend.code_General.urls import paths, urlpatterns
 
 ##############################################################################
 ### WSGI

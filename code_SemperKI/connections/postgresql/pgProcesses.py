@@ -11,13 +11,13 @@ from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-from code_General.utilities import basics
-from code_General.modelFiles.userModel import User
-from code_General.modelFiles.organizationModel import Organization
-from code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults
-from code_General.connections import s3
-from code_General.utilities import crypto
+from Generic_Backend.code_General.utilities import basics
+from Generic_Backend.code_General.modelFiles.userModel import User
+from Generic_Backend.code_General.modelFiles.organizationModel import Organization
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
+from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults
+from Generic_Backend.code_General.connections import s3
+from Generic_Backend.code_General.utilities import crypto
 
 
 from ...modelFiles.projectModel import Project
@@ -26,7 +26,7 @@ from ...modelFiles.dataModel import Data
 
 from ...definitions import *
 
-from ...services import serviceManager 
+from ...serviceManager import serviceManager
 
 import logging
 logger = logging.getLogger("errors")
@@ -718,20 +718,18 @@ class ProcessManagementBase():
         dictForEventsAsOutput = {}
 
         projectObj = Project.objects.get(projectID=projectID)
-        dictForEventsAsOutput[projectObj.client] = {"eventType": "projectEvent"}
-        dictForEventsAsOutput[projectObj.client]["processes"] = []
-        dictForEventsAsOutput[projectObj.client]["projectID"] = projectID
+        dictForEventsAsOutput[projectObj.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+        dictForEventsAsOutput[projectObj.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [] }]
         for process in projectObj.processes.all():
             if process.processID in affectedProcessesIDs:
                 if projectObj.client != process.client:
                     if process.client not in dictForEventsAsOutput:
-                        dictForEventsAsOutput[process.client] = {"eventType": "projectEvent"}
-                        dictForEventsAsOutput[process.client]["process"] = [{"processID": process.processID, event: 1}]
-                        dictForEventsAsOutput[process.client]["projectID"] = projectID
+                        dictForEventsAsOutput[process.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+                        dictForEventsAsOutput[process.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
                     else:
-                        dictForEventsAsOutput[process.client]["processes"].append({"processID": process.processID, event: 1})
+                        dictForEventsAsOutput[process.client][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 else:
-                    dictForEventsAsOutput[projectObj.client]["processes"].append({"processID": process.processID, event: 1})
+                    dictForEventsAsOutput[projectObj.client][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
                 if process.processStatus >= ProcessStatus.REQUESTED:
@@ -744,12 +742,10 @@ class ProcessManagementBase():
                     if contractorID != "":
                         if projectObj.client != contractorID:
                             if contractorID not in dictForEventsAsOutput:
-                                dictForEventsAsOutput[contractorID] = {"eventType": "projectEvent"}
-                                dictForEventsAsOutput[contractorID]["processes"] = [{"processID": process.processID, event: 1}]
-                                dictForEventsAsOutput[contractorID]["projectID"] = projectID
+                                dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+                                dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
                             else:
-                                dictForEventsAsOutput[contractorID]["processes"].append({"processID": process.processID, event: 1})
-
+                                dictForEventsAsOutput[contractorID][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
         return dictForEventsAsOutput
     
     ##############################################

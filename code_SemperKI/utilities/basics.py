@@ -11,8 +11,8 @@ import json
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
-from code_General.definitions import SessionContent
-from code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
+from Generic_Backend.code_General.definitions import SessionContent
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
 from ..connections.postgresql.pgProcesses import ProcessManagementBase
 
 #######################################################

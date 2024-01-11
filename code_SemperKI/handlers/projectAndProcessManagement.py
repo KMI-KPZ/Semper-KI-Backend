@@ -15,15 +15,15 @@ from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-from code_General.utilities import crypto, rights
-from code_General.connections import s3
-from code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
-from code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
-from code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities import crypto, rights
+from Generic_Backend.code_General.connections import s3
+from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.postgresql import pgProcesses
 from ..definitions import *
-from ..services import serviceManager
+from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
 
 logger = logging.getLogger("logToFile")
@@ -145,7 +145,7 @@ def updateProject(request):
                         raise returnVal
                 
                 # TODO send to websockets that are active, that a new message/status is available for that project
-                # outputDict = {"eventType": "projectEvent"}
+                # outputDict = {EventsDescription.eventType: "projectEvent"}
                 # outputDict["projectID"] = projectID
                 # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
                 # channel_layer = get_channel_layer()
@@ -628,8 +628,8 @@ def getMissedEvents(request):
     lastLogin = timezone.make_aware(datetime.strptime(user[UserDescription.lastSeen], '%Y-%m-%d %H:%M:%S.%f+00:00'))
     projects = pgProcesses.ProcessManagementBase.getProjects(request.session)
 
-    output = {"eventType": "projectEvent", "events": []}
-
+    output = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+    #TODO: organization events like role changed or something
     for project in projects:
         currentProject = {}
         currentProject[ProjectDescription.projectID] = project[ProjectDescription.projectID]
@@ -655,7 +655,7 @@ def getMissedEvents(request):
                 processArray.append(currentProcess)
         if len(processArray):
             currentProject[SessionContentSemperKI.processes] = processArray
-            output["events"].append(currentProject)
+            output[EventsDescription.events].append(currentProject)
     
     # set accessed time to now
     pgProfiles.ProfileManagementBase.setLoginTime(user[UserDescription.hashedID])

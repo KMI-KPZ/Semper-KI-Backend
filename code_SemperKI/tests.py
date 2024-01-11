@@ -12,7 +12,7 @@ import datetime
 import json, io
 from .urls import paths
 
-from code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
+from Generic_Backend.code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
 from .definitions import ProjectDescription, ProcessDescription, SessionContentSemperKI, ProcessUpdates
 
 # Create your tests here.

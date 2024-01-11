@@ -7,7 +7,7 @@
 
 ## Environments
 The backend currently supports the environment ```--env <environment>``` which will be interpreted as follows:
-- django settings file ```code_General.settings.<environment>.py``` will be used
+- django settings file ```main.settings.<environment>.py``` will be used
 - .env.\<environment> will be used for the environment variables
 - if the environment MODE=\<environment> is set, in asgi application it will work as on ```python manage.py command --env <environment>``` has been set (used for backend docker container)
 

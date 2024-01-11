@@ -10,7 +10,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 import datetime
 
-from code_General.connections.redis import RedisConnection
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
 ####################################################################################
 class ManageQueries:
