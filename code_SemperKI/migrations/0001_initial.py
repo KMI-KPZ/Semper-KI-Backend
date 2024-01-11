@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Generic_Backend.code_General', '0001_initial'),
+        ('code_General', '0001_initial'),
     ]
 
     operations = [
@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('createdWhen', models.DateTimeField(auto_now_add=True)),
                 ('updatedWhen', models.DateTimeField()),
                 ('accessedWhen', models.DateTimeField(auto_now=True)),
-                ('contractor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='asContractor', to='Generic_Backend.code_General.organization')),
+                ('contractor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='asContractor', to='code_General.organization')),
                 ('dependenciesIn', models.ManyToManyField(related_name='processesIn', to='code_SemperKI.process')),
                 ('dependenciesOut', models.ManyToManyField(related_name='processesOut', to='code_SemperKI.process')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='processes', to='code_SemperKI.project')),
