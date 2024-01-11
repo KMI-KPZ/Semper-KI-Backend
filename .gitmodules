@@ -3,4 +3,4 @@
 	url = https://github.com/KMI-KPZ/Ontology.git
 [submodule "Generic_Backend"]
 	path = Generic_Backend
-	url = git@github.com:KMI-KPZ/Generic_Backend.git
+	url = https://github.com/KMI-KPZ/Generic_Backend.git

@@ -727,9 +727,9 @@ class ProcessManagementBase():
                         dictForEventsAsOutput[process.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
                         dictForEventsAsOutput[process.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
                     else:
-                        dictForEventsAsOutput[process.client][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+                        dictForEventsAsOutput[process.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 else:
-                    dictForEventsAsOutput[projectObj.client][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+                    dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
                 if process.processStatus >= ProcessStatus.REQUESTED:
@@ -745,7 +745,7 @@ class ProcessManagementBase():
                                 dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
                                 dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
                             else:
-                                dictForEventsAsOutput[contractorID][EventsDescription.events][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+                                dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
         return dictForEventsAsOutput
     
     ##############################################
