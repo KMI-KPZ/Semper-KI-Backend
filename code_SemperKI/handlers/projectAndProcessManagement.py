@@ -251,6 +251,10 @@ def createProcessID(request, projectID):
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProcessID.__name__):
             # get client ID
             client = pgProcesses.ProcessManagementBase.getProjectObj(projectID).client
+            currentUserID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+            if currentUserID != client:
+                # No one except the client should be able to add a process to the project
+                return JsonResponse({}, status=401)
             returnObj = pgProcesses.ProcessManagementBase.addProcessTemplateToProject(projectID, template, client)
             if isinstance(returnObj, Exception):
                 raise returnObj
