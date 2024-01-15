@@ -1,0 +1,60 @@
+version: '3.4'
+ 
+services:
+  backend-stage:
+    image: backend-stage
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["-e stage"]
+    env_file:
+     - .env.stage
+    ports:
+      - 127.0.0.1:8000:8000
+    volumes:
+      - .:/app
+    networks:
+      - semper-ki-stage-network
+
+  db-stage:
+    image: postgres:15
+    env_file:
+     - .env.stage
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      - ./postgres/data/:/var/lib/postgresql/data-dev/
+    networks:
+      - semper-ki-stage-network
+
+  files-stage:
+    image: redis:7
+    env_file:
+      - .env.stage
+    ports:
+      - 127.0.0.1:6379:6379
+    volumes:
+      - ./redis/data/:/var/lib/redis/data/
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - semper-ki-stage-network
+  
+  localstack-stage:
+    image: localstack/localstack
+    volumes:
+      - ./localstack/:/var/lib/localstack
+    env_file:
+      - .env.stage
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_PERSISTENCE=1
+    ports:
+      - "127.0.0.1:4566:4566"
+    networks:
+      - semper-ki-stage-network
+
+networks:
+  semper-ki-stage-network:

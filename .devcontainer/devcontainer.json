@@ -1,12 +1,14 @@
 {
     "name": "Python 3",
     //"context": "..",
-    "dockerComposeFile": ["../docker-compose.yml"], // You need to point it your `docker-compose.yml` file with proper path.
+    "dockerComposeFile": ["../docker-local-dev-services.yml"], // You need to point it your `docker-compose.yml` file with proper path.
     // Uncomment the next line if you want to publish any ports.
     "devPort": 8000,
     // Uncomment the next line to run commands after the container is created.
     // "postCreateCommand": "python --version",
-    "service": "backend", // You must define which service you are going to use from docker compose.
+    "services": [
+        "*"
+    ], // You must define which service you are going to use from docker compose.
     "workspaceFolder": "/app", // path to your source inside docker file
     "extensions": [
       // extensions which is going to be installed inside the docker environment

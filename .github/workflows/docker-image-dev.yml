@@ -1,10 +1,8 @@
-name: Docker Image CI
+name: Docker Image Production CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "stage" ]
 
 jobs:
 
@@ -15,8 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: create env file from secrets
-      run: echo "${{ secrets.MY_ENV_FILE }}" > .env
+      run: echo "${{ secrets.PRODUCTION }}" > .env.production
     - name: Build the Docker image
-      run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit
+      run: docker compose -f docker-compose.test.yml up --abort-on-container-exit
   
 #--file Dockerfile --tag my-image-name:$(date +%s)
