@@ -58,6 +58,7 @@
             "permission": "edit"
          },
          "elements": [
+            "ProjectContractorSelection",
             "ProjectButtonEditName",
             "ProjectsButtonNew",
             "ProjectButtonEdit",
