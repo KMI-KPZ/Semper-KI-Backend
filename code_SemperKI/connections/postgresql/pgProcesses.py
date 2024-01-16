@@ -923,6 +923,7 @@ class ProcessManagementBase():
                         continue
                 currentProject = project.toDict()
                 currentProject["processesCount"] = len(project.processes.all())
+                currentProject["owner"] = True
                     
                 output.append(currentProject)
             
@@ -941,6 +942,7 @@ class ProcessManagementBase():
                     receivedProjects[project.projectID]["processesCount"] += 1
                 
                 for project in receivedProjects:
+                    receivedProjects[project]["owner"] = False
                     output.append(receivedProjects[project])
             
             
