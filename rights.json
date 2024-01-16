@@ -112,6 +112,7 @@
             "permission": "delete"
          },
          "elements": [
+            "ProjectsButtonDeleteSelected",
             "ProjectButtonDelete",
             "ProcessButtonDelete"
          ],
