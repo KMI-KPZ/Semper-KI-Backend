@@ -12,6 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        token: ${{ secrets.PAT }}
     - name: create env file from secrets
       run: echo "${{ secrets.PRODUCTION }}" > .env.production
     - name: Build the Docker image
