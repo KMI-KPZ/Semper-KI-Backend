@@ -296,6 +296,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024
 
+# create logging file if it doesn't exist as the logging filehandler struggles with permissions
+with open("logs/info.log", 'a') as logFile:
+    logFile.close()
 
 # Logging
 LOGGING = {
