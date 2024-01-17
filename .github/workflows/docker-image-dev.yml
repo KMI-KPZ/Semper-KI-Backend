@@ -4,16 +4,23 @@ on:
   push:
     branches: [ "main", "staging" ]
 
+permissions: read-all
+
 jobs:
 
   build:
 
     runs-on: ubuntu-latest
-
+    permissions:
+      packages: write
+      deployments: write
+      contents: read
+      actions: read
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: true
+        token: ${{ secrets.PAT }}
     - name: create env file from secrets
       run: echo "${{ secrets.PRODUCTION }}" > .env.production
     - name: Build the Docker image
