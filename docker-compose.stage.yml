@@ -27,7 +27,7 @@ services:
     networks:
       - semper-ki-stage-network
 
-  files-stage:
+  redis-stage:
     image: redis:7
     env_file:
       - .env.stage
