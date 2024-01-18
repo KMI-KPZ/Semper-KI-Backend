@@ -1,6 +1,27 @@
 {
 	"version": "2.0.0",
 	"tasks": [
+
+		{  "label": "docker-compose-up",
+			"type": "shell",
+			"command" :"docker-compose",
+			"args": [
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","up","-d"
+			],
+			"group": {
+				"kind":"build",
+				"isDefault": true,
+			} ,
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			}
+		},
+			
 		{
 			"type": "docker-build",
 			"label": "docker-build",
@@ -10,7 +31,10 @@
 				"dockerfile": "${workspaceFolder}/Dockerfile",
 				"context": "${workspaceFolder}",
 				"pull": true
-			}
+			},
+			"dependsOn":[
+				"docker-compose-up"
+			]
 		},
 		{
 			"type": "docker-run",
@@ -19,19 +43,42 @@
 				"docker-build"
 			],
 			"dockerRun": {
-				//"ports": [{"containerPort": 8000, "hostPort": 8000, "protocol": "tcp"}],
-				"customOptions": "-p 127.0.0.1:8000:8000"
+				"customOptions": "-p 8000:8000",
+				"volumes": [
+					{ "containerPath": "/app", "localPath": "${workspaceFolder}"}
+				],
+				"env": {
+					"MODE" :"local_container"
+				},
+				"network": "vs-code-dev-services_semper-ki-dev-network"
 			},
 			"python": {
 				"args": [
-					//"runserver",
-					//"0.0.0.0:8000",
-					//"--settings=backend_django.settings.debug"
-					"backend_django.asgi --bind 0.0.0.0:8000 --reload --env DJANGO_SETTINGS_MODULE=backend_django.settings.debug_local --capture-output --log-level debug -k uvicorn.workers.UvicornWorker --workers 1 --threads 1 --timeout 12000"
+					"main.asgi:application --reload --reload-include *.* --reload-exclude  *.log --log-level info --env-file ./.env.dev --host 0.0.0.0 --port 8000 "
 				],
 
-				//"file": "manage.py"
-				"module": "gunicorn"
+				"module":"uvicorn"
+			}
+		},
+		{ 
+			"label": "docker-compose-down",
+			"type": "shell",
+			"command": "docker-compose",
+			"args": [
+				"-p", "vs-code-dev-services", "-f", "./docker-local-dev-services.yml","down"
+			],
+			"group": {
+				"kind":"build",
+				"isDefault": true,
+			},
+
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
 			}
 		}
 	]

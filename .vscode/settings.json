@@ -2,7 +2,7 @@
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./backend_django",
+        "./main",
         "-p",
         "*test*.py"
     ],
