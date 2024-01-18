@@ -54,7 +54,7 @@ As for the compose files:
 - `docker-local-dev-container-backend.yml`: For the backend container when running in local_container mode
 - `docker-local-dev-services.yml`: Every other container like redis, postgres and so on
 - `docker-compose.test.yml`: For running the tests, can be called via docker-compose up directly
-- `docker-compose.stage.yml`: Used on the server for staging
+- `docker-compose.staging.yml`: Used on the server for staging
 - `docker-compose.production.yml`: Same as above albeit for production
 
 ## Optional commands
@@ -64,8 +64,4 @@ As for the compose files:
 - ```python manage.py mail --env <environment> email-address``` to send a test mail to the email-address
 
 - the other environments will be added later as well as the docker-compose files
-
-## !! ATTENTION !! -> not yet ready for stage and production!
-
-# Installation of Frontend
 

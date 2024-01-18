@@ -10,7 +10,7 @@ services:
     env_file:
       - .env.production
     ports:
-      - 127.0.0.1:8001:8000
+      - 127.0.0.1:8002:8000
     volumes:
       - .:/app
     networks:
@@ -21,7 +21,7 @@ services:
     env_file:
      - .env.production
     ports:
-      - 127.0.0.1:5433:5432
+      - 127.0.0.1:5434:5432
     volumes:
       - ./postgres/data/:/var/lib/postgresql/data/
     networks:
@@ -32,7 +32,7 @@ services:
     env_file:
       - .env.production
     ports:
-      - 127.0.0.1:6380:6379
+      - 127.0.0.1:6381:6379
     volumes:
       - ./redis/data/:/var/lib/redis/data/
       - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
@@ -52,7 +52,7 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - LOCALSTACK_PERSISTENCE=1
     ports:
-      - "127.0.0.1:4567:4566"
+      - "127.0.0.1:4568:4566"
     networks:
       - semper-ki-production-network
 
