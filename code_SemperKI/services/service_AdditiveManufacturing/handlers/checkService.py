@@ -15,16 +15,19 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from Generic_Backend.code_General.utilities import crypto
-from ..utilities import mocks
-
-from Generic_Backend.code_General.connections.postgresql import pgProfiles
-from code_SemperKI.connections.postgresql import pgProcesses
-
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn
-
 from Generic_Backend.code_General.connections import redis
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.definitions import FileObjectContent
 
-logger = logging.getLogger("logToFile")
+from code_SemperKI.connections.postgresql import pgProcesses
+from code_SemperKI.handlers.projectAndProcessManagement import getProcessAndProjectFromSession
+from code_SemperKI.definitions import ProcessDescription
+
+from ..utilities import mocks
+from ..definitions import ServiceDetails
+
+logger = logging.getLogger("errors")
 
 
 #######################################################
@@ -140,3 +143,53 @@ def checkLogistics(request):
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
 
+#######################################################
+@require_http_methods(["GET"])
+def checkModel(request, processID):
+    """
+    Ask IWU service for model dimensions
+
+    :param request: GET Request with processID
+    :type request: GET
+    :return: JSON with dimensions
+    :rtype: Json Response
+
+    """
+    try:
+        model = {}
+        project, process = getProcessAndProjectFromSession(request.session, processID)
+        if process == None:
+            processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+            if processObj == None:
+                raise Exception("Process not found!")
+            
+            if ServiceDetails.model not in processObj.serviceDetails:
+                raise Exception("Model not found!")
+            
+            model = processObj.serviceDetails[ServiceDetails.model]
+        else:
+            if ServiceDetails.model not in process[ProcessDescription.serviceDetails]:
+                raise Exception("Model not found!")
+            model = process[ProcessDescription.serviceDetails][ServiceDetails.model]
+        
+        modelName = model[FileObjectContent.fileName]
+
+        mock = {
+            "filename": modelName,
+            "measurements": {
+                "volume": 1.0,
+                "surfaceArea": 1.0,
+                "mbbDimensions": {
+                    "_1": 1.0,
+                    "_2": 1.0,
+                    "_3": 1.0
+                },
+                "mbbVolume": 1.0
+            }
+        }
+
+        return JsonResponse(mock)
+
+    except (Exception) as error:
+        logger.error(f'Generic error in checkModel: {str(error)}')
+        return JsonResponse({}, status=500)
