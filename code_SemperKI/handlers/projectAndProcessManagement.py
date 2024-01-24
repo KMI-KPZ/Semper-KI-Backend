@@ -231,7 +231,7 @@ def createProcessID(request, projectID):
         template = {ProcessDescription.processID: processID, 
                     ProcessDescription.client: "", 
                     ProcessDescription.processStatus: 0, 
-                    ProcessDescription.processDetails: {},
+                    ProcessDescription.processDetails: {ProcessDetails.amount: 1},
                     ProcessDescription.serviceStatus: 0, 
                     ProcessDescription.serviceType: serviceManager.getNone(), 
                     ProcessDescription.serviceDetails: {},
