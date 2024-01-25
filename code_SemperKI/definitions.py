@@ -115,6 +115,9 @@ class ProcessDetails(StrEnumExactylAsDefined):
     """
     name = enum.auto()
     provisionalContractor = enum.auto()
+    amount = enum.auto()
+    title = enum.auto()
+    clientAdress = enum.auto()
 
 ####################################################################################
 # Enum for messages
