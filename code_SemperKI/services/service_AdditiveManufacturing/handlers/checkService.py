@@ -7,8 +7,10 @@ Contains: Handlers using simulation to check the processes
 """
 
 import json, random, logging, datetime
+from io import BytesIO
+
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 
 from asgiref.sync import async_to_sync
@@ -26,6 +28,7 @@ from code_SemperKI.definitions import ProcessDescription
 
 from ..utilities import mocks
 from ..definitions import ServiceDetails
+import requests
 
 logger = logging.getLogger("errors")
 
@@ -143,6 +146,29 @@ def checkLogistics(request):
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
 
+def getChemnitzData(fileResponse: FileResponse):
+    result =  {}
+
+    # with open("logs/Mushu.stl", "rb") as f:
+    #     fileContent = f.read()
+    fileContent = b''.join(chunk for chunk in fileResponse.streaming_content)
+
+    url = "http://localhost:9000/properties"
+    headers = {'Content-Type': 'model/stl','content-disposition' : 'filename="ein-dateiname.stl"'}
+
+    response = requests.post(url, data=fileContent, headers=headers)
+
+    # Check the response
+    if response.status_code == 200:
+        print("Success")
+        print(response)
+        result = response.json()
+    else:
+        print("Fehler")
+        print(response)
+
+    return JsonResponse(result)
+
 #######################################################
 @require_http_methods(["GET"])
 def checkModel(request, processID):
@@ -174,6 +200,13 @@ def checkModel(request, processID):
         
         modelName = model[FileObjectContent.fileName]
 
+        from ....handlers.files import downloadFile
+        #fileContent is of type BytesIO
+        fileContent = downloadFile(request, processID, model[FileObjectContent.id])
+        print(fileContent)
+        resultData = getChemnitzData(fileContent)
+
+
         mock = {
             "filename": modelName,
             "measurements": {
@@ -188,7 +221,7 @@ def checkModel(request, processID):
             }
         }
 
-        return JsonResponse(mock)
+        return JsonResponse(resultData)
 
     except (Exception) as error:
         logger.error(f'Generic error in checkModel: {str(error)}')
