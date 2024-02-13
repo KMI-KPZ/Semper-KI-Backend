@@ -50,3 +50,46 @@ class Project(models.Model):
     def toDict(self):
         return {ProjectDescription.projectID: self.projectID, ProjectDescription.projectStatus: self.projectStatus, ProjectDescription.client: self.client, ProjectDescription.projectDetails: self.projectDetails, ProjectDescription.createdWhen: str(self.createdWhen), ProjectDescription.updatedWhen: str(self.updatedWhen), ProjectDescription.accessedWhen: str(self.accessedWhen) }
 
+
+###################################################
+class ProjectInterface():
+    """
+    Project class interface
+    
+    :projectID: Unique ID for that project, primary key
+    :projectStatus: Current state of the project
+    :client: The hashed ID of the client that created the project
+    :projectDetails: Details like name and such
+    :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+    :updatedWhen: Date and time at which the entry was updated
+    :accessedWhen: Last date and time the data was fetched from the database, automatically set
+    """
+    projectID = ""
+    projectStatus = 0
+    client = ""
+    projectDetails = {}
+    createdWhen = ""
+    updatedWhen = ""
+    accessedWhen = ""
+
+    ###################################################
+    def __init__(self, projectID:str, currentTime:str) -> None:
+        self.projectID = projectID
+        self.projectStatus = 0
+        self.client = ""
+        self.projectDetails = {}
+        self.createdWhen = currentTime
+        self.updatedWhen = currentTime
+        self.accessedWhen = currentTime
+
+    ###################################################
+    def setValues(self, projectStatus, client, projectDetails, updatedWhen, accessedWhen) -> None:
+        self.projectStatus = projectStatus
+        self.client = client
+        self.projectDetails = projectDetails
+        self.updatedWhen = updatedWhen
+        self.accessedWhen = accessedWhen
+        
+    ###################################################
+    def toDict(self):
+        return {ProjectDescription.projectID: self.projectID, ProjectDescription.projectStatus: self.projectStatus, ProjectDescription.client: self.client, ProjectDescription.projectDetails: self.projectDetails, ProjectDescription.createdWhen: str(self.createdWhen), ProjectDescription.updatedWhen: str(self.updatedWhen), ProjectDescription.accessedWhen: str(self.accessedWhen) }

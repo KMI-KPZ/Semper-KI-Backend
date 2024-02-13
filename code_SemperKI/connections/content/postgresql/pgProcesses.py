@@ -20,19 +20,16 @@ from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 
 
-from ...modelFiles.projectModel import Project
-from ...modelFiles.processModel import Process
-from ...modelFiles.dataModel import Data
+from ....modelFiles.projectModel import Project, ProjectInterface
+from ....modelFiles.processModel import Process, ProcessInterface
+from ....modelFiles.dataModel import Data
 
-from ...definitions import *
+from ....definitions import *
 
-from ...serviceManager import serviceManager
+from ....serviceManager import serviceManager
 
 import logging
 logger = logging.getLogger("errors")
-
-#TODO: switch to async versions at some point
-
 
 
 ####################################################################################
@@ -783,9 +780,64 @@ class ProcessManagementBase():
             outList.append(entry.toDict())
         return outList
 
+###############################################################################
+    ##############################################
+    @staticmethod
+    def createProject(projectID:str, client:str):
+        """
+        Create the project in the database directly
 
-    ####################################################################################
-    # Processes/Projects from User
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param client: the userID of the person creating the project
+        :type client: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            now = timezone.now()
+
+            defaultProjectObject = ProjectInterface(projectID, str(now))
+
+            projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: defaultProjectObject.projectStatus, ProjectDescription.updatedWhen: now, ProjectDescription.client: client, ProjectDescription.projectDetails: defaultProjectObject.projectDetails})
+            ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), projectID, DataType.CREATION, client)
+            return None
+        except (Exception) as error:
+            logger.error(f'could not add project to database: {str(error)}')
+            return error
+    
+    ##############################################
+    @staticmethod
+    def createProcess(projectID:str, processID:str, client:str):
+        """
+        Create the project in the database directly
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :param client: the userID of the person creating the project
+        :type client: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            now = timezone.now()
+
+            projectObj = ProcessManagementBase.getProjectObj(projectID)
+
+            defaultProcessObj = ProcessInterface(processID, str(now))
+
+            processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
+            ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)
+            
+            return None
+        except (Exception) as error:
+            logger.error(f'could not add project to database: {str(error)}')
+            return error
+    
     ##############################################
     @staticmethod
     def addProjectToDatabase(session):

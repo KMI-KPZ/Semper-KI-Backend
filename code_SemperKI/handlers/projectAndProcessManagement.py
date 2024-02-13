@@ -21,10 +21,11 @@ from Generic_Backend.code_General.definitions import SessionContent, FileObjectC
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from ..connections.postgresql import pgProcesses
+from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -81,27 +82,28 @@ def createProjectID(request):
     """
     # generate ID string, make timestamp and create template for project
     projectID = crypto.generateURLFriendlyRandomString()
-    now = timezone.now()
+    #now = timezone.now()
+    contentManager = ManageContent(request.session)
+    interface = contentManager.getCorrectInterface(createProjectID.__name__)
+    client = contentManager.getClient()
+    interface.createProject(projectID, client)
 
     # login defines client
-    template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.projectStatus: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.projectDetails: {}, SessionContentSemperKI.processes: {}} 
-
-    if SessionContentSemperKI.CURRENT_PROJECTS not in request.session:
-        request.session[SessionContentSemperKI.CURRENT_PROJECTS] = {}
+    #template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.projectStatus: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.projectDetails: {}, SessionContentSemperKI.processes: {}} 
 
     # if User is logged in, everything is database backend. For anonymous users, the cache suffices
-    if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
-        template[ProcessDescription.client] = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-        # save template only temporary in session and then in database
-        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
-        pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-        request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-        del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
+    # if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
+    #     template[ProcessDescription.client] = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+    #     # save template only temporary in session and then in database
+    #     request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
+    #     pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+    #     request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+    #     del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
 
-    else:
-        # save project template in session for now
-        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
-        request.session.modified = True
+    # else:
+    #     # save project template in session for now
+    #     request.session = sessionObj.createProject(projectID)
+    request.session.modified = True
 
     #return just the id for the frontend
     return JsonResponse({ProjectDescription.projectID: projectID})
@@ -187,9 +189,10 @@ def deleteProjects(request):
         for projectID in projectIDs:
             if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 for currentProjectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                    for currentProcess in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
-                        for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files]:
-                            s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files][fileObj]["id"])
+                    if SessionContentSemperKI.processes in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID]:
+                        for currentProcess in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
+                            for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files]:
+                                s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files][fileObj]["id"])
                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
                 request.session.modified = True
 
@@ -543,8 +546,11 @@ def getFlatProjects(request):
         if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
             for entry in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 tempDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][entry])
-                tempDict["processesCount"] = len(tempDict[SessionContentSemperKI.processes])
-                del tempDict[SessionContentSemperKI.processes] # frontend doesn't need that
+                if SessionContentSemperKI.processes in tempDict:
+                    tempDict["processesCount"] = len(tempDict[SessionContentSemperKI.processes])
+                    del tempDict[SessionContentSemperKI.processes] # frontend doesn't need that
+                else:
+                    tempDict["processesCount"] = 0
                 outDict["projects"].append(tempDict)
         
         # From Database
