@@ -13,9 +13,10 @@ from Generic_Backend.code_General.definitions import SessionContent, FileObjectC
 from Generic_Backend.code_General.connections import s3
 
 from ...definitions import SessionContentSemperKI
-from ...definitions import ProjectUpdates, ProcessUpdates
+from ...definitions import ProjectUpdates, ProcessUpdates, ProcessStatus, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
+from ...serviceManager import serviceManager
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
@@ -309,7 +310,7 @@ class ProcessManagementSession(AbstractContentInterface):
                 currentProject = self.structuredSessionObj.getProject(projectID)
                 for key in content:
                     currentProject[ProjectDescription.projectDetails][key] = content[key]
-                currentProject[ProjectDescription.updatedWhen] = updated
+                currentProject[ProjectDescription.updatedWhen] = str(updated)
             return True
         except (Exception) as error:
             logger.error(f'could not update project: {str(error)}')
@@ -327,10 +328,11 @@ class ProcessManagementSession(AbstractContentInterface):
 
         """
         try:
-            for currentProcess in self.structuredSessionObj.getProcesses(projectID):
-                files = currentProcess[ProcessDescription.files]
-                for fileObj in files:
-                    s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.id])
+            processes = self.structuredSessionObj.getProcesses(projectID)
+            for currentProcess in processes:
+                files = processes[currentProcess][ProcessDescription.files]
+                for fileKey in files:
+                    s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.id])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -423,12 +425,12 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     ##############################################
-    # TODO
-    
-    def updateProcess(self, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
         """
         Change details of a process like its status, or save communication. 
 
+        :param projectID: Project that this process belongs to
+        :type projectID: str
         :param processID: unique processID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -441,15 +443,55 @@ class ProcessManagementSession(AbstractContentInterface):
         :rtype: Bool
 
         """
-        pass
+        try:
+            updated = timezone.now()
+            currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
+            if updateType == ProcessUpdates.messages:
+                currentProcess[ProcessDescription.messages]["messages"].append(content)
+            
+            elif updateType == ProcessUpdates.files:
+                for entry in content:
+                    currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
+            
+            elif updateType == ProcessUpdates.serviceType:
+                currentProcess[ProcessDescription.serviceType] = content
+            
+            elif updateType == ProcessUpdates.serviceDetails:
+                serviceType = currentProcess[ProcessDescription.serviceType]
+                if serviceType != serviceManager.getNone():
+                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
+                else:
+                    raise Exception("No Service chosen!")
+            
+            elif updateType == ProcessUpdates.serviceStatus:
+                currentProcess[ProcessDescription.serviceStatus] = content
+            
+            elif updateType == ProcessUpdates.processDetails:
+                for entry in content:
+                    currentProcess[ProcessDescription.processDetails][entry] = content[entry]
+            
+            elif updateType == ProcessUpdates.processStatus:
+                currentProcess[ProcessDescription.processStatus] = content
+            
+            elif updateType == ProcessUpdates.provisionalContractor:
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
+            else:
+                raise Exception("updateProcess delete " + updateType + " not implemented")
+            
+            currentProcess[ProcessDescription.updatedWhen] = str(updated)
+
+            return True
+        except (Exception) as error:
+            logger.error(f"could not update process: {str(error)}")
+            return error
 
     ##############################################
-    #TODO
-    
-    def deleteFromProcess(self, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
+    def deleteFromProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
         """
         Delete details of a process like its status, or content. 
 
+        :param projectID: Project that this process belongs to
+        :type projectID: str
         :param processID: unique process ID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -462,4 +504,45 @@ class ProcessManagementSession(AbstractContentInterface):
         :rtype: Bool
 
         """
-        pass
+        try:
+            updated = timezone.now()
+            currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
+            if updateType == ProcessUpdates.messages:
+                currentProcess[ProcessDescription.messages]["messages"] = []
+        
+            elif updateType == ProcessUpdates.files:
+                for entry in content:
+                    del currentProcess[ProcessDescription.files][entry]
+            
+            elif updateType == ProcessUpdates.serviceType:
+                currentProcess[ProcessDescription.serviceType] = serviceManager.getNone()
+            
+            elif updateType == ProcessUpdates.serviceDetails:
+                serviceType = currentProcess[ProcessDescription.serviceType]
+                if serviceType != serviceManager.getNone():
+                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
+                else:
+                    raise Exception("No Service chosen!")
+            
+            elif updateType == ProcessUpdates.serviceStatus:
+                currentProcess[ProcessDescription.serviceStatus] = 0
+            
+            elif updateType == ProcessUpdates.processDetails:
+                for entry in content:
+                    del currentProcess[ProcessDescription.processDetails][entry]
+            
+            elif updateType == ProcessUpdates.processStatus:
+                currentProcess[ProcessDescription.processStatus] = ProcessStatus.DRAFT
+            
+            elif updateType == ProcessUpdates.provisionalContractor:
+                del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
+            
+            else:
+                raise Exception("updateProcess delete " + updateType + " not implemented")
+
+            currentProcess[ProcessDescription.updatedWhen] = str(updated)
+
+            return True
+        except (Exception) as error:
+            logger.error(f"could not delete from process: {str(error)}")
+            return error

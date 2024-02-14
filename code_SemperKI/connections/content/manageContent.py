@@ -10,6 +10,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 from Generic_Backend.code_General.definitions import SessionContent, GlobalDefaults
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
+from ...utilities.basics import manualCheckIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
 from .session import ProcessManagementSession
 from .postgresql.pgProcesses import ProcessManagementBase
 
@@ -27,19 +28,63 @@ class ManageContent():
         self.postgresManagement = ProcessManagementBase()
 
     #######################################################
-    def getCorrectInterface(self, functionName:str):
+    def checkRightsForProject(self, projectID) -> bool:
+        """
+        Check if user may see project
+
+        :param functionName: The name of the calling function
+        :type functionName: str
+        :param projectID: The projectID of the project in question
+        :type projectID: str
+        :return: True if the user belongs to the rightful, false if not
+        :rtype: Bool
+
+        """
+        currentUserID = self.getClient()
+        if currentUserID == GlobalDefaults.anonymous:
+            return True
+        elif manualCheckIfUserMaySeeProject(self.currentSession, currentUserID, projectID):
+            return True
+        
+        return False
+
+    #######################################################
+    def checkRightsForProcess(self, processID) -> bool:
+        """
+        Check if user may see process
+
+        :param processID: The processID of the process in question
+        :type processID: str
+        :return: True if the user belongs to the rightful, false if not
+        :rtype: Bool
+
+        """
+        currentUserID = self.getClient()
+        if currentUserID == GlobalDefaults.anonymous:
+            return True
+        elif manualCheckIfUserMaySeeProcess(self.currentSession, currentUserID, processID):
+            return True
+        
+        return False
+
+    #######################################################
+    def getCorrectInterface(self, functionName):
         """
         Return the correct class interface
         
         :param functionName: The name of the calling function
         :type functionName: str
         :return: Either the session or the postgres interface
-        :rtype: ProcessManagementSession | ProcessManagementBase
+        :rtype: ProcessManagementSession | ProcessManagementBase | None
 
         """
-        if manualCheckifLoggedIn(self.currentSession) and manualCheckIfRightsAreSufficient(self.currentSession, functionName):
-            return self.postgresManagement
+        if manualCheckifLoggedIn(self.currentSession):
+            if manualCheckIfRightsAreSufficient(self.currentSession, functionName):
+                return self.postgresManagement
+            else:
+                return None
         else:
+            self.currentSession.modified = True
             return self.sessionManagement
         
     #######################################################

@@ -28,13 +28,15 @@ from ....definitions import *
 
 from ....serviceManager import serviceManager
 
+from ..abstractInterface import AbstractContentInterface
+
 import logging
 logger = logging.getLogger("errors")
 
 
 ####################################################################################
 # Projects/Processes general
-class ProcessManagementBase():
+class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
@@ -513,10 +515,12 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def updateProcess(processID, updateType: ProcessUpdates, content, updatedBy):
+    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy):
         """
         Change details of a process like its status, or save communication. 
 
+        :param projectID: The project ID, not necessary here
+        :type projectID: str
         :param processID: unique processID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -602,10 +606,12 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def deleteFromProcess(processID, updateType: ProcessUpdates, content, deletedBy):
+    def deleteFromProcess(projectID, processID, updateType: ProcessUpdates, content, deletedBy):
         """
         Delete details of a process like its status, or content. 
 
+        :param projectID: Project that this process belongs to, not needed here
+        :type projectID: str
         :param processID: unique process ID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -801,7 +807,6 @@ class ProcessManagementBase():
             defaultProjectObject = ProjectInterface(projectID, str(now))
 
             projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: defaultProjectObject.projectStatus, ProjectDescription.updatedWhen: now, ProjectDescription.client: client, ProjectDescription.projectDetails: defaultProjectObject.projectDetails})
-            ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), projectID, DataType.CREATION, client)
             return None
         except (Exception) as error:
             logger.error(f'could not add project to database: {str(error)}')

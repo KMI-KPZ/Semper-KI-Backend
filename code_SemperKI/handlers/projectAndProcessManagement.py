@@ -17,7 +17,7 @@ from channels.layers import get_channel_layer
 
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription
+from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
@@ -85,6 +85,10 @@ def createProjectID(request):
     #now = timezone.now()
     contentManager = ManageContent(request.session)
     interface = contentManager.getCorrectInterface(createProjectID.__name__)
+    if interface == None:
+        logger.error("Rights not sufficient in createProjectID")
+        return JsonResponse({}, status=401)
+    
     client = contentManager.getClient()
     interface.createProject(projectID, client)
 
@@ -103,7 +107,8 @@ def createProjectID(request):
     # else:
     #     # save project template in session for now
     #     request.session = sessionObj.createProject(projectID)
-    request.session.modified = True
+
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
 
     #return just the id for the frontend
     return JsonResponse({ProjectDescription.projectID: projectID})
@@ -124,46 +129,33 @@ def updateProject(request):
         changes = json.loads(request.body.decode("utf-8"))
         projectID = changes[ProjectDescription.projectID]
 
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-            if ProjectDescription.projectStatus in changes["changes"]:
-                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.projectStatus] = changes["changes"][ProjectDescription.projectStatus]
-            elif ProjectDescription.projectDetails in changes["changes"]:
-                for elem in changes["changes"][ProjectDescription.projectDetails]:
-                    request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][ProjectDescription.projectDetails][elem] = changes["changes"][ProjectDescription.projectDetails][elem]
-            request.session.modified = True
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProject.__name__):
-                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-                if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-                    return HttpResponse("Not allowed!", status=401)
-                
-                if ProjectDescription.projectStatus in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.projectStatus, changes["changes"][ProjectDescription.projectStatus])
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-                if ProjectDescription.projectDetails in changes["changes"]:
-                    returnVal = pgProcesses.ProcessManagementBase.updateProject(projectID, ProjectUpdates.projectDetails, changes["changes"][ProjectDescription.projectDetails])
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-                
-                # TODO send to websockets that are active, that a new message/status is available for that project
-                # outputDict = {EventsDescription.eventType: "projectEvent"}
-                # outputDict["projectID"] = projectID
-                # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
-                # channel_layer = get_channel_layer()
-                # listOfUsers = pgProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
-                # for user in listOfUsers:
-                #     if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-                #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
-                #             "type": "sendMessageJSON",
-                #             "dict": outputDict,
-                #         })
-                logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(updateProject.__name__)
+        if interface == None or not contentManager.checkRightsForProject(projectID):
+            logger.error("Rights not sufficient in updateProject")
+            return HttpResponse("Insufficient rights!", status=401)
 
-            else:
-                return HttpResponse("Not logged in", status=401)
+        for entry in changes["changes"]:
+            returnVal = interface.updateProject(projectID, entry, changes["changes"][entry])
+            if isinstance(returnVal, Exception):
+                raise returnVal
+              
+        # TODO send to websockets that are active, that a new message/status is available for that project
+        # outputDict = {EventsDescription.eventType: "projectEvent"}
+        # outputDict["projectID"] = projectID
+        # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
+        # channel_layer = get_channel_layer()
+        # listOfUsers = pgProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
+        # for user in listOfUsers:
+        #     if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+        #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
+        #             "type": "sendMessageJSON",
+        #             "dict": outputDict,
+        #         })
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
 
         return HttpResponse("Success")
+    
     except (Exception) as error:
         loggerError.error(f"updateProject: {str(error)}")
         return HttpResponse("Failed",status=500)
@@ -184,10 +176,21 @@ def deleteProjects(request):
     """
     try:
         projectIDs = request.GET['projectIDs'].split(",")
-        loggedIn = False # don't check rights in every iteration
+        #loggedIn = False # don't check rights in every iteration
+
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(deleteProjects.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in deleteProjects")
+            return HttpResponse("Insufficient rights!", status=401)
         
         for projectID in projectIDs:
-            if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
+            if not contentManager.checkRightsForProject(projectID):
+                logger.error("Rights not sufficient in deleteProjects")
+                return HttpResponse("Insufficient rights!", status=401)
+            interface.deleteProject(projectID)
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+            """ if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 for currentProjectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
                     if SessionContentSemperKI.processes in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID]:
                         for currentProcess in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
@@ -204,8 +207,8 @@ def deleteProjects(request):
                 
                 pgProcesses.ProcessManagementBase.deleteProject(projectID)
             else:
-                raise Exception("Not logged in or rights insufficient!")
-
+                raise Exception("Not logged in or rights insufficient!") """
+        
         return HttpResponse("Success")
     except (Exception) as error:
         loggerError.error(f"deleteProject: {str(error)}")
@@ -230,6 +233,17 @@ def createProcessID(request, projectID):
     try:
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
+        
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(createProcessID.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in createProcessID")
+            return JsonResponse({}, status=401)
+        
+        client = contentManager.getClient()
+        interface.createProcess(projectID, processID, client)
+
+        """ 
         now = timezone.now()
         template = {ProcessDescription.processID: processID, 
                     ProcessDescription.client: "", 
@@ -261,12 +275,179 @@ def createProcessID(request, projectID):
             returnObj = pgProcesses.ProcessManagementBase.addProcessTemplateToProject(projectID, template, client)
             if isinstance(returnObj, Exception):
                 raise returnObj
+        """
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
         # return just the generated ID for frontend
         return JsonResponse({ProcessDescription.processID: processID})
     except (Exception) as error:
         loggerError.error(f"createProcessID: {str(error)}")
         return JsonResponse({}, status=500)
+
+# #######################################################
+# def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
+#     """
+#     Update process logic
+    
+#     :param projectID: Project ID
+#     :type projectID: Str
+#     :param projectID: Process ID
+#     :type projectID: Str
+#     :return: Message if it worked or not
+#     :rtype: Str, bool or Error
+#     """
+#     try:
+#         now = timezone.now()
+#         if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
+#             # changes
+#             for processID in processIDs:
+#                 # deletions
+#                 if "deletions" in changes:
+#                     for elem in changes["deletions"]:
+#                         if elem == ProcessUpdates.messages:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"] = []
+                    
+#                         elif elem == ProcessUpdates.files:
+#                             for entry in changes["deletions"][ProcessUpdates.files]:
+#                                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry]
+                        
+#                         elif elem == ProcessUpdates.serviceType:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = serviceManager.getNone()
+                        
+#                         elif elem == ProcessUpdates.serviceDetails:
+#                             serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
+#                             if serviceType != serviceManager.getNone():
+#                                 request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["deletions"][ProcessUpdates.serviceDetails])
+#                             else:
+#                                 raise Exception("No Service chosen!")
+                        
+#                         elif elem == ProcessUpdates.serviceStatus:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = 0
+                        
+#                         elif elem == ProcessUpdates.processDetails:
+#                             for entry in changes["deletions"][ProcessUpdates.processDetails]:
+#                                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry]
+                        
+#                         elif elem == ProcessUpdates.processStatus:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = ProcessStatus.DRAFT
+                        
+#                         elif elem == ProcessUpdates.provisionalContractor:
+#                             del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
+
+#                 for elem in changes["changes"]:
+#                     if elem == ProcessUpdates.messages:
+#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"].append(changes["changes"][ProcessUpdates.messages])
+                    
+#                     elif elem == ProcessUpdates.files:
+#                         for entry in changes["changes"][ProcessUpdates.files]:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry] = changes["changes"][ProcessUpdates.files][entry]
+                    
+#                     elif elem == ProcessUpdates.serviceType:
+#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = changes["changes"][ProcessUpdates.serviceType]
+                    
+#                     elif elem == ProcessUpdates.serviceDetails:
+#                         serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
+#                         if serviceType != serviceManager.getNone():
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["changes"][ProcessUpdates.serviceDetails])
+#                         else:
+#                             raise Exception("No Service chosen!")
+                    
+#                     elif elem == ProcessUpdates.serviceStatus:
+#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = changes["changes"][ProcessUpdates.serviceStatus]
+                    
+#                     elif elem == ProcessUpdates.processDetails:
+#                         for entry in changes["changes"][ProcessUpdates.processDetails]:
+#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry] = changes["changes"][ProcessDescription.processDetails][entry]
+                    
+#                     elif elem == ProcessUpdates.processStatus:
+#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = changes["changes"][ProcessUpdates.processStatus]
+                    
+#                     elif elem == ProcessUpdates.provisionalContractor:
+#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = changes["changes"][ProcessUpdates.provisionalContractor]
+
+#                 request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.updatedWhen] = str(now)
+            
+#             request.session.modified = True
+#         else:
+#             # database version
+#             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
+#                 userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+
+#                 for processID in processIDs:
+#                     if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
+#                         return ("", False) # user may not change this process
+        
+#                     if "deletions" in changes:
+#                         for elem in changes["deletions"]:
+#                             returnVal = True
+#                             if elem == ProcessUpdates.serviceDetails: # service is a dict in itself      
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
+#                             elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.messages, changes["deletions"][ProcessUpdates.messages], userID)
+#                             elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.files, changes["deletions"][ProcessUpdates.files], userID)
+#                             elif elem == ProcessUpdates.provisionalContractor:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.provisionalContractor, changes["deletions"][ProcessUpdates.provisionalContractor], userID)
+#                             elif elem == ProcessUpdates.processDetails:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processDetails, changes["deletions"][ProcessUpdates.processDetails], userID)
+#                             elif elem == ProcessUpdates.processStatus:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processStatus, changes["deletions"][ProcessUpdates.processStatus], userID)
+#                             elif elem == ProcessUpdates.serviceType:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceType, changes["deletions"][ProcessUpdates.serviceType], userID)
+#                             elif elem == ProcessUpdates.serviceStatus:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceStatus, changes["deletions"][ProcessUpdates.serviceStatus], userID)
+#                             elif elem == ProcessUpdates.serviceDetails:
+#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
+#                             else:
+#                                 raise Exception("updateProcess delete " + elem + " not implemented")
+#                             if isinstance(returnVal, Exception):
+#                                 raise returnVal
+
+#                     for elem in changes["changes"]:
+#                         returnVal = True
+#                         if elem == ProcessUpdates.serviceType:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessUpdates.serviceType], userID)
+#                             fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.serviceType, "edit")
+                        
+#                         elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
+#                             fireWebsocketEvents(projectID, [processID], request.session, "messages", "messages")
+                        
+#                         elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files], userID)
+#                             fireWebsocketEvents(projectID, [processID], request.session, "files", "files")
+                        
+#                         elif elem == ProcessUpdates.serviceDetails:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessUpdates.serviceDetails], userID)
+                        
+#                         elif elem == ProcessUpdates.processDetails:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessUpdates.processDetails], userID)
+                        
+#                         elif elem == ProcessUpdates.processStatus:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessUpdates.processStatus], userID)
+#                             fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.processStatus, "edit")
+                        
+#                         elif elem == ProcessUpdates.serviceStatus:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessUpdates.serviceStatus], userID)
+                        
+#                         elif elem == ProcessUpdates.provisionalContractor:
+#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessUpdates.provisionalContractor], userID)
+                        
+#                         else:
+#                             raise Exception("updateProcess change " + elem + " not implemented")
+
+#                         if isinstance(returnVal, Exception):
+#                             raise returnVal
+                    
+#                     # logging
+#                     logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+
+#             else:
+#                 return ("", False)
+            
+#         return ("", True)
+#     except (Exception) as error:
+#         return (error, True)
 
 #######################################################
 def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
@@ -281,159 +462,53 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
     :rtype: Str, bool or Error
     """
     try:
-        now = timezone.now()
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-            # changes
-            for processID in processIDs:
-                # deletions
-                if "deletions" in changes:
-                    for elem in changes["deletions"]:
-                        if elem == ProcessUpdates.messages:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"] = []
-                    
-                        elif elem == ProcessUpdates.files:
-                            for entry in changes["deletions"][ProcessUpdates.files]:
-                                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry]
-                        
-                        elif elem == ProcessUpdates.serviceType:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = serviceManager.getNone()
-                        
-                        elif elem == ProcessUpdates.serviceDetails:
-                            serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
-                            if serviceType != serviceManager.getNone():
-                                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["deletions"][ProcessUpdates.serviceDetails])
-                            else:
-                                raise Exception("No Service chosen!")
-                        
-                        elif elem == ProcessUpdates.serviceStatus:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = 0
-                        
-                        elif elem == ProcessUpdates.processDetails:
-                            for entry in changes["deletions"][ProcessUpdates.processDetails]:
-                                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry]
-                        
-                        elif elem == ProcessUpdates.processStatus:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = ProcessStatus.DRAFT
-                        
-                        elif elem == ProcessUpdates.provisionalContractor:
-                            del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
-
-                for elem in changes["changes"]:
-                    if elem == ProcessUpdates.messages:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"].append(changes["changes"][ProcessUpdates.messages])
-                    
-                    elif elem == ProcessUpdates.files:
-                        for entry in changes["changes"][ProcessUpdates.files]:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry] = changes["changes"][ProcessUpdates.files][entry]
-                    
-                    elif elem == ProcessUpdates.serviceType:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = changes["changes"][ProcessUpdates.serviceType]
-                    
-                    elif elem == ProcessUpdates.serviceDetails:
-                        serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
-                        if serviceType != serviceManager.getNone():
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["changes"][ProcessUpdates.serviceDetails])
-                        else:
-                            raise Exception("No Service chosen!")
-                    
-                    elif elem == ProcessUpdates.serviceStatus:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = changes["changes"][ProcessUpdates.serviceStatus]
-                    
-                    elif elem == ProcessUpdates.processDetails:
-                        for entry in changes["changes"][ProcessUpdates.processDetails]:
-                            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry] = changes["changes"][ProcessDescription.processDetails][entry]
-                    
-                    elif elem == ProcessUpdates.processStatus:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = changes["changes"][ProcessUpdates.processStatus]
-                    
-                    elif elem == ProcessUpdates.provisionalContractor:
-                        request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = changes["changes"][ProcessUpdates.provisionalContractor]
-
-                request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.updatedWhen] = str(now)
-            
-            request.session.modified = True
-        else:
-            # database version
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
-                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-
-                for processID in processIDs:
-                    if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
-                        return ("", False) # user may not change this process
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(updateProcess.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in updateProcess")
+            return ("", False)
         
-                    if "deletions" in changes:
-                        for elem in changes["deletions"]:
-                            returnVal = True
-                            if elem == ProcessUpdates.serviceDetails: # service is a dict in itself      
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
-                            elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.messages, changes["deletions"][ProcessUpdates.messages], userID)
-                            elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.files, changes["deletions"][ProcessUpdates.files], userID)
-                            elif elem == ProcessUpdates.provisionalContractor:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.provisionalContractor, changes["deletions"][ProcessUpdates.provisionalContractor], userID)
-                            elif elem == ProcessUpdates.processDetails:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processDetails, changes["deletions"][ProcessUpdates.processDetails], userID)
-                            elif elem == ProcessUpdates.processStatus:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processStatus, changes["deletions"][ProcessUpdates.processStatus], userID)
-                            elif elem == ProcessUpdates.serviceType:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceType, changes["deletions"][ProcessUpdates.serviceType], userID)
-                            elif elem == ProcessUpdates.serviceStatus:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceStatus, changes["deletions"][ProcessUpdates.serviceStatus], userID)
-                            elif elem == ProcessUpdates.serviceDetails:
-                                returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
-                            else:
-                                raise Exception("updateProcess delete " + elem + " not implemented")
-                            if isinstance(returnVal, Exception):
-                                raise returnVal
-
-                    for elem in changes["changes"]:
-                        returnVal = True
-                        if elem == ProcessUpdates.serviceType:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessUpdates.serviceType], userID)
-                            fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.serviceType, "edit")
-                        
-                        elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
-                            fireWebsocketEvents(projectID, [processID], request.session, "messages", "messages")
-                        
-                        elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files], userID)
-                            fireWebsocketEvents(projectID, [processID], request.session, "files", "files")
-                        
-                        elif elem == ProcessUpdates.serviceDetails:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessUpdates.serviceDetails], userID)
-                        
-                        elif elem == ProcessUpdates.processDetails:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessUpdates.processDetails], userID)
-                        
-                        elif elem == ProcessUpdates.processStatus:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessUpdates.processStatus], userID)
-                            fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.processStatus, "edit")
-                        
-                        elif elem == ProcessUpdates.serviceStatus:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessUpdates.serviceStatus], userID)
-                        
-                        elif elem == ProcessUpdates.provisionalContractor:
-                            returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessUpdates.provisionalContractor], userID)
-                        
-                        else:
-                            raise Exception("updateProcess change " + elem + " not implemented")
-
-                        if isinstance(returnVal, Exception):
-                            raise returnVal
-                    
-                    # logging
-                    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
-
-            else:
+        client = contentManager.getClient()
+        
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in updateProcess")
                 return ("", False)
             
+            if "deletions" in changes:
+                for elem in changes["deletions"]:
+                    # exclude people not having sufficient rights for that specific operation
+                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
+                        if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, str(elem)):
+                            logger.error("Rights not sufficient in updateProcess")
+                            return ("", False)
+                        
+                    returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
+
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
+
+            if "changes" in changes:
+                for elem in changes["changes"]:
+                    # for websocket events
+                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
+                        # exclude people not having sufficient rights for that specific operation
+                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, str(elem)):
+                            logger.error("Rights not sufficient in updateProcess")
+                            return ("", False)
+                        fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
+                    
+                    returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
+
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
+
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+
         return ("", True)
     except (Exception) as error:
         return (error, True)
-
-
+        
 #######################################################
 def getProcessAndProjectFromSession(session, processID):
     """

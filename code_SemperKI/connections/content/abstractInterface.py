@@ -158,10 +158,12 @@ class AbstractContentInterface(ABC):
 
     ##############################################
     @abstractmethod
-    def updateProcess(self, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
         """
         Change details of a process like its status, or save communication. 
 
+        :param projectID: Project that this process belongs to
+        :type projectID: str
         :param processID: unique processID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -178,10 +180,12 @@ class AbstractContentInterface(ABC):
 
     ##############################################
     @abstractmethod
-    def deleteFromProcess(self, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
+    def deleteFromProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
         """
         Delete details of a process like its status, or content. 
 
+        :param projectID: Project that this process belongs to
+        :type projectID: str
         :param processID: unique process ID to be edited
         :type processID: str
         :param updateType: changed process details
