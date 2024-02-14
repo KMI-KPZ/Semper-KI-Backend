@@ -132,8 +132,9 @@ def getMaterials(request):
     #         resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": mocks.testpicture.mockPicturePath})
 
     # mockup here:
-    #filters.update(mocks.materialMock)
-    filters.update(resultsOfQueries)
+    mocks.materialMock["materials"].extend(resultsOfQueries["materials"])
+    filters.update(mocks.materialMock)
+    #filters.update(resultsOfQueries)
     
     # TODO: gzip this 
     return JsonResponse(filters)
