@@ -6,11 +6,12 @@ Akshay NS 2023
 Contains: Configuration for Celery worker
 
 """
+############################################
 from __future__ import absolute_import
 
 from dotenv import load_dotenv
 
-from celery import Celery, shared_task
+from celery import Celery
 
 import os
 ############################################
