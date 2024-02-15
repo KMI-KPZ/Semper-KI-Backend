@@ -66,6 +66,22 @@ class ManageContent():
             return True
         
         return False
+    
+    #######################################################
+    def checkRights(self, functionName) -> bool:
+        """
+        Check if user is logged in and function may be called
+
+        :param functionName: The name of the calling function
+        :type functionName: str
+        :return: True if the user belongs to the rightful, false if not
+        :rtype: Bool
+
+        """
+        if manualCheckifLoggedIn(self.currentSession) and manualCheckIfRightsAreSufficient(self.currentSession, functionName):
+            return True
+        else:
+            return False
 
     #######################################################
     def getCorrectInterface(self, functionName):

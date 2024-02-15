@@ -29,6 +29,7 @@ from ....definitions import *
 from ....serviceManager import serviceManager
 
 from ..abstractInterface import AbstractContentInterface
+from ..session import ProcessManagementSession
 
 import logging
 logger = logging.getLogger("errors")
@@ -856,26 +857,26 @@ class ProcessManagementBase(AbstractContentInterface):
 
         """
         now = timezone.now()
+        contentOfSession = ProcessManagementSession(session)
         try:
             # Check if there's anything to save
-            if SessionContentSemperKI.CURRENT_PROJECTS not in session:
+            if not contentOfSession.getIfContentIsInSession():
                 return None
             
             # first get user
             clientID = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
 
             # then go through projects
-            for projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
+            projects = contentOfSession.structuredSessionObj.getProjects()
+            for entry in projects:
+                projectID = entry[ProjectDescription.projectID]
+                project = contentOfSession.getProject(projectID)
 
-                # project object
                 # check if obj already exists in database and overwrite it
                 # if not, create a new entry
-                existingObj = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
-
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: existingObj[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: existingObj[ProjectDescription.projectDetails]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: project[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: project[ProjectDescription.projectDetails]})
                 # save processes
-                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
-                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][entry]
+                for process in project[SessionContentSemperKI.processes]:
                     processID = process[ProcessDescription.processID]
                     serviceType = process[ProcessDescription.serviceType]
                     serviceStatus = process[ProcessDescription.serviceStatus]
@@ -975,9 +976,9 @@ class ProcessManagementBase(AbstractContentInterface):
             output = []
             
             for project in projects:
-                if SessionContentSemperKI.CURRENT_PROJECTS in session:
-                    if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                        continue
+                # if SessionContentSemperKI.CURRENT_PROJECTS in session:
+                #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
+                #         continue
                 currentProject = project.toDict()
                 currentProject["processesCount"] = len(project.processes.all())
                 currentProject["owner"] = True
@@ -1002,9 +1003,6 @@ class ProcessManagementBase(AbstractContentInterface):
                     receivedProjects[project]["owner"] = False
                     output.append(receivedProjects[project])
             
-            
-            output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:

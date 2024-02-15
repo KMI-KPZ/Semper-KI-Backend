@@ -7,7 +7,7 @@ Contains: Offers an interface to access the session dictionary in a structured w
 """
 
 from django.utils import timezone
-import logging
+import logging, copy
 
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
@@ -60,6 +60,19 @@ class StructuredSession():
         return True if SessionContentSemperKI.CURRENT_PROJECTS in self.currentSession else False
 
     #######################################################
+    def clearContentFromSession(self) -> None:
+        """
+        Delete all projects from session
+
+        :return: Nothing
+        :rtype: None
+        
+        """
+        self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+        del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]
+        self.currentSession.modified = True
+
+    #######################################################
     def getProject(self, projectID:str) -> dict:
         """
         Return specific project from session
@@ -70,8 +83,10 @@ class StructuredSession():
         :rtype: dict
 
         """
-
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
+        if projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
+        else:
+            return {}
 
     #######################################################
     def getProjects(self) -> list:
@@ -83,7 +98,7 @@ class StructuredSession():
 
         """
 
-        return list(self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS])
+        return list(self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS].values())
     
     #######################################################
     def setProject(self, projectID:str, content:dict) -> None:
@@ -165,6 +180,25 @@ class StructuredSession():
                         return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
 
         return {}
+    
+    #######################################################
+    def getProcessAndProjectPerID(self, processID:str):
+        """
+        Get process without project ID but return it
+
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Corresponding projectID and dictionary with process in it
+        :rtype: (str,dict)
+        
+        """
+        for projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+                for currentProcessID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
+                    if currentProcessID == processID:
+                        return (projectID, self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID])
+
+        return (None, None)
 
     #######################################################
     def setProcess(self, projectID:str, processID:str, content:dict):
@@ -277,7 +311,8 @@ class ProcessManagementSession(AbstractContentInterface):
 
         """
         try: 
-            savedProject = self.structuredSessionObj.getProject(projectID)
+            savedProject = copy.deepcopy(self.structuredSessionObj.getProject(projectID))
+            savedProject[SessionContentSemperKI.processes] = [savedProject[SessionContentSemperKI.processes][process] for process in savedProject[SessionContentSemperKI.processes]]
             return savedProject
         
         except (Exception) as error:

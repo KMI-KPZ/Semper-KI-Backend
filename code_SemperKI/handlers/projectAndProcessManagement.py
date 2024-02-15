@@ -522,12 +522,17 @@ def getProcessAndProjectFromSession(session, processID):
     :rtype: Dict or None
     """
     try:
-        if SessionContentSemperKI.CURRENT_PROJECTS in session:
-            for currentProjectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                for currentProcessID in session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
-                    if currentProcessID == processID:
-                        return (currentProjectID, session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcessID])
-        return (None, None)
+        contentManager = ManageContent(session)
+        if contentManager.sessionManagement.getIfContentIsInSession():
+            return contentManager.sessionManagement.structuredSessionObj.getProcessAndProjectPerID(processID)
+        else:
+            return (None, None)
+        # if SessionContentSemperKI.CURRENT_PROJECTS in session:
+        #     for currentProjectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
+        #         for currentProcessID in session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
+        #             if currentProcessID == processID:
+        #                 return (currentProjectID, session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcessID])
+        # return (None, None)
     except (Exception) as error:
         loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
         return (None, None)
@@ -577,23 +582,19 @@ def deleteProcesses(request, projectID):
     """
     try:
         processIDs = request.GET['processIDs'].split(",")
-        loggedIn = False # check rights only once
-        for processID in processIDs:
-            if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files]:
-                    s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][fileObj][FileObjectContent.id])
-                
-                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
-                request.session.modified = True
 
-            elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProcesses.__name__)):
-                loggedIn = True
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
-                    raise Exception("Not logged in or rights insufficient!")
-                pgProcesses.ProcessManagementBase.deleteProcess(processID)
-            else:
-                raise Exception("Not logged in or rights insufficient!")
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(deleteProcesses.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in deleteProcesses")
+            return HttpResponse("Insufficient rights!", status=401)
+
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            interface.deleteProcess(processID)
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
         
         return HttpResponse("Success")
     except (Exception) as error:
@@ -617,23 +618,22 @@ def getFlatProjects(request):
     """
     try:
         outDict = {"projects": []}
-        # From session
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
-            for entry in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                tempDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][entry])
-                if SessionContentSemperKI.processes in tempDict:
-                    tempDict["processesCount"] = len(tempDict[SessionContentSemperKI.processes])
-                    del tempDict[SessionContentSemperKI.processes] # frontend doesn't need that
-                else:
-                    tempDict["processesCount"] = 0
-                outDict["projects"].append(tempDict)
+        contentManager = ManageContent(request.session)
+
+        # Gather from session...
+        if contentManager.sessionManagement.getIfContentIsInSession():
+            sessionContent = contentManager.sessionManagement.getProjectsFlat(request.session)
+            outDict["projects"].extend(sessionContent)
         
-        # From Database
+        # ... or from database
         if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):           
-            objFromDB = pgProcesses.ProcessManagementBase.getProjectsFlat(request.session)
+            objFromDB = contentManager.postgresManagement.getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
 
+        outDict["projects"] = sorted(outDict["projects"], key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
+        
         return JsonResponse(outDict)
     
     except (Exception) as error:
@@ -656,15 +656,21 @@ def getProject(request, projectID):
 
     """
     try:
-        outDict = {}
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
-            if projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                outDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]) # copy the content
-                outDict[SessionContentSemperKI.processes] = [outDict[SessionContentSemperKI.processes][process] for process in outDict[SessionContentSemperKI.processes]]
-                return JsonResponse(outDict)
-        
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
-            userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        contentManager = ManageContent(request.session)
+        # Is the project inside the session?
+        project = {}
+        if contentManager.sessionManagement.getIfContentIsInSession():
+            project = contentManager.sessionManagement.getProject(projectID)
+        if len(project) > 0:
+            return JsonResponse(project)
+        else:
+            # if not, look into database and check if the user or the contractor wants the project 
+            interface = contentManager.getCorrectInterface(getProject.__name__)
+            if interface == None:
+                logger.error("Rights not sufficient in getProject")
+                return JsonResponse({}, status=401)
+            
+            userID = contentManager.getClient()
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
                 return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
             else:
@@ -673,7 +679,23 @@ def getProject(request, projectID):
                 else:
                     return JsonResponse({}, status=401)
 
-        return JsonResponse({})
+        # if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
+        #     if projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
+        #         outDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]) # copy the content
+        #         outDict[SessionContentSemperKI.processes] = [outDict[SessionContentSemperKI.processes][process] for process in outDict[SessionContentSemperKI.processes]]
+        #         return JsonResponse(outDict)
+        
+        # if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
+        #     userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        #     if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
+        #         return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+        #     else:
+        #         if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+        #             return JsonResponse(pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID))
+        #         else:
+        #             return JsonResponse({}, status=401)
+
+        # return JsonResponse({})
     except (Exception) as error:
         loggerError.error(f"getProject: {str(error)}")
         return JsonResponse({}, status=500)
@@ -805,14 +827,13 @@ def saveProjectsViaWebsocket(session):
 
     """
     try:
-        if SessionContentSemperKI.CURRENT_PROJECTS in session and manualCheckifLoggedIn(session) and manualCheckIfRightsAreSufficient(session, "saveProjects"):
+        contentManager = ManageContent(session)
+        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession() and contentManager.checkRights("saveProjects"):
             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(session)
             if isinstance(error, Exception):
                 raise error
             
-            session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-            del session[SessionContentSemperKI.CURRENT_PROJECTS]
-            #session.modified = True
+            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         return None
@@ -837,14 +858,13 @@ def saveProjects(request):
     """
 
     try:
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
+        contentManager = ManageContent(request.session)
+        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
             if isinstance(error, Exception):
                 raise error
 
-            request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-            del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
-            request.session.modified = True
+            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
         
@@ -880,7 +900,8 @@ def verifyProject(request):
             return HttpResponse("Not allowed!", status=401)
 
         # first save projects
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
+        contentManager = ManageContent(request.session)
+        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
             if isinstance(error, Exception):
                 raise error
@@ -889,9 +910,7 @@ def verifyProject(request):
             
             # then clear drafts from session
             
-            request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-            del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
-
+            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
 
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
