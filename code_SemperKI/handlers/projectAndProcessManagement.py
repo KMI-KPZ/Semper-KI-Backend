@@ -915,7 +915,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED, userID)
+            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED, userID)
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -961,7 +961,7 @@ def sendProject(request):
         # TODO Check if process is verified
         
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
+            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
         # TODO send local files to remote
