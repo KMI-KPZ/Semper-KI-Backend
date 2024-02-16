@@ -10,6 +10,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project
+from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
@@ -109,6 +110,85 @@ class Process(models.Model):
                 ProcessDescription.processDetails: self.processDetails,
                 ProcessDescription.client: self.client,
                 ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
+                ProcessDescription.files: self.files,
+                ProcessDescription.messages: self.messages,
+                ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
+    
+
+###################################################
+class ProcessInterface():
+    """
+    Process management class interface.
+    
+    :processID: Unique ID for that process, primary key
+    :processDetails: Name of the process and stuff
+    :processStatus: How everything is going in general
+    :serviceDetails: Details for that service
+    :serviceStatus: How everything is going for the service
+    :serviceType: Which service it is
+    :client: Who started the process
+    :files: Registrar keeping check, which files are currently there, link to Data model
+    :messages: same as files but for chat messages
+    :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+    :updatedWhen: Date and time at which the entry was updated
+    :accessedWhen: Last date and time the entry was fetched from the database, automatically set
+    """
+    ###################################################
+    processID = ""
+    
+    processDetails = {}
+    processStatus = 0
+
+    serviceDetails = {}
+    serviceStatus = 0
+    serviceType = 0
+
+    client = ""
+    
+    files = {}
+    messages = {"messages": []}
+
+    createdWhen = ""
+    updatedWhen = ""
+    accessedWhen = ""
+
+    ###################################################
+    def __init__(self, processID:str, currentTime:str) -> None:
+        self.processID = processID
+        self.processDetails = {"amount": 1}
+        self.processStatus = 0
+        self.serviceDetails = {}
+        self.serviceStatus = 0
+        self.serviceType = serviceManager.getNone()
+        self.client = ""
+        self.files = {}
+        self.messages = {"messages": []}
+        self.createdWhen = currentTime
+        self.updatedWhen = currentTime
+        self.accessedWhen = currentTime
+
+    ###################################################
+    def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, updatedWhen, accessedWhen) -> None:
+        self.processDetails = processDetails
+        self.processStatus = processStatus
+        self.serviceDetails = serviceDetails
+        self.serviceStatus = serviceStatus
+        self.serviceType = serviceType
+        self.client = client
+        self.files = files
+        self.messages = messages
+        self.updatedWhen = updatedWhen
+        self.accessedWhen = accessedWhen
+    
+    ###################################################
+    def toDict(self):
+        return {ProcessDescription.processID: self.processID, 
+                ProcessDescription.serviceDetails: self.serviceDetails, 
+                ProcessDescription.processStatus: self.processStatus,
+                ProcessDescription.serviceType: self.serviceType,
+                ProcessDescription.serviceStatus: self.serviceStatus,
+                ProcessDescription.processDetails: self.processDetails,
+                ProcessDescription.client: self.client,
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}

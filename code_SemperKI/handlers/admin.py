@@ -15,7 +15,7 @@ from django.views.decorators.http import require_http_methods
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from ..connections.postgresql import pgProcesses
+from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessDescription
 
 logger = logging.getLogger("logToFile")
