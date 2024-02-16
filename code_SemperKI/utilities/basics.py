@@ -13,10 +13,10 @@ from django.http import HttpResponse, JsonResponse
 
 from Generic_Backend.code_General.definitions import SessionContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from ..connections.postgresql.pgProcesses import ProcessManagementBase
+from ..connections.content.postgresql.pgProcesses import ProcessManagementBase
 
 #######################################################
-def manualCheckIfUserMaySeeProject(session, userID:str,projectID:str) -> bool:
+def manualCheckIfUserMaySeeProject(session, userID:str, projectID:str) -> bool:
     """
     Look for all users of the project and check if they are allowed to see it
 
@@ -38,7 +38,7 @@ def manualCheckIfUserMaySeeProject(session, userID:str,projectID:str) -> bool:
 
 
 #######################################################
-def manualCheckIfUserMaySeeProcess(session, userID:str,processID:str) -> bool:
+def manualCheckIfUserMaySeeProcess(session, userID:str, processID:str) -> bool:
     """
     Look for all users of the process and check if they are allowed to see it
 

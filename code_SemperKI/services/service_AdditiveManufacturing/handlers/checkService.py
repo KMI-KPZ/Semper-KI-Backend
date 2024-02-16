@@ -20,7 +20,7 @@ from Generic_Backend.code_General.connections import redis
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import FileObjectContent
 
-from code_SemperKI.connections.postgresql import pgProcesses
+from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.projectAndProcessManagement import getProcessAndProjectFromSession
 from code_SemperKI.definitions import ProcessDescription
 

@@ -27,7 +27,7 @@ from Generic_Backend.code_General.connections import s3
 
 from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
-from ..connections.postgresql import pgProcesses
+from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
 from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
 

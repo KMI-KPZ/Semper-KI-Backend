@@ -20,24 +20,24 @@ from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 
 
-from ...modelFiles.projectModel import Project
-from ...modelFiles.processModel import Process
-from ...modelFiles.dataModel import Data
+from ....modelFiles.projectModel import Project, ProjectInterface
+from ....modelFiles.processModel import Process, ProcessInterface
+from ....modelFiles.dataModel import Data
 
-from ...definitions import *
+from ....definitions import *
 
-from ...serviceManager import serviceManager
+from ....serviceManager import serviceManager
+
+from ..abstractInterface import AbstractContentInterface
+from ..session import ProcessManagementSession
 
 import logging
 logger = logging.getLogger("errors")
 
-#TODO: switch to async versions at some point
-
-
 
 ####################################################################################
 # Projects/Processes general
-class ProcessManagementBase():
+class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
@@ -516,10 +516,12 @@ class ProcessManagementBase():
     
     ##############################################
     @staticmethod
-    def updateProcess(processID, updateType: ProcessUpdates, content, updatedBy):
+    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy):
         """
         Change details of a process like its status, or save communication. 
 
+        :param projectID: The project ID, not necessary here
+        :type projectID: str
         :param processID: unique processID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -605,10 +607,12 @@ class ProcessManagementBase():
 
     ##############################################
     @staticmethod
-    def deleteFromProcess(processID, updateType: ProcessUpdates, content, deletedBy):
+    def deleteFromProcess(projectID, processID, updateType: ProcessUpdates, content, deletedBy):
         """
         Delete details of a process like its status, or content. 
 
+        :param projectID: Project that this process belongs to, not needed here
+        :type projectID: str
         :param processID: unique process ID to be edited
         :type processID: str
         :param updateType: changed process details
@@ -783,9 +787,63 @@ class ProcessManagementBase():
             outList.append(entry.toDict())
         return outList
 
+###############################################################################
+    ##############################################
+    @staticmethod
+    def createProject(projectID:str, client:str):
+        """
+        Create the project in the database directly
 
-    ####################################################################################
-    # Processes/Projects from User
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param client: the userID of the person creating the project
+        :type client: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            now = timezone.now()
+
+            defaultProjectObject = ProjectInterface(projectID, str(now))
+
+            projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: defaultProjectObject.projectStatus, ProjectDescription.updatedWhen: now, ProjectDescription.client: client, ProjectDescription.projectDetails: defaultProjectObject.projectDetails})
+            return None
+        except (Exception) as error:
+            logger.error(f'could not add project to database: {str(error)}')
+            return error
+    
+    ##############################################
+    @staticmethod
+    def createProcess(projectID:str, processID:str, client:str):
+        """
+        Create the project in the database directly
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :param client: the userID of the person creating the project
+        :type client: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            now = timezone.now()
+
+            projectObj = ProcessManagementBase.getProjectObj(projectID)
+
+            defaultProcessObj = ProcessInterface(processID, str(now))
+
+            processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
+            ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)
+            
+            return None
+        except (Exception) as error:
+            logger.error(f'could not add project to database: {str(error)}')
+            return error
+    
     ##############################################
     @staticmethod
     def addProjectToDatabase(session):
@@ -799,26 +857,26 @@ class ProcessManagementBase():
 
         """
         now = timezone.now()
+        contentOfSession = ProcessManagementSession(session)
         try:
             # Check if there's anything to save
-            if SessionContentSemperKI.CURRENT_PROJECTS not in session:
+            if not contentOfSession.getIfContentIsInSession():
                 return None
             
             # first get user
             clientID = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
 
             # then go through projects
-            for projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
+            projects = contentOfSession.structuredSessionObj.getProjects()
+            for entry in projects:
+                projectID = entry[ProjectDescription.projectID]
+                project = contentOfSession.getProject(projectID)
 
-                # project object
                 # check if obj already exists in database and overwrite it
                 # if not, create a new entry
-                existingObj = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
-
-                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: existingObj[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: existingObj[ProjectDescription.projectDetails]})
+                projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: project[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: project[ProjectDescription.projectDetails]})
                 # save processes
-                for entry in session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
-                    process = session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][entry]
+                for process in project[SessionContentSemperKI.processes]:
                     processID = process[ProcessDescription.processID]
                     serviceType = process[ProcessDescription.serviceType]
                     serviceStatus = process[ProcessDescription.serviceStatus]
@@ -918,9 +976,9 @@ class ProcessManagementBase():
             output = []
             
             for project in projects:
-                if SessionContentSemperKI.CURRENT_PROJECTS in session:
-                    if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                        continue
+                # if SessionContentSemperKI.CURRENT_PROJECTS in session:
+                #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
+                #         continue
                 currentProject = project.toDict()
                 currentProject["processesCount"] = len(project.processes.all())
                 currentProject["owner"] = True
@@ -945,9 +1003,6 @@ class ProcessManagementBase():
                     receivedProjects[project]["owner"] = False
                     output.append(receivedProjects[project])
             
-            
-            output = sorted(output, key=lambda x: 
-                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
             return output
 
         except (Exception) as error:
