@@ -110,7 +110,7 @@ def deleteModel(request, processID):
                 modelExistsAsFile = True
         else:
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteModel.__name__):
-                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
                 modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
                 if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
                     modelExistsAsFile = True              

@@ -44,6 +44,14 @@ class ServiceBase(ABC):
         """
         pass
 
+    ###################################################
+    @abstractmethod
+    def serviceReady(self, existingContent) -> bool:
+        """
+        Check if a service has been defined completely
+
+        """
+
 ######################################################
 class _ServicesManager():
     """

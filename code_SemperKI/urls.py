@@ -46,6 +46,7 @@ newPaths= {
     "verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
     "sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
     "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
+    "statusButtonRequest": ("public/statusButtonRequest/",projectAndProcessManagement.statusButtonRequest),
 
     "getServices": ("public/getServices/",manageServices.getServices),
 

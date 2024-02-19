@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Functions specific for 3D printing service that access the database directly
 """
 
-from Generic_Backend.code_General.definitions import FileObject
+from Generic_Backend.code_General.definitions import FileObjectContent
 
 from ...definitions import ServiceDetails
 import logging
@@ -70,3 +70,30 @@ def deleteServiceDetails(existingContent, deletedContent):
     
     return existingContent
 
+####################################################################################
+def serviceReady(existingContent) -> bool:
+    """
+    Check if everything is there
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :return: True if all components are there
+    :rtype: Bool
+    """
+
+    try:
+        checks = 0
+        for entry in existingContent:
+            if entry == ServiceDetails.model and FileObjectContent.id in existingContent[ServiceDetails.model]:
+                checks += 1
+            elif entry == ServiceDetails.material and len(existingContent[ServiceDetails.material]) > 0:
+                checks += 1
+            #elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0: # optional
+                #checks += 1
+            else:
+                raise NotImplementedError("This service detail does not exist (yet).")
+            
+        return True if checks >= 2 else False
+    except (Exception) as error:
+        logger.error(f'Generic error in serviceReady(3D Print): {str(error)}')
+        return False

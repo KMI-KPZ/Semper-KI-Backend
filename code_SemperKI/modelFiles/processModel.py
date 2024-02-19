@@ -9,7 +9,7 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .projectModel import Project
+from .projectModel import Project, ProjectInterface
 from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
@@ -121,6 +121,7 @@ class ProcessInterface():
     Process management class interface.
     
     :processID: Unique ID for that process, primary key
+    :project: ProjectInterface of project that this process belongs to
     :processDetails: Name of the process and stuff
     :processStatus: How everything is going in general
     :serviceDetails: Details for that service
@@ -136,6 +137,8 @@ class ProcessInterface():
     ###################################################
     processID = ""
     
+    project = ProjectInterface("","")
+
     processDetails = {}
     processStatus = 0
 
@@ -153,8 +156,9 @@ class ProcessInterface():
     accessedWhen = ""
 
     ###################################################
-    def __init__(self, processID:str, currentTime:str) -> None:
+    def __init__(self, project:ProjectInterface, processID:str, currentTime:str) -> None:
         self.processID = processID
+        self.project = project
         self.processDetails = {"amount": 1}
         self.processStatus = 0
         self.serviceDetails = {}

@@ -28,6 +28,8 @@ from ....definitions import *
 
 from ....serviceManager import serviceManager
 
+from ....utilities.states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
+
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 
@@ -224,10 +226,12 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getProcessObj(processID):
+    def getProcessObj(projectID, processID):
         """
         Get one process.
 
+        :param projectID: The ID of the project, not used here
+        :type projectID: str
         :param processID: process ID for a process
         :type processID: str
         :return: Requested process
@@ -287,7 +291,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
-                processesOfThatProject.append(entry.toDict())
+                processDetails = entry.toDict()
+                processesOfThatProject.append(processDetails)
 
             output[SessionContentSemperKI.processes] = processesOfThatProject
             
@@ -640,7 +645,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     del currentProcess.files[content[entry][FileObjectContent.id]]
 
             elif updateType == ProcessUpdates.processStatus:
-                currentProcess.processStatus = ProcessStatus.DRAFT
+                currentProcess.processStatus = processStatusAsInt(ProcessStatusAsString.DRAFT)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
                 
             elif updateType == ProcessUpdates.processDetails:
@@ -736,7 +741,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
-                if process.processStatus >= ProcessStatus.REQUESTED:
+                if process.processStatus >= processStatusAsInt(ProcessStatusAsString.REQUESTED):
                     contractorID = ""
                     if process.contractor != None:
                         contractorID = process.contractor.hashedID
@@ -834,7 +839,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             projectObj = ProcessManagementBase.getProjectObj(projectID)
 
-            defaultProcessObj = ProcessInterface(processID, str(now))
+            defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now)), processID, str(now))
 
             processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
             ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)

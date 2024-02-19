@@ -39,3 +39,16 @@ def deleteServiceDetails(existingContent, deletedContent):
     """
     # TODO
     return existingContent
+
+####################################################################################
+def serviceReady(existingContent) -> bool:
+    """
+    Check if everything is there
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :return: True if all components are there
+    :rtype: Bool
+    """
+    # TODO
+    return True

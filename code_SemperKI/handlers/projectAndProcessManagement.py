@@ -25,6 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from ..utilities.states.stateDescriptions import *
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -475,6 +476,9 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                 logger.error("Rights not sufficient in updateProcess")
                 return ("", False)
             
+            process = interface.getProcessObj(projectID, processID)
+            currentState = StateMachine(initialAsInt=process.processStatus)
+
             if "deletions" in changes:
                 for elem in changes["deletions"]:
                     # exclude people not having sufficient rights for that specific operation
@@ -499,9 +503,11 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
-
                     if isinstance(returnVal, Exception):
                         raise returnVal
+            
+            # change state for this process if necessary
+            currentState.onUpdateEvent(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -555,6 +561,10 @@ def updateProcess(request):
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
         
+        # TODO remove
+        if ProcessUpdates.processStatus in changes["changes"]:
+            del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
+
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
         if flag is False:
             return HttpResponse("Not logged in", status=401)
@@ -661,6 +671,7 @@ def getProject(request, projectID):
         project = {}
         if contentManager.sessionManagement.getIfContentIsInSession():
             project = contentManager.sessionManagement.getProject(projectID)
+            addButtonsToProcess(project) # calls current node of the state machine
         if len(project) > 0:
             return JsonResponse(project)
         else:
@@ -672,10 +683,14 @@ def getProject(request, projectID):
             
             userID = contentManager.getClient()
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
-                return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+                project = pgProcesses.ProcessManagementBase.getProject(projectID)
+                addButtonsToProcess(project)
+                return JsonResponse(project)
             else:
                 if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-                    return JsonResponse(pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID))
+                    project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
+                    addButtonsToProcess(project)
+                    return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)
 
@@ -793,7 +808,7 @@ def getContractors(request, processID):
     try:
         projectObj, processObj = getProcessAndProjectFromSession(request.session,processID)
         if processObj == None:
-            processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+            processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
             if processObj == None:
                 raise Exception("Process ID not found in session or db")
             else: # db
@@ -876,6 +891,33 @@ def saveProjects(request):
     
 #######################################################
 @checkIfUserIsLoggedIn()
+@require_http_methods(["POST"]) # TODO, GET is only for debugging
+def statusButtonRequest(request):
+    """
+    Button was clicked, so the state must change (transition inside state machine)
+    
+    :param request: PATCH Request
+    :type request: HTTP PATCH
+    :return: Response with new buttons
+    :rtype: JSONResponse
+    """
+    # get from info, create correct object, initialize statemachine, switch state accordingly
+    info = json.loads(request.body.decode("utf-8"))
+    processIDs = info[InterfaceForStateChange.processIDs]
+    currentState = info[InterfaceForStateChange.CURRENT_STATE]
+    nextState = info[InterfaceForStateChange.CLICKED_BUTTON]
+    stateObj = returnCorrectState(currentState)
+    sm = StateMachine(stateObj)
+    sm.onButtonEvent(nextState)
+    # create new button json
+    # for every button
+    # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
+    # take status code and construct button from there
+
+    return JsonResponse({})
+    
+#######################################################
+@checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"]) 
 @checkIfRightsAreSufficient(json=False)
 def verifyProject(request):
@@ -915,7 +957,7 @@ def verifyProject(request):
         # TODO start services and set status to "verifying" instead of verified
         #listOfCallIDsAndProcessesIDs = []
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED, userID)
+            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), userID)
             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
@@ -961,7 +1003,7 @@ def sendProject(request):
         # TODO Check if process is verified
         
         for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
+            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.REQUESTED), userID)
             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
         # TODO send local files to remote
@@ -996,7 +1038,7 @@ def getProcessHistory(request, processID):
 
     """
     try:
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
 
         if processObj == None:
             raise Exception("Process not found in DB!")

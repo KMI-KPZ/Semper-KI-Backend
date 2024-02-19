@@ -159,7 +159,7 @@ def checkModel(request, processID):
         model = {}
         project, process = getProcessAndProjectFromSession(request.session, processID)
         if process == None:
-            processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+            processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
             if processObj == None:
                 raise Exception("Process not found!")
             
@@ -193,3 +193,4 @@ def checkModel(request, processID):
     except (Exception) as error:
         logger.error(f'Generic error in checkModel: {str(error)}')
         return JsonResponse({}, status=500)
+    
