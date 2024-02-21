@@ -88,8 +88,8 @@ def serviceReady(existingContent) -> bool:
                 checks += 1
             elif entry == ServiceDetails.material and len(existingContent[ServiceDetails.material]) > 0:
                 checks += 1
-            #elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0: # optional
-                #checks += 1
+            elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0:
+                checks += 0 # optional
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
             

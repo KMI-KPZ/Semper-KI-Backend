@@ -28,7 +28,7 @@ from ....definitions import *
 
 from ....serviceManager import serviceManager
 
-from ....utilities.states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
+import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
@@ -645,7 +645,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     del currentProcess.files[content[entry][FileObjectContent.id]]
 
             elif updateType == ProcessUpdates.processStatus:
-                currentProcess.processStatus = processStatusAsInt(ProcessStatusAsString.DRAFT)
+                currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
                 
             elif updateType == ProcessUpdates.processDetails:
@@ -741,7 +741,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
-                if process.processStatus >= processStatusAsInt(ProcessStatusAsString.REQUESTED):
+                if process.processStatus >= StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.REQUESTED):
                     contractorID = ""
                     if process.contractor != None:
                         contractorID = process.contractor.hashedID

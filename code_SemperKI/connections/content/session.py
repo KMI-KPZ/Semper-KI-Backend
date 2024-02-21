@@ -17,7 +17,7 @@ from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...serviceManager import serviceManager
-from ...utilities.states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
+import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
@@ -411,7 +411,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             content = self.structuredSessionObj.getProcess(projectID, processID)
-            returnObj = ProcessInterface(ProjectInterface(processID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
+            returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
             returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
             return returnObj
         except (Exception) as error:
@@ -568,7 +568,7 @@ class ProcessManagementSession(AbstractContentInterface):
                     del currentProcess[ProcessDescription.processDetails][entry]
             
             elif updateType == ProcessUpdates.processStatus:
-                currentProcess[ProcessDescription.processStatus] = processStatusAsInt(ProcessStatusAsString.DRAFT)
+                currentProcess[ProcessDescription.processStatus] = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]

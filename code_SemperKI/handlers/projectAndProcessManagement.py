@@ -25,7 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..utilities.states.stateDescriptions import *
+from ..utilities.states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange, ProcessStatusAsString, returnCorrectState
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -507,6 +507,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         raise returnVal
             
             # change state for this process if necessary
+            process = interface.getProcessObj(projectID, processID)
             currentState.onUpdateEvent(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
