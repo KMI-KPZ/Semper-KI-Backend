@@ -93,7 +93,7 @@ class StateMachine(object):
         # The next state will be the result of the onEvent function.
         self.state = self.state.onUpdateEvent(interface, process)
     ###################################################
-    def onButtonEvent(self, event:str):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         """
         A button was pressed, advance state accordingly
 
@@ -101,7 +101,7 @@ class StateMachine(object):
         :type event: str
 
         """
-        self.state = self.state.onButtonEvent(event)
+        self.state = self.state.onButtonEvent(event, interface, process)
 
 
 #######################################################
@@ -124,7 +124,8 @@ class State(ABC):
         pass
 
     ###################################################
-    transitions = []
+    updateTransitions = []
+    buttonTransitions = {}
 
     ###################################################
     def onUpdateEvent(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
@@ -141,7 +142,7 @@ class State(ABC):
         """
         try:
             returnState = self
-            for t in self.transitions:
+            for t in self.updateTransitions:
                 resultOfTransition = t(self, interface, process)
                 if resultOfTransition != self:
                     returnState = resultOfTransition
@@ -154,17 +155,32 @@ class State(ABC):
             return self
 
     ###################################################
-    def onButtonEvent(self, event:str):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         """
         A button was pressed, advance state accordingly
 
         :param event: The button pressed, as ProcessStatusAsString
         :type event: str
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
         :return: Same or next object in state machine
         :rtype: State Object
 
         """
-        pass
+        try:
+            returnState = self
+            for t in self.buttonTransitions:
+                if event == t:
+                    returnState = self.buttonTransitions[t](self, interface, process)
+                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
+                    break #TODO: Ensure that only one transition is possible 
+            
+            return returnState
+        except (Exception) as error:
+            loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
+            return self
 
 
     ###################################################
@@ -202,7 +218,9 @@ class DRAFT(State):
 
     ###################################################
     # Transitions
-    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> DRAFT | SERVICE_IN_PROGRESS:
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT | SERVICE_IN_PROGRESS:
         """
         Check if service has been chosen
 
@@ -212,20 +230,16 @@ class DRAFT(State):
         return self
 
     ###################################################
-    transitions = [to_SERVICE_IN_PROGRESS]
+    updateTransitions = [to_SERVICE_IN_PROGRESS]
+    buttonTransitions = {}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface,process)
     
     ###################################################
-    def onButtonEvent(self, event: str):
-        try:
-            return self
-        except (Exception) as error:
-            loggerError.error(f"DRAFT onButtonEvent: {str(error)}")
-            return self
-    
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process)
     
 #######################################################
 class SERVICE_IN_PROGRESS(State):
@@ -269,26 +283,43 @@ class SERVICE_IN_PROGRESS(State):
                 "showIn": "project",
             }
         ]
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_READY:
+        """
+        Check if service has been fully defined
+
+        """
+        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return SERVICE_READY()
+        return self
+    
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return DRAFT()
+
+    ###################################################
+    updateTransitions = [to_SERVICE_READY]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        try:
-            if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
-                interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_READY), process.client)
-                return SERVICE_READY()
-            else:
-                return self
-        except (Exception) as error:
-            loggerError.error(f"SERVICE_IN_PROGRESS onUpdateEvent: {str(error)}")
-            return self
+        return super().onUpdateEvent(interface,process)
         
     ###################################################
-    def onButtonEvent(self, event: str):
-        try:
-            return self
-        except (Exception) as error:
-            loggerError.error(f"SERVICE_IN_PROGRESS onButtonEvent: {str(error)}")
-            return self
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process)
 
 #######################################################
 class SERVICE_READY(State):

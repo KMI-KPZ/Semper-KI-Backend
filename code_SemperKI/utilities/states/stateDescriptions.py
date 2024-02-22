@@ -144,8 +144,10 @@ class InterfaceForStateChange(StrEnumExactylAsDefined):
 
     """
 
+    projectID = enum.auto()
     processIDs = enum.auto()
-    CURRENT_STATE = enum.auto()
+    buttonData = enum.auto()
+    targetStatus = enum.auto()
     CLICKED_BUTTON = enum.auto()
 
 #######################################################

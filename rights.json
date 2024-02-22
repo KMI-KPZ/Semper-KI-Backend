@@ -17,7 +17,8 @@
             "getProject",
             "getFlatProjects",
             "getProcessHistory",
-            "downloadProcessHistory"
+            "downloadProcessHistory",
+            "statusButtonRequest"
          ]
       },
       {
@@ -63,10 +64,38 @@
             "ProjectsButtonNew",
             "ProjectButtonEdit",
             "ProjectButtonNew",
-            "ProjectButtonEDIT",
+            "ProjectButtonDELETE",
+            "ProjectButtonCONTRACTOR_SELECTED",
+            "ProjectButtonVERIFYING_AND_REQUESTED",
+            "ProjectButtonVERIFYING",
+            "ProjectButtonREQUESTED",
+            "ProjectButtonCLARIFICATION",
+            "ProjectButtonCONFIRMED_BY_CONTRACTOR",
+            "ProjectButtonREJECTED_BY_CONTRACTOR",
+            "ProjectButtonCONFIRMED_BY_CLIENT",
+            "ProjectButtonREJECTED_BY_CLIENT",
+            "ProjectButtonPRODUCTION",
+            "ProjectButtonDELIVERY",
+            "ProjectButtonCOMPLETED",
+            "ProjectButtonREPROJECT",
             "ProjectButtonDelete",
             "ProjectStatusButtons",
             "ProcessButtonModelPreView",
+            "ProcessButtonEDIT",
+            "ProcessButtonDELETE",
+            "ProcessButtonCONTRACTOR_SELECTED",
+            "ProcessButtonVERIFYING_AND_REQUESTED",
+            "ProcessButtonVERIFYING",
+            "ProcessButtonREQUESTED",
+            "ProcessButtonCLARIFICATION",
+            "ProcessButtonCONFIRMED_BY_CONTRACTOR",
+            "ProcessButtonREJECTED_BY_CONTRACTOR",
+            "ProcessButtonCONFIRMED_BY_CLIENT",
+            "ProcessButtonREJECTED_BY_CLIENT",
+            "ProcessButtonPRODUCTION",
+            "ProcessButtonDELIVERY",
+            "ProcessButtonCOMPLETED",
+            "ProcessButtonREPROJECTButton",
             "ProcessButtonDelete",
             "ProcessStatusButtons"
          ],
@@ -78,7 +107,8 @@
             "verifyProject",
             "sendProject",
             "createProcessID",
-            "createProjectID"
+            "createProjectID",
+            "statusButtonRequest"
          ]
       },
       {
@@ -95,7 +125,8 @@
             "deleteProcesses",
             "deleteProjects",
             "deleteFile",
-            "deleteModel"
+            "deleteModel",
+            "statusButtonRequest"
          ]
       },
       {

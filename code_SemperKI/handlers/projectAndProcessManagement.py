@@ -475,9 +475,6 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             if not contentManager.checkRightsForProcess(processID):
                 logger.error("Rights not sufficient in updateProcess")
                 return ("", False)
-            
-            process = interface.getProcessObj(projectID, processID)
-            currentState = StateMachine(initialAsInt=process.processStatus)
 
             if "deletions" in changes:
                 for elem in changes["deletions"]:
@@ -508,6 +505,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             
             # change state for this process if necessary
             process = interface.getProcessObj(projectID, processID)
+            currentState = StateMachine(initialAsInt=process.processStatus)
             currentState.onUpdateEvent(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
@@ -891,7 +889,6 @@ def saveProjects(request):
         return HttpResponse("Failed")
     
 #######################################################
-@checkIfUserIsLoggedIn()
 @require_http_methods(["POST"]) # TODO, GET is only for debugging
 def statusButtonRequest(request):
     """
@@ -904,12 +901,17 @@ def statusButtonRequest(request):
     """
     # get from info, create correct object, initialize statemachine, switch state accordingly
     info = json.loads(request.body.decode("utf-8"))
+    projectID = info[InterfaceForStateChange.projectID]
     processIDs = info[InterfaceForStateChange.processIDs]
-    currentState = info[InterfaceForStateChange.CURRENT_STATE]
-    nextState = info[InterfaceForStateChange.CLICKED_BUTTON]
-    stateObj = returnCorrectState(currentState)
-    sm = StateMachine(stateObj)
-    sm.onButtonEvent(nextState)
+    buttonData = info[InterfaceForStateChange.buttonData]
+    nextState = buttonData[InterfaceForStateChange.targetStatus]
+
+    contentManager = ManageContent(request.session)
+    interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
+    for processID in processIDs:
+        process = interface.getProcessObj(projectID, processID)
+        sm = StateMachine(initialAsInt=process.processStatus)
+        sm.onButtonEvent(nextState, interface, process)
     # create new button json
     # for every button
     # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
