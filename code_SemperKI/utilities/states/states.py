@@ -373,19 +373,109 @@ class SERVICE_READY(State):
                 "showIn": "both",
             }
         ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        try:
-            return self
-        except (Exception) as error:
-            loggerError.error(f"SERVICE_READY onUpdateEvent: {str(error)}")
-            return self
+        return super().onUpdateEvent(interface,process)
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process)
+    
+
+
+    
+#####################################################################################################
+#######################################################
+class TEMPLATE(State):
+    """
+    Service is ready
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.TEMPLATE) # TODO change to current state
 
     ###################################################
-    def onButtonEvent(self, event: str):
-        try:
-            return self
-        except (Exception) as error:
-            loggerError.error(f"SERVICE_READY onButtonEvent: {str(error)}")
-            return self
+    def buttons(self) -> list:
+        """
+        Choose contractor
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.DRAFT, # TODO change to previous state
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.CONTRACTOR_SELECTED, # TODO change to next state
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_NEXT_STATE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT | SERVICE_READY: # TODO: Change to current and next state
+        """
+        From:
+        To:
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_PREVIOUS_STATE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT: # TODO: Change to previous state
+        """
+        To:
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
+    buttonTransitions = {} # TODO add functions that are called on button click, leave empty if none exist
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
