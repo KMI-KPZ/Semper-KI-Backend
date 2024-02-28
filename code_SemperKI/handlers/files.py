@@ -53,7 +53,7 @@ def uploadFiles(request):
         # TODO: Licenses, ...
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-
+        assert(userName!="", True)
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
             fileID = crypto.generateURLFriendlyRandomString()

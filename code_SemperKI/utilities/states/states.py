@@ -230,7 +230,19 @@ class DRAFT(State):
         return self
 
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS]
+    def to_WAITING_FOR_OTHER_PROCESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT | WAITING_FOR_OTHER_PROCESS:
+        """
+        Check if service has been chosen
+
+        """
+        #if process.serviceType != ServiceManager.serviceManager.getNone():
+        #    return SERVICE_IN_PROGRESS()
+        #return self
+        pass # TODO
+
+    ###################################################
+    updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
     buttonTransitions = {}
 
     ###################################################
@@ -310,7 +322,16 @@ class SERVICE_IN_PROGRESS(State):
         return DRAFT()
 
     ###################################################
-    updateTransitions = [to_SERVICE_READY]
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+        """
+        Service Conditions not OK
+
+        """
+        pass # TODO Implement or delete if not necessary
+    
+    ###################################################
+    updateTransitions = [to_SERVICE_READY, to_SERVICE_COMPLICATION]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
@@ -377,10 +398,35 @@ class SERVICE_READY(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY | CONTRACTOR_SELECTED:
+        """
+        Contractor was Selected
 
+        """
+        pass # TODO Implement or delete if not necessary
+    
     ###################################################
-    updateTransitions = []
-    buttonTransitions = {}
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        pass # TODO Implement or delete if not necessary
+    
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+        """
+        Service Conditions not OK
+
+        """
+        pass # TODO Implement or delete if not necessary
+    
+    ###################################################
+    updateTransitions = [to_SERVICE_COMPLICATION]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED }
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -389,23 +435,94 @@ class SERVICE_READY(State):
     ###################################################
     def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
-    
 
-
-    
-#####################################################################################################
 #######################################################
-class TEMPLATE(State):
+class WAITING_FOR_OTHER_PROCESS(State):
     """
-    Service is ready
+    Waiting for other preceding Process
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.TEMPLATE) # TODO change to current state
+    statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
 
     ###################################################
     def buttons(self) -> list:
         """
-        Choose contractor
+        Buttons for WAITING_FOR_OTHER_PROCESS
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.DRAFT,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          WAITING_FOR_OTHER_PROCESS | SERVICE_IN_PROGRESS:
+        """
+        From: WAITING_FORT_OTHER_PROGRESS
+        To: SERVICE_IN_PROGRESS
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT:
+        """
+        To: DRAFT
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_SERVICE_IN_PROGRESS]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+    
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class SERVICE_COMPLICATION(State):
+    """
+    Service Complication happened
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Back to Draft
 
         """
         return [
@@ -433,13 +550,98 @@ class TEMPLATE(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT:
+        """
+        To: Draft
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_COMPLICATION | SERVICE_IN_PROGRESS:
+        """
+        From: SERVICE_COMPLICATION
+        To: SERVICE_IN_PROGRESS
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_COMPLICATION | SERVICE_READY:
+        """
+        From: SERVICE_COMPLICATION
+        To: SERVICE_READY
+
+        """
+        pass # TODO Implement or delete if not necessary
+    
+    ###################################################
+    updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class CONTRACTOR_SELECTED(State):
+    """
+    Contractor has been chosen
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_SELECTED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for  CONTRACTOR_SELECTED
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
             },
             {
-                "title": ButtonLabels.CONTRACTOR_SELECTED, # TODO change to next state
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.VERIFYING,
                 "icon": IconType.FactoryIcon,
                 "action": {
                     "type": "navigation",
-                    "to": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    "to": ProcessStatusAsString.VERIFYING,
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -450,27 +652,27 @@ class TEMPLATE(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_NEXT_STATE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DRAFT | SERVICE_READY: # TODO: Change to current and next state
+    def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_SELECTED | to_VERIFYING: # TODO: Change to current and next state
         """
-        From:
-        To:
+        From: CONTRACTOR_SELECTED
+        To: VERIFYING
 
         """
         pass # TODO Implement or delete if not necessary
 
     ###################################################
-    def to_PREVIOUS_STATE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DRAFT: # TODO: Change to previous state
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_READY:
         """
-        To:
+        To: SERVICE_READY
         
         """
         pass # TODO Implement or delete if not necessary
 
     ###################################################
-    updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
-    buttonTransitions = {} # TODO add functions that are called on button click, leave empty if none exist
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -479,3 +681,1052 @@ class TEMPLATE(State):
     ###################################################
     def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class VERIFYING(State):
+    """
+    Service is ready
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for VERIFYING
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_VERIFIED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFYING | VERIFIED:
+        """
+        From: VERIFYING
+        To: VERIFIED
+
+        """
+        pass # TODO Implement or delete if not necessary
+    
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFYING | SERVICE_COMPLICATION:
+        """
+        From: VERIFYING
+        To: SERVICE_COMPLICATION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_SELECTED:
+        """
+        To: CONTRACTOR_SELECTED
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_VERIFIED, to_SERVICE_COMPLICATION]
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED }
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class VERIFIED(State):
+    """
+    Contractor has been Verified
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFIED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Manual Request
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.REQUESTED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.REQUESTED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_REQUESTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFIED | REQUESTED:
+        """
+        From: VERIFIED
+        To: REQUESTED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_SELECTED:
+        """
+        To: CONTRACTOR_SELECTED
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_REQUESTED]
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED, ProcessStatusAsString.REQUESTED: to_REQUESTED} # TODO add functions that are called on button click, leave empty if none exist
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class REQUESTED(State):
+    """
+    Product Requested at Contractor
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.REQUESTED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for REQUESTED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.CLARIFICATION,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.CLARIFICATION,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CLARIFICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUESTED | CLARIFICATION: 
+        """
+        From: REQUESTED
+        To: CLARIFICATION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUESTED | CONFIRMED_BY_CONTRACTOR:
+        """
+        From: REQUESTED
+        To: CONFIRMED_BY_CONTRACTOR
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUESTED | REJECTED_BY_CONTRACTOR:
+        """
+        From: REQUESTED
+        To: REJECTED_BY_CONTRACTOR
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.CLARIFICATION: to_CLARIFICATION, ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class CLARIFICATION(State):
+    """
+    Clarification needed by Contractor
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for CLARIFICATION
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CLARIFICATION | CONFIRMED_BY_CONTRACTOR:
+        """
+        From: CLARIFICATION
+        To: CONFIRMED_BY_CONTRACTOR
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CLARIFICATION | REJECTED_BY_CONTRACTOR:
+        """
+        From: CLARIFICATION
+        To: REJECTED_BY_CONTRACTOR
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_REQUESTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUESTED:
+        """
+        To: REQUESTED
+        
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR, ProcessStatusAsString.REQUESTED: to_REQUESTED} # TODO add functions that are called on button click, leave empty if none exist
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class CONFIRMED_BY_CONTRACTOR(State):
+    """
+    Order Confirmed by Contractor
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for CONFIRMED_BY_CONTRACTOR, no Back-Button
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.CONFIRMED_BY_CLIENT,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.REJECTED_BY_CLIENT,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CONFIRMED_BY_CLIENT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONFIRMED_BY_CONTRACTOR | CONFIRMED_BY_CLIENT:
+        """
+        From: CONFIRMED_BY_CONTRACTOR
+        To: CONFIRMED_BY_CLIENT
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_REJECTED_BY_CLIENT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONFIRMED_BY_CONTRACTOR | REJECTED_BY_CLIENT:
+        """
+        From: CONFIRMED_BY_CONTRACTOR
+        To: REJECTED_BY_CLIENT
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CLIENT: to_CONFIRMED_BY_CLIENT, ProcessStatusAsString.REJECTED_BY_CLIENT: to_REJECTED_BY_CLIENT}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class REJECTED_BY_CONTRACTOR(State):
+    """
+    Order Rejected by Contractor
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CONTRACTOR)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        No Buttons only CANCELED
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REJECTED_BY_CONTRACTOR | CANCELED:
+        """
+        From: REJECTED_BY_CONTRACTOR
+        To: CANCELLED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_CANCELED]
+    buttonTransitions = {}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class CONFIRMED_BY_CLIENT(State):
+    """
+    Order Confirmed by Client
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CLIENT)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for CONFIRMED_BY_CLIENT, no Back-Button
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.PRODUCTION,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.PRODUCTION,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_PRODUCTION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONFIRMED_BY_CLIENT | PRODUCTION:
+        """
+        From: CONFIRMED_BY_CLIENT
+        To: PRODUCTION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.PRODUCTION: to_PRODUCTION}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class REJECTED_BY_CLIENT(State):
+    """
+    Order Rejected by Contractor
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CLIENT)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        No Buttons only CANCELED
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REJECTED_BY_CLIENT | CANCELED:
+        """
+        From: REJECTED_BY_CLIENT
+        To: CANCELLED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_CANCELED]
+    buttonTransitions = {}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class PRODUCTION(State):
+    """
+    Order is in Production
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for PRODUCTION, no Back-Button
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.DELIVERY,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.DELIVERY,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.FAILED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.FAILED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_DELIVERY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          PRODUCTION | DELIVERY:
+        """
+        From: PRODUCTION
+        To: DELIVERY
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          PRODUCTION | FAILED:
+        """
+        From: PRODUCTION
+        To: FAILED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.DELIVERY: to_DELIVERY, ProcessStatusAsString.FAILED: to_FAILED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class DELIVERY(State):
+    """
+    Order is being delivered
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for DELIVERY, no Back-Button
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE,
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.COMPLETED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.COMPLETED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.DISPUTE,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.DISPUTE,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.FAILED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.FAILED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DELIVERY | COMPLETED:
+        """
+        From: DELIVERY
+        To: COMPLETED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_DISPUTE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DELIVERY | DISPUTE:
+        """
+        From: DELIVERY
+        To: DISPUTE
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DELIVERY | FAILED:
+        """
+        From: DELIVERY
+        To: FAILED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.COMPLETED: to_COMPLETED, ProcessStatusAsString.DISPUTE: to_DISPUTE, ProcessStatusAsString.FAILED: to_FAILED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class DISPUTE(State):
+    """
+    Dispute over Delivery
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.DISPUTE)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        Buttons for DISPUTE, no Back-Button
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.COMPLETED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.COMPLETED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
+            {
+                "title": ButtonLabels.FAILED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "navigation",
+                    "to": ProcessStatusAsString.FAILED,
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DISPUTE | COMPLETED:
+        """
+        From: DISPUTE
+        To: COMPLETED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+     ###################################################
+    def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DISPUTE | FAILED:
+        """
+        From: DISPUTE
+        To: FAILED
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.COMPLETED: to_COMPLETED, ProcessStatusAsString.COMPLETED: to_FAILED,}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class COMPLETED(State):
+    """
+    Order has been completed
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.COMPLETED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        No Buttons 
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          COMPLETED | SERVICE_COMPLICATION:
+        """
+        From: COMPLETED
+        To: SERVICE_COMPLICATION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_SERVICE_COMPLICATION]
+    buttonTransitions = {}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class FAILED(State):
+    """
+    Contractor has failed the contract
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.FAILED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        No Buttons 
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          FAILED | SERVICE_COMPLICATION:
+        """
+        From: FAILED
+        To: SERVICE_COMPLICATION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_SERVICE_COMPLICATION]
+    buttonTransitions = {}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class CANCELED(State):
+    """
+    Order has been canceled
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.CANCELED)
+
+    ###################################################
+    def buttons(self) -> list:
+        """
+        No Buttons 
+
+        """
+        return [
+            {
+                "title": ButtonLabels.DELETE, # do not change
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }
+        ] 
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CANCELED | SERVICE_COMPLICATION:
+        """
+        From: CANCELED
+        To: SERVICE_COMPLICATION
+
+        """
+        pass # TODO Implement or delete if not necessary
+
+    ###################################################
+    updateTransitions = [to_SERVICE_COMPLICATION]
+    buttonTransitions = {}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
