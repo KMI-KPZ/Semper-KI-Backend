@@ -1,3 +1,4 @@
+from __future__ import annotations 
 """
 Part of Semper-KI software
 
@@ -114,6 +115,31 @@ class Process(models.Model):
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
     
+###################################################
+class ManyToManySimulation():
+    """
+    Simulate a many to many field for session
+
+    """
+    ###################################################
+    def __init__(self) -> None:
+        self._arrayOfProcesses = []
+
+    ###################################################
+    def add(self, pi:ProcessInterface):
+        """
+        Add a process interface to the array
+        """
+        self._arrayOfProcesses.append(pi)
+    
+    ###################################################
+    def all(self) -> list[ProcessInterface]:
+        """
+        Get array for iteration
+        """
+        return self._arrayOfProcesses
+
+
 
 ###################################################
 class ProcessInterface():
@@ -146,6 +172,9 @@ class ProcessInterface():
     serviceStatus = 0
     serviceType = 0
 
+    dependenciesIn = ManyToManySimulation()
+    dependenciesOut = ManyToManySimulation()
+
     client = ""
     
     files = {}
@@ -164,6 +193,8 @@ class ProcessInterface():
         self.serviceDetails = {}
         self.serviceStatus = 0
         self.serviceType = serviceManager.getNone()
+        dependenciesIn = ManyToManySimulation()
+        dependenciesOut = ManyToManySimulation()
         self.client = ""
         self.files = {}
         self.messages = {"messages": []}

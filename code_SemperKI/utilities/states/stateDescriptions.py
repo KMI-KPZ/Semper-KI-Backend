@@ -1,9 +1,9 @@
 """
 Part of Semper-KI software
 
-Silvio Weging 2023
+Silvio Weging 2024
 
-Contains: Contains the state machine and fellow classes
+Contains: Contains definitions for the state machine
 """
 
 import enum
@@ -174,7 +174,9 @@ class ButtonLabels(StrEnumExactylAsDefined):
     DELIVERY = enum.auto()
     COMPLETED = enum.auto()
     REPROJECT = enum.auto()
+    DISPUTE = enum.auto() #TODO not in frontend currently
     SERVICE_IN_PROGRESS = enum.auto()
+    FAILED = enum.auto() #TODO not in frontend currently
     NONE = enum.auto()
 
 #######################################################

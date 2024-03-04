@@ -21,6 +21,7 @@ import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
+# TODO: history alias Data
 
 #######################################################
 class StructuredSession():

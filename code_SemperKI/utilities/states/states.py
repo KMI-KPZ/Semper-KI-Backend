@@ -1,4 +1,12 @@
 from __future__ import annotations 
+"""
+Part of Semper-KI software
+
+Silvio Weging 2024
+
+Contains: State machine with states
+"""
+
 
 import logging
 
@@ -14,7 +22,7 @@ import code_SemperKI.serviceManager as ServiceManager
 
 from .stateDescriptions import *
 
-from ...definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDescription
+from ...definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -233,13 +241,14 @@ class DRAFT(State):
     def to_WAITING_FOR_OTHER_PROCESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           DRAFT | WAITING_FOR_OTHER_PROCESS:
         """
-        Check if service has been chosen
+        Check if other process is before this one
 
         """
-        #if process.serviceType != ServiceManager.serviceManager.getNone():
-        #    return SERVICE_IN_PROGRESS()
-        #return self
-        pass # TODO
+        for priorProcess in process.dependenciesIn.all():
+            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                return WAITING_FOR_OTHER_PROCESS() # there are processes that this one depends on and they're not finished (yet)
+        return self # either all prior processes have been completed or there are none
+        
 
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
@@ -328,7 +337,8 @@ class SERVICE_IN_PROGRESS(State):
         Service Conditions not OK
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO
+        return self
     
     ###################################################
     updateTransitions = [to_SERVICE_READY, to_SERVICE_COMPLICATION]
@@ -404,7 +414,9 @@ class SERVICE_READY(State):
         Contractor was Selected
 
         """
-        pass # TODO Implement or delete if not necessary
+        if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
+            return CONTRACTOR_SELECTED()
+        return self
     
     ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -413,7 +425,11 @@ class SERVICE_READY(State):
         Button was pressed, clean up and go back
 
         """
-        pass # TODO Implement or delete if not necessary
+        serviceContent = process.serviceDetails
+        #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return DRAFT()
     
     ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -422,7 +438,8 @@ class SERVICE_READY(State):
         Service Conditions not OK
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO
+        return self
     
     ###################################################
     updateTransitions = [to_SERVICE_COMPLICATION]
@@ -440,6 +457,8 @@ class SERVICE_READY(State):
 class WAITING_FOR_OTHER_PROCESS(State):
     """
     Waiting for other preceding Process
+
+    TODO
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
@@ -487,8 +506,12 @@ class WAITING_FOR_OTHER_PROCESS(State):
         From: WAITING_FORT_OTHER_PROGRESS
         To: SERVICE_IN_PROGRESS
 
+        Must be triggered from the outside, for example when a process is finished, it signals all outgoing dependend processes of this
         """
-        pass # TODO Implement or delete if not necessary
+        for priorProcess in process.dependenciesIn.all():
+            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                return self # there are processes that this one depends on and they're not finished (yet)
+        return SERVICE_IN_PROGRESS() # all prior processes have been completed
 
     ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -497,7 +520,11 @@ class WAITING_FOR_OTHER_PROCESS(State):
         To: DRAFT
         
         """
-        pass # TODO Implement or delete if not necessary
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return DRAFT()
 
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS]
@@ -515,6 +542,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
 class SERVICE_COMPLICATION(State):
     """
     Service Complication happened
+    TODO
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
@@ -562,7 +590,11 @@ class SERVICE_COMPLICATION(State):
         To: Draft
         
         """
-        pass # TODO Implement or delete if not necessary
+        serviceContent = process.serviceDetails
+        #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return DRAFT()
 
     ###################################################
     def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -653,13 +685,14 @@ class CONTRACTOR_SELECTED(State):
     # Transitions
     ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONTRACTOR_SELECTED | to_VERIFYING: # TODO: Change to current and next state
+          CONTRACTOR_SELECTED | VERIFYING: # TODO: Change to current and next state
         """
         From: CONTRACTOR_SELECTED
         To: VERIFYING
 
         """
-        pass # TODO Implement or delete if not necessary
+        #TODO call verify on interface
+        return self
 
     ###################################################
     def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -668,7 +701,8 @@ class CONTRACTOR_SELECTED(State):
         To: SERVICE_READY
         
         """
-        pass # TODO Implement or delete if not necessary
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
+        return SERVICE_READY()
 
     ###################################################
     updateTransitions = []
@@ -685,7 +719,7 @@ class CONTRACTOR_SELECTED(State):
 #######################################################
 class VERIFYING(State):
     """
-    Service is ready
+    Process is currently being verified
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
@@ -734,7 +768,8 @@ class VERIFYING(State):
         To: VERIFIED
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO Verification successfull
+        return VERIFIED()
     
     ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -744,7 +779,8 @@ class VERIFYING(State):
         To: SERVICE_COMPLICATION
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO Verification failed
+        return self
 
     ###################################################
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -753,7 +789,8 @@ class VERIFYING(State):
         To: CONTRACTOR_SELECTED
         
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO Cancel verification
+        return self
 
     ###################################################
     updateTransitions = [to_VERIFIED, to_SERVICE_COMPLICATION]
@@ -770,7 +807,7 @@ class VERIFYING(State):
 #######################################################
 class VERIFIED(State):
     """
-    Contractor has been Verified
+    Process has been verified
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFIED)
@@ -829,8 +866,10 @@ class VERIFIED(State):
         From: VERIFIED
         To: REQUESTED
 
+        Is called from the outside by a finished verification
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO call send
+        return REQUESTED()
 
     ###################################################
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -839,7 +878,8 @@ class VERIFIED(State):
         To: CONTRACTOR_SELECTED
         
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO discard verification
+        return CONTRACTOR_SELECTED()
 
     ###################################################
     updateTransitions = [to_REQUESTED]
@@ -856,7 +896,7 @@ class VERIFIED(State):
 #######################################################
 class REQUESTED(State):
     """
-    Product Requested at Contractor
+    Contractor was informed about possible contract
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REQUESTED)
@@ -923,7 +963,7 @@ class REQUESTED(State):
         To: CLARIFICATION
 
         """
-        pass # TODO Implement or delete if not necessary
+        return CLARIFICATION()
 
     ###################################################
     def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -933,7 +973,7 @@ class REQUESTED(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
-        pass # TODO Implement or delete if not necessary
+        return CONFIRMED_BY_CONTRACTOR()
 
     ###################################################
     def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -943,7 +983,7 @@ class REQUESTED(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
-        pass # TODO Implement or delete if not necessary
+        return REJECTED_BY_CONTRACTOR()
 
     ###################################################
     updateTransitions = []
@@ -1017,7 +1057,7 @@ class CLARIFICATION(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
-        pass # TODO Implement or delete if not necessary
+        return CONFIRMED_BY_CONTRACTOR()
 
     ###################################################
     def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1027,20 +1067,11 @@ class CLARIFICATION(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
-        pass # TODO Implement or delete if not necessary
-
-    ###################################################
-    def to_REQUESTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REQUESTED:
-        """
-        To: REQUESTED
-        
-        """
-        pass # TODO Implement or delete if not necessary
+        return REJECTED_BY_CONTRACTOR()
 
     ###################################################
     updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
-    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR, ProcessStatusAsString.REQUESTED: to_REQUESTED} # TODO add functions that are called on button click, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR} # TODO add functions that are called on button click, leave empty if none exist
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1110,7 +1141,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: CONFIRMED_BY_CLIENT
 
         """
-        pass # TODO Implement or delete if not necessary
+        return CONFIRMED_BY_CLIENT()
 
     ###################################################
     def to_REJECTED_BY_CLIENT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1120,7 +1151,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: REJECTED_BY_CLIENT
 
         """
-        pass # TODO Implement or delete if not necessary
+        return REJECTED_BY_CLIENT()
 
     ###################################################
     updateTransitions = []
@@ -1172,7 +1203,8 @@ class REJECTED_BY_CONTRACTOR(State):
         To: CANCELLED
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO do stuff to clean up
+        return CANCELED()
 
     ###################################################
     updateTransitions = [to_CANCELED]
@@ -1235,7 +1267,7 @@ class CONFIRMED_BY_CLIENT(State):
         To: PRODUCTION
 
         """
-        pass # TODO Implement or delete if not necessary
+        return PRODUCTION()
 
     ###################################################
     updateTransitions = []
@@ -1287,7 +1319,8 @@ class REJECTED_BY_CLIENT(State):
         To: CANCELLED
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO clean up and stuff
+        return CANCELED()
 
     ###################################################
     updateTransitions = [to_CANCELED]
@@ -1361,7 +1394,7 @@ class PRODUCTION(State):
         To: DELIVERY
 
         """
-        pass # TODO Implement or delete if not necessary
+        return DELIVERY()
 
     ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1371,7 +1404,7 @@ class PRODUCTION(State):
         To: FAILED
 
         """
-        pass # TODO Implement or delete if not necessary
+        return FAILED()
 
     ###################################################
     updateTransitions = []
@@ -1456,7 +1489,8 @@ class DELIVERY(State):
         To: COMPLETED
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO: Send out signal to dependent processes
+        return COMPLETED()
 
     ###################################################
     def to_DISPUTE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1466,7 +1500,7 @@ class DELIVERY(State):
         To: DISPUTE
 
         """
-        pass # TODO Implement or delete if not necessary
+        return DISPUTE()
 
     ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1476,7 +1510,7 @@ class DELIVERY(State):
         To: FAILED
 
         """
-        pass # TODO Implement or delete if not necessary
+        return FAILED()
 
     ###################################################
     updateTransitions = []
@@ -1550,7 +1584,8 @@ class DISPUTE(State):
         To: COMPLETED
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO: Send out signals
+        return COMPLETED()
 
      ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1560,11 +1595,11 @@ class DISPUTE(State):
         To: FAILED
 
         """
-        pass # TODO Implement or delete if not necessary
+        return FAILED()
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.COMPLETED: to_COMPLETED, ProcessStatusAsString.COMPLETED: to_FAILED,}
+    buttonTransitions = {ProcessStatusAsString.COMPLETED: to_COMPLETED, ProcessStatusAsString.COMPLETED: to_FAILED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1612,7 +1647,8 @@ class COMPLETED(State):
         To: SERVICE_COMPLICATION
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO
+        return self
 
     ###################################################
     updateTransitions = [to_SERVICE_COMPLICATION]
@@ -1664,7 +1700,8 @@ class FAILED(State):
         To: SERVICE_COMPLICATION
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO
+        return self
 
     ###################################################
     updateTransitions = [to_SERVICE_COMPLICATION]
@@ -1716,7 +1753,8 @@ class CANCELED(State):
         To: SERVICE_COMPLICATION
 
         """
-        pass # TODO Implement or delete if not necessary
+        # TODO
+        return self
 
     ###################################################
     updateTransitions = [to_SERVICE_COMPLICATION]
