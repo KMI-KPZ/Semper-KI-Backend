@@ -40,6 +40,20 @@ logger = logging.getLogger("errors")
 ####################################################################################
 # Projects/Processes general
 class ProcessManagementBase(AbstractContentInterface):
+
+    ##############################################
+    def __init__(self, session) -> None:
+        self._sessionObject = session
+
+    ##############################################
+    def getUserID(self) -> str:
+        """
+        Retrieve UserID from session
+        
+        :return: UserID
+        :rtype: str
+        """
+        return profileManagement[self._sessionObject[SessionContent.PG_PROFILE_CLASS]].getClientID(self._sessionObject)
     
     ##############################################
     @staticmethod
@@ -582,33 +596,6 @@ class ProcessManagementBase(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f'could not update process: {str(error)}')
             return error
-    
-    ##############################################
-    @staticmethod
-    def sendProcess(processID):
-        """
-        Send process to contractor.
-
-        :param processID: ID of the process that is being sent
-        :type processID: str
-        :return: Nothing or an error
-        :rtype: None or error
-        """
-        #TODO - create data entries for everything that's happening
-        try:
-            processObj = Process.objects.get(processID=processID)
-            
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
-            processObj.contractor = contractorObj
-            processObj.save()
-
-            #TODO change Status
-            # updateProcess
-
-            return None
-        except (Exception) as error:
-            logger.error(f'could not send process: {str(error)}')
-            return error
 
     ##############################################
     @staticmethod
@@ -1037,3 +1024,63 @@ class ProcessManagementBase(AbstractContentInterface):
             logger.error(f"Error getting all contractors: {str(error)}")
 
         return returnValue
+    
+    ##############################################
+    @staticmethod
+    def verifyProcess(projectID:str, processID:str, userID:str):
+        """
+        Verify the process.
+
+        :param projectID: Project that this process belongs to
+        :type projectID: str
+        :param processID: processID that shall be verified
+        :type processID: str
+        :param userID: Who ordered the verification
+        :type userID: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            # send verification job to queue 
+            #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
+
+            # TODO Websocket Event
+
+            
+            return None
+
+        
+        except (Exception) as error:
+            logger.error(f"verifyProcesses: {str(error)}")
+
+    ##############################################
+    @staticmethod
+    def sendProcess(processID:str, userID):
+        """
+        Send the process to its contractor(s).
+
+        :param processID: processID that is verified
+        :type processIDsArray: list[str]
+        :param userID: Who ordered the verification
+        :type userID: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+            
+            # TODO Check if process is verified
+
+            # send process to contractor
+            processObj = Process.objects.get(processID=processID)
+            
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+            processObj.contractor = contractorObj
+            processObj.save()
+
+            dataID = crypto.generateURLFriendlyRandomString()
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processID, DataType.OTHER, userID, {})
+        
+        except (Exception) as error:
+            logger.error(f"sendProcesses: {str(error)}")

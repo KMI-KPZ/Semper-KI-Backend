@@ -53,7 +53,6 @@ def uploadFiles(request):
         # TODO: Licenses, ...
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-        assert(userName!="", True)
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
             fileID = crypto.generateURLFriendlyRandomString()
@@ -110,7 +109,7 @@ def downloadFile(request, processID, fileID):
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
                 if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
                     fileOfThisProcess = currentProcess.files[fileID]
                     if len(fileOfThisProcess) == 0:
                         return HttpResponse("Not found!", status=404)
@@ -161,7 +160,7 @@ def downloadFilesAsZip(request, processID):
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
                 if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
                     filesOfThisProcess = currentProcess.files
                 else:
                     return HttpResponse("Not allowed to see process!", status=401)
@@ -216,7 +215,7 @@ def downloadProcessHistory(request, processID):
     """
     try:
         # get Project
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
         if processObj == None:
             raise Exception("Process not found in DB!")
 
@@ -304,7 +303,7 @@ def deleteFile(request, processID, fileID):
             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
                 if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
                     fileOfThisProcess = currentProcess.files[fileID]
                     if len(fileOfThisProcess) == 0:
                         return HttpResponse("Not found!", status=404)                

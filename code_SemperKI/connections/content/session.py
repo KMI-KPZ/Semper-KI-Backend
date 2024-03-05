@@ -11,6 +11,7 @@ import logging, copy
 
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
 
 from ...definitions import SessionContentSemperKI
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
@@ -251,6 +252,16 @@ class ProcessManagementSession(AbstractContentInterface):
     #######################################################
     def __init__(self, session) -> None:
         self.structuredSessionObj = StructuredSession(session)
+
+    ##############################################
+    def getUserID(self) -> str:
+        """
+        Retrieve UserID from session
+        
+        :return: UserID
+        :rtype: str
+        """
+        return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
 
     #######################################################
     def getIfContentIsInSession(self) -> bool:

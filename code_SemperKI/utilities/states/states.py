@@ -37,29 +37,10 @@ def addButtonsToProcess(projectObj) -> None: #is changed in place
     """
     for process in projectObj[SessionContentSemperKI.processes]:
         processStatusAsString = processStatusFromIntToStr(process[ProcessDescription.processStatus])
-        process["processStatusButtons"] = returnCorrectState(processStatusAsString).buttons()
+        process["processStatusButtons"] = stateDict[processStatusAsString].buttons()
 
 
-#######################################################
-# TODO solve this better by creating a global dictionary or a static class or something
-def returnCorrectState(stateString:str):
-    """
-    Return the state class with respect to the string provided
-
-    :param stateString: Contains the string with respect to the enum
-    :type stateString: str
-    :return: Subclass object of the State class
-    :rtype: State()
-    
-    """
-
-    if stateString == ProcessStatusAsString.DRAFT:
-        return DRAFT()
-    elif stateString == ProcessStatusAsString.SERVICE_IN_PROGRESS:
-        return SERVICE_IN_PROGRESS()
-    elif stateString == ProcessStatusAsString.SERVICE_READY:
-        return SERVICE_READY()
-
+stateDict = {} # will later contain mapping from string to instande of every state
 ###############################################################################
 # State Machine
 #######################################################
@@ -81,9 +62,9 @@ class StateMachine(object):
 
         # Start with a default state.
         if initialAsStr != "":
-            self.state = returnCorrectState(initialAsStr)
+            self.state = stateDict[initialAsStr]
         elif initialAsInt != -1:
-            self.state = returnCorrectState(processStatusFromIntToStr(initialAsInt))
+            self.state = stateDict[processStatusFromIntToStr(initialAsInt)]
         else:
             self.state = DRAFT()
 
@@ -155,6 +136,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
+                    # TODO send mail if person is not logged in
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -183,6 +165,7 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
+                    # TODO send mail to other person
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -216,6 +199,7 @@ class DRAFT(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DRAFT)
+    name = ProcessStatusAsString.DRAFT
 
     ###################################################
     def buttons(self) -> list:
@@ -270,6 +254,7 @@ class SERVICE_IN_PROGRESS(State):
     """
     
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
+    name = name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     
     ###################################################
     def buttons(self) -> list:
@@ -359,6 +344,7 @@ class SERVICE_READY(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_READY)
+    name = ProcessStatusAsString.SERVICE_READY
 
     ###################################################
     def buttons(self) -> list:
@@ -397,7 +383,7 @@ class SERVICE_READY(State):
                 "icon": IconType.FactoryIcon,
                 "action": {
                     "type": "navigation",
-                    "to": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    "to": "contractorSelection",
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -419,6 +405,16 @@ class SERVICE_READY(State):
         return self
     
     ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+        """
+        Service Conditions not OK
+
+        """
+        # TODO
+        return self
+    
+    ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         DRAFT:
         """
@@ -432,18 +428,8 @@ class SERVICE_READY(State):
         return DRAFT()
     
     ###################################################
-    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
-        """
-        Service Conditions not OK
-
-        """
-        # TODO
-        return self
-    
-    ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED }
+    updateTransitions = [to_CONTRACTOR_SELECTED, to_SERVICE_COMPLICATION]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -462,6 +448,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
+    name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
 
     ###################################################
     def buttons(self) -> list:
@@ -546,6 +533,7 @@ class SERVICE_COMPLICATION(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
+    name = ProcessStatusAsString.SERVICE_COMPLICATION
 
     ###################################################
     def buttons(self) -> list:
@@ -635,6 +623,7 @@ class CONTRACTOR_SELECTED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_SELECTED)
+    name = ProcessStatusAsString.CONTRACTOR_SELECTED
 
     ###################################################
     def buttons(self) -> list:
@@ -670,10 +659,13 @@ class CONTRACTOR_SELECTED(State):
             },
             {
                 "title": ButtonLabels.VERIFYING,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.TaskIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.VERIFYING,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.VERIFYING,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -692,7 +684,8 @@ class CONTRACTOR_SELECTED(State):
 
         """
         #TODO call verify on interface
-        return self
+        interface.verifyProcess(process.project.projectID, process.processID, interface.getUserID())
+        return VERIFYING()
 
     ###################################################
     def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -723,6 +716,7 @@ class VERIFYING(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
+    name = ProcessStatusAsString.VERIFYING
 
     ###################################################
     def buttons(self) -> list:
@@ -790,7 +784,7 @@ class VERIFYING(State):
         
         """
         # TODO Cancel verification
-        return self
+        return CONTRACTOR_SELECTED()
 
     ###################################################
     updateTransitions = [to_VERIFIED, to_SERVICE_COMPLICATION]
@@ -811,6 +805,7 @@ class VERIFIED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFIED)
+    name = name = ProcessStatusAsString.VERIFIED
 
     ###################################################
     def buttons(self) -> list:
@@ -846,10 +841,13 @@ class VERIFIED(State):
             },
             {
                 "title": ButtonLabels.REQUESTED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.MailIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.REQUESTED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.REQUESTED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -869,6 +867,7 @@ class VERIFIED(State):
         Is called from the outside by a finished verification
         """
         # TODO call send
+        interface.sendProcess(process.processID, interface.getUserID())
         return REQUESTED()
 
     ###################################################
@@ -900,6 +899,7 @@ class REQUESTED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REQUESTED)
+    name = ProcessStatusAsString.REQUESTED
 
     ###################################################
     def buttons(self) -> list:
@@ -920,10 +920,13 @@ class REQUESTED(State):
             },
             {
                 "title": ButtonLabels.CLARIFICATION,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.QuestionAnswerIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.CLARIFICATION,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CLARIFICATION,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -931,10 +934,13 @@ class REQUESTED(State):
             },
             {
                 "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -942,10 +948,13 @@ class REQUESTED(State):
             },
             {
                 "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1004,6 +1013,7 @@ class CLARIFICATION(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
+    name = ProcessStatusAsString.CLARIFICATION
 
     ###################################################
     def buttons(self) -> list:
@@ -1025,10 +1035,13 @@ class CLARIFICATION(State):
             },
             {
                 "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1036,10 +1049,13 @@ class CLARIFICATION(State):
             },
             {
                 "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1088,6 +1104,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR)
+    name = ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR
 
     ###################################################
     def buttons(self) -> list:
@@ -1109,10 +1126,13 @@ class CONFIRMED_BY_CONTRACTOR(State):
             },
             {
                 "title": ButtonLabels.CONFIRMED_BY_CLIENT,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1120,10 +1140,13 @@ class CONFIRMED_BY_CONTRACTOR(State):
             },
             {
                 "title": ButtonLabels.REJECTED_BY_CLIENT,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1172,6 +1195,7 @@ class REJECTED_BY_CONTRACTOR(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CONTRACTOR)
+    name = ProcessStatusAsString.REJECTED_BY_CONTRACTOR
 
     ###################################################
     def buttons(self) -> list:
@@ -1225,6 +1249,7 @@ class CONFIRMED_BY_CLIENT(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CLIENT)
+    name = ProcessStatusAsString.CONFIRMED_BY_CLIENT
 
     ###################################################
     def buttons(self) -> list:
@@ -1248,8 +1273,11 @@ class CONFIRMED_BY_CLIENT(State):
                 "title": ButtonLabels.PRODUCTION,
                 "icon": IconType.FactoryIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.PRODUCTION,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.PRODUCTION,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1288,6 +1316,7 @@ class REJECTED_BY_CLIENT(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CLIENT)
+    name = ProcessStatusAsString.REJECTED_BY_CLIENT
 
     ###################################################
     def buttons(self) -> list:
@@ -1341,6 +1370,7 @@ class PRODUCTION(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION)
+    name = ProcessStatusAsString.PRODUCTION
 
     ###################################################
     def buttons(self) -> list:
@@ -1362,10 +1392,13 @@ class PRODUCTION(State):
             },
             {
                 "title": ButtonLabels.DELIVERY,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.LocalShippingIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.DELIVERY,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.DELIVERY,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1373,10 +1406,13 @@ class PRODUCTION(State):
             },
             {
                 "title": ButtonLabels.FAILED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.FAILED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.FAILED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1425,6 +1461,7 @@ class DELIVERY(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY)
+    name = ProcessStatusAsString.DELIVERY
 
     ###################################################
     def buttons(self) -> list:
@@ -1446,10 +1483,13 @@ class DELIVERY(State):
             },
             {
                 "title": ButtonLabels.COMPLETED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.COMPLETED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.COMPLETED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1457,10 +1497,13 @@ class DELIVERY(State):
             },
             {
                 "title": ButtonLabels.DISPUTE,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.TroubleshootIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.DISPUTE,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.DISPUTE,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1468,10 +1511,13 @@ class DELIVERY(State):
             },
             {
                 "title": ButtonLabels.FAILED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.FAILED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.FAILED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1531,6 +1577,7 @@ class DISPUTE(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DISPUTE)
+    name = ProcessStatusAsString.DISPUTE
 
     ###################################################
     def buttons(self) -> list:
@@ -1552,10 +1599,13 @@ class DISPUTE(State):
             },
             {
                 "title": ButtonLabels.COMPLETED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.COMPLETED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.COMPLETED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1563,10 +1613,13 @@ class DISPUTE(State):
             },
             {
                 "title": ButtonLabels.FAILED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.CancelIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": ProcessStatusAsString.FAILED,
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.FAILED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -1616,6 +1669,7 @@ class COMPLETED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.COMPLETED)
+    name = ProcessStatusAsString.COMPLETED
 
     ###################################################
     def buttons(self) -> list:
@@ -1669,6 +1723,7 @@ class FAILED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.FAILED)
+    name = ProcessStatusAsString.FAILED
 
     ###################################################
     def buttons(self) -> list:
@@ -1722,6 +1777,7 @@ class CANCELED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CANCELED)
+    name = ProcessStatusAsString.CANCELED
 
     ###################################################
     def buttons(self) -> list:
@@ -1768,3 +1824,7 @@ class CANCELED(State):
     def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
+# fill dictionary
+for subclass in State.__subclasses__():
+    instance = subclass()
+    stateDict[instance.name] = instance

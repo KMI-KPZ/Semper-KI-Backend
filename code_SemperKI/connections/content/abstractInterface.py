@@ -199,3 +199,14 @@ class AbstractContentInterface(ABC):
 
         """
         pass
+
+    ##############################################
+    @abstractmethod
+    def getUserID(self) -> str:
+        """
+        Retrieve UserID from session
+        
+        :return: UserID
+        :rtype: str
+        """
+        pass

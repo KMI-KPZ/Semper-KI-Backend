@@ -25,7 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..utilities.states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange, ProcessStatusAsString, returnCorrectState
+from ..utilities.states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -920,107 +920,107 @@ def statusButtonRequest(request):
     return JsonResponse({})
     
 #######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["PATCH"]) 
-@checkIfRightsAreSufficient(json=False)
-def verifyProject(request):
-    """
-    Start calculations on server and set status accordingly
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["PATCH"]) 
+# @checkIfRightsAreSufficient(json=False)
+# def verifyProject(request):
+#     """
+#     Start calculations on server and set status accordingly
 
-    :param request: PATCH Request
-    :type request: HTTP PATCH
-    :return: Response if processes are started successfully
-    :rtype: HTTP Response
+#     :param request: PATCH Request
+#     :type request: HTTP PATCH
+#     :return: Response if processes are started successfully
+#     :rtype: HTTP Response
 
-    """
-    try:
-        # get information
-        info = json.loads(request.body.decode("utf-8"))
-        projectID = info["projectID"]
-        sendToContractorAfterVerification = info["send"]
-        processesIDArray = info["processIDs"]
-        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+#     """
+#     try:
+#         # get information
+#         info = json.loads(request.body.decode("utf-8"))
+#         projectID = info["projectID"]
+#         sendToContractorAfterVerification = info["send"]
+#         processesIDArray = info["processIDs"]
+#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
 
-        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-            return HttpResponse("Not allowed!", status=401)
+#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
+#             return HttpResponse("Not allowed!", status=401)
 
-        # first save projects
-        contentManager = ManageContent(request.session)
-        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
-            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-            if isinstance(error, Exception):
-                raise error
+#         # first save projects
+#         contentManager = ManageContent(request.session)
+#         if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
+#             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+#             if isinstance(error, Exception):
+#                 raise error
 
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+#             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
             
-            # then clear drafts from session
+#             # then clear drafts from session
             
-            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
+#             contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
 
-        # TODO start services and set status to "verifying" instead of verified
-        #listOfCallIDsAndProcessesIDs = []
-        for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), userID)
-            #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
-            #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
+#         # TODO start services and set status to "verifying" instead of verified
+#         #listOfCallIDsAndProcessesIDs = []
+#         for entry in processesIDArray:
+#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), userID)
+#             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
+#             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
 
-        # start collecting process, 
-        #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
+#         # start collecting process, 
+#         #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
 
-        # TODO Websocket Event
+#         # TODO Websocket Event
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
 
-        if sendToContractorAfterVerification:
-            sendProject(request)
+#         if sendToContractorAfterVerification:
+#             sendProject(request)
 
-        return HttpResponse("Success")
+#         return HttpResponse("Success")
     
-    except (Exception) as error:
-        loggerError.error(f"verifyProject: {str(error)}")
-        return HttpResponse("Failed")
+#     except (Exception) as error:
+#         loggerError.error(f"verifyProject: {str(error)}")
+#         return HttpResponse("Failed")
     
-#######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["PATCH"]) 
-@checkIfRightsAreSufficient(json=False)
-def sendProject(request):
-    """
-    Retrieve Calculations and send process to contractor(s)
+# #######################################################
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["PATCH"]) 
+# @checkIfRightsAreSufficient(json=False)
+# def sendProject(request):
+#     """
+#     Retrieve Calculations and send process to contractor(s)
 
-    :param request: PATCH Request
-    :type request: HTTP PATCH
-    :return: Response if processes are started successfully
-    :rtype: HTTP Response
+#     :param request: PATCH Request
+#     :type request: HTTP PATCH
+#     :return: Response if processes are started successfully
+#     :rtype: HTTP Response
 
-    """
-    try:
-        info = json.loads(request.body.decode("utf-8"))
-        projectID = info["projectID"]
-        processesIDArray = info["processIDs"]
-        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+#     """
+#     try:
+#         info = json.loads(request.body.decode("utf-8"))
+#         projectID = info["projectID"]
+#         processesIDArray = info["processIDs"]
+#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
         
-        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-            return HttpResponse("Not allowed!", status=401)
+#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
+#             return HttpResponse("Not allowed!", status=401)
         
-        # TODO Check if process is verified
+#         # TODO Check if process is verified
         
-        for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.REQUESTED), userID)
-            pgProcesses.ProcessManagementBase.sendProcess(entry)
+#         for entry in processesIDArray:
+#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.REQUESTED), userID)
+#             pgProcesses.ProcessManagementBase.sendProcess(entry)
 
-        # TODO send local files to remote
+#         # TODO send local files to remote
 
-        # websocket event
-        fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
+#         # websocket event
+#         fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         
-        return HttpResponse("Success")
+#         return HttpResponse("Success")
     
-    except (Exception) as error:
-        loggerError.error(f"sendProject: {str(error)}")
-        return HttpResponse("Failed")
+#     except (Exception) as error:
+#         loggerError.error(f"sendProject: {str(error)}")
+#         return HttpResponse("Failed")
 
 
 #######################################################

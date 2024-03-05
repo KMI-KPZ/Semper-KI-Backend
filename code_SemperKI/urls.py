@@ -43,8 +43,8 @@ newPaths= {
     "updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
     "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
     "deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
-    "verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
-    "sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
+    #"verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
+    #"sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
     "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
     "statusButtonRequest": ("public/statusButtonRequest/",projectAndProcessManagement.statusButtonRequest),
 

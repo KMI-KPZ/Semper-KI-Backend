@@ -25,7 +25,7 @@ class ManageContent():
     def __init__(self, session) -> None:
         self.currentSession = session
         self.sessionManagement = ProcessManagementSession(session)
-        self.postgresManagement = ProcessManagementBase()
+        self.postgresManagement = ProcessManagementBase(session)
 
     #######################################################
     def checkRightsForProject(self, projectID) -> bool:
