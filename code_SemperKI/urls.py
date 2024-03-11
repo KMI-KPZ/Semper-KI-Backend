@@ -27,6 +27,7 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from MSQ.handlers import interface
 
 newPaths= {
 
@@ -65,6 +66,11 @@ newPaths= {
     "downloadFilesAsZip": ("public/downloadFilesAsZip/<processID>/",files.downloadFilesAsZip),
     "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
     "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
+
+    "getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
+    "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
+    "sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
+    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
 }
 
 

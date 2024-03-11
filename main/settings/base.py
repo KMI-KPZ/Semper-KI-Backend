@@ -126,8 +126,9 @@ class BackendConfigHelper(ConfigHelper):
         'FORWARD_URL': {'var': 'FORWARD_URL', 'hint': 'The URL to which Login should point',
                    'default': 'http://127.0.0.1:3000', 'required': True},
         'PGADMIN_DEFAULT_EMAIL': {'var': 'PGADMIN_DEFAULT_EMAIL', 'hint': 'Email for postgresadmin', 'default': 'test@infai.org', 'required': True},
-        'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True}
-
+        'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True},
+        'CELERY_BROKER_URL': {'var': 'CELERY_BROKER_URL', 'hint': 'Redis', 'default': None, 'required': True},
+        'CELERY_RESULT_BACKEND': {'var': 'CELERY_RESULT_BACKEND', 'hint': 'Redis', 'default': None, 'required': True}
     }
 
     def __init__(self):

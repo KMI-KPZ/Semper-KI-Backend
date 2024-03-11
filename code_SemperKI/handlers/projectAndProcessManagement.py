@@ -899,6 +899,7 @@ def statusButtonRequest(request):
     :return: Response with new buttons
     :rtype: JSONResponse
     """
+
     # get from info, create correct object, initialize statemachine, switch state accordingly
     info = json.loads(request.body.decode("utf-8"))
     projectID = info[InterfaceForStateChange.projectID]
