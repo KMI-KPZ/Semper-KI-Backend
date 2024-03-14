@@ -56,13 +56,14 @@ services:
   celery-worker:
     build:
       context: .
+      dockerfile: ./MSQ/Dockerfile.MSQ
     container_name: local-celery-worker
     entrypoint: celery
     env_file:
       - .env.local_container
-    command: -A celery worker -n local_worker --queues=local --loglevel=info
+    command: -A MSQ.module.celery worker -n local_worker --loglevel=DEBUG
     volumes:
-      - .:/var/www/app/worker
+      - .:/app
     networks:
       - semper-ki-dev-network
 

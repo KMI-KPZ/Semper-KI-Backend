@@ -10,9 +10,9 @@ eg.
 def task1(*args, **kwargs):
 return 
 
-2. Call the function (like task1) with .delay or .applyasync()
+2. Call the function (like task1) with .delay or .apply_async()
 
 eg. task1.delay(*args, **kwargs) will push the task message onto the queue, and the celery worker running on another server will pick it up.
 
-3. The return of task1.delay or task1.applyasync() will be an AsyncResult object containing the result, task_id, status and other parameters.
+3. The return of task1.delay or task1.apply_async() will be an AsyncResult object containing the result, task_id, status and other parameters.
 

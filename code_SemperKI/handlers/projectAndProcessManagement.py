@@ -33,7 +33,6 @@ loggerError = logging.getLogger("errors")
 ################################################################################################
 
 #######################################################
-
 def fireWebsocketEvents(projectID, processIDArray, session, event, operation=""):
     """
     Fire websocket event from a list for a specific project and process. 

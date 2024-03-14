@@ -5,7 +5,9 @@ Silvio Weging 2024
 
 Contains: Interface with the message queuing system
 """
+import asyncio
 import MSQ.module.celery as TaskQueue
+from ..tasks.tasks import dummy, dummyDerp
 from django.http import HttpResponse
 
 ####################################################################
@@ -37,15 +39,11 @@ def sendExampleRemote(request):
     return HttpResponse("Success")
 
 ####################################################################
-@TaskQueue.app.task
-def dummy(a:int,b:str):
-    return str(a)+b
-
-####################################################################
 def sendExampleLocal(request):
     """
     Send example script to remote worker
     
     """
-    retVal = dummy.apply_async(args=[1,"bla"], queue="local")
+    retVal = dummy.delay(1,"bla")
+    retVal = dummyDerp.delay(1,"bla")
     return HttpResponse("Success")

@@ -867,7 +867,9 @@ class VERIFIED(State):
         Is called from the outside by a finished verification
         """
         # TODO call send
-        interface.sendProcess(process.processID, interface.getUserID())
+        retVal = interface.sendProcess(process.processID, interface.getUserID())
+        if isinstance(retVal, Exception):
+            return VERIFIED()
         return REQUESTED()
 
     ###################################################

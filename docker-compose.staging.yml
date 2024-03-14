@@ -56,5 +56,19 @@ services:
     networks:
       - semper-ki-staging-network
 
+  celery-worker:
+    build:
+      context: .
+      dockerfile: ./MSQ/Dockerfile.MSQ
+    container_name: local-celery-worker
+    entrypoint: celery
+    env_file:
+      - .env.staging
+    command: -A MSQ.module.celery worker -n local_worker --loglevel=info
+    volumes:
+      - .:/app
+    networks:
+      - semper-ki-staging-network
+
 networks:
   semper-ki-staging-network:

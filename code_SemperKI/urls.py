@@ -67,9 +67,9 @@ newPaths= {
     "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
     "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
 
-    "getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
+    #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
     "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
-    "sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
+    #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
 }
 

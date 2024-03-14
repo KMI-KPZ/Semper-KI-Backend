@@ -32,6 +32,7 @@ import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
+from ....utilities.asyncTask import run
 
 import logging
 logger = logging.getLogger("errors")
@@ -1043,16 +1044,13 @@ class ProcessManagementBase(AbstractContentInterface):
         """
         try:
             # send verification job to queue 
-            #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
-
-            # TODO Websocket Event
-
-            
+            #run()
+            dataID = crypto.generateURLFriendlyRandomString()
+            ProcessManagementBase.createDataEntry("Verification started", dataID, processID, DataType.STATUS, userID)
             return None
 
-        
         except (Exception) as error:
-            logger.error(f"verifyProcesses: {str(error)}")
+            logger.error(f"verifyProcess: {str(error)}")
 
     ##############################################
     @staticmethod
@@ -1070,11 +1068,13 @@ class ProcessManagementBase(AbstractContentInterface):
         """
         try:
             
-            # TODO Check if process is verified
-
-            # send process to contractor
             processObj = Process.objects.get(processID=processID)
+    
+            # Check if process is verified
+            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFIED):
+                raise Exception("Not verified yet!")
             
+            # send process to contractor
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
             processObj.contractor = contractorObj
             processObj.save()
@@ -1083,4 +1083,4 @@ class ProcessManagementBase(AbstractContentInterface):
             ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processID, DataType.OTHER, userID, {})
         
         except (Exception) as error:
-            logger.error(f"sendProcesses: {str(error)}")
+            logger.error(f"sendProcess: {str(error)}")
