@@ -6,47 +6,35 @@ Silvio Weging 2024
 Contains: Send away a task in a fire-and-forget fashion
 """
 
-import asyncio, inspect
-from asgiref.sync import sync_to_async
+import asyncio
 
 ####################################################################
-async def doTask(task, params:tuple=None):
+# From https://techoverflow.net/2020/10/01/how-to-fix-python-asyncio-runtimeerror-there-is-no-current-event-loop-in-thread/
+def getOrCreateEventLoop() -> asyncio.AbstractEventLoop:
     """
-    Send some task with params to an async computation in a fire-and-forget kinda way.
+    Since threads don't have their own event loop, a new one must be created usually
 
-    :param task: The task at hand
-    :type task: Function object
-    :param params: The parameters of the function, can be None if there aren't any
-    :type params: tuple or None
-    :return: Nothing, it's fire and forget, you know
-    :rtype: None
     """
-    if inspect.iscoroutinefunction(task):
-        if params == None:
-            nothing = await task()
-        else:
-            nothing = await task(*params)
-    else:
-        if params == None:
-            nothing = await sync_to_async(task)()
-        else:
-            nothing = await sync_to_async(task)(*params)
-
-    return
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
 
 ####################################################################
-def run(task, params:tuple=None):
+# From https://stackoverflow.com/questions/37278647/fire-and-forget-python-async-await
+# DECORATOR
+def runInBackground(task):
     """
-    Call this from any sync function.
+    Decorator for a task that shall be run in the background when called
 
-    :param task: The task at hand
-    :type task: Function object
-    :param params: The parameters of the function, can be None if there aren't any
-    :type params: tuple or None
-    :return: Nothing, it's fire and forget, you know
-    :rtype: None
+    :param task: The function
+    :type task: Function Object
+    
     """
+    def wrapped(*args, **kwargs):
+        return getOrCreateEventLoop().run_in_executor(None, task, *args, *kwargs)
 
-    asyncio.run(doTask(task, params))
-
-    return 
+    return wrapped
