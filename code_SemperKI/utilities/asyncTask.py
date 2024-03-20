@@ -38,3 +38,11 @@ def runInBackground(task):
         return getOrCreateEventLoop().run_in_executor(None, task, *args, *kwargs)
 
     return wrapped
+
+####################################################################
+# Example:
+@runInBackground
+def testTask(a:int,b:str):
+    print("Task done", a)
+    return str(a)+b
+# then use testTask(1," Test") and it will be run async

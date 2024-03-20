@@ -253,6 +253,17 @@ class ProcessManagementSession(AbstractContentInterface):
     def __init__(self, session) -> None:
         self.structuredSessionObj = StructuredSession(session)
 
+    #######################################################
+    def getSession(self):
+        """
+        Get the session
+        
+        :return: The session 
+        :rtype: Django session obj (dict)
+        """
+        return self.structuredSessionObj.getSession()
+
+
     ##############################################
     def getUserID(self) -> str:
         """

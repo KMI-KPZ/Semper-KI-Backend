@@ -32,7 +32,7 @@ import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....utilities.asyncTask import run
+from ....tasks.processTasks import verificationOfProcess
 
 import logging
 logger = logging.getLogger("errors")
@@ -44,7 +44,18 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     def __init__(self, session) -> None:
-        self._sessionObject = session
+        self.structuredSessionObj = session
+
+    #######################################################
+    def getSession(self):
+        """
+        Get the session
+
+        :return: The session
+        :rtype: Django session obj(dict)
+
+        """
+        return self.structuredSessionObj
 
     ##############################################
     def getUserID(self) -> str:
@@ -54,7 +65,7 @@ class ProcessManagementBase(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        return profileManagement[self._sessionObject[SessionContent.PG_PROFILE_CLASS]].getClientID(self._sessionObject)
+        return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
     
     ##############################################
     @staticmethod
@@ -1028,25 +1039,23 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
-    def verifyProcess(projectID:str, processID:str, userID:str):
+    def verifyProcess(processObj:Process, session, userID:str):
         """
         Verify the process.
 
-        :param projectID: Project that this process belongs to
-        :type projectID: str
-        :param processID: processID that shall be verified
-        :type processID: str
-        :param userID: Who ordered the verification
-        :type userID: str
+        :param projectObj: Process object
+        :type projectID: Process
+        :param session: Session of this user
+        :type session: Django session object
         :return: Nothing
         :rtype: None
         
         """
-        try:
-            # send verification job to queue 
-            #run()
+        try: 
             dataID = crypto.generateURLFriendlyRandomString()
-            ProcessManagementBase.createDataEntry("Verification started", dataID, processID, DataType.STATUS, userID)
+            ProcessManagementBase.createDataEntry("Verification started", dataID, processObj.processID, DataType.STATUS, userID)
+            # send verification job to queue 
+            verificationOfProcess(processObj, session)
             return None
 
         except (Exception) as error:

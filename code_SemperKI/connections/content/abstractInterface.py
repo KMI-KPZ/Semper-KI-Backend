@@ -17,6 +17,18 @@ class AbstractContentInterface(ABC):
     
     """
 
+    #######################################################
+    @abstractmethod
+    def getSession(self):
+        """
+        Get the session
+
+        :return: The session
+        :rtype: Django session obj(dict)
+
+        """
+        pass
+
     ###################################################
     @abstractmethod
     def createProject(self, projectID:str, client:str):
