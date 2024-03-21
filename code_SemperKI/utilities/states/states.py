@@ -31,13 +31,13 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def addButtonsToProcess(projectObj) -> None: #is changed in place
+def addButtonsToProcess(projectObj, client=True) -> None: #is changed in place
     """
     Look at process status of every process of a project and add respective buttons
     """
     for process in projectObj[SessionContentSemperKI.processes]:
         processStatusAsString = processStatusFromIntToStr(process[ProcessDescription.processStatus])
-        process["processStatusButtons"] = stateDict[processStatusAsString].buttons()
+        process["processStatusButtons"] = stateDict[processStatusAsString].buttons(client)
 
 
 stateDict = {} # will later contain mapping from string to instance of every state
@@ -67,6 +67,46 @@ class StateMachine(object):
             self.state = stateDict[processStatusFromIntToStr(initialAsInt)]
         else:
             self.state = stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def showPaths(self):
+        """
+        Show the paths that this machine can take
+        
+        """
+        try:
+            outDict = {"nodes": [], "edges": []}
+            edgeID = -1
+
+            for node in stateDict:
+                outDict["nodes"].append({"id": node})
+
+                for transition in stateDict[node].updateTransitions:
+                    edgeID += 1
+                    transitionTypesArr = transition.__annotations__["return"].split("|")
+                    if len(transitionTypesArr) == 2:
+                        source = transitionTypesArr[0].rstrip(" ")
+                        target = transitionTypesArr[1].lstrip(" ")
+                    else:
+                        source = node
+                        target = transitionTypesArr[0].rstrip(" ")
+                    outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                for transitionKey in stateDict[node].buttonTransitions:
+                    transition = stateDict[node].buttonTransitions[transitionKey]
+                    edgeID += 1
+                    transitionTypesArr = transition.__annotations__["return"].split("|")
+                    if len(transitionTypesArr) == 2:
+                        source = transitionTypesArr[0].rstrip(" ")
+                        target = transitionTypesArr[1].lstrip(" ")
+                    else:
+                        source = node
+                        target = transitionTypesArr[0].rstrip(" ")
+                    outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+
+            return outDict
+        except Exception as e:
+            print(node, e)
+            return outDict
 
     ###################################################
     def onUpdateEvent(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
@@ -103,10 +143,11 @@ class State(ABC):
 
     ###################################################
     def __init__(self):
-        print('Processing current state:', str(self))
+        #print('Processing current state:', str(self))
+        pass
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -202,7 +243,7 @@ class DRAFT(State):
     name = ProcessStatusAsString.DRAFT
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         None
         """
@@ -254,10 +295,10 @@ class SERVICE_IN_PROGRESS(State):
     """
     
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
-    name = name = ProcessStatusAsString.SERVICE_IN_PROGRESS
+    name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Back to draft
 
@@ -347,7 +388,7 @@ class SERVICE_READY(State):
     name = ProcessStatusAsString.SERVICE_READY
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Choose contractor
 
@@ -451,7 +492,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
@@ -536,7 +577,7 @@ class SERVICE_COMPLICATION(State):
     name = ProcessStatusAsString.SERVICE_COMPLICATION
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Back to Draft
 
@@ -626,7 +667,7 @@ class CONTRACTOR_SELECTED(State):
     name = ProcessStatusAsString.CONTRACTOR_SELECTED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for  CONTRACTOR_SELECTED
 
@@ -713,13 +754,14 @@ class CONTRACTOR_SELECTED(State):
 class VERIFYING(State):
     """
     Process is currently being verified
+
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
     name = ProcessStatusAsString.VERIFYING
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for VERIFYING
 
@@ -762,19 +804,9 @@ class VERIFYING(State):
         To: VERIFIED
 
         """
-        # TODO Verification successfull
-        return stateDict[ProcessStatusAsString.VERIFIED]
-    
-    ###################################################
-    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          VERIFYING | SERVICE_COMPLICATION:
-        """
-        From: VERIFYING
-        To: SERVICE_COMPLICATION
+        # TODO Can only be set by admins
 
-        """
-        # TODO Verification failed
-        return self
+        return stateDict[ProcessStatusAsString.VERIFIED]
 
     ###################################################
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -787,7 +819,7 @@ class VERIFYING(State):
         return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
 
     ###################################################
-    updateTransitions = [to_VERIFIED, to_SERVICE_COMPLICATION]
+    updateTransitions = [to_VERIFIED]
     buttonTransitions = {ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED }
 
     ###################################################
@@ -808,7 +840,7 @@ class VERIFIED(State):
     name = name = ProcessStatusAsString.VERIFIED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Manual Request
 
@@ -866,8 +898,7 @@ class VERIFIED(State):
 
         Is called from the outside by a finished verification
         """
-        # TODO call send
-        retVal = interface.sendProcess(process.processID, interface.getUserID())
+        retVal = interface.sendProcess(process, interface.getSession() , interface.getUserID())
         if isinstance(retVal, Exception):
             return stateDict[ProcessStatusAsString.VERIFIED]
         return stateDict[ProcessStatusAsString.REQUESTED]
@@ -904,65 +935,81 @@ class REQUESTED(State):
     name = ProcessStatusAsString.REQUESTED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for REQUESTED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
+        
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.CLARIFICATION,
-                "icon": IconType.QuestionAnswerIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CLARIFICATION,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ]
+        else: # contractor
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                {
+                    "title": ButtonLabels.CLARIFICATION,
+                    "icon": IconType.QuestionAnswerIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.CLARIFICATION,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                },
+                {
+                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
     
     ###################################################
     # Transitions
@@ -1012,58 +1059,63 @@ class REQUESTED(State):
 class CLARIFICATION(State):
     """
     Clarification needed by Contractor
+
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
     name = ProcessStatusAsString.CLARIFICATION
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for CLARIFICATION
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+            ]
+        else:
+            return [
+                {
+                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
     
     ###################################################
     # Transitions
@@ -1109,53 +1161,56 @@ class CONFIRMED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for CONFIRMED_BY_CONTRACTOR, no Back-Button
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.CONFIRMED_BY_CLIENT,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.REJECTED_BY_CLIENT,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                {
+                    "title": ButtonLabels.CONFIRMED_BY_CLIENT,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
-    
+                {
+                    "title": ButtonLabels.REJECTED_BY_CLIENT,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
+        else:
+            return [
+            ]
     ###################################################
     # Transitions
     ###################################################
@@ -1200,24 +1255,27 @@ class REJECTED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.REJECTED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         No Buttons only CANCELED
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ] 
+        else:
+            return []
     
     ###################################################
     # Transitions
@@ -1254,38 +1312,42 @@ class CONFIRMED_BY_CLIENT(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CLIENT
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for CONFIRMED_BY_CLIENT, no Back-Button
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.PRODUCTION,
-                "icon": IconType.FactoryIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.PRODUCTION,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+            ]
+        else:
+            return [
+                {
+                    "title": ButtonLabels.PRODUCTION,
+                    "icon": IconType.FactoryIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.PRODUCTION,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
     
     ###################################################
     # Transitions
@@ -1314,31 +1376,34 @@ class CONFIRMED_BY_CLIENT(State):
 #######################################################
 class REJECTED_BY_CLIENT(State):
     """
-    Order Rejected by Contractor
+    Order rejected by Client
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CLIENT)
     name = ProcessStatusAsString.REJECTED_BY_CLIENT
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         No Buttons only CANCELED
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ] 
+        else:
+            return []
     
     ###################################################
     # Transitions
@@ -1375,52 +1440,56 @@ class PRODUCTION(State):
     name = ProcessStatusAsString.PRODUCTION
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for PRODUCTION, no Back-Button
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.DELIVERY,
-                "icon": IconType.LocalShippingIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.DELIVERY,
+        if client:
+            return [
+            ]
+        else:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.FAILED,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.FAILED,
+                {
+                    "title": ButtonLabels.DELIVERY,
+                    "icon": IconType.LocalShippingIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DELIVERY,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.FAILED,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
     
     ###################################################
     # Transitions
@@ -1466,67 +1535,69 @@ class DELIVERY(State):
     name = ProcessStatusAsString.DELIVERY
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for DELIVERY, no Back-Button
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE,
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.COMPLETED,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.COMPLETED,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE,
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.DISPUTE,
-                "icon": IconType.TroubleshootIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.DISPUTE,
+                {
+                    "title": ButtonLabels.COMPLETED,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.COMPLETED,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.FAILED,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.FAILED,
+                {
+                    "title": ButtonLabels.DISPUTE,
+                    "icon": IconType.TroubleshootIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DISPUTE,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
-    
+                {
+                    "title": ButtonLabels.FAILED,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
+        else:
+            return []
     ###################################################
     # Transitions
     ###################################################
@@ -1582,52 +1653,55 @@ class DISPUTE(State):
     name = ProcessStatusAsString.DISPUTE
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.COMPLETED,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.COMPLETED,
+        if client:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-            {
-                "title": ButtonLabels.FAILED,
-                "icon": IconType.CancelIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.FAILED,
+                {
+                    "title": ButtonLabels.COMPLETED,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.COMPLETED,
+                        },
                     },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.FAILED,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] 
+        else:
+            []
     
     ###################################################
     # Transitions
@@ -1674,7 +1748,7 @@ class COMPLETED(State):
     name = ProcessStatusAsString.COMPLETED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         No Buttons 
 
@@ -1728,7 +1802,7 @@ class FAILED(State):
     name = ProcessStatusAsString.FAILED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         No Buttons 
 
@@ -1782,7 +1856,7 @@ class CANCELED(State):
     name = ProcessStatusAsString.CANCELED
 
     ###################################################
-    def buttons(self) -> list:
+    def buttons(self, client=True) -> list:
         """
         No Buttons 
 

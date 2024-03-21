@@ -665,11 +665,12 @@ def getProject(request, projectID):
     """
     try:
         contentManager = ManageContent(request.session)
+        client = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         # Is the project inside the session?
         project = {}
         if contentManager.sessionManagement.getIfContentIsInSession():
             project = contentManager.sessionManagement.getProject(projectID)
-            addButtonsToProcess(project) # calls current node of the state machine
+            addButtonsToProcess(project, project[ProjectDescription.client] == client) # calls current node of the state machine
         if len(project) > 0:
             return JsonResponse(project)
         else:
@@ -682,12 +683,12 @@ def getProject(request, projectID):
             userID = contentManager.getClient()
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
                 project = pgProcesses.ProcessManagementBase.getProject(projectID)
-                addButtonsToProcess(project)
+                addButtonsToProcess(project, project[ProjectDescription.client] == client)
                 return JsonResponse(project)
             else:
                 if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
                     project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
-                    addButtonsToProcess(project)
+                    addButtonsToProcess(project, project[ProjectDescription.client] == client)
                     return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)
@@ -904,20 +905,42 @@ def statusButtonRequest(request):
     projectID = info[InterfaceForStateChange.projectID]
     processIDs = info[InterfaceForStateChange.processIDs]
     buttonData = info[InterfaceForStateChange.buttonData]
-    nextState = buttonData[InterfaceForStateChange.targetStatus]
+    if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
+        # TODO
+        request.GET['processIDs'] = ','.join(processIDs)
+        deleteProcesses(request, projectID)
+    else:
+        nextState = buttonData[InterfaceForStateChange.targetStatus]
 
-    contentManager = ManageContent(request.session)
-    interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
-    for processID in processIDs:
-        process = interface.getProcessObj(projectID, processID)
-        sm = StateMachine(initialAsInt=process.processStatus)
-        sm.onButtonEvent(nextState, interface, process)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
+        for processID in processIDs:
+            process = interface.getProcessObj(projectID, processID)
+            sm = StateMachine(initialAsInt=process.processStatus)
+            sm.onButtonEvent(nextState, interface, process)
     # create new button json
     # for every button
     # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
     # take status code and construct button from there
 
     return JsonResponse({})
+
+#######################################################
+@require_http_methods(["GET"])
+def getStateMachine(request):
+    """
+    Print out the whole state machine and all transitions
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response with graph in JSON Format
+    :rtype: JSONResponse
+    
+    """
+    sm = StateMachine(initialAsInt=0)
+    paths = sm.showPaths()
+    return JsonResponse(paths)
+
     
 #######################################################
 # @checkIfUserIsLoggedIn()

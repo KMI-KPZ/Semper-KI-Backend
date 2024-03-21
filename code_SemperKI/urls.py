@@ -71,6 +71,7 @@ newPaths= {
     "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
+    "getStateMachine": ("private/getStateMachine/", projectAndProcessManagement.getStateMachine),
 }
 
 

@@ -149,6 +149,7 @@ class InterfaceForStateChange(StrEnumExactylAsDefined):
     buttonData = enum.auto()
     targetStatus = enum.auto()
     CLICKED_BUTTON = enum.auto()
+    type = enum.auto()
 
 #######################################################
 class ButtonLabels(StrEnumExactylAsDefined):

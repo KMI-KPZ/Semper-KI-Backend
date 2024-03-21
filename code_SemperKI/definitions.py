@@ -79,12 +79,20 @@ class ProcessUpdates(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for processDetails
+class ProjectDetails(StrEnumExactylAsDefined):
+    """
+    What Details can a Project have?
+    
+    """
+    title = enum.auto()
+
+####################################################################################
+# Enum for processDetails
 class ProcessDetails(StrEnumExactylAsDefined):
     """
     What Details can a Process have?
     
     """
-    name = enum.auto()
     provisionalContractor = enum.auto()
     amount = enum.auto()
     title = enum.auto()
@@ -124,3 +132,12 @@ class EventsDescription(StrEnumExactylAsDefined):
     projectEvent = enum.auto()
     orgaEvent = enum.auto()
     
+####################################################################################
+# Enum for subjects the system sends out via E-Mail
+class SubjectsForMail(StrEnumExactylAsDefined):
+    """
+    What an E-Mail from the SYSTEM can be about
+
+    """
+    statusUpdate = "Status update"
+    projectReceived = "New project received"

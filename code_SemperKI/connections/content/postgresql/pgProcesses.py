@@ -32,7 +32,7 @@ import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....tasks.processTasks import verificationOfProcess
+from ....tasks.processTasks import verificationOfProcess, sendProcess
 
 import logging
 logger = logging.getLogger("errors")
@@ -1063,33 +1063,37 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def sendProcess(processID:str, userID):
+    def sendProcess(processObj:Process, session, userID:str):
         """
         Send the process to its contractor(s).
 
-        :param processID: processID that is verified
-        :type processIDsArray: list[str]
-        :param userID: Who ordered the verification
+        :param processObj: process that shall be send
+        :type processObj: Process
+        :param session: Who ordered the verification
+        :type session: Django session object (dict-like)
+        :param userID: Who ordered the sendaway
         :type userID: str
         :return: Nothing
         :rtype: None
         
         """
         try:
-            
-            processObj = Process.objects.get(processID=processID)
-    
+
             # Check if process is verified
             if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFIED):
                 raise Exception("Not verified yet!")
             
-            # send process to contractor
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
-            processObj.contractor = contractorObj
-            processObj.save()
 
+            # Create history entry
             dataID = crypto.generateURLFriendlyRandomString()
-            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processID, DataType.OTHER, userID, {})
-        
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
+            
+            # send process asyncronously
+            sendProcess(processObj, contractorObj, session)
+
+            return None
+            
         except (Exception) as error:
             logger.error(f"sendProcess: {str(error)}")
+            return error
