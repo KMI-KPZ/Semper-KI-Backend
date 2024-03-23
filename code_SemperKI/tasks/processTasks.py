@@ -27,7 +27,7 @@ def sendEMail(userEMailAdress:str, subject:str, toWhom:str, locale:str, message:
     """
     Send an E-Mail asynchronously
 
-    :param userEMailAdress: E-Mail adress of user
+    :param userEMailAdress: E-Mail address of user
     :type userEMailAdress: str 
     :param subject: What the mail is about
     :type subject: str 
@@ -72,7 +72,15 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
 
     # Check ....
 
-    # If successful: set status in database & send out mail & Websocket event 
+    # But first, check if the status has been changed in the meantime (gone back or cancelled or something)
+    currentProcessObj = DBProcessesAccess.ProcessManagementBase.getProcessObj("", processObj.processID)
+    if currentProcessObj == None:
+        # Process doesn't exist anymore
+        return
+    elif currentProcessObj.processStatus != processStatusAsInt(ProcessStatusAsString.VERIFYING):
+        return # Not needed anymore
+    
+    # If successful: set status in database & send out mail & Websocket event     
     userOfThatProcess = ProfileManagementBase.getUser(session)
     userEMailAdress = userOfThatProcess[UserDescription.details][UserDetails.email]
     if valid:
@@ -106,7 +114,8 @@ def sendProcess(processObj:Process, contractorObj:Organization, session):
     processObj.save()
 
     # send email to contractor (async)
-    sendEMail(contractorObj.details[OrganizationDetails.email], SubjectsForMail.projectReceived, contractorObj.name, "de-DE", f"Neuer Auftrag mit Namen '{processObj.project.projectDetails[ProjectDetails.title]}' für Sie")
+    if OrganizationDetails.email in contractorObj.details:
+        sendEMail(contractorObj.details[OrganizationDetails.email], SubjectsForMail.projectReceived, contractorObj.name, "de-DE", f"Neuer Auftrag mit Namen '{processObj.project.projectDetails[ProjectDetails.title]}' für Sie")
 
     # Send Websocket Event
     ProjectAndProcessManagement.fireWebsocketEvents(processObj.project.projectID, [processObj.processID], session, ProcessUpdates.processStatus)

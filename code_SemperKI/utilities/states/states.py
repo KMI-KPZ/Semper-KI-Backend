@@ -13,12 +13,14 @@ import logging
 from abc import ABC, abstractmethod
 
 from Generic_Backend.code_General.utilities.basics import Logging
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase,ProfileManagementOrganization, profileManagement, SessionContent
 
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
 import code_SemperKI.connections.content.session as SessionInterface
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
 import code_SemperKI.serviceManager as ServiceManager
+import code_SemperKI.tasks.processTasks as ProcessTasks
 
 from .stateDescriptions import *
 
@@ -214,6 +216,52 @@ class State(ABC):
             loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
             return self
 
+    ###################################################
+    def sendMailToClient(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, reason:str, message:str):
+        """
+        Send a mail to the client
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :param reason: What is the reason for the mail
+        :type reason: str
+        :param message: The content of the message
+        :type message: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        # Send mail to client
+        clientMail = profileManagement[interface.getSession()[[SessionContent.PG_PROFILE_CLASS]]].getEMailAdress(process.client)
+        clientName = ProfileManagementBase.getUserNameViaHash(process.client)
+        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
+        ProcessTasks.sendEMail(clientMail, f"{reason} for process {processTitle}", clientName, "de-DE", message)
+        
+    ###################################################
+    def sendMailToContractor(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, reason:str, message:str):
+        """
+        Send a mail to the contractor
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :param reason: What is the reason for the mail
+        :type reason: str
+        :param message: The content of the message
+        :type message: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        # Send mail to contractor
+        contractorMail = ProfileManagementOrganization.getEMailAdress(process.contractor)
+        contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor)
+        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
+        ProcessTasks.sendEMail(contractorMail, f"{reason} beim Prozess '{processTitle}'", contracorName, "de-DE", message)
+        
 
     ###################################################
     def __repr__(self):
@@ -1021,6 +1069,8 @@ class REQUESTED(State):
         To: CLARIFICATION
 
         """
+
+        self.sendMailToClient(interface, process, "Rückfragen", "Der Hersteller benötigt weitere Informationen. Bitte gehen Sie auf die Website der Plattform.")
         return stateDict[ProcessStatusAsString.CLARIFICATION]
 
     ###################################################
@@ -1031,6 +1081,7 @@ class REQUESTED(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
+        self.sendMailToClient(interface, process, "Vom Hersteller akzeptiert", "Der Hersteller hat den Auftrag akzeptiert.")
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
 
     ###################################################
@@ -1041,6 +1092,7 @@ class REQUESTED(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
+        self.sendMailToClient(interface, process, "Vom Hersteller abgelehnt", "Der Hersteller hat den Auftrag abgelehnt.")
         return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
 
     ###################################################
@@ -1127,6 +1179,7 @@ class CLARIFICATION(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
+        self.sendMailToClient(interface, process, "Vom Hersteller akzeptiert", "Der Hersteller hat den Auftrag akzeptiert.")
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
 
     ###################################################
@@ -1137,6 +1190,7 @@ class CLARIFICATION(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
+        self.sendMailToClient(interface, process, "Vom Hersteller abgelehnt", "Der Hersteller hat den Auftrag abgelehnt.")
         return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
 
     ###################################################
@@ -1221,6 +1275,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: CONFIRMED_BY_CLIENT
 
         """
+        self.sendMailToContractor(interface, process, "Vom Kunden bestätigt", "Der Kunde hat den Prozess bestätigt.")
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CLIENT]
 
     ###################################################
@@ -1231,6 +1286,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: REJECTED_BY_CLIENT
 
         """
+        self.sendMailToContractor(interface, process, "Vom Kunden abgelehnt", "Der Kunde hat den Prozess abgelehnt.")
         return stateDict[ProcessStatusAsString.REJECTED_BY_CLIENT]
 
     ###################################################
@@ -1359,6 +1415,7 @@ class CONFIRMED_BY_CLIENT(State):
         To: PRODUCTION
 
         """
+        self.sendMailToClient(interface, process, "Prozess in Produktion", "Der Hersteller hat mit der Produktion begonnen.")
         return stateDict[ProcessStatusAsString.PRODUCTION]
 
     ###################################################
@@ -1501,6 +1558,7 @@ class PRODUCTION(State):
         To: DELIVERY
 
         """
+        self.sendMailToClient(interface, process, "Lieferung", "Der Hesteller hat mit der Lieferung begonnen.")
         return stateDict[ProcessStatusAsString.DELIVERY]
 
     ###################################################
@@ -1511,6 +1569,7 @@ class PRODUCTION(State):
         To: FAILED
 
         """
+        self.sendMailToClient(interface, process, "Produktion fehlgeschlagen", "Der Hersteller konnte nicht herstellen.")
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -1609,6 +1668,7 @@ class DELIVERY(State):
 
         """
         # TODO: Send out signal to dependent processes
+        self.sendMailToContractor(interface, process, "Prozess abgeschlossen", "Prozess wurde als abgeschlossen markiert.")
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -1619,6 +1679,7 @@ class DELIVERY(State):
         To: DISPUTE
 
         """
+        self.sendMailToContractor(interface, process, "Probleme", "Lieferung wurde als problematisch markiert.")
         return stateDict[ProcessStatusAsString.DISPUTE]
 
     ###################################################
@@ -1629,6 +1690,7 @@ class DELIVERY(State):
         To: FAILED
 
         """
+        self.sendMailToContractor(interface, process, "Gescheitert", "Prozess gescheitert.")
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -1714,6 +1776,7 @@ class DISPUTE(State):
 
         """
         # TODO: Send out signals
+        self.sendMailToContractor(interface, process, "Disput aufgelöst", "Kunde hat Prozess Abgeschlossen.")
         return stateDict[ProcessStatusAsString.COMPLETED]
 
      ###################################################
@@ -1724,6 +1787,7 @@ class DISPUTE(State):
         To: FAILED
 
         """
+        self.sendMailToContractor(interface, process, "Prozess gescheitert", "Kunde hat Prozess als gescheitert markiert.")
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################

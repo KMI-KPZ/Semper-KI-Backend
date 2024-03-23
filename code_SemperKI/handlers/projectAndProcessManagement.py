@@ -575,6 +575,37 @@ def updateProcess(request):
         return HttpResponse("Failed",status=500)
 
 #######################################################
+def deleteProcessFunction(session, processIDs):
+    """
+    Delete the processes
+
+    :param session: The session
+    :type session: Django session object (dict-like)
+    :param processIDs: Array of proccess IDs 
+    :type processIDs: list[str]
+    :return: The response
+    :rtype: HttpResponse | Exception
+
+    """
+    try:
+        contentManager = ManageContent(session)
+        interface = contentManager.getCorrectInterface(deleteProcesses.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in deleteProcesses")
+            return HttpResponse("Insufficient rights!", status=401)
+
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            interface.deleteProcess(processID)
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        return HttpResponse("Success")
+    
+    except Exception as e:
+        return e
+
+#######################################################
 @require_http_methods(["DELETE"])
 def deleteProcesses(request, projectID):
     """
@@ -590,21 +621,11 @@ def deleteProcesses(request, projectID):
     """
     try:
         processIDs = request.GET['processIDs'].split(",")
-
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteProcesses.__name__)
-        if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
-            return HttpResponse("Insufficient rights!", status=401)
-
-        for processID in processIDs:
-            if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
-                return HttpResponse("Insufficient rights!", status=401)
-            interface.deleteProcess(processID)
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        retVal = deleteProcessFunction(request.session, processIDs)
+        if isinstance(retVal, Exception):
+            raise retVal
+        return retVal
         
-        return HttpResponse("Success")
     except (Exception) as error:
         loggerError.error(f"deleteProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
@@ -665,12 +686,12 @@ def getProject(request, projectID):
     """
     try:
         contentManager = ManageContent(request.session)
-        client = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        userID = contentManager.getClient()
         # Is the project inside the session?
         project = {}
         if contentManager.sessionManagement.getIfContentIsInSession():
             project = contentManager.sessionManagement.getProject(projectID)
-            addButtonsToProcess(project, project[ProjectDescription.client] == client) # calls current node of the state machine
+            addButtonsToProcess(project, project[ProjectDescription.client] == userID) # calls current node of the state machine
         if len(project) > 0:
             return JsonResponse(project)
         else:
@@ -680,15 +701,14 @@ def getProject(request, projectID):
                 logger.error("Rights not sufficient in getProject")
                 return JsonResponse({}, status=401)
             
-            userID = contentManager.getClient()
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
                 project = pgProcesses.ProcessManagementBase.getProject(projectID)
-                addButtonsToProcess(project, project[ProjectDescription.client] == client)
+                addButtonsToProcess(project, project[ProjectDescription.client] == userID)
                 return JsonResponse(project)
             else:
                 if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
                     project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
-                    addButtonsToProcess(project, project[ProjectDescription.client] == client)
+                    addButtonsToProcess(project, project[ProjectDescription.client] == userID)
                     return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)
@@ -899,31 +919,35 @@ def statusButtonRequest(request):
     :return: Response with new buttons
     :rtype: JSONResponse
     """
+    try:
+        # get from info, create correct object, initialize statemachine, switch state accordingly
+        info = json.loads(request.body.decode("utf-8"))
+        projectID = info[InterfaceForStateChange.projectID]
+        processIDs = info[InterfaceForStateChange.processIDs]
+        buttonData = info[InterfaceForStateChange.buttonData]
+        if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
+            retVal = deleteProcessFunction(request.session, processIDs)
+            if isinstance(retVal, Exception):
+                raise retVal
+            return retVal
+        else:
+            nextState = buttonData[InterfaceForStateChange.targetStatus]
 
-    # get from info, create correct object, initialize statemachine, switch state accordingly
-    info = json.loads(request.body.decode("utf-8"))
-    projectID = info[InterfaceForStateChange.projectID]
-    processIDs = info[InterfaceForStateChange.processIDs]
-    buttonData = info[InterfaceForStateChange.buttonData]
-    if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
-        # TODO
-        request.GET['processIDs'] = ','.join(processIDs)
-        deleteProcesses(request, projectID)
-    else:
-        nextState = buttonData[InterfaceForStateChange.targetStatus]
+            contentManager = ManageContent(request.session)
+            interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
+            for processID in processIDs:
+                process = interface.getProcessObj(projectID, processID)
+                sm = StateMachine(initialAsInt=process.processStatus)
+                sm.onButtonEvent(nextState, interface, process)
+        # create new button json
+        # for every button
+        # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
+        # take status code and construct button from there
 
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
-        for processID in processIDs:
-            process = interface.getProcessObj(projectID, processID)
-            sm = StateMachine(initialAsInt=process.processStatus)
-            sm.onButtonEvent(nextState, interface, process)
-    # create new button json
-    # for every button
-    # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
-    # take status code and construct button from there
-
-    return JsonResponse({})
+        return JsonResponse({})
+    except Exception as e:
+        loggerError.error(f"statusButtonRequest: {str(e)}")
+        return JsonResponse({}, status=500)
 
 #######################################################
 @require_http_methods(["GET"])
