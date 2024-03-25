@@ -25,7 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..utilities.states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange
+from ..states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -575,7 +575,7 @@ def updateProcess(request):
         return HttpResponse("Failed",status=500)
 
 #######################################################
-def deleteProcessFunction(session, processIDs):
+def deleteProcessFunction(session, processIDs:list[str]):
     """
     Delete the processes
 

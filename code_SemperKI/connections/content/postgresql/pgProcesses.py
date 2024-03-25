@@ -28,7 +28,7 @@ from ....definitions import *
 
 from ....serviceManager import serviceManager
 
-import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
+import code_SemperKI.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession

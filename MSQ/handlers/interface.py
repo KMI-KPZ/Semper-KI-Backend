@@ -5,7 +5,7 @@ Silvio Weging 2024
 
 Contains: Interface with the message queuing system
 """
-import code_SemperKI.utilities.asyncTask as aTask
+import Generic_Backend.code_General.utilities.asyncTask as aTask
 import MSQ.module.celery as TaskQueue
 from ..tasks.tasks import dummy, dummyDerp
 from django.http import HttpResponse

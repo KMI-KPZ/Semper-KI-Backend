@@ -18,7 +18,7 @@ from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...serviceManager import serviceManager
-import code_SemperKI.utilities.states.stateDescriptions as StateDescriptions
+import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")

@@ -21,10 +21,11 @@ import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
 import code_SemperKI.serviceManager as ServiceManager
 import code_SemperKI.tasks.processTasks as ProcessTasks
+import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
 
-from ...definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails
+from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -295,7 +296,17 @@ class DRAFT(State):
         """
         None
         """
-        return []
+        return [{
+                "title": ButtonLabels.DELETE,
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            }]
 
     ###################################################
     # Transitions
@@ -1081,7 +1092,8 @@ class REQUESTED(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
-        self.sendMailToClient(interface, process, "Vom Hersteller akzeptiert", "Der Hersteller hat den Auftrag akzeptiert.")
+        userLocale = ProfileManagementBase.getUserLocale(interface.getSession())
+        self.sendMailToClient(interface, process, Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"]), Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"]))
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
 
     ###################################################

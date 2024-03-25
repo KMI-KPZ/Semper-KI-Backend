@@ -1,0 +1,19 @@
+{
+    "de-DE":
+    {
+        "email": {
+            "subjects": {
+                "confirmedByClient": "Vom Auftraggeber bestätigt",
+                "confirmedByContractor": "Vom Auftragnehmer bestätigt",
+                "declinedByClient": "Vom Auftraggeber abgelehnt",
+                "declinedByContractor": "Vom Auftragnehmer abgelehnt"
+            },
+            "content": {
+                "confirmedByClient": "Der Auftraggeber hat den Prozess bestätigt.",
+                "confirmedByContractor": "Der Auftraggeber hat den Prozess bestätigt."
+            }
+        }   
+    },
+    "en-GB":
+    {}
+}

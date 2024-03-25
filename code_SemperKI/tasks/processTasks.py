@@ -12,10 +12,10 @@ from Generic_Backend.code_General.connections.mailer import MailingClass
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, Organization
 from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
+from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
-from ..utilities.asyncTask import runInBackground
 from ..definitions import ProcessDescription, ProcessUpdates, SubjectsForMail, ProjectDetails
-from ..utilities.states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
+from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
 from ..modelFiles.processModel import Process
 from ..serviceManager import serviceManager
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
