@@ -13,7 +13,7 @@ import logging
 from abc import ABC, abstractmethod
 
 from Generic_Backend.code_General.utilities.basics import Logging
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase,ProfileManagementOrganization, profileManagement, SessionContent
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
 import code_SemperKI.connections.content.session as SessionInterface
@@ -34,13 +34,24 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def addButtonsToProcess(projectObj, client=True) -> None: #is changed in place
+def addButtonsToProcess(projectObj, client=True, admin=False) -> None: #is changed in place
     """
     Look at process status of every process of a project and add respective buttons
+
+    :param projectObj: The project object containing all processes
+    :type projectObj: Project | ProjectInterface
+    :param client: Whether the current user is the client or the contractor
+    :type client: Bool
+    :param admin: Whether the current user is an admin (which may see all buttons) or not
+    :type admin: Bool
+    :return: Nothing
+    :rtype: None
+
     """
+
     for process in projectObj[SessionContentSemperKI.processes]:
         processStatusAsString = processStatusFromIntToStr(process[ProcessDescription.processStatus])
-        process["processStatusButtons"] = stateDict[processStatusAsString].buttons(client)
+        process["processStatusButtons"] = stateDict[processStatusAsString].buttons(client, admin)
 
 
 stateDict = {} # will later contain mapping from string to instance of every state
@@ -150,7 +161,7 @@ class State(ABC):
         pass
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -180,7 +191,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    # TODO send mail if person is not logged in
+                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -209,7 +220,7 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    # TODO send mail to other person
+                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -218,7 +229,7 @@ class State(ABC):
             return self
 
     ###################################################
-    def sendMailToClient(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, reason:str, message:str):
+    def sendMailToClient(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
         """
         Send a mail to the client
 
@@ -226,6 +237,8 @@ class State(ABC):
         :type interface: ProcessManagementSession | ProcessManagementBase
         :param process: The process object
         :type process: Process | ProcessInterface
+        :param locale: The locale string for that user
+        :type locale: str
         :param reason: What is the reason for the mail
         :type reason: str
         :param message: The content of the message
@@ -235,13 +248,16 @@ class State(ABC):
         
         """
         # Send mail to client
-        clientMail = profileManagement[interface.getSession()[[SessionContent.PG_PROFILE_CLASS]]].getEMailAdress(process.client)
+        if ProfileManagementBase.checkIfHashIDBelongsToOrganization(process.client):
+            clientMail = ProfileManagementOrganization.getEMailAddress(process.client)
+        else:
+            clientMail = ProfileManagementUser.getEMailAddress(process.client)
         clientName = ProfileManagementBase.getUserNameViaHash(process.client)
         processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(clientMail, f"{reason} for process {processTitle}", clientName, "de-DE", message)
+        ProcessTasks.sendEMail(clientMail, f"{reason} '{processTitle}'", clientName, locale, message)
         
     ###################################################
-    def sendMailToContractor(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, reason:str, message:str):
+    def sendMailToContractor(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
         """
         Send a mail to the contractor
 
@@ -249,6 +265,8 @@ class State(ABC):
         :type interface: ProcessManagementSession | ProcessManagementBase
         :param process: The process object
         :type process: Process | ProcessInterface
+        :param locale: The locale string for that user
+        :type locale: str
         :param reason: What is the reason for the mail
         :type reason: str
         :param message: The content of the message
@@ -258,10 +276,10 @@ class State(ABC):
         
         """
         # Send mail to contractor
-        contractorMail = ProfileManagementOrganization.getEMailAdress(process.contractor)
-        contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor)
+        contractorMail = ProfileManagementOrganization.getEMailAddress(process.contractor.hashedID)
+        contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor.hashedID)
         processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(contractorMail, f"{reason} beim Prozess '{processTitle}'", contracorName, "de-DE", message)
+        ProcessTasks.sendEMail(contractorMail, f"{reason} '{processTitle}'", contracorName, locale, message)
         
 
     ###################################################
@@ -292,7 +310,7 @@ class DRAFT(State):
     name = ProcessStatusAsString.DRAFT
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         None
         """
@@ -357,7 +375,7 @@ class SERVICE_IN_PROGRESS(State):
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Back to draft
 
@@ -447,7 +465,7 @@ class SERVICE_READY(State):
     name = ProcessStatusAsString.SERVICE_READY
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Choose contractor
 
@@ -551,7 +569,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
@@ -636,7 +654,7 @@ class SERVICE_COMPLICATION(State):
     name = ProcessStatusAsString.SERVICE_COMPLICATION
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Back to Draft
 
@@ -726,7 +744,7 @@ class CONTRACTOR_SELECTED(State):
     name = ProcessStatusAsString.CONTRACTOR_SELECTED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for  CONTRACTOR_SELECTED
 
@@ -783,7 +801,6 @@ class CONTRACTOR_SELECTED(State):
         To: VERIFYING
 
         """
-        #TODO call verify on interface
         interface.verifyProcess(process, interface.getSession() , interface.getUserID())
         return stateDict[ProcessStatusAsString.VERIFYING]
 
@@ -820,7 +837,7 @@ class VERIFYING(State):
     name = ProcessStatusAsString.VERIFYING
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for VERIFYING
 
@@ -863,7 +880,7 @@ class VERIFYING(State):
         To: VERIFIED
 
         """
-        # TODO Can only be set by admins
+        # TODO Can only be set by admins (admins need to see buttons)
 
         return stateDict[ProcessStatusAsString.VERIFIED]
 
@@ -896,10 +913,10 @@ class VERIFIED(State):
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFIED)
-    name = name = ProcessStatusAsString.VERIFIED
+    name = ProcessStatusAsString.VERIFIED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Manual Request
 
@@ -994,13 +1011,14 @@ class REQUESTED(State):
     name = ProcessStatusAsString.REQUESTED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for REQUESTED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend([
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1012,9 +1030,9 @@ class REQUESTED(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "project",
                 }
-            ]
-        else: # contractor
-            return [
+            ])
+        if not client or admin: # contractor
+            outArr.extend([
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1068,7 +1086,8 @@ class REQUESTED(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
+            ])
+        return outArr
     
     ###################################################
     # Transitions
@@ -1080,8 +1099,10 @@ class REQUESTED(State):
         To: CLARIFICATION
 
         """
-
-        self.sendMailToClient(interface, process, "Rückfragen", "Der Hersteller benötigt weitere Informationen. Bitte gehen Sie auf die Website der Plattform.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","questionsFromContractor"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","questionsFromContractor"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.CLARIFICATION]
 
     ###################################################
@@ -1092,8 +1113,10 @@ class REQUESTED(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(interface.getSession())
-        self.sendMailToClient(interface, process, Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"]), Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"]))
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
 
     ###################################################
@@ -1104,7 +1127,10 @@ class REQUESTED(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
-        self.sendMailToClient(interface, process, "Vom Hersteller abgelehnt", "Der Hersteller hat den Auftrag abgelehnt.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
 
     ###################################################
@@ -1130,13 +1156,14 @@ class CLARIFICATION(State):
     name = ProcessStatusAsString.CLARIFICATION
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for CLARIFICATION
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend([
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1148,9 +1175,9 @@ class CLARIFICATION(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "project",
                 },
-            ]
-        else:
-            return [
+            ])
+        if not client or admin:
+            outArr.extend([
                 {
                     "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
                     "icon": IconType.DoneAllIcon,
@@ -1179,7 +1206,8 @@ class CLARIFICATION(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
+            ])
+        return outArr
     
     ###################################################
     # Transitions
@@ -1191,7 +1219,10 @@ class CLARIFICATION(State):
         To: CONFIRMED_BY_CONTRACTOR
 
         """
-        self.sendMailToClient(interface, process, "Vom Hersteller akzeptiert", "Der Hersteller hat den Auftrag akzeptiert.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
 
     ###################################################
@@ -1202,7 +1233,10 @@ class CLARIFICATION(State):
         To: REJECTED_BY_CONTRACTOR
 
         """
-        self.sendMailToClient(interface, process, "Vom Hersteller abgelehnt", "Der Hersteller hat den Auftrag abgelehnt.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
 
     ###################################################
@@ -1227,13 +1261,14 @@ class CONFIRMED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for CONFIRMED_BY_CONTRACTOR, no Back-Button
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend([
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1273,10 +1308,13 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
-        else:
-            return [
-            ]
+            ])
+        if not client or admin:
+            outArr.extend(
+            [
+            ])
+        return outArr
+
     ###################################################
     # Transitions
     ###################################################
@@ -1287,7 +1325,10 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: CONFIRMED_BY_CLIENT
 
         """
-        self.sendMailToContractor(interface, process, "Vom Kunden bestätigt", "Der Kunde hat den Prozess bestätigt.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByClient"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByClient"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.CONFIRMED_BY_CLIENT]
 
     ###################################################
@@ -1298,7 +1339,10 @@ class CONFIRMED_BY_CONTRACTOR(State):
         To: REJECTED_BY_CLIENT
 
         """
-        self.sendMailToContractor(interface, process, "Vom Kunden abgelehnt", "Der Kunde hat den Prozess abgelehnt.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByClient"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByClient"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.REJECTED_BY_CLIENT]
 
     ###################################################
@@ -1323,13 +1367,14 @@ class REJECTED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.REJECTED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         No Buttons only CANCELED
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1341,9 +1386,12 @@ class REJECTED_BY_CONTRACTOR(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "project",
                 }
-            ] 
-        else:
-            return []
+            ] )
+        if not client or admin:
+            outArr.extend([
+
+            ])
+        return outArr
     
     ###################################################
     # Transitions
@@ -1380,13 +1428,14 @@ class CONFIRMED_BY_CLIENT(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CLIENT
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for CONFIRMED_BY_CLIENT, no Back-Button
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1398,9 +1447,9 @@ class CONFIRMED_BY_CLIENT(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "project",
                 },
-            ]
-        else:
-            return [
+            ])
+        if not client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.PRODUCTION,
                     "icon": IconType.FactoryIcon,
@@ -1415,7 +1464,8 @@ class CONFIRMED_BY_CLIENT(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
+            ] )
+        return outArr
     
     ###################################################
     # Transitions
@@ -1427,7 +1477,10 @@ class CONFIRMED_BY_CLIENT(State):
         To: PRODUCTION
 
         """
-        self.sendMailToClient(interface, process, "Prozess in Produktion", "Der Hersteller hat mit der Produktion begonnen.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inProduction"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inProduction"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.PRODUCTION]
 
     ###################################################
@@ -1452,13 +1505,14 @@ class REJECTED_BY_CLIENT(State):
     name = ProcessStatusAsString.REJECTED_BY_CLIENT
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         No Buttons only CANCELED
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1470,9 +1524,12 @@ class REJECTED_BY_CLIENT(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "project",
                 }
-            ] 
-        else:
-            return []
+            ] )
+        if not client or admin:
+            outArr.extend([
+
+            ])
+        return outArr
     
     ###################################################
     # Transitions
@@ -1509,16 +1566,17 @@ class PRODUCTION(State):
     name = ProcessStatusAsString.PRODUCTION
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for PRODUCTION, no Back-Button
 
         """
-        if client:
-            return [
-            ]
-        else:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
+            ])
+        if not client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1558,7 +1616,8 @@ class PRODUCTION(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
+            ] )
+        return outArr
     
     ###################################################
     # Transitions
@@ -1570,7 +1629,10 @@ class PRODUCTION(State):
         To: DELIVERY
 
         """
-        self.sendMailToClient(interface, process, "Lieferung", "Der Hesteller hat mit der Lieferung begonnen.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inDelivery"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inDelivery"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.DELIVERY]
 
     ###################################################
@@ -1581,7 +1643,10 @@ class PRODUCTION(State):
         To: FAILED
 
         """
-        self.sendMailToClient(interface, process, "Produktion fehlgeschlagen", "Der Hersteller konnte nicht herstellen.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
+        self.sendMailToClient(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -1606,13 +1671,14 @@ class DELIVERY(State):
     name = ProcessStatusAsString.DELIVERY
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for DELIVERY, no Back-Button
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE,
                     "icon": IconType.DeleteIcon,
@@ -1666,9 +1732,12 @@ class DELIVERY(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
-        else:
-            return []
+            ] )
+        if not client or admin:
+            outArr.extend([
+
+            ])
+        return outArr
     ###################################################
     # Transitions
     ###################################################
@@ -1680,7 +1749,10 @@ class DELIVERY(State):
 
         """
         # TODO: Send out signal to dependent processes
-        self.sendMailToContractor(interface, process, "Prozess abgeschlossen", "Prozess wurde als abgeschlossen markiert.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -1691,7 +1763,10 @@ class DELIVERY(State):
         To: DISPUTE
 
         """
-        self.sendMailToContractor(interface, process, "Probleme", "Lieferung wurde als problematisch markiert.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","dispute"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","dispute"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.DISPUTE]
 
     ###################################################
@@ -1702,7 +1777,10 @@ class DELIVERY(State):
         To: FAILED
 
         """
-        self.sendMailToContractor(interface, process, "Gescheitert", "Prozess gescheitert.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -1727,13 +1805,14 @@ class DISPUTE(State):
     name = ProcessStatusAsString.DISPUTE
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
         """
-        if client:
-            return [
+        outArr = []
+        if client or admin:
+            outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
@@ -1773,9 +1852,12 @@ class DISPUTE(State):
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "both",
                 }
-            ] 
-        else:
-            []
+            ] )
+        if not client or admin:
+            outArr.extend([
+
+            ])
+        return outArr
     
     ###################################################
     # Transitions
@@ -1788,7 +1870,10 @@ class DISPUTE(State):
 
         """
         # TODO: Send out signals
-        self.sendMailToContractor(interface, process, "Disput aufgelöst", "Kunde hat Prozess Abgeschlossen.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.COMPLETED]
 
      ###################################################
@@ -1799,7 +1884,10 @@ class DISPUTE(State):
         To: FAILED
 
         """
-        self.sendMailToContractor(interface, process, "Prozess gescheitert", "Kunde hat Prozess als gescheitert markiert.")
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
+        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
+        self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -1824,7 +1912,7 @@ class COMPLETED(State):
     name = ProcessStatusAsString.COMPLETED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         No Buttons 
 
@@ -1878,7 +1966,7 @@ class FAILED(State):
     name = ProcessStatusAsString.FAILED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         No Buttons 
 
@@ -1932,7 +2020,7 @@ class CANCELED(State):
     name = ProcessStatusAsString.CANCELED
 
     ###################################################
-    def buttons(self, client=True) -> list:
+    def buttons(self, client=True, admin=False) -> list:
         """
         No Buttons 
 

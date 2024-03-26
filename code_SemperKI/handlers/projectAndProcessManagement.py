@@ -66,6 +66,39 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="")
                         "dict": values,
                     })
 
+#######################################################
+def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
+    """
+    Fire websocket event from a list for a specific project and process. 
+    If it should fire for only specific operations like messages or files, specify so.
+    
+    :param projectID: The project ID
+    :type projectID: Str
+    :param processIDArray: The process IDs
+    :type processIDArray: list(Str)
+    :param session: The session of the current user
+    :type session: Dict
+    :param event: The event to fire
+    :type event: Str
+    :param operation: Nothing or messages, files, ...
+    :type operation: Str
+    :return: Nothing
+    :rtype: None
+    """
+ 
+    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
+    channel_layer = get_channel_layer()
+    for userID in dictForEvents: # user/orga that is associated with that process
+        values = dictForEvents[userID] # message, formatted for frontend
+        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+        for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+            if operation=="" or operation in permission:
+                async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                    "type": "sendMessageJSON",
+                    "dict": values,
+                })
+
 # Projects
 
 #######################################################

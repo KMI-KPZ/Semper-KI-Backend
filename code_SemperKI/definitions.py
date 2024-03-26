@@ -132,12 +132,3 @@ class EventsDescription(StrEnumExactylAsDefined):
     projectEvent = enum.auto()
     orgaEvent = enum.auto()
     
-####################################################################################
-# Enum for subjects the system sends out via E-Mail
-class SubjectsForMail(StrEnumExactylAsDefined):
-    """
-    What an E-Mail from the SYSTEM can be about
-
-    """
-    statusUpdate = "Status update"
-    projectReceived = "New project received"

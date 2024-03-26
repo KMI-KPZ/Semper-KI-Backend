@@ -6,20 +6,24 @@ Silvio Weging 2024
 Contains: Tasks that are needed for almost every process 
             and which shall be run in the background
 """
+from time import sleep
 from django.conf import settings
 
 from Generic_Backend.code_General.connections.mailer import MailingClass
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, Organization
-from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementBase, ProfileManagementOrganization, Organization
+from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails, ProfileClasses
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
-from ..definitions import ProcessDescription, ProcessUpdates, SubjectsForMail, ProjectDetails
+import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
+import code_SemperKI.handlers.projectAndProcessManagement as ProjectAndProcessManagement
+import code_SemperKI.utilities.locales as Locales
+
+from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails
 from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
 from ..modelFiles.processModel import Process
 from ..serviceManager import serviceManager
-import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
-import code_SemperKI.handlers.projectAndProcessManagement as ProjectAndProcessManagement
+
 
 ####################################################################
 @runInBackground
@@ -41,6 +45,8 @@ def sendEMail(userEMailAdress:str, subject:str, toWhom:str, locale:str, message:
     :rtype: None
     
     """
+    if userEMailAdress == None:
+        return
     mailer = MailingClass()
     mailer.sendMail(userEMailAdress, subject, mailer.mailingTemplate(toWhom, locale, message) )
 
@@ -73,6 +79,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     # Check ....
 
     # But first, check if the status has been changed in the meantime (gone back or cancelled or something)
+    sleep(3)
     currentProcessObj = DBProcessesAccess.ProcessManagementBase.getProcessObj("", processObj.processID)
     if currentProcessObj == None:
         # Process doesn't exist anymore
@@ -80,24 +87,27 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     elif currentProcessObj.processStatus != processStatusAsInt(ProcessStatusAsString.VERIFYING):
         return # Not needed anymore
     
-    # If successful: set status in database & send out mail & Websocket event     
-    userOfThatProcess = ProfileManagementBase.getUser(session)
-    userEMailAdress = userOfThatProcess[UserDescription.details][UserDetails.email]
+    # Get all details and set status in database    
+    userOfThatProcess, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
+    locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
+    userEMailAdress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
+    processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
+    subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","statusUpdate"])
     if valid:
+        message = Locales.manageTranslations.getTranslation(locale, ["email","content","verificationSuccessful"])
         DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), "SYSTEM")
-        ProjectAndProcessManagement.fireWebsocketEvents(processObj.project.projectID, [processObj.processID], session, ProcessUpdates.processStatus)
-        sendEMail(userEMailAdress, SubjectsForMail.statusUpdate, userOfThatProcess[UserDescription.name], "de-DE", "VERIFIKATION ERFOLGREICH")
-    # Else: send out mail & websocket event, that it failed
-    else:
+    else: # Else: set to failed
+        message = Locales.manageTranslations.getTranslation(locale, ["email","content","verificationFailed"])
         DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
-        ProjectAndProcessManagement.fireWebsocketEvents(processObj.project.projectID, [processObj.processID], session, ProcessUpdates.processStatus)
-        sendEMail(userEMailAdress, SubjectsForMail.statusUpdate, userOfThatProcess[UserDescription.name], "de-DE", "VERIFIKATION GESCHEITERT")
-
+    
+    # send out mail & Websocket event 
+    ProjectAndProcessManagement.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
+    sendEMail(userEMailAdress, f"{subject} '{processTitle}'", userOfThatProcess[UserDescription.name], locale, message)
 ####################################################################
 @runInBackground
 def sendProcess(processObj:Process, contractorObj:Organization, session):
     """
-    Send the process on its merry way
+    Send the e-mails regarding the process on their merry way to the user and the contractor
     
     :param processObj: The process belonging to the project
     :type processObj: Process
@@ -109,16 +119,19 @@ def sendProcess(processObj:Process, contractorObj:Organization, session):
     :rtype: None
 
     """
-    # send process to contractor
-    processObj.contractor = contractorObj
-    processObj.save()
+    # Send email to contractor (async)
+    locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
+    contractorEMailAdress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
+    processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
+    subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","newProcessForContractor"])
+    message = Locales.manageTranslations.getTranslation(locale, ["email","content","newProcessForContractor"])
+    sendEMail(contractorEMailAdress, subject, contractorObj.name, locale, f"{message} {processTitle}")
 
-    # send email to contractor (async)
-    if OrganizationDetails.email in contractorObj.details:
-        sendEMail(contractorObj.details[OrganizationDetails.email], SubjectsForMail.projectReceived, contractorObj.name, "de-DE", f"Neuer Auftrag mit Namen '{processObj.project.projectDetails[ProjectDetails.title]}' für Sie")
-
-    # Send Websocket Event
-    ProjectAndProcessManagement.fireWebsocketEvents(processObj.project.projectID, [processObj.processID], session, ProcessUpdates.processStatus)
-
-
+    # Send Mail to user that the process is on its way
+    userObj, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
+    locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
+    userMailAdress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
+    subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","processSent"])
+    message = Locales.manageTranslations.getTranslation(locale, ["email","content","processSent"])
+    sendEMail(userMailAdress, f"{subject} '{processTitle}'", userObj.name, locale, message)
 

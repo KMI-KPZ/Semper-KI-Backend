@@ -740,20 +740,15 @@ class ProcessManagementBase(AbstractContentInterface):
                     dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
-                if process.processStatus >= StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.REQUESTED):
-                    contractorID = ""
-                    if process.contractor != None:
-                        contractorID = process.contractor.hashedID
-                    elif ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
-                        contractorID = process.processDetails[ProcessDetails.provisionalContractor]
-                    
-                    if contractorID != "":
-                        if projectObj.client != contractorID:
-                            if contractorID not in dictForEventsAsOutput:
-                                dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                                dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                            else:
-                                dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+                contractorID = ""
+                if process.contractor != None:
+                    contractorID = process.contractor.hashedID
+                    if projectObj.client != contractorID:
+                        if contractorID not in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+                            dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
+                        else:
+                            dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
         return dictForEventsAsOutput
     
     ##############################################
@@ -1089,7 +1084,11 @@ class ProcessManagementBase(AbstractContentInterface):
             dataID = crypto.generateURLFriendlyRandomString()
             ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
             
-            # send process asyncronously
+            # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
+            processObj.contractor = contractorObj
+            processObj.save()
+
+            # send the rest (e-mails and such) asyncronously
             sendProcess(processObj, contractorObj, session)
 
             return None
