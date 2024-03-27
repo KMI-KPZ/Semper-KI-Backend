@@ -18,7 +18,7 @@ from channels.layers import get_channel_layer
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.content.postgresql import pgProcesses
@@ -720,11 +720,12 @@ def getProject(request, projectID):
     try:
         contentManager = ManageContent(request.session)
         userID = contentManager.getClient()
+        adminOrNot = manualCheckifAdmin(request.session)
         # Is the project inside the session?
         project = {}
         if contentManager.sessionManagement.getIfContentIsInSession():
             project = contentManager.sessionManagement.getProject(projectID)
-            addButtonsToProcess(project, project[ProjectDescription.client] == userID) # calls current node of the state machine
+            addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot) # calls current node of the state machine
         if len(project) > 0:
             return JsonResponse(project)
         else:
@@ -736,12 +737,12 @@ def getProject(request, projectID):
             
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
                 project = pgProcesses.ProcessManagementBase.getProject(projectID)
-                addButtonsToProcess(project, project[ProjectDescription.client] == userID)
+                addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
                 return JsonResponse(project)
             else:
                 if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
                     project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
-                    addButtonsToProcess(project, project[ProjectDescription.client] == userID)
+                    addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
                     return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)

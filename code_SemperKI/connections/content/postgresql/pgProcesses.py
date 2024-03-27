@@ -766,7 +766,8 @@ class ProcessManagementBase(AbstractContentInterface):
             currentOC = entry.toDict()
             currentOC["processesCount"] = len(entry.processes.all())
             outList.append(currentOC)
-
+        outList.sort(key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
         return outList
     
     ##############################################

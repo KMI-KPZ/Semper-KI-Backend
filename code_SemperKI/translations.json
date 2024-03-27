@@ -38,5 +38,41 @@
         }   
     },
     "en-GB":
-    {}
+    {
+        "email": {
+            "subjects": {
+                "confirmedByClient": "Confirmed by client",
+                "confirmedByContractor": "Confirmed by contractor",
+                "declinedByClient": "Declined by client",
+                "declinedByContractor": "Declined by contractor",
+                "statusUpdate": "Change of state in process:",
+                "newProcessForContractor": "New process for you!",
+                "processSent": "The following process has been sent: ",
+                "questionsFromContractor": "The contractor has questions about: ",
+                "inProduction": "Production started for process: ",
+                "inDelivery": "Delivery in progress for process: ",
+                "productionFailed": "Production failed for process: ",
+                "processFinished": "Process finished: ",
+                "dispute": "Problems with process: ",
+                "failed": "Process failed: "
+            },
+            "content": {
+                "confirmedByClient": "The client confirmed the process.",
+                "confirmedByContractor": "The contractor confirmed the process.",
+                "declinedByClient": "The client declined the process.",
+                "declinedByContractor": "The contractor declined the process.",
+                "verificationSuccessful": "Verification successful.",
+                "verificationFailed": "Verification failed.",
+                "newProcessForContractor": "New process for you with the name: ",
+                "processSent": "The process has been sent to the contractor.",
+                "questionsFromContractor": "The contractor requires more information. Please visit the platform.",
+                "inProduction": "The contractor started production.",
+                "inDelivery": "The contractor started delivery.",
+                "productionFailed": "The production of the process failed. Please contact the contractor.",
+                "processFinished": "The client declared the process as finished. Thank you very much!",
+                "dispute": "The delivered product was declared as non-sufficient. Please contact the client.",
+                "failed": "The process was declared as failed by the client. We thank you anyway!"
+            }
+        }   
+    }
 }
