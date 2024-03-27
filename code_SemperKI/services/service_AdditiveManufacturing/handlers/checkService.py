@@ -6,20 +6,15 @@ Silvio Weging 2023
 Contains: Handlers using simulation to check the processes
 """
 
-import json, random, logging, datetime
+import random, logging
 from io import BytesIO
 
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
-
-from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn
 from Generic_Backend.code_General.connections import redis
-from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import FileObjectContent
 
 from code_SemperKI.connections.content.postgresql import pgProcesses
@@ -205,7 +200,7 @@ def checkModel(request, processID) -> JsonResponse:
             if ServiceDetails.model not in process[ProcessDescription.serviceDetails]:
                 raise Exception("Model not found!")
             model = process[ProcessDescription.serviceDetails][ServiceDetails.model]
-        
+
         modelName = model[FileObjectContent.fileName]
         mock = {
             "filename": modelName,
