@@ -14,7 +14,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     env_file:
-     - .env.local_container
+     - .env.local
     ports:
       - "8088:80"
     volumes:
@@ -26,7 +26,7 @@ services:
     image: redis:7
     container_name: redis
     env_file:
-    - .env.local_container
+    - .env.local
     ports:
       - 127.0.0.1:6379:6379
     volumes:
@@ -38,20 +38,38 @@ services:
     networks:
       - semper-ki-dev-network
     
-  localstack:
-      image: localstack/localstack
-      container_name: localstack-aws
+#  localstack:
+#      image: localstack/localstack
+#      container_name: localstack-aws
+#      volumes:
+#        - ./localstack/:/var/lib/localstack
+#      env_file:
+#        - .env.local_container
+#      environment:
+#        - DOCKER_HOST=unix:///var/run/docker.sock
+#        - LOCALSTACK_PERSISTENCE=1
+#        - PERSISTENCE=1
+#        - DEBUG=1
+#      ports:
+#        - "127.0.0.1:4566:4566"
+#      networks:
+#          - semper-ki-dev-network
+
+  minio:
+      image: minio/minio
+      container_name: minio-aws
       volumes:
-        - ./localstack/:/var/lib/localstack
+        - ./minio/data:/data
+        - ./minio/config:/root/.minio
+        - ./docker/docker-service-minio-start.sh:/usr/local/bin/docker-service-minio-start.sh
       env_file:
         - .env.local_container
-      environment:
-        - DOCKER_HOST=unix:///var/run/docker.sock
-        - LOCALSTACK_PERSISTENCE=1
       ports:
-        - "127.0.0.1:4566:4566"
+        - "127.0.0.1:4566:9000"
+        - "127.0.0.1:9001:9001"
+      entrypoint: /usr/local/bin/docker-service-minio-start.sh
       networks:
-          - semper-ki-dev-network
+        - semper-ki-dev-network
 
 networks:
   semper-ki-dev-network:

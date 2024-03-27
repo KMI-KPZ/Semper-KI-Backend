@@ -28,6 +28,7 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
 
+
 newPaths= {
 
     "getContractors": ("public/getContractors/<processID>/",projectAndProcessManagement.getContractors),
@@ -60,12 +61,12 @@ newPaths= {
     "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
 
     "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
-    "downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
+    #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
+    "downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFileStream),
     "downloadFilesAsZip": ("public/downloadFilesAsZip/<processID>/",files.downloadFilesAsZip),
     "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
     "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
 }
-
 
 # add paths
 for entry in newPaths:

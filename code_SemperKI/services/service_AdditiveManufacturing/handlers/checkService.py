@@ -10,7 +10,7 @@ import json, random, logging, datetime
 from io import BytesIO
 
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse, FileResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
 from asgiref.sync import async_to_sync
@@ -25,8 +25,8 @@ from Generic_Backend.code_General.definitions import FileObjectContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.projectAndProcessManagement import getProcessAndProjectFromSession
 from code_SemperKI.definitions import ProcessDescription
+from code_SemperKI.handlers.files import getFileReadableStream
 
-from ..utilities import mocks
 from ..definitions import ServiceDetails
 import requests
 
@@ -146,32 +146,41 @@ def checkLogistics(request):
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
 
-def getChemnitzData(fileResponse: FileResponse):
-    result =  {}
 
-    # with open("logs/Mushu.stl", "rb") as f:
-    #     fileContent = f.read()
-    fileContent = b''.join(chunk for chunk in fileResponse.streaming_content)
+#######################################################
+def getChemnitzData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
+    """
+    Send the model to the Chemnitz service and get the dimensions
 
-    url = "http://localhost:9000/properties"
-    headers = {'Content-Type': 'model/stl','content-disposition' : 'filename="ein-dateiname.stl"'}
+    :param readableObject: The model to be sent to the service with a .read() method
+    :type readableObject: BytesIO | EncryptionAdapter
+    :return: data obtained by IWU service
+    :rtype: Dict
 
-    response = requests.post(url, data=fileContent, headers=headers)
+    """
+
+    result =  {"status_code": 500, "content": {"error": "Fehler"}}
+
+    url = settings.IWS_ENDPOINT + "/properties"
+    headers = {'Content-Type': 'model/stl','content-disposition' : f'filename="{fileName}"'}
+
+    try:
+        response = requests.post(url, data=readableObject, headers=headers, stream=True)
+    except Exception as e:
+        logger.warning(f"Error while sending model to Chemnitz service: {str(e)}")
+        return {"status_code" : 500, "content": {"error": "Fehler"}}
 
     # Check the response
     if response.status_code == 200:
-        print("Success")
-        print(response)
+        logger.info(f"Success capturing measurements from Chemnitz service")
         result = response.json()
-    else:
-        print("Fehler")
-        print(response)
+        result["status_code"] = 200
 
-    return JsonResponse(result)
+    return result
 
 #######################################################
 @require_http_methods(["GET"])
-def checkModel(request, processID):
+def checkModel(request, processID) -> JsonResponse:
     """
     Ask IWU service for model dimensions
 
@@ -182,7 +191,6 @@ def checkModel(request, processID):
 
     """
     try:
-        model = {}
         project, process = getProcessAndProjectFromSession(request.session, processID)
         if process == None:
             processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
@@ -199,28 +207,32 @@ def checkModel(request, processID):
             model = process[ProcessDescription.serviceDetails][ServiceDetails.model]
         
         modelName = model[FileObjectContent.fileName]
-
-        from ....handlers.files import downloadFile
-        #fileContent is of type BytesIO
-        fileContent = downloadFile(request, processID, model[FileObjectContent.id])
-        print(fileContent)
-        resultData = getChemnitzData(fileContent)
-
-
         mock = {
             "filename": modelName,
             "measurements": {
-                "volume": 1.0,
-                "surfaceArea": 1.0,
+                "volume": "n.a.",
+                "surfaceArea": "n.a.",
                 "mbbDimensions": {
-                    "_1": 1.0,
-                    "_2": 1.0,
-                    "_3": 1.0
+                    "_1": "n.a.",
+                    "_2": "n.a.",
+                    "_3": "n.a.",
                 },
-                "mbbVolume": 1.0
-            }
+                "mbbVolume": "n.a.",
+            },
+            "status_code": 200
         }
 
+        if settings.IWS_ENDPOINT is None:
+            return JsonResponse(mock)
+
+        fileContent, Flag = getFileReadableStream(request, processID, model[FileObjectContent.id])
+        if Flag:
+            resultData = getChemnitzData(fileContent, modelName)
+        else:
+            logger.warning(f"Error while accessing file {modelName}")
+
+        if resultData["status_code"] != 200:
+            return JsonResponse(mock)
         return JsonResponse(resultData)
 
     except (Exception) as error:
