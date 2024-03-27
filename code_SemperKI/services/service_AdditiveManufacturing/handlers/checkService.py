@@ -23,7 +23,6 @@ from code_SemperKI.definitions import ProcessDescription
 from code_SemperKI.handlers.files import getFileReadableStream
 
 from ..definitions import ServiceDetails
-import requests
 
 logger = logging.getLogger("errors")
 
