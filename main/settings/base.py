@@ -127,8 +127,11 @@ class BackendConfigHelper(ConfigHelper):
                    'default': 'http://127.0.0.1:3000', 'required': True},
         'PGADMIN_DEFAULT_EMAIL': {'var': 'PGADMIN_DEFAULT_EMAIL', 'hint': 'Email for postgresadmin', 'default': 'test@infai.org', 'required': True},
         'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True},
+        'IWS_ENDPOINT': {'var': 'IWS_ENDPOINT', 'hint': 'Endpoint for the IWS service', 'default': None, 'required': False}, #'http://:153.96.234.100:8080'
         'CELERY_BROKER_URL': {'var': 'CELERY_BROKER_URL', 'hint': 'Redis', 'default': None, 'required': True},
         'CELERY_RESULT_BACKEND': {'var': 'CELERY_RESULT_BACKEND', 'hint': 'Redis', 'default': None, 'required': True}
+
+
     }
 
     def __init__(self):
