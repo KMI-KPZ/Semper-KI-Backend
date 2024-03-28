@@ -34,6 +34,7 @@ newPaths = {
 
     "uploadModel": ("public/uploadModel/",model.uploadModel),
     "deleteModel": ("public/deleteModel/<processID>/",model.deleteModel),
+    "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
 
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
     "checkPrices": ("public/checkPrices/",checkService.checkPrice),

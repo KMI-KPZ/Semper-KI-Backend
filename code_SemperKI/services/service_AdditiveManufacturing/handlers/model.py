@@ -9,6 +9,7 @@ Contains: handling of model files
 import logging
 from datetime import datetime
 
+from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -132,3 +133,47 @@ def deleteModel(request, processID):
     except (Exception) as error:
         loggerError.error(f"Error while deleting file: {str(error)}")
         return HttpResponse("Failed", status=500)
+
+#######################################################
+@require_http_methods(["GET"])
+def getModelRepository(request):
+    """
+    Get previews and file names of 3D models from out curated repository.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :return: JSON with names of files, link to preview files and link to files itself
+    :rtype: JSONResponse
+    
+    """
+    content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
+    outDict = {}
+    for elem in content:
+        path = elem["Key"]
+        splitPath = path.split("/")[1:]
+        if len(splitPath) > 1:
+            if "license" in elem["Metadata"]:
+                license = elem["Metadata"]["license"]
+            else:
+                license = ""
+            if splitPath[0] in outDict:
+                if "Preview" in splitPath[1]:
+                    outDict[splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                else:
+                    outDict[splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                if license != "" and outDict[splitPath[0]]["license"] == "":
+                    outDict[splitPath[0]]["license"] = license
+            else:
+                outDict[splitPath[0]] = {"name": splitPath[0], "license": "", "preview": "", "file": ""}
+                if "Preview" in splitPath[1]:
+                    outDict[splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                else:
+                    outDict[splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                if license != "" and outDict[splitPath[0]]["license"] == "":
+                    outDict[splitPath[0]]["license"] = license
+                
+
+    return JsonResponse(outDict)
+
+
+    
