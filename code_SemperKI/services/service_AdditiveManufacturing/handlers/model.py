@@ -24,6 +24,7 @@ from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataTy
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.files import deleteFile
+from code_SemperKI.connections.content.manageContent import ManageContent
 
 from ..definitions import ServiceDetails
 from ..connections.postgresql import pgService
@@ -66,6 +67,7 @@ def uploadModel(request):
         model[fileID][FileObjectContent.URI] = ""
         model[fileID][FileObjectContent.createdBy] = userName
         model[fileID][FileObjectContent.path] = filePath
+        model[fileID][FileObjectContent.remote] = False
 
         returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
         if returnVal is not True:
@@ -89,12 +91,14 @@ def uploadModel(request):
 
 #######################################################
 @require_http_methods(["DELETE"])
-def deleteModel(request, processID):
+def deleteModel(request, projectID, processID):
     """
     Delete the model and the file with it, if not done already
     
     :param request: request
     :type request: HTTP POST
+    :param projectID: The ID of the project
+    :type projectiD: str
     :param processID: process ID
     :type processID: Str
     :return: Successful or not
@@ -102,29 +106,23 @@ def deleteModel(request, processID):
 
     """
     try:
-        modelOfThisProcess = {}
-        modelExistsAsFile = False
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
-        if currentProcess != None:
-            modelOfThisProcess = currentProcess[ProcessDescription.serviceDetails][ServiceDetails.model]
-            if modelOfThisProcess[FileObjectContent.id] in currentProcess[ProcessDescription.files]:
-                modelExistsAsFile = True
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteModel.__name__):
-                currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
-                modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
-                if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
-                    modelExistsAsFile = True              
-            else:
-                return HttpResponse("Not logged in or rights insufficient!", status=401)
-
+        # TODO maybe rewrite to support multiple model files
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(deleteModel.__name__)
+        if interface == None:
+            return HttpResponse("Not logged in or rights insufficient!", status=401)
+        currentProcess = interface.getProcessObj(projectID, processID)
+        modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
+        if modelOfThisProcess[FileObjectContent.id] in currentProcess[ProcessDescription.files]:
+            modelExistsAsFile = True
+            
         if modelExistsAsFile:
             deleteFile(request, processID, modelOfThisProcess[FileObjectContent.id])
         
         changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.model: modelOfThisProcess[FileObjectContent.id]}}}
-        message, flag = updateProcessFunction(request, changes, currentProjectID, [processID])
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
-            return JsonResponse({}, status=401)
+            return HttpResponse("Insufficient rights!", status=401)
         if isinstance(message, Exception):
             raise message
 

@@ -18,7 +18,8 @@
             "getFlatProjects",
             "getProcessHistory",
             "downloadProcessHistory",
-            "statusButtonRequest"
+            "statusButtonRequest",
+            "checkModel"
          ]
       },
       {
@@ -37,7 +38,9 @@
             "uploadModel",
             "deleteFile",
             "deleteModel",
-            "downloadProcessHistory"
+            "downloadProcessHistory",
+            "downloadFileStream",
+            "checkModel"
          ]
       },
       {
@@ -108,7 +111,8 @@
             "sendProject",
             "createProcessID",
             "createProjectID",
-            "statusButtonRequest"
+            "statusButtonRequest",
+            "checkModel"
          ]
       },
       {

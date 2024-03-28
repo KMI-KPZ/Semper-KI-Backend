@@ -80,7 +80,7 @@ class Command(BaseCommand):
         print(f'###############################\nuploading file to local stack with concurrent {concurrency} parts\n###############################')
         manageLocalS3.uploadFileObject(fileKey, encryptionAdapterToLocalStack, config)
 
-        streamingBodyLocal, Flag = manageLocalS3.getFileStreamingBody(fileKey)
+        streamingBodyLocal, flag = manageLocalS3.getFileStreamingBody(fileKey)
         if not streamingBodyLocal:
             print("Error while accessing stream object")
             return
@@ -99,9 +99,9 @@ class Command(BaseCommand):
 
 
         # Download the file from S3 and monitor memory usage
-        streamingBody, Flag = manageRemoteS3.getFileStreamingBody(fileKeyEnc)
+        streamingBody, flag = manageRemoteS3.getFileStreamingBody(fileKeyEnc)
 
-        if not Flag:
+        if not flag:
             print("Error while downloading file")
             return
 
@@ -118,7 +118,7 @@ class Command(BaseCommand):
         print(f'###############################\nmoving file with internal method\n###############################')
         moveFileToRemote(fileKey, fileKeyEnc, True, True)
 
-        streamingBody, Flag = manageRemoteS3.getFileStreamingBody(fileKeyEnc)
+        streamingBody, flag = manageRemoteS3.getFileStreamingBody(fileKeyEnc)
         decryptionAdapter = EncryptionAdapter(streamingBody)
         decryptionAdapter.setDebugLogger(logging)
         decryptionAdapter.setupDecryptOnRead(base64.b64decode(manageRemoteS3.aesEncryptionKey))
@@ -131,7 +131,6 @@ class Command(BaseCommand):
             manageRemoteS3.deleteFile(fileKeyEnc)
 
     ##############################################
-
     def _logMemInfo(self,comment=""):
         """
             Print memory info with a comment to the debug logger if it is set
@@ -141,11 +140,11 @@ class Command(BaseCommand):
         """
         if not self.debugLogger:
             return
+        
         self.debugLogger.debug(f'Current memory usage: {psutil.Process().memory_info().rss / 1024 / 1024} MB | {comment}')
 
 
     ##############################################
-
     def compareFiles(self, file_path, decryptionAdapter:EncryptionAdapter, chunksize:int = 5*1024*1024):
         """
         Compare two files

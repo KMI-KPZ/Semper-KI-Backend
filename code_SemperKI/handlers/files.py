@@ -31,6 +31,7 @@ from Generic_Backend.code_General.connections import s3
 
 from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 
+from ..connections.content.manageContent import ManageContent
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
 from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
@@ -70,6 +71,7 @@ def uploadFiles(request):
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
+            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
             returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
             if returnVal is not True:
                 return HttpResponse("Failed", status=500)
@@ -77,7 +79,7 @@ def uploadFiles(request):
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
-            return HttpResponse("Unsufficient rights!", status=401)
+            return HttpResponse("Insufficient rights!", status=401)
         if isinstance(message, Exception):
             raise message
 
@@ -92,6 +94,7 @@ def uploadFiles(request):
 def downloadFile(request, processID, fileID):
     """
     Send file to user from storage
+    DEPRECATED!!!!
 
     :param request: Request of user for a specific file of a process
     :type request: HTTP POST
@@ -126,10 +129,10 @@ def downloadFile(request, processID, fileID):
                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
         # retrieve the correct file and download it from aws to the user
-        content, Flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-        if Flag is False:
-            content, Flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-            if Flag is False:
+        content, flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+        if flag is False:
+            content, flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+            if flag is False:
                 return HttpResponse("Not found!", status=404)
             
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(datetime.now()))
@@ -142,15 +145,17 @@ def downloadFile(request, processID, fileID):
 
 
 #######################################################
-def getFileInfoFromProcess(request: HttpRequest, processID: str, fileID: str) -> (object, bool):
+def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:
     """
-    obtain file information from a process
+    Obtain file(s) information from a process
 
     :param request: Request of user for a specific file of a process
     :type request: HTTP POST
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
-    :param fileID: file ID
+    :param fileID: file ID, if given then only that file is returned, else all files
     :type fileID: Str
     :return: file metadata or Error HttpResponse  , retrieval success
     :rtype: (dict|HttpResponse, bool)
@@ -158,30 +163,26 @@ def getFileInfoFromProcess(request: HttpRequest, processID: str, fileID: str) ->
     """
     try:
         # Retrieve the files info from either the session or the database
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session, processID)
-        if currentProcess is not None:
-            if fileID in currentProcess[ProcessDescription.files]:
-                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
-            else:
-                return (HttpResponse("Not found!", status=404), False)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(downloadFile.__name__)
+        if interface == None:
+            return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
+        
+        if not contentManager.checkRightsForProcess(processID):
+            return (HttpResponse("Not allowed to see process!", status=401),False)
+
+        currentProcess = interface.getProcessObj(projectID, processID)
+        if currentProcess == None:
+            return (HttpResponse("Not found!", status=404), False)
+        
+        if fileID != "":
+            if fileID not in currentProcess.files:
+                return (HttpResponse("Not found!", status=404),False)
+            
+            fileOfThisProcess = currentProcess.files[fileID]
+            return (fileOfThisProcess, True)
         else:
-            if (manualCheckifLoggedIn(request.session)  and
-                    manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__)):
-
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-                    fileOfThisProcess = currentProcess.files[fileID]
-                    if len(fileOfThisProcess) == 0:
-                        return (HttpResponse("Not found!", status=404),False)
-                else:
-                    return (HttpResponse("Not allowed to see process!", status=401),False)
-            else:
-                return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
-
-        return (fileOfThisProcess, True)
+            return (currentProcess.files, True)
 
     except (Exception) as error:
         loggerError.error(f"Error while retrieving file information: {str(error)}")
@@ -189,12 +190,14 @@ def getFileInfoFromProcess(request: HttpRequest, processID: str, fileID: str) ->
 
 
 #######################################################
-def getFileObject(request: HttpRequest, processID: str, fileID: str) -> (object, bool, bool):
+def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]:
     """
     Get file from storage and return it as accessible object - you have to decrypt it if necessary
 
     :param request: Request of user for a specific file of a process
     :type request: HttpRequest
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
     :param fileID: file ID
@@ -205,19 +208,23 @@ def getFileObject(request: HttpRequest, processID: str, fileID: str) -> (object,
     """
     try:
         isRemote = False
-        fileOfThisProcess, Flag = getFileInfoFromProcess(request, processID, fileID)
-        if Flag is False:
+        fileOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        if flag is False:
             return (None, False, False)
 
         # retrieve the correct file object
-        fileObj, Flag = s3.manageLocalS3.getFileObject(fileOfThisProcess[FileObjectContent.path])
-        if Flag is False:
-            fileObj, Flag = s3.manageRemoteS3.getFileObject(fileOfThisProcess[FileObjectContent.path])
-            isRemote = True
-            if Flag is False:
+        if fileOfThisProcess[FileObjectContent.remote]:
+            fileObj, flag = s3.manageRemoteS3.getFileObject(fileOfThisProcess[FileObjectContent.path])
+            if flag is False:
                 logger.warning(f"File {fileID} not found in process {processID}")
-                return (None,False, False)
-
+                return (None, False, False)
+            isRemote = True
+        else:
+            fileObj, flag = s3.manageLocalS3.getFileObject(fileOfThisProcess[FileObjectContent.path])
+            if flag is False:
+                logger.warning(f"File {fileID} not found in process {processID}")
+                return (None, False, False)
+            
         logger.info(
             f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},"
             f"{Logging.Predicate.FETCHED},accessed,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(
@@ -231,13 +238,15 @@ def getFileObject(request: HttpRequest, processID: str, fileID: str) -> (object,
 
 
 #######################################################
-def getFileReadableStream(request, processID, fileID) -> (EncryptionAdapter, bool):
+def getFileReadableStream(request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
 
     :param request: Request of user for a specific file of a process
     :type request: HTTP POST
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
     :param fileID: file ID
@@ -247,11 +256,11 @@ def getFileReadableStream(request, processID, fileID) -> (EncryptionAdapter, boo
 
     """
     try:
-        fileObj, Flag, isRemote = getFileObject(request, processID, fileID)
-        if Flag is False:
+        fileObj, flag, isRemote = getFileObject(request, projectID, processID, fileID)
+        if flag is False:
             return (None, False)
 
-        if not Flag:
+        if not flag:
             logger.warning(f"File {fileID} not found in process {processID}")
             return  (None, False)
 
@@ -262,7 +271,7 @@ def getFileReadableStream(request, processID, fileID) -> (EncryptionAdapter, boo
         streamingBody = fileObj['Body']
         if not isinstance(streamingBody, StreamingBody):
             logger.warning(f"Error while accessing streaming body in file {fileID} of process {processID}")
-            return
+            return (None, False)
 
         encryptionAdapter = EncryptionAdapter(streamingBody)
 
@@ -280,7 +289,7 @@ def getFileReadableStream(request, processID, fileID) -> (EncryptionAdapter, boo
 
 
 #######################################################
-def moveFileToRemote(fileKeyLocal, fileKeyRemote, delteLocal = True, printDebugInfo = False) -> bool:
+def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebugInfo = False) -> bool:
     """
     Move a file from local to remote storage with on the fly encryption not managing other information
 
@@ -296,8 +305,8 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, delteLocal = True, printDebugI
     """
     try:
         # try to retrieve it from local storage
-        fileStreamingBody, Flag = s3.manageLocalS3.getFileStreamingBody(fileKeyLocal)
-        if Flag is False:
+        fileStreamingBody, flag = s3.manageLocalS3.getFileStreamingBody(fileKeyLocal)
+        if flag is False:
             logger.warning(f"File {fileKeyLocal} not found in local storage to move to remote")
             return False
 
@@ -320,7 +329,7 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, delteLocal = True, printDebugI
             logging.error(f"Error while uploading file {fileKeyLocal} from local to remote {fileKeyRemote}: {str(e)}")
             return False
 
-        if delteLocal:
+        if deleteLocal:
             returnVal = s3.manageLocalS3.deleteFile(fileKeyLocal)
             if returnVal is not True:
                 logging.error("Deletion of file" + fileKeyLocal + " failed")
@@ -334,12 +343,14 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, delteLocal = True, printDebugI
 
 #######################################################
 @require_http_methods(["GET"])
-def downloadFileStream(request, processID, fileID):
+def downloadFileStream(request, projectID, processID, fileID):
     """
     Send file to user from storage
 
     :param request: Request of user for a specific file of a process
     :type request: HTTP POST
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
     :param fileID: file ID
@@ -349,8 +360,8 @@ def downloadFileStream(request, processID, fileID):
 
     """
     try:
-        encryptionAdapter, Flag = getFileReadableStream(request, processID, fileID)
-        if Flag is False:
+        encryptionAdapter, flag = getFileReadableStream(request, projectID, processID, fileID)
+        if flag is False:
             return HttpResponse("Failed", status=500)
 
         # encryptionAdapter.setDebugLogger(loggerDebug)
@@ -364,46 +375,38 @@ def downloadFileStream(request, processID, fileID):
 
 #######################################################
 @require_http_methods(["GET"])
-def downloadFilesAsZip(request, processID):
+def downloadFilesAsZip(request, projectID, processID):
     """
     Send files to user as zip
 
     :param request: Request of user for all selected files of a process
     :type request: HTTP POST
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
     :return: Saved content
     :rtype: FileResponse
 
     """
+    # TODO solve with streaming
     try:
         fileIDs = request.GET['fileIDs'].split(",")
         filesArray = []
 
         # Retrieve the files infos from either the session or the database
-        filesOfThisProcess = {}
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
-        if currentProcess != None:
-            filesOfThisProcess = currentProcess[ProcessDescription.files]
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
-                    filesOfThisProcess = currentProcess.files
-                else:
-                    return HttpResponse("Not allowed to see process!", status=401)
-            else:
-                return HttpResponse("Not logged in or rights insufficient!", status=401)
-
+        filesOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID)
+        if flag is False:
+            return filesOfThisProcess # will be HTTPResponse
+        
         # get files, download them from aws, put them in an array together with their name
         for elem in filesOfThisProcess:
             currentEntry = filesOfThisProcess[elem]
             if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
-                content, Flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
-                if Flag is False:
-                    content, Flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
-                    if Flag is False:
+                content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
+                if flag is False:
+                    content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
+                    if flag is False:
                         return HttpResponse("Not found!", status=404)
                 
                 filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
@@ -503,12 +506,14 @@ def downloadProcessHistory(request, processID):
 
 #######################################################
 @require_http_methods(["DELETE"])
-def deleteFile(request, processID, fileID):
+def deleteFile(request, projectID, processID, fileID):
     """
     Delete a file from storage
 
     :param request: Request of user for a specific file of a process
     :type request: HTTP DELETE
+    :param projectID: Project ID
+    :type projectID: str
     :param processID: process ID
     :type processID: Str
     :param fileID: file ID
@@ -520,43 +525,17 @@ def deleteFile(request, processID, fileID):
     try:
 
         # Retrieve the files infos from either the session or the database
-        fileOfThisProcess = {}
-        liesInDatabase = False
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
-        if currentProcess != None:
-            if fileID in currentProcess[ProcessDescription.files]:
-                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
-            else:
-                return HttpResponse("Not found!", status=404)
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteFile.__name__):
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
-                    fileOfThisProcess = currentProcess.files[fileID]
-                    if len(fileOfThisProcess) == 0:
-                        return HttpResponse("Not found!", status=404)                
-                    liesInDatabase = True
-                else:
-                    return HttpResponse("Not allowed to see process!", status=401)
-            else:
-                return HttpResponse("Not logged in or rights insufficient!", status=401)
-        
+        fileOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+
         deletions = {"changes": {}, "deletions": {}}
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
         
         # TODO send deletion to service, should the deleted file be the model for example
-        
-        message, flag = updateProcessFunction(request, deletions, currentProjectID, [processID])
+        message, flag = updateProcessFunction(request, deletions, projectID, [processID])
         if flag is False:
             return HttpResponse("Not logged in", status=401)
         if isinstance(message, Exception):
             raise message
-        
-        if not liesInDatabase: # file deletion in database already triggers file deletion in aws
-            returnVal = s3.manageLocalS3.deleteFile(fileOfThisProcess[FileObjectContent.path])
-            if returnVal is not True:
-                raise Exception("Deletion of file" + fileID + " failed")
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return HttpResponse("Success", status=200)

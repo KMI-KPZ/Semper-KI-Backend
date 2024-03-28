@@ -391,7 +391,10 @@ class ProcessManagementSession(AbstractContentInterface):
             for currentProcess in processes:
                 files = processes[currentProcess][ProcessDescription.files]
                 for fileKey in files:
-                    s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.id])
+                    if files[fileKey][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -476,7 +479,10 @@ class ProcessManagementSession(AbstractContentInterface):
             currentProcess = self.structuredSessionObj.getProcessPerID(processID)
             files = currentProcess[ProcessDescription.files]
             for fileObj in files:
-                s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.id])
+                if fileObj[FileObjectContent.remote]:
+                    s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
+                else:
+                    s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -571,6 +577,10 @@ class ProcessManagementSession(AbstractContentInterface):
         
             elif updateType == ProcessUpdates.files:
                 for entry in content:
+                    if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
                     del currentProcess[ProcessDescription.files][entry]
             
             elif updateType == ProcessUpdates.serviceType:

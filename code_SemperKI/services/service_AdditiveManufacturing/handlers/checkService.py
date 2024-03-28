@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Handlers using simulation to check the processes
 """
 
-import random, logging
+import random, logging, requests
 from io import BytesIO
 
 from django.conf import settings
@@ -18,9 +18,10 @@ from Generic_Backend.code_General.connections import redis
 from Generic_Backend.code_General.definitions import FileObjectContent
 
 from code_SemperKI.connections.content.postgresql import pgProcesses
-from code_SemperKI.handlers.projectAndProcessManagement import getProcessAndProjectFromSession
-from code_SemperKI.definitions import ProcessDescription
+from code_SemperKI.definitions import ProcessDescription, ProcessUpdates
 from code_SemperKI.handlers.files import getFileReadableStream
+from code_SemperKI.connections.content.manageContent import ManageContent
+from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
 
 from ..definitions import ServiceDetails
 
@@ -44,8 +45,8 @@ def checkPrintability(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
-    if Flag:
+    (contentOrError, flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
+    if flag:
         # if a model has been uploaded, use that
         model = contentOrError
     else:
@@ -83,8 +84,8 @@ def checkPrice(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
-    if Flag:
+    (contentOrError, flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
+    if flag:
         # if a model has been uploaded, use that
         model = contentOrError
     else:
@@ -121,8 +122,8 @@ def checkLogistics(request):
     model = None
     selected = request.session["selected"]
 
-    (contentOrError, Flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
-    if Flag:
+    (contentOrError, flag) = redis.RedisConnection().retrieveContent(request.session.session_key)
+    if flag:
         # if a model has been uploaded, use that
         model = contentOrError
     else:
@@ -142,7 +143,7 @@ def checkLogistics(request):
 
 
 #######################################################
-def getChemnitzData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
+def getBoundaryData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
     """
     Send the model to the Chemnitz service and get the dimensions
 
@@ -174,32 +175,34 @@ def getChemnitzData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
 
 #######################################################
 @require_http_methods(["GET"])
-def checkModel(request, processID) -> JsonResponse:
+def checkModel(request, projectID, processID) -> JsonResponse:
     """
     Ask IWU service for model dimensions
 
     :param request: GET Request with processID
     :type request: GET
+    :param projectID: The ID of the project
+    :type projectID: str
+    :param processID: The ID of the process
+    :type processID: str
     :return: JSON with dimensions
     :rtype: Json Response
 
     """
     try:
-        project, process = getProcessAndProjectFromSession(request.session, processID)
-        if process == None:
-            processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
-            if processObj == None:
-                raise Exception("Process not found!")
-            
-            if ServiceDetails.model not in processObj.serviceDetails:
-                raise Exception("Model not found!")
-            
-            model = processObj.serviceDetails[ServiceDetails.model]
-        else:
-            if ServiceDetails.model not in process[ProcessDescription.serviceDetails]:
-                raise Exception("Model not found!")
-            model = process[ProcessDescription.serviceDetails][ServiceDetails.model]
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(checkModel.__name__)
+        if interface == None:
+            JsonResponse({}, status=401)
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            raise Exception("Model not found!")
+        
+        # If calculations are already there, take these
+        if ServiceDetails.calculations in process.serviceDetails:
+            return JsonResponse(process.serviceDetails[ServiceDetails.calculations])
 
+        model = process.serviceDetails[ServiceDetails.model]
         modelName = model[FileObjectContent.fileName]
         mock = {
             "filename": modelName,
@@ -219,14 +222,23 @@ def checkModel(request, processID) -> JsonResponse:
         if settings.IWS_ENDPOINT is None:
             return JsonResponse(mock)
 
-        fileContent, Flag = getFileReadableStream(request, processID, model[FileObjectContent.id])
-        if Flag:
-            resultData = getChemnitzData(fileContent, modelName)
+        fileContent, flag = getFileReadableStream(request, processID, model[FileObjectContent.id])
+        if flag:
+            resultData = getBoundaryData(fileContent, modelName)
         else:
             logger.warning(f"Error while accessing file {modelName}")
 
         if resultData["status_code"] != 200:
             return JsonResponse(mock)
+        
+        # save results in model file details
+        changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.calculations: resultData}}}
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        if flag is False:
+            return HttpResponse("Insufficient rights!", status=401)
+        if isinstance(message, Exception):
+            raise message
+
         return JsonResponse(resultData)
 
     except (Exception) as error:

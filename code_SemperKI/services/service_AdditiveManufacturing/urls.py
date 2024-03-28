@@ -40,8 +40,8 @@ newPaths = {
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
     "checkPrices": ("public/checkPrices/",checkService.checkPrice),
     "checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/checkModel/<processID>/", checkService.checkModel),
-    "checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
+    "checkModel": ("public/checkModel/<projectID>/<processID>/", checkService.checkModel),
+    #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "onto_getPrinters": ("public/onto/getPrinters/",resources.onto_getPrinters),
     "onto_getPrinter": ("public/onto/getPrinter/",resources.onto_getPrinter),

@@ -33,6 +33,8 @@ def updateServiceDetails(existingContent, newContent):
                 existingContent[ServiceDetails.material] = newContent[entry]
             elif entry == ServiceDetails.postProcessings:
                 existingContent[ServiceDetails.postProcessings] = newContent[entry]
+            elif entry == ServiceDetails.calculations:
+                existingContent[ServiceDetails.calculations] = newContent[entry]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -58,10 +60,13 @@ def deleteServiceDetails(existingContent, deletedContent):
         for entry in deletedContent:
             if entry == ServiceDetails.model:
                 del existingContent[ServiceDetails.model]
+                del existingContent[ServiceDetails.calculations] # invalidate calculations since the model doesn't exist anymore
             elif entry == ServiceDetails.material:
                 del existingContent[ServiceDetails.material]
             elif entry == ServiceDetails.postProcessings:
                 del existingContent[ServiceDetails.postProcessings]
+            elif entry == ServiceDetails.calculations:
+                del existingContent[ServiceDetails.calculations]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 

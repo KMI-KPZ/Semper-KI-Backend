@@ -64,10 +64,10 @@ newPaths= {
 
     "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
     #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
-    "downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFileStream),
-    "downloadFilesAsZip": ("public/downloadFilesAsZip/<processID>/",files.downloadFilesAsZip),
-    "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
-    "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
+    "downloadFile": ("public/downloadFile/<projectID>/<processID>/<fileID>/",files.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<projectID>/<processID>/",files.downloadFilesAsZip),
+    "deleteFile": ("public/deleteFile/<projectID>/<processID>/<fileID>/",files.deleteFile),
+    "downloadProcessHistory": ("public/downloadProcessHistory/<projectID>/<processID>/",files.downloadProcessHistory),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
     "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),

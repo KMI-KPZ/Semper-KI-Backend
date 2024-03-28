@@ -84,7 +84,7 @@ class ManageContent():
             return False
 
     #######################################################
-    def getCorrectInterface(self, functionName):
+    def getCorrectInterface(self, functionName=""):
         """
         Return the correct class interface
         
@@ -95,10 +95,13 @@ class ManageContent():
 
         """
         if manualCheckifLoggedIn(self.currentSession):
-            if manualCheckIfRightsAreSufficient(self.currentSession, functionName):
-                return self.postgresManagement
+            if functionName != "":
+                if manualCheckIfRightsAreSufficient(self.currentSession, functionName):
+                    return self.postgresManagement
+                else:
+                    return None
             else:
-                return None
+                return self.postgresManagement
         else:
             self.currentSession.modified = True
             return self.sessionManagement

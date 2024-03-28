@@ -193,8 +193,8 @@ class ProcessInterface():
         self.serviceDetails = {}
         self.serviceStatus = 0
         self.serviceType = serviceManager.getNone()
-        dependenciesIn = ManyToManySimulation()
-        dependenciesOut = ManyToManySimulation()
+        self.dependenciesIn = ManyToManySimulation()
+        self.dependenciesOut = ManyToManySimulation()
         self.client = ""
         self.files = {}
         self.messages = {"messages": []}
@@ -204,6 +204,10 @@ class ProcessInterface():
 
     ###################################################
     def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, updatedWhen, accessedWhen) -> None:
+        """
+        Setter
+
+        """
         self.processDetails = processDetails
         self.processStatus = processStatus
         self.serviceDetails = serviceDetails
@@ -214,7 +218,7 @@ class ProcessInterface():
         self.messages = messages
         self.updatedWhen = updatedWhen
         self.accessedWhen = accessedWhen
-    
+
     ###################################################
     def toDict(self):
         return {ProcessDescription.processID: self.processID, 

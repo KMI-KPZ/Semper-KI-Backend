@@ -853,21 +853,22 @@ def getContractors(request, processID):
 
     :param request: GET request
     :type request: HTTP GET
+    :param processID: The ID of the process a contractor is chosen for
+    :type processID: str
     :return: List of contractors and some details
     :rtype: JSON
 
     """
     # TODO filter 
     try:
-        projectObj, processObj = getProcessAndProjectFromSession(request.session,processID)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface() # checks not needed for rights, was done in the decorators
+        processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
         if processObj == None:
-            processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
-            if processObj == None:
-                raise Exception("Process ID not found in session or db")
-            else: # db
-                serviceType = processObj.serviceType
-        else: # session
-            serviceType = processObj[ProcessDescription.serviceType]
+            raise Exception("Process ID not found in session or db")
+ 
+        serviceType = processObj.serviceType
+
 
         listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
         # TODO Check suitability
