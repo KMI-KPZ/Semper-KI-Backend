@@ -56,5 +56,19 @@ services:
     networks:
       - semper-ki-production-network
 
+  celery-worker:
+    build:
+      context: .
+      dockerfile: ./MSQ/Dockerfile.MSQ
+    container_name: local-celery-worker
+    entrypoint: celery
+    env_file:
+      - .env.production
+    command: -A MSQ.module.celery worker -n local_worker --loglevel=info
+    volumes:
+      - .:/app
+    networks:
+      - semper-ki-production-network
+
 networks:
   semper-ki-production-network:

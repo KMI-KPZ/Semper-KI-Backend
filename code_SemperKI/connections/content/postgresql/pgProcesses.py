@@ -28,8 +28,11 @@ from ....definitions import *
 
 from ....serviceManager import serviceManager
 
+import code_SemperKI.states.stateDescriptions as StateDescriptions
+
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
+from ....tasks.processTasks import verificationOfProcess, sendProcess
 
 import logging
 logger = logging.getLogger("errors")
@@ -38,6 +41,31 @@ logger = logging.getLogger("errors")
 ####################################################################################
 # Projects/Processes general
 class ProcessManagementBase(AbstractContentInterface):
+
+    ##############################################
+    def __init__(self, session) -> None:
+        self.structuredSessionObj = session
+
+    #######################################################
+    def getSession(self):
+        """
+        Get the session
+
+        :return: The session
+        :rtype: Django session obj(dict)
+
+        """
+        return self.structuredSessionObj
+
+    ##############################################
+    def getUserID(self) -> str:
+        """
+        Retrieve UserID from session
+        
+        :return: UserID
+        :rtype: str
+        """
+        return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
     
     ##############################################
     @staticmethod
@@ -224,10 +252,12 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getProcessObj(processID):
+    def getProcessObj(projectID, processID):
         """
         Get one process.
 
+        :param projectID: The ID of the project, not used here
+        :type projectID: str
         :param processID: process ID for a process
         :type processID: str
         :return: Requested process
@@ -287,7 +317,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             processesOfThatProject = []
             for entry in projectObj.processes.all():
-                processesOfThatProject.append(entry.toDict())
+                processDetails = entry.toDict()
+                processesOfThatProject.append(processDetails)
 
             output[SessionContentSemperKI.processes] = processesOfThatProject
             
@@ -433,7 +464,10 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                if allFiles[entry][FileObjectContent.remote]:
+                    s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                else:
+                    s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -577,33 +611,6 @@ class ProcessManagementBase(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f'could not update process: {str(error)}')
             return error
-    
-    ##############################################
-    @staticmethod
-    def sendProcess(processID):
-        """
-        Send process to contractor.
-
-        :param processID: ID of the process that is being sent
-        :type processID: str
-        :return: Nothing or an error
-        :rtype: None or error
-        """
-        #TODO - create data entries for everything that's happening
-        try:
-            processObj = Process.objects.get(processID=processID)
-            
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
-            processObj.contractor = contractorObj
-            processObj.save()
-
-            #TODO change Status
-            # updateProcess
-
-            return None
-        except (Exception) as error:
-            logger.error(f'could not send process: {str(error)}')
-            return error
 
     ##############################################
     @staticmethod
@@ -635,12 +642,15 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                    if content[entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
 
             elif updateType == ProcessUpdates.processStatus:
-                currentProcess.processStatus = ProcessStatus.DRAFT
+                currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
                 
             elif updateType == ProcessUpdates.processDetails:
@@ -736,20 +746,15 @@ class ProcessManagementBase(AbstractContentInterface):
                     dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
                 
                 # only signal contractors that received the process 
-                if process.processStatus >= ProcessStatus.REQUESTED:
-                    contractorID = ""
-                    if process.contractor != None:
-                        contractorID = process.contractor.hashedID
-                    elif ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
-                        contractorID = process.processDetails[ProcessDetails.provisionalContractor]
-                    
-                    if contractorID != "":
-                        if projectObj.client != contractorID:
-                            if contractorID not in dictForEventsAsOutput:
-                                dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                                dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                            else:
-                                dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+                contractorID = ""
+                if process.contractor != None:
+                    contractorID = process.contractor.hashedID
+                    if projectObj.client != contractorID:
+                        if contractorID not in dictForEventsAsOutput:
+                            dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
+                            dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
+                        else:
+                            dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
         return dictForEventsAsOutput
     
     ##############################################
@@ -767,7 +772,8 @@ class ProcessManagementBase(AbstractContentInterface):
             currentOC = entry.toDict()
             currentOC["processesCount"] = len(entry.processes.all())
             outList.append(currentOC)
-
+        outList.sort(key=lambda x: 
+                   timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
         return outList
     
     ##############################################
@@ -834,7 +840,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             projectObj = ProcessManagementBase.getProjectObj(projectID)
 
-            defaultProcessObj = ProcessInterface(processID, str(now))
+            defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now)), processID, str(now))
 
             processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
             ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)
@@ -1025,10 +1031,75 @@ class ProcessManagementBase(AbstractContentInterface):
             returnValue = []
             for entry in listOfSuitableContractors:
                 detailsOfOrganization = {}
-                if OrganizationDetails.adress in entry.details:
-                    detailsOfOrganization[OrganizationDetails.adress] = entry.details[OrganizationDetails.adress]
+                if OrganizationDetails.address in entry.details:
+                    detailsOfOrganization[OrganizationDetails.address] = entry.details[OrganizationDetails.address]
                 returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: detailsOfOrganization})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")
 
         return returnValue
+    
+    ##############################################
+    @staticmethod
+    def verifyProcess(processObj:Process, session, userID:str):
+        """
+        Verify the process.
+
+        :param projectObj: Process object
+        :type projectID: Process
+        :param session: Session of this user
+        :type session: Django session object
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try: 
+            dataID = crypto.generateURLFriendlyRandomString()
+            ProcessManagementBase.createDataEntry("Verification started", dataID, processObj.processID, DataType.STATUS, userID)
+            # send verification job to queue 
+            verificationOfProcess(processObj, session)
+            return None
+
+        except (Exception) as error:
+            logger.error(f"verifyProcess: {str(error)}")
+
+    ##############################################
+    @staticmethod
+    def sendProcess(processObj:Process, session, userID:str):
+        """
+        Send the process to its contractor(s).
+
+        :param processObj: process that shall be send
+        :type processObj: Process
+        :param session: Who ordered the verification
+        :type session: Django session object (dict-like)
+        :param userID: Who ordered the sendaway
+        :type userID: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        try:
+
+            # Check if process is verified
+            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFIED):
+                raise Exception("Not verified yet!")
+            
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+
+            # Create history entry
+            dataID = crypto.generateURLFriendlyRandomString()
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
+            
+            # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
+            processObj.contractor = contractorObj
+            processObj.save()
+
+            # send the rest (e-mails and such) asyncronously
+            sendProcess(processObj, contractorObj, session)
+
+            return None
+            
+        except (Exception) as error:
+            logger.error(f"sendProcess: {str(error)}")
+            return error

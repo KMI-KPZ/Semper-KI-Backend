@@ -7,7 +7,7 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails
+from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
@@ -32,5 +32,13 @@ class AdditiveManufacturing(Semper.ServiceBase):
 
         """
         return AM_deleteServiceDetails(existingContent, deletedContent)
+    
+    ###################################################
+    def serviceReady(self, existingContent) -> bool:
+        """
+        Checks if the service is completely defined
+        
+        """
+        return AM_serviceIsReady(existingContent)
 
 Semper.serviceManager.register("ADDITIVE_MANUFACTURING", 1, AdditiveManufacturing())

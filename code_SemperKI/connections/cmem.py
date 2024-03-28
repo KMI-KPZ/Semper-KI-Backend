@@ -6,9 +6,10 @@ Silvio Weging 2023
 Contains: Services for the sparql endpoint
 """
 
-from SPARQLWrapper import SPARQLWrapper, JSON
-from django.conf import settings
+
 import datetime
+from django.conf import settings
+from SPARQLWrapper import SPARQLWrapper, JSON
 from authlib.integrations.requests_client import OAuth2Session
 
 from Generic_Backend.code_General.connections.redis import RedisConnection
@@ -70,16 +71,37 @@ class ManageQueries:
     redisCon = RedisConnection()
 
     #######################################################
-    def __init__(self, filePathAndName) -> None:
+    def retrieveContentFromRedis(self) -> str:
+        """
+        Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
 
-        query, exists = self.redisCon.retrieveContentJSON(filePathAndName)
+        :return: The query as string
+        :rtype: str
+
+        """
+
+        query, exists = self.redisCon.retrieveContentJSON(self.filePathAndName)
         if not exists:
-            with open(str(settings.BASE_DIR) + filePathAndName) as queryFile:
+            with open(str(settings.BASE_DIR) + self.filePathAndName) as queryFile:
                 queryFileContent = queryFile.read()
-                self.redisCon.addContentJSON(filePathAndName, {"content": queryFileContent})
-                self.savedQuery = queryFileContent
+                self.redisCon.addContentJSON(self.filePathAndName, {"content": queryFileContent}, True)
+                return queryFileContent
         else:
-            self.savedQuery = query["content"]
+            return query["content"]
+
+    #######################################################
+    def __init__(self, filePathAndName) -> None:
+        """
+        Retrieve query from file and save it into redis 
+
+        :param filePathAndName: the very same
+        :type filePathAndName: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        self.filePathAndName = filePathAndName
+        self.retrieveContentFromRedis() # save file initially
 
     #######################################################
     def sendQuery(self):
@@ -99,7 +121,7 @@ class ManageQueries:
         endpointCopy.addCustomHttpHeader(
         httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
         endpointCopy.setReturnFormat(JSON)
-        endpointCopy.setQuery(self.savedQuery)
+        endpointCopy.setQuery(self.retrieveContentFromRedis())
 
         results = endpointCopy.queryAndConvert()
         return results["results"]["bindings"]

@@ -11,15 +11,18 @@ import logging, copy
 
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
 
 from ...definitions import SessionContentSemperKI
-from ...definitions import ProjectUpdates, ProcessUpdates, ProcessStatus, ProcessDetails
+from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...serviceManager import serviceManager
+import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
+# TODO: history alias Data
 
 #######################################################
 class StructuredSession():
@@ -251,6 +254,27 @@ class ProcessManagementSession(AbstractContentInterface):
         self.structuredSessionObj = StructuredSession(session)
 
     #######################################################
+    def getSession(self):
+        """
+        Get the session
+        
+        :return: The session 
+        :rtype: Django session obj (dict)
+        """
+        return self.structuredSessionObj.getSession()
+
+
+    ##############################################
+    def getUserID(self) -> str:
+        """
+        Retrieve UserID from session
+        
+        :return: UserID
+        :rtype: str
+        """
+        return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
+
+    #######################################################
     def getIfContentIsInSession(self) -> bool:
         """
         Tell management class whether there is content in the session
@@ -367,7 +391,10 @@ class ProcessManagementSession(AbstractContentInterface):
             for currentProcess in processes:
                 files = processes[currentProcess][ProcessDescription.files]
                 for fileKey in files:
-                    s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.id])
+                    if files[fileKey][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -410,7 +437,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             content = self.structuredSessionObj.getProcess(projectID, processID)
-            returnObj = ProcessInterface(processID, content[ProcessDescription.createdWhen])
+            returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
             returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
             return returnObj
         except (Exception) as error:
@@ -435,7 +462,7 @@ class ProcessManagementSession(AbstractContentInterface):
 
         now = timezone.now()
 
-        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(processID, str(now)).toDict())
+        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now)), processID, str(now)).toDict())
 
     ###################################################
     def deleteProcess(self, processID:str, processObj=None):
@@ -452,7 +479,10 @@ class ProcessManagementSession(AbstractContentInterface):
             currentProcess = self.structuredSessionObj.getProcessPerID(processID)
             files = currentProcess[ProcessDescription.files]
             for fileObj in files:
-                s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.id])
+                if fileObj[FileObjectContent.remote]:
+                    s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
+                else:
+                    s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -547,6 +577,10 @@ class ProcessManagementSession(AbstractContentInterface):
         
             elif updateType == ProcessUpdates.files:
                 for entry in content:
+                    if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
                     del currentProcess[ProcessDescription.files][entry]
             
             elif updateType == ProcessUpdates.serviceType:
@@ -567,7 +601,7 @@ class ProcessManagementSession(AbstractContentInterface):
                     del currentProcess[ProcessDescription.processDetails][entry]
             
             elif updateType == ProcessUpdates.processStatus:
-                currentProcess[ProcessDescription.processStatus] = ProcessStatus.DRAFT
+                currentProcess[ProcessDescription.processStatus] = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]

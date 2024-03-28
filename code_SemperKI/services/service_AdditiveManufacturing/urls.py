@@ -25,6 +25,7 @@ from .handlers import checkService, filter, resources, model
 
 from code_SemperKI.urls import paths, urlpatterns
 
+
 newPaths = {
     "getProcessData": ('public/getProcessData/',filter.getProcessData),
     "getModels": ('public/getModels/',filter.getModels),
@@ -34,11 +35,13 @@ newPaths = {
 
     "uploadModel": ("public/uploadModel/",model.uploadModel),
     "deleteModel": ("public/deleteModel/<processID>/",model.deleteModel),
+    "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
 
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
     "checkPrices": ("public/checkPrices/",checkService.checkPrice),
     "checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/checkModel/<processID>/", checkService.checkModel),
+    "checkModel": ("public/checkModel/<projectID>/<processID>/", checkService.checkModel),
+    #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "onto_getPrinters": ("public/onto/getPrinters/",resources.onto_getPrinters),
     "onto_getPrinter": ("public/onto/getPrinter/",resources.onto_getPrinter),
@@ -55,7 +58,6 @@ newPaths = {
     "orga_createMaterial": ("public/orga/createMaterial/",resources.orga_createMaterial),
     "orga_removeMaterial": ("public/orga/removeMaterial/",resources.orga_removeMaterial),
 }
-
 
 # add paths
 for entry in newPaths:

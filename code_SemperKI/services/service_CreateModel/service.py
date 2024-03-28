@@ -7,7 +7,7 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails
+from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails, serviceReady as CM_serviceReady
 
 ###################################################
 class CreateModel(Semper.ServiceBase):
@@ -36,6 +36,10 @@ class CreateModel(Semper.ServiceBase):
         """
 
         return CM_deleteServiceDetails(existingContent, newContent)
+    
+    ###################################################
+    def serviceReady(self, existingContent) -> bool:
+        return CM_serviceReady(existingContent)
     
 
 Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())

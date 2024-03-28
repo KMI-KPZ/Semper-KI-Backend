@@ -1,3 +1,4 @@
+from __future__ import annotations 
 """
 Part of Semper-KI software
 
@@ -9,7 +10,7 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .projectModel import Project
+from .projectModel import Project, ProjectInterface
 from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
@@ -114,6 +115,31 @@ class Process(models.Model):
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
     
+###################################################
+class ManyToManySimulation():
+    """
+    Simulate a many to many field for session
+
+    """
+    ###################################################
+    def __init__(self) -> None:
+        self._arrayOfProcesses = []
+
+    ###################################################
+    def add(self, pi:ProcessInterface):
+        """
+        Add a process interface to the array
+        """
+        self._arrayOfProcesses.append(pi)
+    
+    ###################################################
+    def all(self) -> list[ProcessInterface]:
+        """
+        Get array for iteration
+        """
+        return self._arrayOfProcesses
+
+
 
 ###################################################
 class ProcessInterface():
@@ -121,6 +147,7 @@ class ProcessInterface():
     Process management class interface.
     
     :processID: Unique ID for that process, primary key
+    :project: ProjectInterface of project that this process belongs to
     :processDetails: Name of the process and stuff
     :processStatus: How everything is going in general
     :serviceDetails: Details for that service
@@ -136,12 +163,17 @@ class ProcessInterface():
     ###################################################
     processID = ""
     
+    project = ProjectInterface("","")
+
     processDetails = {}
     processStatus = 0
 
     serviceDetails = {}
     serviceStatus = 0
     serviceType = 0
+
+    dependenciesIn = ManyToManySimulation()
+    dependenciesOut = ManyToManySimulation()
 
     client = ""
     
@@ -153,13 +185,16 @@ class ProcessInterface():
     accessedWhen = ""
 
     ###################################################
-    def __init__(self, processID:str, currentTime:str) -> None:
+    def __init__(self, project:ProjectInterface, processID:str, currentTime:str) -> None:
         self.processID = processID
+        self.project = project
         self.processDetails = {"amount": 1}
         self.processStatus = 0
         self.serviceDetails = {}
         self.serviceStatus = 0
         self.serviceType = serviceManager.getNone()
+        self.dependenciesIn = ManyToManySimulation()
+        self.dependenciesOut = ManyToManySimulation()
         self.client = ""
         self.files = {}
         self.messages = {"messages": []}
@@ -169,6 +204,10 @@ class ProcessInterface():
 
     ###################################################
     def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, updatedWhen, accessedWhen) -> None:
+        """
+        Setter
+
+        """
         self.processDetails = processDetails
         self.processStatus = processStatus
         self.serviceDetails = serviceDetails
@@ -179,7 +218,7 @@ class ProcessInterface():
         self.messages = messages
         self.updatedWhen = updatedWhen
         self.accessedWhen = accessedWhen
-    
+
     ###################################################
     def toDict(self):
         return {ProcessDescription.processID: self.processID, 

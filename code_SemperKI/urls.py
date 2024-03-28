@@ -27,6 +27,8 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from MSQ.handlers import interface
+
 
 newPaths= {
 
@@ -43,9 +45,10 @@ newPaths= {
     "updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
     "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
     "deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
-    "verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
-    "sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
+    #"verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
+    #"sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
     "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
+    "statusButtonRequest": ("public/statusButtonRequest/",projectAndProcessManagement.statusButtonRequest),
 
     "getServices": ("public/getServices/",manageServices.getServices),
 
@@ -60,12 +63,18 @@ newPaths= {
     "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
 
     "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
-    "downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
-    "downloadFilesAsZip": ("public/downloadFilesAsZip/<processID>/",files.downloadFilesAsZip),
-    "deleteFile": ("public/deleteFile/<processID>/<fileID>/",files.deleteFile),
-    "downloadProcessHistory": ("public/downloadProcessHistory/<processID>/",files.downloadProcessHistory),
-}
+    #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
+    "downloadFile": ("public/downloadFile/<projectID>/<processID>/<fileID>/",files.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<projectID>/<processID>/",files.downloadFilesAsZip),
+    "deleteFile": ("public/deleteFile/<projectID>/<processID>/<fileID>/",files.deleteFile),
+    "downloadProcessHistory": ("public/downloadProcessHistory/<projectID>/<processID>/",files.downloadProcessHistory),
 
+    #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
+    "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
+    #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
+    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
+    "getStateMachine": ("private/getStateMachine/", projectAndProcessManagement.getStateMachine),
+}
 
 # add paths
 for entry in newPaths:

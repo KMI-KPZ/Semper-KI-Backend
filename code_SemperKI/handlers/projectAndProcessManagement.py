@@ -18,13 +18,14 @@ from channels.layers import get_channel_layer
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from ..states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -32,7 +33,6 @@ loggerError = logging.getLogger("errors")
 ################################################################################################
 
 #######################################################
-
 def fireWebsocketEvents(projectID, processIDArray, session, event, operation=""):
     """
     Fire websocket event from a list for a specific project and process. 
@@ -65,6 +65,39 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="")
                         "type": "sendMessageJSON",
                         "dict": values,
                     })
+
+#######################################################
+def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
+    """
+    Fire websocket event from a list for a specific project and process. 
+    If it should fire for only specific operations like messages or files, specify so.
+    
+    :param projectID: The project ID
+    :type projectID: Str
+    :param processIDArray: The process IDs
+    :type processIDArray: list(Str)
+    :param session: The session of the current user
+    :type session: Dict
+    :param event: The event to fire
+    :type event: Str
+    :param operation: Nothing or messages, files, ...
+    :type operation: Str
+    :return: Nothing
+    :rtype: None
+    """
+ 
+    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
+    channel_layer = get_channel_layer()
+    for userID in dictForEvents: # user/orga that is associated with that process
+        values = dictForEvents[userID] # message, formatted for frontend
+        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+        userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+        for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+            if operation=="" or operation in permission:
+                async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                    "type": "sendMessageJSON",
+                    "dict": values,
+                })
 
 # Projects
 
@@ -474,7 +507,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             if not contentManager.checkRightsForProcess(processID):
                 logger.error("Rights not sufficient in updateProcess")
                 return ("", False)
-            
+
             if "deletions" in changes:
                 for elem in changes["deletions"]:
                     # exclude people not having sufficient rights for that specific operation
@@ -499,9 +532,13 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
                         fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
-
                     if isinstance(returnVal, Exception):
                         raise returnVal
+            
+            # change state for this process if necessary
+            process = interface.getProcessObj(projectID, processID)
+            currentState = StateMachine(initialAsInt=process.processStatus)
+            currentState.onUpdateEvent(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -555,6 +592,10 @@ def updateProcess(request):
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
         
+        # TODO remove
+        if ProcessUpdates.processStatus in changes["changes"]:
+            del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
+
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
         if flag is False:
             return HttpResponse("Not logged in", status=401)
@@ -565,6 +606,37 @@ def updateProcess(request):
     except (Exception) as error:
         loggerError.error(f"updateProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
+
+#######################################################
+def deleteProcessFunction(session, processIDs:list[str]):
+    """
+    Delete the processes
+
+    :param session: The session
+    :type session: Django session object (dict-like)
+    :param processIDs: Array of proccess IDs 
+    :type processIDs: list[str]
+    :return: The response
+    :rtype: HttpResponse | Exception
+
+    """
+    try:
+        contentManager = ManageContent(session)
+        interface = contentManager.getCorrectInterface(deleteProcesses.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in deleteProcesses")
+            return HttpResponse("Insufficient rights!", status=401)
+
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            interface.deleteProcess(processID)
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        return HttpResponse("Success")
+    
+    except Exception as e:
+        return e
 
 #######################################################
 @require_http_methods(["DELETE"])
@@ -582,21 +654,11 @@ def deleteProcesses(request, projectID):
     """
     try:
         processIDs = request.GET['processIDs'].split(",")
-
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteProcesses.__name__)
-        if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
-            return HttpResponse("Insufficient rights!", status=401)
-
-        for processID in processIDs:
-            if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
-                return HttpResponse("Insufficient rights!", status=401)
-            interface.deleteProcess(processID)
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        retVal = deleteProcessFunction(request.session, processIDs)
+        if isinstance(retVal, Exception):
+            raise retVal
+        return retVal
         
-        return HttpResponse("Success")
     except (Exception) as error:
         loggerError.error(f"deleteProcess: {str(error)}")
         return HttpResponse("Failed",status=500)
@@ -657,10 +719,13 @@ def getProject(request, projectID):
     """
     try:
         contentManager = ManageContent(request.session)
+        userID = contentManager.getClient()
+        adminOrNot = manualCheckifAdmin(request.session)
         # Is the project inside the session?
         project = {}
         if contentManager.sessionManagement.getIfContentIsInSession():
             project = contentManager.sessionManagement.getProject(projectID)
+            addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot) # calls current node of the state machine
         if len(project) > 0:
             return JsonResponse(project)
         else:
@@ -670,12 +735,15 @@ def getProject(request, projectID):
                 logger.error("Rights not sufficient in getProject")
                 return JsonResponse({}, status=401)
             
-            userID = contentManager.getClient()
             if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
-                return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+                project = pgProcesses.ProcessManagementBase.getProject(projectID)
+                addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
+                return JsonResponse(project)
             else:
                 if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-                    return JsonResponse(pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID))
+                    project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
+                    addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
+                    return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)
 
@@ -785,21 +853,22 @@ def getContractors(request, processID):
 
     :param request: GET request
     :type request: HTTP GET
+    :param processID: The ID of the process a contractor is chosen for
+    :type processID: str
     :return: List of contractors and some details
     :rtype: JSON
 
     """
     # TODO filter 
     try:
-        projectObj, processObj = getProcessAndProjectFromSession(request.session,processID)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface() # checks not needed for rights, was done in the decorators
+        processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
         if processObj == None:
-            processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
-            if processObj == None:
-                raise Exception("Process ID not found in session or db")
-            else: # db
-                serviceType = processObj.serviceType
-        else: # session
-            serviceType = processObj[ProcessDescription.serviceType]
+            raise Exception("Process ID not found in session or db")
+ 
+        serviceType = processObj.serviceType
+
 
         listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
         # TODO Check suitability
@@ -875,107 +944,165 @@ def saveProjects(request):
         return HttpResponse("Failed")
     
 #######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["PATCH"]) 
-@checkIfRightsAreSufficient(json=False)
-def verifyProject(request):
+@require_http_methods(["POST"]) # TODO, GET is only for debugging
+def statusButtonRequest(request):
     """
-    Start calculations on server and set status accordingly
-
+    Button was clicked, so the state must change (transition inside state machine)
+    
     :param request: PATCH Request
     :type request: HTTP PATCH
-    :return: Response if processes are started successfully
-    :rtype: HTTP Response
-
+    :return: Response with new buttons
+    :rtype: JSONResponse
     """
     try:
-        # get information
+        # get from info, create correct object, initialize statemachine, switch state accordingly
         info = json.loads(request.body.decode("utf-8"))
-        projectID = info["projectID"]
-        sendToContractorAfterVerification = info["send"]
-        processesIDArray = info["processIDs"]
-        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        projectID = info[InterfaceForStateChange.projectID]
+        processIDs = info[InterfaceForStateChange.processIDs]
+        buttonData = info[InterfaceForStateChange.buttonData]
+        if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
+            retVal = deleteProcessFunction(request.session, processIDs)
+            if isinstance(retVal, Exception):
+                raise retVal
+            return retVal
+        else:
+            nextState = buttonData[InterfaceForStateChange.targetStatus]
 
-        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-            return HttpResponse("Not allowed!", status=401)
+            contentManager = ManageContent(request.session)
+            interface = contentManager.getCorrectInterface(statusButtonRequest.__name__)
+            for processID in processIDs:
+                process = interface.getProcessObj(projectID, processID)
+                sm = StateMachine(initialAsInt=process.processStatus)
+                sm.onButtonEvent(nextState, interface, process)
+        # create new button json
+        # for every button
+        # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
+        # take status code and construct button from there
 
-        # first save projects
-        contentManager = ManageContent(request.session)
-        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
-            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-            if isinstance(error, Exception):
-                raise error
+        return JsonResponse({})
+    except Exception as e:
+        loggerError.error(f"statusButtonRequest: {str(e)}")
+        return JsonResponse({}, status=500)
 
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
-            
-            # then clear drafts from session
-            
-            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
+#######################################################
+@require_http_methods(["GET"])
+def getStateMachine(request):
+    """
+    Print out the whole state machine and all transitions
 
-        # TODO start services and set status to "verifying" instead of verified
-        #listOfCallIDsAndProcessesIDs = []
-        for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.VERIFIED, userID)
-            #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
-            #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
-
-        # start collecting process, 
-        #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
-
-        # TODO Websocket Event
-
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
-
-        if sendToContractorAfterVerification:
-            sendProject(request)
-
-        return HttpResponse("Success")
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response with graph in JSON Format
+    :rtype: JSONResponse
     
-    except (Exception) as error:
-        loggerError.error(f"verifyProject: {str(error)}")
-        return HttpResponse("Failed")
+    """
+    sm = StateMachine(initialAsInt=0)
+    paths = sm.showPaths()
+    return JsonResponse(paths)
+
     
 #######################################################
-@checkIfUserIsLoggedIn()
-@require_http_methods(["PATCH"]) 
-@checkIfRightsAreSufficient(json=False)
-def sendProject(request):
-    """
-    Retrieve Calculations and send process to contractor(s)
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["PATCH"]) 
+# @checkIfRightsAreSufficient(json=False)
+# def verifyProject(request):
+#     """
+#     Start calculations on server and set status accordingly
 
-    :param request: PATCH Request
-    :type request: HTTP PATCH
-    :return: Response if processes are started successfully
-    :rtype: HTTP Response
+#     :param request: PATCH Request
+#     :type request: HTTP PATCH
+#     :return: Response if processes are started successfully
+#     :rtype: HTTP Response
 
-    """
-    try:
-        info = json.loads(request.body.decode("utf-8"))
-        projectID = info["projectID"]
-        processesIDArray = info["processIDs"]
-        userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-        
-        if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-            return HttpResponse("Not allowed!", status=401)
-        
-        # TODO Check if process is verified
-        
-        for entry in processesIDArray:
-            pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, ProcessStatus.REQUESTED, userID)
-            pgProcesses.ProcessManagementBase.sendProcess(entry)
+#     """
+#     try:
+#         # get information
+#         info = json.loads(request.body.decode("utf-8"))
+#         projectID = info["projectID"]
+#         sendToContractorAfterVerification = info["send"]
+#         processesIDArray = info["processIDs"]
+#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
 
-        # TODO send local files to remote
+#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
+#             return HttpResponse("Not allowed!", status=401)
 
-        # websocket event
-        fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
+#         # first save projects
+#         contentManager = ManageContent(request.session)
+#         if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
+#             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+#             if isinstance(error, Exception):
+#                 raise error
 
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-        
-        return HttpResponse("Success")
+#             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+            
+#             # then clear drafts from session
+            
+#             contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
+
+#         # TODO start services and set status to "verifying" instead of verified
+#         #listOfCallIDsAndProcessesIDs = []
+#         for entry in processesIDArray:
+#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), userID)
+#             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
+#             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
+
+#         # start collecting process, 
+#         #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
+
+#         # TODO Websocket Event
+
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
+
+#         if sendToContractorAfterVerification:
+#             sendProject(request)
+
+#         return HttpResponse("Success")
     
-    except (Exception) as error:
-        loggerError.error(f"sendProject: {str(error)}")
-        return HttpResponse("Failed")
+#     except (Exception) as error:
+#         loggerError.error(f"verifyProject: {str(error)}")
+#         return HttpResponse("Failed")
+    
+# #######################################################
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["PATCH"]) 
+# @checkIfRightsAreSufficient(json=False)
+# def sendProject(request):
+#     """
+#     Retrieve Calculations and send process to contractor(s)
+
+#     :param request: PATCH Request
+#     :type request: HTTP PATCH
+#     :return: Response if processes are started successfully
+#     :rtype: HTTP Response
+
+#     """
+#     try:
+#         info = json.loads(request.body.decode("utf-8"))
+#         projectID = info["projectID"]
+#         processesIDArray = info["processIDs"]
+#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
+        
+#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
+#             return HttpResponse("Not allowed!", status=401)
+        
+#         # TODO Check if process is verified
+        
+#         for entry in processesIDArray:
+#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.REQUESTED), userID)
+#             pgProcesses.ProcessManagementBase.sendProcess(entry)
+
+#         # TODO send local files to remote
+
+#         # websocket event
+#         fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
+
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+        
+#         return HttpResponse("Success")
+    
+#     except (Exception) as error:
+#         loggerError.error(f"sendProject: {str(error)}")
+#         return HttpResponse("Failed")
 
 
 #######################################################
@@ -996,7 +1123,7 @@ def getProcessHistory(request, processID):
 
     """
     try:
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj(processID)
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
 
         if processObj == None:
             raise Exception("Process not found in DB!")
