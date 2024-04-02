@@ -11,13 +11,14 @@ from django.conf import settings
 
 from Generic_Backend.code_General.connections.mailer import MailingClass
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementBase, ProfileManagementOrganization, Organization
-from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails, ProfileClasses
+from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
 import code_SemperKI.handlers.projectAndProcessManagement as ProjectAndProcessManagement
 import code_SemperKI.utilities.locales as Locales
+import code_SemperKI.handlers.files as FileHandler
 
 from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails
 from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
@@ -102,7 +103,8 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     
     # send out mail & Websocket event 
     ProjectAndProcessManagement.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
-    sendEMail(userEMailAdress, f"{subject} '{processTitle}'", userOfThatProcess[UserDescription.name], locale, message)
+    sendEMail(userEMailAdress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
+
 ####################################################################
 @runInBackground
 def sendProcess(processObj:Process, contractorObj:Organization, session):
@@ -119,6 +121,11 @@ def sendProcess(processObj:Process, contractorObj:Organization, session):
     :rtype: None
 
     """
+    # Send files from local to remote
+    for fileKey in processObj.files:
+        FileHandler.moveFileToRemote(fileKey, fileKey)
+        processObj.files[fileKey][FileObjectContent.remote] = True
+
     # Send email to contractor (async)
     locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
     contractorEMailAdress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)

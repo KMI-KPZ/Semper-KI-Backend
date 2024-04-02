@@ -42,7 +42,6 @@ loggerError = logging.getLogger("errors")
 loggerInfo = logging.getLogger("info")
 loggerDebug = getLogger("django_debug")
 
-
 #######################################################
 @require_http_methods(["POST"])
 def uploadFiles(request):
@@ -59,6 +58,14 @@ def uploadFiles(request):
         projectID = info["projectID"]
         processID = info["processID"]
         # TODO: Licenses, ...
+
+        content = ManageContent(request.session)
+        interface = content.getCorrectInterface(uploadFiles.__name__)
+        if interface.checkIfFilesAreRemote(projectID, processID):
+            remote = True
+        else:
+            remote = False
+
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
@@ -71,10 +78,16 @@ def uploadFiles(request):
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
-            returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-            if returnVal is not True:
-                return HttpResponse("Failed", status=500)
+            if remote:
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = True
+                returnVal = s3.manageRemoteS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
+                if returnVal is not True:
+                    return HttpResponse("Failed", status=500)
+            else:
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
+                returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
+                if returnVal is not True:
+                    return HttpResponse("Failed", status=500)
         
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

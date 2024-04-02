@@ -48,6 +48,14 @@ def uploadModel(request):
         info = request.POST 
         projectID = info["projectID"]
         processID = info["processID"]
+
+        content = ManageContent(request.session)
+        interface = content.getCorrectInterface(uploadModel.__name__)
+        if interface.checkIfFilesAreRemote(projectID, processID):
+            remote = True
+        else:
+            remote = False
+
         fileTags = info[FileObjectContent.tags].split(",")
         fileLicenses = info[FileObjectContent.licenses].split(",")
         fileCertificates = info[FileObjectContent.certificates].split(",")
@@ -67,11 +75,16 @@ def uploadModel(request):
         model[fileID][FileObjectContent.URI] = ""
         model[fileID][FileObjectContent.createdBy] = userName
         model[fileID][FileObjectContent.path] = filePath
-        model[fileID][FileObjectContent.remote] = False
-
-        returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-        if returnVal is not True:
-            return JsonResponse({}, status=500)
+        if remote:
+            model[fileID][FileObjectContent.remote] = True
+            returnVal = s3.manageRemoteS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
+            if returnVal is not True:
+                return JsonResponse({}, status=500)
+        else:
+            model[fileID][FileObjectContent.remote] = False
+            returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
+            if returnVal is not True:
+                return JsonResponse({}, status=500)
         
         changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileID]}}}
 

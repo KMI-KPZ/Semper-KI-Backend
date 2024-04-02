@@ -792,6 +792,31 @@ class ProcessManagementBase(AbstractContentInterface):
         for entry in PObject.processes.all():
             outList.append(entry.toDict())
         return outList
+    
+    ##############################################
+    @staticmethod
+    def checkIfFilesAreRemote(projectID:str, processID:str) -> bool:
+        """
+        If at least one file is remote, say so to trigger upload to remote for new files as well
+
+        :param projectID: The ID of the project that the process is part of
+        :type projectID: str
+        :param processID: The ID of the process in question
+        :type processID: str
+        :return: True if remote, false if local
+        :rtype: bool
+        
+        """
+        try:
+            processObj = ProcessManagementBase.getProcessObj(projectID, processID)
+            for fileKey in processObj.files:
+                if processObj.files[fileKey][FileObjectContent.remote]:
+                    return True
+                
+            return False
+        except (Exception) as error:
+            logger.error(f'could not check if files are remote: {str(error)}')
+            return False
 
 ###############################################################################
     ##############################################
