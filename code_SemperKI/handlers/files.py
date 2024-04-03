@@ -29,9 +29,8 @@ from Generic_Backend.code_General.utilities.files import createFileResponse
 from Generic_Backend.code_General.definitions import FileObjectContent
 from Generic_Backend.code_General.connections import s3
 
-from .projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
-
-from ..connections.content.manageContent import ManageContent
+import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+import code_SemperKI.connections.content.manageContent as ManageC
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
 from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
@@ -59,7 +58,7 @@ def uploadFiles(request):
         processID = info["processID"]
         # TODO: Licenses, ...
 
-        content = ManageContent(request.session)
+        content = ManageC.ManageContent(request.session)
         interface = content.getCorrectInterface(uploadFiles.__name__)
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
@@ -90,7 +89,7 @@ def uploadFiles(request):
                     return HttpResponse("Failed", status=500)
         
         # Save into files field of the process
-        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        message, flag = PPManagement.updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return HttpResponse("Insufficient rights!", status=401)
         if isinstance(message, Exception):
@@ -122,7 +121,7 @@ def downloadFile(request, processID, fileID):
     try:
         # Retrieve the files info from either the session or the database
         fileOfThisProcess = {}
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
+        currentProjectID, currentProcess = PPManagement.getProcessAndProjectFromSession(request.session,processID)
         if currentProcess != None:
             if fileID in currentProcess[ProcessDescription.files]:
                 fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
@@ -176,7 +175,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     """
     try:
         # Retrieve the files info from either the session or the database
-        contentManager = ManageContent(request.session)
+        contentManager = ManageC.ManageContent(request.session)
         interface = contentManager.getCorrectInterface(downloadFile.__name__)
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
@@ -544,7 +543,7 @@ def deleteFile(request, projectID, processID, fileID):
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
         
         # TODO send deletion to service, should the deleted file be the model for example
-        message, flag = updateProcessFunction(request, deletions, projectID, [processID])
+        message, flag = PPManagement.updateProcessFunction(request, deletions, projectID, [processID])
         if flag is False:
             return HttpResponse("Not logged in", status=401)
         if isinstance(message, Exception):

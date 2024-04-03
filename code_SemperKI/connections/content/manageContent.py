@@ -12,7 +12,7 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ...utilities.basics import manualCheckIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
 from .session import ProcessManagementSession
-from .postgresql.pgProcesses import ProcessManagementBase
+import code_SemperKI.connections.content.postgresql.pgProcesses as PPManagement
 
 #######################################################
 class ManageContent():
@@ -25,7 +25,7 @@ class ManageContent():
     def __init__(self, session) -> None:
         self.currentSession = session
         self.sessionManagement = ProcessManagementSession(session)
-        self.postgresManagement = ProcessManagementBase(session)
+        self.postgresManagement = PPManagement.ProcessManagementBase(session)
 
     #######################################################
     def checkRightsForProject(self, projectID) -> bool:

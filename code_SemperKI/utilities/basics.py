@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 
 from Generic_Backend.code_General.definitions import SessionContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from ..connections.content.postgresql.pgProcesses import ProcessManagementBase
+import code_SemperKI.connections.content.postgresql.pgProcesses as PGProcesses
 
 #######################################################
 def manualCheckIfUserMaySeeProject(session, userID:str, projectID:str) -> bool:
@@ -30,7 +30,7 @@ def manualCheckIfUserMaySeeProject(session, userID:str, projectID:str) -> bool:
     """
     if session[SessionContent.usertype] == "admin":
         return True
-    users = ProcessManagementBase.getAllUsersOfProject(projectID)
+    users = PGProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
     if userID in users:
         return True
     
@@ -52,7 +52,7 @@ def manualCheckIfUserMaySeeProcess(session, userID:str, processID:str) -> bool:
     """
     if session[SessionContent.usertype] == "admin":
         return True
-    users = ProcessManagementBase.getAllUsersOfProcess(processID)
+    users = PGProcesses.ProcessManagementBase.getAllUsersOfProcess(processID)
     if userID in users:
         return True
     

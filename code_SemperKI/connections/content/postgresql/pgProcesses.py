@@ -32,7 +32,7 @@ import code_SemperKI.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....tasks.processTasks import verificationOfProcess, sendProcess
+from ....tasks.processTasks import verificationOfProcess, sendProcess, sendLocalFileToRemote
 
 import logging
 logger = logging.getLogger("errors")
@@ -1118,6 +1118,13 @@ class ProcessManagementBase(AbstractContentInterface):
             
             # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
             processObj.contractor = contractorObj
+
+            # Send files from local to remote
+            for fileKey in processObj.files:
+                pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
+                sendLocalFileToRemote(pathOnStorage)
+                processObj.files[fileKey][FileObjectContent.remote] = True
+
             processObj.save()
 
             # send the rest (e-mails and such) asyncronously
