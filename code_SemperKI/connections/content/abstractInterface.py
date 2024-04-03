@@ -222,3 +222,19 @@ class AbstractContentInterface(ABC):
         :rtype: str
         """
         pass
+
+    ##############################################
+    @abstractmethod
+    def checkIfFilesAreRemote(self, projectID:str, processID:str) -> bool:
+        """
+        If at least one file is remote, say so to trigger upload to remote for new files as well
+
+        :param projectID: The ID of the project that the process is part of
+        :type projectID: str
+        :param processID: The ID of the process in question
+        :type processID: str
+        :return: True if remote, false if local
+        :rtype: bool
+        
+        """
+        pass

@@ -32,7 +32,7 @@ import code_SemperKI.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....tasks.processTasks import verificationOfProcess, sendProcess
+from ....tasks.processTasks import verificationOfProcess, sendProcess, sendLocalFileToRemote
 
 import logging
 logger = logging.getLogger("errors")
@@ -792,6 +792,31 @@ class ProcessManagementBase(AbstractContentInterface):
         for entry in PObject.processes.all():
             outList.append(entry.toDict())
         return outList
+    
+    ##############################################
+    @staticmethod
+    def checkIfFilesAreRemote(projectID:str, processID:str) -> bool:
+        """
+        If at least one file is remote, say so to trigger upload to remote for new files as well
+
+        :param projectID: The ID of the project that the process is part of
+        :type projectID: str
+        :param processID: The ID of the process in question
+        :type processID: str
+        :return: True if remote, false if local
+        :rtype: bool
+        
+        """
+        try:
+            processObj = ProcessManagementBase.getProcessObj(projectID, processID)
+            for fileKey in processObj.files:
+                if processObj.files[fileKey][FileObjectContent.remote]:
+                    return True
+                
+            return False
+        except (Exception) as error:
+            logger.error(f'could not check if files are remote: {str(error)}')
+            return False
 
 ###############################################################################
     ##############################################
@@ -1093,6 +1118,13 @@ class ProcessManagementBase(AbstractContentInterface):
             
             # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
             processObj.contractor = contractorObj
+
+            # Send files from local to remote
+            for fileKey in processObj.files:
+                pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
+                sendLocalFileToRemote(pathOnStorage)
+                processObj.files[fileKey][FileObjectContent.remote] = True
+
             processObj.save()
 
             # send the rest (e-mails and such) asyncronously
