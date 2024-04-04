@@ -40,6 +40,7 @@ def checkPrintability(request):
     :return: ?
     :rtype: ?
 
+    TODO: OLD
     """
 
     model = None
@@ -80,6 +81,7 @@ def checkPrice(request):
     :return: JSON with prices for various stuff
     :rtype: Json Response
 
+    TODO: OLD
     """
     model = None
     selected = request.session["selected"]
@@ -118,6 +120,7 @@ def checkLogistics(request):
     :return: JSON with times for various stuff
     :rtype: Json Response
 
+    TODO: OLD
     """
     model = None
     selected = request.session["selected"]
@@ -140,6 +143,23 @@ def checkLogistics(request):
         summedUpLogistics += logistics
         request.session["selected"]["cart"][idx]["logistics"] = logistics
     return HttpResponse(summedUpLogistics)
+
+#######################################################
+def checkIfSelectionIsAvailable(processObj:pgProcesses.Process|pgProcesses.ProcessInterface):
+    """
+    Check if the selection really is available or not.
+    Currently a dummy
+
+    :param processObj: The process in question
+    :type processObj: Process or ProcessInterface
+    :return: True if everything is in order, False if something is missing
+    :rtype: bool
+    
+    """
+    serviceDetails = processObj.serviceDetails
+    processDetails = processObj.processDetails
+    # TODO
+    return True
 
 
 #######################################################

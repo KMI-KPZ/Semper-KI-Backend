@@ -8,6 +8,7 @@ Contains: Class which describes the service in particular
 import code_SemperKI.serviceManager as Semper
 
 from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady
+from .handlers.checkService import checkIfSelectionIsAvailable
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
@@ -40,5 +41,13 @@ class AdditiveManufacturing(Semper.ServiceBase):
         
         """
         return AM_serviceIsReady(existingContent)
+
+    ###################################################
+    def checkIfSelectionIsAvailable(self, processObj) -> bool:
+        """
+        Checks, if the selection of the service is available (material, ...)
+        
+        """
+        return checkIfSelectionIsAvailable(processObj)
 
 Semper.serviceManager.register("ADDITIVE_MANUFACTURING", 1, AdditiveManufacturing())

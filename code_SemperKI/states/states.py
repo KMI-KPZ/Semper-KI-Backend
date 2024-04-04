@@ -53,6 +53,30 @@ def addButtonsToProcess(projectObj, client=True, admin=False) -> None: #is chang
         processStatusAsString = processStatusFromIntToStr(process[ProcessDescription.processStatus])
         process["processStatusButtons"] = stateDict[processStatusAsString].buttons(client, admin)
 
+#######################################################
+def signalCompleteToDependentProcesses(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, processObj:ProcessModel.Process|ProcessModel.ProcessInterface) -> None:
+    """
+    If a state transitions to completed, signal all dependent processes, that this happened.
+
+    :param interface: The session or database interface
+    :type interface: ProcessManagementSession | ProcessManagementBase
+    :param processObj: The current process
+    :type processObj: Process | ProcessInterface
+    :return: Nothing
+    :rtype: None
+    
+    """
+    try:
+        for dependendProcess in processObj.dependenciesOut.all():
+            if processStatusFromIntToStr(dependendProcess.processStatus) == ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS:
+                currentStateMachine = StateMachine(initialAsInt=dependendProcess.processStatus)
+                currentStateMachine.onUpdateEvent(interface, dependendProcess)
+        
+        return
+    except Exception as error:
+        loggerError.error(f"Error when updating dependent processes: {error}")
+
+
 
 stateDict = {} # will later contain mapping from string to instance of every state
 ###############################################################################
@@ -101,10 +125,17 @@ class StateMachine(object):
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         target = transitionTypesArr[1].lstrip(" ")
+                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                    elif len(transitionTypesArr) > 2:
+                        source = transitionTypesArr[0].rstrip(" ")
+                        for entryIdx in range(1,len(transitionTypesArr)):
+                            target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
+                            outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                            edgeID += 1
                     else:
                         source = node
                         target = transitionTypesArr[0].rstrip(" ")
-                    outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
                 for transitionKey in stateDict[node].buttonTransitions:
                     transition = stateDict[node].buttonTransitions[transitionKey]
                     edgeID += 1
@@ -112,10 +143,17 @@ class StateMachine(object):
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         target = transitionTypesArr[1].lstrip(" ")
+                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                    elif len(transitionTypesArr) > 2:
+                        source = transitionTypesArr[0].rstrip(" ")
+                        for entryIdx in range(1,len(transitionTypesArr)):
+                            target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
+                            outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                            edgeID += 1
                     else:
                         source = node
                         target = transitionTypesArr[0].rstrip(" ")
-                    outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
 
             return outDict
         except Exception as e:
@@ -343,7 +381,7 @@ class DRAFT(State):
     def to_WAITING_FOR_OTHER_PROCESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           DRAFT | WAITING_FOR_OTHER_PROCESS:
         """
-        Check if other process is before this one
+        Check if other process exists before this one
 
         """
         for priorProcess in process.dependenciesIn.all():
@@ -440,11 +478,13 @@ class SERVICE_IN_PROGRESS(State):
         Service Conditions not OK
 
         """
-        # TODO
-        return self
+        if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
+            return self
+        else:
+            return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
     
     ###################################################
-    updateTransitions = [to_SERVICE_READY, to_SERVICE_COMPLICATION]
+    updateTransitions = [to_SERVICE_COMPLICATION, to_SERVICE_READY]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
@@ -529,8 +569,10 @@ class SERVICE_READY(State):
         Service Conditions not OK
 
         """
-        # TODO
-        return self
+        if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
+            return self
+        else:
+            return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
     
     ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -546,7 +588,7 @@ class SERVICE_READY(State):
         return stateDict[ProcessStatusAsString.DRAFT]
     
     ###################################################
-    updateTransitions = [to_CONTRACTOR_SELECTED, to_SERVICE_COMPLICATION]
+    updateTransitions = [to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
@@ -562,7 +604,6 @@ class WAITING_FOR_OTHER_PROCESS(State):
     """
     Waiting for other preceding Process
 
-    TODO
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
@@ -647,7 +688,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
 class SERVICE_COMPLICATION(State):
     """
     Service Complication happened
-    TODO
+
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
@@ -661,20 +702,6 @@ class SERVICE_COMPLICATION(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.DRAFT, # TODO change to previous state
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
                 "action": {
@@ -684,47 +711,57 @@ class SERVICE_COMPLICATION(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
-            }
+            },
+            {
+                "title": ButtonLabels.SERVICE_COMPLICATION,
+                "icon": IconType.TroubleshootIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            },
         ] 
     
     ###################################################
     # Transitions
     ###################################################
-    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DRAFT:
-        """
-        To: Draft
+    # def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    #       DRAFT:
+    #     """
+    #     To: Draft
         
-        """
-        serviceContent = process.serviceDetails
-        #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
-        return DRAFT()
+    #     """
+    #     serviceContent = process.serviceDetails
+    #     #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+    #     interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+    #     interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+    #     return stateDict[ProcessStatusAsString.DRAFT]
 
     ###################################################
     def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_COMPLICATION | SERVICE_IN_PROGRESS:
+          SERVICE_COMPLICATION | SERVICE_IN_PROGRESS | SERVICE_READY:
         """
         From: SERVICE_COMPLICATION
-        To: SERVICE_IN_PROGRESS
+        To: SERVICE_IN_PROGRESS | SERVICE_READY
 
         """
-        pass # TODO Implement or delete if not necessary
-
-    ###################################################
-    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_COMPLICATION | SERVICE_READY:
-        """
-        From: SERVICE_COMPLICATION
-        To: SERVICE_READY
-
-        """
-        pass # TODO Implement or delete if not necessary
+        if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
+            if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+                return stateDict[ProcessStatusAsString.SERVICE_READY]
+            else:
+                return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        else:
+            return self
     
     ###################################################
     updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1748,7 +1785,10 @@ class DELIVERY(State):
         To: COMPLETED
 
         """
-        # TODO: Send out signal to dependent processes
+        
+        # signal to dependent processes, that this one is finished
+        signalCompleteToDependentProcesses(interface, process)
+
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
@@ -1869,14 +1909,16 @@ class DISPUTE(State):
         To: COMPLETED
 
         """
-        # TODO: Send out signals
+        # signal to dependent processes, that this one is finished
+        signalCompleteToDependentProcesses(interface, process)
+
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
         self.sendMailToContractor(interface, process, userLocale, subject, message)
         return stateDict[ProcessStatusAsString.COMPLETED]
 
-     ###################################################
+    ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           DISPUTE | FAILED:
         """

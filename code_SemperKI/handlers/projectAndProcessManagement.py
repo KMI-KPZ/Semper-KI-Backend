@@ -316,6 +316,80 @@ def createProcessID(request, projectID):
     except (Exception) as error:
         loggerError.error(f"createProcessID: {str(error)}")
         return JsonResponse({}, status=500)
+    
+#######################################################
+def cloneProcess(projectID:str, processIDs:list[str]):
+    """
+    Duplicate selected processes. Works only for logged in users.
+
+    :param projectID: The project ID of the project the processes belonged to
+    :type projectID: str
+    :param processIDs: List of processes to be cloned
+    :type processIDs: list of strings
+    :return: Nothing
+    :rtype: None
+    
+    """
+    try:
+        # create new project with old information
+        oldProject = pgProcesses.ProcessManagementBase.getProjectObj(projectID)
+        newProjectID = crypto.generateURLFriendlyRandomString()
+        errorOrNone = pgProcesses.ProcessManagementBase.createProject(newProjectID, oldProject.client)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, oldProject.projectDetails)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        
+        # for every old process, create new process with old information
+        for processID in processIDs:
+            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(projectID, processID) 
+            newProcessID = crypto.generateURLFriendlyRandomString()
+            errorOrNone = pgProcesses.ProcessManagementBase.createProcess(newProjectID, newProcessID, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
+            del oldProcessDetails[ProcessDetails.provisionalContractor]
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # copy files but with new fileID
+            newFileDict = {}
+            for fileKey in oldProcess.files:
+                oldFile = oldProcess.files[fileKey]
+                newFile = copy.deepcopy(oldFile)
+                newFileID = crypto.generateURLFriendlyRandomString()
+                newFile[FileObjectContent.id] = newFileID
+                newFilePath = newProcessID+"/"+newFileID
+                newFile[FileObjectContent.path] = newFilePath
+                newFile[FileObjectContent.date] = str(timezone.now())
+                if oldFile[FileObjectContent.remote]:
+                    s3.manageRemoteS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                else:
+                    s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                newFileDict[newFileID] = newFile
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.files, newFileDict, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # set service specific stuff
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceType, oldProcess.serviceType, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceDetails, oldProcess.serviceDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            # TODO set model -> implementation in service (clone service)
+
+            
+
+
+        
+
+    except Exception as error:
+        loggerError.error(f"Error when cloning processes: {error}")
 
 # #######################################################
 # def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):

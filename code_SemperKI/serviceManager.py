@@ -21,7 +21,14 @@ class ServiceBase(ABC):
     ##############################################################
     # Handlers
 
-
+    ###################################################
+    @abstractmethod
+    def checkIfSelectionIsAvailable(self, processObj) -> bool:
+        """
+        Checks, if the selection of the service is available (material, ...)
+        
+        """
+        pass
 
     ##############################################################
     # Connections
@@ -51,6 +58,7 @@ class ServiceBase(ABC):
         Check if a service has been defined completely
 
         """
+        pass
 
 ######################################################
 class _ServicesManager():
