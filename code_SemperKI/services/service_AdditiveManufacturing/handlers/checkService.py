@@ -222,7 +222,7 @@ def checkModel(request, projectID, processID) -> JsonResponse:
         if settings.IWS_ENDPOINT is None:
             return JsonResponse(mock)
 
-        fileContent, flag = getFileReadableStream(request, processID, model[FileObjectContent.id])
+        fileContent, flag = getFileReadableStream(request, projectID, processID, model[FileObjectContent.id])
         if flag:
             resultData = getBoundaryData(fileContent, modelName)
         else:

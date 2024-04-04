@@ -7,6 +7,7 @@ Contains: File upload handling
 """
 import base64
 import logging, zipfile
+import os
 from logging import getLogger
 from io import BytesIO
 from datetime import datetime
@@ -372,12 +373,18 @@ def downloadFileStream(request, projectID, processID, fileID):
 
     """
     try:
+        fileMetaData, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        if flag is False:
+            return fileMetaData
+
         encryptionAdapter, flag = getFileReadableStream(request, projectID, processID, fileID)
         if flag is False:
             return HttpResponse("Failed", status=500)
 
-        # encryptionAdapter.setDebugLogger(loggerDebug)
-        return FileResponse(encryptionAdapter, as_attachment=True)
+        if os.getenv("DJANGO_LOG_LEVEL", None) == "DEBUG":
+            encryptionAdapter.setDebugLogger(loggerDebug)
+
+        return createFileResponse(encryptionAdapter, filename=fileMetaData[FileObjectContent.fileName])
 
     except (Exception) as error:
         loggerError.error(f"Error while downloading file: {str(error)}")
