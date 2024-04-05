@@ -112,7 +112,8 @@
             "createProcessID",
             "createProjectID",
             "statusButtonRequest",
-            "checkModel"
+            "checkModel",
+            "cloneProcess"
          ]
       },
       {

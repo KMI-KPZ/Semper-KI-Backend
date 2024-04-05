@@ -592,19 +592,29 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.serviceType: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: ""})
                       
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy, {ProcessUpdates.serviceStatus: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy, {ProcessUpdates.serviceDetails: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
+
+            elif updateType == ProcessUpdates.dependenciesIn:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesIn.add(connectedProcess)
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesIn: content})
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesOut.add(connectedProcess)
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
 
             currentProcess.save()
             return True
@@ -660,19 +670,29 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DETAILS, "content": ProcessUpdates.serviceDetails})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceDetails})
 
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = 0 #TODO
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.serviceStatus})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceStatus})
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = serviceManager.getNone()
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.serviceType})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+
+            elif updateType == ProcessUpdates.dependenciesIn:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesIn.remove(connectedProcess)
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesIn})
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesOut.remove(connectedProcess)
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
 
             currentProcess.save()
             return True
@@ -710,6 +730,9 @@ class ProcessManagementBase(AbstractContentInterface):
             messages = template[ProcessDescription.messages]
             client = clientID
             processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, files=files, messages=messages, updatedWhen=timezone.now())
+            
+            # TODO create dependencies
+            
             return None
         except (Exception) as error:
             logger.error(f'could not add process template to project: {str(error)}')
@@ -919,6 +942,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
                     ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
+
+                    # TODO create dependencies
 
                     # generate entries in data
                     for elem in process[ProcessDescription.files]:

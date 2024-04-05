@@ -60,6 +60,22 @@ class ServiceBase(ABC):
         """
         pass
 
+    ####################################################################################
+    @abstractmethod
+    def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
+        """
+        Clone content of the service
+
+        :param existingContent: What the process currently holds about the service
+        :type existingContent: dict
+        :param newProcess: The new process as object
+        :type newProcess: Process|ProcessInterface
+        :return: The copy of the service details
+        :rtype: dict
+        
+        """
+        pass
+
 ######################################################
 class _ServicesManager():
     """

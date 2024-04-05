@@ -7,13 +7,14 @@ Contains: Functions specific for 3D printing service that access the database di
 """
 
 from Generic_Backend.code_General.definitions import FileObjectContent
+from code_SemperKI.modelFiles.processModel import Process, ProcessInterface
 
 from ...definitions import ServiceDetails
 import logging
 logger = logging.getLogger("errors")
 
 ####################################################################################
-def updateServiceDetails(existingContent, newContent):
+def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
     """
     Update the content of the current service in the process
 
@@ -44,7 +45,7 @@ def updateServiceDetails(existingContent, newContent):
     return existingContent
 
 ####################################################################################
-def deleteServiceDetails(existingContent, deletedContent):
+def deleteServiceDetails(existingContent, deletedContent) -> dict:
     """
     Delete stuff from the service
 
@@ -76,7 +77,7 @@ def deleteServiceDetails(existingContent, deletedContent):
     return existingContent
 
 ####################################################################################
-def serviceReady(existingContent) -> bool:
+def serviceReady(existingContent:dict) -> bool:
     """
     Check if everything is there
 
@@ -102,3 +103,39 @@ def serviceReady(existingContent) -> bool:
     except (Exception) as error:
         logger.error(f'Generic error in serviceReady(3D Print): {str(error)}')
         return False
+    
+####################################################################################
+def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterface) -> dict:
+    """
+    Clone content of the service
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: dict
+    :param newProcess: The new process as object
+    :type newProcess: Process|ProcessInterface
+    :return: The copy of the service details
+    :rtype: dict
+    
+    """
+    try:
+        outDict = {}
+
+        # create new model file but with the content of the old one (except path and such)
+        outDict[ServiceDetails.model] = {}
+        oldModel = existingContent[ServiceDetails.model]
+        for fileKey in newProcess.files:
+            if fileKey == oldModel[FileObjectContent.id]:
+                outDict[ServiceDetails.model] = newProcess.files[fileKey]
+                break
+        
+        # the rest can just be copied over
+        outDict[ServiceDetails.material] = existingContent[ServiceDetails.material]
+        outDict[ServiceDetails.calculations] = existingContent[ServiceDetails.calculations]
+        outDict[ServiceDetails.postProcessings] = existingContent[ServiceDetails.postProcessings]
+    
+    except Exception as error:
+        logger.error(f'Generic error in cloneServiceDetails(3D Print): {str(error)}')
+    
+    return outDict
+
+    

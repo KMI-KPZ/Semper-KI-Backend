@@ -448,17 +448,7 @@ class SERVICE_IN_PROGRESS(State):
     
     ###################################################
     # Transitions
-    ###################################################
-    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_IN_PROGRESS | SERVICE_READY:
-        """
-        Check if service has been fully defined
 
-        """
-        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
-            return stateDict[ProcessStatusAsString.SERVICE_READY]
-        return self
-    
     ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         DRAFT:
@@ -472,6 +462,17 @@ class SERVICE_IN_PROGRESS(State):
         return stateDict[ProcessStatusAsString.DRAFT]
 
     ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_READY:
+        """
+        Check if service has been fully defined
+
+        """
+        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_READY]
+        return self
+    
+    ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
         """
@@ -484,7 +485,20 @@ class SERVICE_IN_PROGRESS(State):
             return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
     
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION, to_SERVICE_READY]
+    def to_WAITING_FOR_OTHER_PROCESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DRAFT | WAITING_FOR_OTHER_PROCESS:
+        """
+        Check if other process exists before this one
+
+        """
+        for priorProcess in process.dependenciesIn.all():
+            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS] # there are processes that this one depends on and they're not finished (yet)
+        return self # either all prior processes have been completed or there are none
+        
+
+    ###################################################
+    updateTransitions = [to_WAITING_FOR_OTHER_PROCESS, to_SERVICE_COMPLICATION, to_SERVICE_READY]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
 
     ###################################################
@@ -646,6 +660,17 @@ class WAITING_FOR_OTHER_PROCESS(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_READY:
+        """
+        Check if service has been fully defined
+
+        """
+        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_READY]
+        return self
+
+    ###################################################
     def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           WAITING_FOR_OTHER_PROCESS | SERVICE_IN_PROGRESS:
         """
@@ -673,7 +698,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         return stateDict[ProcessStatusAsString.DRAFT]
 
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS]
+    updateTransitions = [to_SERVICE_READY, to_SERVICE_IN_PROGRESS]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
     
     ###################################################
@@ -1956,38 +1981,42 @@ class COMPLETED(State):
     ###################################################
     def buttons(self, client=True, admin=False) -> list:
         """
-        No Buttons 
+        Delete and clone (client only)
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
+        if client or admin:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.CLONE,
+                    "icon": IconType.ReplayIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "cloneProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ] 
+        else:
+            return []
     
     ###################################################
     # Transitions
-    ###################################################
-    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          COMPLETED | SERVICE_COMPLICATION:
-        """
-        From: COMPLETED
-        To: SERVICE_COMPLICATION
-
-        """
-        # TODO
-        return self
 
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION]
+    updateTransitions = []
     buttonTransitions = {}
 
     ###################################################
@@ -2010,38 +2039,42 @@ class FAILED(State):
     ###################################################
     def buttons(self, client=True, admin=False) -> list:
         """
-        No Buttons 
+        Delete and clone (client only)
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
+        if client or admin:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.CLONE,
+                    "icon": IconType.ReplayIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "cloneProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ] 
+        else:
+            return []
     
     ###################################################
     # Transitions
-    ###################################################
-    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          FAILED | SERVICE_COMPLICATION:
-        """
-        From: FAILED
-        To: SERVICE_COMPLICATION
-
-        """
-        # TODO
-        return self
 
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION]
+    updateTransitions = []
     buttonTransitions = {}
 
     ###################################################
@@ -2064,38 +2097,42 @@ class CANCELED(State):
     ###################################################
     def buttons(self, client=True, admin=False) -> list:
         """
-        No Buttons 
+        Delete and clone (client only)
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
+        if client or admin:
+            return [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+                {
+                    "title": ButtonLabels.CLONE,
+                    "icon": IconType.ReplayIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "cloneProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                }
+            ] 
+        else:
+            return []
     
     ###################################################
     # Transitions
-    ###################################################
-    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CANCELED | SERVICE_COMPLICATION:
-        """
-        From: CANCELED
-        To: SERVICE_COMPLICATION
-
-        """
-        # TODO
-        return self
 
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION]
+    updateTransitions = []
     buttonTransitions = {}
 
     ###################################################

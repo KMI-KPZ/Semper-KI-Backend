@@ -7,8 +7,8 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails, serviceReady as CM_serviceReady
-from .handlers.checkService import checkIfSelectionIsAvailable
+from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails, serviceReady as CM_serviceReady, cloneServiceDetails as CM_cloneServiceDetails
+from .handlers.checkService import checkIfSelectionIsAvailable as CM_checkIfSelectionIsAvailable
 
 ###################################################
 class CreateModel(Semper.ServiceBase):
@@ -52,6 +52,21 @@ class CreateModel(Semper.ServiceBase):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        return checkIfSelectionIsAvailable(processObj)
+        return CM_checkIfSelectionIsAvailable(processObj)
+    
+    ####################################################################################
+    def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
+        """
+        Clone content of the service
+
+        :param existingContent: What the process currently holds about the service
+        :type existingContent: dict
+        :param newProcess: The new process as object
+        :type newProcess: Process|ProcessInterface
+        :return: The copy of the service details
+        :rtype: dict
+        
+        """
+        return CM_cloneServiceDetails(existingContent, newProcess)
 
 Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())

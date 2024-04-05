@@ -180,6 +180,7 @@ class ButtonLabels(StrEnumExactylAsDefined):
     SERVICE_IN_PROGRESS = enum.auto()
     FAILED = enum.auto() #TODO not in frontend currently
     NONE = enum.auto()
+    CLONE = enum.auto() # TODO not in frontend currently
 
 #######################################################
 class ButtonTypes(StrEnumExactylAsDefined):

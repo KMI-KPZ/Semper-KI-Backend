@@ -438,7 +438,16 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             content = self.structuredSessionObj.getProcess(projectID, processID)
             returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
-            returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
+            
+            # dependencies are saved as list of processIDs 
+            if ProcessDescription.dependenciesIn in content:
+                dependenciesIn = content[ProcessDescription.dependenciesIn]
+                dependenciesOut = content[ProcessDescription.dependenciesOut]
+            else:
+                dependenciesIn = []
+                dependenciesOut = []
+            
+            returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], dependenciesIn, dependenciesOut, content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
             return returnObj
         except (Exception) as error:
             logger.error(f"Could not fetch process: {str(error)}")
@@ -540,8 +549,21 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
+            
+            elif updateType == ProcessUpdates.dependenciesIn:
+                if ProcessDescription.dependenciesIn in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesIn].append(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesIn] = [content]
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                if ProcessDescription.dependenciesOut in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesOut].append(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesOut] = [content]
+            
             else:
-                raise Exception("updateProcess delete " + updateType + " not implemented")
+                raise Exception("updateProcess " + updateType + " not implemented")
             
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
 
@@ -549,7 +571,7 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
             return error
-
+        
     ##############################################
     def deleteFromProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
         """
@@ -606,6 +628,18 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType == ProcessUpdates.provisionalContractor:
                 del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
             
+            elif updateType == ProcessUpdates.dependenciesIn:
+                if ProcessDescription.dependenciesIn in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesIn].remove(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesIn] = []
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                if ProcessDescription.dependenciesOut in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesOut].remove(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesOut] = []
+
             else:
                 raise Exception("updateProcess delete " + updateType + " not implemented")
 
