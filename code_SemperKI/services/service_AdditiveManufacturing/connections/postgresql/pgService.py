@@ -61,7 +61,8 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
         for entry in deletedContent:
             if entry == ServiceDetails.model:
                 del existingContent[ServiceDetails.model]
-                del existingContent[ServiceDetails.calculations] # invalidate calculations since the model doesn't exist anymore
+                if ServiceDetails.calculations in existingContent:
+                    del existingContent[ServiceDetails.calculations] # invalidate calculations since the model doesn't exist anymore
             elif entry == ServiceDetails.material:
                 del existingContent[ServiceDetails.material]
             elif entry == ServiceDetails.postProcessings:

@@ -126,11 +126,11 @@ def deleteModel(request, projectID, processID):
             return HttpResponse("Not logged in or rights insufficient!", status=401)
         currentProcess = interface.getProcessObj(projectID, processID)
         modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
-        if modelOfThisProcess[FileObjectContent.id] in currentProcess[ProcessDescription.files]:
+        if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
             modelExistsAsFile = True
             
         if modelExistsAsFile:
-            deleteFile(request, processID, modelOfThisProcess[FileObjectContent.id])
+            deleteFile(request, projectID, processID, modelOfThisProcess[FileObjectContent.id])
         
         changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.model: modelOfThisProcess[FileObjectContent.id]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

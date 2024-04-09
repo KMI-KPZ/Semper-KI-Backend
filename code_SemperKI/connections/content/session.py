@@ -454,6 +454,26 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     #######################################################
+    def getProcessStatus(self, projectID:str, processID:str):
+        """
+        Return the process and all its details
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Process Object
+        :rtype: ProcessInterface
+
+        """
+        try:
+            content = self.structuredSessionObj.getProcess(projectID, processID)
+            return content[ProcessDescription.processStatus]
+        except (Exception) as error:
+            logger.error(f"Could not fetch process status: {str(error)}")
+            return 0
+
+    #######################################################
     def createProcess(self, projectID:str, processID:str, client:str):
         """
         Create the process
@@ -552,16 +572,32 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.dependenciesIn:
                 if ProcessDescription.dependenciesIn in currentProcess:
-                    currentProcess[ProcessDescription.dependenciesIn].append(content)
+                    if content not in currentProcess[ProcessDescription.dependenciesIn]:
+                        currentProcess[ProcessDescription.dependenciesIn].append(content)
                 else:
                     currentProcess[ProcessDescription.dependenciesIn] = [content]
+                
+                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
+                if ProcessDescription.dependenciesOut in dependentProcess:
+                    if processID not in dependentProcess[ProcessDescription.dependenciesOut]:
+                        dependentProcess[ProcessDescription.dependenciesOut].append(processID)
+                else:
+                    dependentProcess[ProcessDescription.dependenciesOut] = [processID]
 
             elif updateType == ProcessUpdates.dependenciesOut:
                 if ProcessDescription.dependenciesOut in currentProcess:
-                    currentProcess[ProcessDescription.dependenciesOut].append(content)
+                    if content not in currentProcess[ProcessDescription.dependenciesOut]:
+                        currentProcess[ProcessDescription.dependenciesOut].append(content)
                 else:
                     currentProcess[ProcessDescription.dependenciesOut] = [content]
-            
+                
+                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
+                if ProcessDescription.dependenciesIn in dependentProcess:
+                    if processID not in dependentProcess[ProcessDescription.dependenciesIn]:
+                        dependentProcess[ProcessDescription.dependenciesIn].append(processID)
+                else:
+                    dependentProcess[ProcessDescription.dependenciesIn] = [processID]
+
             else:
                 raise Exception("updateProcess " + updateType + " not implemented")
             

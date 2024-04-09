@@ -6,7 +6,7 @@ Silvio Weging 2023
 
 Contains: Model for processes
 """
-import json, enum
+import json, enum, copy
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -110,7 +110,7 @@ class Process(models.Model):
                 ProcessDescription.serviceStatus: self.serviceStatus,
                 ProcessDescription.processDetails: self.processDetails,
                 ProcessDescription.dependenciesIn: [ process.processID for process in self.dependenciesIn.all()],
-                ProcessDescription.dependenciesOut: [ process.processID for process in self.dependenciesIn.all()],
+                ProcessDescription.dependenciesOut: [ process.processID for process in self.dependenciesOut.all()],
                 ProcessDescription.client: self.client,
                 ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
                 ProcessDescription.files: self.files,
@@ -129,7 +129,7 @@ class ManyToManySimulation():
     
     ###################################################
     def initialize(self, dependencies:list[str]) -> None:
-        self._arrayOfProcesses = dependencies
+        self._arrayOfProcesses = copy.deepcopy(dependencies)
 
     ###################################################
     def add(self, pi:ProcessInterface):
@@ -236,7 +236,7 @@ class ProcessInterface():
                 ProcessDescription.serviceStatus: self.serviceStatus,
                 ProcessDescription.processDetails: self.processDetails,
                 ProcessDescription.dependenciesIn: self.dependenciesIn.all(),
-                ProcessDescription.dependenciesOut: self.dependenciesIn.all(),
+                ProcessDescription.dependenciesOut: self.dependenciesOut.all(),
                 ProcessDescription.client: self.client,
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,

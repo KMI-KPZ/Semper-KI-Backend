@@ -76,6 +76,34 @@ def signalCompleteToDependentProcesses(interface:SessionInterface.ProcessManagem
     except Exception as error:
         loggerError.error(f"Error when updating dependent processes: {error}")
 
+#######################################################
+def signalDependencyToOtherProcesses(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, processObj:ProcessModel.Process|ProcessModel.ProcessInterface) -> None:
+    """
+    If a process adds a dependency, signal all dependent processes, that this happened.
+
+    :param interface: The session or database interface
+    :type interface: ProcessManagementSession | ProcessManagementBase
+    :param processObj: The current process
+    :type processObj: Process | ProcessInterface
+    :return: Nothing
+    :rtype: None
+    
+    """
+    try:
+        if isinstance(interface, SessionInterface.ProcessManagementSession):
+            for dependendProcessID in processObj.dependenciesOut.all():
+                dependendProcess = interface.getProcessObj(processObj.project.projectID, dependendProcessID)
+                currentStateMachine = StateMachine(initialAsInt=dependendProcess.processStatus)
+                currentStateMachine.onUpdateEvent(interface, dependendProcess)
+        else:
+            for dependendProcess in processObj.dependenciesOut.all():
+                currentStateMachine = StateMachine(initialAsInt=dependendProcess.processStatus)
+                currentStateMachine.onUpdateEvent(interface, dependendProcess)
+            
+        return
+    except Exception as error:
+        loggerError.error(f"Error when updating dependent processes: {error}")
+
 
 
 stateDict = {} # will later contain mapping from string to instance of every state
@@ -384,11 +412,17 @@ class DRAFT(State):
         Check if other process exists before this one
 
         """
-        for priorProcess in process.dependenciesIn.all():
-            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS] # there are processes that this one depends on and they're not finished (yet)
+        if isinstance(interface, SessionInterface.ProcessManagementSession): # inside the session, only ids are saved
+            for priorProcessID in process.dependenciesIn.all():
+                dependendProcess = interface.getProcessObj(process.project.projectID, priorProcessID)
+                if dependendProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS] # there are processes that this one depends on and they're not finished (yet)
+
+        else:
+            for priorProcess in process.dependenciesIn.all():
+                if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS]
         return self # either all prior processes have been completed or there are none
-        
 
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
@@ -468,7 +502,7 @@ class SERVICE_IN_PROGRESS(State):
         Check if service has been fully defined
 
         """
-        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
             return stateDict[ProcessStatusAsString.SERVICE_READY]
         return self
     
@@ -491,11 +525,18 @@ class SERVICE_IN_PROGRESS(State):
         Check if other process exists before this one
 
         """
-        for priorProcess in process.dependenciesIn.all():
-            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS] # there are processes that this one depends on and they're not finished (yet)
+        if isinstance(interface, SessionInterface.ProcessManagementSession): # inside the session, only ids are saved
+            for priorProcessID in process.dependenciesIn.all():
+                dependendProcess = interface.getProcessObj(process.project.projectID, priorProcessID)
+                if dependendProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS] # there are processes that this one depends on and they're not finished (yet)
+
+        else:
+            for priorProcess in process.dependenciesIn.all():
+                if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return stateDict[ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS]
         return self # either all prior processes have been completed or there are none
-        
+            
 
     ###################################################
     updateTransitions = [to_WAITING_FOR_OTHER_PROCESS, to_SERVICE_COMPLICATION, to_SERVICE_READY]
@@ -661,12 +702,22 @@ class WAITING_FOR_OTHER_PROCESS(State):
     # Transitions
     ###################################################
     def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_IN_PROGRESS | SERVICE_READY:
+          WAITING_FOR_OTHER_PROCESS | SERVICE_READY:
         """
         Check if service has been fully defined
 
         """
-        if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if isinstance(interface, SessionInterface.ProcessManagementSession): # inside the session, only ids are saved
+            for priorProcessID in process.dependenciesIn.all():
+                dependendProcess = interface.getProcessObj(process.project.projectID, priorProcessID)
+                if dependendProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self # there are processes that this one depends on and they're not finished (yet)
+        else:
+            for priorProcess in process.dependenciesIn.all():
+                if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self
+
+        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
             return stateDict[ProcessStatusAsString.SERVICE_READY]
         return self
 
@@ -679,13 +730,43 @@ class WAITING_FOR_OTHER_PROCESS(State):
 
         Must be triggered from the outside, for example when a process is finished, it signals all outgoing dependend processes of this
         """
-        for priorProcess in process.dependenciesIn.all():
-            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                return self # there are processes that this one depends on and they're not finished (yet)
-        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS] # all prior processes have been completed
-
+        if isinstance(interface, SessionInterface.ProcessManagementSession): # inside the session, only ids are saved
+            for priorProcessID in process.dependenciesIn.all():
+                dependendProcess = interface.getProcessObj(process.project.projectID, priorProcessID)
+                if dependendProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self # there are processes that this one depends on and they're not finished (yet)
+        else:
+            for priorProcess in process.dependenciesIn.all():
+                if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self
+        
+        if process.serviceType != ServiceManager.serviceManager.getNone():
+            return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS] 
+        return self
+    
     ###################################################
     def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          WAITING_FOR_OTHER_PROCESS | DRAFT:
+        """
+        If no service was selected, return to draft after dependency was fulfilled
+
+        """
+        if isinstance(interface, SessionInterface.ProcessManagementSession): # inside the session, only ids are saved
+            for priorProcessID in process.dependenciesIn.all():
+                dependendProcess = interface.getProcessObj(process.project.projectID, priorProcessID)
+                if dependendProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self # there are processes that this one depends on and they're not finished (yet)
+        else:
+            for priorProcess in process.dependenciesIn.all():
+                if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                    return self
+        
+        if process.serviceType == ServiceManager.serviceManager.getNone():
+            return stateDict[ProcessStatusAsString.DRAFT]
+        return self
+
+    ###################################################
+    def to_DRAFT_viaButton(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           DRAFT:
         """
         To: DRAFT
@@ -698,8 +779,8 @@ class WAITING_FOR_OTHER_PROCESS(State):
         return stateDict[ProcessStatusAsString.DRAFT]
 
     ###################################################
-    updateTransitions = [to_SERVICE_READY, to_SERVICE_IN_PROGRESS]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+    updateTransitions = [to_SERVICE_READY, to_SERVICE_IN_PROGRESS, to_DRAFT]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT_viaButton}
     
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -777,7 +858,7 @@ class SERVICE_COMPLICATION(State):
 
         """
         if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
-            if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
                 return stateDict[ProcessStatusAsString.SERVICE_READY]
             else:
                 return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]

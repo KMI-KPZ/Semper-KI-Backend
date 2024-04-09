@@ -25,7 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, addButtonsToProcess, InterfaceForStateChange
+from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, addButtonsToProcess, InterfaceForStateChange, signalDependencyToOtherProcesses
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -51,20 +51,22 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="")
     :return: Nothing
     :rtype: None
     """
- 
-    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
-    channel_layer = get_channel_layer()
-    for userID in dictForEvents: # user/orga that is associated with that process
-        values = dictForEvents[userID] # message, formatted for frontend
-        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-        if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
-            userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-            for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
-                if operation=="" or operation in permission:
-                    async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                        "type": "sendMessageJSON",
-                        "dict": values,
-                    })
+    if manualCheckifLoggedIn(session):
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
+        channel_layer = get_channel_layer()
+        for userID in dictForEvents: # user/orga that is associated with that process
+            values = dictForEvents[userID] # message, formatted for frontend
+            subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+            if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
+                userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+                    if operation=="" or operation in permission:
+                        async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                            "type": "sendMessageJSON",
+                            "dict": values,
+                        })
+    else: # not logged in therefore no websockets to fire
+        return
 
 #######################################################
 def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
@@ -85,7 +87,7 @@ def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
     :return: Nothing
     :rtype: None
     """
- 
+
     dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
     channel_layer = get_channel_layer()
     for userID in dictForEvents: # user/orga that is associated with that process
@@ -649,6 +651,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             process = interface.getProcessObj(projectID, processID)
             currentState = StateMachine(initialAsInt=process.processStatus)
             currentState.onUpdateEvent(interface, process)
+            signalDependencyToOtherProcesses(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 

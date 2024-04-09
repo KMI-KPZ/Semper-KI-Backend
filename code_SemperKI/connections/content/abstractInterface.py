@@ -154,6 +154,22 @@ class AbstractContentInterface(ABC):
         """
         pass
 
+    ####################################################
+    @abstractmethod
+    def getProcessStatus(self, projectID:str, processID:str):
+        """
+        Return the process status and all its details
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Process status
+        :rtype: Int
+
+        """
+        pass
+
     ###################################################
     @abstractmethod
     def deleteProcess(self, processID:str, processObj=None):
