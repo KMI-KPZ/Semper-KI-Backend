@@ -123,16 +123,20 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
 
         # create new model file but with the content of the old one (except path and such)
         outDict[ServiceDetails.model] = {}
-        oldModel = existingContent[ServiceDetails.model]
-        for fileKey in newProcess.files:
-            if fileKey == oldModel[FileObjectContent.id]:
-                outDict[ServiceDetails.model] = newProcess.files[fileKey]
-                break
+        if ServiceDetails.model in existingContent:
+            oldModel = existingContent[ServiceDetails.model]
+            for fileKey in newProcess.files:
+                if fileKey == oldModel[FileObjectContent.id]:
+                    outDict[ServiceDetails.model] = newProcess.files[fileKey]
+                    break
         
         # the rest can just be copied over
-        outDict[ServiceDetails.material] = existingContent[ServiceDetails.material]
-        outDict[ServiceDetails.calculations] = existingContent[ServiceDetails.calculations]
-        outDict[ServiceDetails.postProcessings] = existingContent[ServiceDetails.postProcessings]
+        if ServiceDetails.material in existingContent:
+            outDict[ServiceDetails.material] = existingContent[ServiceDetails.material]
+        if ServiceDetails.calculations in existingContent:
+            outDict[ServiceDetails.calculations] = existingContent[ServiceDetails.calculations]
+        if ServiceDetails.postProcessings in existingContent:
+            outDict[ServiceDetails.postProcessings] = existingContent[ServiceDetails.postProcessings]
     
     except Exception as error:
         logger.error(f'Generic error in cloneServiceDetails(3D Print): {str(error)}')

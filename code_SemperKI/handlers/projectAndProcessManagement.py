@@ -376,7 +376,7 @@ def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
                 newFile[FileObjectContent.path] = newFilePath
                 newFile[FileObjectContent.date] = str(timezone.now())
                 if oldFile[FileObjectContent.remote]:
-                    s3.manageRemoteS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                    s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
                 else:
                     s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
                 newFileDict[fileKey] = newFile
