@@ -277,27 +277,35 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
-    def getProcessStatus(projectID, processID):
+    def getProcessDependencies(projectID:str, processID:str) -> tuple[list[Process],list[Process]]:
         """
-        Get status of a process.
+        Return the process dependencies 
 
-        :param projectID: The ID of the project, not used here
+        :param projectID: The ID of the project
         :type projectID: str
-        :param processID: process ID for a process
+        :param processID: The ID of the process
         :type processID: str
-        :return: Requested process status
-        :rtype: Int
+        :return: Incoming and outgoing dependencies
+        :rtype: tuple[list,list]
 
         """
         try:
             currentProcess = Process.objects.get(processID=processID)
-            return currentProcess.processStatus
+            dependenciesIn = []
+            dependenciesOut = []
+            for dependentProcess in currentProcess.dependenciesIn.all():
+                dependenciesIn.append(dependentProcess)
+            for dependentProcess in currentProcess.dependenciesOut.all():
+                dependenciesOut.append(dependentProcess)
+            return (dependenciesIn, dependenciesOut)
+        
         except (ObjectDoesNotExist) as error:
-            return 0
+            logger.error(f'Process {processID} does not exist: {str(error)}')
+            return ([],[])
         except (Exception) as error:
             logger.error(f'could not get process status: {str(error)}')
         
-        return 0
+        return ([],[])
     
     ##############################################
     @staticmethod

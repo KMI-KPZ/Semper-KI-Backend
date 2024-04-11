@@ -156,16 +156,16 @@ class AbstractContentInterface(ABC):
 
     ####################################################
     @abstractmethod
-    def getProcessStatus(self, projectID:str, processID:str):
+    def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list,list]:
         """
-        Return the process status and all its details
+        Return the process dependencies 
 
         :param projectID: The ID of the project
         :type projectID: str
         :param processID: The ID of the process
         :type processID: str
-        :return: Process status
-        :rtype: Int
+        :return: Incoming and outgoing dependencies
+        :rtype: tuple[list,list]
 
         """
         pass

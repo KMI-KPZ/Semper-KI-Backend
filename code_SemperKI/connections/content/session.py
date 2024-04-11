@@ -454,24 +454,41 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     #######################################################
-    def getProcessStatus(self, projectID:str, processID:str):
+    def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list[ProcessInterface],list[ProcessInterface]]:
         """
-        Return the process and all its details
+        Return the process dependencies 
 
         :param projectID: The ID of the project
         :type projectID: str
         :param processID: The ID of the process
         :type processID: str
-        :return: Process Object
-        :rtype: ProcessInterface
+        :return: Incoming and outgoing dependencies
+        :rtype: tuple[list,list]
 
         """
         try:
-            content = self.structuredSessionObj.getProcess(projectID, processID)
-            return content[ProcessDescription.processStatus]
+            processObject = self.getProcessObj(projectID, processID)
+            if isinstance(processObject, Exception):
+                raise processObject
+            dependenciesIn = []
+            dependenciesOut = []
+            for dependentProcessID in processObject.dependenciesIn.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesIn.append(dependentProcess)
+            for dependentProcessID in processObject.dependenciesOut.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesOut.append(dependentProcess)
+
+            return (dependenciesIn, dependenciesOut)
+
         except (Exception) as error:
-            logger.error(f"Could not fetch process status: {str(error)}")
-            return 0
+            logger.error(f"Could not fetch dependencies: {str(error)}")
+            return ([],[])
+        
 
     #######################################################
     def createProcess(self, projectID:str, processID:str, client:str):
