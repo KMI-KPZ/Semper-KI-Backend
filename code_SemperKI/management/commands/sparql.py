@@ -12,10 +12,13 @@ from argparse import ArgumentParser
 from django.core.management import BaseCommand
 
 from code_General.utilities.sparql import QueryType
-from ...code_services.code_service_AdditiveManufacturing.connections.cmem import AdditiveQueryManager
-from code_General.connections.redis import RedisConnection
-from ...connections.cmem import cmemOauthToken, endpoint
-
+from code_SemperKI.services.service_AdditiveManufacturing.connections.cmem import AdditiveQueryManager
+from Generic_Backend.code_General.connections.redis import RedisConnection
+#from code_SemperKI.services.service_AdditiveManufacturing.connections.cmem import cmemOauthToken, endpoint
+import code_SemperKI.connections.cmem as SKICmem
+endpoint = SKICmem.endpoint
+updateEndpoint = SKICmem.updateEndpoint
+cmemOauthToken = SKICmem.oauthToken
 
 ####################################################################################
 class Command(BaseCommand):
@@ -34,12 +37,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print(f'Options: \n{options}')
-        manager = AdditiveQueryManager(RedisConnection(), cmemOauthToken, endpoint)
+        manager = AdditiveQueryManager(RedisConnection(), cmemOauthToken, endpoint, updateEndpoint)
 
         # get id from argument
         resource = options['resource']
         queryType = QueryType.__getitem__(options['query_type']) if options['query_type'] is not None else None
+
         id = options['id']
+
+
 
         if manager.__dict__.get(resource) is None:
             print(f'\nUnknown resource "{resource}"')
@@ -59,7 +65,7 @@ class Command(BaseCommand):
                 print(f'\t{type}')
             exit(0)
 
-        if id is None or queryType != QueryType.GET:
+        if id is None and queryType != QueryType.GET:
             print(f'\nNo id given - setting query type to GET')
             queryType = QueryType.GET
 
@@ -67,7 +73,8 @@ class Command(BaseCommand):
         if queryType == QueryType.GET:
             print(json.dumps(manager.__dict__[resource].get({}), indent=4))
         elif queryType == QueryType.INSERT:
-            print(manager.__dict__[resource].insert({"ID": id, 'name': "Thomas ORGA " + str(id)}))
+            print(manager.__dict__[resource].getVars(QueryType.INSERT))
+            print(manager.__dict__[resource].insert({"ID": id, 'name': "Thomas ORGA " + str(id), "Material": "<https://data.semper-ki.org/Material/test-PLA>","PrinterModel" : "Industry F340"}))
         elif queryType == QueryType.UPDATE:
             print(manager.__dict__[resource].update({"ID": id, 'name': "Thomas ORGA " + str(id)}))
         elif queryType == QueryType.DELETE:

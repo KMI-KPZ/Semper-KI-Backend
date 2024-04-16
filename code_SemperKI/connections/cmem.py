@@ -60,6 +60,7 @@ class ManageToken:
                 self.token = self.client.refresh_token(settings.CMEM_TOKEN_ENDPOINT, refresh_token=self.token["refresh_token"])
 
 endpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
+updateEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_UPDATE_ENDPOINT)
 oauthToken = ManageToken()
 
 ##################################################################

@@ -133,8 +133,8 @@ def getMaterials(request):
 
     # mockup here:
     mocks.materialMock["materials"].extend(resultsOfQueries["materials"])
-    filters.update(mocks.materialMock)
-    #filters.update(resultsOfQueries)
+    # filters.update(mocks.materialMock)
+    filters.update(resultsOfQueries)
     
     # TODO: gzip this 
     return JsonResponse(filters)

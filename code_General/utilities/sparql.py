@@ -9,7 +9,7 @@ import urllib
 from enum import Enum
 import re
 
-from code_General.connections.redis import RedisConnection
+from Generic_Backend.code_General.connections.redis import RedisConnection
 from SPARQLWrapper import SPARQLWrapper, JSON
 from django.conf import settings
 
@@ -27,13 +27,14 @@ class SparqlQueryManager:
     redisCon: RedisConnection
     oauthTokenManager: ManageToken
     endpoint: SPARQLWrapper
+    updateEndpoint: SPARQLWrapper
 
     # derive from this class and create properties like this:
     # myTopic : SparqlResource = {QueryType.GET: "/Ontology/queries/material_Hannes", QueryType.UPDATE: "/Ontology/queries/Data update/Material_Hannes"}
     # can later be accessed like this: myManager.myTopic.getAll() be sure to access only the configured query types
 
     #######################################################
-    def __init__(self, redisConnection, oauthTokenManager, endpoint) -> None:
+    def __init__(self, redisConnection, oauthTokenManager, endpoint, updateEndpoint) -> None:
         """
 
         :param self:
@@ -49,6 +50,7 @@ class SparqlQueryManager:
         self.redisCon = redisConnection
         self.oauthTokenManager = oauthTokenManager
         self.endpoint = endpoint
+        self.updateEndpoint = updateEndpoint
         self.setup()
 
     #######################################################
@@ -76,7 +78,7 @@ class SparqlQueryManager:
 
         """
 
-        sparqlResource = SparqlResource(self.endpoint, self.oauthTokenManager)
+        sparqlResource = SparqlResource(self.endpoint, self.updateEndpoint, self.oauthTokenManager)
         types = [member for member in QueryType]
         for key, path in config.items():
             if key in types:
@@ -126,6 +128,7 @@ class SparqlResource:
     """
 
     endpoint: SPARQLWrapper = None
+    updateEndpoint: SPARQLWrapper = None
     oauthToken: ManageToken = None
     _getQuery: str = None
     _insertQuery: str = None
@@ -152,7 +155,7 @@ class SparqlResource:
         self._vars[queryType] = self.extractVars(query)
 
     #######################################################
-    def _sendQuery(self, query):
+    def _sendQuery(self, query, endpoint=None):
         """
         Send SPARQL query.
         :param self: Contains sparql query as obj
@@ -161,10 +164,11 @@ class SparqlResource:
         :rtype: JSON
 
         """
+
         # request a refresh token
         self.oauthToken.checkIfExpired()
         # maybe construct first, save that to redis and then search/filter from that
-        endpointCopy = self.endpoint
+        endpointCopy = self.endpoint if endpoint is None else endpoint
         endpointCopy.addCustomHttpHeader(
             httpHeaderName="Authorization", httpHeaderValue="Bearer " + self.oauthToken.token["access_token"])
         endpointCopy.setReturnFormat(JSON)
@@ -245,10 +249,10 @@ class SparqlResource:
         for key, value in data.items():
             query = query.replace("[$" + key + "]", str(value))
         # query = "query=" + urllib.parse.quote(query)
-        self.endpoint.setMethod("POST")
+        self.updateEndpoint.setMethod("POST")
         print("################## INSERT #################### QUERY:\n" + query + "\n##############################################\n")
 
-        return self._sendQuery(query)
+        return self._sendQuery(query, self.updateEndpoint)
 
     #######################################################
 
