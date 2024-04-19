@@ -438,11 +438,57 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             content = self.structuredSessionObj.getProcess(projectID, processID)
             returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
-            returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
+            
+            # dependencies are saved as list of processIDs 
+            if ProcessDescription.dependenciesIn in content:
+                dependenciesIn = content[ProcessDescription.dependenciesIn]
+                dependenciesOut = content[ProcessDescription.dependenciesOut]
+            else:
+                dependenciesIn = []
+                dependenciesOut = []
+            
+            returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], dependenciesIn, dependenciesOut, content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
             return returnObj
         except (Exception) as error:
             logger.error(f"Could not fetch process: {str(error)}")
             return error
+
+    #######################################################
+    def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list[ProcessInterface],list[ProcessInterface]]:
+        """
+        Return the process dependencies 
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Incoming and outgoing dependencies
+        :rtype: tuple[list,list]
+
+        """
+        try:
+            processObject = self.getProcessObj(projectID, processID)
+            if isinstance(processObject, Exception):
+                raise processObject
+            dependenciesIn = []
+            dependenciesOut = []
+            for dependentProcessID in processObject.dependenciesIn.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesIn.append(dependentProcess)
+            for dependentProcessID in processObject.dependenciesOut.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesOut.append(dependentProcess)
+
+            return (dependenciesIn, dependenciesOut)
+
+        except (Exception) as error:
+            logger.error(f"Could not fetch dependencies: {str(error)}")
+            return ([],[])
+        
 
     #######################################################
     def createProcess(self, projectID:str, processID:str, client:str):
@@ -540,8 +586,37 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
+            
+            elif updateType == ProcessUpdates.dependenciesIn:
+                if ProcessDescription.dependenciesIn in currentProcess:
+                    if content not in currentProcess[ProcessDescription.dependenciesIn]:
+                        currentProcess[ProcessDescription.dependenciesIn].append(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesIn] = [content]
+                
+                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
+                if ProcessDescription.dependenciesOut in dependentProcess:
+                    if processID not in dependentProcess[ProcessDescription.dependenciesOut]:
+                        dependentProcess[ProcessDescription.dependenciesOut].append(processID)
+                else:
+                    dependentProcess[ProcessDescription.dependenciesOut] = [processID]
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                if ProcessDescription.dependenciesOut in currentProcess:
+                    if content not in currentProcess[ProcessDescription.dependenciesOut]:
+                        currentProcess[ProcessDescription.dependenciesOut].append(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesOut] = [content]
+                
+                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
+                if ProcessDescription.dependenciesIn in dependentProcess:
+                    if processID not in dependentProcess[ProcessDescription.dependenciesIn]:
+                        dependentProcess[ProcessDescription.dependenciesIn].append(processID)
+                else:
+                    dependentProcess[ProcessDescription.dependenciesIn] = [processID]
+
             else:
-                raise Exception("updateProcess delete " + updateType + " not implemented")
+                raise Exception("updateProcess " + updateType + " not implemented")
             
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
 
@@ -549,7 +624,7 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
             return error
-
+        
     ##############################################
     def deleteFromProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
         """
@@ -606,6 +681,18 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType == ProcessUpdates.provisionalContractor:
                 del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
             
+            elif updateType == ProcessUpdates.dependenciesIn:
+                if ProcessDescription.dependenciesIn in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesIn].remove(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesIn] = []
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                if ProcessDescription.dependenciesOut in currentProcess:
+                    currentProcess[ProcessDescription.dependenciesOut].remove(content)
+                else:
+                    currentProcess[ProcessDescription.dependenciesOut] = []
+
             else:
                 raise Exception("updateProcess delete " + updateType + " not implemented")
 

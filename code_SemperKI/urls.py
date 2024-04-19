@@ -33,7 +33,6 @@ from MSQ.handlers import interface
 newPaths= {
 
     "getContractors": ("public/getContractors/<processID>/",projectAndProcessManagement.getContractors),
-    
     "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),
     "retrieveProjects": ("public/retrieveProjects/",projectAndProcessManagement.retrieveProjects),
     "getMissedEvents": ("public/getMissedEvents/",projectAndProcessManagement.getMissedEvents),
@@ -49,6 +48,7 @@ newPaths= {
     #"sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
     "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
     "statusButtonRequest": ("public/statusButtonRequest/",projectAndProcessManagement.statusButtonRequest),
+    "getStateMachine": ("private/getStateMachine/", projectAndProcessManagement.getStateMachine),
 
     "getServices": ("public/getServices/",manageServices.getServices),
 
@@ -56,6 +56,7 @@ newPaths= {
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
 
     "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
+    "checkVersion": ("public/checkVersion/", frontpage.checkVersionOfFrontend),
 
     "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
     "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
@@ -73,7 +74,7 @@ newPaths= {
     "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
-    "getStateMachine": ("private/getStateMachine/", projectAndProcessManagement.getStateMachine),
+    
 }
 
 # add paths

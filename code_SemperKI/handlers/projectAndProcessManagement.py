@@ -25,7 +25,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..states.states import processStatusAsInt, StateMachine, addButtonsToProcess, InterfaceForStateChange
+from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, addButtonsToProcess, InterfaceForStateChange, signalDependencyToOtherProcesses
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -51,20 +51,22 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="")
     :return: Nothing
     :rtype: None
     """
- 
-    dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
-    channel_layer = get_channel_layer()
-    for userID in dictForEvents: # user/orga that is associated with that process
-        values = dictForEvents[userID] # message, formatted for frontend
-        subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
-        if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
-            userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-            for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
-                if operation=="" or operation in permission:
-                    async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
-                        "type": "sendMessageJSON",
-                        "dict": values,
-                    })
+    if manualCheckifLoggedIn(session):
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
+        channel_layer = get_channel_layer()
+        for userID in dictForEvents: # user/orga that is associated with that process
+            values = dictForEvents[userID] # message, formatted for frontend
+            subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
+            if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
+                userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
+                for permission in rights.rightsManagement.getPermissionsNeededForPath(updateProcess.__name__):
+                    if operation=="" or operation in permission:
+                        async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
+                            "type": "sendMessageJSON",
+                            "dict": values,
+                        })
+    else: # not logged in therefore no websockets to fire
+        return
 
 #######################################################
 def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
@@ -85,7 +87,7 @@ def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
     :return: Nothing
     :rtype: None
     """
- 
+
     dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
     channel_layer = get_channel_layer()
     for userID in dictForEvents: # user/orga that is associated with that process
@@ -316,6 +318,116 @@ def createProcessID(request, projectID):
     except (Exception) as error:
         loggerError.error(f"createProcessID: {str(error)}")
         return JsonResponse({}, status=500)
+    
+#######################################################
+def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
+    """
+    Duplicate selected processes. Works only for logged in users.
+
+    :param request: POST request from statusButtonRequest
+    :type request: HTTP POST
+    :param projectID: The project ID of the project the processes belonged to
+    :type projectID: str
+    :param processIDs: List of processes to be cloned
+    :type processIDs: list of strings
+    :return: JSON with project and process IDs
+    :rtype: JSONResponse
+    
+    """
+    try:
+        outDict = {"projectID": "", "processIDs": []}
+
+        # create new project with old information
+        oldProject = pgProcesses.ProcessManagementBase.getProjectObj(oldProjectID)
+        newProjectID = crypto.generateURLFriendlyRandomString()
+        outDict["projectID"] = newProjectID
+        errorOrNone = pgProcesses.ProcessManagementBase.createProject(newProjectID, oldProject.client)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, oldProject.projectDetails)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        
+        mapOfOldProcessIDsToNewOnes = {}
+        # for every old process, create new process with old information
+        for processID in oldProcessIDs:
+            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, processID) 
+            newProcessID = crypto.generateURLFriendlyRandomString()
+            outDict["processIDs"].append(newProcessID)
+            mapOfOldProcessIDsToNewOnes[processID] = newProcessID
+            errorOrNone = pgProcesses.ProcessManagementBase.createProcess(newProjectID, newProcessID, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
+            del oldProcessDetails[ProcessDetails.provisionalContractor]
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # copy files but with new fileID
+            newFileDict = {}
+            for fileKey in oldProcess.files:
+                oldFile = oldProcess.files[fileKey]
+                newFile = copy.deepcopy(oldFile)
+                #newFileID = crypto.generateURLFriendlyRandomString()
+                newFile[FileObjectContent.id] = fileKey
+                newFilePath = newProcessID+"/"+fileKey
+                newFile[FileObjectContent.path] = newFilePath
+                newFile[FileObjectContent.date] = str(timezone.now())
+                if oldFile[FileObjectContent.remote]:
+                    s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
+                else:
+                    s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                newFileDict[fileKey] = newFile
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.files, newFileDict, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # set service specific stuff
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceType, oldProcess.serviceType, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            # set service details -> implementation in service (cloneServiceDetails)
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID) 
+            errorOrNewDetails = serviceManager.getService(oldProcess.serviceType).cloneServiceDetails(oldProcess.serviceDetails, newProcess)
+            if isinstance(errorOrNewDetails, Exception):
+                raise errorOrNewDetails
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceDetails, errorOrNewDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+
+        # all new processes must already be created here in order to link them accordingly
+        for oldProcessID in mapOfOldProcessIDsToNewOnes:
+            newProcessID = mapOfOldProcessIDsToNewOnes[oldProcessID]
+            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, oldProcessID)
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
+            # connect the processes if they where dependend before
+            for connectedOldProcessIn in oldProcess.dependenciesIn.all():
+                if connectedOldProcessIn.processID in oldProcessIDs:
+                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
+                    newProcess.dependenciesIn.add(newConnectedProcess)
+            for connectedOldProcessIn in oldProcess.dependenciesOut.all():
+                if connectedOldProcessIn.processID in oldProcessIDs:
+                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
+                    newProcess.dependenciesOut.add(newConnectedProcess)
+            newProcess.save()
+
+            # set process state through state machine (could be complete or waiting or in conflict and so on)
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS), oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
+            currentState = StateMachine(initialAsInt=newProcess.processStatus)
+            contentManager = ManageContent(request.session)
+            interface = contentManager.getCorrectInterface(cloneProcess.__name__)
+            currentState.onUpdateEvent(interface, newProcess)
+
+        return JsonResponse(outDict)
+        
+    except Exception as error:
+        loggerError.error(f"Error when cloning processes: {error}")
+        return JsonResponse({})
 
 # #######################################################
 # def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
@@ -539,6 +651,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
             process = interface.getProcessObj(projectID, processID)
             currentState = StateMachine(initialAsInt=process.processStatus)
             currentState.onUpdateEvent(interface, process)
+            signalDependencyToOtherProcesses(interface, process)
 
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -949,8 +1062,8 @@ def statusButtonRequest(request):
     """
     Button was clicked, so the state must change (transition inside state machine)
     
-    :param request: PATCH Request
-    :type request: HTTP PATCH
+    :param request: POST Request
+    :type request: HTTP POST
     :return: Response with new buttons
     :rtype: JSONResponse
     """
@@ -965,6 +1078,11 @@ def statusButtonRequest(request):
             if isinstance(retVal, Exception):
                 raise retVal
             return retVal
+        elif "cloneProcess" in buttonData[InterfaceForStateChange.type]:
+            retVal = cloneProcess(request, projectID, processIDs)
+            if isinstance(retVal, Exception):
+                raise retVal
+            return retVal
         else:
             nextState = buttonData[InterfaceForStateChange.targetStatus]
 
@@ -974,10 +1092,6 @@ def statusButtonRequest(request):
                 process = interface.getProcessObj(projectID, processID)
                 sm = StateMachine(initialAsInt=process.processStatus)
                 sm.onButtonEvent(nextState, interface, process)
-        # create new button json
-        # for every button
-        # Button data must be saved into process["processStatusButtons"], since getProject retrieves it.
-        # take status code and construct button from there
 
         return JsonResponse({})
     except Exception as e:

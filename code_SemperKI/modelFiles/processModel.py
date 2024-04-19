@@ -6,7 +6,7 @@ Silvio Weging 2023
 
 Contains: Model for processes
 """
-import json, enum
+import json, enum, copy
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
@@ -109,6 +109,8 @@ class Process(models.Model):
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,
                 ProcessDescription.processDetails: self.processDetails,
+                ProcessDescription.dependenciesIn: [ process.processID for process in self.dependenciesIn.all()],
+                ProcessDescription.dependenciesOut: [ process.processID for process in self.dependenciesOut.all()],
                 ProcessDescription.client: self.client,
                 ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
                 ProcessDescription.files: self.files,
@@ -124,16 +126,20 @@ class ManyToManySimulation():
     ###################################################
     def __init__(self) -> None:
         self._arrayOfProcesses = []
+    
+    ###################################################
+    def initialize(self, dependencies:list[str]) -> None:
+        self._arrayOfProcesses = copy.deepcopy(dependencies)
 
     ###################################################
     def add(self, pi:ProcessInterface):
         """
         Add a process interface to the array
         """
-        self._arrayOfProcesses.append(pi)
+        self._arrayOfProcesses.append(pi.processID)
     
     ###################################################
-    def all(self) -> list[ProcessInterface]:
+    def all(self) -> list[str]:
         """
         Get array for iteration
         """
@@ -203,7 +209,7 @@ class ProcessInterface():
         self.accessedWhen = currentTime
 
     ###################################################
-    def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, updatedWhen, accessedWhen) -> None:
+    def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, dependenciedIn, dependenciesOut, updatedWhen, accessedWhen) -> None:
         """
         Setter
 
@@ -216,6 +222,8 @@ class ProcessInterface():
         self.client = client
         self.files = files
         self.messages = messages
+        self.dependenciesIn.initialize(dependenciedIn)
+        self.dependenciesOut.initialize(dependenciesOut)
         self.updatedWhen = updatedWhen
         self.accessedWhen = accessedWhen
 
@@ -227,6 +235,8 @@ class ProcessInterface():
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,
                 ProcessDescription.processDetails: self.processDetails,
+                ProcessDescription.dependenciesIn: self.dependenciesIn.all(),
+                ProcessDescription.dependenciesOut: self.dependenciesOut.all(),
                 ProcessDescription.client: self.client,
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,

@@ -18,6 +18,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.utilities.basics import findFirstOccurence
 
 
 from ....modelFiles.projectModel import Project, ProjectInterface
@@ -273,6 +274,38 @@ class ProcessManagementBase(AbstractContentInterface):
             logger.error(f'could not get process object: {str(error)}')
         
         return None
+    
+    ##############################################
+    @staticmethod
+    def getProcessDependencies(projectID:str, processID:str) -> tuple[list[Process],list[Process]]:
+        """
+        Return the process dependencies 
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Incoming and outgoing dependencies
+        :rtype: tuple[list,list]
+
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            dependenciesIn = []
+            dependenciesOut = []
+            for dependentProcess in currentProcess.dependenciesIn.all():
+                dependenciesIn.append(dependentProcess)
+            for dependentProcess in currentProcess.dependenciesOut.all():
+                dependenciesOut.append(dependentProcess)
+            return (dependenciesIn, dependenciesOut)
+        
+        except (ObjectDoesNotExist) as error:
+            logger.error(f'Process {processID} does not exist: {str(error)}')
+            return ([],[])
+        except (Exception) as error:
+            logger.error(f'could not get process status: {str(error)}')
+        
+        return ([],[])
     
     ##############################################
     @staticmethod
@@ -592,19 +625,33 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.serviceType: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: ""})
                       
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy, {ProcessUpdates.serviceStatus: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy, {ProcessUpdates.serviceDetails: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
+
+            elif updateType == ProcessUpdates.dependenciesIn:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesIn.add(connectedProcess)
+                connectedProcess.dependenciesOut.add(currentProcess)
+                connectedProcess.save()
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesIn: content})
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesOut.add(connectedProcess)
+                connectedProcess.dependenciesIn.add(currentProcess)
+                connectedProcess.save()
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
 
             currentProcess.save()
             return True
@@ -660,19 +707,29 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceDetails:
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DETAILS, "content": ProcessUpdates.serviceDetails})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceDetails})
 
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = 0 #TODO
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.serviceStatus})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceStatus})
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = serviceManager.getNone()
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.serviceType})
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+
+            elif updateType == ProcessUpdates.dependenciesIn:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesIn.remove(connectedProcess)
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesIn})
+
+            elif updateType == ProcessUpdates.dependenciesOut:
+                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
+                currentProcess.dependenciesOut.remove(connectedProcess)
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
 
             currentProcess.save()
             return True
@@ -681,39 +738,42 @@ class ProcessManagementBase(AbstractContentInterface):
             return error
 
     ##############################################
-    @staticmethod
-    def addProcessTemplateToProject(projectID, template, clientID):
-        """
-        add a process to an existing project in the database
+    # @staticmethod
+    # def addProcessTemplateToProject(projectID, template, clientID):
+    #     """
+    #     add a process to an existing project in the database
 
-        :param projectID: project ID to retrieve data from
-        :type projectID: str
-        :param template: Dictionary with templated process
-        :type template: Dict
-        :return: None or Error
-        :rtype: None or Error
+    #     :param projectID: project ID to retrieve data from
+    #     :type projectID: str
+    #     :param template: Dictionary with templated process
+    #     :type template: Dict
+    #     :return: None or Error
+    #     :rtype: None or Error
 
-        """
+    #     """
 
-        try:
-            # check if exists
-            projectObj = Project.objects.get(projectID=projectID)
+    #     try:
+    #         # check if exists
+    #         projectObj = Project.objects.get(projectID=projectID)
             
-            # if it does, create process
-            processID = template[ProcessDescription.processID]
-            serviceType = template[ProcessDescription.serviceType]
-            processStatus = template[ProcessDescription.processStatus]
-            serviceStatus = template[ProcessDescription.serviceStatus]
-            serviceDetails = template[ProcessDescription.serviceDetails]
-            processDetails = template[ProcessDescription.processDetails]
-            files = template[ProcessDescription.files]
-            messages = template[ProcessDescription.messages]
-            client = clientID
-            processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, files=files, messages=messages, updatedWhen=timezone.now())
-            return None
-        except (Exception) as error:
-            logger.error(f'could not add process template to project: {str(error)}')
-            return error
+    #         # if it does, create process
+    #         processID = template[ProcessDescription.processID]
+    #         serviceType = template[ProcessDescription.serviceType]
+    #         processStatus = template[ProcessDescription.processStatus]
+    #         serviceStatus = template[ProcessDescription.serviceStatus]
+    #         serviceDetails = template[ProcessDescription.serviceDetails]
+    #         processDetails = template[ProcessDescription.processDetails]
+    #         files = template[ProcessDescription.files]
+    #         messages = template[ProcessDescription.messages]
+    #         client = clientID
+    #         processObj = Process.objects.create(processID=processID, project=projectObj, processDetails=processDetails, processStatus=processStatus, serviceDetails=serviceDetails, serviceStatus=serviceStatus, serviceType=serviceType, client=client, files=files, messages=messages, updatedWhen=timezone.now())
+            
+    #         # TODO create dependencies
+            
+    #         return None
+    #     except (Exception) as error:
+    #         logger.error(f'could not add process template to project: {str(error)}')
+    #         return error
 
 
     ##############################################
@@ -907,6 +967,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 # if not, create a new entry
                 projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: project[ProjectDescription.projectStatus], ProjectDescription.updatedWhen: now, ProjectDescription.client: clientID, ProjectDescription.projectDetails: project[ProjectDescription.projectDetails]})
                 # save processes
+                listOfProcessObjects = []
                 for process in project[SessionContentSemperKI.processes]:
                     processID = process[ProcessDescription.processID]
                     serviceType = process[ProcessDescription.serviceType]
@@ -916,8 +977,11 @@ class ProcessManagementBase(AbstractContentInterface):
                     processDetails = process[ProcessDescription.processDetails]
                     files = process[ProcessDescription.files]
                     messages = process[ProcessDescription.messages]
+                    dependenciesIn = process[ProcessDescription.dependenciesIn]
+                    dependenciesOut = process[ProcessDescription.dependenciesOut]
 
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
+                    listOfProcessObjects.append( (processObj, dependenciesIn, dependenciesOut) )
                     ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
 
                     # generate entries in data
@@ -927,6 +991,16 @@ class ProcessManagementBase(AbstractContentInterface):
                             fileEntry[FileObjectContent.createdBy] = clientID
                         dataID = crypto.generateURLFriendlyRandomString()
                         ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
+
+                # link dependencies
+                for processObj, dependenciesListIn, dependenciesListOut in listOfProcessObjects:
+                    for processID in dependenciesListIn:
+                        linkedProcessObj = findFirstOccurence(listOfProcessObjects, None, lambda x: x[0].processID == processID)
+                        processObj.dependenciesIn.add(linkedProcessObj[0])
+                    for processID in dependenciesListOut:
+                        linkedProcessObj = findFirstOccurence(listOfProcessObjects, None, lambda x: x[0].processID == processID)
+                        processObj.dependenciesOut.add(linkedProcessObj[0])
+                    processObj.save()
 
             return None
         except (Exception) as error:

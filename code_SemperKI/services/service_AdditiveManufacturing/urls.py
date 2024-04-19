@@ -34,7 +34,7 @@ newPaths = {
     "getPostProcessing": ('public/getPostProcessing/',filter.getPostProcessing),
 
     "uploadModel": ("public/uploadModel/",model.uploadModel),
-    "deleteModel": ("public/deleteModel/<processID>/",model.deleteModel),
+    "deleteModel": ("public/deleteModel/<projectID>/<processID>/",model.deleteModel),
     "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
 
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),

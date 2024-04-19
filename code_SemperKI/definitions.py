@@ -9,6 +9,10 @@ import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
+# Version of the backend
+SEMPER_KI_VERSION = "0.2.1"
+
+###################################################
 from .modelFiles.processModel import ProcessDescription
 from .modelFiles.projectModel import ProjectDescription
 from .modelFiles.dataModel import DataDescription
@@ -27,6 +31,8 @@ class DataType(enum.IntEnum):
     DELETION = 5
     DETAILS = 6
     OTHER = 7
+    SERVICE = 8
+    DEPENDENCY = 9
 
 ####################################################################################
 def dataTypeToString(dataType:DataType):
@@ -49,6 +55,10 @@ def dataTypeToString(dataType:DataType):
         return "DETAILS"
     elif dataType == DataType.OTHER:
         return "OTHER"
+    elif dataType == DataType.SERVICE:
+        return "SERVICE"
+    elif dataType == DataType.DEPENDENCY:
+        return "DEPENDENCY"
     return ""
 
 ####################################################################################
@@ -76,6 +86,8 @@ class ProcessUpdates(StrEnumExactylAsDefined):
     processDetails = enum.auto()
     processStatus = enum.auto()
     provisionalContractor = enum.auto()
+    dependenciesIn = enum.auto()
+    dependenciesOut = enum.auto()
 
 ####################################################################################
 # Enum for processDetails

@@ -160,6 +160,7 @@ class ButtonLabels(StrEnumExactylAsDefined):
     """
     BACK = enum.auto()
     SELECT_SERVICE = enum.auto()
+    SERVICE_COMPLICATION = enum.auto() # TODO not in frontend currently
     EDIT = enum.auto()
     DELETE = enum.auto()
     CONTRACTOR_SELECTED = enum.auto()
@@ -179,6 +180,7 @@ class ButtonLabels(StrEnumExactylAsDefined):
     SERVICE_IN_PROGRESS = enum.auto()
     FAILED = enum.auto() #TODO not in frontend currently
     NONE = enum.auto()
+    CLONE = enum.auto() # TODO not in frontend currently
 
 #######################################################
 class ButtonTypes(StrEnumExactylAsDefined):
