@@ -23,6 +23,7 @@ class BackendConfigHelper(ConfigHelper):
     dbs = ('default',)
     # required env vars
 
+
     env_vars_external = {
         # AUTH0
         'AUTH0_DOMAIN': {'var': 'AUTH0_DOMAIN',
@@ -63,6 +64,8 @@ class BackendConfigHelper(ConfigHelper):
                              'hint': 'CMEM client secret for authentication services for management via m2m calls',
                              'default': None, 'required': True},
         'CMEM_SPARQL_ENDPOINT': {'var': 'CMEM_SPARQL_ENDPOINT', 'hint': 'Cmem sparql endpoint url', 'default': None, 'required': True},
+        'CMEM_SPARQL_UPDATE_ENDPOINT': {'var': 'CMEM_SPARQL_UPDATE_ENDPOINT', 'hint': 'Cmem sparql endpoint url for updates!', 'default': None,
+                                 'required': True},
         'CMEM_TOKEN_ENDPOINT': {'var': 'CMEM_TOKEN_ENDPOINT', 'hint': 'Oauth Endpoint from cmem', 'default': None, 'required': True},
         'COYPU_CLIENT_ID': {'var': 'COYPU_CLIENT_ID',
                           'hint': 'COYPU client id for authentication services for management via m2m calls',
@@ -89,7 +92,6 @@ class BackendConfigHelper(ConfigHelper):
         'EMAIL_USE_SSL': {'var': 'EMAIL_USE_SSL', 'hint': 'Email use ssl for sending emails', 'default': False,'required': False, 'type': 'bool'},
         'EMAIL_ADDR_SUPPORT' : {'var': 'EMAIL_ADDR_SUPPORT', 'hint': 'Email address for support, i.e. for contact form', 'default': 'semper-ki@infai.org'},
     }
-
     env_vars_internal = {
         'DJANGO_SECRET': {'var': 'SECRET_KEY', 'hint': 'Django secret key used for hashing and encryption',
                           'default': '1234567890', 'required': True},
