@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 
 from django.core.management import BaseCommand
 
-from code_General.utilities.sparql import QueryType
+from Generic_Backend.code_General.utilities.sparql import QueryType
 from code_SemperKI.services.service_AdditiveManufacturing.connections.cmem import AdditiveQueryManager
 from Generic_Backend.code_General.connections.redis import RedisConnection
 #from code_SemperKI.services.service_AdditiveManufacturing.connections.cmem import cmemOauthToken, endpoint
@@ -25,7 +25,6 @@ class Command(BaseCommand):
     help = 'list all SemperKI services'
 
     ####################################################################################
-
     def add_arguments(self, parser: ArgumentParser):
         # add argument id as integer required
         parser.add_argument('resource', type=str, nargs="?",
@@ -35,6 +34,7 @@ class Command(BaseCommand):
         parser.add_argument('id', type=int, nargs="?",
                             help='an id; if no --insert is given the organisation with that ID will be loaded, if --insert is given a new organisation will be created with that ID')
 
+    ####################################################################################
     def handle(self, *args, **options):
         print(f'Options: \n{options}')
         manager = AdditiveQueryManager(RedisConnection(), cmemOauthToken, endpoint, updateEndpoint)
@@ -44,8 +44,6 @@ class Command(BaseCommand):
         queryType = QueryType.__getitem__(options['query_type']) if options['query_type'] is not None else None
 
         id = options['id']
-
-
 
         if manager.__dict__.get(resource) is None:
             print(f'\nUnknown resource "{resource}"')
@@ -88,6 +86,7 @@ class Command(BaseCommand):
         # print(manager.serviceProvider.getAll())
         exit(0)
 
+    ####################################################################################
     def showResources(self, manager: AdditiveQueryManager):
         resources = manager.getResourcesAndTypes()
         print('List of all resources:')

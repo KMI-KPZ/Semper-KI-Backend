@@ -7,12 +7,11 @@ Contains: Services for the sparql endpoint regarding 3D Printer Data
 """
 
 import code_SemperKI.connections.cmem as SKICmem
-from code_General.utilities.sparql import SparqlResource,SparqlQueryManager,QueryType
+from Generic_Backend.code_General.utilities.sparql import SparqlResource,SparqlQueryManager,QueryType
 
 
 
 #######################################################
-
 class AdditiveQueryManager(SparqlQueryManager):
     material: SparqlResource = {QueryType.GET: "/Ontology/queries/material_Hannes"}
     printer: SparqlResource = {QueryType.GET: "/Ontology/queries/printer_Hannes"}
