@@ -23,8 +23,10 @@ def sparqlPage(request):
     :type request: HTTP GET
     :return: Rendered page
     :rtype: HTTPResponse
-
+    
     """
+
+    assert request, f"In {sparqlPage.__name__}: request is empty" #Assertion
     return render(
         request,
         "sparql.html"  # ,

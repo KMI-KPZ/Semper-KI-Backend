@@ -23,4 +23,5 @@ def getServices(request):
     
     """
 
+    assert request, f"In {getServices.__name__}: request is empty" #Assertion
     return JsonResponse(serviceManager.getAllServices())

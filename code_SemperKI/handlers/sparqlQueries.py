@@ -23,6 +23,7 @@ def sendQuery(request):
     :rtype: JSONResponse
 
     """
+    assert request, f"In {sendQuery.__name__}: request is empty" #Assertion
     results = cmem.sendGeneralQuery(request.POST["query"])
     
     return JsonResponse(results, safe=False)
@@ -38,6 +39,7 @@ def sendQueryCoypu(request):
     :rtype: JSONResponse
 
     """
+    assert request, f"In {sendQueryCoypu.__name__}: request is empty" #Assertion
     results = coypu.getExampleNews.sendQuery()
     pattern = re.compile(".*a class=\"external text\" href=\"(.*)\" rel")
     for idx, element in enumerate(results):

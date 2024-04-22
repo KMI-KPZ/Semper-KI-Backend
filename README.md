@@ -28,7 +28,7 @@ The backend currently supports the environment ```--env <environment>``` which w
   - edit .env.local_container for the external connections (ask the team for credentials) and change ENV_TOKEN to local_container to see which env file is being used in outputs
   - copy .env.local_container to .env.local and change internal connections hosts (e.g. database, redis) to localhost as well as ENV_TOKEN to local to see which env file is being used in outputs
 - create the folder `logs` if it doesn't exist in the root directory of the project, as well as the files `info.log` and `ip_log.log` inside it. Open your WSL/Terminal and call `sudo chown -R 5678 logs/` on it from the WSL
-- LOCAL ONLY: call ```start_local_dev.bat -m local ``` to build and run only the containers with background connections (database, redis, ...)
+- LOCAL ONLY: call ```start_local_dev.bat -m local``` to build and run only the containers with background connections (database, redis, ...)
 - LOCAL ONLY: call ```python manage.py create_db --env local``` to create the database named in .env.local (which should be the same as in .env.local_container) 
 - OR CONTAINER ONLY: launch the containerized version twice (first will create the db, second will use it)
 - LOCAL ONLY: call ```python manage.py migrate --env local``` to migrate the database to the latest state 

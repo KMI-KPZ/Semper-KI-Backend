@@ -36,7 +36,9 @@ def getAllProjectsFlatAsAdmin(request):
     :rtype: JSONResponse
     """
     # get all projects if you're an admin
+    assert request, f"In {getAllProjectsFlatAsAdmin.__name__}: request is empty" #Assertion
     projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
+    assert projects, f"In {getAllProjectsFlatAsAdmin.__name__}: projects is empty" #Assertion, darfs empty sein?
     for idx, entry in enumerate(projects):
         clientID = entry[ProcessDescription.client]
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
@@ -61,6 +63,7 @@ def getSpecificProjectAsAdmin(request, projectID):
     :rtype: JSONResponse
     """
 
+    assert request, f"In {getSpecificProjectAsAdmin.__name__}: request is empty" #Assertion
     logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
     return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 

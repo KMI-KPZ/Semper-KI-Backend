@@ -24,6 +24,7 @@ def isMagazineUp(request):
     :rtype: JSON Response
 
     """
+    assert request, f"In {isMagazineUp.__name__}: request is empty" #Assertion
     if request.method == "POST":
         try:
             content = json.loads(request.body.decode("utf-8"))

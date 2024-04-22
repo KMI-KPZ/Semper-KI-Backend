@@ -47,17 +47,23 @@ def uploadFiles(request):
     :rtype: HTTP Response
     """
     try:
+        assert request, f"In {uploadFiles.__name__}: request is empty" #Assertion
         info = request.POST
+        assert info, f"In {uploadFiles.__name__}: info was not generated Properly" #Assertion
         projectID = info["projectID"]
         processID = info["processID"]
         # TODO: Licenses, ...
         fileNames = list(request.FILES.keys())
+        assert fileNames, f"In {uploadFiles.__name__}: The list fileNames is empty" #Assertion
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-        assert(userName!="", True)
+        assert userName!="", f"In {uploadFiles.__name__}: Non-empty username expected, got: '{userName}'" #Assertion
+
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
             fileID = crypto.generateURLFriendlyRandomString()
+            assert fileID, f"In {uploadFiles.__name__}: fileID was not generated properly" #Assertion
             filePath = processID+"/"+fileID
+            assert filePath!="/"+fileID, f"In {uploadFiles.__name__}: processID is empty: '{userName}'" #Assertion
             changes["changes"][ProcessUpdates.files][fileID] = {}
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
@@ -70,8 +76,10 @@ def uploadFiles(request):
         
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        assert flag, f"In {uploadFiles.__name__}: flag was not generated properly from request" #Assertion
+        assert message, f"In {uploadFiles.__name__}: message was not generated properly from request" #Assertion
         if flag is False:
-            return HttpResponse("Unsufficient rights!", status=401)
+            return HttpResponse("Insufficient rights!", status=401)
         if isinstance(message, Exception):
             raise message
 
