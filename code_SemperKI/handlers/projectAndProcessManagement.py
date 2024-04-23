@@ -127,22 +127,6 @@ def createProjectID(request):
     client = contentManager.getClient()
     interface.createProject(projectID, client)
 
-    # login defines client
-    #template = {ProjectDescription.projectID: projectID, ProcessDescription.client: "", ProjectDescription.projectStatus: 0, ProjectDescription.createdWhen: str(now), ProjectDescription.updatedWhen: str(now), ProjectDescription.projectDetails: {}, SessionContentSemperKI.processes: {}} 
-
-    # if User is logged in, everything is database backend. For anonymous users, the cache suffices
-    # if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProjectID.__name__):
-    #     template[ProcessDescription.client] = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-    #     # save template only temporary in session and then in database
-    #     request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = template
-    #     pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-    #     request.session[SessionContentSemperKI.CURRENT_PROJECTS].clear()
-    #     del request.session[SessionContentSemperKI.CURRENT_PROJECTS]
-
-    # else:
-    #     # save project template in session for now
-    #     request.session = sessionObj.createProject(projectID)
-
     logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
 
     #return just the id for the frontend
@@ -225,24 +209,6 @@ def deleteProjects(request):
                 return HttpResponse("Insufficient rights!", status=401)
             interface.deleteProject(projectID)
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-            """ if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                for currentProjectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                    if SessionContentSemperKI.processes in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID]:
-                        for currentProcess in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
-                            for fileObj in request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files]:
-                                s3.manageLocalS3.deleteFile(request.session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcess][ProcessDescription.files][fileObj]["id"])
-                del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
-                request.session.modified = True
-
-            elif loggedIn or (manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, deleteProjects.__name__)):
-                loggedIn = True
-                userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-                if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-                    return HttpResponse("Not allowed!", status=401)
-                
-                pgProcesses.ProcessManagementBase.deleteProject(projectID)
-            else:
-                raise Exception("Not logged in or rights insufficient!") """
         
         return HttpResponse("Success")
     except (Exception) as error:
@@ -278,39 +244,6 @@ def createProcessID(request, projectID):
         client = contentManager.getClient()
         interface.createProcess(projectID, processID, client)
 
-        """ 
-        now = timezone.now()
-        template = {ProcessDescription.processID: processID, 
-                    ProcessDescription.client: "", 
-                    ProcessDescription.processStatus: 0, 
-                    ProcessDescription.processDetails: {ProcessDetails.amount: 1},
-                    ProcessDescription.serviceStatus: 0, 
-                    ProcessDescription.serviceType: serviceManager.getNone(), 
-                    ProcessDescription.serviceDetails: {},
-                    ProcessDescription.createdWhen: str(now), 
-                    ProcessDescription.updatedWhen: str(now), 
-                    ProcessDescription.files: {}, 
-                    ProcessDescription.messages: {"messages": []} 
-                    } # the last ones are just for in-session storage
-
-        # save into respective project
-        if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-            request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID] = template
-            request.session.modified = True
-            return JsonResponse({ProcessDescription.processID: processID})
-
-        # else: it's in the database, fetch it from there
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, createProcessID.__name__):
-            # get client ID
-            client = pgProcesses.ProcessManagementBase.getProjectObj(projectID).client
-            currentUserID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-            if currentUserID != client:
-                # No one except the client should be able to add a process to the project
-                return JsonResponse({}, status=401)
-            returnObj = pgProcesses.ProcessManagementBase.addProcessTemplateToProject(projectID, template, client)
-            if isinstance(returnObj, Exception):
-                raise returnObj
-        """
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
         # return just the generated ID for frontend
@@ -429,171 +362,6 @@ def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
         loggerError.error(f"Error when cloning processes: {error}")
         return JsonResponse({})
 
-# #######################################################
-# def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
-#     """
-#     Update process logic
-    
-#     :param projectID: Project ID
-#     :type projectID: Str
-#     :param projectID: Process ID
-#     :type projectID: Str
-#     :return: Message if it worked or not
-#     :rtype: Str, bool or Error
-#     """
-#     try:
-#         now = timezone.now()
-#         if SessionContentSemperKI.CURRENT_PROJECTS in request.session and projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-#             # changes
-#             for processID in processIDs:
-#                 # deletions
-#                 if "deletions" in changes:
-#                     for elem in changes["deletions"]:
-#                         if elem == ProcessUpdates.messages:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"] = []
-                    
-#                         elif elem == ProcessUpdates.files:
-#                             for entry in changes["deletions"][ProcessUpdates.files]:
-#                                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry]
-                        
-#                         elif elem == ProcessUpdates.serviceType:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = serviceManager.getNone()
-                        
-#                         elif elem == ProcessUpdates.serviceDetails:
-#                             serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
-#                             if serviceType != serviceManager.getNone():
-#                                 request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["deletions"][ProcessUpdates.serviceDetails])
-#                             else:
-#                                 raise Exception("No Service chosen!")
-                        
-#                         elif elem == ProcessUpdates.serviceStatus:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = 0
-                        
-#                         elif elem == ProcessUpdates.processDetails:
-#                             for entry in changes["deletions"][ProcessUpdates.processDetails]:
-#                                 del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry]
-                        
-#                         elif elem == ProcessUpdates.processStatus:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = ProcessStatus.DRAFT
-                        
-#                         elif elem == ProcessUpdates.provisionalContractor:
-#                             del request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
-
-#                 for elem in changes["changes"]:
-#                     if elem == ProcessUpdates.messages:
-#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.messages]["messages"].append(changes["changes"][ProcessUpdates.messages])
-                    
-#                     elif elem == ProcessUpdates.files:
-#                         for entry in changes["changes"][ProcessUpdates.files]:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.files][entry] = changes["changes"][ProcessUpdates.files][entry]
-                    
-#                     elif elem == ProcessUpdates.serviceType:
-#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType] = changes["changes"][ProcessUpdates.serviceType]
-                    
-#                     elif elem == ProcessUpdates.serviceDetails:
-#                         serviceType = request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceType]
-#                         if serviceType != serviceManager.getNone():
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceDetails], changes["changes"][ProcessUpdates.serviceDetails])
-#                         else:
-#                             raise Exception("No Service chosen!")
-                    
-#                     elif elem == ProcessUpdates.serviceStatus:
-#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.serviceStatus] = changes["changes"][ProcessUpdates.serviceStatus]
-                    
-#                     elif elem == ProcessUpdates.processDetails:
-#                         for entry in changes["changes"][ProcessUpdates.processDetails]:
-#                             request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][entry] = changes["changes"][ProcessDescription.processDetails][entry]
-                    
-#                     elif elem == ProcessUpdates.processStatus:
-#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processStatus] = changes["changes"][ProcessUpdates.processStatus]
-                    
-#                     elif elem == ProcessUpdates.provisionalContractor:
-#                         request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = changes["changes"][ProcessUpdates.provisionalContractor]
-
-#                 request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID][ProcessDescription.updatedWhen] = str(now)
-            
-#             request.session.modified = True
-#         else:
-#             # database version
-#             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, updateProcess.__name__):
-#                 userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-
-#                 for processID in processIDs:
-#                     if manualCheckIfUserMaySeeProcess(request.session, userID, processID) == False:
-#                         return ("", False) # user may not change this process
-        
-#                     if "deletions" in changes:
-#                         for elem in changes["deletions"]:
-#                             returnVal = True
-#                             if elem == ProcessUpdates.serviceDetails: # service is a dict in itself      
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
-#                             elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.messages, changes["deletions"][ProcessUpdates.messages], userID)
-#                             elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.files, changes["deletions"][ProcessUpdates.files], userID)
-#                             elif elem == ProcessUpdates.provisionalContractor:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.provisionalContractor, changes["deletions"][ProcessUpdates.provisionalContractor], userID)
-#                             elif elem == ProcessUpdates.processDetails:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processDetails, changes["deletions"][ProcessUpdates.processDetails], userID)
-#                             elif elem == ProcessUpdates.processStatus:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.processStatus, changes["deletions"][ProcessUpdates.processStatus], userID)
-#                             elif elem == ProcessUpdates.serviceType:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceType, changes["deletions"][ProcessUpdates.serviceType], userID)
-#                             elif elem == ProcessUpdates.serviceStatus:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceStatus, changes["deletions"][ProcessUpdates.serviceStatus], userID)
-#                             elif elem == ProcessUpdates.serviceDetails:
-#                                 returnVal = pgProcesses.ProcessManagementBase.deleteFromProcess(processID, ProcessUpdates.serviceDetails, changes["deletions"][ProcessUpdates.serviceDetails], userID)
-#                             else:
-#                                 raise Exception("updateProcess delete " + elem + " not implemented")
-#                             if isinstance(returnVal, Exception):
-#                                 raise returnVal
-
-#                     for elem in changes["changes"]:
-#                         returnVal = True
-#                         if elem == ProcessUpdates.serviceType:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceType, changes["changes"][ProcessUpdates.serviceType], userID)
-#                             fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.serviceType, "edit")
-                        
-#                         elif elem == ProcessUpdates.messages and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "messages"):
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.messages, changes["changes"][ProcessUpdates.messages], userID)
-#                             fireWebsocketEvents(projectID, [processID], request.session, "messages", "messages")
-                        
-#                         elif elem == ProcessUpdates.files and manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, "files"):
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.files, changes["changes"][ProcessUpdates.files], userID)
-#                             fireWebsocketEvents(projectID, [processID], request.session, "files", "files")
-                        
-#                         elif elem == ProcessUpdates.serviceDetails:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceDetails, changes["changes"][ProcessUpdates.serviceDetails], userID)
-                        
-#                         elif elem == ProcessUpdates.processDetails:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processDetails, changes["changes"][ProcessUpdates.processDetails], userID)
-                        
-#                         elif elem == ProcessUpdates.processStatus:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.processStatus, changes["changes"][ProcessUpdates.processStatus], userID)
-#                             fireWebsocketEvents(projectID, [processID], request.session, ProcessDescription.processStatus, "edit")
-                        
-#                         elif elem == ProcessUpdates.serviceStatus:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.serviceStatus, changes["changes"][ProcessUpdates.serviceStatus], userID)
-                        
-#                         elif elem == ProcessUpdates.provisionalContractor:
-#                             returnVal = pgProcesses.ProcessManagementBase.updateProcess(processID, ProcessUpdates.provisionalContractor, changes["changes"][ProcessUpdates.provisionalContractor], userID)
-                        
-#                         else:
-#                             raise Exception("updateProcess change " + elem + " not implemented")
-
-#                         if isinstance(returnVal, Exception):
-#                             raise returnVal
-                    
-#                     # logging
-#                     logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
-
-#             else:
-#                 return ("", False)
-            
-#         return ("", True)
-#     except (Exception) as error:
-#         return (error, True)
-
 #######################################################
 def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
     """
@@ -677,12 +445,6 @@ def getProcessAndProjectFromSession(session, processID):
             return contentManager.sessionManagement.structuredSessionObj.getProcessAndProjectPerID(processID)
         else:
             return (None, None)
-        # if SessionContentSemperKI.CURRENT_PROJECTS in session:
-        #     for currentProjectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
-        #         for currentProcessID in session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes]:
-        #             if currentProcessID == processID:
-        #                 return (currentProjectID, session[SessionContentSemperKI.CURRENT_PROJECTS][currentProjectID][SessionContentSemperKI.processes][currentProcessID])
-        # return (None, None)
     except (Exception) as error:
         loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
         return (None, None)
@@ -859,22 +621,6 @@ def getProject(request, projectID):
                     return JsonResponse(project)
                 else:
                     return JsonResponse({}, status=401)
-
-        # if SessionContentSemperKI.CURRENT_PROJECTS in request.session:
-        #     if projectID in request.session[SessionContentSemperKI.CURRENT_PROJECTS]:
-        #         outDict = copy.deepcopy(request.session[SessionContentSemperKI.CURRENT_PROJECTS][projectID]) # copy the content
-        #         outDict[SessionContentSemperKI.processes] = [outDict[SessionContentSemperKI.processes][process] for process in outDict[SessionContentSemperKI.processes]]
-        #         return JsonResponse(outDict)
-        
-        # if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProject.__name__):
-        #     userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-        #     if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
-        #         return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
-        #     else:
-        #         if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-        #             return JsonResponse(pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID))
-        #         else:
-        #             return JsonResponse({}, status=401)
 
         # return JsonResponse({})
     except (Exception) as error:
@@ -1113,111 +859,6 @@ def getStateMachine(request):
     sm = StateMachine(initialAsInt=0)
     paths = sm.showPaths()
     return JsonResponse(paths)
-
-    
-#######################################################
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["PATCH"]) 
-# @checkIfRightsAreSufficient(json=False)
-# def verifyProject(request):
-#     """
-#     Start calculations on server and set status accordingly
-
-#     :param request: PATCH Request
-#     :type request: HTTP PATCH
-#     :return: Response if processes are started successfully
-#     :rtype: HTTP Response
-
-#     """
-#     try:
-#         # get information
-#         info = json.loads(request.body.decode("utf-8"))
-#         projectID = info["projectID"]
-#         sendToContractorAfterVerification = info["send"]
-#         processesIDArray = info["processIDs"]
-#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-
-#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-#             return HttpResponse("Not allowed!", status=401)
-
-#         # first save projects
-#         contentManager = ManageContent(request.session)
-#         if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
-#             error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-#             if isinstance(error, Exception):
-#                 raise error
-
-#             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
-            
-#             # then clear drafts from session
-            
-#             contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
-
-#         # TODO start services and set status to "verifying" instead of verified
-#         #listOfCallIDsAndProcessesIDs = []
-#         for entry in processesIDArray:
-#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), userID)
-#             #call = price.calculatePrice_Mock.delay([1,2,3]) # placeholder for each thing like model, material, post-processing
-#             #listOfCallIDsAndProcessesIDs.append((call.id, entry, collectAndSend.EnumResultType.price))
-
-#         # start collecting process, 
-#         #collectAndSend.waitForResultAndSendProcess(listOfCallIDsAndProcessesIDs, sendToManufacturerAfterVerification)
-
-#         # TODO Websocket Event
-
-#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},verify,{Logging.Object.OBJECT},process {projectID}," + str(datetime.now()))
-
-#         if sendToContractorAfterVerification:
-#             sendProject(request)
-
-#         return HttpResponse("Success")
-    
-#     except (Exception) as error:
-#         loggerError.error(f"verifyProject: {str(error)}")
-#         return HttpResponse("Failed")
-    
-# #######################################################
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["PATCH"]) 
-# @checkIfRightsAreSufficient(json=False)
-# def sendProject(request):
-#     """
-#     Retrieve Calculations and send process to contractor(s)
-
-#     :param request: PATCH Request
-#     :type request: HTTP PATCH
-#     :return: Response if processes are started successfully
-#     :rtype: HTTP Response
-
-#     """
-#     try:
-#         info = json.loads(request.body.decode("utf-8"))
-#         projectID = info["projectID"]
-#         processesIDArray = info["processIDs"]
-#         userID = pgProfiles.profileManagement[request.session[SessionContent.PG_PROFILE_CLASS]].getClientID(request.session)
-        
-#         if manualCheckIfUserMaySeeProject(request.session, userID, projectID) == False:
-#             return HttpResponse("Not allowed!", status=401)
-        
-#         # TODO Check if process is verified
-        
-#         for entry in processesIDArray:
-#             pgProcesses.ProcessManagementBase.updateProcess(projectID, entry, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.REQUESTED), userID)
-#             pgProcesses.ProcessManagementBase.sendProcess(entry)
-
-#         # TODO send local files to remote
-
-#         # websocket event
-#         fireWebsocketEvents(projectID, processesIDArray, request.session, ProcessDescription.processStatus)
-
-#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},sent,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-        
-#         return HttpResponse("Success")
-    
-#     except (Exception) as error:
-#         loggerError.error(f"sendProject: {str(error)}")
-#         return HttpResponse("Failed")
-
 
 #######################################################
 @checkIfUserIsLoggedIn()
