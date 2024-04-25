@@ -5,18 +5,19 @@ Silvio Weging 2024
 
 Contains: Interface with the message queuing system
 """
-import Generic_Backend.code_General.utilities.asyncTask as aTask
 import MSQ.module.celery as TaskQueue
 from ..tasks.tasks import dummy, dummyDerp
 from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
 
 ####################################################################
 # Remote stuff 
 
 ####################################################################
+@require_http_methods(["GET"])
 def getResultsBack(request, taskID):
     """
-    Send example script to remote worker
+    Get results from celery worker via ID
     
     :param request: Get request, not used
     :type request: GET
@@ -30,30 +31,20 @@ def getResultsBack(request, taskID):
     return HttpResponse("Success")
 
 ####################################################################
-def sendExampleRemote(request):
-    """
-    Send example script to remote worker
+# def sendExampleRemote(request):
+#     """
+#     Send example script to remote worker
     
-    """
-    retVal = TaskQueue.app.send_task(name="runScript", args=[open("MSQ/scripts/test.py").read(),(1,"bla")], queue="remote")
-    return HttpResponse("Success")
-
-@aTask.runInBackground
-def derp(a,b):
-    print("Task done", a)
-    return str(a)+b
+#     """
+#     retVal = TaskQueue.app.send_task(name="runScript", args=[open("MSQ/scripts/test.py").read(),(1,"bla")], queue="remote")
+#     return HttpResponse("Success")
 
 ####################################################################
 def sendExampleLocal(request):
     """
-    Send example script to remote worker
+    Send example to worker
     
     """
-    #retVal = dummy.delay(1,"bla")
-    #retVal = dummyDerp.delay(1,"bla")
-    derp(1,"bla")
-    derp(2,"bla")
-    derp(3,"bla")
-    derp(4,"bla")
-    print("Success")
+    retVal = dummy.delay(1,"bla")
+    retVal = dummyDerp.delay(1,"bla")
     return HttpResponse("Success")
