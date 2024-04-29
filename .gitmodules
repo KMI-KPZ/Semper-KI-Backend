@@ -4,3 +4,6 @@
 [submodule "Generic_Backend"]
 	path = Generic_Backend
 	url = https://github.com/KMI-KPZ/Generic_Backend.git
+[submodule "Swagger-editor-doc/swagger-editor"]
+	path = Swagger-editor-doc/swagger-editor
+	url = https://github.com/swagger-api/swagger-editor.git
