@@ -140,6 +140,22 @@ class AbstractContentInterface(ABC):
 
     ####################################################
     @abstractmethod
+    def getProcess(self, projectID:str, processID:str):
+        """
+        Return the process and all its details as dict
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Dictionary containing the process
+        :rtype: dict
+
+        """
+        pass
+
+    ####################################################
+    @abstractmethod
     def getProcessObj(self, projectID:str, processID:str):
         """
         Return the process and all its details

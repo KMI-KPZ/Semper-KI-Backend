@@ -109,6 +109,8 @@ class ProcessDetails(StrEnumExactylAsDefined):
     amount = enum.auto()
     title = enum.auto()
     clientAdress = enum.auto()
+    imagePath = enum.auto()
+
 
 ####################################################################################
 # Enum for messages
@@ -144,3 +146,16 @@ class EventsDescription(StrEnumExactylAsDefined):
     projectEvent = enum.auto()
     orgaEvent = enum.auto()
     
+####################################################################################
+# Enum for flat process status
+class FlatProcessStatus(StrEnumExactylAsDefined):
+    """
+    For Frontend
+    
+    """
+    ACTION_REQUIRED = enum.auto()
+    WAITING_CONTRACTOR= enum.auto()
+    WAITING_CLIENT = enum.auto()
+    WAITING_PROCESS = enum.auto()
+    IN_PROGRESS = enum.auto()
+    COMPLETED = enum.auto()
