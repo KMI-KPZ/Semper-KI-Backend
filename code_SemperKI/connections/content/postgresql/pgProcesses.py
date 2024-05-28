@@ -277,6 +277,30 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
+    def getProcess(projectID, processID):
+        """
+        Get one process.
+
+        :param projectID: The ID of the project, not used here
+        :type projectID: str
+        :param processID: process ID for a process
+        :type processID: str
+        :return: Process as dict
+        :rtype: Dict
+
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            return currentProcess.toDict()
+        except (ObjectDoesNotExist) as error:
+            return {}
+        except (Exception) as error:
+            logger.error(f'could not get process object: {str(error)}')
+        
+        return {}
+    
+    ##############################################
+    @staticmethod
     def getProcessDependencies(projectID:str, processID:str) -> tuple[list[Process],list[Process]]:
         """
         Return the process dependencies 
@@ -896,7 +920,7 @@ class ProcessManagementBase(AbstractContentInterface):
         try:
             now = timezone.now()
 
-            defaultProjectObject = ProjectInterface(projectID, str(now))
+            defaultProjectObject = ProjectInterface(projectID, str(now), client)
 
             projectObj, flag = Project.objects.update_or_create(projectID=projectID, defaults={ProjectDescription.projectStatus: defaultProjectObject.projectStatus, ProjectDescription.updatedWhen: now, ProjectDescription.client: client, ProjectDescription.projectDetails: defaultProjectObject.projectDetails})
             return None
@@ -925,7 +949,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             projectObj = ProcessManagementBase.getProjectObj(projectID)
 
-            defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now)), processID, str(now))
+            defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
 
             processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
             ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)

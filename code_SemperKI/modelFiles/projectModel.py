@@ -73,10 +73,10 @@ class ProjectInterface():
     accessedWhen = ""
 
     ###################################################
-    def __init__(self, projectID:str, currentTime:str) -> None:
+    def __init__(self, projectID:str, currentTime:str, client) -> None:
         self.projectID = projectID
         self.projectStatus = 0
-        self.client = ""
+        self.client = client
         self.projectDetails = {}
         self.createdWhen = currentTime
         self.updatedWhen = currentTime

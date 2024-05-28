@@ -25,7 +25,7 @@ import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
 
-from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails
+from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -34,24 +34,40 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def addButtonsToProcess(projectObj, client=True, admin=False) -> None: #is changed in place
+def getButtonsForProcess(processStatusCode, client=True, admin=False) -> None: #is changed in place
     """
     Look at process status of every process of a project and add respective buttons
 
-    :param projectObj: The project object containing all processes
-    :type projectObj: Project | ProjectInterface
+    :param processStatusCode: The current status of the process in question
+    :type processStatusCode: int
     :param client: Whether the current user is the client or the contractor
     :type client: Bool
     :param admin: Whether the current user is an admin (which may see all buttons) or not
     :type admin: Bool
-    :return: Nothing
-    :rtype: None
+    :return: The buttons corresponding to the status
+    :rtype: Dict
 
     """
 
-    for process in projectObj[SessionContentSemperKI.processes]:
-        processStatusAsString = processStatusFromIntToStr(process[ProcessDescription.processStatus])
-        process["processStatusButtons"] = stateDict[processStatusAsString].buttons(client, admin)
+    processStatusAsString = processStatusFromIntToStr(processStatusCode)
+    return stateDict[processStatusAsString].buttons(client, admin)
+
+#######################################################
+def getFlatStatus(processStatusCode:int, client=True) -> str:
+    """
+    Get code string if something is required from the user for that status
+
+    :param processStatusCode: The current status of the process
+    :type processStatusCode: int
+    :param client: Signals, if the user is the client of the process or not
+    :type client: Bool
+    :returns: The flat status string from FlatProcessStatus
+    :rtype: str
+    
+    """
+    processStatusAsString = processStatusFromIntToStr(processStatusCode)
+    return stateDict[processStatusAsString].getFlatStatus(client)
+
 
 #######################################################
 def signalCompleteToDependentProcesses(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, processObj:ProcessModel.Process|ProcessModel.ProcessInterface) -> None:
@@ -231,6 +247,18 @@ class State(ABC):
         pass
 
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        pass
+
+    ###################################################
     updateTransitions = []
     buttonTransitions = {}
 
@@ -388,6 +416,21 @@ class DRAFT(State):
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
             }]
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
 
     ###################################################
     # Transitions
@@ -471,6 +514,21 @@ class SERVICE_IN_PROGRESS(State):
                 "showIn": "project",
             }
         ]
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
     
     ###################################################
     # Transitions
@@ -591,6 +649,21 @@ class SERVICE_READY(State):
         ] 
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -683,6 +756,21 @@ class WAITING_FOR_OTHER_PROCESS(State):
                 "showIn": "project",
             }
         ] 
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_PROCESS
+        else:
+            return FlatProcessStatus.WAITING_PROCESS
     
     ###################################################
     # Transitions
@@ -807,6 +895,21 @@ class SERVICE_COMPLICATION(State):
         ] 
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     # def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -907,6 +1010,21 @@ class CONTRACTOR_SELECTED(State):
         ] 
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -984,6 +1102,21 @@ class VERIFYING(State):
                 "showIn": "project",
             }
         ] 
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_PROCESS
+        else:
+            return FlatProcessStatus.WAITING_PROCESS
     
     ###################################################
     # Transitions
@@ -1077,6 +1210,21 @@ class VERIFIED(State):
                 "showIn": "both",
             }
         ] 
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
     
     ###################################################
     # Transitions
@@ -1205,6 +1353,21 @@ class REQUESTED(State):
         return outArr
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_CONTRACTOR
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_CLARIFICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1325,6 +1488,21 @@ class CLARIFICATION(State):
         return outArr
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.WAITING_CLIENT
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1429,6 +1607,21 @@ class CONFIRMED_BY_CONTRACTOR(State):
             [
             ])
         return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.WAITING_CLIENT
 
     ###################################################
     # Transitions
@@ -1509,6 +1702,21 @@ class REJECTED_BY_CONTRACTOR(State):
         return outArr
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.COMPLETED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1583,6 +1791,21 @@ class CONFIRMED_BY_CLIENT(State):
         return outArr
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_CONTRACTOR
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_PRODUCTION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1645,6 +1868,21 @@ class REJECTED_BY_CLIENT(State):
 
             ])
         return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.COMPLETED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
     
     ###################################################
     # Transitions
@@ -1733,6 +1971,21 @@ class PRODUCTION(State):
                 }
             ] )
         return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_CONTRACTOR
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
     
     ###################################################
     # Transitions
@@ -1853,6 +2106,22 @@ class DELIVERY(State):
 
             ])
         return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.WAITING_CLIENT
+
     ###################################################
     # Transitions
     ###################################################
@@ -1978,6 +2247,21 @@ class DISPUTE(State):
         return outArr
     
     ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_CONTRACTOR
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
     # Transitions
     ###################################################
     def to_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -2064,6 +2348,21 @@ class COMPLETED(State):
             ] 
         else:
             return []
+        
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.COMPLETED
+        else:
+            return FlatProcessStatus.COMPLETED
     
     ###################################################
     # Transitions
@@ -2122,6 +2421,21 @@ class FAILED(State):
             ] 
         else:
             return []
+        
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.COMPLETED
+        else:
+            return FlatProcessStatus.COMPLETED
     
     ###################################################
     # Transitions
@@ -2180,6 +2494,21 @@ class CANCELED(State):
             ] 
         else:
             return []
+        
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.COMPLETED
+        else:
+            return FlatProcessStatus.COMPLETED
     
     ###################################################
     # Transitions

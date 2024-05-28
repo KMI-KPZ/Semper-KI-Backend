@@ -169,7 +169,7 @@ class ProcessInterface():
     ###################################################
     processID = ""
     
-    project = ProjectInterface("","")
+    project = ProjectInterface("","","")
 
     processDetails = {}
     processStatus = 0
@@ -191,7 +191,7 @@ class ProcessInterface():
     accessedWhen = ""
 
     ###################################################
-    def __init__(self, project:ProjectInterface, processID:str, currentTime:str) -> None:
+    def __init__(self, project:ProjectInterface, processID:str, currentTime:str, client:str) -> None:
         self.processID = processID
         self.project = project
         self.processDetails = {"amount": 1}
@@ -201,7 +201,7 @@ class ProcessInterface():
         self.serviceType = serviceManager.getNone()
         self.dependenciesIn = ManyToManySimulation()
         self.dependenciesOut = ManyToManySimulation()
-        self.client = ""
+        self.client = client
         self.files = {}
         self.messages = {"messages": []}
         self.createdWhen = currentTime

@@ -26,7 +26,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
 from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
-from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, addButtonsToProcess, InterfaceForStateChange, signalDependencyToOtherProcesses
+from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess, InterfaceForStateChange, signalDependencyToOtherProcesses, getFlatStatus
 from ..connections.content.manageContent import ManageContent
 
 logger = logging.getLogger("logToFile")
@@ -546,11 +546,11 @@ def deleteProcesses(request, projectID):
 @require_http_methods(["GET"]) 
 def getFlatProjects(request):
     """
-    Retrieve projects without much detail.
+    Retrieve all projects.
 
     :param request: GET Request
     :type request: HTTP GET
-    :return: Response with list
+    :return: Response with dict
     :rtype: JSON Response
 
     """
@@ -563,8 +563,8 @@ def getFlatProjects(request):
             sessionContent = contentManager.sessionManagement.getProjectsFlat(request.session)
             outDict["projects"].extend(sessionContent)
         
-        # ... or from database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):           
+        # ... and from database
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProcess.__name__):           
             objFromDB = contentManager.postgresManagement.getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
@@ -577,13 +577,13 @@ def getFlatProjects(request):
     except (Exception) as error:
         loggerError.error(f"getFlatProjects: {str(error)}")
         
-    return JsonResponse({"projects": []})
+    return JsonResponse({})
 
 #######################################################
 @require_http_methods(["GET"]) 
 def getProject(request, projectID):
     """
-    Retrieve project and processes.
+    Retrieve project with flat processes.
 
     :param request: GET Request
     :type request: HTTP GET
@@ -595,37 +595,65 @@ def getProject(request, projectID):
     """
     try:
         contentManager = ManageContent(request.session)
-        userID = contentManager.getClient()
-        adminOrNot = manualCheckifAdmin(request.session)
-        # Is the project inside the session?
-        project = {}
-        if contentManager.sessionManagement.getIfContentIsInSession():
-            project = contentManager.sessionManagement.getProject(projectID)
-            addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot) # calls current node of the state machine
-        if len(project) > 0:
-            return JsonResponse(project)
-        else:
-            # if not, look into database and check if the user or the contractor wants the project 
-            interface = contentManager.getCorrectInterface(getProject.__name__)
-            if interface == None:
-                logger.error("Rights not sufficient in getProject")
-                return JsonResponse({}, status=401)
-            
-            if pgProcesses.ProcessManagementBase.checkIfUserIsClient(userID, projectID=projectID):
-                project = pgProcesses.ProcessManagementBase.getProject(projectID)
-                addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
-                return JsonResponse(project)
-            else:
-                if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-                    project = pgProcesses.ProcessManagementBase.getProjectForContractor(projectID, userID)
-                    addButtonsToProcess(project, project[ProjectDescription.client] == userID, adminOrNot)
-                    return JsonResponse(project)
-                else:
-                    return JsonResponse({}, status=401)
+        interface = contentManager.getCorrectInterface(getProject.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in getProject")
+            return JsonResponse({}, status=401)
+        
+        projectAsDict = interface.getProject(projectID)
+        processList = projectAsDict[SessionContentSemperKI.processes]
+        listOfFlatProcesses = []
+        for entry in processList:
+            flatProcessDict = {
+                ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
+                ProcessDescription.processID: entry[ProcessDescription.processID],
+                ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
+                ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
+                ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
+                "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
+                ProcessDetails.amount: entry[ProcessDescription.processDetails][ProcessDetails.amount] if ProcessDetails.amount in entry[ProcessDescription.processDetails] else 1,
+                ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
+            }
+            listOfFlatProcesses.append(flatProcessDict)
 
-        # return JsonResponse({})
+        projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
+        return JsonResponse(projectAsDict)
+    
     except (Exception) as error:
         loggerError.error(f"getProject: {str(error)}")
+        
+    return JsonResponse({})
+    
+
+#######################################################
+@require_http_methods(["GET"]) 
+def getProcess(request, projectID, processID):
+    """
+    Retrieve complete process.
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response with list
+    :rtype: JSON Response
+
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        userID = contentManager.getClient()
+        adminOrNot = manualCheckifAdmin(request.session)
+        interface = contentManager.getCorrectInterface(getProject.__name__)
+        if interface == None:
+            logger.error("Rights not sufficient in getProject")
+            return JsonResponse({}, status=401)
+
+        process = interface.getProcess(projectID, processID)
+        if process != {}:
+            buttons = getButtonsForProcess(process[ProcessDescription.processStatus], process[ProcessDescription.client] == userID, adminOrNot) # calls current node of the state machine
+            process["processStatusButtons"] = buttons
+        return JsonResponse(process)
+
+    except (Exception) as error:
+        loggerError.error(f"getProcess: {str(error)}")
         return JsonResponse({}, status=500)
 
 #######################################################

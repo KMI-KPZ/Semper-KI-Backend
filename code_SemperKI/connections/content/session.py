@@ -299,7 +299,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             content = self.structuredSessionObj.getProject(projectID)
-            returnObj = ProjectInterface(projectID, content[ProjectDescription.createdWhen])
+            returnObj = ProjectInterface(projectID, content[ProjectDescription.createdWhen], content[ProjectDescription.client])
             returnObj.setValues(content[ProjectDescription.projectStatus], content[ProjectDescription.client], content[ProjectDescription.projectDetails], content[ProjectDescription.updatedWhen], content[ProjectDescription.accessedWhen])
             return returnObj
         except (Exception) as error:
@@ -321,7 +321,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         now = timezone.now()
 
-        self.structuredSessionObj.setProject(projectID, ProjectInterface(projectID, str(now)).toDict())
+        self.structuredSessionObj.setProject(projectID, ProjectInterface(projectID, str(now), client).toDict())
     
     #######################################################
     def getProject(self, projectID:str) -> dict:
@@ -437,7 +437,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             content = self.structuredSessionObj.getProcess(projectID, processID)
-            returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen]), processID, content[ProcessDescription.createdWhen])
+            returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen], content[ProcessDescription.client]), processID, content[ProcessDescription.createdWhen], content[ProcessDescription.client])
             
             # dependencies are saved as list of processIDs 
             if ProcessDescription.dependenciesIn in content:
@@ -452,6 +452,27 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f"Could not fetch process: {str(error)}")
             return error
+        
+    #######################################################
+    def getProcess(self, projectID:str, processID:str):
+        """
+        Return the process and all its details as dict
+
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: Dictionary containing the process
+        :rtype: dict
+
+        """
+        try:
+            processObj = self.getProcessObj(projectID, processID)
+            return processObj.toDict()
+
+        except (Exception) as error:
+            logger.error(f"Could not fetch process: {str(error)}")
+            return {}
 
     #######################################################
     def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list[ProcessInterface],list[ProcessInterface]]:
@@ -508,7 +529,7 @@ class ProcessManagementSession(AbstractContentInterface):
 
         now = timezone.now()
 
-        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now)), processID, str(now)).toDict())
+        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client).toDict())
 
     ###################################################
     def deleteProcess(self, processID:str, processObj=None):
