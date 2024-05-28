@@ -19,9 +19,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from Generic_Backend.code_General.urls import paths, urlpatterns
+
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 ##############################################################################
 ### WSGI
@@ -29,10 +31,13 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
 from MSQ.handlers import interface
 
-
 newPaths= {
+    "rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
+    #"rest-test2": ("public/resttest2/", testResponse.restTestAPI.as_view()),
+    "schema": ('api/schema/', SpectacularAPIView.as_view()),
+    "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
 
-    "getContractors": ("public/getContractors/<processID>/",projectAndProcessManagement.getContractors),
+    "getContractors": ("public/getContractors/<str:processID>/",projectAndProcessManagement.getContractors),
     "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),
     "retrieveProjects": ("public/retrieveProjects/",projectAndProcessManagement.retrieveProjects),
     "getMissedEvents": ("public/getMissedEvents/",projectAndProcessManagement.getMissedEvents),

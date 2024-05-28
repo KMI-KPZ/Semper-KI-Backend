@@ -153,3 +153,5 @@ redis/data*
 minio
 
 mesh.json
+
+*.vtk

@@ -213,6 +213,8 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'storages',
+    'rest_framework',
+    'drf_spectacular',
     'main',
     'Generic_Backend.code_General',
     'code_SemperKI'
@@ -425,3 +427,19 @@ STORAGES = {
 
 
 STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Semper-KI Backend',
+    'DESCRIPTION': 'API for Semper-KI',
+    'VERSION': '0.3.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
