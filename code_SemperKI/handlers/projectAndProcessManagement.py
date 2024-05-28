@@ -15,6 +15,7 @@ from django.utils import timezone
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
+
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults
@@ -706,7 +707,7 @@ def getMissedEvents(request):
 @require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
 @checkIfUserMaySeeProcess(json=True)
-def getContractors(request, processID):
+def getContractors(request, processID:str):
     """
     Get all suitable Contractors.
 

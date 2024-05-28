@@ -49,3 +49,19 @@ def isMagazineUp(request):
         return JsonResponse(response)
 
 
+###################################################
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.serializers import BaseSerializer
+from drf_spectacular.utils import extend_schema
+
+@api_view(['GET'])
+def restTest(request, dummy:str):
+    if request.method == "GET":
+        return Response("Test "+dummy, status=status.HTTP_200_OK)
+    
+class restTestAPI(APIView):
+    def get(self, request, format=None):
+        return Response("Test2", status=status.HTTP_200_OK)
