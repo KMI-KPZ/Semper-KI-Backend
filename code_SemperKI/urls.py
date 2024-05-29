@@ -32,8 +32,8 @@ from .handlers import projectAndProcessManagement, testResponse, frontpage, spar
 from MSQ.handlers import interface
 
 newPaths= {
-    "rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
-    #"rest-test2": ("public/resttest2/", testResponse.restTestAPI.as_view()),
+    #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
+    "rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
     "schema": ('api/schema/', SpectacularAPIView.as_view()),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
 

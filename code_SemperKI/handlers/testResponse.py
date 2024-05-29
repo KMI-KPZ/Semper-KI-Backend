@@ -49,12 +49,13 @@ def isMagazineUp(request):
         return JsonResponse(response)
 
 
+
 ###################################################
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.serializers import BaseSerializer
+from rest_framework import serializers
 from drf_spectacular.utils import extend_schema
 
 @api_view(['GET'])
@@ -63,5 +64,35 @@ def restTest(request, dummy:str):
         return Response("Test "+dummy, status=status.HTTP_200_OK)
     
 class restTestAPI(APIView):
-    def get(self, request, format=None):
-        return Response("Test2", status=status.HTTP_200_OK)
+
+    class RequestSerializer(serializers.Serializer):
+        name = serializers.CharField(max_length=100)
+        age = serializers.IntegerField(min_value=18)
+
+        def create(self, validated_data):
+            return {**validated_data}
+
+        def update(self, instance, validated_data):
+            instance.name = validated_data.get('name', instance.name)
+            instance.age = validated_data.get('age', instance.age)
+            return instance
+        
+    class ResponseSerializer(serializers.Serializer):
+        name = serializers.CharField(max_length=100)
+        age = serializers.IntegerField(min_value=18)
+
+    @extend_schema(
+        operation_id="test",
+        summary="Test",
+        description="Test",
+        request=requestSerializer,
+        responses={
+            200: responseSerializer,
+        },
+    )
+    def get(self, request, dummy:str, format=None):
+        return Response({"name": "test", "age": 12}, status=status.HTTP_200_OK)
+    
+    def post(self, request, dummy:str, format=None):
+        serializer = self.RequestSerializer(request.body.decode("utf-8"))
+        return Response({"name": "post", "age": 12}, status=status.HTTP_200_OK)
