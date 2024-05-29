@@ -16,6 +16,7 @@
             "getMissedEvents",
             "getProject",
             "getFlatProjects",
+            "getProcess",
             "getProcessHistory",
             "downloadProcessHistory",
             "statusButtonRequest",

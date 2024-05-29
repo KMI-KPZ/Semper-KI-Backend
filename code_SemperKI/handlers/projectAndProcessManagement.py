@@ -564,7 +564,7 @@ def getFlatProjects(request):
             outDict["projects"].extend(sessionContent)
         
         # ... and from database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getProcess.__name__):           
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):           
             objFromDB = contentManager.postgresManagement.getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
@@ -577,7 +577,7 @@ def getFlatProjects(request):
     except (Exception) as error:
         loggerError.error(f"getFlatProjects: {str(error)}")
         
-    return JsonResponse({})
+    return JsonResponse({}, status=500)
 
 #######################################################
 @require_http_methods(["GET"]) 
