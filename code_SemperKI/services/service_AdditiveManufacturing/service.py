@@ -65,4 +65,14 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         return AM_cloneServiceDetails(existingContent, newProcess)
 
+    ###################################################
+    def getFilteredContractors(self, processObj) -> list:
+        """
+        Get a list of contractors that are available for this service
+
+        """
+        print("GetFilteredContractors for ")
+        return []
+
+
 Semper.serviceManager.register("ADDITIVE_MANUFACTURING", 1, AdditiveManufacturing())

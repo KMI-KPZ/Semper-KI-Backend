@@ -241,4 +241,10 @@ class ProcessInterface():
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
-    
+
+    def save(self) -> None:
+        """
+        Save to database
+
+        """
+        pass

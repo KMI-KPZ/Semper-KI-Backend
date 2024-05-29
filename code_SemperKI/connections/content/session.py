@@ -423,7 +423,7 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     #######################################################
-    def getProcessObj(self, projectID:str, processID:str):
+    def getProcessObj(self, projectID:str, processID:str) -> ProcessInterface:
         """
         Return the process and all its details
 
