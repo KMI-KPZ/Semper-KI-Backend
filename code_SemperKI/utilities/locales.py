@@ -19,7 +19,22 @@ class ManageTranslations():
     
     """
 
-    redisCon = RedisConnection()
+    
+    #######################################################
+    def __init__(self, filePathAndName) -> None:
+        """
+        Retrieve translations from file and save it into redis 
+
+        :param filePathAndName: the very same
+        :type filePathAndName: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+
+        self.filePathAndName = filePathAndName
+        self.redisCon = RedisConnection()
+        self.retrieveContentFromRedis()
 
     #######################################################
     def retrieveContentFromRedis(self) -> str:
@@ -40,20 +55,6 @@ class ManageTranslations():
             return translations
 
 
-    #######################################################
-    def __init__(self, filePathAndName) -> None:
-        """
-        Retrieve translations from file and save it into redis 
-
-        :param filePathAndName: the very same
-        :type filePathAndName: str
-        :return: Nothing
-        :rtype: None
-        
-        """
-
-        self.filePathAndName = filePathAndName
-        self.retrieveContentFromRedis()
 
     #######################################################
     def getTranslation(self, locale:str, keyArr:list[str]) -> str:

@@ -29,12 +29,12 @@ class BackendDjangoConfig(AppConfig, BackendConfigHelper):
     
     """
     name = 'main' 
-    checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
 
     #######################################################
     def __init__(self,app_name, app_module):
         AppConfig.__init__(self,app_name, app_module)
         BackendConfigHelper.__init__(self)
+        self.checks_disable = { 'check_env': ('generate_env',), 'check_db' : ('create_db','generate_env'), 'check_redis': ('create_db','generate_env')}
 
     #######################################################
     def collectAllImports(self):

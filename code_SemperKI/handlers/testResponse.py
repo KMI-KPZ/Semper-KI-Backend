@@ -12,6 +12,8 @@ from django.http import HttpResponse, JsonResponse
 # this makes it possible to assume for a function, that certain requests are passed through
 from django.views.decorators.http import require_http_methods
 
+from code_SemperKI.utilities.basics import ExceptionSerializer
+
 ###################################################
 @require_http_methods(["POST", "GET"])
 def isMagazineUp(request):
@@ -77,10 +79,6 @@ class restTestAPI(APIView):
         name = serializers.CharField(max_length=100)
         age = serializers.IntegerField(min_value=18)
         dummy = serializers.CharField(max_length=100)
-
-    class ExceptionSerializer(serializers.Serializer):
-        message = serializers.CharField()
-        exception = serializers.CharField()
 
     @extend_schema(
         operation_id="test",

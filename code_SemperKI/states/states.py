@@ -12,7 +12,7 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.utilities.basics import Logging
+from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement

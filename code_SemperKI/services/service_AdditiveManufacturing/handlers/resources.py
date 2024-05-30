@@ -14,7 +14,8 @@ from django.http import HttpResponse, JsonResponse
 from ..utilities import mocks
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, Logging
+from Generic_Backend.code_General.definitions import Logging
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from django.views.decorators.http import require_http_methods
 
 from ..connections import cmem

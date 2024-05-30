@@ -11,6 +11,8 @@ import json
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
+from rest_framework import serializers
+
 from Generic_Backend.code_General.definitions import SessionContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
 import code_SemperKI.connections.content.postgresql.pgProcesses as PGProcesses
@@ -85,3 +87,9 @@ def checkIfUserMaySeeProcess(json=False):
         return inner
 
     return decorator
+
+
+#####################################################################
+class ExceptionSerializer(serializers.Serializer):
+    message = serializers.CharField()
+    exception = serializers.CharField()

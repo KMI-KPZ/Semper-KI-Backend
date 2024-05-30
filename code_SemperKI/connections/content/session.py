@@ -31,7 +31,7 @@ class StructuredSession():
 
     """
 
-    currentSession = {}
+    currentSession : dict = {}
 
     #######################################################
     def __init__(self, session) -> None:

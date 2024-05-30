@@ -17,8 +17,8 @@ from django.utils import timezone
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.definitions import FileObjectContent
-from Generic_Backend.code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.definitions import FileObjectContent, Logging
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType, DataDescription
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession

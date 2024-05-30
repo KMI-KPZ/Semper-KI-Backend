@@ -29,6 +29,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from .handlers.public.project import ProjectInterface
 from MSQ.handlers import interface
 
 newPaths= {
@@ -36,6 +37,8 @@ newPaths= {
     "rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
     "schema": ('api/schema/', SpectacularAPIView.as_view()),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
+
+    "projects": ('public/project/*', ProjectInterface.as_view()),
 
     "getContractors": ("public/getContractors/<str:processID>/",projectAndProcessManagement.getContractors),
     "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),

@@ -229,7 +229,7 @@ Writing to this log file in the code needs some preliminaries:
   ```
   import logging
   from datetime import datetime
-  from ..utilities.basics import Logging
+  from ..definitions import Logging
   logger = logging.getLogger("logToFile")
   ```
 - Then in any function the logger can be called with `logger.info(...)` where ... is a string with a certain structure
