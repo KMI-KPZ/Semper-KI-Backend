@@ -83,11 +83,9 @@ class AdditiveManufacturing(Semper.ServiceBase):
         #obtain measures of the object
         #build_plate = processObj.get("build_plate")
         manager = AdditiveQueryManager(RedisConnection(), cmemOauthToken, endpoint, updateEndpoint)
-        if manager.getResource("buildPlate").hasGet() :
-            res = manager.getResource("buildPlate")
-            if res.hasGet() :
-                # dummy data - filters printers for now
-                return res.get({"min_length":2500,"min_width":2500,"min_height": 1500})
+        if manager.buildPlate.hasGet() :
+           # dummy data - filters printers for now
+           return manager.buildPlate.get({"min_length":2500,"min_width":2500,"min_height": 1500})
 
         return []
 
