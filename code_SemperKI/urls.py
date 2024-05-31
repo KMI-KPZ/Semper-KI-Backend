@@ -29,30 +29,34 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
-from .handlers.public.project import ProjectInterface
+from .handlers.public import project
 from MSQ.handlers import interface
 
 newPaths= {
     #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
-    "rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
+    #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
     "schema": ('api/schema/', SpectacularAPIView.as_view()),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
 
-    "projects": ('public/project/*', ProjectInterface.as_view()),
+    "createProject": ('public/project/create', project.createProjectID),
+    "getProject": ("public/project/get/<str:projectID>/",project.getProject),
+    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
+    "updateProject": ("public/project/update/",project.updateProject),
+    "deleteProjects": ("public/project/delete/",project.deleteProjects),
 
     "getContractors": ("public/getContractors/<str:processID>/",projectAndProcessManagement.getContractors),
     "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),
     #"retrieveProjects": ("public/retrieveProjects/",projectAndProcessManagement.retrieveProjects),
     "getMissedEvents": ("public/getMissedEvents/",projectAndProcessManagement.getMissedEvents),
-    "createProjectID": ("public/createProjectID/",projectAndProcessManagement.createProjectID),
-    "getProject": ("public/getProject/<projectID>/",projectAndProcessManagement.getProject),
-    "getFlatProjects": ("public/getFlatProjects/", projectAndProcessManagement.getFlatProjects),
+    #"createProjectID": ("public/createProjectID/",projectAndProcessManagement.createProjectID),
+    #"getProject": ("public/getProject/<projectID>/",projectAndProcessManagement.getProject),
+    #"getFlatProjects": ("public/getFlatProjects/", projectAndProcessManagement.getFlatProjects),
     "getProcess": ("public/getProcess/<projectID>/<processID>/",projectAndProcessManagement.getProcess),
     "createProcessID": ("public/createProcessID/<projectID>/",projectAndProcessManagement.createProcessID),
     "updateProcess": ("public/updateProcess/",projectAndProcessManagement.updateProcess),
-    "updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
+    #"updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
     "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
-    "deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
+    #"deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
     #"verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
     #"sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
     "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),

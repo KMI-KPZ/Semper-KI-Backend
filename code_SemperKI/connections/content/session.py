@@ -145,9 +145,10 @@ class StructuredSession():
         :rtype: dict
 
         """
-
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
-
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
+        else:
+            return {}
 ###################################################################
     #######################################################
     def getProcess(self, projectID:str, processID:str):
@@ -162,9 +163,10 @@ class StructuredSession():
         :rtype: Dict
 
         """
-
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
-
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
+        else:
+            return {}
     #######################################################
     def getProcessPerID(self, processID:str):
         """
