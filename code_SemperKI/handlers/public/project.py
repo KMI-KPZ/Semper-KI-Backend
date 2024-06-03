@@ -1,3 +1,12 @@
+"""
+Part of Semper-KI software
+
+Silvio Weging 2024
+
+Contains: Handlers for projects
+"""
+
+
 from http import HTTPMethod
 import io, logging
 from datetime import datetime
