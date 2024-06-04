@@ -86,7 +86,7 @@ def uploadModel(request):
             if returnVal is not True:
                 return JsonResponse({}, status=500)
         
-        changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileID]}}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.models: model[fileID]}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -125,14 +125,14 @@ def deleteModel(request, projectID, processID):
         if interface == None:
             return HttpResponse("Not logged in or rights insufficient!", status=401)
         currentProcess = interface.getProcessObj(projectID, processID)
-        modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
+        modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
         if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
             modelExistsAsFile = True
             
         if modelExistsAsFile:
             deleteFile(request, projectID, processID, modelOfThisProcess[FileObjectContent.id])
         
-        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.model: modelOfThisProcess[FileObjectContent.id]}}}
+        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.models: modelOfThisProcess[FileObjectContent.id]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return HttpResponse("Insufficient rights!", status=401)

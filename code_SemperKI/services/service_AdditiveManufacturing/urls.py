@@ -22,6 +22,7 @@ Including another URLconf
 from django.urls import path
 
 from .handlers import checkService, filter, resources, model
+from .handlers.public.model import uploadModel
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -33,8 +34,8 @@ newPaths = {
     "getMaterials": ('public/getMaterials/',filter.getMaterials),
     "getPostProcessing": ('public/getPostProcessing/',filter.getPostProcessing),
 
-    "uploadModel": ("public/uploadModel/",model.uploadModel),
-    "deleteModel": ("public/deleteModel/<projectID>/<processID>/",model.deleteModel),
+    "uploadModel": ("public/service/additive-manufacturing/model/upload/",uploadModel),
+    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>",model.deleteModel),
     "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
 
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),

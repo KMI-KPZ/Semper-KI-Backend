@@ -208,6 +208,7 @@ def checkModel(request, projectID, processID) -> JsonResponse:
     :return: JSON with dimensions
     :rtype: Json Response
 
+     TODO
     """
     try:
         contentManager = ManageContent(request.session)
@@ -222,7 +223,7 @@ def checkModel(request, projectID, processID) -> JsonResponse:
         if ServiceDetails.calculations in process.serviceDetails:
             return JsonResponse(process.serviceDetails[ServiceDetails.calculations])
 
-        model = process.serviceDetails[ServiceDetails.model]
+        model = process.serviceDetails[ServiceDetails.models]
         modelName = model[FileObjectContent.fileName]
         mock = {
             "filename": modelName,
