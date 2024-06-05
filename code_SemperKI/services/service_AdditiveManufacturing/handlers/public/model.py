@@ -64,7 +64,7 @@ class SReqUploadModels(serializers.Serializer):
 )
 @require_http_methods(["POST"])
 @api_view(["POST"])
-def uploadModel(request:Request):
+def uploadModels(request:Request):
     """
     File upload for multiple files.
     TODO: Verify files, python-magic could help, or https://github.com/mbourqui/django-constrainedfilefield as well as https://stackoverflow.com/questions/20272579/django-validate-file-type-of-uploaded-file
