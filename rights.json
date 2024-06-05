@@ -32,6 +32,7 @@
          ],
          "paths": [
             "updateProcess",
+            "updateProcessFunction",
             "downloadFilesAsZip",
             "downloadFile",
             "uploadFiles",
@@ -53,7 +54,8 @@
             "ProcessButtonChat"
          ],
          "paths": [
-            "updateProcess"
+            "updateProcess",
+            "updateProcessFunction"
          ]
       },
       {
@@ -104,6 +106,7 @@
          ],
          "paths": [
             "updateProcess",
+            "updateProcessFunction",
             "updateProject",
             "getContractors",
             "saveProjects",

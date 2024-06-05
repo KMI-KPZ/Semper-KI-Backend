@@ -86,7 +86,7 @@ class _ServicesManager():
     ###################################################
     class _Structure(StrEnumExactylAsDefined):
         """
-        How the services dictionary is structures
+        How the services dictionary is structured
 
         """
         object = enum.auto()
