@@ -17,8 +17,8 @@ class ServiceDetails(StrEnumExactylAsDefined):
     What does the service consists of 
 
     """
-    model = enum.auto()
-    material = enum.auto()
+    models = enum.auto()
+    materials = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
 

@@ -38,7 +38,7 @@ newPaths= {
     "schema": ('api/schema/', SpectacularAPIView.as_view()),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
 
-    "createProject": ('public/project/create', project.createProjectID),
+    "createProject": ('public/project/create/', project.createProjectID),
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),
     "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
     "updateProject": ("public/project/update/",project.updateProject),

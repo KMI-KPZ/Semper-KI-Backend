@@ -547,7 +547,8 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             currentProcess = self.structuredSessionObj.getProcessPerID(processID)
             files = currentProcess[ProcessDescription.files]
-            for fileObj in files:
+            for fileKey in files:
+                fileObj = files[fileKey]
                 if fileObj[FileObjectContent.remote]:
                     s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
                 else:
