@@ -34,7 +34,8 @@ from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunc
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.connections.content.manageContent import ManageContent
-
+from MSQ.tasks.tasks import callfTetWild
+from MSQ.handlers.interface import returnFileFromfTetWild
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -244,6 +245,69 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in deleteModel: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
+    summary="Converts an uploaded stl file to a file with tetrahedral mesh",
+    description=" ",
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        404: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+def remeshSTLToTetraheadras(request:Request, projectID:str, processID:str, fileID:str):
+    """
+    Converts an uploaded stl file to a file with tetrahedral mesh
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Indirectly a file (via Celery)
+    :rtype: (File)Response
+
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
+        if interface == None:
+            message = "Rights not sufficient in deleteModel"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        currentProcess = interface.getProcessObj(projectID, processID)
+        modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
+        if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
+            message = "Model not found in deleteModel"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        modelsOfThisProcess[fileID][FileObjectContent.path]
+        filePath, _ = callfTetWild(modelsOfThisProcess[fileID][FileObjectContent.path])
+        if filePath == "":
+            raise Exception("Calculation failed!")
+        return returnFileFromfTetWild(filePath)
+        #return Response("Success")
+    except (Exception) as error:
+        message = f"Error in remeshSTLToTetraheadras: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

@@ -22,7 +22,7 @@ Including another URLconf
 from django.urls import path
 
 from .handlers import checkService, filter, resources, model
-from .handlers.public.model import uploadModels, deleteModel
+from .handlers.public.model import uploadModels, deleteModel, remeshSTLToTetraheadras
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -36,6 +36,7 @@ newPaths = {
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",uploadModels),
     "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",deleteModel),
+    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", remeshSTLToTetraheadras),
     "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
 
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),

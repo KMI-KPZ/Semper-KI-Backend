@@ -5,19 +5,30 @@ Silvio Weging 2024
 
 Contains: Interface with the message queuing system
 """
+from Generic_Backend.code_General.connections import s3
 import MSQ.module.celery as TaskQueue
-from ..tasks.tasks import dummy, dummyDerp
-from django.http import HttpResponse
+from ..tasks.tasks import dummy, callfTetWild
+from django.http import FileResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
 
 ####################################################################
-# Remote stuff 
+def returnFileFromfTetWild(filePath:str):
+    """
+    Only temporary solution
+
+    """
+    content, flag = s3.manageLocalS3.downloadFile(filePath)
+    if flag is False:
+        content, flag = s3.manageRemoteS3.downloadFile(filePath)
+        if flag is False:
+            return HttpResponse("Not found", status=404)
+    return FileResponse(content, filename="Test.ugrid")
 
 ####################################################################
 @require_http_methods(["GET"])
 def getResultsBack(request, taskID):
     """
-    Get results from celery worker via ID
+    Get results from celery worker via ID, dispatch to further handlers
     
     :param request: Get request, not used
     :type request: GET
@@ -27,7 +38,12 @@ def getResultsBack(request, taskID):
     :rtype: HttpResponse
     """
     retVal = TaskQueue.app.AsyncResult(taskID)
-    print(retVal.result)
+    callingFunction = retVal.result[1]
+    resultOfCalculation = retVal.result[0]
+    if callingFunction == dummy.__name__:
+        return HttpResponse(retVal.result)
+    elif callingFunction == callfTetWild.__name__:
+        return returnFileFromfTetWild(resultOfCalculation)
     return HttpResponse("Success")
 
 ####################################################################
@@ -40,11 +56,11 @@ def getResultsBack(request, taskID):
 #     return HttpResponse("Success")
 
 ####################################################################
+from io import BytesIO
 def sendExampleLocal(request):
     """
     Send example to worker
     
     """
     retVal = dummy.delay(1,"bla")
-    retVal = dummyDerp.delay(1,"bla")
     return HttpResponse("Success")
