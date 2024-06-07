@@ -417,7 +417,8 @@ class ProcessManagementSession(AbstractContentInterface):
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
                 allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
-                del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
+                if SessionContentSemperKI.processes in allProjects[idx]:
+                    del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
             
             return allProjects
         except (Exception) as error:

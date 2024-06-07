@@ -408,7 +408,7 @@ def deleteProjects(request):
 
     """
     try:
-        projectIDs = request.GET['projectIDs'].split(",")
+        projectIDs = request.data['projectIDs']
         #loggedIn = False # don't check rights in every iteration
 
         contentManager = ManageContent(request.session)
