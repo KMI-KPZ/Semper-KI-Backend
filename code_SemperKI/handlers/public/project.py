@@ -37,18 +37,24 @@ loggerError = logging.getLogger("errors")
 # Get project(s)
 ########################################################
 # Serializers
+
+########################################################
+class ProjectDetailsSerializer(serializers.Serializer):
+    title = serializers.CharField()
+
+########################################################
 class SResGetProject(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     projectStatus = serializers.IntegerField()
     client = serializers.CharField(max_length=200)
-    projectDetails = serializers.JSONField()
+    projectDetails = ProjectDetailsSerializer()
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processes = serializers.ListField()
 ########################################################
 class SResGetFlatProjects(serializers.Serializer):
-    projects = serializers.ListField()
+    projects = serializers.ListField()#TODO specify further
 
 ########################################################
 # Handler

@@ -23,6 +23,7 @@ from django.urls import path
 
 from .handlers import checkService, filter, resources, model
 from .handlers.public.model import uploadModels, deleteModel, remeshSTLToTetraheadras
+from .handlers.public.checkService import checkModel
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -42,7 +43,7 @@ newPaths = {
     "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
     "checkPrices": ("public/checkPrices/",checkService.checkPrice),
     "checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/checkModel/<projectID>/<processID>/", checkService.checkModel),
+    "checkModel": ("public/checkModel/<str:projectID>/<str:processID>/<str:fileID>/", checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "onto_getPrinters": ("public/onto/getPrinters/",resources.onto_getPrinters),
