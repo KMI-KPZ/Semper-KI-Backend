@@ -14,10 +14,4 @@ RUN --mount=type=cache,target=/root/.cache \
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc bash iputils-ping curl gawk libgmp-dev git cmake
 
-RUN git clone https://github.com/wildmeshing/fTetWild.git
-RUN cd fTetWild
-RUN mkdir build
-RUN cd build/
-RUN cmake ..
-RUN make
 

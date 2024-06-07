@@ -155,3 +155,5 @@ minio
 mesh.json
 
 *.vtk
+
+*.stl
