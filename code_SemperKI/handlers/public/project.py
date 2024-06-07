@@ -191,6 +191,12 @@ def getProject(request, projectID):
 # Create project
 #######################################################
 # Serializers     
+        
+#######################################################
+class SReqCreateProjectID(serializers.Serializer):
+    title = serializers.CharField(max_length=200)
+        
+#######################################################
 class SResCreateProjectID(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
 
@@ -199,9 +205,10 @@ class SResCreateProjectID(serializers.Serializer):
 @extend_schema(
     summary="Create project and send ID back to frontend",
     description=" ",
-    request=None,
+    request=SReqCreateProjectID,
     responses={
         200: SResCreateProjectID,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     },
@@ -218,6 +225,20 @@ def createProjectID(request):
 
     """
     try:
+        inSerializer = SReqCreateProjectID(data=request.data)
+        if not inSerializer.is_valid():
+            message = "Verification failed in createProjectID"
+            exception = "Verification failed"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        projectTitle = validatedInput[ProjectDetails.title]
+
         # generate ID string, make timestamp and create template for project
         projectID = crypto.generateURLFriendlyRandomString()
         #now = timezone.now()
@@ -236,6 +257,7 @@ def createProjectID(request):
         
         client = contentManager.getClient()
         interface.createProject(projectID, client)
+        interface.updateProject(projectID, ProjectUpdates.projectDetails, {ProjectDetails.title: projectTitle})
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
 
@@ -290,47 +312,8 @@ def updateProject(request):
 
     """
     try:
-        json_data=request.body
-        stream= io.BytesIO(json_data)
-        jsonContent = JSONParser().parse(stream)
-        serializer = SReqUpdateProject(data=jsonContent)
-        if serializer.is_valid():
-            validatedInput = serializer.data
-            projectID = validatedInput[ProjectDescription.projectID]
-
-            contentManager = ManageContent(request.session)
-            interface = contentManager.getCorrectInterface(updateProject.__name__)
-            if interface == None or not contentManager.checkRightsForProject(projectID):
-                message = "Rights not sufficient in updateProject"
-                exception = "Unauthorized"
-                logger.error(message)
-                exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-                if exceptionSerializer.is_valid():
-                    return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-                else:
-                    return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            for entry in validatedInput["changes"]:
-                returnVal = interface.updateProject(projectID, entry, validatedInput["changes"][entry])
-                if isinstance(returnVal, Exception):
-                    raise returnVal
-                
-            # TODO send to websockets that are active, that a new message/status is available for that project
-            # outputDict = {EventsDescription.eventType: "projectEvent"}
-            # outputDict["projectID"] = projectID
-            # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
-            # channel_layer = get_channel_layer()
-            # listOfUsers = pgProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
-            # for user in listOfUsers:
-            #     if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-            #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
-            #             "type": "sendMessageJSON",
-            #             "dict": outputDict,
-            #         })
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-
-            return Response("Success")
-        else:
+        inSerializer = SReqUpdateProject(data=request.data)
+        if not inSerializer.is_valid():
             message = "Validation failed"
             exception = "Validation failed"
             logger.error(message)
@@ -339,6 +322,43 @@ def updateProject(request):
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        validatedInput = inSerializer.data
+        projectID = validatedInput[ProjectDescription.projectID]
+
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(updateProject.__name__)
+        if interface == None or not contentManager.checkRightsForProject(projectID):
+            message = "Rights not sufficient in updateProject"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        for entry in validatedInput["changes"]:
+            returnVal = interface.updateProject(projectID, entry, validatedInput["changes"][entry])
+            if isinstance(returnVal, Exception):
+                raise returnVal
+            
+        # TODO send to websockets that are active, that a new message/status is available for that project
+        # outputDict = {EventsDescription.eventType: "projectEvent"}
+        # outputDict["projectID"] = projectID
+        # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
+        # channel_layer = get_channel_layer()
+        # listOfUsers = pgProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
+        # for user in listOfUsers:
+        #     if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
+        #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
+        #             "type": "sendMessageJSON",
+        #             "dict": outputDict,
+        #         })
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
+
+        return Response("Success")
+            
 
     except (Exception) as error:
         message = f"Error in updateProject: {str(error)}"
