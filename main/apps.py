@@ -11,6 +11,7 @@ from django.apps import AppConfig
 from django.core.checks import register
 from .checks import Tags, checkEnv, checkDb, checkRedis
 from logging import getLogger
+from django.conf import settings
 logger = getLogger("django_debug")
 
 #
@@ -43,10 +44,10 @@ class BackendDjangoConfig(AppConfig, BackendConfigHelper):
 
         """
         currentDirectory = os.getcwd()  # current working directory
-
-        for root, dirs, files in os.walk(currentDirectory):
-            if 'imports.py' in files:
-                serviceFilePath = os.path.join(root, 'imports.py')
+        if settings.DEBUG: # this is faster for debugging
+            listOfImports = ["code_SemperKI/imports.py", "code_SemperKI/services/service_AdditiveManufacturing/imports.py", "code_SemperKI/services/service_CreateModel/imports.py", "Generic_Backend/code_General/imports.py"]
+            for entry in listOfImports:
+                serviceFilePath = os.path.join(settings.BASE_DIR, entry)
 
                 # create module name by replacing the path separator with dots
                 moduleName = os.path.relpath(serviceFilePath, currentDirectory).replace(os.sep, '.').rstrip('.py')
@@ -58,6 +59,21 @@ class BackendDjangoConfig(AppConfig, BackendConfigHelper):
                 spec.loader.exec_module(module)
 
                 print(f"Imported module {moduleName}")
+        else:
+            for root, dirs, files in os.walk(currentDirectory):
+                if 'imports.py' in files:
+                    serviceFilePath = os.path.join(root, 'imports.py')
+
+                    # create module name by replacing the path separator with dots
+                    moduleName = os.path.relpath(serviceFilePath, currentDirectory).replace(os.sep, '.').rstrip('.py')
+
+                    # import the module
+                    spec = importlib.util.spec_from_file_location(moduleName, serviceFilePath)
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[moduleName] = module
+                    spec.loader.exec_module(module)
+
+                    print(f"Imported module {moduleName}")
 
     #######################################################
     def ready(self):

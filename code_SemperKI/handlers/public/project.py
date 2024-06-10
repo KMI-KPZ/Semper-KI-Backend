@@ -27,7 +27,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckIfRightsAre
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getFlatStatus
-from code_SemperKI.utilities.basics import ExceptionSerializer
+from code_SemperKI.utilities.basics import ExceptionSerializer, checkVersion
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -59,6 +59,7 @@ class SResGetFlatProjects(serializers.Serializer):
 ########################################################
 # Handler
 #######################################################
+#@checkVersion(1.0) TODO
 @extend_schema(
     summary="Get all projects flattened",
     description=" ",
@@ -90,7 +91,7 @@ def getFlatProjects(request):
             outDict["projects"].extend(sessionContent)
         
         # ... and from database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.__name__):           
+        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.cls.__name__):           
             objFromDB = contentManager.postgresManagement.getProjectsFlat(request.session)
             if len(objFromDB) >= 1:
                 outDict["projects"].extend(objFromDB)
@@ -141,7 +142,7 @@ def getProject(request, projectID):
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(getProject.__name__)
+        interface = contentManager.getCorrectInterface(getProject.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in getProject"
             exception = "Unauthorized"
@@ -243,7 +244,7 @@ def createProjectID(request):
         projectID = crypto.generateURLFriendlyRandomString()
         #now = timezone.now()
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(createProjectID.__name__)
+        interface = contentManager.getCorrectInterface(createProjectID.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in createProjectID"
             exception = "Unauthorized"
@@ -327,7 +328,7 @@ def updateProject(request):
         projectID = validatedInput[ProjectDescription.projectID]
 
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProject.__name__)
+        interface = contentManager.getCorrectInterface(updateProject.cls.__name__)
         if interface == None or not contentManager.checkRightsForProject(projectID):
             message = "Rights not sufficient in updateProject"
             exception = "Unauthorized"
@@ -412,7 +413,7 @@ def deleteProjects(request):
         #loggedIn = False # don't check rights in every iteration
 
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteProjects.__name__)
+        interface = contentManager.getCorrectInterface(deleteProjects.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in updateProject"
             exception = "Unauthorized"

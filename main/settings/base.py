@@ -430,10 +430,11 @@ STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDP
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.BasicAuthentication', #TODO: Set API Keys
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning'
 }
 
 SPECTACULAR_SETTINGS = {

@@ -42,7 +42,7 @@ def getAllProjectsFlatAsAdmin(request):
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
         projects[idx]["clientName"] = userName
         
-    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
     return JsonResponse(projects, safe=False)
 
 ##############################################
@@ -61,7 +61,7 @@ def getSpecificProjectAsAdmin(request, projectID):
     :rtype: JSONResponse
     """
 
-    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
     return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 
     

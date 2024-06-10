@@ -12,6 +12,9 @@ from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
 from rest_framework import serializers
+from rest_framework.versioning import AcceptHeaderVersioning
+from rest_framework.response import Response
+from rest_framework import status
 
 from Generic_Backend.code_General.definitions import SessionContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
@@ -93,3 +96,39 @@ def checkIfUserMaySeeProcess(json=False):
 class ExceptionSerializer(serializers.Serializer):
     message = serializers.CharField()
     exception = serializers.CharField()
+
+
+#################### DECORATOR ###################################
+def checkVersion(version=1.0):
+    """
+    Checks if the version is supported or not. If not, returns an error message.
+
+    :param version: Version of the API to check if it is supported or not
+    :type version: Float
+    :return: Response whether the version is supported or not
+    :rtype: HTTPRespone
+    """
+
+    ######################################################
+    class VersioningForHandlers(AcceptHeaderVersioning):
+        allowed_versions = []
+
+        def __init__(self, allowedVersions) -> None:
+            super().__init__()
+            self.allowed_versions = [allowedVersions]
+
+    ######################################################
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            versioning = VersioningForHandlers(version)
+            version = versioning.determine_version(request)
+            if isinstance(version, Exception):
+                return Response("Version mismatch!", status=status.HTTP_406_NOT_ACCEPTABLE)
+            
+        return inner
+
+    return decorator
+
+
+

@@ -35,7 +35,7 @@ from MSQ.handlers import interface
 newPaths= {
     #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
     #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
-    "schema": ('api/schema/', SpectacularAPIView.as_view()),
+    "schema": ('api/schema/', SpectacularAPIView.as_view(api_version='v1')),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
 
     "createProject": ('public/project/create/', project.createProjectID),
@@ -69,7 +69,6 @@ newPaths= {
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
 
     "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
-    "checkVersion": ("public/checkVersion/", frontpage.checkVersionOfFrontend),
 
     "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
     "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
