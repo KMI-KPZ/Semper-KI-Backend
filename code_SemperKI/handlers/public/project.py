@@ -117,7 +117,6 @@ def getFlatProjects(request):
 
 
 #######################################################
-@checkVersion(0.3)
 @extend_schema(
     summary="Get a project by ID",
     description=" ",
@@ -129,6 +128,7 @@ def getFlatProjects(request):
     },
 )
 @api_view([HTTPMethod.GET])
+@checkVersion(0.3)
 def getProject(request, projectID):
     """
     Retrieve project with flat processes.
@@ -204,7 +204,6 @@ class SResCreateProjectID(serializers.Serializer):
 
 #######################################################
 # Handler
-@checkVersion(0.3)
 @extend_schema(
     summary="Create project and send ID back to frontend",
     description=" ",
@@ -217,6 +216,7 @@ class SResCreateProjectID(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.POST])
+@checkVersion(0.3)
 def createProjectID(request):
     """
     Create project and send ID to frontend
@@ -292,7 +292,6 @@ class SReqUpdateProject(serializers.Serializer):
 
 ########################################################
 # Handler
-@checkVersion(0.3)
 @extend_schema(
     summary="Update stuff about the project",
     description=" ",
@@ -305,6 +304,7 @@ class SReqUpdateProject(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.PATCH])
+@checkVersion(0.3)
 def updateProject(request):
     """
     Update stuff about the project
@@ -382,7 +382,6 @@ def updateProject(request):
 
 ########################################################
 # Handler
-@checkVersion(0.3)
 @extend_schema(
     summary="Delete the whole projects",
     description=" ",
@@ -402,6 +401,7 @@ def updateProject(request):
     )],
 )
 @api_view([HTTPMethod.DELETE])
+@checkVersion(0.3)
 def deleteProjects(request):
     """
     Delete whole projects
