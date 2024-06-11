@@ -29,7 +29,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
-from .handlers.public import project
+from .handlers.public import project, process
 from MSQ.handlers import interface
 
 newPaths= {
@@ -51,8 +51,8 @@ newPaths= {
     #"createProjectID": ("public/createProjectID/",projectAndProcessManagement.createProjectID),
     #"getProject": ("public/getProject/<projectID>/",projectAndProcessManagement.getProject),
     #"getFlatProjects": ("public/getFlatProjects/", projectAndProcessManagement.getFlatProjects),
-    "getProcess": ("public/getProcess/<projectID>/<processID>/",projectAndProcessManagement.getProcess),
-    "createProcessID": ("public/createProcessID/<projectID>/",projectAndProcessManagement.createProcessID),
+    "getProcess": ("public/process/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
+    "createProcessID": ("public/process/createProcessID/<str:projectID>", process.createProcessID),
     "updateProcess": ("public/updateProcess/",projectAndProcessManagement.updateProcess),
     #"updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
     "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
