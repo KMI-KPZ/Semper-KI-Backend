@@ -59,7 +59,6 @@ class SResGetFlatProjects(serializers.Serializer):
 ########################################################
 # Handler
 #######################################################
-#@checkVersion(1.0) TODO
 @extend_schema(
     summary="Get all projects flattened",
     description=" ",
@@ -71,6 +70,7 @@ class SResGetFlatProjects(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.GET])
+@checkVersion(0.3)
 def getFlatProjects(request):
     """
     Retrieve all projects.
@@ -117,6 +117,7 @@ def getFlatProjects(request):
 
 
 #######################################################
+@checkVersion(0.3)
 @extend_schema(
     summary="Get a project by ID",
     description=" ",
@@ -203,6 +204,7 @@ class SResCreateProjectID(serializers.Serializer):
 
 #######################################################
 # Handler
+@checkVersion(0.3)
 @extend_schema(
     summary="Create project and send ID back to frontend",
     description=" ",
@@ -290,6 +292,7 @@ class SReqUpdateProject(serializers.Serializer):
 
 ########################################################
 # Handler
+@checkVersion(0.3)
 @extend_schema(
     summary="Update stuff about the project",
     description=" ",
@@ -379,6 +382,7 @@ def updateProject(request):
 
 ########################################################
 # Handler
+@checkVersion(0.3)
 @extend_schema(
     summary="Delete the whole projects",
     description=" ",

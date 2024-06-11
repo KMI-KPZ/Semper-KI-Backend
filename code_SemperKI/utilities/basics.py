@@ -98,8 +98,17 @@ class ExceptionSerializer(serializers.Serializer):
     exception = serializers.CharField()
 
 
+
+
 #################### DECORATOR ###################################
-def checkVersion(version=1.0):
+class VersioningForHandlers(AcceptHeaderVersioning):
+    allowed_versions = []
+
+    def __init__(self, allowedVersions) -> None:
+        super().__init__()
+        self.allowed_versions = [str(allowedVersions)]
+######################################################
+def checkVersion(version=0.3):
     """
     Checks if the version is supported or not. If not, returns an error message.
 
@@ -109,23 +118,15 @@ def checkVersion(version=1.0):
     :rtype: HTTPRespone
     """
 
-    ######################################################
-    class VersioningForHandlers(AcceptHeaderVersioning):
-        allowed_versions = []
-
-        def __init__(self, allowedVersions) -> None:
-            super().__init__()
-            self.allowed_versions = [allowedVersions]
-
-    ######################################################
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            versioning = VersioningForHandlers(version)
-            version = versioning.determine_version(request)
-            if isinstance(version, Exception):
-                return Response("Version mismatch!", status=status.HTTP_406_NOT_ACCEPTABLE)
-            
+            try:
+                versioning = VersioningForHandlers(version)
+                versionOfReq = versioning.determine_version(request)
+                return func(request, *args, **kwargs)
+            except Exception as e:
+                return Response(f"Version mismatch! {version} required!", status=status.HTTP_406_NOT_ACCEPTABLE)
         return inner
 
     return decorator
