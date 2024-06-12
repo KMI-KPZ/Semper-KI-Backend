@@ -99,10 +99,11 @@ def retrieveMaterialsWithFilter(request:Request):
         for elem in materialsRes:
             title = elem["Material"]["value"]
             resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture.mockPicturePath})
-        output.update(resultsOfQueries)
+
         
         # mockup here:
         mock = copy.deepcopy(mocks.materialMock)
+        mock["materials"].extend(resultsOfQueries["materials"])
         output.update(mock)
 
         outSerializer = SResMaterialsWithFilters(data=output)
