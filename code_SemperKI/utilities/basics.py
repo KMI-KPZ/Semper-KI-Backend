@@ -102,7 +102,7 @@ class ExceptionSerializer(serializers.Serializer):
 
 #################### DECORATOR ###################################
 class VersioningForHandlers(AcceptHeaderVersioning):
-    allowed_versions = []
+    allowed_versions = ["0.3"] # default for swagger
 
     def __init__(self, allowedVersions) -> None:
         super().__init__()
