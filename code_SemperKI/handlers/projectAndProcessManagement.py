@@ -754,12 +754,13 @@ def getContractors(request, processID:str):
         processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
         if processObj == None:
             raise Exception("Process ID not found in session or db")
- 
         serviceType = processObj.serviceType
+        service = serviceManager.getService(processObj.serviceType)
 
 
-        listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
+        #listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
         # TODO Check suitability
+        listOfAllContractors = service.getFilteredContractors(processObj)
 
         # remove unnecessary information and add identifier
         # for idx, elem in enumerate(listOfAllContractors):

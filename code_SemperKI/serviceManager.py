@@ -76,6 +76,15 @@ class ServiceBase(ABC):
         """
         pass
 
+    ###################################################
+    @abstractmethod
+    def getFilteredContractors(self, processObj) -> list:
+        """
+        Get a list of contractors that can do the job
+
+        """
+        pass
+
 ######################################################
 class _ServicesManager():
     """

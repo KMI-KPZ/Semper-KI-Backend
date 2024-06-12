@@ -19,6 +19,7 @@ class AdditiveQueryManager(SparqlQueryManager):
                                         QueryType.INSERT:"/Ontology/queries/Data insert/ServiceProvider_Hannes",
                                         QueryType.DELETE:"/Ontology/queries/Data delete/ServiceProvider_Hannes",}
     manufacturer: SparqlResource = { QueryType.GET:"/Ontology/queries/manufacturer_Hannes"}
+    buildPlate: SparqlResource = { QueryType.GET:"/code_SemperKI/services/service_AdditiveManufacturing/connections/printers_by_build_plate_filtered"}
 
 ########################################
 # list of objects

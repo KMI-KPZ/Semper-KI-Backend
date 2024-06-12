@@ -60,7 +60,8 @@ class Command(BaseCommand):
         if queryType is None:
             print(f'\nQuery types for {resource}:')
             for type in manager.getResourcesAndTypes()[resource]:
-                print(f'\t{type}')
+                vars = manager.getResource(resource).getVars(QueryType[type])
+                print(f'\t{type} - {vars}')
             exit(0)
 
         if id is None and queryType != QueryType.GET:
@@ -69,10 +70,10 @@ class Command(BaseCommand):
 
         # switch case
         if queryType == QueryType.GET:
-            print(json.dumps(manager.__dict__[resource].get({}), indent=4))
+            print(json.dumps(manager.__dict__[resource].get({"min_length":2500,"min_width":2500,"min_height": 1500}), indent=4))
         elif queryType == QueryType.INSERT:
             print(manager.__dict__[resource].getVars(QueryType.INSERT))
-            print(manager.__dict__[resource].insert({"ID": id, 'name': "Thomas ORGA " + str(id), "Material": "<https://data.semper-ki.org/Material/test-PLA>","PrinterModel" : "Industry F340"}))
+            print(manager.__dict__[resource].insert({"ID": id, 'name': "Thomas ORGA " + str(id), "Material": "<https://data.semper-ki.org/Material/test-PLA>","PrinterModel" : "<https://data.semper-ki.org/3DPrinter/Thermwood+LSAM+MT>"}))
         elif queryType == QueryType.UPDATE:
             print(manager.__dict__[resource].update({"ID": id, 'name': "Thomas ORGA " + str(id)}))
         elif queryType == QueryType.DELETE:
