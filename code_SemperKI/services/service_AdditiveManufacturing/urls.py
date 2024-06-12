@@ -21,29 +21,33 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers import checkService, filter, resources, model
-from .handlers.public.model import uploadModels, deleteModel, remeshSTLToTetraheadras
-from .handlers.public.checkService import checkModel
+from .handlers import filter, resources
+from .handlers.public import materials, checkService, filter, model, postProcessings
 
 from code_SemperKI.urls import paths, urlpatterns
 
 
 newPaths = {
-    "getProcessData": ('public/getProcessData/',filter.getProcessData),
-    "getModels": ('public/getModels/',filter.getModels),
-    "getFilters": ('public/getFilters/',filter.getFilters),
-    "getMaterials": ('public/getMaterials/',filter.getMaterials),
-    "getPostProcessing": ('public/getPostProcessing/',filter.getPostProcessing),
+    #"getProcessData": ('public/getProcessData/',filter.getProcessData),
+    #"getModels": ('public/getModels/',filter.getModels),
+    #"getFilters": ('public/getFilters/',filter.getFilters),
+    "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
+    "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
+    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
 
-    "uploadModel": ("public/service/additive-manufacturing/model/upload/",uploadModels),
-    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",deleteModel),
-    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", remeshSTLToTetraheadras),
-    "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
+    "getPostProcessings": ('public/service/additive-manufacturing/post-processing/get/',postProcessings.retrievePostProcessingsWithFilter),
+    "setPostProcessing": ('public/service/additive-manufacturing/post-processing/set/',postProcessings.setPostProcessingSelection),
+    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<str:materialID>/',postProcessings.deletePostProcessingFromSelection),
 
-    "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
-    "checkPrices": ("public/checkPrices/",checkService.checkPrice),
-    "checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/checkModel/<str:projectID>/<str:processID>/<str:fileID>/", checkModel),
+    "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
+    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",model.deleteModel),
+    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
+    "getModelRepository": ("public/service/additive-manufacturing/model/repository/", model.getModelRepository),
+
+    #"checkPrintability": ("public/checkPrintability/",checkService.),
+    #"checkPrices": ("public/checkPrices/",checkService.checkPrice),
+    #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
+    "checkModel": ("public/checkModel/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "onto_getPrinters": ("public/onto/getPrinters/",resources.onto_getPrinters),

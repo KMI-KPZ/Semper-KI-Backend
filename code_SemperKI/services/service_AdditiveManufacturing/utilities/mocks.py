@@ -44,13 +44,13 @@ def getEmptyMockModel():
 def mockMaterials():
     materials = {"materials": []}
 
-    materials["materials"].append({"id": crypto.generateMD5("PLA - black"), "title": "PLA - black", "propList": [], "URI": settings.STATIC_URL+"media/PLA_black.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - white"), "title": "PLA - white", "propList": [], "URI": settings.STATIC_URL+"media/PLA_white.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - gray"), "title": "PLA - gray", "propList": [], "URI": settings.STATIC_URL+"media/PLA_grey.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - red"), "title": "PLA - red", "propList": [], "URI": settings.STATIC_URL+"media/PLA_red.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - blue"), "title": "PLA - blue", "propList": [], "URI": settings.STATIC_URL+"media/PLA_blue.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - yellow"), "title": "PLA - yellow", "propList": [], "URI": settings.STATIC_URL+"media/PLA_yellow.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - green"), "title": "PLA - green", "propList": [], "URI": settings.STATIC_URL+"media/PLA_green.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - black"), "title": "PLA - black", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_black.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - white"), "title": "PLA - white", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_white.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - gray"), "title": "PLA - gray", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_grey.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - red"), "title": "PLA - red", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_red.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - blue"), "title": "PLA - blue", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_blue.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - yellow"), "title": "PLA - yellow", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_yellow.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - green"), "title": "PLA - green", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_green.jpg"})
 
     """
     materials["materials"].append({"id": crypto.generateMD5("ABS"), "title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": testpicture.mockPicturePath})
@@ -71,8 +71,8 @@ def mockPostProcessing():
     possibleValues = ["selection1", "selection2", "selection3"]
     processingOptions = ["selection", "number", "text"]
 
-    postProcessing["postProcessing"].append({"id": crypto.generateMD5("None"), "title": "None", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "URI": testpicture.mockPicturePath})
-    postProcessing["postProcessing"].append({"id": crypto.generateMD5("Remove Support"), "title": "Remove Support", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "URI": testpicture.mockPicturePath})
+    postProcessing["postProcessing"].append({"id": crypto.generateMD5("None"), "title": "None", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
+    postProcessing["postProcessing"].append({"id": crypto.generateMD5("Remove Support"), "title": "Remove Support", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
 
     """ for i in range(3):
         title = "postProcessing " + str(i)

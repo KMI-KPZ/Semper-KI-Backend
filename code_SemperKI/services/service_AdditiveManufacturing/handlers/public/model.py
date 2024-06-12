@@ -315,3 +315,81 @@ def remeshSTLToTetraheadras(request:Request, projectID:str, processID:str, fileI
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+class SResRepoContent(serializers.Serializer):
+    name = serializers.CharField()
+    license= serializers.CharField()
+    preview=serializers.CharField()
+    file=serializers.CharField()
+
+#######################################################
+class SResModelRepository(serializers.Serializer):
+    repository = serializers.DictField(
+        child=SResRepoContent()               
+    )
+
+#######################################################
+@extend_schema(
+    summary="Get previews and file names of 3D models from our curated repository",
+    description=" ",
+    request=None,
+    responses={
+        200: SResModelRepository,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def getModelRepository(request:Request):
+    """
+    Get previews and file names of 3D models from our curated repository
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON with names of files, link to preview files and link to files themselves
+    :rtype: JSON Response
+
+    """
+    try:
+        content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
+        outDict = {"repository": {}}
+        for elem in content:
+            path = elem["Key"]
+            splitPath = path.split("/")[1:]
+            if len(splitPath) > 1:
+                if "license" in elem["Metadata"]:
+                    license = elem["Metadata"]["license"]
+                else:
+                    license = ""
+                if splitPath[0] in outDict["repository"]:
+                    if "Preview" in splitPath[1]:
+                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                    else:
+                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
+                        outDict["repository"][splitPath[0]]["license"] = license
+                else:
+                    outDict["repository"][splitPath[0]] = {"name": splitPath[0], "license": "", "preview": "", "file": ""}
+                    if "Preview" in splitPath[1]:
+                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                    else:
+                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
+                        outDict["repository"][splitPath[0]]["license"] = license
+
+        outSerializer = SResModelRepository(data=outDict)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {getModelRepository.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -106,7 +106,8 @@ class VersioningForHandlers(AcceptHeaderVersioning):
 
     def __init__(self, allowedVersions) -> None:
         super().__init__()
-        self.allowed_versions = [str(allowedVersions)]
+        if str(allowedVersions) not in self.allowed_versions:
+            self.allowed_versions = [str(allowedVersions)]
 ######################################################
 def checkVersion(version=0.3):
     """
