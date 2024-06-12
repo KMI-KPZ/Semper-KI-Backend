@@ -33,3 +33,11 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
+# get list of all printer/material
+
+# get list of items for orga
+
+# set printer/material for orga (keep in mind: one item at the time for sparql)
+
+# delete printer/material for orga
+
