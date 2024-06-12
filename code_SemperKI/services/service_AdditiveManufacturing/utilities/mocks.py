@@ -66,13 +66,13 @@ materialMock = mockMaterials()
 
 #######################################################
 def mockPostProcessing():
-    postProcessing = {"postProcessing": []}
+    postProcessing = {"postProcessings": []}
 
     possibleValues = ["selection1", "selection2", "selection3"]
     processingOptions = ["selection", "number", "text"]
 
-    postProcessing["postProcessing"].append({"id": crypto.generateMD5("None"), "title": "None", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
-    postProcessing["postProcessing"].append({"id": crypto.generateMD5("Remove Support"), "title": "Remove Support", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
+    postProcessing["postProcessings"].append({"id": crypto.generateMD5("None"), "title": "None", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
+    postProcessing["postProcessings"].append({"id": crypto.generateMD5("Remove Support"), "title": "Remove Support", "checked": False, "selectedValue": "", "valueList": [], "type": "text", "imgPath": testpicture.mockPicturePath})
 
     """ for i in range(3):
         title = "postProcessing " + str(i)

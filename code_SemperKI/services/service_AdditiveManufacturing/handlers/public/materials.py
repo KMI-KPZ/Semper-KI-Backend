@@ -39,7 +39,18 @@ loggerError = logging.getLogger("errors")
 # Serializer
 #######################################################
 class SReqFilter(serializers.Serializer):
-    filter = serializers.ListField(child=serializers.DictField())
+    filters = serializers.ListField(child=serializers.DictField())
+
+#######################################################
+class SReqMaterialContent(serializers.Serializer):
+    id = serializers.CharField(max_length=100)
+    title = serializers.CharField(max_length=100)
+    propList = serializers.ListField()
+    imgPath = serializers.CharField(max_length=200) 
+
+#######################################################
+class SResMaterialsWithFilters(serializers.Serializer):
+    materials = serializers.ListField(child=SReqMaterialContent())
 
 #######################################################
 @extend_schema(
@@ -47,7 +58,7 @@ class SReqFilter(serializers.Serializer):
     description=" ",
     request=SReqFilter,
     responses={
-        200: None,
+        200: SResMaterialsWithFilters,
         500: ExceptionSerializer
     }
 )
@@ -77,24 +88,28 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
-        output = {}
+        output = {"materials": []}
         
-        filtersForSparql = []
-        for entry in filters["filters"]:
-            filtersForSparql.append([entry["question"]["title"], entry["answer"]])
+        #filtersForSparql = []
+        #for entry in filters["filters"]:
+        #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
         #TODO ask via sparql with most general filter and then iteratively filter response
         resultsOfQueries = {"materials": []}
         materialsRes = cmem.getAllMaterials.sendQuery()
         for elem in materialsRes:
             title = elem["Material"]["value"]
             resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture.mockPicturePath})
-        output.update(resultsOfQueries["materials"])
+        output.update(resultsOfQueries)
         
         # mockup here:
-        mock = copy.deepcopy(mocks.materialMock["materials"])
+        mock = copy.deepcopy(mocks.materialMock)
         output.update(mock)
-        
-        return JsonResponse(output)
+
+        outSerializer = SResMaterialsWithFilters(data=output)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in retrieveMaterialsWithFilter: {str(error)}"
         exception = str(error)
@@ -107,13 +122,7 @@ def retrieveMaterialsWithFilter(request:Request):
         
 #######################################################
 # Serializer
-#######################################################
-class SReqMaterialContent(serializers.Serializer):
-    id = serializers.CharField(max_length=100)
-    title = serializers.CharField(max_length=100)
-    propList = serializers.ListField()
-    imgPath = serializers.CharField(max_length=200) 
-    
+
 #######################################################
 class SReqSetMaterial(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)

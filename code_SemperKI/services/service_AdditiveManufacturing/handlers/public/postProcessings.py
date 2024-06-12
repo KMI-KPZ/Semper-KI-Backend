@@ -36,15 +36,32 @@ from code_SemperKI.utilities.basics import *
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-# TODO: Serializers
+# Serializers
+#######################################################
+class SReqFilter(serializers.Serializer):
+    filters = serializers.ListField(child=serializers.DictField())
+
+#######################################################
+class SReqPostProcessingsContent(serializers.Serializer):
+    id = serializers.CharField(max_length=100)
+    title = serializers.CharField(max_length=100)
+    checked = serializers.BooleanField()
+    selectedValue = serializers.CharField(allow_blank=True)
+    valueList = serializers.ListField()
+    type = serializers.CharField(allow_blank=True)
+    imgPath = serializers.CharField(max_length=200) 
+
+#######################################################
+class SResPostProcessingsWithFilters(serializers.Serializer):
+    postProcessings = serializers.ListField(child=SReqPostProcessingsContent())
 
 #######################################################
 @extend_schema(
     summary="Return all postProcessings conforming to the filter",
     description=" ",
-    request=None,
+    request=SReqFilter,
     responses={
-        200: None,
+        200: SResPostProcessingsWithFilters,
         500: ExceptionSerializer
     }
 )
@@ -62,12 +79,23 @@ def retrievePostProcessingsWithFilter(request:Request):
 
     """
     try:
-        filters = request.data
-        output = {}
+        inSerializer = SReqFilter(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {retrievePostProcessingsWithFilter.cls.__name__}"
+            exception = "Verification failed"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        filtersForSparql = []
-        for entry in filters["filters"]:
-            filtersForSparql.append([entry["question"]["title"], entry["answer"]])
+        filters = inSerializer.data
+        output = {"postProcessings": []}
+        
+        #filtersForSparql = []
+        #for entry in filters["filters"]:
+        #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
         #TODO ask via sparql with most general filter and then iteratively filter response
         """ resultsOfQueries = {"postProcessings": []}
         postProcessingsRes = cmem.getAllMaterials.sendQuery()
@@ -77,10 +105,14 @@ def retrievePostProcessingsWithFilter(request:Request):
         output.update(resultsOfQueries["postProcessings"]) """
         
         # mockup here:
-        mock = copy.deepcopy(mocks.postProcessingMock["postProcessing"])
+        mock = copy.deepcopy(mocks.postProcessingMock)
         output.update(mock)
         
-        return JsonResponse(output)
+        outSerializer = SResPostProcessingsWithFilters(data=output)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {retrievePostProcessingsWithFilter.cls.__name__}: {str(error)}"
         exception = str(error)
@@ -93,16 +125,6 @@ def retrievePostProcessingsWithFilter(request:Request):
         
 #######################################################
 # Serializer
-#######################################################
-class SReqPostProcessingsContent(serializers.Serializer):
-    id = serializers.CharField(max_length=100)
-    title = serializers.CharField(max_length=100)
-    checked = serializers.BooleanField()
-    selectedValue = serializers.CharField()
-    valueList = serializers.ListField()
-    type = serializers.CharField()
-    imgPath = serializers.CharField(max_length=200) 
-    
 #######################################################
 class SReqSetPostProcessings(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
