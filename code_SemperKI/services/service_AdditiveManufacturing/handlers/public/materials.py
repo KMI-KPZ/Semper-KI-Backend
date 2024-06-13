@@ -28,7 +28,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
-from code_SemperKI.services.service_AdditiveManufacturing.connections import cmem
+from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, ServiceDetails
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
@@ -38,7 +38,7 @@ loggerError = logging.getLogger("errors")
 #######################################################
 # Serializer
 #######################################################
-class SReqFilter(serializers.Serializer):
+class SReqMaterialsFilter(serializers.Serializer):
     filters = serializers.ListField(child=serializers.DictField())
 
 #######################################################
@@ -56,7 +56,7 @@ class SResMaterialsWithFilters(serializers.Serializer):
 @extend_schema(
     summary="Return all materials conforming to the filter",
     description=" ",
-    request=SReqFilter,
+    request=SReqMaterialsFilter,
     responses={
         200: SResMaterialsWithFilters,
         500: ExceptionSerializer
@@ -76,7 +76,7 @@ def retrieveMaterialsWithFilter(request:Request):
 
     """
     try:
-        inSerializer = SReqFilter(data=request.data)
+        inSerializer = SReqMaterialsFilter(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {retrieveMaterialsWithFilter.cls.__name__}"
             exception = "Verification failed"
@@ -95,7 +95,7 @@ def retrieveMaterialsWithFilter(request:Request):
         #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
         #TODO ask via sparql with most general filter and then iteratively filter response
         resultsOfQueries = {"materials": []}
-        materialsRes = cmem.getAllMaterials.sendQuery()
+        materialsRes = sparqlQueries.getAllMaterials.sendQuery()
         for elem in materialsRes:
             title = elem["Material"]["value"]
             resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture.mockPicturePath})

@@ -6,23 +6,46 @@ Silvio Weging 2023
 Contains: Services for the sparql endpoint
 """
 
+import copy
+import re
 from django.conf import settings
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 from Generic_Backend.code_General.utilities.oauth import ManageToken
 from Generic_Backend.code_General.connections.redis import RedisConnection
 
-endpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
-updateEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_UPDATE_ENDPOINT)
-oauthToken = ManageToken(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET, token_endpoint=settings.CMEM_TOKEN_ENDPOINT, token_endpoint_auth_method='client_secret_post')
-
 ##################################################################
-class ManageQueries:
+class ManageSPARQLQuery:
     """
     Contains query from file as object
 
     """
-    redisCon = RedisConnection()
+    
+    #######################################################
+    def __init__(self, filePathAndName, post=False, parameters={}) -> None:
+        """
+        Retrieve query from file and save it into redis 
+
+        :param filePathAndName: the very same
+        :type filePathAndName: str
+        :param post: True if the query posts something, False if it gets something
+        :type post: Bool
+        :return: Nothing
+        :rtype: None
+        
+        """
+        self.redisCon = RedisConnection()
+        self.endpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
+        self.updateEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_UPDATE_ENDPOINT)
+        self.oauthToken = ManageToken(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET, token_endpoint=settings.CMEM_TOKEN_ENDPOINT, token_endpoint_auth_method='client_secret_post')
+
+        self.filePathAndName = filePathAndName
+        self.parameters = parameters
+
+        if post:
+            self.endpoint.setMethod("POST") # GET is default
+
+        self.retrieveContentFromRedis() # save file initially
 
     #######################################################
     def retrieveContentFromRedis(self) -> str:
@@ -42,64 +65,48 @@ class ManageQueries:
                 return queryFileContent
         else:
             return query["content"]
-
-    #######################################################
-    def __init__(self, filePathAndName) -> None:
-        """
-        Retrieve query from file and save it into redis 
-
-        :param filePathAndName: the very same
-        :type filePathAndName: str
-        :return: Nothing
-        :rtype: None
         
+    #######################################################
+    def getParameters(self) -> dict:
         """
-        self.filePathAndName = filePathAndName
-        self.retrieveContentFromRedis() # save file initially
+        Retrieve the parameters if there are any so that they can be filled
+
+        :return: Dictionary that describe the parameters for the query
+        :rtype: dict
+
+        """
+        return copy.deepcopy(self.parameters) # needs to be changeable
 
     #######################################################
-    def sendQuery(self):
+    def sendQuery(self, parameters:dict={}):
         """
         Send SPARQL query.
         :param self: Contains sparql query as obj
         :type self: Object
+        :param parameters: The parameters for the query. Need to come from the outside to ensure thread safety!
+        :type parameters: dict
         :return: result of query
         :rtype: JSON
 
         """
+        # retrieve query and set parameters
+        query = self.retrieveContentFromRedis()
+        for parameter in parameters:
+            value = parameters[parameter]
+            regexPattern = r"\[\$"+re.escape(parameter) + r"\]"
+            query = re.sub(regexPattern, value, query)
+
         # request a refresh token
-        oauthToken.checkIfExpired()
+        self.oauthToken.checkIfExpired()
 
         # maybe construct first, save that to redis and then search/filter from that
-        endpointCopy = endpoint
+        endpointCopy = self.endpoint
         endpointCopy.addCustomHttpHeader(
-        httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
+        httpHeaderName="Authorization", httpHeaderValue="Bearer "+self.oauthToken.token["access_token"])
         endpointCopy.setReturnFormat(JSON)
-        endpointCopy.setQuery(self.retrieveContentFromRedis())
+        endpointCopy.setQuery(query)
 
         results = endpointCopy.queryAndConvert()
         return results["results"]["bindings"]
+    
 
-
-#######################################################
-def sendGeneralQuery(query):
-    """
-    Send SPARQL query.
-    :param query: Contains sparql query as string
-    :type query: str
-    :return: result of query
-    :rtype: JSON
-
-    """
-    # request a refresh token
-    oauthToken.checkIfExpired()
-
-    # maybe construct first, save that to redis and then search/filter from that
-    endpointCopy = endpoint
-    endpointCopy.addCustomHttpHeader(
-    httpHeaderName="Authorization", httpHeaderValue="Bearer "+oauthToken.token["access_token"])
-    endpointCopy.setReturnFormat(JSON)
-    endpointCopy.setQuery(query)
-
-    results = endpointCopy.queryAndConvert()
-    return results["results"]["bindings"]

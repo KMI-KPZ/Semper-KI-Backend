@@ -77,4 +77,7 @@ class CreateModel(Semper.ServiceBase):
         """
         return []
 
-Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())
+SERVICE_NAME = "CREATE_MODEL"
+SERVICE_NUMBER = 2
+
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, CreateModel())

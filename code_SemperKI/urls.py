@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from .handlers import projectAndProcessManagement, testResponse, files, admin, manageServices
 from .handlers.public import project
 from MSQ.handlers import interface
 
@@ -69,11 +69,6 @@ newPaths= {
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
 
     "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
-
-    "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
-    "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
-    "testQuerySize": ("private/query/",frontpage.sparqlPage),
-    "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
 
     "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
     #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),

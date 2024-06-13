@@ -757,16 +757,10 @@ def getContractors(request, processID:str):
         serviceType = processObj.serviceType
         service = serviceManager.getService(processObj.serviceType)
 
-
-        #listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
         # TODO Check suitability
         listOfAllContractors = service.getFilteredContractors(processObj)
-
-        # remove unnecessary information and add identifier
-        # for idx, elem in enumerate(listOfAllContractors):
-        #     contractorList.append({})
-        #     contractorList[idx]["name"] = elem["name"]
-        #     contractorList[idx]["id"] = elem["hashedID"]
+        if len(listOfAllContractors) == 0:
+            listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
 
         return JsonResponse(listOfAllContractors, safe=False)
     except (Exception) as error:

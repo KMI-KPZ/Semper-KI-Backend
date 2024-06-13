@@ -28,8 +28,8 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
-from code_SemperKI.services.service_AdditiveManufacturing.connections import cmem
-from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, PostProcessDetails, ServiceDetails
+from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
+from code_SemperKI.services.service_AdditiveManufacturing.definitions import PostProcessDetails, ServiceDetails
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 
@@ -38,7 +38,7 @@ loggerError = logging.getLogger("errors")
 #######################################################
 # Serializers
 #######################################################
-class SReqFilter(serializers.Serializer):
+class SReqPostProcessingsFilter(serializers.Serializer):
     filters = serializers.ListField(child=serializers.DictField())
 
 #######################################################
@@ -59,7 +59,7 @@ class SResPostProcessingsWithFilters(serializers.Serializer):
 @extend_schema(
     summary="Return all postProcessings conforming to the filter",
     description=" ",
-    request=SReqFilter,
+    request=SReqPostProcessingsFilter,
     responses={
         200: SResPostProcessingsWithFilters,
         500: ExceptionSerializer
@@ -79,7 +79,7 @@ def retrievePostProcessingsWithFilter(request:Request):
 
     """
     try:
-        inSerializer = SReqFilter(data=request.data)
+        inSerializer = SReqPostProcessingsFilter(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {retrievePostProcessingsWithFilter.cls.__name__}"
             exception = "Verification failed"
@@ -157,7 +157,7 @@ def setPostProcessingSelection(request:Request):
 
     """
     try:
-        serializedContent = SReqPostProcessingsContent(data=request.data)
+        serializedContent = SReqSetPostProcessings(data=request.data)
         if not serializedContent.is_valid():
             message = "Validation failed in setPostProcessingSelection"
             exception = "Validation failed"

@@ -18,7 +18,7 @@ from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from django.views.decorators.http import require_http_methods
 
-from ..connections import cmem
+from ..utilities import sparqlQueries
 
 logger = logging.getLogger("logToFile")
 
@@ -37,7 +37,7 @@ def onto_getMaterials(request):
     """
 
     resultsOfQueries = {"materials": []}
-    materialsRes = cmem.getAllMaterials.sendQuery()
+    materialsRes = sparqlQueries.getAllMaterials.sendQuery()
     for elem in materialsRes:
         title = elem["Material"]["value"]
         resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
@@ -59,7 +59,7 @@ def onto_getPrinters(request):
     """
 
     resultsOfQueries = {"printers": []}
-    printersRes = cmem.getAllPrinters.sendQuery()
+    printersRes = sparqlQueries.getAllPrinters.sendQuery()
     for elem in printersRes:
         title = elem["3DPrinter_name"]["value"]
         resultsOfQueries["printers"].append({"title": title, "URI": elem["3DPrinter_name"]["value"]})
@@ -143,7 +143,7 @@ def orga_getPrinters(request):
 
     orgaName = json.loads(request.body.decode("utf-8"))["organization"]
     resultsOfQueries = {"printers": []}
-    printersRes = cmem.getAllPrinters.sendQuery()
+    printersRes = sparqlQueries.getAllPrinters.sendQuery()
     for elem in printersRes:
         title = elem["Printer"]["value"]
         resultsOfQueries["printers"].append({"title": title, "URI": elem["Printer"]["value"]})
@@ -361,7 +361,7 @@ def orga_getMaterials(request):
 
     orgaName = json.loads(request.body.decode("utf-8"))["organization"]
     resultsOfQueries = {"materials": []}
-    materialsRes = cmem.getAllMaterials.sendQuery()
+    materialsRes = sparqlQueries.getAllMaterials.sendQuery()
     for elem in materialsRes:
         title = elem["Material"]["value"]
         resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})

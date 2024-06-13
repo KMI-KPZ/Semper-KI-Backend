@@ -49,5 +49,4 @@ class PostProcessDetails(StrEnumExactylAsDefined):
     imgPath = enum.auto()
 
 
-
 # TODO: Service Status Codes

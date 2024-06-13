@@ -56,7 +56,6 @@ def getResultsBack(request, taskID):
 #     return HttpResponse("Success")
 
 ####################################################################
-from io import BytesIO
 def sendExampleLocal(request):
     """
     Send example to worker
