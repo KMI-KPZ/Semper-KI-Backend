@@ -208,7 +208,8 @@
             "onto_getMaterial",
             "onto_getPrinter",
             "onto_getPrinters",
-            "onto_getMaterials"
+            "onto_getMaterials",
+            "orga_getResources"
          ]
       },
       {
@@ -230,7 +231,10 @@
             "orga_removePrinter",
             "orga_createPrinter",
             "orga_addPrinterEdit",
-            "orga_addPrinter"
+            "orga_addPrinter",
+            "orga_addMaterialToPrinter",
+            "orga_updateMaterialAndPrinter",
+            "orga_removeLinkToPrinter"
          ]
       }
    ]

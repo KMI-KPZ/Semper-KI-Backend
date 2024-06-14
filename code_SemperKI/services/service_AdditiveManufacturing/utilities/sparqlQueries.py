@@ -26,8 +26,8 @@ class SparqlParameters(StrEnumExactylAsDefined):
 # list of Sparql queries
 getAllMaterials = SKICmem.ManageSPARQLQuery("/Ontology/queries/material_Hannes")
 getAllPrinters = SKICmem.ManageSPARQLQuery("/Ontology/queries/printer_Hannes")
-getServiceProviders = SKICmem.ManageSPARQLQuery("/Ontology/queries/ServiceProvider_list_Hannes")
+getServiceProviders = SKICmem.ManageSPARQLQuery("/Ontology/queries/ServiceProvider_list_Hannes", parameters={SparqlParameters.ID: ""})
 createEntryForContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data insert/ServiceProvider_Hannes", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.name: "", SparqlParameters.PrinterModel: "", SparqlParameters.Material: ""})
 updateEntryForContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data update/ServiceProvider_Hannes", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.name: "", SparqlParameters.PrinterModel: "", SparqlParameters.Material: ""})
-deleteEntryForContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/ServiceProvider_Hannes", post=True, parameters={SparqlParameters.ID: ""})
-filterByBuildPlate = SKICmem.ManageSPARQLQuery("",parameters={})
+deleteEntryForContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/ServiceProvider_Hannes", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.PrinterModel: ""})
+filterByBuildPlate = SKICmem.ManageSPARQLQuery("/Ontology/queries/buildplate_values_by_Printer_Hannes",parameters={})
