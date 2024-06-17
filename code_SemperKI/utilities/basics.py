@@ -11,6 +11,7 @@ import json
 from functools import wraps
 from django.http import HttpResponse, JsonResponse
 
+from rest_framework import exceptions
 from rest_framework import serializers
 from rest_framework.versioning import AcceptHeaderVersioning
 from rest_framework.response import Response
@@ -126,8 +127,10 @@ def checkVersion(version=0.3):
                 versioning = VersioningForHandlers(version)
                 versionOfReq = versioning.determine_version(request)
                 return func(request, *args, **kwargs)
-            except Exception as e:
+            except exceptions.NotAcceptable as e:
                 return Response(f"Version mismatch! {version} required!", status=status.HTTP_406_NOT_ACCEPTABLE)
+            except Exception as e:
+                return Response(f"Exception in {func.__name__}: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return inner
 
     return decorator

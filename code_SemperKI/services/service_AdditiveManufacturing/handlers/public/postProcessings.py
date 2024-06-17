@@ -236,7 +236,7 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
 
     """
     try:
-        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.postProcessings: postProcessingID}}}
+        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.postProcessings: {postProcessingID: ""}}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

@@ -235,7 +235,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,mate
 
     """
     try:
-        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.materials: materialID}}}
+        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.materials: {materialID: ""}}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
