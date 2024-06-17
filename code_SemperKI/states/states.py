@@ -489,7 +489,7 @@ class SERVICE_IN_PROGRESS(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -512,6 +512,20 @@ class SERVICE_IN_PROGRESS(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
+                    },
+                },
+                "active": False,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "both",
             }
         ]
     
@@ -606,12 +620,12 @@ class SERVICE_READY(State):
     ###################################################
     def buttons(self, client=True, admin=False) -> list:
         """
-        Choose contractor
+        Finish this service and go to overview
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -636,7 +650,127 @@ class SERVICE_READY(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.CONTRACTOR_SELECTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
+            }
+        ] 
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Service is completely defined
+
+        """
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+    
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+        """
+        Service Conditions not OK
+
+        """
+        if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
+            return self
+        else:
+            return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
+    
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+    
+    ###################################################
+    updateTransitions = [to_SERVICE_COMPLICATION, ]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process)
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process)
+
+#######################################################
+class SERVICE_COMPLETED(State):
+    """
+    Service is ready and has been declared as completely described
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
+    name = ProcessStatusAsString.SERVICE_COMPLETED
+
+    ###################################################
+    def buttons(self, client=True, admin=False) -> list:
+        """
+        Choose contractor
+
+        """
+        return [
+            {
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE,
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
                 "icon": IconType.FactoryIcon,
                 "action": {
                     "type": "navigation",
@@ -669,7 +803,7 @@ class SERVICE_READY(State):
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         SERVICE_READY | CONTRACTOR_SELECTED:
         """
-        Contractor was Selected
+        Contractor was selected
 
         """
         if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
@@ -689,21 +823,17 @@ class SERVICE_READY(State):
             return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
     
     ###################################################
-    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        DRAFT:
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
         """
-        Button was pressed, clean up and go back
+        Button was pressed, go back
 
         """
-        serviceContent = process.serviceDetails
-        #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
-        return stateDict[ProcessStatusAsString.DRAFT]
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
     
     ###################################################
     updateTransitions = [to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -731,7 +861,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -879,7 +1009,7 @@ class SERVICE_COMPLICATION(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.SERVICE_COMPLICATION,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
                 "icon": IconType.TroubleshootIcon,
                 "action": {
                     "type": "request",
@@ -969,7 +1099,7 @@ class CONTRACTOR_SELECTED(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -994,7 +1124,7 @@ class CONTRACTOR_SELECTED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.VERIFYING,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
                 "icon": IconType.TaskIcon,
                 "action": {
                     "type": "request",
@@ -1077,7 +1207,7 @@ class VERIFYING(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -1139,7 +1269,6 @@ class VERIFYING(State):
         To: CONTRACTOR_SELECTED
         
         """
-        # TODO Cancel verification
         return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
 
     ###################################################
@@ -1171,7 +1300,7 @@ class VERIFIED(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -1196,7 +1325,7 @@ class VERIFIED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.REQUESTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
                 "icon": IconType.MailIcon,
                 "action": {
                     "type": "request",
@@ -1308,7 +1437,7 @@ class REQUESTED(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.CLARIFICATION,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CLARIFICATION,
                     "icon": IconType.QuestionAnswerIcon,
                     "action": {
                         "type": "request",
@@ -1322,7 +1451,7 @@ class REQUESTED(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1336,7 +1465,7 @@ class REQUESTED(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1457,7 +1586,7 @@ class CLARIFICATION(State):
         if not client or admin:
             outArr.extend([
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1471,7 +1600,7 @@ class CLARIFICATION(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1574,7 +1703,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CLIENT,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1588,7 +1717,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CLIENT,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1774,7 +1903,7 @@ class CONFIRMED_BY_CLIENT(State):
         if not client or admin:
             outArr.extend( [
                 {
-                    "title": ButtonLabels.PRODUCTION,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION,
                     "icon": IconType.FactoryIcon,
                     "action": {
                         "type": "request",
@@ -1942,7 +2071,7 @@ class PRODUCTION(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.DELIVERY,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY,
                     "icon": IconType.LocalShippingIcon,
                     "action": {
                         "type": "request",
@@ -1956,7 +2085,7 @@ class PRODUCTION(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -2059,7 +2188,7 @@ class DELIVERY(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.COMPLETED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -2073,7 +2202,7 @@ class DELIVERY(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.DISPUTE,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
                     "icon": IconType.TroubleshootIcon,
                     "action": {
                         "type": "request",
@@ -2087,7 +2216,7 @@ class DELIVERY(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -2212,7 +2341,7 @@ class DISPUTE(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.COMPLETED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -2226,7 +2355,7 @@ class DISPUTE(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
