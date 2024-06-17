@@ -821,9 +821,20 @@ class SERVICE_COMPLETED(State):
             return self
         else:
             return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
+        
+    ##################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        else:
+            return self
     
     ###################################################
-    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    def to_SERVICE_IN_PROGRESS_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         SERVICE_IN_PROGRESS:
         """
         Button was pressed, go back
@@ -832,8 +843,8 @@ class SERVICE_COMPLETED(State):
         return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
     
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS}
+    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
+    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):

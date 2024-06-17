@@ -190,7 +190,7 @@ def setMaterialSelection(request:Request):
         if isinstance(message, Exception):
             raise message
         
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},added,{Logging.Object.OBJECT},material,"+str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},set,{Logging.Object.OBJECT},material,"+str(datetime.now()))
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -251,7 +251,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,mate
         if isinstance(message, Exception):
             raise message
         
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},added,{Logging.Object.OBJECT},material,"+str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},deleted,{Logging.Object.OBJECT},material,"+str(datetime.now()))
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in deleteMaterialFromSelection: {str(error)}"

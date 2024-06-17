@@ -107,12 +107,15 @@ def serviceReady(existingContent:dict) -> bool:
     try:
         checks = 0
         for entry in existingContent:
-            if entry == ServiceDetails.models and len(existingContent[ServiceDetails.models]) > 0:
-                checks += 1
-            elif entry == ServiceDetails.materials and len(existingContent[ServiceDetails.materials]) > 0:
-                checks += 1
-            elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0:
-                checks += 0 # optional
+            if entry == ServiceDetails.models:
+                if len(existingContent[ServiceDetails.models]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.materials:
+                if len(existingContent[ServiceDetails.materials]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.postProcessings:
+                if len(existingContent[ServiceDetails.postProcessings]) > 0:
+                    checks += 0 # optional
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
             

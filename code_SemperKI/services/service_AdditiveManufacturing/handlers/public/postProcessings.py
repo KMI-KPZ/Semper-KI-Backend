@@ -191,7 +191,7 @@ def setPostProcessingSelection(request:Request):
         if isinstance(message, Exception):
             raise message
         
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},added,{Logging.Object.OBJECT},postProcessing,"+str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},set,{Logging.Object.OBJECT},postProcessing,"+str(datetime.now()))
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -252,7 +252,7 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
         if isinstance(message, Exception):
             raise message
         
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},added,{Logging.Object.OBJECT},postProcessing,"+str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},deleted,{Logging.Object.OBJECT},postProcessing,"+str(datetime.now()))
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {deletePostProcessingFromSelection.cls.__name__}: {str(error)}"
