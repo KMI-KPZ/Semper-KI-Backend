@@ -124,6 +124,9 @@ def checkVersion(version=0.3):
         @wraps(func)
         def inner(request, *args, **kwargs):
             try:
+                if request.version == None:
+                    #getting really tired of swaggers bullshit (of sometimes not sending the correct header)
+                    return func(request, *args, **kwargs)
                 versioning = VersioningForHandlers(version)
                 versionOfReq = versioning.determine_version(request)
                 return func(request, *args, **kwargs)

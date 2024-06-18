@@ -204,8 +204,8 @@ def orga_getResources(request:Request):
 # set printer/material for orga (keep in mind: one item at the time for sparql)
 #######################################################
 class SReqOrgaAddMaterial(serializers.Serializer):
-    materialID = serializers.CharField(max_length=200)
-    printerID = serializers.CharField(max_length=200)
+    material = serializers.CharField(max_length=200)
+    printer = serializers.CharField(max_length=200)
 
 #######################################################
 @extend_schema(
@@ -235,7 +235,7 @@ def orga_addMaterialToPrinter(request:Request):
     """
     try:
 
-        serializedInput = SReqOrgaAddMaterial(request.data)
+        serializedInput = SReqOrgaAddMaterial(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addMaterialToPrinter.cls.__name__}"
             exception = "Verification failed"
@@ -246,8 +246,8 @@ def orga_addMaterialToPrinter(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        materialID = serializedInput.data["materialID"] #TODO how must this be coded?
-        printerID = serializedInput.data["printerID"]
+        materialName = serializedInput.data["material"]
+        printerName = serializedInput.data["printer"]
 
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
         orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
@@ -266,8 +266,8 @@ def orga_addMaterialToPrinter(request:Request):
         sparqlQueries.createEntryForContractor.sendQuery(
             {sparqlQueries.SparqlParameters.ID: orgaID, 
              sparqlQueries.SparqlParameters.name: orgaName,
-             sparqlQueries.SparqlParameters.Material: materialID, 
-             sparqlQueries.SparqlParameters.PrinterModel: printerID})
+             sparqlQueries.SparqlParameters.Material: materialName, 
+             sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         return Response("Success", status=status.HTTP_200_OK)
 
@@ -301,7 +301,7 @@ def orga_addMaterialToPrinter(request:Request):
 def orga_updateMaterialAndPrinter(request:Request):
     """
     Update a Link to an existing printer and material for an organization in the knowledge graph
-    Can also be used to delete the connection of a printer to a material by setting it to "None"?
+    Can also be used to delete the connection of a printer to a material by setting it to "None"
 
     :param request: PATCH Request
     :type request: HTTP PATCH
@@ -311,7 +311,7 @@ def orga_updateMaterialAndPrinter(request:Request):
     """
     try:
 
-        serializedInput = SReqOrgaAddMaterial(request.data)
+        serializedInput = SReqOrgaAddMaterial(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_updateMaterialAndPrinter.cls.__name__}"
             exception = "Verification failed"
@@ -322,8 +322,8 @@ def orga_updateMaterialAndPrinter(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        materialID = serializedInput.data["materialID"] #TODO how must this be coded?
-        printerID = serializedInput.data["printerID"]
+        materialName = serializedInput.data["material"]
+        printerName = serializedInput.data["printer"]
 
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
         orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
@@ -342,8 +342,8 @@ def orga_updateMaterialAndPrinter(request:Request):
         sparqlQueries.updateEntryForContractor.sendQuery(
             {sparqlQueries.SparqlParameters.ID: orgaID, 
              sparqlQueries.SparqlParameters.name: orgaName,
-             sparqlQueries.SparqlParameters.Material: materialID, 
-             sparqlQueries.SparqlParameters.PrinterModel: printerID})
+             sparqlQueries.SparqlParameters.Material: materialName, 
+             sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         return Response("Success", status=status.HTTP_200_OK)
 
@@ -361,7 +361,7 @@ def orga_updateMaterialAndPrinter(request:Request):
 # delete printer for orga
 #######################################################
 @extend_schema(
-    summary="Remove the connection of an organization to a printer and/or material",
+    summary="Remove the connection of an organization to a printer",
     description=" ",
     request=None,
     responses={
@@ -375,16 +375,14 @@ def orga_updateMaterialAndPrinter(request:Request):
 @checkIfRightsAreSufficient(json=False)
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def orga_removeLinkToPrinter(request:Request, printerID:str):
+def orga_removeLinkToPrinter(request:Request, printer:str):
     """
     Remove the connection of an organization to a printer
 
     :param request: DELETE Request
     :type request: HTTP DELETE
-    :param printerID: The ID of the printer of that orga
-    :type printerID: str
-    :param materialID: The ID of the material from that orga that should now belong to that printer
-    :type materialID: str
+    :param printer: The name of the printer of that orga
+    :type printer: str
     :return: Success or not
     :rtype: HTTP Response
 
@@ -394,7 +392,7 @@ def orga_removeLinkToPrinter(request:Request, printerID:str):
 
         #Check that this orga provides AM as service
         if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
-            message = f"Orga does not offer service in {orga_updateMaterialAndPrinter.cls.__name__}"
+            message = f"Orga does not offer service in {orga_removeLinkToPrinter.cls.__name__}"
             exception = "Not found"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -403,13 +401,133 @@ def orga_removeLinkToPrinter(request:Request, printerID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        sparqlQueries.deleteEntryForContractor.sendQuery(
+        sparqlQueries.deletePrinterOfContractor.sendQuery(
             {sparqlQueries.SparqlParameters.ID: orgaID, 
-             sparqlQueries.SparqlParameters.PrinterModel: printerID})
+             sparqlQueries.SparqlParameters.PrinterModel: printer})
         
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_removeLinkToPrinter.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# delete material for orga
+#######################################################
+@extend_schema(
+    summary="Remove the connection of an organization to a printer and material",
+    description=" ",
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["DELETE"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["DELETE"])
+@checkVersion(0.3)
+def orga_removeLinkToMaterial(request:Request, printer:str, material:str):
+    """
+    Remove the connection of an organization to a printer
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param printer: The name of the printer of that orga
+    :type printer: str
+    :param material: The name of the material from that orga that should not belong to that printer anymore
+    :type material: str
+    :return: Success or not
+    :rtype: HTTP Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_removeLinkToMaterial.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        sparqlQueries.deleteLinkPrinterMaterialOfContractor.sendQuery(
+            {sparqlQueries.SparqlParameters.ID: orgaID, 
+             sparqlQueries.SparqlParameters.PrinterModel: printer,
+             sparqlQueries.SparqlParameters.Material: material})
+        
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {orga_removeLinkToMaterial.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# delete material for orga
+#######################################################
+@extend_schema(
+    summary="Remove all connections of an organization",
+    description=" ",
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["DELETE"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["DELETE"])
+@checkVersion(0.3)
+def orga_removeAll(request:Request):
+    """
+    Remove all connections of an organization
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param printer: The name of the printer of that orga
+    :type printer: str
+    :param material: The name of the material from that orga that should not belong to that printer anymore
+    :type material: str
+    :return: Success or not
+    :rtype: HTTP Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_removeAll.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        sparqlQueries.deleteAllFromContractor.sendQuery(
+            {sparqlQueries.SparqlParameters.ID: orgaID})
+        
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {orga_removeAll.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

@@ -67,7 +67,9 @@ newPaths = {
     "orga_getResources": ("public/service/additive-manufacturing/resources/orga/get-all/", resources.orga_getResources),
     "orga_createLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/create/", resources.orga_addMaterialToPrinter),
     "orga_updateLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/patch/", resources.orga_updateMaterialAndPrinter),
-    "orga_deletePrinterFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete/", resources.orga_removeLinkToPrinter),
+    "orga_deletePrinterFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-printer/<str:printer>/", resources.orga_removeLinkToPrinter),
+    "orga_deleteLinkToMaterialFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-material/<str:printer>/<str:material>/", resources.orga_removeLinkToMaterial),
+    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-all/", resources.orga_removeAll)
 
 }
 

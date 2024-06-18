@@ -234,7 +234,9 @@
             "orga_addPrinter",
             "orga_addMaterialToPrinter",
             "orga_updateMaterialAndPrinter",
-            "orga_removeLinkToPrinter"
+            "orga_removeLinkToPrinter",
+            "orga_removeLinkToMaterial",
+            "orga_removeAll"
          ]
       }
    ]

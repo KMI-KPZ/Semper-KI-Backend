@@ -45,4 +45,19 @@ def filterByBuildPlate(calculations:dict):
     :rtype: list
     
     """
+    if "measurements" in calculations:
+        # Calculations:
+        # "measurements": {
+        #     "volume": -1.0,
+        #     "surfaceArea": -1.0,
+        #     "mbbDimensions": {
+        #         "_1": -1.0,
+        #         "_2": -1.0,
+        #         "_3": -1.0,
+        printers = getPrintersByBuildPlate.sendQuery({
+            SparqlParameters.min_height: calculations["measurements"]["mbbDimensions"]["_1"],
+            SparqlParameters.min_length: calculations["measurements"]["mbbDimensions"]["_2"],
+            SparqlParameters.min_width: calculations["measurements"]["mbbDimensions"]["_3"],
+            })
+
     return []

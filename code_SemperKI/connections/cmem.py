@@ -35,20 +35,23 @@ class ManageSPARQLQuery:
         
         """
         self.redisCon = RedisConnection()
-        self.endpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
-        self.updateEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_UPDATE_ENDPOINT)
+        getEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_ENDPOINT)
+        updateEndpoint = SPARQLWrapper(settings.CMEM_SPARQL_UPDATE_ENDPOINT)
         self.oauthToken = ManageToken(settings.CMEM_CLIENT_ID, settings.CMEM_CLIENT_SECRET, token_endpoint=settings.CMEM_TOKEN_ENDPOINT, token_endpoint_auth_method='client_secret_post')
 
         self.filePathAndName = filePathAndName
         self.parameters = parameters
 
         if post:
+            self.endpoint = updateEndpoint
             self.endpoint.setMethod("POST") # GET is default
+        else:
+            self.endpoint = getEndpoint
 
-        self.retrieveContentFromRedis() # save file initially
+        self.retrieveContentFromRedis(initial=True) # save file initially
 
     #######################################################
-    def retrieveContentFromRedis(self) -> str:
+    def retrieveContentFromRedis(self, initial=False) -> str:
         """
         Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
 
@@ -56,9 +59,8 @@ class ManageSPARQLQuery:
         :rtype: str
 
         """
-
         query, exists = self.redisCon.retrieveContentJSON(self.filePathAndName)
-        if not exists:
+        if not exists or initial:
             with open(str(settings.BASE_DIR) + self.filePathAndName) as queryFile:
                 queryFileContent = queryFile.read()
                 self.redisCon.addContentJSON(self.filePathAndName, {"content": queryFileContent}, True)
@@ -107,6 +109,13 @@ class ManageSPARQLQuery:
         endpointCopy.setQuery(query)
 
         results = endpointCopy.queryAndConvert()
-        return results["results"]["bindings"]
+        if results == b'':
+            return {}
+        if "results" in results:
+            if "bindings" in results["results"]:
+                return results["results"]["bindings"]
+            return results["results"]
+        return {}
+        
     
 
