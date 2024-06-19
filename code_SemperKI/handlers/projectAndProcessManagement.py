@@ -765,7 +765,7 @@ def getContractors(request, processID:str):
         return JsonResponse(listOfAllContractors, safe=False)
     except (Exception) as error:
         loggerError.error(f"getContractors: {str(error)}")
-        return error
+        return HttpResponse(error, status=500)
 
 #######################################################
 def saveProjectsViaWebsocket(session):
