@@ -29,7 +29,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ### WSGI
 
 from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
-from .handlers.public import project, process, statemachine, miscellaneous, admin_, events
+from .handlers.public import project, process, statemachine, miscellaneous, events
 from MSQ.handlers import interface
 
 newPaths= {
@@ -38,29 +38,29 @@ newPaths= {
     "schema": ('api/schema/', SpectacularAPIView.as_view(api_version='v1')),
     "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
     
-    "createProject": ('public/project/create/', project.createProjectID), #w
-    "getProject": ("public/project/get/<str:projectID>/",project.getProject), #w
-    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects), #w
-    "updateProject": ("public/project/update/",project.updateProject), #w
-    "deleteProjects": ("public/project/delete/",project.deleteProjects), #nw
-    "saveProjects": ("public/project/saveProjects/", project.saveProjects), #nw
-    "getProcess": ("public/process/getProcess/<str:projectID>/<str:processID>/", process.getProcess), #w
-    "createProcessID": ("public/process/createProcessID/<str:projectID>", process.createProcessID), #w
-    "updateProcess": ("public/process/updateProcess/", process.updateProcess), #nw
-    "deleteProcesses": ("public/process/deleteProcesses/<str:projectID>/", process.deleteProcesses), #nw
-    "getProcessHistory": ("public/process/getProcessHistory/<str:processID>/", process.getProcessHistory), #nw
-    "getContractors": ("public/process/getContractors/<str:processID>", process.getContractors), #nw
-    "getStateMachine": ("public/statemachine/getStateMachine/", statemachine.getStateMachine), #w
-    "getServices": ("public/miscellaneous/getServices/", miscellaneous.getServices), #nw
-    "getMissedEvents": ("public/events/getMissedEvents/", events.getMissedEvents), #nw
-    "uploadFiles": ("public/miscellaneous/uploadFiles/",miscellaneous.uploadFiles), #nw
-    "downloadFile": ("public/miscellaneous/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", miscellaneous.downloadFileStream), #nw
-    "downloadFilesAsZip": ("public/miscellaneous/downloadFilesAsZip/<str:projectID>/<str:processID>/",miscellaneous.downloadFilesAsZip), #nw
-    "deleteFile": ("public/miscellaneous/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",miscellaneous.deleteFile),   #nw
-    "downloadProcessHistory": ("public/miscellaneous/downloadProcessHistory/<str:processID>/", miscellaneous.downloadProcessHistory), #nw
-    "getAllProjectsFlatAsAdmin": ("public/admin_/getAllProjectsFlatAsAdmin/", admin_.getAllProjectsFlatAsAdmin), #nw
-    "getSpecificProjectAsAdmin": ("public/admin_/getSpecificProjectAsAdmin/<str:projectID>/", admin_.getSpecificProjectAsAdmin), #nw
-    "statusButtonRequest": ("public/miscellaneous/statusButtonRequest/", miscellaneous.statusButtonRequest), #nw
+    "createProjectID": ('public/createProjectID/', project.createProjectID), 
+    "getProject": ("public/getProject/<str:projectID>/",project.getProject),
+    "getFlatProjects": ("public/getFlatProjects/", project.getFlatProjects),
+    "updateProject": ("public/updateProject/" ,project.updateProject),
+    "deleteProjects": ("public/deleteProjects/" ,project.deleteProjects),
+    "saveProjects": ("public/saveProjects/", project.saveProjects),
+    "getProcess": ("public/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
+    "createProcessID": ("public/createProcessID/<str:projectID>", process.createProcessID),
+    "updateProcess": ("public/updateProcess/", process.updateProcess), 
+    "deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses), 
+    "getProcessHistory": ("public/getProcessHistory/<str:processID>/", process.getProcessHistory),
+    "getContractors": ("public/getContractors/<str:processID>/", process.getContractors),
+    "getStateMachine": ("private/getStateMachine/", statemachine.getStateMachine), 
+    "getServices": ("public/getServices/", miscellaneous.getServices), 
+    "getMissedEvents": ("public/getMissedEvents/", events.getMissedEvents),
+    "uploadFiles": ("public/uploadFiles/",miscellaneous.uploadFiles),
+    "downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", miscellaneous.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",miscellaneous.downloadFilesAsZip), 
+    "deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",miscellaneous.deleteFile), 
+    "downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", miscellaneous.downloadProcessHistory), 
+    "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/", admin.getAllProjectsFlatAsAdmin),
+    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin),
+    "statusButtonRequest": ("public/statusButtonRequest/", miscellaneous.statusButtonRequest), 
 
 
     "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
@@ -70,9 +70,9 @@ newPaths= {
     "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
-    "getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack), #nw
+    "getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack),
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
-    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), #nw
+    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
 }
 
@@ -85,5 +85,3 @@ for entry in newPaths:
     urlpatterns.append(path(pathItself, handler, name=key))
 
 paths.update(newPaths)
-
-

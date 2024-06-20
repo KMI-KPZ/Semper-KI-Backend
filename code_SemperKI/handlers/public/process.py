@@ -22,7 +22,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin
-from Generic_Backend.code_General.utilities import crypto,
+from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from code_SemperKI.states.states import getButtonsForProcess
