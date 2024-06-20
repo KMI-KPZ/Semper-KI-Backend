@@ -6,11 +6,9 @@ Akshay NS 2024
 Contains: Handlers for processes
 """
 
-import json, logging, copy
+import json, logging
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.utils import timezone
 from django.conf import settings
 
 from rest_framework import status, serializers
@@ -21,44 +19,44 @@ from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
+
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import manualCheckifAdmin
-from Generic_Backend.code_General.utilities import crypto, rights
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin
+from Generic_Backend.code_General.utilities import crypto,
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from code_SemperKI.states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess
+from code_SemperKI.states.states import getButtonsForProcess
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.connections.content.manageContent import ManageContent
+from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.utilities.basics import ExceptionSerializer
 from code_SemperKI.handlers.public.project import *
+from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, deleteProcessFunction
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
+#############
 
 
-# "createProcessID": ("public/createProcessID/", process.createProcessID),
-####################################################
+
 #########Serializer#############
-class SResCreateProcessID(serializers.Serializer):
-    processID = serializers.CharField(max_length=200)
-
+#TODO Add serializer for createProcessID.
 #######################################################
 @extend_schema(
     summary="Create a process ID ",
     description="creates a process ID for a given project id",
     request=None,
+    tags=['process'],
     responses={
-        200: SResCreateProcessID,
+        200: None,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["GET"])
-# @checkIfRightsAreSufficient(json=False)
+
 @api_view(["GET"])
 def createProcessID(request, projectID):
     """
@@ -94,12 +92,14 @@ def createProcessID(request, projectID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
         #return just the id for the frontend
+        #TODO add outseriliazer for createProcessID.
         output = {ProcessDescription.processID: processID}
-        outSerializer = SResCreateProcessID(data=output)
-        if outSerializer.is_valid():
-            return Response(outSerializer.data, status=status.HTTP_200_OK)
-        else:
-            raise Exception(outSerializer.errors)
+        return Response(output, status=status.HTTP_200_OK)
+        # outSerializer = SResCreateProcessID(data=output)
+        # if outSerializer.is_valid():
+        #     return Response(outSerializer.data, status=status.HTTP_200_OK)
+        # else:
+        #     raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in createProcessID: {str(error)}"
         exception = str(error)
@@ -111,16 +111,15 @@ def createProcessID(request, projectID):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
-# "getProcess": ("public/getProcess/", process.getProcess),
-##############################
+
 ###serializer###########
-class SResGetProcess(serializers.Serializer):
-    process = serializers.ListField()
+#TODO Add serializer for getProcess
 #######################################################
 @extend_schema(
     summary="Retrieve complete process.",
     description="Retrieve complete process using projectID and processID ",
     request=None,
+    tags=['process'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -160,16 +159,241 @@ def getProcess(request, projectID, processID):
         if process != {}:
             buttons = getButtonsForProcess(process[ProcessDescription.processStatus], process[ProcessDescription.client] == userID, adminOrNot) # calls current node of the state machine
             process["processStatusButtons"] = buttons
-        #return just list of process.
-        outSerializer = SResGetProcess(data=process)
-        if outSerializer.is_valid():
-            return Response(outSerializer.data, status=status.HTTP_200_OK)
-        else:
-            raise Exception(outSerializer.errors)    
+        ###TODO: add outserializers.
+        return Response(process, status=status.HTTP_200_OK)
+        # outSerializer = SResGetProcess(data=process)
+        # if outSerializer.is_valid():
+        #     return Response(outSerializer.data, status=status.HTTP_200_OK)
+        # else:
+        #     raise Exception(outSerializer.errors)    
             
         
     except (Exception) as error:
         message = f"Error in getProcess: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)      
+        
+####################    
+#########Serializer#############
+#TODO Add serializer
+# "updateProcess": ("public/updateProcess/", process.updateProcess),
+#######################################################
+@extend_schema(
+    summary="Update stuff about the process",
+    description=" ",
+    request=None,
+    tags=['process'],
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["PATCH"])
+# @checkIfRightsAreSufficient(json=False)
+@api_view(["PATCH"])
+def updateProcess(request):
+    """
+    Update stuff about the process
+
+    :param request: Request with content
+    :type request: HTTP PATCH
+    :return: Message if it worked or not
+    :rtype: HTTPResponse
+
+    """
+    try:
+        changes = json.loads(request.body.decode("utf-8"))
+        projectID = changes["projectID"]
+        processIDs = changes["processIDs"] # list of processIDs
+        
+        # TODO remove
+        if ProcessUpdates.processStatus in changes["changes"]:
+            del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
+
+        message, flag = updateProcessFunction(request, changes, projectID, processIDs)
+        if flag is False:
+            return HttpResponse("Not logged in", status=401)
+        if isinstance(message, Exception):
+            raise Exception(message)
+
+        return HttpResponse("Success")
+    except (Exception) as error:
+        message = f"Error in updateProcess: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#########Serializer#############
+#TODO Add serializer    
+# "deleteProcesses": ("public/deleteProcesses/", process.deleteProcesses),
+#######################################################
+@extend_schema(
+    summary="Delete one or more processes",
+    description=" ",
+    request=None,
+    tags=['process'],
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["DELETE"])
+# @checkIfRightsAreSufficient(json=False)
+@api_view(["DELETE"])
+def deleteProcesses(request, projectID):
+    """
+    Delete one or more processes
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param projectID: id of the project
+    :type projectID: str
+    :return: Success or not
+    :rtype: HTTPRespone
+
+    """
+    try:
+        processIDs = request.GET['processIDs'].split(",")
+        retVal = deleteProcessFunction(request.session, processIDs)
+        if isinstance(retVal, Exception):
+            raise retVal
+        return retVal
+    except (Exception) as error:
+        message = f"Error in deleteProcesses: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+#########Serializer#############
+#TODO Add serializer        
+# "getProcessHistory": ("public/getProcessHistory/", process.getProcessHistory),
+#######################################################
+@extend_schema(
+    summary="See who has done what and when",
+    description=" ",
+    request=None,
+    tags=['process'],
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient(json=True)
+@checkIfUserMaySeeProcess(json=True)
+@api_view(["GET"])
+def getProcessHistory(request, processID):
+    """
+    See who has done what and when
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param processID: The process of interest
+    :type processID: str
+    :return: JSON of process history
+    :rtype: JSON Response
+
+    """
+    try:
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
+
+        if processObj == None:
+            raise Exception("Process not found in DB!")
+        
+        listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
+        # parse for frontend
+        for index, entry in enumerate(listOfData):
+            outDatum = {}
+            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
+            outDatum[DataDescription.type] = entry[DataDescription.type]
+            outDatum[DataDescription.data] = entry[DataDescription.data]
+            listOfData[index] = outDatum # overwrite
+
+        outObj = {"history": listOfData}
+
+        return Response(outObj, status.status_code.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in getProcessHistory: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+#########Serializer#############
+#TODO Add serializer  
+#######################################################
+@extend_schema(
+    summary="Get all suitable Contractors",
+    description=" ",
+    tags=['process'],
+    request=None,
+    responses={
+        200: None,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient(json=True)
+@checkIfUserMaySeeProcess(json=True)
+@api_view(["GET"])
+def getContractors(request, processID:str):
+    """
+    Get all suitable Contractors.
+
+    :param request: GET request
+    :type request: HTTP GET
+    :param processID: The ID of the process a contractor is chosen for
+    :type processID: str
+    :return: List of contractors and some details
+    :rtype: JSON
+
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface() # checks not needed for rights, was done in the decorators
+        processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
+        if processObj == None:
+            raise Exception("Process ID not found in session or db")
+ 
+        serviceType = processObj.serviceType
+
+
+        listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
+        # TODO Check suitability
+
+        # remove unnecessary information and add identifier
+        # for idx, elem in enumerate(listOfAllContractors):
+        #     contractorList.append({})
+        #     contractorList[idx]["name"] = elem["name"]
+        #     contractorList[idx]["id"] = elem["hashedID"]
+
+        return JsonResponse(listOfAllContractors, safe=False)
+    except (Exception) as error:
+        message = f"Error in getContractors: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

@@ -23,16 +23,18 @@ from drf_spectacular.utils import OpenApiParameter
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
-from Generic_Backend.code_General.utilities.basics import manualCheckIfRightsAreSufficient, manualCheckifLoggedIn
+
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 from code_SemperKI.connections.content.manageContent import ManageContent
+from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getFlatStatus
-from code_SemperKI.utilities.basics import ExceptionSerializer, checkVersion
+from code_SemperKI.utilities.basics import ExceptionSerializer
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 
-#########################################################################
+
 ########################################################
 # Get project(s)
 ########################################################
@@ -64,6 +66,7 @@ class SResGetFlatProjects(serializers.Serializer):
     summary="Get all projects flattened",
     description=" ",
     request=None,
+    tags=['projects'],
     responses={
         200: SResGetFlatProjects,
         401: ExceptionSerializer,
@@ -121,6 +124,7 @@ def getFlatProjects(request):
     summary="Get a project by ID",
     description=" ",
     request=None,
+    tags=['projects'],
     responses={
         200: SResGetProject,
         401: ExceptionSerializer,
@@ -207,6 +211,7 @@ class SResCreateProjectID(serializers.Serializer):
     summary="Create project and send ID back to frontend",
     description=" ",
     request=SReqCreateProjectID,
+    tags=['projects'],
     responses={
         200: SResCreateProjectID,
         400: ExceptionSerializer,
@@ -294,6 +299,7 @@ class SReqUpdateProject(serializers.Serializer):
     summary="Update stuff about the project",
     description=" ",
     request=SReqUpdateProject,
+    tags=['projects'],
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -371,7 +377,7 @@ def updateProject(request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-#########################################################################
+
 ########################################################
 # Delete projects
 ########################################################
@@ -383,6 +389,7 @@ def updateProject(request):
     summary="Delete the whole projects",
     description=" ",
     request=None,
+    tags=['projects'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -439,7 +446,7 @@ def deleteProjects(request):
             interface.deleteProject(projectID)
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
         
-        return Response("Success")
+        return Response("Success", status=status.HTTP_200_OK)
     
     except (Exception) as error:
         message = f"Error in deleteProjects: {str(error)}"
@@ -451,3 +458,51 @@ def deleteProjects(request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+#######################################################
+@extend_schema(
+    summary="Save projects to database",
+    description=" ",
+    tags=['projects'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+# @checkIfUserIsLoggedIn()
+# @checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+def saveProjects(request):
+    """
+    Save projects to database
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Response if sent successfully or not
+    :rtype: HTTP Response
+
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
+            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
+            if isinstance(error, Exception):
+                raise error
+
+            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
+
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in saveProjects: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
