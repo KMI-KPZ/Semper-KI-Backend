@@ -10,6 +10,10 @@ import MSQ.module.celery as TaskQueue
 from ..tasks.tasks import dummy, callfTetWild
 from django.http import FileResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
+from drf_spectacular.utils import extend_schema
+from rest_framework.response import Response
+from code_SemperKI.utilities.basics import *
+from rest_framework.decorators import api_view
 
 ####################################################################
 def returnFileFromfTetWild(filePath:str):
@@ -25,7 +29,21 @@ def returnFileFromfTetWild(filePath:str):
     return FileResponse(content, filename="Test.ugrid")
 
 ####################################################################
-@require_http_methods(["GET"])
+@extend_schema(
+    summary="Get results from celery worker via ID, dispatch to further handlers",
+    description=" ",
+    tags=['celery'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+# @checkIfUserIsLoggedIn()
+# @require_http_methods(["GET"])
+# @checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
 def getResultsBack(request, taskID):
     """
     Get results from celery worker via ID, dispatch to further handlers
