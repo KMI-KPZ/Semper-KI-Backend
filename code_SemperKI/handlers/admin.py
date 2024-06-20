@@ -15,6 +15,14 @@ from django.views.decorators.http import require_http_methods
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
+from rest_framework import status, serializers
+from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view
+from rest_framework.request import Request
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter
+from code_SemperKI.utilities.basics import *
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessDescription
 
@@ -23,9 +31,24 @@ logger = logging.getLogger("logToFile")
 # Projects #############################################################################################################
 
 ##############################################
+#########Serializer#############
+#TODO Add serializer  
+# "getAllProjectsFlatAsAdmin": ("public/getAllProjectsFlatAsAdmin/", admin_.getAllProjectsFlatAsAdmin),
+#######################################################
+@extend_schema(
+    summary="Get all Projects in flat format.",
+    description=" ",
+    tags=['admin'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def getAllProjectsFlatAsAdmin(request):
     """
     Get all Projects in flat format.
@@ -46,9 +69,24 @@ def getAllProjectsFlatAsAdmin(request):
     return JsonResponse(projects, safe=False)
 
 ##############################################
+#########Serializer#############
+#TODO Add serializer  
+# "getSpecificProjectAsAdmin": ("public/getSpecificProjectAsAdmin/", admin_.getSpecificProjectAsAdmin),
+#######################################################
+@extend_schema(
+    summary="Get all info for a specific project.",
+    description=" ",
+    tags=['admin'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def getSpecificProjectAsAdmin(request, projectID):
     """
     Get all info for a specific project.
