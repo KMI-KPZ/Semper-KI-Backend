@@ -32,6 +32,8 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
+#########Serializer#############
+#TODO Add serializer  
 # "getStateMachine": ("public/getStateMachine/", statemachine.getStateMachine),
 #######################################################
 @extend_schema(
