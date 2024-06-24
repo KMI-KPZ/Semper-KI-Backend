@@ -219,7 +219,7 @@ def updateProcess(request):
 
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
         if flag is False:
-            return HttpResponse("Not logged in", status=401)
+            return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
             raise Exception(message)
 
