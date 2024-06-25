@@ -62,11 +62,16 @@ def getAllProjectsFlatAsAdmin(request):
     projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
     for idx, entry in enumerate(projects):
         clientID = entry[ProcessDescription.client]
+        assert isinstance(clientID, str), f"In {getAllProjectsFlatAsAdmin.__name__}: expected clientID to be of type string, instead got: {type(clientID)}"
+        assert clientID != "", f"In {getAllProjectsFlatAsAdmin.__name__}: non-empty clientID expected"
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
+        assert isinstance(userName, str), f"In {getAllProjectsFlatAsAdmin.__name__}: expected userName to be of type string, instead got: {type(userName)}"
+        assert userName != "", f"In {getAllProjectsFlatAsAdmin.__name__}: non-empty userName expected"
+        
         projects[idx]["clientName"] = userName
         
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
-    return JsonResponse(projects, safe=False)
+    return JsonResponse(projects, safe=False)                                                         # muss logging hier in lowercase sein?
 
 ##############################################
 #########Serializer#############

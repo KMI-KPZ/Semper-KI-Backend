@@ -60,12 +60,15 @@ def getMissedEvents(request):
 
     """
     user = pgProfiles.ProfileManagementBase.getUser(request.session)
+    assert isinstance (user, dict), f"In {getMissedEvents.__name__}: expected user to be of type dictionary, instead got: {type(user)}"
     lastLogin = timezone.make_aware(datetime.strptime(user[UserDescription.lastSeen], '%Y-%m-%d %H:%M:%S.%f+00:00'))
     projects = pgProcesses.ProcessManagementBase.getProjects(request.session)
-
+    assert isinstance (projects, list), f"In {getMissedEvents.__name__}: expected projects to be of type list, instead got: {type(projects)}"
+    
     output = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
     #TODO: organization events like role changed or something
     for project in projects:
+        #assert isinstance (project, ProjectDescription), f"In {getMissedEvents.__name__}: expected user to be of type Project, instead got: {type(project)}" #not tested yet
         currentProject = {}
         currentProject[ProjectDescription.projectID] = project[ProjectDescription.projectID]
         processArray = []
