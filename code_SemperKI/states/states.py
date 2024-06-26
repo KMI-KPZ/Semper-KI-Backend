@@ -771,15 +771,18 @@ class SERVICE_COMPLETED(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.ArrowBackIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": "contractorSelection",
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    },
                 },
                 "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
         ] 
     
     ###################################################
@@ -843,8 +846,8 @@ class SERVICE_COMPLETED(State):
         return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
     
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button}
+    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
+    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1096,7 +1099,7 @@ class SERVICE_COMPLICATION(State):
 #######################################################
 class CONTRACTOR_SELECTED(State):
     """
-    Contractor has been chosen
+    Contractor has been chosen (opens page for verification in frontend)
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_SELECTED)
@@ -1105,18 +1108,18 @@ class CONTRACTOR_SELECTED(State):
     ###################################################
     def buttons(self, client=True, admin=False) -> list:
         """
-        Buttons for  CONTRACTOR_SELECTED
+        Buttons for  CONTRACTOR_SELECTED 
 
         """
         return [
             {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
                     },
                 },
                 "active": True,
@@ -1169,8 +1172,9 @@ class CONTRACTOR_SELECTED(State):
     # Transitions
     ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONTRACTOR_SELECTED | VERIFYING: # TODO: Change to current and next state
+          VERIFYING: 
         """
+        Starts verification
         From: CONTRACTOR_SELECTED
         To: VERIFYING
 
@@ -1179,7 +1183,7 @@ class CONTRACTOR_SELECTED(State):
         return stateDict[ProcessStatusAsString.VERIFYING]
 
     ###################################################
-    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           SERVICE_READY:
         """
         To: SERVICE_READY
@@ -1190,7 +1194,7 @@ class CONTRACTOR_SELECTED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.VERIFYING: to_VERIFYING}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1241,6 +1245,20 @@ class VERIFYING(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
+            },
+            { # this button shall not do anything
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
+                "icon": IconType.MailIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.VERIFYING,
+                    },
+                },
+                "active": False,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "both",
             }
         ] 
     
