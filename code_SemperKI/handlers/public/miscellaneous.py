@@ -396,7 +396,6 @@ def downloadFileStream(request, projectID, processID, fileID):
         401: ExceptionSerializer,
         404: ExceptionSerializer,
         500: ExceptionSerializer,
-        
     }
 )
 @api_view(["GET"])
