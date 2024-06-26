@@ -14,22 +14,20 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.conf import settings
+import json, logging, copy
 
-from boto3.s3.transfer import TransferConfig
 from botocore.response import StreamingBody
 from reportlab.pdfgen import canvas
 from reportlab.lib import pagesizes
 
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
-from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import OpenApiParameter
+
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities.files import createFileResponse
@@ -42,8 +40,9 @@ from code_SemperKI.serviceManager import serviceManager
 import code_SemperKI.connections.content.manageContent as ManageC
 from code_SemperKI.connections.content.manageContent import ManageContent
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+from code_SemperKI.handlers.public.process import deleteProcesses
 from code_SemperKI.connections.content.postgresql import pgProcesses
-from code_SemperKI.states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess, InterfaceForStateChange
+from code_SemperKI.states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, InterfaceForStateChange
 
 
 logger = logging.getLogger("logToFile")
@@ -53,8 +52,6 @@ loggerDebug = logging.getLogger("django_debug")
 
 #########Serializer#############
 #TODO Add serializer  
-# "getServices": ("public/getServices/", miscellaneous.getServices),
-#######################################################
 @extend_schema(
     summary="Return the offered services",
     description=" ",
@@ -93,13 +90,8 @@ downloadFileStream), #
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
-        
 #########Serializer#############
 #TODO Add serializer  
- 
-#  "uploadFiles": ("public/uploadFiles/", miscellaneous.uploadFiles),
- #######################################################
 @extend_schema(
      summary="File upload for a process",
      description=" ",
@@ -111,7 +103,6 @@ downloadFileStream), #
          500: ExceptionSerializer
      }
  )
-
 @api_view(["POST"])
 def uploadFiles(request):
     """
@@ -278,7 +269,6 @@ def getFileObject(request, projectID, processID, fileID) -> tuple[object, bool, 
       
 #########Serializer#############
 #TODO Add serializer  
-# "getFilesInfoFromProcess": ("public/getFilesInfoFromProc/", miscellaneous.getFilesInfoFromProcess),
 @extend_schema(
     summary="Obtain file(s) information from a process",
     description=" ",
@@ -287,13 +277,10 @@ def getFileObject(request, projectID, processID, fileID) -> tuple[object, bool, 
     responses={
         200: None,
         401: ExceptionSerializer,
+        404: ExceptionSerializer,
         500: ExceptionSerializer,
-        404: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["POST"])
-# @checkIfRightsAreSufficient(json=False)
 @api_view(["POST"])
 def getFilesInfoFromProcess(request, projectID, processID, fileID) -> tuple[object, bool]:
     """
@@ -345,8 +332,6 @@ def getFilesInfoFromProcess(request, projectID, processID, fileID) -> tuple[obje
 
 #########Serializer#############
 #TODO Add serializer  
-# "downloadFileStream": ("public/downloadFileStream/", miscellaneous.downloadFileStream),
-#######################################################
 @extend_schema(
     summary="Send file to user from storage",
     description="Send file to user from storage with request of user for a specific file of a process  ",
@@ -358,7 +343,6 @@ def getFilesInfoFromProcess(request, projectID, processID, fileID) -> tuple[obje
         500: ExceptionSerializer
     }
 )
-
 @api_view(["GET"])
 def downloadFileStream(request, projectID, processID, fileID):
     """
@@ -400,11 +384,8 @@ def downloadFileStream(request, projectID, processID, fileID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
         
-        
 #########Serializer#############
 #TODO Add serializer  
-# "downloadFilesAsZip": ("public/downloadFilesAsZip/", miscellaneous.downloadFilesAsZip),
-#######################################################
 @extend_schema(
     summary="Send files to user as zip",
     description=" ",
@@ -413,11 +394,11 @@ def downloadFileStream(request, projectID, processID, fileID):
     responses={
         200: None,
         401: ExceptionSerializer,
+        404: ExceptionSerializer,
         500: ExceptionSerializer,
-        404: ExceptionSerializer
+        
     }
 )
-
 @api_view(["GET"])
 def downloadFilesAsZip(request, projectID, processID):
     """
@@ -477,11 +458,8 @@ def downloadFilesAsZip(request, projectID, processID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
         
-        
 #########Serializer#############
 #TODO Add serializer  
-# "deleteFile": ("public/deleteFile/", miscellaneous.deleteFile),
-#######################################################
 @extend_schema(
     summary="Delete a file from storage",
     description=" ",
@@ -493,7 +471,6 @@ def downloadFilesAsZip(request, projectID, processID):
         500: ExceptionSerializer
     }
 )
-
 @api_view(["DELETE"])
 def deleteFile(request, projectID, processID, fileID):
     """
@@ -538,11 +515,8 @@ def deleteFile(request, projectID, processID, fileID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
-#########Serializer#############
+#########Serializer############
 #TODO Add serializer  
-# "downloadProcessHistory": ("public/downloadProcessHistory/", miscellaneous.downloadProcessHistory),
-#######################################################
 @extend_schema(
     summary="See who has done what and when and download this as pdf",
     description=" ",
@@ -632,8 +606,7 @@ def downloadProcessHistory(request, processID):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
-        
-        
+########################################################
 def deleteProcessFunction(session, processIDs:list[str]):
     """
     Delete the processes
@@ -663,8 +636,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
     
     except Exception as e:
         return e
-    
-    
+############################################################   
 def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
     """
     Duplicate selected processes. Works only for logged in users.
@@ -773,12 +745,9 @@ def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
     except Exception as error:
         loggerError.error(f"Error when cloning processes: {error}")
         return JsonResponse({})    
-
-
+    
 #########Serializer#############
 #TODO Add serializer  
-# "statusButtonRequest": ("public/statusButtonRequest/", miscellaneous.statusButtonRequest),
-#######################################################
 @extend_schema(
     summary="Button was clicked, so the state must change (transition inside state machine)",
     description=" ",
@@ -790,7 +759,6 @@ def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
         500: ExceptionSerializer
     }
 )
-
 @api_view(["GET"])
 def statusButtonRequest(request):
     """
@@ -837,3 +805,4 @@ def statusButtonRequest(request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+##############################################

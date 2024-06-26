@@ -11,14 +11,10 @@ from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
-from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import OpenApiParameter
-
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin
@@ -38,13 +34,9 @@ from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunc
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-#############
-
-
 
 #########Serializer#############
 #TODO Add serializer for createProcessID.
-#######################################################
 @extend_schema(
     summary="Create a process ID ",
     description="creates a process ID for a given project id",
@@ -56,7 +48,6 @@ loggerError = logging.getLogger("errors")
         500: ExceptionSerializer
     }
 )
-
 @api_view(["GET"])
 def createProcessID(request, projectID):
     """
@@ -110,11 +101,8 @@ def createProcessID(request, projectID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
-
 ###serializer###########
 #TODO Add serializer for getProcess
-#######################################################
 @extend_schema(
     summary="Retrieve complete process.",
     description="Retrieve complete process using projectID and processID ",
@@ -126,9 +114,6 @@ def createProcessID(request, projectID):
         500: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["GET"])
-# @checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 def getProcess(request, projectID, processID):
     """
@@ -166,8 +151,6 @@ def getProcess(request, projectID, processID):
         #     return Response(outSerializer.data, status=status.HTTP_200_OK)
         # else:
         #     raise Exception(outSerializer.errors)    
-            
-        
     except (Exception) as error:
         message = f"Error in getProcess: {str(error)}"
         exception = str(error)
@@ -178,11 +161,8 @@ def getProcess(request, projectID, processID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)      
         
-####################    
 #########Serializer#############
 #TODO Add serializer
-# "updateProcess": ("public/updateProcess/", process.updateProcess),
-#######################################################
 @extend_schema(
     summary="Update stuff about the process",
     description=" ",
@@ -194,9 +174,6 @@ def getProcess(request, projectID, processID):
         500: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["PATCH"])
-# @checkIfRightsAreSufficient(json=False)
 @api_view(["PATCH"])
 def updateProcess(request):
     """
@@ -236,8 +213,6 @@ def updateProcess(request):
         
 #########Serializer#############
 #TODO Add serializer    
-# "deleteProcesses": ("public/deleteProcesses/", process.deleteProcesses),
-#######################################################
 @extend_schema(
     summary="Delete one or more processes",
     description=" ",
@@ -249,9 +224,6 @@ def updateProcess(request):
         500: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["DELETE"])
-# @checkIfRightsAreSufficient(json=False)
 @api_view(["DELETE"])
 def deleteProcesses(request, projectID):
     """
@@ -281,11 +253,8 @@ def deleteProcesses(request, projectID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
 #########Serializer#############
 #TODO Add serializer        
-# "getProcessHistory": ("public/getProcessHistory/", process.getProcessHistory),
-#######################################################
 @extend_schema(
     summary="See who has done what and when",
     description=" ",
@@ -331,7 +300,7 @@ def getProcessHistory(request, processID):
 
         outObj = {"history": listOfData}
 
-        return Response(outObj, status.status_code.HTTP_200_OK)
+        return Response(outObj, status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in getProcessHistory: {str(error)}"
         exception = str(error)
@@ -342,10 +311,8 @@ def getProcessHistory(request, processID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        
 #########Serializer#############
 #TODO Add serializer  
-#######################################################
 @extend_schema(
     summary="Get all suitable Contractors",
     description=" ",
@@ -401,3 +368,5 @@ def getContractors(request, processID:str):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
+        
+#######################################

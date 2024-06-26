@@ -7,10 +7,9 @@ Contains: Handling of admin view requests
 
 """
 
-import datetime, json, logging
+import datetime, logging
 
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.http import  JsonResponse
 
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
@@ -33,8 +32,6 @@ logger = logging.getLogger("logToFile")
 ##############################################
 #########Serializer#############
 #TODO Add serializer  
-# "getAllProjectsFlatAsAdmin": ("public/getAllProjectsFlatAsAdmin/", admin_.getAllProjectsFlatAsAdmin),
-#######################################################
 @extend_schema(
     summary="Get all Projects in flat format.",
     description=" ",
@@ -65,14 +62,12 @@ def getAllProjectsFlatAsAdmin(request):
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
         projects[idx]["clientName"] = userName
         
-    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
-    return JsonResponse(projects, safe=False)
+    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
+    return Response(projects, safe=False)
 
 ##############################################
 #########Serializer#############
 #TODO Add serializer  
-# "getSpecificProjectAsAdmin": ("public/getSpecificProjectAsAdmin/", admin_.getSpecificProjectAsAdmin),
-#######################################################
 @extend_schema(
     summary="Get all info for a specific project.",
     description=" ",
@@ -99,7 +94,7 @@ def getSpecificProjectAsAdmin(request, projectID):
     :rtype: JSONResponse
     """
 
-    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
+    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
     return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 
     

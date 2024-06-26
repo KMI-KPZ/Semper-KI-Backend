@@ -6,14 +6,13 @@ Akshay NS 2024
 Contains: handlers for events
 """
 
-import json, logging, copy
+import logging
 from datetime import datetime
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
 from django.utils import timezone
 from django.conf import settings
 
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
@@ -33,7 +32,7 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
-# "getMissedEvents": ("public/getMissedEvents/", miscellaneous.getMissedEvents),
+
 #######################################################
 @extend_schema(
     summary=" Show how many events (chat messages ...) were missed since last login.",
@@ -95,4 +94,4 @@ def getMissedEvents(request):
     # set accessed time to now
     pgProfiles.ProfileManagementBase.setLoginTime(user[UserDescription.hashedID])
 
-    return JsonResponse(output, status=200, safe=False)
+    return Response(output, status=status.HTTP_200_OK, safe=False)

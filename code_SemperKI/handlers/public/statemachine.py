@@ -6,27 +6,19 @@ Akshay NS 2024
 Contains: 
 """
 
-import json, logging, copy
-from datetime import datetime
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.utils import timezone
-from django.conf import settings
+import logging
 
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
-from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import OpenApiParameter
+
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
-from code_SemperKI.states.states import processStatusAsInt, ProcessStatusAsString, StateMachine
+from code_SemperKI.states.states import StateMachine
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -34,7 +26,6 @@ loggerError = logging.getLogger("errors")
 
 #########Serializer#############
 #TODO Add serializer  
-# "getStateMachine": ("public/getStateMachine/", statemachine.getStateMachine),
 #######################################################
 @extend_schema(
     summary="Print out the whole state machine and all transitions",
@@ -47,9 +38,6 @@ loggerError = logging.getLogger("errors")
         500: ExceptionSerializer
     }
 )
-# @checkIfUserIsLoggedIn()
-# @require_http_methods(["GET"])
-# @checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 def getStateMachine(request):
     """
@@ -74,3 +62,5 @@ def getStateMachine(request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################
