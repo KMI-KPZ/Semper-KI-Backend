@@ -73,6 +73,8 @@ def createProcessID(request, projectID):
     try:
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
+        assert isinstance(processID, str), f"In {createProcessID.__name__}: expected processID to be of type string, instead got: {type(processID)}"
+        assert processID != "", f"In {createProcessID.__name__}: non-empty processID expected"
         
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(createProcessID.__name__)
@@ -143,7 +145,10 @@ def getProcess(request, projectID, processID):
     try:
         contentManager = ManageContent(request.session)
         userID = contentManager.getClient()
+        assert isinstance(userID, str), f"In {getProcess.__name__}: expected userID to be of type string, instead got: {type(userID)}"
+        assert userID != "", f"In {getProcess.__name__}: non-empty userID expected"
         adminOrNot = manualCheckifAdmin(request.session)
+        assert isinstance(adminOrNot, bool), f"In {getProcess.__name__}: expected adminOrNot to be of type bool, instead got {type(adminOrNot)}"
         interface = contentManager.getCorrectInterface(getProject.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in getProcess"
@@ -210,14 +215,19 @@ def updateProcess(request):
     """
     try:
         changes = json.loads(request.body.decode("utf-8"))
+        assert "projectID" in changes.keys(), f"In {updateProcess.__name__}: projectID not in request"
+        assert "projectIDs" in changes.keys(), f"In {updateProcess.__name__}: projectIDs not in request"
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
         
         # TODO remove
+        assert "changes" in changes.keys(), f"In {updateProcess.__name__}: changes not in request"
         if ProcessUpdates.processStatus in changes["changes"]:
             del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
 
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
+        assert isinstance(message, str), f"In {updateProcess.__name__}: expected message to be of type string instead got {type(message)}"
+        assert isinstance(flag, bool), f"In {updateProcess.__name__}: expected flag to be of type bool instead got {type(message)}"
         if flag is False:
             return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
