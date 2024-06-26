@@ -23,7 +23,7 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter, OpenApiSchemaBase
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfNestedKeyExists, getNestedValue
 from Generic_Backend.code_General.connections import redis
 from Generic_Backend.code_General.definitions import FileObjectContent
 
@@ -118,9 +118,9 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(checkModel.__name__)
+        interface = contentManager.getCorrectInterface(checkModel.cls.__name__)
         if interface == None:
-            message = "Rights not sufficient in checkModel"
+            message = f"Rights not sufficient in {checkModel.cls.__name__}"
             exception = "Unauthorized"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -130,7 +130,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         process = interface.getProcessObj(projectID, processID)
         if isinstance(process, Exception):
-            message = "Model not found in checkModel"
+            message = f"Model not found in {checkModel.cls.__name__}"
             exception = "Not found"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -140,7 +140,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         # If calculations are already there, take these, unless they are mocked
-        if fileID in process.serviceDetails.get(ServiceDetails.calculations, []) and process.serviceDetails[ServiceDetails.calculations].get(fileID, [])["measurements"]["volume"] != -1.0:
+        if checkIfNestedKeyExists(process.serviceDetails, ServiceDetails.calculations, fileID, "measurements", "volume") and process.serviceDetails[ServiceDetails.calculations][fileID]["measurements"]["volume"] != -1.0:
             outputSerializer = SResCheckModel(data=process.serviceDetails[ServiceDetails.calculations][fileID])
             if outputSerializer.is_valid():
                 return Response(outputSerializer.data, status=status.HTTP_200_OK)
@@ -195,7 +195,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.calculations: {fileID: resultData}}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
-            message = "Rights not sufficient in checkModel while updating process"
+            message = f"Rights not sufficient in {checkModel.cls.__name__} while updating process"
             exception = "Unauthorized"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -212,7 +212,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
         else:
             raise Exception("Validation failed")
     except (Exception) as error:
-        message = f"Error in checkModel: {str(error)}"
+        message = f"Error in {checkModel.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
