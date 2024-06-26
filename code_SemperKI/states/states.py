@@ -8,6 +8,7 @@ Contains: State machine with states
 """
 
 
+import copy
 import logging
 
 from abc import ABC, abstractmethod
@@ -682,6 +683,17 @@ class SERVICE_READY(State):
     
     ###################################################
     # Transitions
+    ##################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        else:
+            return self
+        
     ###################################################
     def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         SERVICE_COMPLETED:
@@ -717,7 +729,7 @@ class SERVICE_READY(State):
         return stateDict[ProcessStatusAsString.DRAFT]
     
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION, ]
+    updateTransitions = [to_SERVICE_COMPLICATION, to_SERVICE_IN_PROGRESS]
     buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED}
 
     ###################################################
@@ -737,21 +749,17 @@ class SERVICE_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
 
-    ###################################################
-    def buttons(self, client=True, admin=False) -> list:
-        """
-        Choose contractor
-
-        """
-        return [
+    def __init__(self):
+        super().__init__()
+        self.buttonsInactive = [
             {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
+                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
                     },
                 },
                 "active": True,
@@ -771,7 +779,7 @@ class SERVICE_COMPLETED(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
-                "icon": IconType.ArrowBackIcon,
+                "icon": IconType.DoneAllIcon,
                 "action": {
                     "type": "request",
                     "data": {
@@ -779,11 +787,22 @@ class SERVICE_COMPLETED(State):
                         "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
                     },
                 },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
+                "active": False,
+                "buttonVariant": ButtonTypes.primary,
                 "showIn": "process",
             },
         ] 
+        self.buttonsActive = copy.deepcopy(self.buttonsInactive)
+        self.buttonsActive[2]["active"] = True #set forward button to active
+        self.buttonsList = self.buttonsInactive
+
+    ###################################################
+    def buttons(self, client=True, admin=False) -> list:
+        """
+        Choose contractor
+
+        """
+        return self.buttonsList
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -801,6 +820,19 @@ class SERVICE_COMPLETED(State):
             return FlatProcessStatus.ACTION_REQUIRED
     
     ###################################################
+    def setCorrectButtons(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Set the correct Buttons, a bit of a hack
+        
+        """
+        if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
+            and ProcessDetails.clientAdress in process.processDetails and process.processDetails[ProcessDetails.clientAdress] != {}:
+            self.buttonsList = self.buttonsActive
+        else:
+            self.buttonsList = self.buttonsInactive
+        return self
+
     # Transitions
     ###################################################
     def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -809,7 +841,8 @@ class SERVICE_COMPLETED(State):
         Contractor was selected
 
         """
-        if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
+        if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
+            and ProcessDetails.clientAdress in process.processDetails and process.processDetails[ProcessDetails.clientAdress] != {}:
             return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
         return self
     
@@ -837,17 +870,17 @@ class SERVICE_COMPLETED(State):
             return self
     
     ###################################################
-    def to_SERVICE_IN_PROGRESS_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        SERVICE_IN_PROGRESS:
+    def to_SERVICE_READY_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
         """
         Button was pressed, go back
 
         """
-        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
     
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
+    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION, setCorrectButtons]
+    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1257,7 +1290,7 @@ class VERIFYING(State):
                     },
                 },
                 "active": False,
-                "buttonVariant": ButtonTypes.secondary,
+                "buttonVariant": ButtonTypes.primary,
                 "showIn": "both",
             }
         ] 
