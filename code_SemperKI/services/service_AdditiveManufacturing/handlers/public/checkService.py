@@ -140,7 +140,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         # If calculations are already there, take these, unless they are mocked
-        if fileID in process.serviceDetails[ServiceDetails.calculations] and process.serviceDetails[ServiceDetails.calculations][fileID]["measurements"]["volume"] != -1.0:
+        if fileID in process.serviceDetails.get(ServiceDetails.calculations, []) and process.serviceDetails[ServiceDetails.calculations].get(fileID, [])["measurements"]["volume"] != -1.0:
             outputSerializer = SResCheckModel(data=process.serviceDetails[ServiceDetails.calculations][fileID])
             if outputSerializer.is_valid():
                 return Response(outputSerializer.data, status=status.HTTP_200_OK)
