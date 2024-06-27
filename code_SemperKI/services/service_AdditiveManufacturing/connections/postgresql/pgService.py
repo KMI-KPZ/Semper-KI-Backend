@@ -34,13 +34,13 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
                 for fileID in newContent[ServiceDetails.models]:    
                     existingContent[ServiceDetails.models][fileID] = newContent[entry][fileID]
             elif entry == ServiceDetails.materials:
-                if existingContent == {} or ServiceDetails.materials not in existingContent:
-                    existingContent[ServiceDetails.materials] = {}
+                #if existingContent == {} or ServiceDetails.materials not in existingContent:
+                existingContent[ServiceDetails.materials] = {}
                 for materialID in newContent[ServiceDetails.materials]:
                     existingContent[ServiceDetails.materials][materialID] = newContent[entry][materialID]
             elif entry == ServiceDetails.postProcessings:
-                if existingContent == {} or ServiceDetails.postProcessings not in existingContent:
-                    existingContent[ServiceDetails.postProcessings] = {}
+                #if existingContent == {} or ServiceDetails.postProcessings not in existingContent:
+                existingContent[ServiceDetails.postProcessings] = {}
                 for postProcessingID in newContent[ServiceDetails.postProcessings]:
                     existingContent[ServiceDetails.postProcessings][postProcessingID] = newContent[entry][postProcessingID]
             elif entry == ServiceDetails.calculations:

@@ -129,7 +129,7 @@ def retrievePostProcessingsWithFilter(request:Request):
 class SReqSetPostProcessings(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
-    postProcessing = SReqPostProcessingsContent()
+    postProcessings = serializers.ListField(child=SReqPostProcessingsContent())
     
 #######################################################
 @extend_schema(
@@ -171,9 +171,11 @@ def setPostProcessingSelection(request:Request):
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
-        postProcessing = info["postProcessing"]
+        postProcessings = info["postProcessings"]
 
-        postProcessingToBeSaved = {postProcessing[PostProcessDetails.id]: postProcessing}
+        postProcessingToBeSaved = {} 
+        for postProcessing in postProcessings:
+            postProcessingToBeSaved[postProcessing[PostProcessDetails.id]] = postProcessing
 
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.postProcessings: postProcessingToBeSaved}}}
 

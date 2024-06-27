@@ -128,7 +128,7 @@ def retrieveMaterialsWithFilter(request:Request):
 class SReqSetMaterial(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
-    material = SReqMaterialContent()
+    materials = serializers.ListField(child=SReqMaterialContent())
     
 #######################################################
 @extend_schema(
@@ -170,9 +170,11 @@ def setMaterialSelection(request:Request):
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
-        material = info["material"]
+        materials = info["materials"]
 
-        materialToBeSaved = {material[MaterialDetails.id]: material}
+        materialToBeSaved = {}
+        for material in materials:
+            materialToBeSaved[material[MaterialDetails.id]] = material
 
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.materials: materialToBeSaved}}}
 
