@@ -525,7 +525,7 @@ class SERVICE_IN_PROGRESS(State):
                     },
                 },
                 "active": False,
-                "buttonVariant": ButtonTypes.secondary,
+                "buttonVariant": ButtonTypes.primary,
                 "showIn": "both",
             }
         ]
