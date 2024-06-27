@@ -35,4 +35,5 @@ updateEntryForContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data upd
 deleteAllFromContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/DeleteAllFromSP", post=True, parameters={SparqlParameters.ID: ""})
 deleteLinkPrinterMaterialOfContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/DeleteLinkPrinterMaterial", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.PrinterModel: "", SparqlParameters.Material: ""})
 deletePrinterOfContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/DeletePrinterOfSP", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.PrinterModel: ""})
-getPrintersByBuildPlate = SKICmem.ManageSPARQLQuery("/Ontology/queries/getPrinterWithBuildPlate",parameters={SparqlParameters.min_height: 0, SparqlParameters.min_length: 0, SparqlParameters.min_width: 0})
+getManufacturersByBuildPlate = SKICmem.ManageSPARQLQuery("/Ontology/queries/serviceprovider_by_buildplate_Hannes",parameters={SparqlParameters.min_height: 0, SparqlParameters.min_length: 0, SparqlParameters.min_width: 0})
+getManufacturersByMaterial = SKICmem.ManageSPARQLQuery("/Ontology/queries/serviceprovider_by_material_Hannes")

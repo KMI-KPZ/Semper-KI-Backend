@@ -757,12 +757,24 @@ def getContractors(request, processID:str):
         serviceType = processObj.serviceType
         service = serviceManager.getService(processObj.serviceType)
 
-        # TODO Check suitability
-        listOfAllContractors = service.getFilteredContractors(processObj)
-        if len(listOfAllContractors) == 0:
-            listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
+        listOfFilteredContractors = service.getFilteredContractors(processObj)
+        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
+        # Therefore parse it
+        listOfResultingContractors = []
+        for contractor in listOfFilteredContractors:
+            idOfContractor = contractor["ID"]["value"]
+            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
+            if isinstance(contractorContentFromDB, Exception):
+                raise contractorContentFromDB
+            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
+            listOfResultingContractors.append(contractorToBeAdded)
+        
+        if len(listOfFilteredContractors) == 0:
+            listOfResultingContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
 
-        return JsonResponse(listOfAllContractors, safe=False)
+        return JsonResponse(listOfResultingContractors, safe=False)
     except (Exception) as error:
         loggerError.error(f"getContractors: {str(error)}")
         return HttpResponse(error, status=500)

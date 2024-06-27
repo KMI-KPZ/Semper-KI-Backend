@@ -9,40 +9,49 @@ Contains: Functions using the sparql queries to filter for contractors
 from ..utilities.sparqlQueries import *
 
 ##################################################
-def filterByMaterial(chosenMaterials:dict):
+def filterByMaterial(resultDict:dict, chosenMaterials:dict):
     """
     Filter by material choice
 
+    :param resultDict: Where the found manufacturers go
+    :type resultDict: dict
     :param chosenMaterials: The materials in the serviceDetails
     :type chosenMaterials: dict
-    :return: list of contractors
-    :rtype: list
+    :return: Nothing, result is written in-place
+    :rtype: None
     
     """
-    return []
+    manufacturers = getManufacturersByMaterial.sendQuery()
+    for entry in manufacturers:
+        if entry["ID"]["value"] not in resultDict:
+            resultDict[entry["ID"]["value"]] = entry
 
 ##################################################
-def filterByPostProcessings(chosenPostProcessings:dict):
+def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
     """
     Filter by post-processings choice
 
+    :param resultDict: Where the found manufacturers go
+    :type resultDict: dict
     :param chosenPostProcessings: The post-processings in the serviceDetails
     :type chosenPostProcessings: dict
-    :return: list of contractors
-    :rtype: list
+    :return: Nothing, result is written in-place
+    :rtype: None
     
     """
-    return []
+    return None
 
 ##################################################
-def filterByBuildPlate(calculations:dict):
+def filterByBuildPlate(resultDict:dict, calculations:dict):
     """
     Filter by dimension of the build plate of the printers
 
+    :param resultDict: Where the found manufacturers go
+    :type resultDict: dict
     :param calculations: The calculations in the serviceDetails
     :type calculations: dict
-    :return: list of contractors
-    :rtype: list
+    :return: Nothing, result is written in-place
+    :rtype: None
     
     """
     if "measurements" in calculations:
@@ -54,10 +63,12 @@ def filterByBuildPlate(calculations:dict):
         #         "_1": -1.0,
         #         "_2": -1.0,
         #         "_3": -1.0,
-        printers = getPrintersByBuildPlate.sendQuery({
+        manufacturers = getManufacturersByBuildPlate.sendQuery({
             SparqlParameters.min_height: calculations["measurements"]["mbbDimensions"]["_1"],
             SparqlParameters.min_length: calculations["measurements"]["mbbDimensions"]["_2"],
             SparqlParameters.min_width: calculations["measurements"]["mbbDimensions"]["_3"],
             })
-
-    return []
+        
+        for entry in manufacturers:
+            if entry["ID"]["value"] not in resultDict:
+                resultDict[entry["ID"]["value"]]  = entry

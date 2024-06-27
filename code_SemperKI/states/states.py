@@ -879,11 +879,12 @@ class SERVICE_COMPLETED(State):
         Button was pressed, go back
 
         """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
         return stateDict[ProcessStatusAsString.SERVICE_READY]
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION, setCorrectButtons]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1219,7 +1220,7 @@ class CONTRACTOR_SELECTED(State):
         return stateDict[ProcessStatusAsString.VERIFYING]
 
     ###################################################
-    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           SERVICE_READY:
         """
         To: SERVICE_READY
@@ -1230,7 +1231,7 @@ class CONTRACTOR_SELECTED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):

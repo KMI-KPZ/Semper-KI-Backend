@@ -80,20 +80,17 @@ class AdditiveManufacturing(Semper.ServiceBase):
 
         """
         # filter by choice of material, post-processings, build plate, etc...
-        resultListMaterial = []
+        resultDict = {}
         if ServiceDetails.materials in processObj.serviceDetails:
-            resultListMaterial = filterByMaterial(processObj.serviceDetails[ServiceDetails.materials])
+            filterByMaterial(resultDict, processObj.serviceDetails[ServiceDetails.materials])
 
-        resultListPostProcess = []
         if ServiceDetails.postProcessings in processObj.serviceDetails:
-            resultListPostProcess = filterByPostProcessings(processObj.serviceDetails[ServiceDetails.postProcessings])
+            filterByPostProcessings(resultDict, processObj.serviceDetails[ServiceDetails.postProcessings])
 
-        resultListBuildPlate = []
         if ServiceDetails.calculations in processObj.serviceDetails:
-            resultListBuildPlate = filterByBuildPlate(processObj.serviceDetails[ServiceDetails.calculations])
+            filterByBuildPlate(resultDict, processObj.serviceDetails[ServiceDetails.calculations])
         
-        return list(set().intersection(resultListMaterial, resultListPostProcess, resultListBuildPlate))
-
+        return list(resultDict.values())
 SERVICE_NAME = "ADDITIVE_MANUFACTURING"
 SERVICE_NUMBER = 1
 
