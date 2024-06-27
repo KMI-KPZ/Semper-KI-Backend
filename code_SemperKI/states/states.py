@@ -15,6 +15,7 @@ from abc import ABC, abstractmethod
 
 from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
 import code_SemperKI.connections.content.session as SessionInterface
@@ -827,7 +828,8 @@ class SERVICE_COMPLETED(State):
         
         """
         if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
-            and ProcessDetails.clientAdress in process.processDetails and process.processDetails[ProcessDetails.clientAdress] != {}:
+            and ProcessDetails.clientBillingAddress in process.processDetails and process.processDetails[ProcessDetails.clientBillingAddress] != {} \
+            and ProcessDetails.clientDeliverAddress in process.processDetails and process.processDetails[ProcessDetails.clientDeliverAddress] != {}:
             self.buttonsList = self.buttonsActive
         else:
             self.buttonsList = self.buttonsInactive
@@ -842,7 +844,8 @@ class SERVICE_COMPLETED(State):
 
         """
         if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
-            and ProcessDetails.clientAdress in process.processDetails and process.processDetails[ProcessDetails.clientAdress] != {}:
+            and ProcessDetails.clientBillingAddress in process.processDetails and process.processDetails[ProcessDetails.clientBillingAddress] != {}\
+            and ProcessDetails.clientDeliverAddress in process.processDetails and process.processDetails[ProcessDetails.clientDeliverAddress] != {}:
             return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
         return self
     
