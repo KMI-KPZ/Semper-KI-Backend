@@ -658,11 +658,14 @@ def getProcess(request, projectID, processID):
             logger.error("Rights not sufficient in getProject")
             return JsonResponse({}, status=401)
 
-        process = interface.getProcess(projectID, processID)
-        if process != {}:
-            buttons = getButtonsForProcess(process[ProcessDescription.processStatus], process[ProcessDescription.client] == userID, adminOrNot) # calls current node of the state machine
-            process["processStatusButtons"] = buttons
-        return JsonResponse(process)
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            raise process
+
+        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
+        outDict = process.toDict()
+        outDict["processStatusButtons"] = buttons
+        return JsonResponse(outDict)
 
     except (Exception) as error:
         loggerError.error(f"getProcess: {str(error)}")
