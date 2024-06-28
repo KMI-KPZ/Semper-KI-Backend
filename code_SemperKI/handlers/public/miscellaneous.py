@@ -7,6 +7,7 @@ Contains: Handlers for miscellaneous
 """
 
 import logging, zipfile, base64, math
+import  copy
 import os
 from io import BytesIO
 from datetime import datetime
@@ -42,6 +43,7 @@ from code_SemperKI.serviceManager import serviceManager
 import code_SemperKI.connections.content.manageContent as ManageC
 from code_SemperKI.connections.content.manageContent import ManageContent
 import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+from code_SemperKI.handlers.public.process import deleteProcesses
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess, InterfaceForStateChange
 
