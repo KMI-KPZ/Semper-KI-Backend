@@ -216,9 +216,12 @@ def updateProcess(request):
     try:
         changes = json.loads(request.body.decode("utf-8"))
         assert "projectID" in changes.keys(), f"In {updateProcess.__name__}: projectID not in request"
-        assert "projectIDs" in changes.keys(), f"In {updateProcess.__name__}: projectIDs not in request"
+        assert "processIDs" in changes.keys(), f"In {updateProcess.__name__}: processIDs not in request"
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
+        assert isinstance(projectID, str), f"In {updateProcess.__name__}: expected projectID to be of type string instead got {type(projectID)}"
+        assert projectID != "", f"In {updateProcess.__name__}: non-empty projectID expected"
+        assert isinstance (processIDs, list), f"In {updateProcess.__name__}: expected processIDs to be of type list instead got {type(processIDs)}"
         
         # TODO remove
         assert "changes" in changes.keys(), f"In {updateProcess.__name__}: changes not in request"
@@ -226,8 +229,8 @@ def updateProcess(request):
             del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
 
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
-        assert isinstance(message, str), f"In {updateProcess.__name__}: expected message to be of type string instead got {type(message)}"
-        assert isinstance(flag, bool), f"In {updateProcess.__name__}: expected flag to be of type bool instead got {type(message)}"
+        assert isinstance(message, str) or isinstance(message, Exception), f"In {updateProcess.__name__}: expected message to be of type string or Exception instead got {type(message)}"
+        assert isinstance(flag, bool), f"In {updateProcess.__name__}: expected flag to be of type bool instead got {type(flag)}"
         if flag is False:
             return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
