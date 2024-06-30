@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 
-import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+from code_SemperKI.handlers.public.websocket import fireWebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
@@ -282,7 +282,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -311,7 +311,7 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState

@@ -21,14 +21,14 @@ from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates
 from code_SemperKI.handlers.files import getFileReadableStream
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 
 from ..definitions import ServiceDetails
 
 logger = logging.getLogger("errors")
 
 
-#######################################################
+#####################################p##################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 def checkPrintability(request):

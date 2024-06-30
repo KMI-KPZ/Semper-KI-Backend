@@ -32,7 +32,7 @@ from code_SemperKI.utilities.basics import *
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.files import getFileReadableStream
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 
 from ...definitions import ServiceDetails
 

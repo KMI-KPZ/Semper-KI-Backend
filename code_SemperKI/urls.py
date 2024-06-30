@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from .handlers import testResponse, frontpage, sparqlQueries, files, admin
 from .handlers.public import project, process, statemachine, miscellaneous, events
 from MSQ.handlers import interface
 
@@ -53,11 +53,11 @@ newPaths= {
     "getStateMachine": ("private/getStateMachine/", statemachine.getStateMachine), 
     "getServices": ("public/getServices/", miscellaneous.getServices), 
     "getMissedEvents": ("public/getMissedEvents/", events.getMissedEvents),
-    "uploadFiles": ("public/uploadFiles/",miscellaneous.uploadFiles),
-    "downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", miscellaneous.downloadFileStream),
-    "downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",miscellaneous.downloadFilesAsZip), 
-    "deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",miscellaneous.deleteFile), 
-    "downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", miscellaneous.downloadProcessHistory), 
+    "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
+    "downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
+    "deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
+    "downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", files.downloadProcessHistory), 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/", admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin),
     "statusButtonRequest": ("public/statusButtonRequest/", miscellaneous.statusButtonRequest), 

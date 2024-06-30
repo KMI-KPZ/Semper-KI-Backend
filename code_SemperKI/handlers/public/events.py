@@ -14,11 +14,9 @@ from django.conf import settings
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
-from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import OpenApiParameter
+
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient

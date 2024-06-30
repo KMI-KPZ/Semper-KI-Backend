@@ -506,3 +506,30 @@ def saveProjects(request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+###################################################
+def saveProjectsViaWebsocket(session):
+    """
+    Save projects to database
+
+    :param session: session of user
+    :type session: Dict
+    :return: None
+    :rtype: None
+
+    """
+    try:
+        contentManager = ManageContent(session)
+        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession() and contentManager.checkRights("saveProjects"):
+            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(session)
+            if isinstance(error, Exception):
+                raise error
+            
+            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
+
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        return None
+    
+    except (Exception) as error:
+        loggerError.error(f"saveProjectsViaWebsocket: {str(error)}")
+        return error        
