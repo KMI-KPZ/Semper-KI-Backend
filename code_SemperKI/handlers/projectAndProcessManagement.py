@@ -8,6 +8,7 @@ Contains: Handlers managing the projects and processes
 
 import json, logging, copy
 from datetime import datetime
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -782,12 +783,12 @@ def getContractors(request, processID:str):
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
             contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name]+"_filtered",
                                    OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
             listOfResultingContractors.append(contractorToBeAdded)
         
-        if len(listOfFilteredContractors) == 0:
-            listOfResultingContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
+        if len(listOfFilteredContractors) == 0 or settings.DEBUG:
+            listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
         return JsonResponse(listOfResultingContractors, safe=False)
     except (Exception) as error:
