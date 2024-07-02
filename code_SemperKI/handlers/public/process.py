@@ -44,6 +44,7 @@ loggerError = logging.getLogger("errors")
 
 #########################################################################
 # createProcessID
+#"createProcessID": ("public/createProcessID/<str:projectID>", process.createProcessID)
 #########################################################################
 #TODO Add serializer for createProcessID.  
 #########################################################################
@@ -114,7 +115,8 @@ def createProcessID(request, projectID):
 
 #########################################################################
 # getProcess
-###serializer###########
+#"getProcess": ("public/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
+###############serializer#######################################
 #TODO Add serializer for getProcess
 ########################################################
 # Handler
@@ -244,6 +246,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
         
 #########################################################################
 # updateProcess
+#"updateProcess": ("public/updateProcess/", process.updateProcess),
 #########################################################################
 #TODO Add serializer for updateProcess
 #########################################################################
@@ -330,6 +333,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
         
 #########################################################################
 # deleteProcess
+#"deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses),
 #########################################################################
 #TODO Add serializer for deleteProcess
 #########################################################################
@@ -376,6 +380,7 @@ def deleteProcesses(request, projectID):
         
 #########################################################################
 # getProcessHistory
+#"getProcessHistory": ("public/getProcessHistory/<str:processID>/", process.getProcessHistory),
 #########################################################################
 #TODO Add serializer for getProcessHistory
 #########################################################################
@@ -438,6 +443,7 @@ def getProcessHistory(request, processID):
         
 #########################################################################
 # getContractors
+#"getContractors": ("public/getContractors/<str:processID>/", process.getContractors),
 #########################################################################
 #TODO Add serializer for getContractors
 #########################################################################
@@ -498,7 +504,6 @@ def getContractors(request, processID:str):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
         
-#######################################
 #########################################################################
 # cloneProcess
 def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
