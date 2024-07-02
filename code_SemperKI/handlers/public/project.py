@@ -34,9 +34,9 @@ from code_SemperKI.utilities.serializer import ExceptionSerializer
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 
-
 ########################################################
 # Get project(s)
+#"getFlatProjects": ("public/getFlatProjects/", project.getFlatProjects),
 ########################################################
 # Serializers
 
@@ -118,8 +118,13 @@ def getFlatProjects(request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-#######################################################
+#########################################################################
+# getProject
+#"getProject": ("public/getProject/<str:projectID>/",project.getProject),
+#########################################################################
+#TODO Add serializer for getProject
+#########################################################################
+# Handler  
 @extend_schema(
     summary="Get a project by ID",
     description=" ",
@@ -194,6 +199,7 @@ def getProject(request, projectID):
 
 #########################################################################
 # Create project
+#"createProjectID": ('public/createProjectID/', project.createProjectID),
 #######################################################
 # Serializers     
         
@@ -287,6 +293,7 @@ def createProjectID(request):
 #########################################################################
 ########################################################
 # Update project
+#"updateProject": ("public/updateProject/" ,project.updateProject),
 ########################################################
 # Serializers
 class SReqUpdateProject(serializers.Serializer):
@@ -377,9 +384,9 @@ def updateProject(request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 ########################################################
 # Delete projects
+#"deleteProjects": ("public/deleteProjects/" ,project.deleteProjects),
 ########################################################
 # Serializers
 
@@ -458,9 +465,13 @@ def deleteProjects(request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-#######################################################
+#########################################################################
+# saveProjects
+#"deleteProjects": ("public/deleteProjects/" ,project.deleteProjects),
+#########################################################################
+#TODO Add serializer for saveProjects
+#########################################################################
+# Handler  
 @extend_schema(
     summary="Save projects to database",
     description=" ",
