@@ -30,7 +30,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.files import deleteFile
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent

@@ -24,9 +24,12 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
-#########Serializer#############
-#TODO Add serializer  
-#######################################################
+#########################################################################
+# getStateMachine
+#########################################################################
+#TODO Add serializer for getStateMachine
+#########################################################################
+# Handler  
 @extend_schema(
     summary="Print out the whole state machine and all transitions",
     description=" ",
@@ -34,7 +37,6 @@ loggerError = logging.getLogger("errors")
     tags = ['state machine'],
     responses={
         200: None,
-        401: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )

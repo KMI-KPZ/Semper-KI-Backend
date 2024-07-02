@@ -25,7 +25,7 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
-from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from ..utilities.basics import *
 from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess, InterfaceForStateChange, signalDependencyToOtherProcesses, getFlatStatus
 from ..connections.content.manageContent import ManageContent
 

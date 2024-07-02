@@ -17,7 +17,7 @@ from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
-import code_SemperKI.handlers.projectAndProcessManagement as ProjectAndProcessManagement
+from code_SemperKI.handlers.public.websocket import fireWebsocketEventForClient
 import code_SemperKI.utilities.locales as Locales
 import code_SemperKI.handlers.files as FileHandler
 
@@ -108,7 +108,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
             DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
         
         # send out mail & Websocket event 
-        ProjectAndProcessManagement.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
+        fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
         sendEMail(userEMailAdress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")

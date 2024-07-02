@@ -5,12 +5,11 @@ Silvio Weging 2024
 
 Contains: Manages the content of the session and the database
 """
-
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 from Generic_Backend.code_General.definitions import SessionContent, GlobalDefaults
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from ...utilities.basics import manualCheckIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from code_SemperKI.utilities.basics import manualCheckIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
 from .session import ProcessManagementSession
 import code_SemperKI.connections.content.postgresql.pgProcesses as PPManagement
 
