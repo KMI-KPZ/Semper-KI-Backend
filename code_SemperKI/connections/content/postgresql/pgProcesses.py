@@ -18,7 +18,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import findFirstOccurence
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
 
 
 from ....modelFiles.projectModel import Project, ProjectInterface
@@ -1005,13 +1005,15 @@ class ProcessManagementBase(AbstractContentInterface):
                     dependenciesOut = process[ProcessDescription.dependenciesOut]
 
                     # add addresses
-                    clientAddresses = ProfileManagementBase.getUser(session)[UserDescription.details][UserDetails.addresses]
-                    defaultAddress = {}
-                    for key in clientAddresses:
-                        entry = clientAddresses[key]
-                        if entry["standard"]:
-                            defaultAddress = entry
-                            break
+                    clientObject = ProfileManagementBase.getUser(session)
+                    defaultAddress = {"undefined": {}}
+                    if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                        clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                        for key in clientAddresses:
+                            entry = clientAddresses[key]
+                            if entry["standard"]:
+                                defaultAddress = entry
+                                break
                     processDetails[ProcessDetails.clientDeliverAddress] = defaultAddress
                     processDetails[ProcessDetails.clientBillingAddress] = defaultAddress
                     

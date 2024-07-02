@@ -20,7 +20,7 @@ from channels.layers import get_channel_layer
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults, Logging, UserDetails
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.content.postgresql import pgProcesses
@@ -248,13 +248,15 @@ def createProcessID(request, projectID):
 
         # set default addresses here
         if manualCheckifLoggedIn(request.session):
-            clientAddresses = pgProfiles.ProfileManagementBase.getUser(request.session)[UserDescription.details][UserDetails.addresses]
-            defaultAddress = {}
-            for key in clientAddresses:
-                entry = clientAddresses[key]
-                if entry["standard"]:
-                    defaultAddress = entry
-                    break
+            clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
+            defaultAddress = {"undefined": {}}
+            if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                for key in clientAddresses:
+                    entry = clientAddresses[key]
+                    if entry["standard"]:
+                        defaultAddress = entry
+                        break
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
             interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
 
