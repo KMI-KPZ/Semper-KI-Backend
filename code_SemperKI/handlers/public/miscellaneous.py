@@ -34,7 +34,8 @@ from Generic_Backend.code_General.utilities.files import createFileResponse
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 
 from code_SemperKI.definitions import *
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
+from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
 from Generic_Backend.code_General.utilities import crypto
 from code_SemperKI.serviceManager import serviceManager
 import code_SemperKI.connections.content.manageContent as ManageC

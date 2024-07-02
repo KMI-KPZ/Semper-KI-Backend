@@ -29,7 +29,7 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getFlatStatus
-from code_SemperKI.utilities.basics import ExceptionSerializer
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")

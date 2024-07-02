@@ -21,7 +21,7 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessDescription
 

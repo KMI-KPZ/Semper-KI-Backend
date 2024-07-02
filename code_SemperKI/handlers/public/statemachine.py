@@ -17,7 +17,7 @@ from drf_spectacular.utils import extend_schema
 from Generic_Backend.code_General.definitions import *
 
 from code_SemperKI.definitions import *
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.states.states import StateMachine
 
 logger = logging.getLogger("logToFile")

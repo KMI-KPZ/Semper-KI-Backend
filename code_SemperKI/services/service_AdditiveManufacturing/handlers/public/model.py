@@ -32,7 +32,7 @@ from code_SemperKI.definitions import *
 from code_SemperKI.handlers.files import deleteFile
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from MSQ.tasks.tasks import callfTetWild
 from MSQ.handlers.interface import returnFileFromfTetWild

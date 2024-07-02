@@ -25,7 +25,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn,
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from code_SemperKI.definitions import *
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgProcesses
 
 logger = logging.getLogger("logToFile")

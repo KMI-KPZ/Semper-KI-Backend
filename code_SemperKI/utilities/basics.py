@@ -93,9 +93,9 @@ def checkIfUserMaySeeProcess(json=False):
 
 
 #####################################################################
-class ExceptionSerializer(serializers.Serializer):
-    message = serializers.CharField()
-    exception = serializers.CharField()
+# class ExceptionSerializer(serializers.Serializer):
+#     message = serializers.CharField()
+#     exception = serializers.CharField()
 
 
 #################### DECORATOR ###################################

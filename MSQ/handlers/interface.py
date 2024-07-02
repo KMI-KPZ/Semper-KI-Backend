@@ -14,6 +14,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from code_SemperKI.utilities.basics import *
 from rest_framework.decorators import api_view
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 
 ####################################################################
 def returnFileFromfTetWild(filePath:str):

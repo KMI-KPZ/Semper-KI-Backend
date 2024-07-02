@@ -12,7 +12,7 @@ from django.http import HttpResponse, JsonResponse
 # this makes it possible to assume for a function, that certain requests are passed through
 from django.views.decorators.http import require_http_methods
 
-from code_SemperKI.utilities.basics import ExceptionSerializer
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 
 ###################################################
 @require_http_methods(["POST", "GET"])

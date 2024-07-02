@@ -28,7 +28,7 @@ from Generic_Backend.code_General.connections import redis
 from Generic_Backend.code_General.definitions import FileObjectContent
 
 from code_SemperKI.definitions import *
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.files import getFileReadableStream
 from code_SemperKI.connections.content.manageContent import ManageContent
