@@ -5,14 +5,12 @@ Akshay NS 2024
 
 Contains: 
 """
-
 import logging
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
-
 
 from Generic_Backend.code_General.definitions import *
 
@@ -26,6 +24,7 @@ loggerError = logging.getLogger("errors")
 
 #########################################################################
 # getStateMachine
+#"getStateMachine": ("private/getStateMachine/", statemachine.getStateMachine)
 #########################################################################
 #TODO Add serializer for getStateMachine
 #########################################################################
