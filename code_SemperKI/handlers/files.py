@@ -35,7 +35,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 
-from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.handlers.public.process import getProcessAndProjectFromSession, updateProcessFunction
 import code_SemperKI.connections.content.manageContent as ManageC
 from ..connections.content.postgresql import pgProcesses
