@@ -34,6 +34,7 @@ loggerDebug = logging.getLogger("django_debug")
 
 #########################################################################
 # getServices
+#"getServices": ("public/getServices/", miscellaneous.getServices)
 #########################################################################
 #TODO Add serializer for getServices
 #########################################################################
@@ -76,6 +77,7 @@ downloadFileStream), #
 
 #########################################################################
 # statusButtonRequest
+#"statusButtonRequest": ("public/statusButtonRequest/", miscellaneous.statusButtonRequest)
 #########################################################################
 #TODO Add serializer for statusButtonRequest
 #########################################################################
