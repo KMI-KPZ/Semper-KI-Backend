@@ -30,8 +30,13 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
-
-#######################################################
+#########################################################################
+# getMissedEvents
+#"getMissedEvents": ("public/getMissedEvents/", events.getMissedEvents)
+#########################################################################
+#TODO Add serializer for getMissedEvents
+#########################################################################
+# Handler  
 @extend_schema(
     summary=" Show how many events (chat messages ...) were missed since last login.",
     description=" ",
