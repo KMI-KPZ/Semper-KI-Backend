@@ -38,7 +38,7 @@ loggerError = logging.getLogger("errors")
     summary="Print out the whole state machine and all transitions",
     description=" ",
     request=None,
-    tags = ['state machine'],
+    tags = ['State machine'],
     responses={
         200: None,
         500: ExceptionSerializer
@@ -89,7 +89,7 @@ class SReqStatusButtons(serializers.Serializer):
 @extend_schema(
     summary="Button was clicked, so the state must change (transition inside state machine)",
     description=" ",
-    tags=['state machine'],
+    tags=['State machine'],
     request=SReqStatusButtons,
     responses={
         200: None,

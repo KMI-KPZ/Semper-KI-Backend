@@ -28,6 +28,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
+from code_SemperKI.utilities.serializer import ExceptionSerializer
 
 from ...utilities import sparqlQueries
 from ...service import SERVICE_NUMBER
@@ -44,6 +45,7 @@ class SResMaterialList(serializers.Serializer):
 @extend_schema(
     summary="Gathers all available materials from the KG",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,
@@ -97,6 +99,7 @@ class SResPrinters(serializers.Serializer):
 @extend_schema(
     summary="Gathers all available 3D printers from KG",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,
@@ -151,6 +154,7 @@ class SResOrgaResources(serializers.Serializer):
 @extend_schema(
     summary="Retrieve all KG information about connected resources for an organization",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,
@@ -211,6 +215,7 @@ class SReqOrgaAddMaterial(serializers.Serializer):
 @extend_schema(
     summary="Links an existing printer and material to an organization in the knowledge graph",
     description=" ",
+    tags=['AM - Resources'],
     request=SReqOrgaAddMaterial,
     responses={
         200: None,
@@ -286,6 +291,7 @@ def orga_addMaterialToPrinter(request:Request):
 @extend_schema(
     summary="Links an existing printer and material to an organization in the knowledge graph",
     description=" ",
+    tags=['AM - Resources'],
     request=SReqOrgaAddMaterial,
     responses={
         200: None,
@@ -363,6 +369,7 @@ def orga_updateMaterialAndPrinter(request:Request):
 @extend_schema(
     summary="Remove the connection of an organization to a printer",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,
@@ -421,6 +428,7 @@ def orga_removeLinkToPrinter(request:Request, printer:str):
 @extend_schema(
     summary="Remove the connection of an organization to a printer and material",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,
@@ -482,6 +490,7 @@ def orga_removeLinkToMaterial(request:Request, printer:str, material:str):
 @extend_schema(
     summary="Remove all connections of an organization",
     description=" ",
+    tags=['AM - Resources'],
     request=None,
     responses={
         200: None,

@@ -96,6 +96,7 @@ class SResCheckModel(serializers.Serializer):
 @extend_schema(
     summary="Calculate model properties like boundary and volume",
     description=" ",
+    tags=['AM - Check model'],
     request=None,
     responses={
         200: SResCheckModel,

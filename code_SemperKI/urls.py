@@ -66,16 +66,16 @@ newPaths= {
     "downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", files.downloadProcessHistory), 
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
-    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
+    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
 
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 
     "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
     #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
-    "downloadFile": ("public/downloadFile/<projectID>/<processID>/<fileID>/",files.downloadFileStream),
-    "downloadFilesAsZip": ("public/downloadFilesAsZip/<projectID>/<processID>/",files.downloadFilesAsZip),
-    "deleteFile": ("public/deleteFile/<projectID>/<processID>/<fileID>/",files.deleteFile),
-    "downloadProcessHistory": ("public/downloadProcessHistory/<projectID>/<processID>/",files.downloadProcessHistory),
+    "downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/",files.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip),
+    "deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile),
+    "downloadProcessHistory": ("public/downloadProcessHistory/<str:projectID>/<str:processID>/",files.downloadProcessHistory),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
     "getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack),

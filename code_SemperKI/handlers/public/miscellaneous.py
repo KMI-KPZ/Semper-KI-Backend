@@ -47,7 +47,7 @@ class SResServices(serializers.Serializer):
     summary="Return the offered services",
     description=" ",
     request=None,
-    tags = ['miscellaneous'],
+    tags = ['Miscellaneous'],
     responses={
         200: None,
         500: ExceptionSerializer

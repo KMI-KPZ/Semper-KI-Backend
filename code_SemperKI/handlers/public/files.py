@@ -89,7 +89,7 @@ class SReqUploadFiles(serializers.Serializer):
      summary="File upload for a process",
      description=" ",
      request=SReqUploadFiles,
-     tags=['files'],
+     tags=['Files'],
      responses={
          200: None,
          401: ExceptionSerializer,
@@ -435,7 +435,7 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebug
 @extend_schema(
     summary="Send file to user from storage",
     description="Send file to user from storage with request of user for a specific file of a process  ",
-    tags=["files"],
+    tags=["Files"],
     request=None,
     responses={
         200: None,
@@ -494,7 +494,7 @@ def downloadFileStream(request:Request, projectID, processID, fileID):
 @extend_schema(
     summary="Send files to user as zip",
     description=" ",
-    tags=["files"],
+    tags=["Files"],
     request=None,
     responses={
         200: None,
@@ -573,7 +573,7 @@ def downloadFilesAsZip(request:Request, projectID, processID):
 @extend_schema(
     summary="See who has done what and when and download this as pdf",
     description=" ",
-    tags=['files'],
+    tags=['Files'],
     request=None,
     responses={
         200: None,
@@ -670,7 +670,7 @@ def downloadProcessHistory(request:Request, processID):
 @extend_schema(
     summary="Delete a file from storage",
     description=" ",
-    tags=['files'],
+    tags=['Files'],
     request=None,
     responses={
         200: None,

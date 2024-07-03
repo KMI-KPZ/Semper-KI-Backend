@@ -66,7 +66,7 @@ class SResGetFlatProjects(serializers.Serializer):
     summary="Get all projects flattened",
     description=" ",
     request=None,
-    tags=['projects'],
+    tags=['Projects'],
     responses={
         200: SResGetFlatProjects,
         401: ExceptionSerializer,
@@ -130,7 +130,7 @@ def getFlatProjects(request:Request):
     summary="Get a project by ID",
     description=" ",
     request=None,
-    tags=['projects'],
+    tags=['Projects'],
     responses={
         200: SResGetProject,
         401: ExceptionSerializer,
@@ -219,7 +219,7 @@ class SResCreateProjectID(serializers.Serializer):
     summary="Create project and send ID back to frontend",
     description=" ",
     request=SReqCreateProjectID,
-    tags=['projects'],
+    tags=['Projects'],
     responses={
         200: SResCreateProjectID,
         400: ExceptionSerializer,
@@ -309,7 +309,7 @@ class SReqUpdateProject(serializers.Serializer):
     summary="Update stuff about the project",
     description=" ",
     request=SReqUpdateProject,
-    tags=['projects'],
+    tags=['Projects'],
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -400,7 +400,7 @@ def updateProject(request:Request):
     summary="Delete the whole projects",
     description=" ",
     request=None,
-    tags=['projects'],
+    tags=['Projects'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -480,7 +480,7 @@ def deleteProjects(request:Request):
 @extend_schema(
     summary="Save projects to database",
     description=" ",
-    tags=['projects'],
+    tags=['Projects'],
     request=None,
     responses={
         200: None,
