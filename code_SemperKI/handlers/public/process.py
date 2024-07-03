@@ -52,7 +52,7 @@ loggerError = logging.getLogger("errors")
     summary="Create a process ID ",
     description="creates a process ID for a given project id",
     request=None,
-    tags=['process'],
+    tags=['processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -123,7 +123,7 @@ def createProcessID(request, projectID):
     summary="Retrieve complete process.",
     description="Retrieve complete process using projectID and processID ",
     request=None,
-    tags=['process'],
+    tags=['processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -254,7 +254,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
     summary="Update stuff about the process",
     description=" ",
     request=None,
-    tags=['process'],
+    tags=['processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -341,7 +341,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
     summary="Delete one or more processes",
     description=" ",
     request=None,
-    tags=['process'],
+    tags=['processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -388,7 +388,7 @@ def deleteProcesses(request, projectID):
     summary="See who has done what and when",
     description=" ",
     request=None,
-    tags=['process'],
+    tags=['processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -450,7 +450,7 @@ def getProcessHistory(request, processID):
 @extend_schema(
     summary="Get all suitable Contractors",
     description=" ",
-    tags=['process'],
+    tags=['processes'],
     request=None,
     responses={
         200: None,
