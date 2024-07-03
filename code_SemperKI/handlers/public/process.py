@@ -41,7 +41,6 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
-
 #########################################################################
 # createProcessID
 #"createProcessID": ("public/createProcessID/<str:projectID>", process.createProcessID)
