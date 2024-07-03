@@ -20,7 +20,7 @@ from drf_spectacular.utils import extend_schema
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin, manualCheckIfRightsAreSufficientForSpecificOperation
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin, manualCheckIfRightsAreSufficientForSpecificOperation
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
@@ -62,6 +62,7 @@ class SResProcessID(serializers.Serializer):
     }
 )
 @api_view(["GET"])
+@checkVersion(0.3)
 def createProcessID(request:Request, projectID):
     """
     Create process ID for frontend
@@ -92,6 +93,21 @@ def createProcessID(request:Request, projectID):
         
         client = contentManager.getClient()
         interface.createProcess(projectID, processID, client)
+
+        # set default addresses here
+        if manualCheckifLoggedIn(request.session):
+            clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
+            defaultAddress = {"undefined": {}}
+            if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                for key in clientAddresses:
+                    entry = clientAddresses[key]
+                    if entry["standard"]:
+                        defaultAddress = entry
+                        break
+            addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
+            interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
+
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -131,6 +147,7 @@ def createProcessID(request:Request, projectID):
     }
 )
 @api_view(["GET"])
+@checkVersion(0.3)
 def getProcess(request:Request, projectID, processID):
     """
     Retrieve complete process.
@@ -156,12 +173,15 @@ def getProcess(request:Request, projectID, processID):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        process = interface.getProcess(projectID, processID)
-        if process != {}:
-            buttons = getButtonsForProcess(process[ProcessDescription.processStatus], process[ProcessDescription.client] == userID, adminOrNot) # calls current node of the state machine
-            process["processStatusButtons"] = buttons
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            raise process
+
+        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
+        outDict = process.toDict()
+        outDict["processStatusButtons"] = buttons
         ###TODO: add outserializers.
-        return Response(process, status=status.HTTP_200_OK)
+        return Response(outDict, status=status.HTTP_200_OK)
         # outSerializer = SResGetProcess(data=process)
         # if outSerializer.is_valid():
         #     return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -267,6 +287,7 @@ class SReqUpdateProcess(serializers.Serializer):
     }
 )
 @api_view(["PATCH"])
+@checkVersion(0.3)
 def updateProcess(request:Request):
     """
     Update stuff about the process
@@ -373,6 +394,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
     )],
 )
 @api_view(["DELETE"])
+@checkVersion(0.3)
 def deleteProcesses(request:Request, projectID):
     """
     Delete one or more processes
@@ -432,6 +454,7 @@ class SResProcessHistory(serializers.Serializer):
 @checkIfRightsAreSufficient(json=True)
 @checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
+@checkVersion(0.3)
 def getProcessHistory(request:Request, processID):
     """
     See who has done what and when
@@ -497,6 +520,7 @@ def getProcessHistory(request:Request, processID):
 @checkIfRightsAreSufficient(json=True)
 @checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
+@checkVersion(0.3)
 def getContractors(request:Request, processID:str):
     """
     Get all suitable Contractors.
@@ -517,18 +541,27 @@ def getContractors(request:Request, processID:str):
             raise Exception("Process ID not found in session or db")
  
         serviceType = processObj.serviceType
+        service = serviceManager.getService(processObj.serviceType)
 
+        listOfFilteredContractors = service.getFilteredContractors(processObj)
+        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
+        # Therefore parse it
+        listOfResultingContractors = []
+        for contractor in listOfFilteredContractors:
+            idOfContractor = contractor["ID"]["value"]
+            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
+            if isinstance(contractorContentFromDB, Exception):
+                raise contractorContentFromDB
+            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name]+"_filtered",
+                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
+            listOfResultingContractors.append(contractorToBeAdded)
+        
+        if len(listOfFilteredContractors) == 0 or settings.DEBUG:
+            listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
-        listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
-        # TODO Check suitability
-
-        # remove unnecessary information and add identifier
-        # for idx, elem in enumerate(listOfAllContractors):
-        #     contractorList.append({})
-        #     contractorList[idx]["name"] = elem["name"]
-        #     contractorList[idx]["id"] = elem["hashedID"]
-
-        return JsonResponse(listOfAllContractors, safe=False)
+        # TODO add serializers
+        return JsonResponse(listOfResultingContractors, safe=False)
     except (Exception) as error:
         message = f"Error in getContractors: {str(error)}"
         exception = str(error)
@@ -562,6 +595,7 @@ class SResCloneProcess(serializers.Serializer):
 @checkIfUserIsLoggedIn()
 @checkIfRightsAreSufficient(json=True)
 @api_view(["GET"])
+@checkVersion(0.3)
 def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
     """
     Duplicate selected processes. Works only for logged in users.

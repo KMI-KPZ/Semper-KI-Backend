@@ -15,7 +15,7 @@ from Generic_Backend.code_General.utilities import crypto
 from code_SemperKI.utilities.basics import testPicture
 from ..utilities import mocks
 
-from ..connections import cmem
+from ..utilities import sparqlQueries
 
 #######################################################
 @require_http_methods(["POST"])
@@ -121,7 +121,7 @@ def getMaterials(request):
         filtersForSparql.append([entry["question"]["title"], entry["answer"]])
     #TODO ask via sparql with most general filter and then iteratively filter response
     resultsOfQueries = {"materials": []}
-    materialsRes = cmem.getAllMaterials.sendQuery()
+    materialsRes = sparqlQueries.getAllMaterials.sendQuery()
     for elem in materialsRes:
         title = elem["Material"]["value"]
         resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "URI": testPicture})

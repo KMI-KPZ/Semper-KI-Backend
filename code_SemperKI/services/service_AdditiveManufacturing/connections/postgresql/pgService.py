@@ -29,22 +29,22 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
     try:
         for entry in newContent:
             if entry == ServiceDetails.models:
-                if existingContent == {}:
+                if existingContent == {} or ServiceDetails.models not in existingContent:
                     existingContent[ServiceDetails.models] = {}
                 for fileID in newContent[ServiceDetails.models]:    
                     existingContent[ServiceDetails.models][fileID] = newContent[entry][fileID]
             elif entry == ServiceDetails.materials:
-                if existingContent == {}:
-                    existingContent[ServiceDetails.materials] = {}
+                #if existingContent == {} or ServiceDetails.materials not in existingContent:
+                existingContent[ServiceDetails.materials] = {}
                 for materialID in newContent[ServiceDetails.materials]:
                     existingContent[ServiceDetails.materials][materialID] = newContent[entry][materialID]
             elif entry == ServiceDetails.postProcessings:
-                if existingContent == {}:
-                    existingContent[ServiceDetails.postProcessings] = {}
+                #if existingContent == {} or ServiceDetails.postProcessings not in existingContent:
+                existingContent[ServiceDetails.postProcessings] = {}
                 for postProcessingID in newContent[ServiceDetails.postProcessings]:
                     existingContent[ServiceDetails.postProcessings][postProcessingID] = newContent[entry][postProcessingID]
             elif entry == ServiceDetails.calculations:
-                if existingContent == {}:
+                if existingContent == {} or ServiceDetails.calculations not in existingContent:
                     existingContent[ServiceDetails.calculations] = {}
                 for fileID in newContent[ServiceDetails.calculations]:
                     existingContent[ServiceDetails.calculations][fileID] = newContent[entry][fileID]
@@ -107,12 +107,15 @@ def serviceReady(existingContent:dict) -> bool:
     try:
         checks = 0
         for entry in existingContent:
-            if entry == ServiceDetails.models and len(existingContent[ServiceDetails.models]) > 0:
-                checks += 1
-            elif entry == ServiceDetails.materials and len(existingContent[ServiceDetails.materials]) > 0:
-                checks += 1
-            elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0:
-                checks += 0 # optional
+            if entry == ServiceDetails.models:
+                if len(existingContent[ServiceDetails.models]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.materials:
+                if len(existingContent[ServiceDetails.materials]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.postProcessings:
+                if len(existingContent[ServiceDetails.postProcessings]) > 0:
+                    checks += 0 # optional
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
             

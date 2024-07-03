@@ -30,7 +30,7 @@ from drf_spectacular.utils import extend_schema
 
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 from Generic_Backend.code_General.utilities.files import createFileResponse
 from Generic_Backend.code_General.definitions import FileObjectContent, Logging
@@ -97,6 +97,7 @@ class SReqUploadFiles(serializers.Serializer):
      }
  )
 @api_view(["POST"])
+@checkVersion(0.3)
 def uploadFiles(request:Request):
     """
     File upload for a process
@@ -442,6 +443,7 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebug
     }
 )
 @api_view(["GET"])
+@checkVersion(0.3)
 def downloadFileStream(request:Request, projectID, processID, fileID):
     """
     Send file to user from storage
@@ -502,6 +504,7 @@ def downloadFileStream(request:Request, projectID, processID, fileID):
     }
 )
 @api_view(["GET"])
+@checkVersion(0.3)
 def downloadFilesAsZip(request:Request, projectID, processID):
     """
     Send files to user as zip
@@ -581,6 +584,7 @@ def downloadFilesAsZip(request:Request, projectID, processID):
 @checkIfRightsAreSufficient(json=False)
 @checkIfUserMaySeeProcess(json=False)
 @api_view(["GET"])
+@checkVersion(0.3)
 def downloadProcessHistory(request:Request, processID):
     """
     See who has done what and when and download this as pdf
@@ -675,6 +679,7 @@ def downloadProcessHistory(request:Request, processID):
     }
 )
 @api_view(["DELETE"])
+@checkVersion(0.3)
 def deleteFile(request:Request, projectID, processID, fileID):
     """
     Delete a file from storage

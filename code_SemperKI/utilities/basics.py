@@ -12,6 +12,7 @@ from functools import wraps
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
+from rest_framework import exceptions
 from rest_framework import serializers
 from rest_framework.versioning import AcceptHeaderVersioning
 from rest_framework.response import Response
@@ -99,8 +100,18 @@ def checkIfUserMaySeeProcess(json=False):
 #     exception = serializers.CharField()
 
 
+
+
 #################### DECORATOR ###################################
-def checkVersion(version=1.0):
+class VersioningForHandlers(AcceptHeaderVersioning):
+    allowed_versions = ["0.3"] # default for swagger
+
+    def __init__(self, allowedVersions) -> None:
+        super().__init__()
+        if str(allowedVersions) not in self.allowed_versions:
+            self.allowed_versions = [str(allowedVersions)]
+######################################################
+def checkVersion(version=0.3):
     """
     Checks if the version is supported or not. If not, returns an error message.
 
@@ -110,23 +121,20 @@ def checkVersion(version=1.0):
     :rtype: HTTPRespone
     """
 
-    ######################################################
-    class VersioningForHandlers(AcceptHeaderVersioning):
-        allowed_versions = []
-
-        def __init__(self, allowedVersions) -> None:
-            super().__init__()
-            self.allowed_versions = [allowedVersions]
-
-    ######################################################
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            versioning = VersioningForHandlers(version)
-            version = versioning.determine_version(request)
-            if isinstance(version, Exception):
-                return Response("Version mismatch!", status=status.HTTP_406_NOT_ACCEPTABLE)
-            
+            try:
+                if request.version == None:
+                    #getting really tired of swaggers bullshit (of sometimes not sending the correct header)
+                    return func(request, *args, **kwargs)
+                versioning = VersioningForHandlers(version)
+                versionOfReq = versioning.determine_version(request)
+                return func(request, *args, **kwargs)
+            except exceptions.NotAcceptable as e:
+                return Response(f"Version mismatch! {version} required!", status=status.HTTP_406_NOT_ACCEPTABLE)
+            except Exception as e:
+                return Response(f"Exception in {func.__name__}: {e}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return inner
 
     return decorator

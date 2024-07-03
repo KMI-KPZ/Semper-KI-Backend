@@ -23,6 +23,7 @@ class ProcessStatusAsString(StrEnumExactylAsDefined):
     SERVICE_READY = enum.auto()
     SERVICE_IN_PROGRESS = enum.auto()
     SERVICE_COMPLICATION = enum.auto()
+    SERVICE_COMPLETED = enum.auto()
     CONTRACTOR_SELECTED = enum.auto()
     VERIFYING = enum.auto()
     VERIFIED = enum.auto()
@@ -55,6 +56,8 @@ def processStatusAsInt(statusString:str) -> int:
         return 201
     elif statusString == ProcessStatusAsString.SERVICE_COMPLICATION:
         return 202
+    elif statusString == ProcessStatusAsString.SERVICE_COMPLETED:
+        return 203
     elif statusString == ProcessStatusAsString.CONTRACTOR_SELECTED:
         return 300
     elif statusString == ProcessStatusAsString.VERIFYING:
@@ -103,6 +106,8 @@ def processStatusFromIntToStr(statusCode:int) -> str:
         return ProcessStatusAsString.SERVICE_IN_PROGRESS
     elif statusCode == 202:
         return ProcessStatusAsString.SERVICE_COMPLICATION
+    elif statusCode == 203:
+        return ProcessStatusAsString.SERVICE_COMPLETED
     elif statusCode == 300:
         return ProcessStatusAsString.CONTRACTOR_SELECTED
     elif statusCode == 400:
@@ -159,6 +164,7 @@ class ButtonLabels(StrEnumExactylAsDefined):
 
     """
     BACK = enum.auto()
+    FORWARD = enum.auto()
     SELECT_SERVICE = enum.auto()
     SERVICE_COMPLICATION = enum.auto() # TODO not in frontend currently
     EDIT = enum.auto()

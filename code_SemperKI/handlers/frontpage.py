@@ -17,21 +17,3 @@ logger = getLogger("django")
 
 
 #######################################################
-def sparqlPage(request):
-    """
-    Landing page for a sparql test query
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: Rendered page
-    :rtype: HTTPResponse
-
-    """
-    return render(
-        request,
-        "sparql.html"  # ,
-        # context={
-        #    "session": request.session.get("user"),
-        # "pretty": json.dumps(request.session.get("user"), indent=4),
-        # },
-    )

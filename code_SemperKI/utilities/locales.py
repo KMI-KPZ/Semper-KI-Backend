@@ -34,10 +34,10 @@ class ManageTranslations():
 
         self.filePathAndName = filePathAndName
         self.redisCon = RedisConnection()
-        self.retrieveContentFromRedis()
+        self.retrieveContentFromRedis(initial=True)
 
     #######################################################
-    def retrieveContentFromRedis(self) -> str:
+    def retrieveContentFromRedis(self, initial=False) -> str:
         """
         Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
 
@@ -46,7 +46,7 @@ class ManageTranslations():
 
         """
         translations, exists = self.redisCon.retrieveContentJSON(self.filePathAndName)
-        if not exists:
+        if not exists or initial:
             with open(str(settings.BASE_DIR) + self.filePathAndName) as translationsFile:
                 translationsFileContent = json.loads(translationsFile.read())
                 self.redisCon.addContentJSON(self.filePathAndName, translationsFileContent, True)

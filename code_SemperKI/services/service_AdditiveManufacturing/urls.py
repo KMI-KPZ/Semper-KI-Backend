@@ -21,45 +21,56 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers import checkService, filter, resources, model
-from .handlers.public.model import uploadModels, deleteModel, remeshSTLToTetraheadras
-from .handlers.public.checkService import checkModel
+from .handlers import filter
+from .handlers.public import materials, checkService, filter, model, postProcessings, resources
 
 from code_SemperKI.urls import paths, urlpatterns
 
 
 newPaths = {
-    "getProcessData": ('public/getProcessData/',filter.getProcessData),
-    "getModels": ('public/getModels/',filter.getModels),
-    "getFilters": ('public/getFilters/',filter.getFilters),
-    "getMaterials": ('public/getMaterials/',filter.getMaterials),
-    "getPostProcessing": ('public/getPostProcessing/',filter.getPostProcessing),
+    #"getProcessData": ('public/getProcessData/',filter.getProcessData),
+    #"getModels": ('public/getModels/',filter.getModels),
+    #"getFilters": ('public/getFilters/',filter.getFilters),
+    "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
+    "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
+    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
 
-    "uploadModel": ("public/service/additive-manufacturing/model/upload/",uploadModels),
-    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",deleteModel),
-    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", remeshSTLToTetraheadras),
-    "getModelRepository": ("public/getModelRepository/", model.getModelRepository),
+    "getPostProcessings": ('public/service/additive-manufacturing/post-processing/get/',postProcessings.retrievePostProcessingsWithFilter),
+    "setPostProcessing": ('public/service/additive-manufacturing/post-processing/set/',postProcessings.setPostProcessingSelection),
+    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<str:postProcessingID>/',postProcessings.deletePostProcessingFromSelection),
 
-    "checkPrintability": ("public/checkPrintability/",checkService.checkPrintability),
-    "checkPrices": ("public/checkPrices/",checkService.checkPrice),
-    "checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/checkModel/<str:projectID>/<str:processID>/<str:fileID>/", checkModel),
+    "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
+    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",model.deleteModel),
+    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
+    "getModelRepository": ("public/service/additive-manufacturing/model/repository/", model.getModelRepository),
+
+    #"checkPrintability": ("public/checkPrintability/",checkService.),
+    #"checkPrices": ("public/checkPrices/",checkService.checkPrice),
+    #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
+    "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
-    "onto_getPrinters": ("public/onto/getPrinters/",resources.onto_getPrinters),
-    "onto_getPrinter": ("public/onto/getPrinter/",resources.onto_getPrinter),
-    "onto_getMaterials": ("public/onto/getMaterials/",resources.onto_getMaterials),
-    "onto_getMaterial": ("public/onto/getMaterial/",resources.onto_getMaterial),
-    "orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
-    "orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
-    "orga_addPrinterEdit": ("public/orga/addPrinterEdit/",resources.orga_addPrinterEdit),
-    "orga_createPrinter": ("public/orga/createPrinter/",resources.orga_createPrinter),
-    "orga_removePrinter": ("public/orga/removePrinter/",resources.orga_removePrinter),
-    "orga_getMaterials": ("public/orga/getMaterials/",resources.orga_getMaterials),
-    "orga_addMaterial": ("public/orga/addMaterial/",resources.orga_addMaterial),
-    "orga_addMaterialEdit": ("public/orga/addMaterialEdit/",resources.orga_addMaterialEdit),
-    "orga_createMaterial": ("public/orga/createMaterial/",resources.orga_createMaterial),
-    "orga_removeMaterial": ("public/orga/removeMaterial/",resources.orga_removeMaterial),
+    "onto_getPrinters": ("public/service/additive-manufacturing/resources/onto/get-printers/",resources.onto_getPrinters),
+    #"onto_getPrinter": ("public/onto/getPrinter/",resources.onto_getPrinter),
+    "onto_getMaterials": ("public/service/additive-manufacturing/resources/onto/get-materials/",resources.onto_getMaterials),
+    #"onto_getMaterial": ("public/onto/getMaterial/",resources.onto_getMaterial),
+    #"orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
+    #"orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
+    #"orga_addPrinterEdit": ("public/orga/addPrinterEdit/",resources.orga_addPrinterEdit),
+    #"orga_createPrinter": ("public/orga/createPrinter/",resources.orga_createPrinter),
+    #"orga_removePrinter": ("public/orga/removePrinter/",resources.orga_removePrinter),
+    #"orga_getMaterials": ("public/orga/getMaterials/",resources.orga_getMaterials),
+    #"orga_addMaterial": ("public/orga/addMaterial/",resources.orga_addMaterial),
+    #"orga_addMaterialEdit": ("public/orga/addMaterialEdit/",resources.orga_addMaterialEdit),
+    #"orga_createMaterial": ("public/orga/createMaterial/",resources.orga_createMaterial),
+    #"orga_removeMaterial": ("public/orga/removeMaterial/",resources.orga_removeMaterial),
+    "orga_getResources": ("public/service/additive-manufacturing/resources/orga/get-all/", resources.orga_getResources),
+    "orga_createLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/create/", resources.orga_addMaterialToPrinter),
+    "orga_updateLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/patch/", resources.orga_updateMaterialAndPrinter),
+    "orga_deletePrinterFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-printer/<str:printer>/", resources.orga_removeLinkToPrinter),
+    "orga_deleteLinkToMaterialFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-material/<str:printer>/<str:material>/", resources.orga_removeLinkToMaterial),
+    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/delete-all/", resources.orga_removeAll)
+
 }
 
 # add paths

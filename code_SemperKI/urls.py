@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import frontpage, sparqlQueries
+from .handlers import frontpage
 from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
 from .handlers.private import testResponse
 from MSQ.handlers import interface
@@ -36,8 +36,8 @@ from MSQ.handlers import interface
 newPaths= {
     #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
     #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
-    "schema": ('api/schema/', SpectacularAPIView.as_view(api_version='0.3')),
-    "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
+    "schema": ('private/schema/', SpectacularAPIView.as_view(api_version='0.3')),
+    "swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
     
     "createProjectID": ('public/createProjectID/', project.createProjectID), 
     "getProject": ("public/getProject/<str:projectID>/",project.getProject),
@@ -65,13 +65,17 @@ newPaths= {
     "deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
     "downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", files.downloadProcessHistory), 
 
-    "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/", admin.getAllProjectsFlatAsAdmin),
-    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin),
-    
-    "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
-    "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
-    "testQuerySize": ("private/query/",frontpage.sparqlPage),
-    "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
+    "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
+    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
+
+    #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
+
+    "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
+    #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
+    "downloadFile": ("public/downloadFile/<projectID>/<processID>/<fileID>/",files.downloadFileStream),
+    "downloadFilesAsZip": ("public/downloadFilesAsZip/<projectID>/<processID>/",files.downloadFilesAsZip),
+    "deleteFile": ("public/deleteFile/<projectID>/<processID>/<fileID>/",files.deleteFile),
+    "downloadProcessHistory": ("public/downloadProcessHistory/<projectID>/<processID>/",files.downloadProcessHistory),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
     "getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack),

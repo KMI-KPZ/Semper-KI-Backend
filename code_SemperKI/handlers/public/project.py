@@ -24,8 +24,8 @@ from drf_spectacular.utils import OpenApiParameter
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import *
@@ -62,7 +62,6 @@ class SResGetFlatProjects(serializers.Serializer):
 ########################################################
 # Handler
 #######################################################
-#@checkVersion(1.0) TODO
 @extend_schema(
     summary="Get all projects flattened",
     description=" ",
@@ -75,6 +74,7 @@ class SResGetFlatProjects(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.GET])
+@checkVersion(0.3)
 def getFlatProjects(request:Request):
     """
     Retrieve all projects.
@@ -138,6 +138,7 @@ def getFlatProjects(request:Request):
     },
 )
 @api_view([HTTPMethod.GET])
+@checkVersion(0.3)
 def getProject(request, projectID):
     """
     Retrieve project with flat processes.
@@ -227,6 +228,7 @@ class SResCreateProjectID(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.POST])
+@checkVersion(0.3)
 def createProjectID(request:Request):
     """
     Create project and send ID to frontend
@@ -316,6 +318,7 @@ class SReqUpdateProject(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.PATCH])
+@checkVersion(0.3)
 def updateProject(request:Request):
     """
     Update stuff about the project
@@ -413,6 +416,7 @@ def updateProject(request:Request):
     )],
 )
 @api_view([HTTPMethod.DELETE])
+@checkVersion(0.3)
 def deleteProjects(request:Request):
     """
     Delete whole projects

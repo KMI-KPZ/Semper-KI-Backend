@@ -21,7 +21,7 @@ from drf_spectacular.utils import extend_schema
 
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, checkVersion
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from code_SemperKI.definitions import *
@@ -53,6 +53,7 @@ loggerError = logging.getLogger("errors")
 @checkIfUserIsLoggedIn(json=True)
 @checkIfRightsAreSufficient(json=True)
 @api_view(["GET"])
+@checkVersion(0.3)
 def getMissedEvents(request:Request):
     """
     Show how many events (chat messages ...) were missed since last login.

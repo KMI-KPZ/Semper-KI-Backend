@@ -9,6 +9,7 @@ Contains: Handlers using simulation to check the processes
 import random, logging, requests
 from io import BytesIO
 
+from code_SemperKI.handlers.projectAndProcessManagement import serviceManager
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods

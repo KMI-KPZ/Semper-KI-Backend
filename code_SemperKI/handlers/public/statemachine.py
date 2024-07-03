@@ -15,6 +15,7 @@ from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.utilities.basics import checkVersion
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -44,6 +45,7 @@ loggerError = logging.getLogger("errors")
     }
 )
 @api_view(["GET"])
+@checkVersion(0.3)
 def getStateMachine(request:Request):
     """
     Print out the whole state machine and all transitions
@@ -96,6 +98,7 @@ class SReqStatusButtons(serializers.Serializer):
     }
 )
 @api_view(["POST"])
+@checkVersion(0.3)
 def statusButtonRequest(request:Request):
     """
     Button was clicked, so the state must change (transition inside state machine)

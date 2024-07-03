@@ -54,6 +54,7 @@ logger = logging.getLogger("logToFile")
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @api_view(["GET"])
+@basics.checkVersion(0.3)
 def getAllProjectsFlatAsAdmin(request:Request):
     """
     Get all Projects in flat format.
@@ -95,6 +96,7 @@ def getAllProjectsFlatAsAdmin(request:Request):
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @api_view(["GET"])
+@basics.checkVersion(0.3)
 def getSpecificProjectAsAdmin(request:Request, projectID):
     """
     Get all info for a specific project.

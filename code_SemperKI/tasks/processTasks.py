@@ -31,12 +31,12 @@ loggerError = logging.getLogger("errors")
 
 ####################################################################
 @runInBackground
-def sendEMail(userEMailAdress:str, subject:str, toWhom:str, locale:str, message:str):
+def sendEMail(userEMailAddress:str, subject:str, toWhom:str, locale:str, message:str):
     """
     Send an E-Mail asynchronously
 
-    :param userEMailAdress: E-Mail address of user
-    :type userEMailAdress: str 
+    :param userEMailAddress: E-Mail address of user
+    :type userEMailAddress: str 
     :param subject: What the mail is about
     :type subject: str 
     :param toWhom: User name
@@ -50,10 +50,10 @@ def sendEMail(userEMailAdress:str, subject:str, toWhom:str, locale:str, message:
     
     """
     try:
-        if userEMailAdress == None:
+        if userEMailAddress == None:
             return
         mailer = MailingClass()
-        mailer.sendMail(userEMailAdress, subject, mailer.mailingTemplate(toWhom, locale, message) )
+        mailer.sendMail(userEMailAddress, subject, mailer.mailingTemplate(toWhom, locale, message) )
     except Exception as error:
         loggerError.error(f"Error while sending email: {str(error)}")
 
@@ -97,7 +97,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Get all details and set status in database    
         userOfThatProcess, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
         locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
-        userEMailAdress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
+        userEMailAddress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","statusUpdate"])
         if valid:
@@ -109,7 +109,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         
         # send out mail & Websocket event 
         websocket.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
-        sendEMail(userEMailAdress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
+        sendEMail(userEMailAddress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")
 
@@ -132,19 +132,19 @@ def sendProcess(processObj:Process, contractorObj:Organization, session):
     try:
         # Send email to contractor (async)
         locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
-        contractorEMailAdress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
+        contractorEMailAddress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","newProcessForContractor"])
         message = Locales.manageTranslations.getTranslation(locale, ["email","content","newProcessForContractor"])
-        sendEMail(contractorEMailAdress, subject, contractorObj.name, locale, f"{message} {processTitle}")
+        sendEMail(contractorEMailAddress, subject, contractorObj.name, locale, f"{message} {processTitle}")
 
         # Send Mail to user that the process is on its way
         userObj, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
         locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
-        userMailAdress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
+        userMailAddress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
         subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","processSent"])
         message = Locales.manageTranslations.getTranslation(locale, ["email","content","processSent"])
-        sendEMail(userMailAdress, f"{subject} '{processTitle}'", userObj.name, locale, message)
+        sendEMail(userMailAddress, f"{subject} '{processTitle}'", userObj.name, locale, message)
     except Exception as error:
         loggerError.error(f"Error while sending process: {str(error)}")
 
