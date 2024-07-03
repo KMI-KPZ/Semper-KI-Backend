@@ -70,8 +70,13 @@ def getAllProjectsFlatAsAdmin(request):
     logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
     return Response(projects, safe=False)
 
-##############################################
-#########Serializer#############
+#########################################################################
+# getSpecificProjectAsAdmin
+#"getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin)
+#########################################################################
+#TODO Add serializer for getSpecificProjectAsAdmin
+#########################################################################
+# Handler  
 #TODO Add serializer  
 @extend_schema(
     summary="Get all info for a specific project.",
