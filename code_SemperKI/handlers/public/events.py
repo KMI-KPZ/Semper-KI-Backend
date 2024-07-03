@@ -14,6 +14,8 @@ from django.conf import settings
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.request import Request
+from rest_framework import serializers
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 
@@ -51,7 +53,7 @@ loggerError = logging.getLogger("errors")
 @checkIfUserIsLoggedIn(json=True)
 @checkIfRightsAreSufficient(json=True)
 @api_view(["GET"])
-def getMissedEvents(request):
+def getMissedEvents(request:Request):
     """
     Show how many events (chat messages ...) were missed since last login.
 
@@ -80,13 +82,13 @@ def getMissedEvents(request):
                 if MessageContent.date in messages and lastLogin < timezone.make_aware(datetime.strptime(messages[MessageContent.date], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages[MessageContent.userID] != user[UserDescription.hashedID]:
                     newMessagesCount += 1
             if lastLogin < timezone.make_aware(datetime.strptime(process[ProcessDescription.updatedWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')):
-                status = 1
+                processStatusEvent = 1
             else:
-                status = 0
+                processStatusEvent = 0
             
             # if something changed, save it. If not, discard
-            if status !=0 or newMessagesCount != 0: 
-                currentProcess[ProcessDescription.processStatus] = status
+            if processStatusEvent !=0 or newMessagesCount != 0: 
+                currentProcess[ProcessDescription.processStatus] = processStatusEvent
                 currentProcess[ProcessDescription.messages] = newMessagesCount
 
                 processArray.append(currentProcess)

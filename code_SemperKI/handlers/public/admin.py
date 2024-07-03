@@ -12,18 +12,22 @@ import datetime, logging
 from django.http import  JsonResponse
 
 from Generic_Backend.code_General.utilities import basics
+from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
+
 from code_SemperKI.utilities.serializer import ExceptionSerializer
-from ..connections.content.postgresql import pgProcesses
-from ..definitions import ProcessDescription
+
+from ...connections.content.postgresql import pgProcesses
+from ...definitions import ProcessDescription
 
 logger = logging.getLogger("logToFile")
 
@@ -32,7 +36,6 @@ logger = logging.getLogger("logToFile")
 ##############################################
 #########################################################################
 # getAllProjectsFlatAsAdmin
-#"getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin)
 #########################################################################
 #TODO Add serializer for getAllProjectsFlatAsAdmin
 #########################################################################
@@ -51,7 +54,7 @@ logger = logging.getLogger("logToFile")
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @api_view(["GET"])
-def getAllProjectsFlatAsAdmin(request):
+def getAllProjectsFlatAsAdmin(request:Request):
     """
     Get all Projects in flat format.
 
@@ -67,7 +70,7 @@ def getAllProjectsFlatAsAdmin(request):
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
         projects[idx]["clientName"] = userName
         
-    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
     return Response(projects, safe=False)
 
 #########################################################################
@@ -92,7 +95,7 @@ def getAllProjectsFlatAsAdmin(request):
 @basics.checkIfUserIsLoggedIn(json=True)
 @basics.checkIfUserIsAdmin(json=True)
 @api_view(["GET"])
-def getSpecificProjectAsAdmin(request, projectID):
+def getSpecificProjectAsAdmin(request:Request, projectID):
     """
     Get all info for a specific project.
 
@@ -104,7 +107,7 @@ def getSpecificProjectAsAdmin(request, projectID):
     :rtype: JSONResponse
     """
 
-    logger.info(f"{basics.Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{basics.Logging.Predicate.FETCHED},fetched,{basics.Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
+    logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
     return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
 
     

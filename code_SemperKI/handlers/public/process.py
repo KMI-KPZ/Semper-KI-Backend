@@ -14,12 +14,11 @@ from django.conf import settings
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin, manualCheckIfRightsAreSufficientForSpecificOperation
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin, manualCheckIfRightsAreSufficientForSpecificOperation
 from Generic_Backend.code_General.utilities import crypto
@@ -33,7 +32,7 @@ from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.public.project import *
-from code_SemperKI.handlers.public.websocket import fireWebsocketEvents
+from code_SemperKI.utilities.websocket import fireWebsocketEvents
 
 
 
@@ -46,6 +45,9 @@ loggerError = logging.getLogger("errors")
 #"createProcessID": ("public/createProcessID/<str:projectID>", process.createProcessID)
 #########################################################################
 #TODO Add serializer for createProcessID.  
+#######################################################
+class SResProcessID(serializers.Serializer):
+    processID = serializers.CharField(max_length=200)
 #########################################################################
 # Handler  
 @extend_schema(
@@ -54,13 +56,13 @@ loggerError = logging.getLogger("errors")
     request=None,
     tags=['processes'],
     responses={
-        200: None,
+        200: SResProcessID,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
 @api_view(["GET"])
-def createProcessID(request, projectID):
+def createProcessID(request:Request, projectID):
     """
     Create process ID for frontend
 
@@ -94,14 +96,12 @@ def createProcessID(request, projectID):
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
         #return just the id for the frontend
-        #TODO add outseriliazer for createProcessID.
         output = {ProcessDescription.processID: processID}
-        return Response(output, status=status.HTTP_200_OK)
-        # outSerializer = SResCreateProcessID(data=output)
-        # if outSerializer.is_valid():
-        #     return Response(outSerializer.data, status=status.HTTP_200_OK)
-        # else:
-        #     raise Exception(outSerializer.errors)
+        outSerializer = SResProcessID(data=output)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in createProcessID: {str(error)}"
         exception = str(error)
@@ -131,7 +131,7 @@ def createProcessID(request, projectID):
     }
 )
 @api_view(["GET"])
-def getProcess(request, projectID, processID):
+def getProcess(request:Request, projectID, processID):
     """
     Retrieve complete process.
 
@@ -179,7 +179,7 @@ def getProcess(request, projectID, processID):
         
 ######################################
 #updateProcessFunction
-def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[str]):
+def updateProcessFunction(request:Request, changes:dict, projectID:str, processIDs:list[str]):
     """
     Update process logic
     
@@ -247,13 +247,18 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
 # updateProcess
 #"updateProcess": ("public/updateProcess/", process.updateProcess),
 #########################################################################
-#TODO Add serializer for updateProcess
+# Serializer for updateProcess
+#######################################################
+class SReqUpdateProcess(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)   
+    processIDs = serializers.ListField(child=serializers.CharField(max_length=200))
+    changes = serializers.DictField() # TODO: list all updateTypes with optional and such
 #########################################################################
 # Handler    
 @extend_schema(
     summary="Update stuff about the process",
     description=" ",
-    request=None,
+    request=SReqUpdateProcess,
     tags=['processes'],
     responses={
         200: None,
@@ -262,7 +267,7 @@ def updateProcessFunction(request, changes:dict, projectID:str, processIDs:list[
     }
 )
 @api_view(["PATCH"])
-def updateProcess(request):
+def updateProcess(request:Request):
     """
     Update stuff about the process
 
@@ -273,7 +278,18 @@ def updateProcess(request):
 
     """
     try:
-        changes = json.loads(request.body.decode("utf-8"))
+        inSerializer = SReqUpdateProcess(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {updateProcess.cls.__name__}"
+            exception = "Verification failed"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        changes = inSerializer.data
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
         
@@ -346,10 +362,18 @@ def deleteProcessFunction(session, processIDs:list[str]):
         200: None,
         401: ExceptionSerializer,
         500: ExceptionSerializer
-    }
+    },
+    parameters=[OpenApiParameter(
+        name='processIDs',
+        type={'type': 'array', 'minItems': 1, 'items': {'type': 'string'}},
+        location=OpenApiParameter.QUERY,
+        required=True,
+        style='form',
+        explode=False,
+    )],
 )
 @api_view(["DELETE"])
-def deleteProcesses(request, projectID):
+def deleteProcesses(request:Request, projectID):
     """
     Delete one or more processes
 
@@ -362,7 +386,7 @@ def deleteProcesses(request, projectID):
 
     """
     try:
-        processIDs = request.GET['processIDs'].split(",")
+        processIDs = request.data['processIDs']
         retVal = deleteProcessFunction(request.session, processIDs)
         if isinstance(retVal, Exception):
             raise retVal
@@ -382,6 +406,15 @@ def deleteProcesses(request, projectID):
 #"getProcessHistory": ("public/getProcessHistory/<str:processID>/", process.getProcessHistory),
 #########################################################################
 #TODO Add serializer for getProcessHistory
+#######################################################
+class SResHistoryEntry(serializers.Serializer):
+    createdBy = serializers.CharField(max_length=200)
+    createdWhen = serializers.CharField(max_length=200)
+    type = serializers.IntegerField()
+    data = serializers.DictField()
+#######################################################
+class SResProcessHistory(serializers.Serializer):
+    history = serializers.ListField(child=SResHistoryEntry())
 #########################################################################
 # Handler           
 @extend_schema(
@@ -390,7 +423,7 @@ def deleteProcesses(request, projectID):
     request=None,
     tags=['processes'],
     responses={
-        200: None,
+        200: SResHistoryEntry,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -399,7 +432,7 @@ def deleteProcesses(request, projectID):
 @checkIfRightsAreSufficient(json=True)
 @checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
-def getProcessHistory(request, processID):
+def getProcessHistory(request:Request, processID):
     """
     See who has done what and when
 
@@ -428,8 +461,11 @@ def getProcessHistory(request, processID):
             listOfData[index] = outDatum # overwrite
 
         outObj = {"history": listOfData}
-
-        return Response(outObj, status=status.HTTP_200_OK)
+        outSerializer = SResHistoryEntry(data=outObj)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in getProcessHistory: {str(error)}"
         exception = str(error)
@@ -461,7 +497,7 @@ def getProcessHistory(request, processID):
 @checkIfRightsAreSufficient(json=True)
 @checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
-def getContractors(request, processID:str):
+def getContractors(request:Request, processID:str):
     """
     Get all suitable Contractors.
 
@@ -505,7 +541,28 @@ def getContractors(request, processID:str):
         
 #########################################################################
 # cloneProcess
-def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
+#########################################################################
+#TODO Add serializer for cloneProcess
+#######################################################
+class SResCloneProcess(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processIDs = serializers.ListField(child=serializers.CharField(max_length=200))
+#########################################################################
+# Handler    
+@extend_schema(
+    summary="Duplicate selected processes. Works only for logged in users.",
+    description=" ",
+    tags=['processes'],
+    request=None,
+    responses={
+        200: SResCloneProcess,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient(json=True)
+@api_view(["GET"])
+def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
     """
     Duplicate selected processes. Works only for logged in users.
 
@@ -608,30 +665,18 @@ def cloneProcess(request, oldProjectID:str, oldProcessIDs:list[str]):
             interface = contentManager.getCorrectInterface(cloneProcess.cls.__name__)
             currentState.onUpdateEvent(interface, newProcess)
 
-        return JsonResponse(outDict)
+        outSerializer = SResCloneProcess(data=outDict)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
         
     except Exception as error:
-        loggerError.error(f"Error when cloning processes: {error}")
-        return JsonResponse({})
-    
-############################################################
-def getProcessAndProjectFromSession(session, processID):
-    """
-    Retrieve a specific process from the current session instead of the database
-    
-    :param session: Session of the current user
-    :type session: Dict
-    :param projectID: Process ID
-    :type projectID: Str
-    :return: Process or None
-    :rtype: Dict or None
-    """
-    try:
-        contentManager = ManageContent(session)
-        if contentManager.sessionManagement.getIfContentIsInSession():
-            return contentManager.sessionManagement.structuredSessionObj.getProcessAndProjectPerID(processID)
+        message = f"Error in getContractors: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return (None, None)
-    except (Exception) as error:
-        loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
-        return (None, None)
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 

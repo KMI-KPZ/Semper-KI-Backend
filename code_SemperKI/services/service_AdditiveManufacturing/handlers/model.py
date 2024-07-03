@@ -23,7 +23,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType, DataDescription
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 from code_SemperKI.connections.content.postgresql import pgProcesses
-from code_SemperKI.handlers.files import deleteFile
+from code_SemperKI.handlers.public.files import deleteFile
 from code_SemperKI.connections.content.manageContent import ManageContent
 
 from ..definitions import ServiceDetails

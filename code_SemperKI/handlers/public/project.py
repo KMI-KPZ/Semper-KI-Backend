@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
@@ -74,7 +75,7 @@ class SResGetFlatProjects(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.GET])
-def getFlatProjects(request):
+def getFlatProjects(request:Request):
     """
     Retrieve all projects.
 
@@ -226,7 +227,7 @@ class SResCreateProjectID(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.POST])
-def createProjectID(request):
+def createProjectID(request:Request):
     """
     Create project and send ID to frontend
 
@@ -315,7 +316,7 @@ class SReqUpdateProject(serializers.Serializer):
     },
 )
 @api_view([HTTPMethod.PATCH])
-def updateProject(request):
+def updateProject(request:Request):
     """
     Update stuff about the project
 
@@ -412,7 +413,7 @@ def updateProject(request):
     )],
 )
 @api_view([HTTPMethod.DELETE])
-def deleteProjects(request):
+def deleteProjects(request:Request):
     """
     Delete whole projects
 
@@ -486,7 +487,7 @@ def deleteProjects(request):
 # @checkIfUserIsLoggedIn()
 # @checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
-def saveProjects(request):
+def saveProjects(request:Request):
     """
     Save projects to database
 

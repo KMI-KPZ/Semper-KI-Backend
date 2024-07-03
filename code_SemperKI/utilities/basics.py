@@ -9,6 +9,7 @@ Contains: Basic stuff like decorators and such that is imported in Semper KI
 import json
 
 from functools import wraps
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 
 from rest_framework import serializers
@@ -130,5 +131,5 @@ def checkVersion(version=1.0):
 
     return decorator
 
-
-
+#######################################################
+testPicture = settings.STATIC_URL+"media/testpicture.jpg"

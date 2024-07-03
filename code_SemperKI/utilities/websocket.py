@@ -5,19 +5,14 @@ Akshay NS 2024
 
 Contains: handlers for websockets
 """
-import json, logging, copy
-from datetime import datetime
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.utils import timezone
-from django.conf import settings
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities import crypto, rights
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities import rights
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 
@@ -29,7 +24,6 @@ from code_SemperKI.utilities.basics import *
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-
 def fireWebsocketEvents(projectID, processIDArray, session, event, operation=""):
     """
     Fire websocket event from a list for a specific project and process. 

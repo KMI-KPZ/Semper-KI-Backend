@@ -19,7 +19,7 @@ from Generic_Backend.code_General.definitions import FileObjectContent
 
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates
-from code_SemperKI.handlers.files import getFileReadableStream
+from code_SemperKI.handlers.public.files import getFileReadableStream
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.handlers.public.process import updateProcessFunction
 

@@ -22,6 +22,12 @@ from django.http import HttpResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 
+from rest_framework import status, serializers
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from drf_spectacular.utils import extend_schema
+
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
@@ -30,17 +36,12 @@ from Generic_Backend.code_General.utilities.files import createFileResponse
 from Generic_Backend.code_General.definitions import FileObjectContent, Logging
 from Generic_Backend.code_General.connections import s3
 
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from drf_spectacular.utils import extend_schema
-
 from code_SemperKI.utilities.serializer import ExceptionSerializer
-from code_SemperKI.handlers.public.process import getProcessAndProjectFromSession, updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 import code_SemperKI.connections.content.manageContent as ManageC
-from ..connections.content.postgresql import pgProcesses
-from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
-from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
+from ...connections.content.postgresql import pgProcesses
+from ...definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
+from ...utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
 from django.http.request import HttpRequest
 
 logger = logging.getLogger("logToFile")
@@ -49,17 +50,45 @@ loggerInfo = logging.getLogger("info")
 loggerDebug = getLogger("django_debug")
 #######################################################
 
+############################################################
+# Helper function
+############################################################
+# def getProcessAndProjectFromSession(session, processID):
+#     """
+#     Retrieve a specific process from the current session instead of the database
+    
+#     :param session: Session of the current user
+#     :type session: Dict
+#     :param projectID: Process ID
+#     :type projectID: Str
+#     :return: Process or None
+#     :rtype: Dict or None
+#     """
+#     try:
+#         contentManager = ManageC.ManageContent(session)
+#         if contentManager.sessionManagement.getIfContentIsInSession():
+#             return contentManager.sessionManagement.structuredSessionObj.getProcessAndProjectPerID(processID)
+#         else:
+#             return (None, None)
+#     except (Exception) as error:
+#         loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
+#         return (None, None)
+
 #########################################################################
 # uploadFiles
 #"uploadFiles": ("public/uploadFiles/",files.uploadFiles)
 #########################################################################
 #TODO Add serializer for uploadFiles
+#######################################################
+class SReqUploadFiles(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processID = serializers.CharField(max_length=200)
 #########################################################################
 # Handler    
 @extend_schema(
      summary="File upload for a process",
      description=" ",
-     request=None,
+     request=SReqUploadFiles,
      tags=['files'],
      responses={
          200: None,
@@ -68,7 +97,7 @@ loggerDebug = getLogger("django_debug")
      }
  )
 @api_view(["POST"])
-def uploadFiles(request):
+def uploadFiles(request:Request):
     """
     File upload for a process
 
@@ -78,7 +107,18 @@ def uploadFiles(request):
     :rtype: HTTP Response
     """
     try:
-        info = request.POST
+        inSerializer = SReqUploadFiles(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {uploadFiles.cls.__name__}"
+            exception = "Verification failed"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        info = inSerializer.data
         projectID = info["projectID"]
         processID = info["processID"]
         # TODO: Licenses, ...
@@ -134,58 +174,58 @@ def uploadFiles(request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
-@require_http_methods(["GET"])
-def downloadFile(request, processID, fileID):
-    """
-    Send file to user from storage
-    DEPRECATED!!!!
+# @require_http_methods(["GET"])
+# def downloadFile(request:Request, processID, fileID):
+#     """
+#     Send file to user from storage
+#     DEPRECATED!!!!
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
-    :param processID: process ID
-    :type processID: Str
-    :param fileID: file ID
-    :type fileID: Str
-    :return: Saved content
-    :rtype: FileResponse
+#     :param request: Request of user for a specific file of a process
+#     :type request: HTTP POST
+#     :param processID: process ID
+#     :type processID: Str
+#     :param fileID: file ID
+#     :type fileID: Str
+#     :return: Saved content
+#     :rtype: FileResponse
 
-    """
-    try:
-        # Retrieve the files info from either the session or the database
-        fileOfThisProcess = {}
-        currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
-        if currentProcess != None:
-            if fileID in currentProcess[ProcessDescription.files]:
-                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
-            else:
-                return HttpResponse("Not found!", status=404)
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
-                    fileOfThisProcess = currentProcess.files[fileID]
-                    if len(fileOfThisProcess) == 0:
-                        return HttpResponse("Not found!", status=404)
-                else:
-                    return HttpResponse("Not allowed to see process!", status=401)
-            else:
-                return HttpResponse("Not logged in or rights insufficient!", status=401)
+#     """
+#     try:
+#         # Retrieve the files info from either the session or the database
+#         fileOfThisProcess = {}
+#         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
+#         if currentProcess != None:
+#             if fileID in currentProcess[ProcessDescription.files]:
+#                 fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
+#             else:
+#                 return HttpResponse("Not found!", status=404)
+#         else:
+#             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
+#                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+#                 if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
+#                     currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
+#                     fileOfThisProcess = currentProcess.files[fileID]
+#                     if len(fileOfThisProcess) == 0:
+#                         return HttpResponse("Not found!", status=404)
+#                 else:
+#                     return HttpResponse("Not allowed to see process!", status=401)
+#             else:
+#                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
-        # retrieve the correct file and download it from aws to the user
-        content, flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-        if flag is False:
-            content, flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-            if flag is False:
-                return HttpResponse("Not found!", status=404)
+#         # retrieve the correct file and download it from aws to the user
+#         content, flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+#         if flag is False:
+#             content, flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+#             if flag is False:
+#                 return HttpResponse("Not found!", status=404)
             
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(datetime.now()))
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(datetime.now()))
             
-        return createFileResponse(content, filename=fileOfThisProcess[FileObjectContent.fileName])
+#         return createFileResponse(content, filename=fileOfThisProcess[FileObjectContent.fileName])
 
-    except (Exception) as error:
-        loggerError.error(f"Error while downloading file: {str(error)}")
-        return HttpResponse("Failed", status=500)
+#     except (Exception) as error:
+#         loggerError.error(f"Error while downloading file: {str(error)}")
+#         return HttpResponse("Failed", status=500)
 
 
 #######################################################
@@ -208,7 +248,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     try:
         # Retrieve the files info from either the session or the database
         contentManager = ManageC.ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(downloadFile.__name__)
+        interface = contentManager.getCorrectInterface(downloadFileStream.__name__)
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
         
@@ -282,7 +322,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
 
 
 #######################################################
-def getFileReadableStream(request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
+def getFileReadableStream(request:Request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
@@ -402,7 +442,7 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebug
     }
 )
 @api_view(["GET"])
-def downloadFileStream(request, projectID, processID, fileID):
+def downloadFileStream(request:Request, projectID, processID, fileID):
     """
     Send file to user from storage
 
@@ -462,7 +502,7 @@ def downloadFileStream(request, projectID, processID, fileID):
     }
 )
 @api_view(["GET"])
-def downloadFilesAsZip(request, projectID, processID):
+def downloadFilesAsZip(request:Request, projectID, processID):
     """
     Send files to user as zip
 
@@ -541,7 +581,7 @@ def downloadFilesAsZip(request, projectID, processID):
 @checkIfRightsAreSufficient(json=False)
 @checkIfUserMaySeeProcess(json=False)
 @api_view(["GET"])
-def downloadProcessHistory(request, processID):
+def downloadProcessHistory(request:Request, processID):
     """
     See who has done what and when and download this as pdf
 
@@ -635,7 +675,7 @@ def downloadProcessHistory(request, processID):
     }
 )
 @api_view(["DELETE"])
-def deleteFile(request, projectID, processID, fileID):
+def deleteFile(request:Request, projectID, processID, fileID):
     """
     Delete a file from storage
 

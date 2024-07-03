@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 
-from code_SemperKI.handlers.public.websocket import fireWebsocketEvents
+from code_SemperKI.utilities.websocket import fireWebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
