@@ -47,10 +47,11 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 loggerInfo = logging.getLogger("info")
 loggerDebug = getLogger("django_debug")
-
 #######################################################
+
 #########################################################################
 # uploadFiles
+#"uploadFiles": ("public/uploadFiles/",files.uploadFiles)
 #########################################################################
 #TODO Add serializer for uploadFiles
 #########################################################################
@@ -385,6 +386,7 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebug
 
 #########################################################################
 # downloadFileStream
+#"downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream)
 #########################################################################
 #TODO Add serializer for downloadFileStream
 #########################################################################
@@ -442,6 +444,7 @@ def downloadFileStream(request, projectID, processID, fileID):
 
 #########################################################################
 # downloadFilesAsZip
+#"downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip)
 #########################################################################
 #TODO Add serializer for downloadFilesAsZip
 #########################################################################
@@ -519,6 +522,7 @@ def downloadFilesAsZip(request, projectID, processID):
         
 #########################################################################
 # downloadProcessHistory
+#"downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", files.downloadProcessHistory)
 #########################################################################
 #TODO Add serializer for downloadProcessHistory
 #########################################################################
@@ -614,6 +618,7 @@ def downloadProcessHistory(request, processID):
 
 #########################################################################
 # deleteFile
+#"deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile)
 #########################################################################
 #TODO Add serializer for deleteFile
 #########################################################################

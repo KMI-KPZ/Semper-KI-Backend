@@ -30,8 +30,13 @@ logger = logging.getLogger("logToFile")
 # Projects #############################################################################################################
 
 ##############################################
-#########Serializer#############
-#TODO Add serializer  
+#########################################################################
+# getAllProjectsFlatAsAdmin
+#"getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/", admin.getSpecificProjectAsAdmin)
+#########################################################################
+#TODO Add serializer for getAllProjectsFlatAsAdmin
+#########################################################################
+# Handler  
 @extend_schema(
     summary="Get all Projects in flat format.",
     description=" ",

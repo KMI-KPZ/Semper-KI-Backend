@@ -29,7 +29,13 @@ def returnFileFromfTetWild(filePath:str):
             return HttpResponse("Not found", status=404)
     return FileResponse(content, filename="Test.ugrid")
 
-####################################################################
+#########################################################################
+# getResultsBack
+#"getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack)
+#########################################################################
+#TODO Add serializer for getResultsBack
+#########################################################################
+# Handler  
 @extend_schema(
     summary="Get results from celery worker via ID, dispatch to further handlers",
     description=" ",
