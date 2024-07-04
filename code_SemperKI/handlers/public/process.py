@@ -80,7 +80,7 @@ def createProcessID(request:Request, projectID):
         processID = crypto.generateURLFriendlyRandomString()
         
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(createProcessID.__name__)
+        interface = contentManager.getCorrectInterface(createProcessID.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in createProcessID"
             exception = "Unauthorized"
@@ -97,7 +97,7 @@ def createProcessID(request:Request, projectID):
         # set default addresses here
         if manualCheckifLoggedIn(request.session):
             clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
-            defaultAddress = {"undefined": {}}
+            defaultAddress = {}
             if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
                 clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                 for key in clientAddresses:
@@ -212,7 +212,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProcess.__name__)
+        interface = contentManager.getCorrectInterface(updateProcess.cls.__name__)
         if interface == None:
             logger.error("Rights not sufficient in updateProcess")
             return ("", False)
@@ -228,7 +228,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                 for elem in changes["deletions"]:
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
-                        if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, str(elem)):
+                        if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
                         
@@ -242,7 +242,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                     # for websocket events
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
                         # exclude people not having sufficient rights for that specific operation
-                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, str(elem)):
+                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
                         WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
@@ -542,6 +542,9 @@ def getContractors(request:Request, processID:str):
  
         serviceType = processObj.serviceType
         service = serviceManager.getService(processObj.serviceType)
+        
+        if serviceType == serviceManager.getNone():
+            return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
 
         listOfFilteredContractors = service.getFilteredContractors(processObj)
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
@@ -561,7 +564,7 @@ def getContractors(request:Request, processID:str):
             listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
         # TODO add serializers
-        return JsonResponse(listOfResultingContractors, safe=False)
+        return Response(listOfResultingContractors)
     except (Exception) as error:
         message = f"Error in getContractors: {str(error)}"
         exception = str(error)

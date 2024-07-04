@@ -72,7 +72,7 @@ def getAllProjectsFlatAsAdmin(request:Request):
         projects[idx]["clientName"] = userName
         
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
-    return Response(projects, safe=False)
+    return Response(projects)
 
 #########################################################################
 # getSpecificProjectAsAdmin

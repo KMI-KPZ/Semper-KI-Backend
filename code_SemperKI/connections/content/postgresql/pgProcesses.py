@@ -1006,7 +1006,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
                     # add addresses
                     clientObject = ProfileManagementBase.getUser(session)
-                    defaultAddress = {"undefined": {}}
+                    defaultAddress = {}
                     if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
                         clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                         for key in clientAddresses:

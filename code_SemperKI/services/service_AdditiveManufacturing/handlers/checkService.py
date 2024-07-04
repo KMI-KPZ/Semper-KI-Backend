@@ -213,7 +213,7 @@ def checkModel(request, projectID, processID) -> JsonResponse:
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(checkModel.__name__)
+        interface = contentManager.getCorrectInterface(checkModel.cls.__name__)
         if interface == None:
             JsonResponse({}, status=401)
         process = interface.getProcessObj(projectID, processID)

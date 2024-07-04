@@ -249,7 +249,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     try:
         # Retrieve the files info from either the session or the database
         contentManager = ManageC.ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(downloadFileStream.__name__)
+        interface = contentManager.getCorrectInterface(downloadFileStream.cls.__name__)
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
         

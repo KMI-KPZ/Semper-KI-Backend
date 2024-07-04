@@ -249,7 +249,7 @@ def createProcessID(request, projectID):
         # set default addresses here
         if manualCheckifLoggedIn(request.session):
             clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
-            defaultAddress = {"undefined": {}}
+            defaultAddress = {}
             if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
                 clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                 for key in clientAddresses:

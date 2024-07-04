@@ -50,7 +50,7 @@ def uploadModel(request):
         processID = info["processID"]
 
         content = ManageContent(request.session)
-        interface = content.getCorrectInterface(uploadModel.__name__)
+        interface = content.getCorrectInterface(uploadModel.cls.__name__)
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
         else:
@@ -121,7 +121,7 @@ def deleteModel(request, projectID, processID):
     try:
         # TODO maybe rewrite to support multiple model files
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteModel.__name__)
+        interface = contentManager.getCorrectInterface(deleteModel.cls.__name__)
         if interface == None:
             return HttpResponse("Not logged in or rights insufficient!", status=401)
         currentProcess = interface.getProcessObj(projectID, processID)

@@ -52,7 +52,7 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="")
             subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
             if subID != pgProfiles.ProfileManagementBase.getUserKey(session=session) and subID != pgProfiles.ProfileManagementBase.getUserOrgaKey(session=session): # don't show a message for the user that changed it
                 userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-                for permission in rights.rightsManagement.getPermissionsNeededForPath(ProcessFunctions.updateProcess.__name__):
+                for permission in rights.rightsManagement.getPermissionsNeededForPath(ProcessFunctions.updateProcess.cls.__name__):
                     if operation=="" or operation in permission:
                         async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
                             "type": "sendMessageJSON",
@@ -88,7 +88,7 @@ def fireWebsocketEventForClient(projectID, processIDArray, event, operation=""):
         values = dictForEvents[userID] # message, formatted for frontend
         subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
         userKeyWOSC = pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=subID)
-        for permission in rights.rightsManagement.getPermissionsNeededForPath(ProcessFunctions.updateProcess.__name__):
+        for permission in rights.rightsManagement.getPermissionsNeededForPath(ProcessFunctions.updateProcess.cls.__name__):
             if operation=="" or operation in permission:
                 async_to_sync(channel_layer.group_send)(userKeyWOSC+permission, {
                     "type": "sendMessageJSON",
