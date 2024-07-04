@@ -13,6 +13,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
 from Generic_Backend.code_General.utilities import basics
+from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from rest_framework import status, serializers
@@ -71,7 +72,7 @@ def getAllProjectsFlatAsAdmin(request):
         projects[idx]["clientName"] = userName
         
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
-    return JsonResponse(projects, safe=False)                                                         # muss logging hier in lowercase sein?
+    return JsonResponse(projects, safe=False)
 
 ##############################################
 #########Serializer#############

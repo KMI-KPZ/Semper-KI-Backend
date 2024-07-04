@@ -73,11 +73,11 @@ def createProcessID(request, projectID):
     try:
         # generate ID, timestamp and template for process
         processID = crypto.generateURLFriendlyRandomString()
-        assert isinstance(processID, str), f"In {createProcessID.__name__}: expected processID to be of type string, instead got: {type(processID)}"
-        assert processID != "", f"In {createProcessID.__name__}: non-empty processID expected"
+        assert isinstance(processID, str), f"In {createProcessID.cls.__name__}: expected processID to be of type string, instead got: {type(processID)}"
+        assert processID != "", f"In {createProcessID.cls.__name__}: non-empty processID expected"
         
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(createProcessID.__name__)
+        interface = contentManager.getCorrectInterface(createProcessID.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in createProcessID"
             exception = "Unauthorized"
@@ -145,10 +145,10 @@ def getProcess(request, projectID, processID):
     try:
         contentManager = ManageContent(request.session)
         userID = contentManager.getClient()
-        assert isinstance(userID, str), f"In {getProcess.__name__}: expected userID to be of type string, instead got: {type(userID)}"
-        assert userID != "", f"In {getProcess.__name__}: non-empty userID expected"
+        assert isinstance(userID, str), f"In {getProcess.cls.__name__}: expected userID to be of type string, instead got: {type(userID)}"
+        assert userID != "", f"In {getProcess.cls.__name__}: non-empty userID expected"
         adminOrNot = manualCheckifAdmin(request.session)
-        assert isinstance(adminOrNot, bool), f"In {getProcess.__name__}: expected adminOrNot to be of type bool, instead got {type(adminOrNot)}"
+        assert isinstance(adminOrNot, bool), f"In {getProcess.cls.__name__}: expected adminOrNot to be of type bool, instead got {type(adminOrNot)}"
         interface = contentManager.getCorrectInterface(getProject.cls.__name__)
         if interface == None:
             message = "Rights not sufficient in getProcess"
@@ -215,22 +215,22 @@ def updateProcess(request):
     """
     try:
         changes = json.loads(request.body.decode("utf-8"))
-        assert "projectID" in changes.keys(), f"In {updateProcess.__name__}: projectID not in request"
-        assert "processIDs" in changes.keys(), f"In {updateProcess.__name__}: processIDs not in request"
+        assert "projectID" in changes.keys(), f"In {updateProcess.cls.__name__}: projectID not in request"
+        assert "processIDs" in changes.keys(), f"In {updateProcess.cls.__name__}: processIDs not in request"
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
-        assert isinstance(projectID, str), f"In {updateProcess.__name__}: expected projectID to be of type string instead got {type(projectID)}"
-        assert projectID != "", f"In {updateProcess.__name__}: non-empty projectID expected"
-        assert isinstance (processIDs, list), f"In {updateProcess.__name__}: expected processIDs to be of type list instead got {type(processIDs)}"
+        assert isinstance(projectID, str), f"In {updateProcess.cls.__name__}: expected projectID to be of type string instead got {type(projectID)}"
+        assert projectID != "", f"In {updateProcess.cls.__name__}: non-empty projectID expected"
+        assert isinstance (processIDs, list), f"In {updateProcess.cls.__name__}: expected processIDs to be of type list instead got {type(processIDs)}"
         
         # TODO remove
-        assert "changes" in changes.keys(), f"In {updateProcess.__name__}: changes not in request"
+        assert "changes" in changes.keys(), f"In {updateProcess.cls.__name__}: changes not in request"
         if ProcessUpdates.processStatus in changes["changes"]:
             del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
 
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)
-        assert isinstance(message, str) or isinstance(message, Exception), f"In {updateProcess.__name__}: expected message to be of type string or Exception instead got {type(message)}"
-        assert isinstance(flag, bool), f"In {updateProcess.__name__}: expected flag to be of type bool instead got {type(flag)}"
+        assert isinstance(message, str) or isinstance(message, Exception), f"In {updateProcess.cls.__name__}: expected message to be of type string or Exception instead got {type(message)}"
+        assert isinstance(flag, bool), f"In {updateProcess.cls.__name__}: expected flag to be of type bool instead got {type(flag)}"
         if flag is False:
             return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):

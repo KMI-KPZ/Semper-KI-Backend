@@ -64,7 +64,7 @@ def getStateMachine(request):
     try:
         sm = StateMachine(initialAsInt=0)
         paths = sm.showPaths()
-        assert isinstance(paths, dict), f"In {getStateMachine.__name__}: expected paths to be of type dict instead got {type(paths)}"
+        assert isinstance(paths, dict), f"In {getStateMachine.cls.__name__}: expected paths to be of type dict instead got {type(paths)}"
         return Response(paths, status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in getStateMachine: {str(error)}"

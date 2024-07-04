@@ -84,7 +84,7 @@ downloadFileStream), #
     """
     try:
         output = serviceManager.getAllServices()
-        assert isinstance(output, dict), f"In {getServices.__name__}: expected paths to be of type dict instead got {type(output)}"
+        assert isinstance(output, dict), f"In {getServices.cls.__name__}: expected paths to be of type dict instead got {type(output)}"
         return Response(output, status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in getServices: {str(error)}"
@@ -127,14 +127,14 @@ def uploadFiles(request):
     """
     try:
         info = request.POST
-        assert "projectID" in info.keys(), f"In {uploadFiles.__name__}: projectID not in request"
-        assert "processID" in info.keys(), f"In {uploadFiles.__name__}: processID not in request"
+        assert "projectID" in info.keys(), f"In {uploadFiles.cls.__name__}: projectID not in request"
+        assert "processID" in info.keys(), f"In {uploadFiles.cls.__name__}: processID not in request"
         projectID = info["projectID"]
         processID = info["processID"]
-        assert isinstance(projectID, str), f"In {uploadFiles.__name__}: expected projectID to be of type string instead got {type(projectID)}"
-        assert projectID != "", f"In {uploadFiles.__name__}: non-empty projectID expected"
-        assert isinstance (processID, str), f"In {uploadFiles.__name__}: expected processID to be of type string instead got {type(processID)}"
-        assert processID != "", f"In {uploadFiles.__name__}: non-empty processID expected"
+        assert isinstance(projectID, str), f"In {uploadFiles.cls.__name__}: expected projectID to be of type string instead got {type(projectID)}"
+        assert projectID != "", f"In {uploadFiles.cls.__name__}: non-empty projectID expected"
+        assert isinstance (processID, str), f"In {uploadFiles.cls__name__}: expected processID to be of type string instead got {type(processID)}"
+        assert processID != "", f"In {uploadFiles.cls.__name__}: non-empty processID expected"
         # TODO: Licenses, ...
 
         content = ManageC.ManageContent(request.session)
@@ -146,15 +146,15 @@ def uploadFiles(request):
 
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-        assert isinstance(userName, str), f"In {uploadFiles.__name__}: expected userName to be of type string instead got {type(userName)}"
-        assert userName != "", f"In {uploadFiles.__name__}: non-empty userName expected"
+        assert isinstance(userName, str), f"In {uploadFiles.cls.__name__}: expected userName to be of type string instead got {type(userName)}"
+        assert userName != "", f"In {uploadFiles.cls.__name__}: non-empty userName expected"
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
-            assert isinstance (fileName, str), f"In {uploadFiles.__name__}: expected fileName to be of type string instead got {type(fileName)}"
-            assert fileName != "", f"In {uploadFiles.__name__}: non-empty fileName expected"
+            assert isinstance (fileName, str), f"In {uploadFiles.cls.__name__}: expected fileName to be of type string instead got {type(fileName)}"
+            assert fileName != "", f"In {uploadFiles.cls.__name__}: non-empty fileName expected"
             fileID = crypto.generateURLFriendlyRandomString()
-            assert isinstance(fileID, str), f"In {uploadFiles.__name__}: expected fileID to be of type string instead got {type(fileID)}"
-            assert fileID != "", f"In {uploadFiles.__name__}: non-empty fileID expected"
+            assert isinstance(fileID, str), f"In {uploadFiles.cls.__name__}: expected fileID to be of type string instead got {type(fileID)}"
+            assert fileID != "", f"In {uploadFiles.cls.__name__}: non-empty fileID expected"
             filePath = processID+"/"+fileID
             changes["changes"][ProcessUpdates.files][fileID] = {}
             changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
@@ -175,8 +175,8 @@ def uploadFiles(request):
         
         # Save into files field of the process
         message, flag = PPManagement.updateProcessFunction(request, changes, projectID, [processID])
-        assert isinstance(message, str) or isinstance(message, Exception), f"In {uploadFiles.__name__}: expected message to be of type string or Exception instead got {type(message)}"
-        assert isinstance(flag, bool), f"In {uploadFiles.__name__}: expected flag to be of type bool instead got {type(flag)}"
+        assert isinstance(message, str) or isinstance(message, Exception), f"In {uploadFiles.cls.__name__}: expected message to be of type string or Exception instead got {type(message)}"
+        assert isinstance(flag, bool), f"In {uploadFiles.cls.__name__}: expected flag to be of type bool instead got {type(flag)}"
         if flag is False:
             return Response("Insufficient rights!", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
@@ -538,8 +538,8 @@ def deleteFile(request, projectID, processID, fileID):
         
         # TODO send deletion to service, should the deleted file be the model for example
         message, flag = PPManagement.updateProcessFunction(request, deletions, projectID, [processID])
-        assert isinstance(message, str) or isinstance(message, Exception), f"In {deleteFile.__name__}: expected message to be of type string or Exception instead got {type(message)}"
-        assert isinstance(flag, bool), f"In {deleteFile.__name__}: expected flag to be of type bool instead got {type(flag)}"
+        assert isinstance(message, str) or isinstance(message, Exception), f"In {deleteFile.cls.__name__}: expected message to be of type string or Exception instead got {type(message)}"
+        assert isinstance(flag, bool), f"In {deleteFile.cls.__name__}: expected flag to be of type bool instead got {type(flag)}"
         if flag is False:
             return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
