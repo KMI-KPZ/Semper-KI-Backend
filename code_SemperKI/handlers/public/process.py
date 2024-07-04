@@ -32,7 +32,7 @@ from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.handlers.public.project import *
-from code_SemperKI.utilities.websocket import fireWebsocketEvents
+import code_SemperKI.utilities.websocket as WebSocketEvents
 
 
 
@@ -245,7 +245,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                         if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
-                        fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
+                        WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):

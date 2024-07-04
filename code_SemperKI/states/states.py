@@ -17,7 +17,7 @@ from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
-from code_SemperKI.utilities.websocket import fireWebsocketEvents
+import code_SemperKI.utilities.websocket as WebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
@@ -284,7 +284,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -313,7 +313,7 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
