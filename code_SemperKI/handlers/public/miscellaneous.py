@@ -49,12 +49,10 @@ class SResServices(serializers.Serializer):
     request=None,
     tags = ['Miscellaneous'],
     responses={
-        200: None,
+        200: SResServices,
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
-@checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 @checkVersion(0.3)
 def getServices(request:Request):
@@ -70,8 +68,12 @@ def getServices(request:Request):
     try:
         
         services = serviceManager.getAllServices()
-        output = {"type": services[ServicesStructure.name], "imgPath": testPicture}
-        outSerializer = SResServices(data=output)
+        outList = []
+        for entry in services:
+            if entry[ServicesStructure.name] == "None":
+                continue
+            outList.append({"type": entry[ServicesStructure.name], "imgPath": testPicture})
+        outSerializer = SResServices(data=outList, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:

@@ -103,7 +103,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         postProcessingsRes = cmem.getAllMaterials.sendQuery()
         for elem in postProcessingsRes:
             title = elem["Material"]["value"]
-            resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture.mockPicturePath})
+            resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture})
         output.update(resultsOfQueries["postProcessings"]) """
         
         # mockup here:

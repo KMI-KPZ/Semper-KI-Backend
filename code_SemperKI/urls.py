@@ -47,7 +47,7 @@ newPaths= {
     "saveProjects": ("public/saveProjects/", project.saveProjects),
 
     "getProcess": ("public/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
-    "createProcessID": ("public/createProcessID/<str:projectID>", process.createProcessID),
+    "createProcessID": ("public/createProcessID/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/updateProcess/", process.updateProcess), 
     "deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses), 
     "getProcessHistory": ("public/getProcessHistory/<str:processID>/", process.getProcessHistory),

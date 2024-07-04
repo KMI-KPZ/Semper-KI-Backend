@@ -100,4 +100,4 @@ def getMissedEvents(request:Request):
     # set accessed time to now
     pgProfiles.ProfileManagementBase.setLoginTime(user[UserDescription.hashedID])
 
-    return Response(output, status=status.HTTP_200_OK, safe=False)
+    return Response(output, status=status.HTTP_200_OK)

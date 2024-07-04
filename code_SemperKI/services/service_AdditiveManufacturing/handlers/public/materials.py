@@ -100,7 +100,7 @@ def retrieveMaterialsWithFilter(request:Request):
         materialsRes = sparqlQueries.getAllMaterials.sendQuery()
         for elem in materialsRes:
             title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture.mockPicturePath})
+            resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
 
         
         # mockup here:

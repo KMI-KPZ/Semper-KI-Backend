@@ -149,18 +149,18 @@ class _ServicesManager():
         return self._services[savedService][ServicesStructure.object]
 
     ####################################################################################
-    def getAllServices(self) -> dict:
+    def getAllServices(self) -> list:
         """
-        Return all registered services as dict
+        Return all registered services as list
         
-        :return: all registered services as dict
-        :rtype: dict
+        :return: all registered services as list
+        :rtype: list
         """
         outDict = copy.deepcopy(self._services)
         for elem in outDict: #remove objects
             outDict[elem].pop(ServicesStructure.object)
 
-        return outDict
+        return list(outDict.values())
 
 
     ######################
