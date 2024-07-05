@@ -39,7 +39,7 @@ def returnFileFromfTetWild(filePath:str):
 @extend_schema(
     summary="Get results from celery worker via ID, dispatch to further handlers",
     description=" ",
-    tags=['Celery'],
+    tags=['BE - Celery'],
     request=None,
     responses={
         200: None,

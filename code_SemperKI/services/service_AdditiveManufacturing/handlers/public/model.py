@@ -52,7 +52,7 @@ class SReqUploadModels(serializers.Serializer):
 @extend_schema(
     summary="File upload for multiple files",
     description=" ",
-    tags=['AM - Models'],
+    tags=['FE - AM Models'],
     request={
         "multipart/form-data": SReqUploadModels
     },	
@@ -183,7 +183,7 @@ def uploadModels(request:Request):
 @extend_schema(
     summary="Delete the model and the file with it, if not done already",
     description=" ",
-    tags=['AM - Models'],
+    tags=['FE - AM Models'],
     request=None,
     responses={
         200: None,
@@ -261,7 +261,7 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
 @extend_schema(
     summary="Converts an uploaded stl file to a file with tetrahedral mesh",
     description=" ",
-    tags=['AM - Models'],
+    tags=['BE - AM Models'],
     request=None,
     responses={
         200: None,
@@ -339,7 +339,7 @@ class SResModelRepository(serializers.Serializer):
 @extend_schema(
     summary="Get previews and file names of 3D models from our curated repository",
     description=" ",
-    tags=['AM - Models'],
+    tags=['FE - AM Models'],
     request=None,
     responses={
         200: SResModelRepository,

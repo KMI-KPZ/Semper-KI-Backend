@@ -42,7 +42,7 @@ loggerError = logging.getLogger("errors")
 @extend_schema(
     summary=" Show how many events (chat messages ...) were missed since last login.",
     description=" ",
-    tags=['Events'],
+    tags=['FE - Events'],
     request=None,
     responses={
         200: None,

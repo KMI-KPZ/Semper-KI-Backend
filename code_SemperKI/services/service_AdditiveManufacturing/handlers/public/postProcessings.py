@@ -60,7 +60,7 @@ class SResPostProcessingsWithFilters(serializers.Serializer):
 @extend_schema(
     summary="Return all postProcessings conforming to the filter",
     description=" ",
-    tags=['AM - Additional Requirements'],
+    tags=['FE - AM Additional Requirements'],
     request=SReqPostProcessingsFilter,
     responses={
         200: SResPostProcessingsWithFilters,
@@ -137,7 +137,7 @@ class SReqSetPostProcessings(serializers.Serializer):
 @extend_schema(
     summary="User selected a postprocessing",
     description=" ",
-    tags=['AM - Additional Requirements'],
+    tags=['FE - AM Additional Requirements'],
     request=SReqSetPostProcessings,
     responses={
         200: None,
@@ -214,7 +214,7 @@ def setPostProcessingSelection(request:Request):
 @extend_schema(
     summary="Remove a prior selected postProcessing from selection",
     description=" ",
-    tags=['AM - Additional Requirements'],
+    tags=['FE - AM Additional Requirements'],
     request=None,
     responses={
         200: None,

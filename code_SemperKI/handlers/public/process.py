@@ -54,7 +54,7 @@ class SResProcessID(serializers.Serializer):
     summary="Create a process ID ",
     description="creates a process ID for a given project id",
     request=None,
-    tags=['Processes'],
+    tags=['FE - Processes'],
     responses={
         200: SResProcessID,
         401: ExceptionSerializer,
@@ -139,7 +139,7 @@ def createProcessID(request:Request, projectID):
     summary="Retrieve complete process.",
     description="Retrieve complete process using projectID and processID ",
     request=None,
-    tags=['Processes'],
+    tags=['FE - Processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -279,7 +279,7 @@ class SReqUpdateProcess(serializers.Serializer):
     summary="Update stuff about the process",
     description=" ",
     request=SReqUpdateProcess,
-    tags=['Processes'],
+    tags=['FE - Processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -378,7 +378,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
     summary="Delete one or more processes",
     description=" ",
     request=None,
-    tags=['Processes'],
+    tags=['FE - Processes'],
     responses={
         200: None,
         401: ExceptionSerializer,
@@ -443,7 +443,7 @@ class SResProcessHistory(serializers.Serializer):
     summary="See who has done what and when",
     description=" ",
     request=None,
-    tags=['Processes'],
+    tags=['FE - Processes'],
     responses={
         200: SResHistoryEntry,
         401: ExceptionSerializer,
@@ -509,7 +509,7 @@ def getProcessHistory(request:Request, processID):
 @extend_schema(
     summary="Get all suitable Contractors",
     description=" ",
-    tags=['Processes'],
+    tags=['FE - Processes'],
     request=None,
     responses={
         200: None,
@@ -588,7 +588,7 @@ class SResCloneProcess(serializers.Serializer):
 @extend_schema(
     summary="Duplicate selected processes. Works only for logged in users.",
     description=" ",
-    tags=['Processes'],
+    tags=['FE - Processes'],
     request=None,
     responses={
         200: SResCloneProcess,

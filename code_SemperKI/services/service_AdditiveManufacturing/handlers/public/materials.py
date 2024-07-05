@@ -57,7 +57,7 @@ class SResMaterialsWithFilters(serializers.Serializer):
 @extend_schema(
     summary="Return all materials conforming to the filter",
     description=" ",
-    tags=['AM - Materials'],
+    tags=['FE - AM Materials'],
     request=SReqMaterialsFilter,
     responses={
         200: SResMaterialsWithFilters,
@@ -136,7 +136,7 @@ class SReqSetMaterial(serializers.Serializer):
 @extend_schema(
     summary="User selected a material",
     description=" ",
-    tags=['AM - Materials'],
+    tags=['FE - AM Materials'],
     request=SReqSetMaterial,
     responses={
         200: None,
@@ -213,7 +213,7 @@ def setMaterialSelection(request:Request):
 @extend_schema(
     summary="Remove a prior selected material from selection",
     description=" ",
-    tags=['AM - Materials'],
+    tags=['FE - AM Materials'],
     request=None,
     responses={
         200: None,

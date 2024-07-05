@@ -43,7 +43,7 @@ logger = logging.getLogger("logToFile")
 @extend_schema(
     summary="Get all Projects in flat format.",
     description=" ",
-    tags=['Admin'],
+    tags=['FE - Admin'],
     request=None,
     responses={
         200: None,
@@ -85,7 +85,7 @@ def getAllProjectsFlatAsAdmin(request:Request):
 @extend_schema(
     summary="Get all info for a specific project.",
     description=" ",
-    tags=['Admin'],
+    tags=['FE - Admin'],
     request=None,
     responses={
         200: None,

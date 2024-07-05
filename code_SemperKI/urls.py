@@ -46,18 +46,18 @@ newPaths= {
     "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
     "saveProjects": ("public/project/save/", project.saveProjects),
 
-    "getProcess": ("public/process/get/process/<str:projectID>/<str:processID>/", process.getProcess),
+    "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
     "deleteProcesses": ("public/process/delete/<str:projectID>/", process.deleteProcesses), 
-    "getProcessHistory": ("public/process/get/history/<str:processID>/", process.getProcessHistory),
-    "getContractors": ("public/process/get/contractors/<str:processID>/", process.getContractors),
+    "getProcessHistory": ("public/process/history/get/<str:processID>/", process.getProcessHistory),
+    "getContractors": ("public/process/contractors/get/<str:processID>/", process.getContractors),
 
-    "getStateMachine": ("private/states/get/machine/", statemachine.getStateMachine), 
-    "statusButtonRequest": ("public/states/get/buttons/", statemachine.statusButtonRequest), 
+    "getStateMachine": ("private/states/machine/get/", statemachine.getStateMachine), 
+    "statusButtonRequest": ("public/states/buttons/get/", statemachine.statusButtonRequest), 
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
-    "getMissedEvents": ("public/events/get/missed/", events.getMissedEvents),
+    "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
