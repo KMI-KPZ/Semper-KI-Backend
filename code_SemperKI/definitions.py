@@ -108,7 +108,8 @@ class ProcessDetails(StrEnumExactylAsDefined):
     provisionalContractor = enum.auto()
     amount = enum.auto()
     title = enum.auto()
-    clientAdress = enum.auto()
+    clientBillingAddress = enum.auto()
+    clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
 
 

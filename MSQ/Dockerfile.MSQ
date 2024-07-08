@@ -7,4 +7,11 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install -r requirements.txt
+COPY requirements.txt /app/
+RUN --mount=type=cache,target=/root/.cache \
+    pip install -r requirements.txt
+
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc bash iputils-ping curl gawk libgmp-dev git cmake
+
+

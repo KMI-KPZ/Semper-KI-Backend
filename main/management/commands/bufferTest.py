@@ -6,7 +6,7 @@ from boto3.s3.transfer import TransferConfig
 from django.core.management.base import BaseCommand
 from Generic_Backend.code_General.connections.s3 import manageRemoteS3, manageLocalS3
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
-from code_SemperKI.handlers.files import moveFileToRemote
+from code_SemperKI.handlers.public.files import moveFileToRemote
 
 logging = getLogger("django_debug")
 

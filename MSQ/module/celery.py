@@ -38,7 +38,7 @@ app.autodiscover_tasks(lambda: ['code_SemperKI'])
 app.autodiscover_tasks(['MSQ.tasks'])
 
 ########################################################################
-def request_task(id):
+def request_task(id:str):
     """
     Communicate to backend, that task is finished
 
@@ -50,7 +50,7 @@ def request_task(id):
 
 
 ########################################################################
-def fire_and_forget(id):
+def fire_and_forget(id:str):
     """
     Send out request but don't await answer
 
@@ -70,6 +70,5 @@ def task_success_handler(sender=None, result=None, **kwargs):
     # print(
     #     f"Task {sender}, ############################### succeeded with result: {result}, {sender.request}"
     # )
-
     # send out that task is finished without awaiting response
     fire_and_forget(sender.request.id)

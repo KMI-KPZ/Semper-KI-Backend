@@ -31,7 +31,7 @@ class StructuredSession():
 
     """
 
-    currentSession = {}
+    currentSession : dict = {}
 
     #######################################################
     def __init__(self, session) -> None:
@@ -145,9 +145,10 @@ class StructuredSession():
         :rtype: dict
 
         """
-
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
-
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
+        else:
+            return {}
 ###################################################################
     #######################################################
     def getProcess(self, projectID:str, processID:str):
@@ -162,9 +163,10 @@ class StructuredSession():
         :rtype: Dict
 
         """
-
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
-
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
+        else:
+            return {}
     #######################################################
     def getProcessPerID(self, processID:str):
         """
@@ -415,7 +417,8 @@ class ProcessManagementSession(AbstractContentInterface):
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
                 allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
-                del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
+                if SessionContentSemperKI.processes in allProjects[idx]:
+                    del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
             
             return allProjects
         except (Exception) as error:
@@ -423,7 +426,7 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     #######################################################
-    def getProcessObj(self, projectID:str, processID:str):
+    def getProcessObj(self, projectID:str, processID:str) -> ProcessInterface:
         """
         Return the process and all its details
 
@@ -545,7 +548,8 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             currentProcess = self.structuredSessionObj.getProcessPerID(processID)
             files = currentProcess[ProcessDescription.files]
-            for fileObj in files:
+            for fileKey in files:
+                fileObj = files[fileKey]
                 if fileObj[FileObjectContent.remote]:
                     s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
                 else:

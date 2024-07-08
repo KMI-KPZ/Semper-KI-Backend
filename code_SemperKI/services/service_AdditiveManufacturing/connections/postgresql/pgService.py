@@ -28,14 +28,26 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
 
     try:
         for entry in newContent:
-            if entry == ServiceDetails.model:
-                existingContent[ServiceDetails.model] = newContent[entry]
-            elif entry == ServiceDetails.material:
-                existingContent[ServiceDetails.material] = newContent[entry]
+            if entry == ServiceDetails.models:
+                if existingContent == {} or ServiceDetails.models not in existingContent:
+                    existingContent[ServiceDetails.models] = {}
+                for fileID in newContent[ServiceDetails.models]:    
+                    existingContent[ServiceDetails.models][fileID] = newContent[entry][fileID]
+            elif entry == ServiceDetails.materials:
+                #if existingContent == {} or ServiceDetails.materials not in existingContent:
+                existingContent[ServiceDetails.materials] = {}
+                for materialID in newContent[ServiceDetails.materials]:
+                    existingContent[ServiceDetails.materials][materialID] = newContent[entry][materialID]
             elif entry == ServiceDetails.postProcessings:
-                existingContent[ServiceDetails.postProcessings] = newContent[entry]
+                #if existingContent == {} or ServiceDetails.postProcessings not in existingContent:
+                existingContent[ServiceDetails.postProcessings] = {}
+                for postProcessingID in newContent[ServiceDetails.postProcessings]:
+                    existingContent[ServiceDetails.postProcessings][postProcessingID] = newContent[entry][postProcessingID]
             elif entry == ServiceDetails.calculations:
-                existingContent[ServiceDetails.calculations] = newContent[entry]
+                if existingContent == {} or ServiceDetails.calculations not in existingContent:
+                    existingContent[ServiceDetails.calculations] = {}
+                for fileID in newContent[ServiceDetails.calculations]:
+                    existingContent[ServiceDetails.calculations][fileID] = newContent[entry][fileID]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -59,16 +71,20 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
 
     try:
         for entry in deletedContent:
-            if entry == ServiceDetails.model:
-                del existingContent[ServiceDetails.model]
+            if entry == ServiceDetails.models:
+                for fileID in deletedContent[ServiceDetails.models]:
+                    del existingContent[ServiceDetails.models][fileID]
                 if ServiceDetails.calculations in existingContent:
-                    del existingContent[ServiceDetails.calculations] # invalidate calculations since the model doesn't exist anymore
-            elif entry == ServiceDetails.material:
-                del existingContent[ServiceDetails.material]
+                    del existingContent[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
+            elif entry == ServiceDetails.materials:
+                for materialID in deletedContent[ServiceDetails.materials]:
+                    del existingContent[ServiceDetails.materials][materialID]
             elif entry == ServiceDetails.postProcessings:
-                del existingContent[ServiceDetails.postProcessings]
+                for postProcessingsID in deletedContent[ServiceDetails.postProcessings]:
+                    del existingContent[ServiceDetails.postProcessings][postProcessingsID]
             elif entry == ServiceDetails.calculations:
-                del existingContent[ServiceDetails.calculations]
+                for fileID in deletedContent[ServiceDetails.calculations]:
+                    del existingContent[ServiceDetails.calculations][fileID]
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -91,12 +107,15 @@ def serviceReady(existingContent:dict) -> bool:
     try:
         checks = 0
         for entry in existingContent:
-            if entry == ServiceDetails.model and FileObjectContent.id in existingContent[ServiceDetails.model]:
-                checks += 1
-            elif entry == ServiceDetails.material and len(existingContent[ServiceDetails.material]) > 0:
-                checks += 1
-            elif entry == ServiceDetails.postProcessings and len(existingContent[ServiceDetails.postProcessings]) > 0:
-                checks += 0 # optional
+            if entry == ServiceDetails.models:
+                if len(existingContent[ServiceDetails.models]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.materials:
+                if len(existingContent[ServiceDetails.materials]) > 0:
+                    checks += 1
+            elif entry == ServiceDetails.postProcessings:
+                if len(existingContent[ServiceDetails.postProcessings]) > 0:
+                    checks += 0 # optional
             else:
                 raise NotImplementedError("This service detail does not exist (yet).")
             
@@ -121,20 +140,21 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
     try:
         outDict = {}
 
-        # create new model file but with the content of the old one (except path and such)
-        outDict[ServiceDetails.model] = {}
-        if ServiceDetails.model in existingContent:
-            oldModel = existingContent[ServiceDetails.model]
+        # create new model file but with the content of the old one (except path and such), also carry calculations over
+        if ServiceDetails.models in existingContent:
+            outDict[ServiceDetails.models] = {}
+            if ServiceDetails.calculations in existingContent:
+                outDict[ServiceDetails.calculations] = {}
+            oldModels = existingContent[ServiceDetails.models]
             for fileKey in newProcess.files:
-                if fileKey == oldModel[FileObjectContent.id]:
-                    outDict[ServiceDetails.model] = newProcess.files[fileKey]
-                    break
+                if fileKey in oldModels:
+                    outDict[ServiceDetails.models][fileKey] = newProcess.files[fileKey]
+                    if fileKey in existingContent[ServiceDetails.calculations]:
+                        outDict[ServiceDetails.calculations][fileKey] = existingContent[ServiceDetails.calculations][fileKey]
         
         # the rest can just be copied over
-        if ServiceDetails.material in existingContent:
-            outDict[ServiceDetails.material] = existingContent[ServiceDetails.material]
-        if ServiceDetails.calculations in existingContent:
-            outDict[ServiceDetails.calculations] = existingContent[ServiceDetails.calculations]
+        if ServiceDetails.materials in existingContent:
+            outDict[ServiceDetails.materials] = existingContent[ServiceDetails.materials]
         if ServiceDetails.postProcessings in existingContent:
             outDict[ServiceDetails.postProcessings] = existingContent[ServiceDetails.postProcessings]
     

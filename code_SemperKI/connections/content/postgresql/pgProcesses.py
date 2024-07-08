@@ -12,13 +12,13 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from Generic_Backend.code_General.utilities import basics
-from Generic_Backend.code_General.modelFiles.userModel import User
+from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults
+from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import findFirstOccurence
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
 
 
 from ....modelFiles.projectModel import Project, ProjectInterface
@@ -1003,6 +1003,20 @@ class ProcessManagementBase(AbstractContentInterface):
                     messages = process[ProcessDescription.messages]
                     dependenciesIn = process[ProcessDescription.dependenciesIn]
                     dependenciesOut = process[ProcessDescription.dependenciesOut]
+
+                    # add addresses
+                    clientObject = ProfileManagementBase.getUser(session)
+                    defaultAddress = {}
+                    if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                        clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                        for key in clientAddresses:
+                            entry = clientAddresses[key]
+                            if entry["standard"]:
+                                defaultAddress = entry
+                                break
+                    processDetails[ProcessDetails.clientDeliverAddress] = defaultAddress
+                    processDetails[ProcessDetails.clientBillingAddress] = defaultAddress
+                    
 
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
                     listOfProcessObjects.append( (processObj, dependenciesIn, dependenciesOut) )

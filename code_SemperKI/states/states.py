@@ -8,14 +8,16 @@ Contains: State machine with states
 """
 
 
+import copy
 import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.utilities.basics import Logging
+from Generic_Backend.code_General.definitions import Logging
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
-import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+import code_SemperKI.utilities.websocket as WebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBInterface
 import code_SemperKI.modelFiles.processModel as ProcessModel
@@ -34,12 +36,12 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def getButtonsForProcess(processStatusCode, client=True, admin=False) -> None: #is changed in place
+def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, admin=False) -> None: #is changed in place
     """
     Look at process status of every process of a project and add respective buttons
 
-    :param processStatusCode: The current status of the process in question
-    :type processStatusCode: int
+    :param process: The current process in question
+    :type process: ProcessModel.Process|ProcessModel.ProcessInterface
     :param client: Whether the current user is the client or the contractor
     :type client: Bool
     :param admin: Whether the current user is an admin (which may see all buttons) or not
@@ -49,8 +51,8 @@ def getButtonsForProcess(processStatusCode, client=True, admin=False) -> None: #
 
     """
 
-    processStatusAsString = processStatusFromIntToStr(processStatusCode)
-    return stateDict[processStatusAsString].buttons(client, admin)
+    processStatusAsString = processStatusFromIntToStr(process.processStatus)
+    return stateDict[processStatusAsString].buttons(process, client, admin)
 
 #######################################################
 def getFlatStatus(processStatusCode:int, client=True) -> str:
@@ -240,7 +242,7 @@ class State(ABC):
         pass
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -282,7 +284,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -311,7 +313,7 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    PPManagement.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
                     break #TODO: Ensure that only one transition is possible 
             
             return returnState
@@ -401,7 +403,7 @@ class DRAFT(State):
     name = ProcessStatusAsString.DRAFT
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         None
         """
@@ -482,14 +484,14 @@ class SERVICE_IN_PROGRESS(State):
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Back to draft
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -512,6 +514,20 @@ class SERVICE_IN_PROGRESS(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
+                "icon": IconType.FactoryIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
+                    },
+                },
+                "active": False,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
             }
         ]
     
@@ -604,14 +620,14 @@ class SERVICE_READY(State):
     name = ProcessStatusAsString.SERVICE_READY
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
-        Choose contractor
+        Finish this service and go to overview
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -636,11 +652,14 @@ class SERVICE_READY(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.CONTRACTOR_SELECTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
                 "icon": IconType.FactoryIcon,
                 "action": {
-                    "type": "navigation",
-                    "to": "contractorSelection",
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
+                    },
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
@@ -665,16 +684,25 @@ class SERVICE_READY(State):
     
     ###################################################
     # Transitions
-    ###################################################
-    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        SERVICE_READY | CONTRACTOR_SELECTED:
+    ##################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
         """
-        Contractor was Selected
+        Service changed	
+        """
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        else:
+            return self
+        
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Service is completely defined
 
         """
-        if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "":
-            return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
-        return self
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
     
     ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -702,8 +730,156 @@ class SERVICE_READY(State):
         return stateDict[ProcessStatusAsString.DRAFT]
     
     ###################################################
-    updateTransitions = [to_SERVICE_COMPLICATION, to_CONTRACTOR_SELECTED]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT}
+    updateTransitions = [to_SERVICE_COMPLICATION, to_SERVICE_IN_PROGRESS]
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface,process)
+        
+    ###################################################
+    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process)
+
+#######################################################
+class SERVICE_COMPLETED(State):
+    """
+    Service is ready and has been declared as completely described
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
+    name = ProcessStatusAsString.SERVICE_COMPLETED
+
+    ###################################################
+    def checkIfButtonIsActive(self, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        """
+        Check if all requirements are met for the state to advance
+
+        :param process: The process containing the information
+        :type process: ProcessModel.Process | ProcessModel.ProcessInterface
+        :return: True if conditions are met, false if not
+        :rtype: Bool
+        """
+        return ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
+            and ProcessDetails.clientBillingAddress in process.processDetails and process.processDetails[ProcessDetails.clientBillingAddress] != {} \
+            and ProcessDetails.clientDeliverAddress in process.processDetails and process.processDetails[ProcessDetails.clientDeliverAddress] != {}       
+
+    ###################################################
+    def buttons(self, process, client=True, admin=False) -> list:
+        """
+        Choose contractor
+
+        """
+        buttonsList = [
+            {
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
+                "icon": IconType.ArrowBackIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "backstepStatus",
+                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
+                    },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.secondary,
+                "showIn": "process",
+            },
+            {
+                "title": ButtonLabels.DELETE,
+                "icon": IconType.DeleteIcon,
+                "action": {
+                    "type": "request",
+                    "data": { "type": "deleteProcess" },
+                },
+                "active": True,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "project",
+            },
+            {
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
+                "icon": IconType.DoneAllIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                    },
+                },
+                "active": False,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "process",
+            },
+        ]
+        
+        if self.checkIfButtonIsActive(process):
+            buttonsList[2]["active"] = True #set forward button to active
+
+        return buttonsList
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+
+    # Transitions
+    ###################################################
+    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY | CONTRACTOR_SELECTED:
+        """
+        Contractor was selected
+
+        """
+        if self.checkIfButtonIsActive(process):
+            return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
+        return self
+    
+    ###################################################
+    def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+        """
+        Service Conditions not OK
+
+        """
+        if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
+            return self
+        else:
+            return stateDict[ProcessStatusAsString.SERVICE_COMPLICATION]
+        
+    ##################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+        else:
+            return self
+    
+    ###################################################
+    def to_SERVICE_READY_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -724,14 +900,14 @@ class WAITING_FOR_OTHER_PROCESS(State):
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -861,7 +1037,7 @@ class SERVICE_COMPLICATION(State):
     name = ProcessStatusAsString.SERVICE_COMPLICATION
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Back to Draft
 
@@ -879,7 +1055,7 @@ class SERVICE_COMPLICATION(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.SERVICE_COMPLICATION,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
                 "icon": IconType.TroubleshootIcon,
                 "action": {
                     "type": "request",
@@ -955,27 +1131,27 @@ class SERVICE_COMPLICATION(State):
 #######################################################
 class CONTRACTOR_SELECTED(State):
     """
-    Contractor has been chosen
+    Contractor has been chosen (opens page for verification in frontend)
     """
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_SELECTED)
     name = ProcessStatusAsString.CONTRACTOR_SELECTED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for  CONTRACTOR_SELECTED
+        Buttons for  CONTRACTOR_SELECTED 
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
                     },
                 },
                 "active": True,
@@ -994,7 +1170,7 @@ class CONTRACTOR_SELECTED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.VERIFYING,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
                 "icon": IconType.TaskIcon,
                 "action": {
                     "type": "request",
@@ -1028,8 +1204,9 @@ class CONTRACTOR_SELECTED(State):
     # Transitions
     ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONTRACTOR_SELECTED | VERIFYING: # TODO: Change to current and next state
+          VERIFYING: 
         """
+        Starts verification
         From: CONTRACTOR_SELECTED
         To: VERIFYING
 
@@ -1038,18 +1215,17 @@ class CONTRACTOR_SELECTED(State):
         return stateDict[ProcessStatusAsString.VERIFYING]
 
     ###################################################
-    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_READY:
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          SERVICE_COMPLETED:
         """
-        To: SERVICE_READY
+        To: SERVICE_COMPLETED
         
         """
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
-        return stateDict[ProcessStatusAsString.SERVICE_READY]
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.VERIFYING: to_VERIFYING}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1070,14 +1246,14 @@ class VERIFYING(State):
     name = ProcessStatusAsString.VERIFYING
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for VERIFYING
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -1100,6 +1276,20 @@ class VERIFYING(State):
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
                 "showIn": "project",
+            },
+            { # this button shall not do anything
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
+                "icon": IconType.MailIcon,
+                "action": {
+                    "type": "request",
+                    "data": {
+                        "type": "forwardStatus",
+                        "targetStatus": ProcessStatusAsString.VERIFYING,
+                    },
+                },
+                "active": False,
+                "buttonVariant": ButtonTypes.primary,
+                "showIn": "both",
             }
         ] 
     
@@ -1139,7 +1329,6 @@ class VERIFYING(State):
         To: CONTRACTOR_SELECTED
         
         """
-        # TODO Cancel verification
         return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
 
     ###################################################
@@ -1164,14 +1353,14 @@ class VERIFIED(State):
     name = ProcessStatusAsString.VERIFIED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Manual Request
 
         """
         return [
             {
-                "title": ButtonLabels.BACK,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
@@ -1196,7 +1385,7 @@ class VERIFIED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.REQUESTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
                 "icon": IconType.MailIcon,
                 "action": {
                     "type": "request",
@@ -1274,7 +1463,7 @@ class REQUESTED(State):
     name = ProcessStatusAsString.REQUESTED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for REQUESTED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
@@ -1308,7 +1497,7 @@ class REQUESTED(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.CLARIFICATION,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CLARIFICATION,
                     "icon": IconType.QuestionAnswerIcon,
                     "action": {
                         "type": "request",
@@ -1322,7 +1511,7 @@ class REQUESTED(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1336,7 +1525,7 @@ class REQUESTED(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1434,7 +1623,7 @@ class CLARIFICATION(State):
     name = ProcessStatusAsString.CLARIFICATION
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for CLARIFICATION
 
@@ -1457,7 +1646,7 @@ class CLARIFICATION(State):
         if not client or admin:
             outArr.extend([
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1471,7 +1660,7 @@ class CLARIFICATION(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1554,7 +1743,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for CONFIRMED_BY_CONTRACTOR, no Back-Button
 
@@ -1574,7 +1763,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.CONFIRMED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CLIENT,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -1588,7 +1777,7 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.REJECTED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CLIENT,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -1675,7 +1864,7 @@ class REJECTED_BY_CONTRACTOR(State):
     name = ProcessStatusAsString.REJECTED_BY_CONTRACTOR
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         No Buttons only CANCELED
 
@@ -1751,7 +1940,7 @@ class CONFIRMED_BY_CLIENT(State):
     name = ProcessStatusAsString.CONFIRMED_BY_CLIENT
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for CONFIRMED_BY_CLIENT, no Back-Button
 
@@ -1774,7 +1963,7 @@ class CONFIRMED_BY_CLIENT(State):
         if not client or admin:
             outArr.extend( [
                 {
-                    "title": ButtonLabels.PRODUCTION,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION,
                     "icon": IconType.FactoryIcon,
                     "action": {
                         "type": "request",
@@ -1843,7 +2032,7 @@ class REJECTED_BY_CLIENT(State):
     name = ProcessStatusAsString.REJECTED_BY_CLIENT
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         No Buttons only CANCELED
 
@@ -1919,7 +2108,7 @@ class PRODUCTION(State):
     name = ProcessStatusAsString.PRODUCTION
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for PRODUCTION, no Back-Button
 
@@ -1942,7 +2131,7 @@ class PRODUCTION(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.DELIVERY,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY,
                     "icon": IconType.LocalShippingIcon,
                     "action": {
                         "type": "request",
@@ -1956,7 +2145,7 @@ class PRODUCTION(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -2039,7 +2228,7 @@ class DELIVERY(State):
     name = ProcessStatusAsString.DELIVERY
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for DELIVERY, no Back-Button
 
@@ -2059,7 +2248,7 @@ class DELIVERY(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.COMPLETED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -2073,7 +2262,7 @@ class DELIVERY(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.DISPUTE,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
                     "icon": IconType.TroubleshootIcon,
                     "action": {
                         "type": "request",
@@ -2087,7 +2276,7 @@ class DELIVERY(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -2192,7 +2381,7 @@ class DISPUTE(State):
     name = ProcessStatusAsString.DISPUTE
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
@@ -2212,7 +2401,7 @@ class DISPUTE(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.COMPLETED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
@@ -2226,7 +2415,7 @@ class DISPUTE(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FAILED,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
@@ -2316,7 +2505,7 @@ class COMPLETED(State):
     name = ProcessStatusAsString.COMPLETED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -2389,7 +2578,7 @@ class FAILED(State):
     name = ProcessStatusAsString.FAILED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -2462,7 +2651,7 @@ class CANCELED(State):
     name = ProcessStatusAsString.CANCELED
 
     ###################################################
-    def buttons(self, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, admin=False) -> list:
         """
         Delete and clone (client only)
 

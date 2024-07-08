@@ -69,4 +69,15 @@ class CreateModel(Semper.ServiceBase):
         """
         return CM_cloneServiceDetails(existingContent, newProcess)
 
-Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())
+    ###################################################
+    def getFilteredContractors(self, processObj) -> list:
+        """
+        Get a list of contractors that can do the job
+
+        """
+        return []
+
+SERVICE_NAME = "CREATE_MODEL"
+SERVICE_NUMBER = 2
+
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, CreateModel())

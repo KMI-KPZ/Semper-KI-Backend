@@ -28,58 +28,52 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import projectAndProcessManagement, testResponse, frontpage, sparqlQueries, files, admin, manageServices
+from .handlers import frontpage
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
+from .handlers.private import testResponse
 from MSQ.handlers import interface
 
 newPaths= {
-    "rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
-    #"rest-test2": ("public/resttest2/", testResponse.restTestAPI.as_view()),
-    "schema": ('api/schema/', SpectacularAPIView.as_view()),
-    "swagger-ui": ('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
+    #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
+    #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
+    "schema": ('private/schema/', SpectacularAPIView.as_view(api_version='0.3')),
+    "swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
+    
+    "createProjectID": ('public/project/create/', project.createProjectID), 
+    "getProject": ("public/project/get/<str:projectID>/",project.getProject),
+    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
+    "updateProject": ("public/project/update/" ,project.updateProject),
+    "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
+    "saveProjects": ("public/project/save/", project.saveProjects),
 
-    "getContractors": ("public/getContractors/<str:processID>/",projectAndProcessManagement.getContractors),
-    "saveProjects": ("public/saveProjects/",projectAndProcessManagement.saveProjects),
-    #"retrieveProjects": ("public/retrieveProjects/",projectAndProcessManagement.retrieveProjects),
-    "getMissedEvents": ("public/getMissedEvents/",projectAndProcessManagement.getMissedEvents),
-    "createProjectID": ("public/createProjectID/",projectAndProcessManagement.createProjectID),
-    "getProject": ("public/getProject/<projectID>/",projectAndProcessManagement.getProject),
-    "getFlatProjects": ("public/getFlatProjects/", projectAndProcessManagement.getFlatProjects),
-    "getProcess": ("public/getProcess/<projectID>/<processID>/",projectAndProcessManagement.getProcess),
-    "createProcessID": ("public/createProcessID/<projectID>/",projectAndProcessManagement.createProcessID),
-    "updateProcess": ("public/updateProcess/",projectAndProcessManagement.updateProcess),
-    "updateProject": ("public/updateProject/",projectAndProcessManagement.updateProject),
-    "deleteProcesses": ("public/deleteProcesses/<projectID>/",projectAndProcessManagement.deleteProcesses),
-    "deleteProjects": ("public/deleteProjects/",projectAndProcessManagement.deleteProjects),
-    #"verifyProject": ("public/verifyProject/",projectAndProcessManagement.verifyProject),
-    #"sendProject": ("public/sendProject/",projectAndProcessManagement.sendProject),
-    "getProcessHistory": ("public/getProcessHistory/<processID>/",projectAndProcessManagement.getProcessHistory),
-    "statusButtonRequest": ("public/statusButtonRequest/",projectAndProcessManagement.statusButtonRequest),
-    "getStateMachine": ("private/getStateMachine/", projectAndProcessManagement.getStateMachine),
+    "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
+    "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
+    "updateProcess": ("public/process/update/", process.updateProcess), 
+    "deleteProcesses": ("public/process/delete/<str:projectID>/", process.deleteProcesses), 
+    "getProcessHistory": ("public/process/history/get/<str:processID>/", process.getProcessHistory),
+    "getContractors": ("public/process/contractors/get/<str:processID>/", process.getContractors),
 
-    "getServices": ("public/getServices/",manageServices.getServices),
+    "getStateMachine": ("private/states/machine/get/", statemachine.getStateMachine), 
+    "statusButtonRequest": ("public/states/buttons/get/", statemachine.statusButtonRequest), 
+
+    "getServices": ("public/services/get/", miscellaneous.getServices), 
+    "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
+
+    "uploadFiles": ("public/files/upload/",files.uploadFiles),
+    "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
+    "downloadFilesAsZip": ("public/files/download/zip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
+    "deleteFile": ("public/files/delete/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
+    "downloadProcessHistory": ("public/files/download/history/<str:processID>/", files.downloadProcessHistory), 
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
-    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<projectID>/",admin.getSpecificProjectAsAdmin),
+    "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
 
-    "isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
-    "checkVersion": ("public/checkVersion/", frontpage.checkVersionOfFrontend),
-
-    "testQuery": ("private/testquery/",sparqlQueries.sendTestQuery),
-    "sendQuery": ("private/sendQuery/",sparqlQueries.sendQuery),
-    "testQuerySize": ("private/query/",frontpage.sparqlPage),
-    "testCoypu": ("public/coypu/",sparqlQueries.sendQueryCoypu),
-
-    "uploadFiles": ("public/uploadFiles/",files.uploadFiles),
-    #"downloadFile": ("public/downloadFile/<processID>/<fileID>/",files.downloadFile),
-    "downloadFile": ("public/downloadFile/<projectID>/<processID>/<fileID>/",files.downloadFileStream),
-    "downloadFilesAsZip": ("public/downloadFilesAsZip/<projectID>/<processID>/",files.downloadFilesAsZip),
-    "deleteFile": ("public/deleteFile/<projectID>/<processID>/<fileID>/",files.deleteFile),
-    "downloadProcessHistory": ("public/downloadProcessHistory/<projectID>/<processID>/",files.downloadProcessHistory),
+    #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),
-    "getResultsBackLocal": ("private/getResultsLocal/<taskID>/", interface.getResultsBack),
+    "getResultsBackLocal": ("private/getResultsLocal/<str:taskID>/", interface.getResultsBack),
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
-    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal),
+    "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
 }
 
@@ -92,5 +86,3 @@ for entry in newPaths:
     urlpatterns.append(path(pathItself, handler, name=key))
 
 paths.update(newPaths)
-
-

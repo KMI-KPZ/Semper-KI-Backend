@@ -8,6 +8,7 @@ Contains: Handlers managing the projects and processes
 
 import json, logging, copy
 from datetime import datetime
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -18,14 +19,14 @@ from channels.layers import get_channel_layer
 
 from Generic_Backend.code_General.utilities import crypto, rights
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation, Logging
+from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent, OrganizationDescription, UserDescription, GlobalDefaults, Logging, UserDetails
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin, manualCheckIfRightsAreSufficient, manualCheckIfRightsAreSufficientForSpecificOperation
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from ..connections.content.postgresql import pgProcesses
 from ..definitions import *
 from ..serviceManager import serviceManager
-from ..utilities.basics import manualCheckIfUserMaySeeProcess, checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProject
+from ..utilities.basics import *
 from ..states.states import processStatusAsInt, ProcessStatusAsString, StateMachine, getButtonsForProcess, InterfaceForStateChange, signalDependencyToOtherProcesses, getFlatStatus
 from ..connections.content.manageContent import ManageContent
 
@@ -244,6 +245,20 @@ def createProcessID(request, projectID):
         
         client = contentManager.getClient()
         interface.createProcess(projectID, processID, client)
+
+        # set default addresses here
+        if manualCheckifLoggedIn(request.session):
+            clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
+            defaultAddress = {}
+            if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                for key in clientAddresses:
+                    entry = clientAddresses[key]
+                    if entry["standard"]:
+                        defaultAddress = entry
+                        break
+            addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
+            interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -646,11 +661,14 @@ def getProcess(request, projectID, processID):
             logger.error("Rights not sufficient in getProject")
             return JsonResponse({}, status=401)
 
-        process = interface.getProcess(projectID, processID)
-        if process != {}:
-            buttons = getButtonsForProcess(process[ProcessDescription.processStatus], process[ProcessDescription.client] == userID, adminOrNot) # calls current node of the state machine
-            process["processStatusButtons"] = buttons
-        return JsonResponse(process)
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            raise process
+
+        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
+        outDict = process.toDict()
+        outDict["processStatusButtons"] = buttons
+        return JsonResponse(outDict)
 
     except (Exception) as error:
         loggerError.error(f"getProcess: {str(error)}")
@@ -754,23 +772,30 @@ def getContractors(request, processID:str):
         processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
         if processObj == None:
             raise Exception("Process ID not found in session or db")
- 
         serviceType = processObj.serviceType
+        service = serviceManager.getService(processObj.serviceType)
 
+        listOfFilteredContractors = service.getFilteredContractors(processObj)
+        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
+        # Therefore parse it
+        listOfResultingContractors = []
+        for contractor in listOfFilteredContractors:
+            idOfContractor = contractor["ID"]["value"]
+            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
+            if isinstance(contractorContentFromDB, Exception):
+                raise contractorContentFromDB
+            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name]+"_filtered",
+                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
+            listOfResultingContractors.append(contractorToBeAdded)
+        
+        if len(listOfFilteredContractors) == 0 or settings.DEBUG:
+            listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
-        listOfAllContractors = pgProcesses.ProcessManagementBase.getAllContractors(serviceType)
-        # TODO Check suitability
-
-        # remove unnecessary information and add identifier
-        # for idx, elem in enumerate(listOfAllContractors):
-        #     contractorList.append({})
-        #     contractorList[idx]["name"] = elem["name"]
-        #     contractorList[idx]["id"] = elem["hashedID"]
-
-        return JsonResponse(listOfAllContractors, safe=False)
+        return JsonResponse(listOfResultingContractors, safe=False)
     except (Exception) as error:
         loggerError.error(f"getContractors: {str(error)}")
-        return error
+        return HttpResponse(error, status=500)
 
 #######################################################
 def saveProjectsViaWebsocket(session):
