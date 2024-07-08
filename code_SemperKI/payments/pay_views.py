@@ -15,6 +15,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
+from ..utilities.serializer import ExceptionSerializer
 
 ###################################################################
 
@@ -34,13 +35,31 @@ from drf_spectacular.utils import OpenApiParameter
         500: ExceptionSerializer
     }
 )
+@api_view(['GET'])
 def create_order(request):
     amount = request.GET.get('amount', '10.00')  # Default amount
     currency = request.GET.get('currency', 'USD')  # Default currency
     order = create_paypal_order(amount, currency)
-    return JsonResponse(order)
+    return Response(order)
 
 #################################################################
+#########################################################################
+# capture_order
+#########################################################################
+#TODO Add serializer for capture_order
+#########################################################################
+# Handler
+@extend_schema(
+    summary='Capture an order',
+    description='Create an order',
+    tags=['payments'],
+    request=None,
+    responses={
+        200: None,
+        500: ExceptionSerializer
+    }
+)
+@api_view(['GET'])
 def capture_order(request, order_id):
     capture = capture_paypal_order(order_id)
-    return JsonResponse(capture)
+    return Response(capture)
