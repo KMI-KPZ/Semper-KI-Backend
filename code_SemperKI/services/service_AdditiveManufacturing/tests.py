@@ -97,11 +97,11 @@ class TestAdditiveManufacturing(TestCase):
         getProjPathSplit = paths["getProject"][0].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.model]) > 0, True)
+        self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
 
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
         deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True)
         response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(ServiceDetails.model not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)
+        self.assertIs(ServiceDetails.models not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)

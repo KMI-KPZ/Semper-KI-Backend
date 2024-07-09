@@ -13,5 +13,7 @@ services:
       - .:/app
     networks:
       - semper-ki-dev-network
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
 networks:
     semper-ki-dev-network:

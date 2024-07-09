@@ -17,13 +17,13 @@ from django.utils import timezone
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.definitions import FileObjectContent
-from Generic_Backend.code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.definitions import FileObjectContent, Logging
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates, DataType, DataDescription
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction, getProcessAndProjectFromSession
 from code_SemperKI.connections.content.postgresql import pgProcesses
-from code_SemperKI.handlers.files import deleteFile
+from code_SemperKI.handlers.public.files import deleteFile
 from code_SemperKI.connections.content.manageContent import ManageContent
 
 from ..definitions import ServiceDetails
@@ -50,7 +50,7 @@ def uploadModel(request):
         processID = info["processID"]
 
         content = ManageContent(request.session)
-        interface = content.getCorrectInterface(uploadModel.__name__)
+        interface = content.getCorrectInterface(uploadModel.cls.__name__)
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
         else:
@@ -86,7 +86,7 @@ def uploadModel(request):
             if returnVal is not True:
                 return JsonResponse({}, status=500)
         
-        changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.model: model[fileID]}}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: model[fileID]}, ProcessUpdates.serviceDetails: {ServiceDetails.models: model[fileID]}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -121,18 +121,18 @@ def deleteModel(request, projectID, processID):
     try:
         # TODO maybe rewrite to support multiple model files
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteModel.__name__)
+        interface = contentManager.getCorrectInterface(deleteModel.cls.__name__)
         if interface == None:
             return HttpResponse("Not logged in or rights insufficient!", status=401)
         currentProcess = interface.getProcessObj(projectID, processID)
-        modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.model]
+        modelOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
         if modelOfThisProcess[FileObjectContent.id] in currentProcess.files:
             modelExistsAsFile = True
             
         if modelExistsAsFile:
             deleteFile(request, projectID, processID, modelOfThisProcess[FileObjectContent.id])
         
-        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.model: modelOfThisProcess[FileObjectContent.id]}}}
+        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.models: modelOfThisProcess[FileObjectContent.id]}}}
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
             return HttpResponse("Insufficient rights!", status=401)

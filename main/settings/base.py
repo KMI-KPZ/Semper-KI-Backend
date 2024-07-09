@@ -116,7 +116,7 @@ class BackendConfigHelper(ConfigHelper):
         'REDIS_PASSWORD': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': "redis_pw", 'required': True},
 
         # Allowed hosts
-        'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Adress of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
+        'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Address of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
         'LOCALSTACK_ACCESS_KEY': {'var': 'LOCALSTACK_ACCESS_KEY', 'hint': 'AWS equivalent of user name, can be anything', 'default': 'test','required': True},
         'LOCALSTACK_SECRET': {'var': 'LOCALSTACK_SECRET', 'hint': 'AWS equivalent of password, can be anything', 'default': 'test','required': True},
         'AES_ENCRYPTION_KEY': {'var': 'AES_ENCRYPTION_KEY', 'hint': 'AES Key generated for encryption as base64 encoded string', 'default': None, 'required': True},
@@ -430,10 +430,11 @@ STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDP
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.BasicAuthentication', #TODO: Set API Keys
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning'
 }
 
 SPECTACULAR_SETTINGS = {

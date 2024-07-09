@@ -9,6 +9,7 @@ Contains: Handlers using simulation to check the processes
 import random, logging, requests
 from io import BytesIO
 
+from code_SemperKI.handlers.projectAndProcessManagement import serviceManager
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -19,16 +20,16 @@ from Generic_Backend.code_General.definitions import FileObjectContent
 
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import ProcessDescription, ProcessUpdates
-from code_SemperKI.handlers.files import getFileReadableStream
+from code_SemperKI.handlers.public.files import getFileReadableStream
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 
 from ..definitions import ServiceDetails
 
 logger = logging.getLogger("errors")
 
 
-#######################################################
+#####################################p##################
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 def checkPrintability(request):
@@ -208,10 +209,11 @@ def checkModel(request, projectID, processID) -> JsonResponse:
     :return: JSON with dimensions
     :rtype: Json Response
 
+     TODO
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(checkModel.__name__)
+        interface = contentManager.getCorrectInterface(checkModel.cls.__name__)
         if interface == None:
             JsonResponse({}, status=401)
         process = interface.getProcessObj(projectID, processID)
@@ -222,7 +224,7 @@ def checkModel(request, projectID, processID) -> JsonResponse:
         if ServiceDetails.calculations in process.serviceDetails:
             return JsonResponse(process.serviceDetails[ServiceDetails.calculations])
 
-        model = process.serviceDetails[ServiceDetails.model]
+        model = process.serviceDetails[ServiceDetails.models]
         modelName = model[FileObjectContent.fileName]
         mock = {
             "filename": modelName,

@@ -19,27 +19,7 @@ class ManageTranslations():
     
     """
 
-    redisCon = RedisConnection()
-
-    #######################################################
-    def retrieveContentFromRedis(self) -> str:
-        """
-        Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
-
-        :return: The translation as JSON
-        :rtype: str
-
-        """
-        translations, exists = self.redisCon.retrieveContentJSON(self.filePathAndName)
-        if not exists:
-            with open(str(settings.BASE_DIR) + self.filePathAndName) as translationsFile:
-                translationsFileContent = json.loads(translationsFile.read())
-                self.redisCon.addContentJSON(self.filePathAndName, translationsFileContent, True)
-                return translationsFileContent
-        else:
-            return translations
-
-
+    
     #######################################################
     def __init__(self, filePathAndName) -> None:
         """
@@ -53,7 +33,28 @@ class ManageTranslations():
         """
 
         self.filePathAndName = filePathAndName
-        self.retrieveContentFromRedis()
+        self.redisCon = RedisConnection()
+        self.retrieveContentFromRedis(initial=True)
+
+    #######################################################
+    def retrieveContentFromRedis(self, initial=False) -> str:
+        """
+        Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
+
+        :return: The translation as JSON
+        :rtype: str
+
+        """
+        translations, exists = self.redisCon.retrieveContentJSON(self.filePathAndName)
+        if not exists or initial:
+            with open(str(settings.BASE_DIR) + self.filePathAndName) as translationsFile:
+                translationsFileContent = json.loads(translationsFile.read())
+                self.redisCon.addContentJSON(self.filePathAndName, translationsFileContent, True)
+                return translationsFileContent
+        else:
+            return translations
+
+
 
     #######################################################
     def getTranslation(self, locale:str, keyArr:list[str]) -> str:

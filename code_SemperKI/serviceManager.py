@@ -76,22 +76,31 @@ class ServiceBase(ABC):
         """
         pass
 
+    ###################################################
+    @abstractmethod
+    def getFilteredContractors(self, processObj) -> list:
+        """
+        Get a list of contractors that can do the job
+
+        """
+        pass
+
+###################################################
+class ServicesStructure(StrEnumExactylAsDefined):
+    """
+    How the services dictionary is structured
+
+    """
+    object = enum.auto()
+    name = enum.auto()
+    identifier = enum.auto()
+
 ######################################################
 class _ServicesManager():
     """
     The class handling the services
 
     """
-
-    ###################################################
-    class _Structure(StrEnumExactylAsDefined):
-        """
-        How the services dictionary is structures
-
-        """
-        object = enum.auto()
-        name = enum.auto()
-        identifier = enum.auto()
     
     ###################################################
     def __init__(self) -> None:
@@ -99,7 +108,7 @@ class _ServicesManager():
         self._defaultName = "None"
         self._defaultIdx = 0
         self._services = {}
-        self._services[self._defaultIdx] = {_ServicesManager._Structure.object: None, _ServicesManager._Structure.name: self._defaultName, _ServicesManager._Structure.identifier: self._defaultIdx} 
+        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx} 
 
     ###################################################
     def register(self, name:str, identifier:int, serviceClassObject):
@@ -114,7 +123,7 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[identifier] = {_ServicesManager._Structure.object: serviceClassObject, _ServicesManager._Structure.name: name, _ServicesManager._Structure.identifier: identifier}
+        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier}
 
     ###################################################
     def getNone(self) -> int:
@@ -137,21 +146,21 @@ class _ServicesManager():
         :rtype: Derived class of ServiceBase
         """
 
-        return self._services[savedService][_ServicesManager._Structure.object]
+        return self._services[savedService][ServicesStructure.object]
 
     ####################################################################################
-    def getAllServices(self):
+    def getAllServices(self) -> list:
         """
-        Return all registered services as dict
+        Return all registered services as list
         
-        :return: all registered services as dict
-        :rtype: dict
+        :return: all registered services as list
+        :rtype: list
         """
         outDict = copy.deepcopy(self._services)
         for elem in outDict: #remove objects
-            outDict[elem].pop(_ServicesManager._Structure.object)
+            outDict[elem].pop(ServicesStructure.object)
 
-        return outDict
+        return list(outDict.values())
 
 
     ######################
@@ -166,8 +175,8 @@ class _ServicesManager():
         """
         outIdx = 0
         for elem in self._services:
-            if self._services[elem][_ServicesManager._Structure.name] == serviceName:
-                outIdx = self._services[elem][_ServicesManager._Structure.identifier]
+            if self._services[elem][ServicesStructure.name] == serviceName:
+                outIdx = self._services[elem][ServicesStructure.identifier]
                 break
         return outIdx
     
@@ -181,7 +190,7 @@ class _ServicesManager():
         :return: Str Code of that service as given in ServiceTypes
         :rtype: Str
         """
-        return self._services[index][_ServicesManager._Structure.name]
+        return self._services[index][ServicesStructure.name]
 
     ###################################################
     # def __getattr__(self, name):

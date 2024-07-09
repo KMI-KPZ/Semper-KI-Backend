@@ -22,29 +22,84 @@ from django.http import HttpResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 
+from rest_framework import status, serializers
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from drf_spectacular.utils import extend_schema
+
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
-from Generic_Backend.code_General.utilities.basics import Logging, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 from Generic_Backend.code_General.utilities.files import createFileResponse
-from Generic_Backend.code_General.definitions import FileObjectContent
+from Generic_Backend.code_General.definitions import FileObjectContent, Logging, FileTypes
 from Generic_Backend.code_General.connections import s3
 
-import code_SemperKI.handlers.projectAndProcessManagement as PPManagement
+from code_SemperKI.utilities.serializer import ExceptionSerializer
+from code_SemperKI.handlers.public.process import updateProcessFunction
 import code_SemperKI.connections.content.manageContent as ManageC
-from ..connections.content.postgresql import pgProcesses
-from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
-from ..utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
+from ...connections.content.postgresql import pgProcesses
+from ...definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
+from ...utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess, testPicture
 from django.http.request import HttpRequest
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 loggerInfo = logging.getLogger("info")
 loggerDebug = getLogger("django_debug")
-
 #######################################################
-@require_http_methods(["POST"])
-def uploadFiles(request):
+
+############################################################
+# Helper function
+############################################################
+# def getProcessAndProjectFromSession(session, processID):
+#     """
+#     Retrieve a specific process from the current session instead of the database
+    
+#     :param session: Session of the current user
+#     :type session: Dict
+#     :param projectID: Process ID
+#     :type projectID: Str
+#     :return: Process or None
+#     :rtype: Dict or None
+#     """
+#     try:
+#         contentManager = ManageC.ManageContent(session)
+#         if contentManager.sessionManagement.getIfContentIsInSession():
+#             return contentManager.sessionManagement.structuredSessionObj.getProcessAndProjectPerID(processID)
+#         else:
+#             return (None, None)
+#     except (Exception) as error:
+#         loggerError.error(f"getProcessAndProjectFromSession: {str(error)}")
+#         return (None, None)
+
+#########################################################################
+# uploadFiles
+#"uploadFiles": ("public/uploadFiles/",files.uploadFiles)
+#########################################################################
+#TODO Add serializer for uploadFiles
+#######################################################
+class SReqUploadFiles(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processID = serializers.CharField(max_length=200)
+    origin = serializers.CharField(max_length=200)
+#########################################################################
+# Handler    
+@extend_schema(
+     summary="File upload for a process",
+     description=" ",
+     request=SReqUploadFiles,
+     tags=['FE - Files'],
+     responses={
+         200: None,
+         401: ExceptionSerializer,
+         500: ExceptionSerializer
+     }
+ )
+@api_view(["POST"])
+@checkVersion(0.3)
+def uploadFiles(request:Request):
     """
     File upload for a process
 
@@ -54,13 +109,24 @@ def uploadFiles(request):
     :rtype: HTTP Response
     """
     try:
-        info = request.POST
+        inSerializer = SReqUploadFiles(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {uploadFiles.cls.__name__}"
+            exception = "Verification failed"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        info = inSerializer.data
         projectID = info["projectID"]
         processID = info["processID"]
-        # TODO: Licenses, ...
+        origin = info["origin"]
 
         content = ManageC.ManageContent(request.session)
-        interface = content.getCorrectInterface(uploadFiles.__name__)
+        interface = content.getCorrectInterface(uploadFiles.cls.__name__)
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
         else:
@@ -70,91 +136,103 @@ def uploadFiles(request):
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
-            fileID = crypto.generateURLFriendlyRandomString()
-            filePath = processID+"/"+fileID
-            changes["changes"][ProcessUpdates.files][fileID] = {}
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
-            if remote:
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = True
-                returnVal = s3.manageRemoteS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-                if returnVal is not True:
-                    return HttpResponse("Failed", status=500)
-            else:
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
-                returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-                if returnVal is not True:
-                    return HttpResponse("Failed", status=500)
+            for file in request.FILES.getlist(fileName):
+                fileID = crypto.generateURLFriendlyRandomString()
+                filePath = projectID + "/" + processID + "/" + fileID
+                changes["changes"][ProcessUpdates.files][fileID] = {}
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = testPicture
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.size] = file.size
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.type] = FileTypes.File
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.origin] = origin
+                if remote:
+                    changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = True
+                    returnVal = s3.manageRemoteS3.uploadFile(filePath, file)
+                    if returnVal is not True:
+                        return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
+                    returnVal = s3.manageLocalS3.uploadFile(filePath, file)
+                    if returnVal is not True:
+                        return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         # Save into files field of the process
-        message, flag = PPManagement.updateProcessFunction(request, changes, projectID, [processID])
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
-            return HttpResponse("Insufficient rights!", status=401)
+            return Response("Insufficient rights!", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
             raise message
 
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},files,"+str(datetime.now()))
-        return HttpResponse("Success")
+        return Response('Success', status=status.HTTP_200_OK)
+        
     except (Exception) as error:
-        loggerError.error(f"Error while uploading files: {str(error)}")
-        return HttpResponse("Failed", status=500)
+        message = f"Error while uploading files: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
-@require_http_methods(["GET"])
-def downloadFile(request, processID, fileID):
-    """
-    Send file to user from storage
-    DEPRECATED!!!!
+# @require_http_methods(["GET"])
+# def downloadFile(request:Request, processID, fileID):
+#     """
+#     Send file to user from storage
+#     DEPRECATED!!!!
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
-    :param processID: process ID
-    :type processID: Str
-    :param fileID: file ID
-    :type fileID: Str
-    :return: Saved content
-    :rtype: FileResponse
+#     :param request: Request of user for a specific file of a process
+#     :type request: HTTP POST
+#     :param processID: process ID
+#     :type processID: Str
+#     :param fileID: file ID
+#     :type fileID: Str
+#     :return: Saved content
+#     :rtype: FileResponse
 
-    """
-    try:
-        # Retrieve the files info from either the session or the database
-        fileOfThisProcess = {}
-        currentProjectID, currentProcess = PPManagement.getProcessAndProjectFromSession(request.session,processID)
-        if currentProcess != None:
-            if fileID in currentProcess[ProcessDescription.files]:
-                fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
-            else:
-                return HttpResponse("Not found!", status=404)
-        else:
-            if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
-                userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-                if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
-                    currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
-                    fileOfThisProcess = currentProcess.files[fileID]
-                    if len(fileOfThisProcess) == 0:
-                        return HttpResponse("Not found!", status=404)
-                else:
-                    return HttpResponse("Not allowed to see process!", status=401)
-            else:
-                return HttpResponse("Not logged in or rights insufficient!", status=401)
+#     """
+#     try:
+#         # Retrieve the files info from either the session or the database
+#         fileOfThisProcess = {}
+#         currentProjectID, currentProcess = getProcessAndProjectFromSession(request.session,processID)
+#         if currentProcess != None:
+#             if fileID in currentProcess[ProcessDescription.files]:
+#                 fileOfThisProcess = currentProcess[ProcessDescription.files][fileID]
+#             else:
+#                 return HttpResponse("Not found!", status=404)
+#         else:
+#             if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, downloadFile.__name__):
+#                 userID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+#                 if manualCheckIfUserMaySeeProcess(request.session, userID, processID):
+#                     currentProcess = pgProcesses.ProcessManagementBase.getProcessObj("",processID)
+#                     fileOfThisProcess = currentProcess.files[fileID]
+#                     if len(fileOfThisProcess) == 0:
+#                         return HttpResponse("Not found!", status=404)
+#                 else:
+#                     return HttpResponse("Not allowed to see process!", status=401)
+#             else:
+#                 return HttpResponse("Not logged in or rights insufficient!", status=401)
 
-        # retrieve the correct file and download it from aws to the user
-        content, flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-        if flag is False:
-            content, flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
-            if flag is False:
-                return HttpResponse("Not found!", status=404)
+#         # retrieve the correct file and download it from aws to the user
+#         content, flag = s3.manageLocalS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+#         if flag is False:
+#             content, flag = s3.manageRemoteS3.downloadFile(fileOfThisProcess[FileObjectContent.path])
+#             if flag is False:
+#                 return HttpResponse("Not found!", status=404)
             
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(datetime.now()))
+#         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(datetime.now()))
             
-        return createFileResponse(content, filename=fileOfThisProcess[FileObjectContent.fileName])
+#         return createFileResponse(content, filename=fileOfThisProcess[FileObjectContent.fileName])
 
-    except (Exception) as error:
-        loggerError.error(f"Error while downloading file: {str(error)}")
-        return HttpResponse("Failed", status=500)
+#     except (Exception) as error:
+#         loggerError.error(f"Error while downloading file: {str(error)}")
+#         return HttpResponse("Failed", status=500)
 
 
 #######################################################
@@ -177,7 +255,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     try:
         # Retrieve the files info from either the session or the database
         contentManager = ManageC.ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(downloadFile.__name__)
+        interface = contentManager.getCorrectInterface(downloadFileStream.cls.__name__)
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
         
@@ -251,7 +329,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
 
 
 #######################################################
-def getFileReadableStream(request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
+def getFileReadableStream(request:Request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
@@ -353,10 +431,26 @@ def moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal = True, printDebug
         loggerError.error(f"Error while moving file to remote: {str(error)}")
         return False
 
-
-#######################################################
-@require_http_methods(["GET"])
-def downloadFileStream(request, projectID, processID, fileID):
+#########################################################################
+# downloadFileStream
+#"downloadFile": ("public/downloadFile/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream)
+#########################################################################
+#TODO Add serializer for downloadFileStream
+#########################################################################
+# Handler     
+@extend_schema(
+    summary="Send file to user from storage",
+    description="Send file to user from storage with request of user for a specific file of a process  ",
+    tags=["FE - Files"],
+    request=None,
+    responses={
+        200: None,
+        500: ExceptionSerializer
+    }
+)
+@api_view(["GET"])
+@checkVersion(0.3)
+def downloadFileStream(request:Request, projectID, processID, fileID):
     """
     Send file to user from storage
 
@@ -379,22 +473,45 @@ def downloadFileStream(request, projectID, processID, fileID):
 
         encryptionAdapter, flag = getFileReadableStream(request, projectID, processID, fileID)
         if flag is False:
-            return HttpResponse("Failed", status=500)
+            return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if os.getenv("DJANGO_LOG_LEVEL", None) == "DEBUG":
             encryptionAdapter.setDebugLogger(loggerDebug)
 
         return createFileResponse(encryptionAdapter, filename=fileMetaData[FileObjectContent.fileName])
-
+    
     except (Exception) as error:
-        loggerError.error(f"Error while downloading file: {str(error)}")
-        return HttpResponse("Failed", status=500)
+        message = f"Error in downloadFileStream: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-#######################################################
-@require_http_methods(["GET"])
-def downloadFilesAsZip(request, projectID, processID):
+#########################################################################
+# downloadFilesAsZip
+#"downloadFilesAsZip": ("public/downloadFilesAsZip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip)
+#########################################################################
+#TODO Add serializer for downloadFilesAsZip
+#########################################################################
+# Handler    
+@extend_schema(
+    summary="Send files to user as zip",
+    description=" ",
+    tags=["FE - Files"],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        404: ExceptionSerializer,
+        500: ExceptionSerializer,
+    }
+)
+@api_view(["GET"])
+@checkVersion(0.3)
+def downloadFilesAsZip(request:Request, projectID, processID):
     """
     Send files to user as zip
 
@@ -408,7 +525,7 @@ def downloadFilesAsZip(request, projectID, processID):
     :rtype: FileResponse
 
     """
-    # TODO solve with streaming
+     # TODO solve with streaming
     try:
         fileIDs = request.GET['fileIDs'].split(",")
         filesArray = []
@@ -426,12 +543,12 @@ def downloadFilesAsZip(request, projectID, processID):
                 if flag is False:
                     content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
                     if flag is False:
-                        return HttpResponse("Not found!", status=404)
+                        return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
                 
                 filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
 
         if len(filesArray) == 0:
-            return HttpResponse("Not found!", status=404)
+            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
         
         # compress each file and put them in the same zip file, all in memory
         zipFile = BytesIO()
@@ -442,17 +559,39 @@ def downloadFilesAsZip(request, projectID, processID):
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
         return createFileResponse(zipFile, filename=processID+".zip")
-
     except (Exception) as error:
-        loggerError.error(f"Error while downloading files as zip: {str(error)}")
-        return HttpResponse("Failed", status=500)
-
-#######################################################
+        message = f"Error while downloading files as zip: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#########################################################################
+# downloadProcessHistory
+#"downloadProcessHistory": ("public/downloadProcessHistory/<str:processID>/", files.downloadProcessHistory)
+#########################################################################
+#TODO Add serializer for downloadProcessHistory
+#########################################################################
+# Handler  
+@extend_schema(
+    summary="See who has done what and when and download this as pdf",
+    description=" ",
+    tags=['FE - Files'],
+    request=None,
+    responses={
+        200: None,
+        500: ExceptionSerializer
+    }
+)
 @checkIfUserIsLoggedIn()
-@require_http_methods(["GET"]) 
 @checkIfRightsAreSufficient(json=False)
 @checkIfUserMaySeeProcess(json=False)
-def downloadProcessHistory(request, processID):
+@api_view(["GET"])
+@checkVersion(0.3)
+def downloadProcessHistory(request:Request, processID):
     """
     See who has done what and when and download this as pdf
 
@@ -517,15 +656,37 @@ def downloadProcessHistory(request, processID):
 
         # return file
         return createFileResponse(outPDFBuffer, filename=processID+".pdf")
-    
     except (Exception) as error:
-        loggerError.error(f"viewProcessHistory: {str(error)}")
-        return HttpResponse("Error!", status=500)
+        message = f"Error in downloadProcessHistory: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
-
-#######################################################
-@require_http_methods(["DELETE"])
-def deleteFile(request, projectID, processID, fileID):
+#########################################################################
+# deleteFile
+#"deleteFile": ("public/deleteFile/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile)
+#########################################################################
+#TODO Add serializer for deleteFile
+#########################################################################
+# Handler  
+@extend_schema(
+    summary="Delete a file from storage",
+    description=" ",
+    tags=['FE - Files'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@api_view(["DELETE"])
+@checkVersion(0.3)
+def deleteFile(request:Request, projectID, processID, fileID):
     """
     Delete a file from storage
 
@@ -550,14 +711,20 @@ def deleteFile(request, projectID, processID, fileID):
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
         
         # TODO send deletion to service, should the deleted file be the model for example
-        message, flag = PPManagement.updateProcessFunction(request, deletions, projectID, [processID])
+        message, flag = updateProcessFunction(request, deletions, projectID, [processID])
         if flag is False:
-            return HttpResponse("Not logged in", status=401)
+            return Response("Not logged in", status=status.HTTP_401_UNAUTHORIZED)
         if isinstance(message, Exception):
             raise message
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
-        return HttpResponse("Success", status=200)
+        return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
-        loggerError.error(f"Error while deleting file: {str(error)}")
-        return HttpResponse("Failed", status=500)
+        message = f"Error while detelting files: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
