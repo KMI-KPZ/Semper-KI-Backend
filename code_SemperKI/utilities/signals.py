@@ -8,7 +8,7 @@ Contains: Signals that can be sent to other apps
 
 import django.dispatch
 import Generic_Backend.code_General.utilities.signals as GeneralSignals
-from ..handlers.projectAndProcessManagement import saveProjects, saveProjectsViaWebsocket
+from ..handlers.public.project import saveProjects, saveProjectsViaWebsocket
 
 ################################################################################################
 

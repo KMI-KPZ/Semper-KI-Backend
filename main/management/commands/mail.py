@@ -7,7 +7,7 @@ Contains:
 """
 
 from django.core.management.base import BaseCommand
-from Generic_Backend.code_General.connections.mailer import KissMailer
+from Generic_Backend.code_General.connections.mailer import MailingClass
 from logging import getLogger
 logging = getLogger("django_debug")
 
@@ -44,9 +44,9 @@ class Command(BaseCommand):
         :rtype: None
         """
 
-        mailer = KissMailer()
+        mailer = MailingClass()
         logging.info(f'sending test mail to {options["to"]}')
-        mailer.sendmail(options['to'], 'test mail', 'this is a test mail')
+        mailer.sendMail(options['to'], 'test mail', 'this is a test mail')
 
 
 

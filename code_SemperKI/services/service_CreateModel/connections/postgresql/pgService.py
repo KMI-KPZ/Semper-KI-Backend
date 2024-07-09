@@ -39,3 +39,32 @@ def deleteServiceDetails(existingContent, deletedContent):
     """
     # TODO
     return existingContent
+
+####################################################################################
+def serviceReady(existingContent) -> bool:
+    """
+    Check if everything is there
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :return: True if all components are there
+    :rtype: Bool
+    """
+    # TODO
+    return True
+
+####################################################################################
+def cloneServiceDetails(existingContent:dict, newProcess) -> dict:
+    """
+    Clone content of the service
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: dict
+    :param newProcess: The new process as object
+    :type newProcess: Process|ProcessInterface
+    :return: The copy of the service details
+    :rtype: dict
+    
+    """
+    # TODO
+    return existingContent

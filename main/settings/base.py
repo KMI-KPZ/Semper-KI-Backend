@@ -23,6 +23,7 @@ class BackendConfigHelper(ConfigHelper):
     dbs = ('default',)
     # required env vars
 
+
     env_vars_external = {
         # AUTH0
         'AUTH0_DOMAIN': {'var': 'AUTH0_DOMAIN',
@@ -63,6 +64,8 @@ class BackendConfigHelper(ConfigHelper):
                              'hint': 'CMEM client secret for authentication services for management via m2m calls',
                              'default': None, 'required': True},
         'CMEM_SPARQL_ENDPOINT': {'var': 'CMEM_SPARQL_ENDPOINT', 'hint': 'Cmem sparql endpoint url', 'default': None, 'required': True},
+        'CMEM_SPARQL_UPDATE_ENDPOINT': {'var': 'CMEM_SPARQL_UPDATE_ENDPOINT', 'hint': 'Cmem sparql endpoint url for updates!', 'default': None,
+                                 'required': True},
         'CMEM_TOKEN_ENDPOINT': {'var': 'CMEM_TOKEN_ENDPOINT', 'hint': 'Oauth Endpoint from cmem', 'default': None, 'required': True},
         'COYPU_CLIENT_ID': {'var': 'COYPU_CLIENT_ID',
                           'hint': 'COYPU client id for authentication services for management via m2m calls',
@@ -89,7 +92,6 @@ class BackendConfigHelper(ConfigHelper):
         'EMAIL_USE_SSL': {'var': 'EMAIL_USE_SSL', 'hint': 'Email use ssl for sending emails', 'default': False,'required': False, 'type': 'bool'},
         'EMAIL_ADDR_SUPPORT' : {'var': 'EMAIL_ADDR_SUPPORT', 'hint': 'Email address for support, i.e. for contact form', 'default': 'semper-ki@infai.org'},
     }
-
     env_vars_internal = {
         'DJANGO_SECRET': {'var': 'SECRET_KEY', 'hint': 'Django secret key used for hashing and encryption',
                           'default': '1234567890', 'required': True},
@@ -114,7 +116,7 @@ class BackendConfigHelper(ConfigHelper):
         'REDIS_PASSWORD': {'var': 'REDIS_PASSWORD', 'hint': 'Redis database for caching', 'default': "redis_pw", 'required': True},
 
         # Allowed hosts
-        'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Adress of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
+        'LOCALSTACK_ENDPOINT': {'var': 'LOCALSTACK_ENDPOINT', 'hint': 'Address of the local AWS storage', 'default': 'http://host.docker.internal:4566', 'required': True},
         'LOCALSTACK_ACCESS_KEY': {'var': 'LOCALSTACK_ACCESS_KEY', 'hint': 'AWS equivalent of user name, can be anything', 'default': 'test','required': True},
         'LOCALSTACK_SECRET': {'var': 'LOCALSTACK_SECRET', 'hint': 'AWS equivalent of password, can be anything', 'default': 'test','required': True},
         'AES_ENCRYPTION_KEY': {'var': 'AES_ENCRYPTION_KEY', 'hint': 'AES Key generated for encryption as base64 encoded string', 'default': None, 'required': True},
@@ -126,7 +128,11 @@ class BackendConfigHelper(ConfigHelper):
         'FORWARD_URL': {'var': 'FORWARD_URL', 'hint': 'The URL to which Login should point',
                    'default': 'http://127.0.0.1:3000', 'required': True},
         'PGADMIN_DEFAULT_EMAIL': {'var': 'PGADMIN_DEFAULT_EMAIL', 'hint': 'Email for postgresadmin', 'default': 'test@infai.org', 'required': True},
-        'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True}
+        'PGADMIN_DEFAULT_PASSWORD': {'var': 'PGADMIN_DEFAULT_PASSWORD', 'hint': 'Password for postgresadmin', 'default': 'asdf', 'required': True},
+        'IWS_ENDPOINT': {'var': 'IWS_ENDPOINT', 'hint': 'Endpoint for the IWS service', 'default': None, 'required': False}, #'http://:153.96.234.100:8080'
+        'CELERY_BROKER_URL': {'var': 'CELERY_BROKER_URL', 'hint': 'Redis', 'default': None, 'required': True},
+        'CELERY_RESULT_BACKEND': {'var': 'CELERY_RESULT_BACKEND', 'hint': 'Redis', 'default': None, 'required': True}
+
 
     }
 
@@ -207,6 +213,8 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'storages',
+    'rest_framework',
+    'drf_spectacular',
     'main',
     'Generic_Backend.code_General',
     'code_SemperKI'
@@ -419,3 +427,20 @@ STORAGES = {
 
 
 STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication', #TODO: Set API Keys
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Semper-KI Backend',
+    'DESCRIPTION': 'API for Semper-KI',
+    'VERSION': '0.3.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

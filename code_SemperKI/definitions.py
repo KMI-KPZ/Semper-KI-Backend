@@ -9,38 +9,13 @@ import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
 
 ###################################################
+# Version of the backend
+SEMPER_KI_VERSION = "0.2.1"
+
+###################################################
 from .modelFiles.processModel import ProcessDescription
 from .modelFiles.projectModel import ProjectDescription
 from .modelFiles.dataModel import DataDescription
-
-###################################################
-# Statuscodes
-class ProcessStatus(enum.IntEnum):
-    """
-    Defines all statuus for the process (independent of the selected service)
-    """
-    DRAFT = 0
-    WAITING_FOR_OTHER_PROCESS =  100
-    SERVICE_READY =  200
-    SERVICE_IN_PROGRESS =  201
-    SERVICE_COMPLICATION =  202
-    CONTRACTOR_SELECTED =  300
-    VERIFYING =  400
-    VERIFIED =  500
-    REQUESTED =  600
-    CLARIFICATION =  700
-    CONFIRMED_BY_CONTRACTOR =  800
-    REJECTED_BY_CONTRACTOR =  801
-    CONFIRMED_BY_CLIENT =  900
-    REJECTED_BY_CLIENT =  901
-    PRODUCTION =  1000
-    DELIVERY =  1100
-    DISPUTE =  1200
-    COMPLETED =  1300
-    FAILED =  1400
-    CANCELED =  1500
-
-
 
 ###################################################
 # Data Types
@@ -56,6 +31,8 @@ class DataType(enum.IntEnum):
     DELETION = 5
     DETAILS = 6
     OTHER = 7
+    SERVICE = 8
+    DEPENDENCY = 9
 
 ####################################################################################
 def dataTypeToString(dataType:DataType):
@@ -78,6 +55,10 @@ def dataTypeToString(dataType:DataType):
         return "DETAILS"
     elif dataType == DataType.OTHER:
         return "OTHER"
+    elif dataType == DataType.SERVICE:
+        return "SERVICE"
+    elif dataType == DataType.DEPENDENCY:
+        return "DEPENDENCY"
     return ""
 
 ####################################################################################
@@ -105,6 +86,17 @@ class ProcessUpdates(StrEnumExactylAsDefined):
     processDetails = enum.auto()
     processStatus = enum.auto()
     provisionalContractor = enum.auto()
+    dependenciesIn = enum.auto()
+    dependenciesOut = enum.auto()
+
+####################################################################################
+# Enum for processDetails
+class ProjectDetails(StrEnumExactylAsDefined):
+    """
+    What Details can a Project have?
+    
+    """
+    title = enum.auto()
 
 ####################################################################################
 # Enum for processDetails
@@ -113,11 +105,13 @@ class ProcessDetails(StrEnumExactylAsDefined):
     What Details can a Process have?
     
     """
-    name = enum.auto()
     provisionalContractor = enum.auto()
     amount = enum.auto()
     title = enum.auto()
-    clientAdress = enum.auto()
+    clientBillingAddress = enum.auto()
+    clientDeliverAddress = enum.auto()
+    imagePath = enum.auto()
+
 
 ####################################################################################
 # Enum for messages
@@ -153,3 +147,16 @@ class EventsDescription(StrEnumExactylAsDefined):
     projectEvent = enum.auto()
     orgaEvent = enum.auto()
     
+####################################################################################
+# Enum for flat process status
+class FlatProcessStatus(StrEnumExactylAsDefined):
+    """
+    For Frontend
+    
+    """
+    ACTION_REQUIRED = enum.auto()
+    WAITING_CONTRACTOR= enum.auto()
+    WAITING_CLIENT = enum.auto()
+    WAITING_PROCESS = enum.auto()
+    IN_PROGRESS = enum.auto()
+    COMPLETED = enum.auto()

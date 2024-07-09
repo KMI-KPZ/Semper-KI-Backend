@@ -5,33 +5,15 @@ Silvio Weging 2023
 
 Contains: Views for some backend websites
 """
-
+import json
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from django.shortcuts import render
-from django.conf import settings
 from logging import getLogger
+
+from ..definitions import SEMPER_KI_VERSION
 
 logger = getLogger("django")
 
 
 #######################################################
-def sparqlPage(request):
-    """
-    Landing page for a sparql test query
-
-    :param request: GET request
-    :type request: HTTP GET
-    :return: Rendered page
-    :rtype: HTTPResponse
-
-    """
-    return render(
-        request,
-        "sparql.html"  # ,
-        # context={
-        #    "session": request.session.get("user"),
-        # "pretty": json.dumps(request.session.get("user"), indent=4),
-        # },
-    )
-
-

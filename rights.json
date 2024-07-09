@@ -16,8 +16,11 @@
             "getMissedEvents",
             "getProject",
             "getFlatProjects",
+            "getProcess",
             "getProcessHistory",
-            "downloadProcessHistory"
+            "downloadProcessHistory",
+            "statusButtonRequest",
+            "checkModel"
          ]
       },
       {
@@ -30,13 +33,16 @@
          ],
          "paths": [
             "updateProcess",
+            "updateProcessFunction",
             "downloadFilesAsZip",
             "downloadFile",
             "uploadFiles",
             "uploadModel",
             "deleteFile",
             "deleteModel",
-            "downloadProcessHistory"
+            "downloadProcessHistory",
+            "downloadFileStream",
+            "checkModel"
          ]
       },
       {
@@ -49,7 +55,8 @@
             "ProcessButtonChat"
          ],
          "paths": [
-            "updateProcess"
+            "updateProcess",
+            "updateProcessFunction"
          ]
       },
       {
@@ -63,22 +70,54 @@
             "ProjectsButtonNew",
             "ProjectButtonEdit",
             "ProjectButtonNew",
-            "ProjectButtonEDIT",
+            "ProjectButtonDELETE",
+            "ProjectButtonCONTRACTOR_SELECTED",
+            "ProjectButtonVERIFYING_AND_REQUESTED",
+            "ProjectButtonVERIFYING",
+            "ProjectButtonREQUESTED",
+            "ProjectButtonCLARIFICATION",
+            "ProjectButtonCONFIRMED_BY_CONTRACTOR",
+            "ProjectButtonREJECTED_BY_CONTRACTOR",
+            "ProjectButtonCONFIRMED_BY_CLIENT",
+            "ProjectButtonREJECTED_BY_CLIENT",
+            "ProjectButtonPRODUCTION",
+            "ProjectButtonDELIVERY",
+            "ProjectButtonCOMPLETED",
+            "ProjectButtonREPROJECT",
             "ProjectButtonDelete",
             "ProjectStatusButtons",
             "ProcessButtonModelPreView",
+            "ProcessButtonEDIT",
+            "ProcessButtonDELETE",
+            "ProcessButtonCONTRACTOR_SELECTED",
+            "ProcessButtonVERIFYING_AND_REQUESTED",
+            "ProcessButtonVERIFYING",
+            "ProcessButtonREQUESTED",
+            "ProcessButtonCLARIFICATION",
+            "ProcessButtonCONFIRMED_BY_CONTRACTOR",
+            "ProcessButtonREJECTED_BY_CONTRACTOR",
+            "ProcessButtonCONFIRMED_BY_CLIENT",
+            "ProcessButtonREJECTED_BY_CLIENT",
+            "ProcessButtonPRODUCTION",
+            "ProcessButtonDELIVERY",
+            "ProcessButtonCOMPLETED",
+            "ProcessButtonREPROJECTButton",
             "ProcessButtonDelete",
             "ProcessStatusButtons"
          ],
          "paths": [
             "updateProcess",
+            "updateProcessFunction",
             "updateProject",
             "getContractors",
             "saveProjects",
             "verifyProject",
             "sendProject",
             "createProcessID",
-            "createProjectID"
+            "createProjectID",
+            "statusButtonRequest",
+            "checkModel",
+            "cloneProcess"
          ]
       },
       {
@@ -95,7 +134,8 @@
             "deleteProcesses",
             "deleteProjects",
             "deleteFile",
-            "deleteModel"
+            "deleteModel",
+            "statusButtonRequest"
          ]
       },
       {
@@ -169,7 +209,8 @@
             "onto_getMaterial",
             "onto_getPrinter",
             "onto_getPrinters",
-            "onto_getMaterials"
+            "onto_getMaterials",
+            "orga_getResources"
          ]
       },
       {
@@ -191,7 +232,12 @@
             "orga_removePrinter",
             "orga_createPrinter",
             "orga_addPrinterEdit",
-            "orga_addPrinter"
+            "orga_addPrinter",
+            "orga_addMaterialToPrinter",
+            "orga_updateMaterialAndPrinter",
+            "orga_removeLinkToPrinter",
+            "orga_removeLinkToMaterial",
+            "orga_removeAll"
          ]
       }
    ]
