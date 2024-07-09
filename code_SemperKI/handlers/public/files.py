@@ -33,7 +33,7 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 from Generic_Backend.code_General.utilities.files import createFileResponse
-from Generic_Backend.code_General.definitions import FileObjectContent, Logging
+from Generic_Backend.code_General.definitions import FileObjectContent, Logging, FileTypes
 from Generic_Backend.code_General.connections import s3
 
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -41,7 +41,7 @@ from code_SemperKI.handlers.public.process import updateProcessFunction
 import code_SemperKI.connections.content.manageContent as ManageC
 from ...connections.content.postgresql import pgProcesses
 from ...definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
-from ...utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess
+from ...utilities.basics import checkIfUserMaySeeProcess, manualCheckIfUserMaySeeProcess, testPicture
 from django.http.request import HttpRequest
 
 logger = logging.getLogger("logToFile")
@@ -83,6 +83,7 @@ loggerDebug = getLogger("django_debug")
 class SReqUploadFiles(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
+    origin = serializers.CharField(max_length=200)
 #########################################################################
 # Handler    
 @extend_schema(
@@ -122,7 +123,7 @@ def uploadFiles(request:Request):
         info = inSerializer.data
         projectID = info["projectID"]
         processID = info["processID"]
-        # TODO: Licenses, ...
+        origin = info["origin"]
 
         content = ManageC.ManageContent(request.session)
         interface = content.getCorrectInterface(uploadFiles.cls.__name__)
@@ -135,24 +136,29 @@ def uploadFiles(request:Request):
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
         for fileName in fileNames:
-            fileID = crypto.generateURLFriendlyRandomString()
-            filePath = processID+"/"+fileID
-            changes["changes"][ProcessUpdates.files][fileID] = {}
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
-            changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
-            if remote:
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = True
-                returnVal = s3.manageRemoteS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-                if returnVal is not True:
-                    return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            else:
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
-                returnVal = s3.manageLocalS3.uploadFile(filePath, request.FILES.getlist(fileName)[0])
-                if returnVal is not True:
-                    return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            for file in request.FILES.getlist(fileName):
+                fileID = crypto.generateURLFriendlyRandomString()
+                filePath = projectID + "/" + processID + "/" + fileID
+                changes["changes"][ProcessUpdates.files][fileID] = {}
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = testPicture
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.size] = file.size
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.type] = FileTypes.File
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.origin] = origin
+                if remote:
+                    changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = True
+                    returnVal = s3.manageRemoteS3.uploadFile(filePath, file)
+                    if returnVal is not True:
+                        return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                else:
+                    changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.remote] = False
+                    returnVal = s3.manageLocalS3.uploadFile(filePath, file)
+                    if returnVal is not True:
+                        return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

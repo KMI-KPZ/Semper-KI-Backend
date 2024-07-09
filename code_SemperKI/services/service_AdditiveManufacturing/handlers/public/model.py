@@ -33,6 +33,7 @@ from code_SemperKI.handlers.public.files import deleteFile
 from code_SemperKI.handlers.public.process import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
 from code_SemperKI.utilities.serializer import ExceptionSerializer
+from code_SemperKI.utilities.basics import testPicture
 from code_SemperKI.connections.content.manageContent import ManageContent
 from MSQ.tasks.tasks import callfTetWild
 from MSQ.handlers.interface import returnFileFromfTetWild
@@ -45,6 +46,7 @@ class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
     details = serializers.CharField(max_length=10000)
+    origin = serializers.CharField(max_length=200)
     # multipart/form-data
 
 
@@ -93,6 +95,7 @@ def uploadModels(request:Request):
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
+        origin = info["origin"]
 
         content = ManageContent(request.session)
         interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
@@ -112,42 +115,42 @@ def uploadModels(request:Request):
             remote = False
         
         detailsOfAllFiles = json.loads(info["details"])
-        models = {}
-        for key in request.data:
-            if key != ProjectDescription.projectID and key != ProcessDescription.processID and key != "details":
-                models[key] = request.data[key]
+        modelNames = list(request.FILES.keys())
         modelsToBeSaved = {}
-        for fileName in models:
-            model = models[fileName]
-            details = {}
-            for detail in detailsOfAllFiles: # details are not in the same order as the models
-                if detail["fileName"] == fileName:
-                    details = detail["details"]
-                    break
-            fileID = crypto.generateURLFriendlyRandomString()
-            filePath = processID+"/"+fileID
-            userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-            modelsToBeSaved[fileID] = {}
-            modelsToBeSaved[fileID][FileObjectContent.id] = fileID
-            modelsToBeSaved[fileID][FileObjectContent.fileName] = fileName
-            modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
-            modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
-            modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
-            modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
-            modelsToBeSaved[fileID][FileObjectContent.URI] = ""
-            modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
-            modelsToBeSaved[fileID][FileObjectContent.path] = filePath
+        for fileName in modelNames:
+            for model in request.FILES.getlist(fileName):
+                details = {}
+                for detail in detailsOfAllFiles: # details are not in the same order as the models
+                    if detail["fileName"] == fileName:
+                        details = detail["details"]
+                        break
+                fileID = crypto.generateURLFriendlyRandomString()
+                filePath = projectID+"/"+processID+"/"+fileID
+                userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+                modelsToBeSaved[fileID] = {}
+                modelsToBeSaved[fileID][FileObjectContent.id] = fileID
+                modelsToBeSaved[fileID][FileObjectContent.path] = filePath
+                modelsToBeSaved[fileID][FileObjectContent.fileName] = fileName
+                modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
+                modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
+                modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
+                modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
+                modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
+                modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
+                modelsToBeSaved[fileID][FileObjectContent.size] = model.size
+                modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
+                modelsToBeSaved[fileID][FileObjectContent.origin] = origin
 
-            if remote:
-                modelsToBeSaved[fileID][FileObjectContent.remote] = True
-                returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
-                if returnVal is not True:
-                    raise Exception(f"File {fileName} could not be saved to remote storage")
-            else:
-                modelsToBeSaved[fileID][FileObjectContent.remote] = False
-                returnVal = s3.manageLocalS3.uploadFile(filePath, model)
-                if returnVal is not True:
-                    raise Exception(f"File {fileName} could not be saved to local storage")
+                if remote:
+                    modelsToBeSaved[fileID][FileObjectContent.remote] = True
+                    returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
+                    if returnVal is not True:
+                        raise Exception(f"File {fileName} could not be saved to remote storage")
+                else:
+                    modelsToBeSaved[fileID][FileObjectContent.remote] = False
+                    returnVal = s3.manageLocalS3.uploadFile(filePath, model)
+                    if returnVal is not True:
+                        raise Exception(f"File {fileName} could not be saved to local storage")
                 
         changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.models: modelsToBeSaved}}}
 
@@ -229,10 +232,10 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        deleteFile(request, projectID, processID, fileID)
+        deleteFile(request._request, projectID, processID, fileID)
         
         changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID}}}}
-        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        message, flag = updateProcessFunction(request._request, changes, projectID, [processID])
         if flag is False:
             message = "Rights not sufficient in deleteModel"
             exception = "Unauthorized"

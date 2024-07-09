@@ -630,6 +630,8 @@ class ProcessManagementBase(AbstractContentInterface):
             dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
+                # check key: content["origin"] -> key
+                # currentProcess.messages[key].append(content["origin"]["key"])
                 currentProcess.messages["messages"].append(content)
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
