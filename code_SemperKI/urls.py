@@ -41,7 +41,7 @@ newPaths= {
     "swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
     
     "createOrder": ("public/payment/create/", create_order),
-    "captureOrder": ("public/payment/capture/", capture_order),
+    "captureOrder": ("public/payment/capture/<str:orderID>/", capture_order),
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),

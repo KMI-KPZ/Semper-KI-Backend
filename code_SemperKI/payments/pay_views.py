@@ -42,7 +42,6 @@ def create_order(request):
     order = create_paypal_order(amount, currency)
     return Response(order)
 
-#################################################################
 #########################################################################
 # capture_order
 #########################################################################
@@ -59,7 +58,12 @@ def create_order(request):
         500: ExceptionSerializer
     }
 )
-@api_view(['GET'])
-def capture_order(request, order_id):
-    capture = capture_paypal_order(order_id)
-    return Response(capture)
+@api_view(['POST'])
+def capture_order(request):
+    order_id = request.data.get('orderID')  # Assuming 'orderID' is part of POST data
+
+    try:
+        response = capture_paypal_order(order_id)
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
