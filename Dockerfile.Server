@@ -16,7 +16,7 @@ RUN apt-get update \
 # Install pip requirements
 WORKDIR /app
 COPY . /app
-RUN python -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt
 
 # set every shell script as executable inside the container
 RUN find /app/*.sh -type f -exec chmod +x {} \;

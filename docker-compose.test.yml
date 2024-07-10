@@ -5,7 +5,7 @@ services:
     image: backend-production
     build:
       context: .
-      dockerfile: ./Dockerfile.Testing
+      dockerfile: ./Dockerfile.Server
     command: ["bash", "run/runtests.sh"]
     env_file:
       - .env.production
@@ -52,7 +52,7 @@ services:
     env_file:
       - .env.production
     ports:
-      - "127.0.0.1:4568:9000"
+      - "127.0.0.1:4571:9000"
     entrypoint: /usr/local/bin/docker-service-minio-start.sh
     networks:
       - semper-ki-production-network
@@ -60,7 +60,7 @@ services:
   celery-worker:
     build:
       context: .
-      dockerfile: ./MSQ/Dockerfile.MSQ
+      dockerfile: ./MSQ/Dockerfile.MSQ.Server
     container_name: local-celery-worker
     entrypoint: celery
     env_file:
