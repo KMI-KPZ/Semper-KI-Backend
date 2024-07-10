@@ -134,6 +134,7 @@ def getFlatProjects(request:Request):
     responses={
         200: SResGetProject,
         401: ExceptionSerializer,
+        404: ExceptionSerializer,
         500: ExceptionSerializer
     },
 )
@@ -166,6 +167,15 @@ def getProject(request, projectID):
         
         
         projectAsDict = interface.getProject(projectID)
+        if isinstance(projectAsDict, Exception):
+            message = f"Project not found in {getProject.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         processList = projectAsDict[SessionContentSemperKI.processes]
         listOfFlatProcesses = []
         for entry in processList:

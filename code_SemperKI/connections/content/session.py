@@ -343,7 +343,7 @@ class ProcessManagementSession(AbstractContentInterface):
         
         except (Exception) as error:
             logger.error(f'could not get project: {str(error)}')
-            return {}
+            return error
 
     ##############################################
     def updateProject(self, projectID:str, updateType: ProjectUpdates, content:dict):

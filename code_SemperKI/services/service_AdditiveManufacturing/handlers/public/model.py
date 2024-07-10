@@ -43,10 +43,11 @@ loggerError = logging.getLogger("errors")
 
 #######################################################
 class SReqUploadModels(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
-    processID = serializers.CharField(max_length=200)
-    details = serializers.CharField(max_length=10000)
-    origin = serializers.CharField(max_length=200)
+    projectID = serializers.CharField(max_length=200, required=True)
+    processID = serializers.CharField(max_length=200, required=True)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"fileName":"file.stl"}]', max_length=10000)
+    origin = serializers.CharField(default="Service",max_length=200)
+    file = serializers.FileField(required=False)
     # multipart/form-data
 
 
@@ -121,7 +122,7 @@ def uploadModels(request:Request):
             for model in request.FILES.getlist(fileName):
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    if detail["fileName"] == fileName:
+                    if detail["fileName"] == fileName or fileName == "file":
                         details = detail["details"]
                         break
                 fileID = crypto.generateURLFriendlyRandomString()

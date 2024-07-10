@@ -383,8 +383,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
         except (Exception) as error:
             logger.error(f'could not get project: {str(error)}')
-        
-        return {}
+            return error
 
     ##############################################
     @staticmethod

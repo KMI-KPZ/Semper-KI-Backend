@@ -84,12 +84,15 @@ class SReqUploadFiles(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
     origin = serializers.CharField(max_length=200)
+    file = serializers.FileField(required=False)
 #########################################################################
 # Handler    
 @extend_schema(
      summary="File upload for a process",
      description=" ",
-     request=SReqUploadFiles,
+     request={
+        "multipart/form-data": SReqUploadFiles
+    },	
      tags=['FE - Files'],
      responses={
          200: None,
