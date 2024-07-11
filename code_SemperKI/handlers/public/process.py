@@ -408,7 +408,7 @@ def deleteProcesses(request:Request, projectID):
 
     """
     try:
-        processIDs = request.data['processIDs']
+        processIDs = request.GET['processIDs'].split(",")
         retVal = deleteProcessFunction(request.session, processIDs)
         if isinstance(retVal, Exception):
             raise retVal

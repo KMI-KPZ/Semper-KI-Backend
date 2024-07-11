@@ -475,7 +475,7 @@ class ProcessManagementSession(AbstractContentInterface):
 
         except (Exception) as error:
             logger.error(f"Could not fetch process: {str(error)}")
-            return {}
+            return error
 
     #######################################################
     def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list[ProcessInterface],list[ProcessInterface]]:

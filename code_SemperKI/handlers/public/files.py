@@ -130,6 +130,16 @@ def uploadFiles(request:Request):
 
         content = ManageC.ManageContent(request.session)
         interface = content.getCorrectInterface(uploadFiles.cls.__name__)
+        if interface == None:
+            message = f"Rights not sufficient in {uploadFiles.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
         else:
@@ -138,17 +148,54 @@ def uploadFiles(request:Request):
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
+
+        # check if duplicates exist
+        existingFileNames = set()
+        processContent = interface.getProcess(projectID, processID)
+        if isinstance(processContent, Exception):
+            message = f"Process not found in {uploadFiles.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        for key in processContent[ProcessDescription.files]:
+            value = processContent[ProcessDescription.files][key]
+            existingFileNames.add(value[FileObjectContent.fileName])
+
         for fileName in fileNames:
+            # rename duplicates
+            counterForFileName = 1
+            nameOfFile = fileName
+            while nameOfFile in existingFileNames:
+                fileNameRoot, extension= os.path.splitext(nameOfFile)
+                if counterForFileName > 100000:
+                    raise Exception("Too many files with the same name uploaded!")
+                
+                if "_" in fileNameRoot:
+                    fileNameRootSplit = fileNameRoot.split("_")
+                    try:
+                        counterForFileName = int(fileNameRootSplit[-1])
+                        fileNameRoot = "_".join(fileNameRootSplit[:-1])
+                        counterForFileName += 1
+                    except:
+                        pass
+                nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
+                counterForFileName += 1
+
             for file in request.FILES.getlist(fileName):
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID + "/" + processID + "/" + fileID
                 changes["changes"][ProcessUpdates.files][fileID] = {}
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = fileName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = nameOfFile
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = testPicture
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdByID] = content.getClient()
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.size] = file.size
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.type] = FileTypes.File
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.origin] = origin
@@ -274,6 +321,10 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
                 return (HttpResponse("Not found!", status=404),False)
             
             fileOfThisProcess = currentProcess.files[fileID]
+
+            if contentManager.getClient() != fileOfThisProcess[FileObjectContent.createdByID]:
+                return (HttpResponse("Not allowed to access file!", status=401), False)
+
             return (fileOfThisProcess, True)
         else:
             return (currentProcess.files, True)
@@ -708,7 +759,9 @@ def deleteFile(request:Request, projectID, processID, fileID):
     try:
 
         # Retrieve the files infos from either the session or the database
-        fileOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        fileOfThisProcess, flag = getFilesInfoFromProcess(request._request, projectID, processID, fileID)
+        if flag == False:
+            return fileOfThisProcess # Response if something went wrong
 
         deletions = {"changes": {}, "deletions": {}}
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
