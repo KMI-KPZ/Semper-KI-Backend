@@ -127,6 +127,10 @@ def uploadFiles(request:Request):
         projectID = info["projectID"]
         processID = info["processID"]
         origin = info["origin"]
+        assert projectID != "", f"In {uploadFiles.cls.__name__}: non-empty projectID expected"
+        assert processID != "", f"In {uploadFiles.cls.__name__}: non-empty processID expected"
+        assert origin != "", f"In {uploadFiles.cls.__name__}: non-empty origin expected"
+
 
         content = ManageC.ManageContent(request.session)
         interface = content.getCorrectInterface(uploadFiles.cls.__name__)
@@ -147,6 +151,7 @@ def uploadFiles(request:Request):
 
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        assert userName != "", f"In {uploadFiles.cls.__name__}: non-empty userName expected"
         changes = {"changes": {ProcessUpdates.files: {}}}
 
         # check if duplicates exist
@@ -166,6 +171,7 @@ def uploadFiles(request:Request):
             existingFileNames.add(value[FileObjectContent.fileName])
 
         for fileName in fileNames:
+            assert fileName != "", f"In {uploadFiles.cls.__name__}: non-empty fileName expected"
             # rename duplicates
             counterForFileName = 1
             nameOfFile = fileName
