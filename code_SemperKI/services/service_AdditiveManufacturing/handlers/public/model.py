@@ -8,6 +8,7 @@ Contains: Handling of model files
 
 import json, logging, copy
 from datetime import datetime
+import os
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
@@ -43,10 +44,11 @@ loggerError = logging.getLogger("errors")
 
 #######################################################
 class SReqUploadModels(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
-    processID = serializers.CharField(max_length=200)
-    details = serializers.CharField(max_length=10000)
-    origin = serializers.CharField(max_length=200)
+    projectID = serializers.CharField(max_length=200, required=True)
+    processID = serializers.CharField(max_length=200, required=True)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"fileName":"file.stl"}]', max_length=10000)
+    origin = serializers.CharField(default="Service",max_length=200)
+    file = serializers.FileField(required=False)
     # multipart/form-data
 
 
@@ -116,27 +118,65 @@ def uploadModels(request:Request):
         
         detailsOfAllFiles = json.loads(info["details"])
         modelNames = list(request.FILES.keys())
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        
+        # check if duplicates exist
+        existingFileNames = set()
+        processContent = interface.getProcess(projectID, processID)
+        if isinstance(processContent, Exception):
+            message = f"Process not found in {uploadModels.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        for key in processContent[ProcessDescription.files]:
+            value = processContent[ProcessDescription.files][key]
+            existingFileNames.add(value[FileObjectContent.fileName])
+
         modelsToBeSaved = {}
         for fileName in modelNames:
+            # rename duplicates
+            counterForFileName = 1
+            nameOfFile = fileName
+            while nameOfFile in existingFileNames:
+                fileNameRoot, extension= os.path.splitext(nameOfFile)
+                if counterForFileName > 100000:
+                    raise Exception("Too many files with the same name uploaded!")
+                
+                if "_" in fileNameRoot:
+                    fileNameRootSplit = fileNameRoot.split("_")
+                    try:
+                        counterForFileName = int(fileNameRootSplit[-1])
+                        fileNameRoot = "_".join(fileNameRootSplit[:-1])
+                        counterForFileName += 1
+                    except:
+                        pass
+                nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
+                counterForFileName += 1
+                
             for model in request.FILES.getlist(fileName):
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    if detail["fileName"] == fileName:
+                    if detail["fileName"] == fileName or fileName == "file":
                         details = detail["details"]
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID+"/"+processID+"/"+fileID
-                userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+                
                 modelsToBeSaved[fileID] = {}
                 modelsToBeSaved[fileID][FileObjectContent.id] = fileID
                 modelsToBeSaved[fileID][FileObjectContent.path] = filePath
-                modelsToBeSaved[fileID][FileObjectContent.fileName] = fileName
+                modelsToBeSaved[fileID][FileObjectContent.fileName] = nameOfFile
                 modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
                 modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
                 modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
                 modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
+                modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()
                 modelsToBeSaved[fileID][FileObjectContent.size] = model.size
                 modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
                 modelsToBeSaved[fileID][FileObjectContent.origin] = origin
@@ -220,6 +260,7 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         currentProcess = interface.getProcessObj(projectID, processID)
         modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
         if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
@@ -229,6 +270,16 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if currentProcess.client != contentManager.getClient():
+            message = f"Rights not sufficient in {deleteModel.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

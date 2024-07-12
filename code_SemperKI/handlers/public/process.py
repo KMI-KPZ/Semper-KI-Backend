@@ -313,8 +313,11 @@ def updateProcess(request:Request):
         changes = inSerializer.data
         projectID = changes["projectID"]
         processIDs = changes["processIDs"] # list of processIDs
+        assert projectID != "", f"In {updateProcess.cls.__name__}: non-empty projectID expected"
+        assert len(processIDs) != 0, f"In {updateProcess.cls.__name__}: non-empty list of processIDs expected"
         
         # TODO remove
+        assert "changes" in changes.keys(), f"In {updateProcess.cls.__name__}: changes not in request"
         if ProcessUpdates.processStatus in changes["changes"]:
             del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
 
@@ -408,7 +411,7 @@ def deleteProcesses(request:Request, projectID):
 
     """
     try:
-        processIDs = request.data['processIDs']
+        processIDs = request.GET['processIDs'].split(",")
         retVal = deleteProcessFunction(request.session, processIDs)
         if isinstance(retVal, Exception):
             raise retVal

@@ -68,7 +68,9 @@ def getAllProjectsFlatAsAdmin(request:Request):
     projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
     for idx, entry in enumerate(projects):
         clientID = entry[ProcessDescription.client]
+        assert clientID != "", f"In {getAllProjectsFlatAsAdmin.cls.__name__}: non-empty clientID expected"
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
+        assert userName != "", f"In {getAllProjectsFlatAsAdmin.cls.__name__}: non-empty userName expected"
         projects[idx]["clientName"] = userName
         
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
