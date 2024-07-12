@@ -7,6 +7,7 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.definitions import NotificationSettingsUser, NotificationSettingsOrganizations
 
 ###################################################
 # Version of the backend
@@ -160,3 +161,30 @@ class FlatProcessStatus(StrEnumExactylAsDefined):
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
     COMPLETED = enum.auto()
+
+####################################################################################
+# Enum for notification settings
+class NotificationSettingsUserSemperKI(NotificationSettingsUser):
+    """
+    Which notifications exist for users?
+    
+    """
+    verification = enum.auto()
+    responseFromContractor = enum.auto()
+    newMessage = enum.auto()
+    actionReminder = enum.auto()
+    errorOccurred = enum.auto()
+
+####################################################################################
+# Enum for notification settings
+class NotificationSettingsOrgaSemperKI(NotificationSettingsOrganizations):
+    """
+    Which notifications exist for orgas?
+    
+    """
+    newProcess = enum.auto()
+    responseFromClient = enum.auto()
+    newMessage = enum.auto()
+    actionReminder = enum.auto()
+    errorOccurred = enum.auto()
+
