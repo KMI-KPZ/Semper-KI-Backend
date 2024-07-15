@@ -164,7 +164,7 @@ class FlatProcessStatus(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for notification settings
-class NotificationSettingsUserSemperKI(NotificationSettingsUser):
+class NotificationSettingsUserSemperKI(StrEnumExactylAsDefined):
     """
     Which notifications exist for users?
     
@@ -177,7 +177,7 @@ class NotificationSettingsUserSemperKI(NotificationSettingsUser):
 
 ####################################################################################
 # Enum for notification settings
-class NotificationSettingsOrgaSemperKI(NotificationSettingsOrganizations):
+class NotificationSettingsOrgaSemperKI(StrEnumExactylAsDefined):
     """
     Which notifications exist for orgas?
     
@@ -187,4 +187,18 @@ class NotificationSettingsOrgaSemperKI(NotificationSettingsOrganizations):
     newMessage = enum.auto()
     actionReminder = enum.auto()
     errorOccurred = enum.auto()
+
+###################################################
+# Enum for priorities for orgas
+class PrioritiesForOrganizationSemperKI(StrEnumExactylAsDefined):
+    """
+    If the organization has some priorities, they can be set here
+    Is used for calculations
+    """
+    cost = enum.auto()
+    time = enum.auto()
+    quality = enum.auto()
+    quantity = enum.auto()
+    resilience = enum.auto()
+    sustainability = enum.auto()
 
