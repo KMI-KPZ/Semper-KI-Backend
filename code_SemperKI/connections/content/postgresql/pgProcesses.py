@@ -293,11 +293,10 @@ class ProcessManagementBase(AbstractContentInterface):
             currentProcess = Process.objects.get(processID=processID)
             return currentProcess.toDict()
         except (ObjectDoesNotExist) as error:
-            return {}
+            return ObjectDoesNotExist("Process not found!")
         except (Exception) as error:
             logger.error(f'could not get process object: {str(error)}')
-        
-        return {}
+            return error
     
     ##############################################
     @staticmethod
@@ -981,7 +980,7 @@ class ProcessManagementBase(AbstractContentInterface):
             
             # first get user
             clientID = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getClientID(session)
-
+            clientName = profileManagement[session[SessionContent.PG_PROFILE_CLASS]].getUserName(session)
             # then go through projects
             projects = contentOfSession.structuredSessionObj.getProjects()
             for entry in projects:
@@ -1027,7 +1026,8 @@ class ProcessManagementBase(AbstractContentInterface):
                     for elem in process[ProcessDescription.files]:
                         fileEntry = process[ProcessDescription.files][elem]
                         if fileEntry[FileObjectContent.createdBy] == GlobalDefaults.anonymous:
-                            fileEntry[FileObjectContent.createdBy] = clientID
+                            fileEntry[FileObjectContent.createdBy] = clientName
+                            fileEntry[FileObjectContent.createdByID] = clientID
                         dataID = crypto.generateURLFriendlyRandomString()
                         ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
 
