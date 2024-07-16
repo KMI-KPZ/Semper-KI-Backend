@@ -302,7 +302,7 @@ def updateProcess(request:Request):
         inSerializer = SReqUpdateProcess(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateProcess.cls.__name__}"
-            exception = "Verification failed"
+            exception = f"Verification failed {inSerializer.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():

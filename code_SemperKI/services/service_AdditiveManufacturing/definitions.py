@@ -8,11 +8,11 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 
 import enum
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ##################################################
 # What makes up the 3D print service
-class ServiceDetails(StrEnumExactylAsDefined):
+class ServiceDetails(StrEnumExactlyAsDefined):
     """
     What does the service consists of 
 
@@ -24,7 +24,7 @@ class ServiceDetails(StrEnumExactylAsDefined):
 
 ##################################################
 # What defines a material?
-class MaterialDetails(StrEnumExactylAsDefined):
+class MaterialDetails(StrEnumExactlyAsDefined):
     """
     What does a material entry contain?
     """
@@ -36,7 +36,7 @@ class MaterialDetails(StrEnumExactylAsDefined):
 
 ##################################################
 # What defines a material?
-class PostProcessDetails(StrEnumExactylAsDefined):
+class PostProcessDetails(StrEnumExactlyAsDefined):
     """
     What does a postprocess entry contain?
     """

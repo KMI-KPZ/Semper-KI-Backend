@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
 """
 import enum
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 from Generic_Backend.code_General.definitions import NotificationSettingsUser, NotificationSettingsOrganizations
 
 ###################################################
@@ -64,7 +64,7 @@ def dataTypeToString(dataType:DataType):
 
 ####################################################################################
 # Enum for updateProcess
-class ProjectUpdates(StrEnumExactylAsDefined):
+class ProjectUpdates(StrEnumExactlyAsDefined):
     """
     What types of updates are there for a project?
 
@@ -74,7 +74,7 @@ class ProjectUpdates(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for updateProcess
-class ProcessUpdates(StrEnumExactylAsDefined):
+class ProcessUpdates(StrEnumExactlyAsDefined):
     """
     What types of updates are there for a process? 
     
@@ -92,7 +92,7 @@ class ProcessUpdates(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for processDetails
-class ProjectDetails(StrEnumExactylAsDefined):
+class ProjectDetails(StrEnumExactlyAsDefined):
     """
     What Details can a Project have?
     
@@ -101,7 +101,7 @@ class ProjectDetails(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for processDetails
-class ProcessDetails(StrEnumExactylAsDefined):
+class ProcessDetails(StrEnumExactlyAsDefined):
     """
     What Details can a Process have?
     
@@ -116,7 +116,7 @@ class ProcessDetails(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for messages
-class MessageContent(StrEnumExactylAsDefined):
+class MessageContent(StrEnumExactlyAsDefined):
     """
     What does a message consists of?
     
@@ -128,7 +128,7 @@ class MessageContent(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for session content
-class SessionContentSemperKI(StrEnumExactylAsDefined):
+class SessionContentSemperKI(StrEnumExactlyAsDefined):
     """
     Name of all added keys to the session for uniform naming
     
@@ -138,7 +138,7 @@ class SessionContentSemperKI(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for events
-class EventsDescription(StrEnumExactylAsDefined):
+class EventsDescription(StrEnumExactlyAsDefined):
     """
     Websocket events and missed events should be in the same format
 
@@ -150,7 +150,7 @@ class EventsDescription(StrEnumExactylAsDefined):
     
 ####################################################################################
 # Enum for flat process status
-class FlatProcessStatus(StrEnumExactylAsDefined):
+class FlatProcessStatus(StrEnumExactlyAsDefined):
     """
     For Frontend
     
@@ -164,7 +164,7 @@ class FlatProcessStatus(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for notification settings
-class NotificationSettingsUserSemperKI(StrEnumExactylAsDefined):
+class NotificationSettingsUserSemperKI(StrEnumExactlyAsDefined):
     """
     Which notifications exist for users?
     
@@ -177,7 +177,7 @@ class NotificationSettingsUserSemperKI(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for notification settings
-class NotificationSettingsOrgaSemperKI(StrEnumExactylAsDefined):
+class NotificationSettingsOrgaSemperKI(StrEnumExactlyAsDefined):
     """
     Which notifications exist for orgas?
     
@@ -190,7 +190,7 @@ class NotificationSettingsOrgaSemperKI(StrEnumExactylAsDefined):
 
 ###################################################
 # Enum for priorities for orgas
-class PrioritiesForOrganizationSemperKI(StrEnumExactylAsDefined):
+class PrioritiesForOrganizationSemperKI(StrEnumExactlyAsDefined):
     """
     If the organization has some priorities, they can be set here
     Is used for calculations

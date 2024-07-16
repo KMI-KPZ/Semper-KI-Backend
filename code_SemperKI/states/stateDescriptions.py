@@ -7,14 +7,14 @@ Contains: Contains definitions for the state machine
 """
 
 import enum
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 
 
 ###############################################################################
 # Definitions
 #######################################################
-class ProcessStatusAsString(StrEnumExactylAsDefined):
+class ProcessStatusAsString(StrEnumExactlyAsDefined):
     """
     Defines all statuus for the process (independent of the selected service)
     """
@@ -143,7 +143,7 @@ def processStatusFromIntToStr(statusCode:int) -> str:
 
 
 #######################################################
-class InterfaceForStateChange(StrEnumExactylAsDefined):
+class InterfaceForStateChange(StrEnumExactlyAsDefined):
     """
     What does the json consist of that is sent back and forth?
 
@@ -157,7 +157,7 @@ class InterfaceForStateChange(StrEnumExactylAsDefined):
     type = enum.auto()
 
 #######################################################
-class ButtonLabels(StrEnumExactylAsDefined):
+class ButtonLabels(StrEnumExactlyAsDefined):
     """
     So that the frontend can render it correctly. 
     Do not edit unless you change it in the translation file of the frontend as well!
@@ -189,7 +189,7 @@ class ButtonLabels(StrEnumExactylAsDefined):
     CLONE = enum.auto() # TODO not in frontend currently
 
 #######################################################
-class ButtonTypes(StrEnumExactylAsDefined):
+class ButtonTypes(StrEnumExactlyAsDefined):
     """
     Types of buttons
     
@@ -198,7 +198,7 @@ class ButtonTypes(StrEnumExactylAsDefined):
     secondary = enum.auto()
 
 #######################################################
-class IconType(StrEnumExactylAsDefined):
+class IconType(StrEnumExactlyAsDefined):
     """
     Names for the specific icons
     
