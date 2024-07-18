@@ -630,7 +630,12 @@ class ProcessManagementBase(AbstractContentInterface):
             if updateType == ProcessUpdates.messages:
                 # check key: content["origin"] -> key
                 # currentProcess.messages[key].append(content["origin"]["key"])
-                currentProcess.messages["messages"].append(content)
+                # currentProcess.messages["messages"].append(content)
+                origin = content['origin']
+                if origin in currentProcess.messages:
+                    currentProcess.messages[origin].append(content)
+                else:
+                    currentProcess.messages[origin] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
             elif updateType == ProcessUpdates.files:
