@@ -37,7 +37,7 @@
             }
         }   
     },
-    "en-GB":
+    "en-US":
     {
         "email": {
             "subjects": {
@@ -70,7 +70,7 @@
                 "inDelivery": "The contractor started delivery.",
                 "productionFailed": "The production of the process failed. Please contact the contractor.",
                 "processFinished": "The client declared the process as finished. Thank you very much!",
-                "dispute": "The delivered product was declared as non-sufficient. Please contact the client.",
+                "dispute": "The delivered product was declared as insufficient. Please contact the client.",
                 "failed": "The process was declared as failed by the client. We thank you anyway!"
             }
         }   
