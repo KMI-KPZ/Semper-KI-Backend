@@ -633,9 +633,9 @@ class ProcessManagementBase(AbstractContentInterface):
                 # currentProcess.messages["messages"].append(content)
                 origin = content['origin']
                 if origin in currentProcess.messages:
-                    currentProcess.messages[origin].append(content)
+                    currentProcess.messages[MessageOrigin[origin]].append(content)
                 else:
-                    currentProcess.messages[origin] = [content]
+                    currentProcess.messages[MessageOrigin[origin]] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
             elif updateType == ProcessUpdates.files:
