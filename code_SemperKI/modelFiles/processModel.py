@@ -184,7 +184,7 @@ class ProcessInterface():
     client = ""
     
     files = {}
-    messages = {"messages": []}
+    messages = {"messages": [],"Clarification": [],"Production": []}
 
     createdWhen = ""
     updatedWhen = ""
@@ -203,7 +203,7 @@ class ProcessInterface():
         self.dependenciesOut = ManyToManySimulation()
         self.client = client
         self.files = {}
-        self.messages = {"messages": []}
+        self.messages = {"messages": [],"Clarification": [],"Production": []}
         self.createdWhen = currentTime
         self.updatedWhen = currentTime
         self.accessedWhen = currentTime

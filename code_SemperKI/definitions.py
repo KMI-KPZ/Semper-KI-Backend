@@ -126,6 +126,16 @@ class MessageContent(StrEnumExactylAsDefined):
     text = enum.auto()
 
 ####################################################################################
+#Enum for MessageOrigin
+class MessageOrigin(StrEnumExactylAsDefined):
+    """
+    What does a message origin consist of?
+    
+    """
+    Clarification = enum.auto()
+    Proudction = enum.auto()
+    
+####################################################################################
 # Enum for session content
 class SessionContentSemperKI(StrEnumExactylAsDefined):
     """
