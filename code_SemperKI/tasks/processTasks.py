@@ -102,7 +102,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","statusUpdate"])
         if valid:
             message = Locales.manageTranslations.getTranslation(locale, ["email","content","verificationSuccessful"])
-            DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFIED), "SYSTEM")
+            DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
         else: # Else: set to failed
             message = Locales.manageTranslations.getTranslation(locale, ["email","content","verificationFailed"])
             DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")

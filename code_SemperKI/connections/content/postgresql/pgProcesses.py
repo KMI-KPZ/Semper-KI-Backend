@@ -1220,7 +1220,7 @@ class ProcessManagementBase(AbstractContentInterface):
         try:
 
             # Check if process is verified
-            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFIED):
+            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])

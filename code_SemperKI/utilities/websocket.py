@@ -49,12 +49,7 @@ def fireWebsocketEvents(projectID, processIDArray, session, event, operation="",
     if manualCheckifLoggedIn(session):
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
         channel_layer = get_channel_layer()
-        setOfUsersWhoAlreadyReceivedIt = set()
         for userID in dictForEvents: # user/orga that is associated with that process
-            if userID in setOfUsersWhoAlreadyReceivedIt:
-                continue
-            else:
-                setOfUsersWhoAlreadyReceivedIt.add(userID)
             values = dictForEvents[userID] # message, formatted for frontend
             values["triggerEvent"] = notificationPreference
             subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key
@@ -94,12 +89,7 @@ def fireWebsocketEventForClient(projectID, processIDArray, event, operation="", 
     
     dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processIDArray, event)
     channel_layer = get_channel_layer()
-    setOfUsersWhoAlreadyReceivedIt = set()
     for userID in dictForEvents: # user/orga that is associated with that process
-        if userID in setOfUsersWhoAlreadyReceivedIt:
-            continue
-        else:
-            setOfUsersWhoAlreadyReceivedIt.add(userID)
         values = dictForEvents[userID] # message, formatted for frontend
         values["triggerEvent"] = notificationPreference
         subID = pgProfiles.ProfileManagementBase.getUserKeyViaHash(userID) # primary key

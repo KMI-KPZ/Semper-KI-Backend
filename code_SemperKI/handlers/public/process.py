@@ -247,7 +247,10 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                             return ("", False)
                         sendNotification = False
                         if elem == ProcessUpdates.messages:
-                            notificationPreferences = pgProfiles.ProfileManagementBase.getNotificationPreferences(contentManager.getClient())
+                            process = interface.getProcessObj(projectID, processID)
+                            # if current client is process client, the contractor gets the message and vice versa
+                            clientOrContractorGetsMessage = process.contractor.hashedID if contentManager.getClient() == process.client else contentManager.getClient() 
+                            notificationPreferences = pgProfiles.ProfileManagementBase.getNotificationPreferences(clientOrContractorGetsMessage)
                             sendNotification = False
                             if notificationPreferences is not None:
                                 if NotificationSettingsUserSemperKI.newMessage in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.newMessage][NotificationTargets.event] == True:
