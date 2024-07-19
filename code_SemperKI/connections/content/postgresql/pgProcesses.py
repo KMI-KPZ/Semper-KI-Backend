@@ -33,7 +33,7 @@ import code_SemperKI.states.stateDescriptions as StateDescriptions
 
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....tasks.processTasks import verificationOfProcess, sendProcess, sendLocalFileToRemote
+from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
 
 import logging
 logger = logging.getLogger("errors")
@@ -1241,7 +1241,7 @@ class ProcessManagementBase(AbstractContentInterface):
             processObj.save()
 
             # send the rest (e-mails and such) asyncronously
-            sendProcess(processObj, contractorObj, session)
+            sendProcessEMails(processObj, contractorObj, session)
 
             return None
             

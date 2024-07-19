@@ -170,7 +170,9 @@ class NotificationSettingsUserSemperKI(StrEnumExactlyAsDefined):
     
     """
     verification = enum.auto()
+    processSent = enum.auto()
     responseFromContractor = enum.auto()
+    statusChange = enum.auto()
     newMessage = enum.auto()
     actionReminder = enum.auto()
     errorOccurred = enum.auto()
@@ -182,8 +184,9 @@ class NotificationSettingsOrgaSemperKI(StrEnumExactlyAsDefined):
     Which notifications exist for orgas?
     
     """
-    newProcess = enum.auto()
+    processReceived = enum.auto()
     responseFromClient = enum.auto()
+    statusChange = enum.auto()
     newMessage = enum.auto()
     actionReminder = enum.auto()
     errorOccurred = enum.auto()

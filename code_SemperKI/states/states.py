@@ -13,7 +13,7 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.definitions import Logging
+from Generic_Backend.code_General.definitions import Logging, NotificationTargets
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
@@ -27,7 +27,7 @@ import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
 
-from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus
+from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -104,6 +104,8 @@ def signalDependencyToOtherProcesses(interface:SessionInterface.ProcessManagemen
     :type interface: ProcessManagementSession | ProcessManagementBase
     :param processObj: The current process
     :type processObj: Process | ProcessInterface
+    :param currentClient: Who is ordering that?
+    :type currentClient: str
     :return: Nothing
     :rtype: None
     
@@ -212,6 +214,10 @@ class StateMachine(object):
         :type interface: ProcessManagementSession | ProcessManagementBase
         :param process: The process object
         :type process: Process | ProcessInterface
+        :param currentClient: Who is ordering that update?
+        :type currentClient: str
+        :return: Nothing
+        :rtype: None
         """
 
         # The next state will be the result of the onEvent function.
@@ -223,6 +229,14 @@ class StateMachine(object):
 
         :param event: The button pressed, as ProcessStatusAsString
         :type event: str
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :param currentClient: Who is ordering that update?
+        :type currentClient: str
+        :return: Nothing
+        :rtype: None
 
         """
         self.state = self.state.onButtonEvent(event, interface, process)
@@ -278,14 +292,21 @@ class State(ABC):
 
         """
         try:
+            currentClient = interface.getUserID()
             returnState = self
             for t in self.updateTransitions:
                 resultOfTransition = t(self, interface, process)
                 if resultOfTransition != self:
                     returnState = resultOfTransition
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
-                    break #TODO: Ensure that only one transition is possible 
+                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+
+                    notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
+                    sendNotification = False
+                    if notificationPreferences is not None:
+                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][NotificationTargets.event] == True:
+                            sendNotification = True # client whishes to be informed
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
+                    break # Ensure that only one transition is possible 
             
             return returnState
         except (Exception) as error:
@@ -308,13 +329,20 @@ class State(ABC):
 
         """
         try:
+            currentClient = interface.getUserID()
             returnState = self
             for t in self.buttonTransitions:
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
-                    break #TODO: Ensure that only one transition is possible 
+                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    
+                    notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
+                    sendNotification = False
+                    if notificationPreferences is not None:
+                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][NotificationTargets.event] == True:
+                            sendNotification = True # client whishes to be informed
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
+                    break # Ensure that only one transition is possible 
             
             return returnState
         except (Exception) as error:
@@ -322,7 +350,7 @@ class State(ABC):
             return self
 
     ###################################################
-    def sendMailToClient(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
+    def sendMailToClient(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, notificationType:str, reason:str, message:str):
         """
         Send a mail to the client
 
@@ -332,6 +360,8 @@ class State(ABC):
         :type process: Process | ProcessInterface
         :param locale: The locale string for that user
         :type locale: str
+        :param notificationType: What type of notification is given here?
+        :type notificationType: str
         :param reason: What is the reason for the mail
         :type reason: str
         :param message: The content of the message
@@ -340,17 +370,19 @@ class State(ABC):
         :rtype: None
         
         """
-        # Send mail to client
-        if ProfileManagementBase.checkIfHashIDBelongsToOrganization(process.client):
-            clientMail = ProfileManagementOrganization.getEMailAddress(process.client)
-        else:
-            clientMail = ProfileManagementUser.getEMailAddress(process.client)
+        # Send mail to client if so desired
+        notificationPreferences = ProfileManagementBase.getNotificationPreferences(process.client)
+        clientMail = ProfileManagementBase.getEMailAddress(process.client)
+
+        if notificationPreferences is not None:
+            if notificationType in notificationPreferences and notificationPreferences[notificationType][NotificationTargets.email] == False:
+                return # client whishes no email for that
         clientName = ProfileManagementBase.getUserNameViaHash(process.client)
         processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
         ProcessTasks.sendEMail(clientMail, f"{reason} '{processTitle}'", clientName, locale, message)
         
     ###################################################
-    def sendMailToContractor(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
+    def sendMailToContractor(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, notificationType:str, reason:str, message:str):
         """
         Send a mail to the contractor
 
@@ -360,6 +392,8 @@ class State(ABC):
         :type process: Process | ProcessInterface
         :param locale: The locale string for that user
         :type locale: str
+        :param notificationType: What type of notification is given here?
+        :type notificationType: str
         :param reason: What is the reason for the mail
         :type reason: str
         :param message: The content of the message
@@ -369,6 +403,10 @@ class State(ABC):
         
         """
         # Send mail to contractor
+        notificationPreferences = ProfileManagementOrganization.getNotificationPreferences(process.contractor.hashedID)
+        if notificationPreferences is not None:
+            if notificationType in notificationPreferences and notificationPreferences[notificationType][NotificationTargets.email] == False:
+                return # contractor whishes no email for that
         contractorMail = ProfileManagementOrganization.getEMailAddress(process.contractor.hashedID)
         contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor.hashedID)
         processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
@@ -467,10 +505,10 @@ class DRAFT(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
     
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
     
 #######################################################
@@ -607,7 +645,7 @@ class SERVICE_IN_PROGRESS(State):
         return super().onUpdateEvent(interface,process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -735,10 +773,10 @@ class SERVICE_READY(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -883,10 +921,10 @@ class SERVICE_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -1020,10 +1058,10 @@ class WAITING_FOR_OTHER_PROCESS(State):
     
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1122,10 +1160,10 @@ class SERVICE_COMPLICATION(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1229,10 +1267,10 @@ class CONTRACTOR_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1337,10 +1375,10 @@ class VERIFYING(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1447,10 +1485,10 @@ class VERIFICATION_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1555,7 +1593,7 @@ class REQUEST_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.responseFromContractor, subject, message)
         return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
 
     ###################################################
@@ -1569,7 +1607,7 @@ class REQUEST_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.responseFromContractor, subject, message)
         return stateDict[ProcessStatusAsString.OFFER_REJECTED]
 
     ###################################################
@@ -1578,10 +1616,10 @@ class REQUEST_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 # #######################################################
@@ -1699,10 +1737,10 @@ class REQUEST_COMPLETED(State):
 
 #     ###################################################
 #     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-#         return super().onUpdateEvent(interface,process) # do not change
+#         return super().onUpdateEvent(interface, process) # do not change
         
 #     ###################################################
-#     def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+#     def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
 #         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1797,7 +1835,7 @@ class OFFER_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByClient"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message)
         return stateDict[ProcessStatusAsString.CONFIRMATION_COMPLETED]
 
     ###################################################
@@ -1811,7 +1849,7 @@ class OFFER_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByClient"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message)
         return stateDict[ProcessStatusAsString.CONFIRMATION_REJECTED]
 
     ###################################################
@@ -1820,10 +1858,10 @@ class OFFER_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1896,10 +1934,10 @@ class OFFER_REJECTED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1979,7 +2017,7 @@ class CONFIRMATION_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inProduction"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inProduction"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.PRODUCTION_IN_PROGRESS]
 
     ###################################################
@@ -1988,10 +2026,10 @@ class CONFIRMATION_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2064,10 +2102,10 @@ class CONFIRMATION_REJECTED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2171,7 +2209,7 @@ class PRODUCTION_IN_PROGRESS(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2180,10 +2218,10 @@ class PRODUCTION_IN_PROGRESS(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2277,7 +2315,7 @@ class PRODUCTION_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inDelivery"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inDelivery"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.DELIVERY_IN_PROGRESS]
 
     ###################################################
@@ -2291,7 +2329,7 @@ class PRODUCTION_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2300,10 +2338,10 @@ class PRODUCTION_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2390,10 +2428,10 @@ class DELIVERY_IN_PROGRESS(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2506,7 +2544,7 @@ class DELIVERY_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2520,7 +2558,7 @@ class DELIVERY_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","dispute"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","dispute"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
         return stateDict[ProcessStatusAsString.DISPUTE]
 
     ###################################################
@@ -2534,7 +2572,7 @@ class DELIVERY_COMPLETED(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2543,10 +2581,10 @@ class DELIVERY_COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2644,7 +2682,7 @@ class DISPUTE(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.statusChange, subject, message)
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2658,7 +2696,7 @@ class DISPUTE(State):
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2667,10 +2705,10 @@ class DISPUTE(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2740,10 +2778,10 @@ class COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2813,10 +2851,10 @@ class FAILED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2886,10 +2924,10 @@ class CANCELED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 # fill dictionary

@@ -12,7 +12,7 @@ import logging
 
 from Generic_Backend.code_General.connections.mailer import MailingClass
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementBase, ProfileManagementOrganization, Organization
-from Generic_Backend.code_General.definitions import SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
+from Generic_Backend.code_General.definitions import NotificationTargets, SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
@@ -21,7 +21,7 @@ import code_SemperKI.utilities.websocket as websocket
 import code_SemperKI.utilities.locales as Locales
 import code_SemperKI.handlers.public.files as FileHandler
 
-from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails
+from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails, NotificationSettingsUserSemperKI, NotificationSettingsOrgaSemperKI
 from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
 from ..modelFiles.processModel import Process
 from ..serviceManager import serviceManager
@@ -97,7 +97,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Get all details and set status in database    
         userOfThatProcess, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
         locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
-        userEMailAddress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
+        userEMailAddress = ProfileManagementBase.getEMailAddress(processObj.client)
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","statusUpdate"])
         if valid:
@@ -108,14 +108,22 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
             DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
         
         # send out mail & Websocket event 
-        websocket.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus)  
-        sendEMail(userEMailAddress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
+        notificationPreferences = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getNotificationPreferences(processObj.client)
+        showEvent = False
+        if notificationPreferences is not None:
+            if NotificationSettingsUserSemperKI.verification in notificationPreferences:
+                if userEMailAddress is not None and notificationPreferences[NotificationSettingsUserSemperKI.verification][NotificationTargets.email] == True:
+                    sendEMail(userEMailAddress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
+                if notificationPreferences[NotificationSettingsUserSemperKI.verification][NotificationTargets.event] == True:
+                    showEvent = True
+        websocket.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus, "", showEvent)  
+        
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")
 
 ####################################################################
 @runInBackground
-def sendProcess(processObj:Process, contractorObj:Organization, session):
+def sendProcessEMails(processObj:Process, contractorObj:Organization, session):
     """
     Send the e-mails regarding the process on their merry way to the user and the contractor
     
@@ -131,20 +139,27 @@ def sendProcess(processObj:Process, contractorObj:Organization, session):
     """
     try:
         # Send email to contractor (async)
-        locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
-        contractorEMailAddress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
-        processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
-        subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","newProcessForContractor"])
-        message = Locales.manageTranslations.getTranslation(locale, ["email","content","newProcessForContractor"])
-        sendEMail(contractorEMailAddress, subject, contractorObj.name, locale, f"{message} {processTitle}")
+        notificationPreferencesContractor = ProfileManagementOrganization.getNotificationPreferences(contractorObj.hashedID)
+        if notificationPreferencesContractor is not None and NotificationSettingsOrgaSemperKI.processReceived in notificationPreferencesContractor and notificationPreferencesContractor[NotificationSettingsOrgaSemperKI.processReceived][NotificationTargets.email] == True:
+            locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
+            contractorEMailAddress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
+            if contractorEMailAddress is not None:
+                processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
+                subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","newProcessForContractor"])
+                message = Locales.manageTranslations.getTranslation(locale, ["email","content","newProcessForContractor"])
+                sendEMail(contractorEMailAddress, subject, contractorObj.name, locale, f"{message} {processTitle}")
 
         # Send Mail to user that the process is on its way
         userObj, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
-        locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
-        userMailAddress = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getEMailAddress(processObj.client)
-        subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","processSent"])
-        message = Locales.manageTranslations.getTranslation(locale, ["email","content","processSent"])
-        sendEMail(userMailAddress, f"{subject} '{processTitle}'", userObj.name, locale, message)
+        notificationPreferencesClient = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getNotificationPreferences(processObj.client)
+        if notificationPreferencesClient is not None and NotificationSettingsUserSemperKI.processSent in notificationPreferencesClient and notificationPreferencesClient[NotificationSettingsUserSemperKI.processSent][NotificationTargets.email] == True:
+            locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
+            userMailAddress = ProfileManagementBase.getEMailAddress(processObj.client)
+            if userMailAddress is not None:
+                subject = Locales.manageTranslations.getTranslation(locale, ["email","subjects","processSent"])
+                message = Locales.manageTranslations.getTranslation(locale, ["email","content","processSent"])
+                sendEMail(userMailAddress, f"{subject} '{processTitle}'", userObj.name, locale, message)
+
     except Exception as error:
         loggerError.error(f"Error while sending process: {str(error)}")
 

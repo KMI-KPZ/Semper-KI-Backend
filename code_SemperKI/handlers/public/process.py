@@ -245,7 +245,14 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                         if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
-                        WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
+                        sendNotification = False
+                        if elem == ProcessUpdates.messages:
+                            notificationPreferences = pgProfiles.ProfileManagementBase.getNotificationPreferences(contentManager.getClient())
+                            sendNotification = False
+                            if notificationPreferences is not None:
+                                if NotificationSettingsUserSemperKI.newMessage in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.newMessage][NotificationTargets.event] == True:
+                                    sendNotification = True # client whishes to be informed
+                        WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem, sendNotification)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):
