@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from Generic_Backend.code_General.utilities import basics
-from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription
+from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
@@ -21,16 +21,13 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
 
 
+from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserSubIDsAndNotificationPreference
 from ....modelFiles.projectModel import Project, ProjectInterface
 from ....modelFiles.processModel import Process, ProcessInterface
 from ....modelFiles.dataModel import Data
-
 from ....definitions import *
-
 from ....serviceManager import serviceManager
-
 import code_SemperKI.states.stateDescriptions as StateDescriptions
-
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
@@ -802,43 +799,37 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID, affectedProcessesIDs:list, event):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str):
         """
         Retrieve information about the users connected to the project from the database. 
 
         :param projectID: project ID to retrieve data from
         :type projectID: str
+        :param processID: The process ID affected
+        :type processID: str
+        :param event: the event that happens
+        :type event: str
+        :param notification: The notification that wants to be send
+        :type notification: str
         :return: Dictionary of users with project ID and processes in order for the websocket to fire events
         :rtype: Dict
 
         """
         # outputList for events
         dictForEventsAsOutput = {}
+        processObj = Process.objects.get(processID=processID)
+        clientID = processObj.client
+        dictOfUserIDsAndPreference = gatherUserSubIDsAndNotificationPreference(clientID, notification, UserNotificationTargets.event)
+        dictOfUsersThatBelongToContractor = {}
+        if processObj.contractor != None:
+            dictOfUsersThatBelongToContractor = gatherUserSubIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
+        
+        for userSubID in dictOfUserIDsAndPreference:
+            dictForEventsAsOutput[userSubID] = {"triggerEvent": dictOfUserIDsAndPreference[userSubID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
 
-        projectObj = Project.objects.get(projectID=projectID)
-        dictForEventsAsOutput[projectObj.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-        dictForEventsAsOutput[projectObj.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [] }]
-        for process in projectObj.processes.all():
-            if process.processID in affectedProcessesIDs:
-                if projectObj.client != process.client:
-                    if process.client not in dictForEventsAsOutput:
-                        dictForEventsAsOutput[process.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                        dictForEventsAsOutput[process.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                    else:
-                        dictForEventsAsOutput[process.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
-                else:
-                    dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
-                
-                # only signal contractors that received the process 
-                contractorID = ""
-                if process.contractor != None:
-                    contractorID = process.contractor.hashedID
-                    if projectObj.client != contractorID:
-                        if contractorID not in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                            dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                        else:
-                            dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+        for userThatBelongsToContractorSubID in dictOfUsersThatBelongToContractor:
+            dictForEventsAsOutput[userThatBelongsToContractorSubID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorSubID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+  
         return dictForEventsAsOutput
     
     ##############################################
@@ -1078,6 +1069,8 @@ class ProcessManagementBase(AbstractContentInterface):
                 # Code specific for orgas
                 # Add projects where the organization is registered as contractor
                 organizationObj = ProfileManagementBase.getOrganizationObject(session)
+                if isinstance(organizationObj, Exception):
+                    raise organizationObj
                 receivedProjects = {}
                 for processAsContractor in organizationObj.asContractor.all():
                     project = processAsContractor.project

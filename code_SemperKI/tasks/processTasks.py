@@ -12,7 +12,7 @@ import logging
 
 from Generic_Backend.code_General.connections.mailer import MailingClass
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementBase, ProfileManagementOrganization, Organization
-from Generic_Backend.code_General.definitions import NotificationTargets, SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
+from Generic_Backend.code_General.definitions import UserNotificationTargets, SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
 
@@ -112,9 +112,9 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         showEvent = False
         if notificationPreferences is not None:
             if NotificationSettingsUserSemperKI.verification in notificationPreferences:
-                if userEMailAddress is not None and notificationPreferences[NotificationSettingsUserSemperKI.verification][NotificationTargets.email] == True:
+                if userEMailAddress is not None and notificationPreferences[NotificationSettingsUserSemperKI.verification][UserNotificationTargets.email] == True:
                     sendEMail(userEMailAddress, f"{subject} '{processTitle}'", userOfThatProcess.name, locale, message)
-                if notificationPreferences[NotificationSettingsUserSemperKI.verification][NotificationTargets.event] == True:
+                if notificationPreferences[NotificationSettingsUserSemperKI.verification][UserNotificationTargets.event] == True:
                     showEvent = True
         websocket.fireWebsocketEventForClient(processObj.project.projectID, [processObj.processID], ProcessUpdates.processStatus, "", showEvent)  
         
@@ -140,7 +140,7 @@ def sendProcessEMails(processObj:Process, contractorObj:Organization, session):
     try:
         # Send email to contractor (async)
         notificationPreferencesContractor = ProfileManagementOrganization.getNotificationPreferences(contractorObj.hashedID)
-        if notificationPreferencesContractor is not None and NotificationSettingsOrgaSemperKI.processReceived in notificationPreferencesContractor and notificationPreferencesContractor[NotificationSettingsOrgaSemperKI.processReceived][NotificationTargets.email] == True:
+        if notificationPreferencesContractor is not None and NotificationSettingsOrgaSemperKI.processReceived in notificationPreferencesContractor and notificationPreferencesContractor[NotificationSettingsOrgaSemperKI.processReceived][UserNotificationTargets.email] == True:
             locale = ProfileManagementBase.getUserLocale(hashedID=contractorObj.hashedID)
             contractorEMailAddress = ProfileManagementOrganization.getEMailAddress(contractorObj.hashedID)
             if contractorEMailAddress is not None:
@@ -152,7 +152,7 @@ def sendProcessEMails(processObj:Process, contractorObj:Organization, session):
         # Send Mail to user that the process is on its way
         userObj, orgaOrNot = ProfileManagementBase.getUserViaHash(processObj.client)
         notificationPreferencesClient = profileManagement[ProfileClasses.organization if orgaOrNot else ProfileClasses.user].getNotificationPreferences(processObj.client)
-        if notificationPreferencesClient is not None and NotificationSettingsUserSemperKI.processSent in notificationPreferencesClient and notificationPreferencesClient[NotificationSettingsUserSemperKI.processSent][NotificationTargets.email] == True:
+        if notificationPreferencesClient is not None and NotificationSettingsUserSemperKI.processSent in notificationPreferencesClient and notificationPreferencesClient[NotificationSettingsUserSemperKI.processSent][UserNotificationTargets.email] == True:
             locale = ProfileManagementBase.getUserLocale(hashedID=processObj.client)
             userMailAddress = ProfileManagementBase.getEMailAddress(processObj.client)
             if userMailAddress is not None:

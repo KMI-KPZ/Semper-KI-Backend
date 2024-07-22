@@ -253,7 +253,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                             notificationPreferences = pgProfiles.ProfileManagementBase.getNotificationPreferences(clientOrContractorGetsMessage)
                             sendNotification = False
                             if notificationPreferences is not None:
-                                if NotificationSettingsUserSemperKI.newMessage in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.newMessage][NotificationTargets.event] == True:
+                                if NotificationSettingsUserSemperKI.newMessage in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.newMessage][UserNotificationTargets.event] == True:
                                     sendNotification = True # client whishes to be informed
                         WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem, sendNotification)
                     

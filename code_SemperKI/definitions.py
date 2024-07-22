@@ -205,3 +205,49 @@ class PrioritiesForOrganizationSemperKI(StrEnumExactlyAsDefined):
     resilience = enum.auto()
     sustainability = enum.auto()
 
+##################################################
+# Enum for values of priorities
+class PriorityTargetsSemperKI(StrEnumExactlyAsDefined):
+    """
+    What does every priority contain
+    
+    """
+    value = enum.auto() # the integer value
+
+##################################################
+# Permission enum
+class PermissionsEnum(enum.StrEnum):
+    """
+    What permissions are there?
+    
+    """
+    proccessesRead = "processes:read"
+    processesFiles = "processes:files"
+    processesMessages = "processes:messages"
+    processesEdit = "processes:edit"
+    processesDelete = "processes:delete"
+    orgaEdit = "orga:edit"
+    orgaDelete = "orga:delete"
+    orgaRead = "orga:read"
+    resourcesRead = "resources:read"
+    resourcesEdit = "resources:edit"
+
+##################################################
+# Class that contains a dictionary which maps the permissions to the notifications
+class MapPermissionsToOrgaNotifications():
+    """
+    Contains a dictionary which maps the permissions to the notifications
+    """
+    permissionsToNotifications = {
+        # all: [x.value for x in NotificationSettingsOrgaSemperKI]
+        PermissionsEnum.proccessesRead: [NotificationSettingsOrgaSemperKI.processReceived.value, NotificationSettingsOrgaSemperKI.responseFromClient.value, NotificationSettingsOrgaSemperKI.statusChange.value], 
+        PermissionsEnum.processesFiles: [], 
+        PermissionsEnum.processesMessages: [NotificationSettingsOrgaSemperKI.newMessage.value], 
+        PermissionsEnum.processesEdit : [NotificationSettingsOrgaSemperKI.actionReminder.value, NotificationSettingsOrgaSemperKI.errorOccurred.value], 
+        PermissionsEnum.processesDelete: [], 
+        PermissionsEnum.orgaEdit: [],
+        PermissionsEnum.orgaDelete: [],
+        PermissionsEnum.orgaRead: [],
+        PermissionsEnum.resourcesRead: [], 
+        PermissionsEnum.resourcesEdit: [],	
+    }

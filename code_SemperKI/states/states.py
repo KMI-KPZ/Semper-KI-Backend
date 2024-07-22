@@ -13,7 +13,7 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.definitions import Logging, NotificationTargets
+from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
@@ -303,7 +303,7 @@ class State(ABC):
                     notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
                     sendNotification = False
                     if notificationPreferences is not None:
-                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][NotificationTargets.event] == True:
+                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][UserNotificationTargets.event] == True:
                             sendNotification = True # client whishes to be informed
                     WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
                     break # Ensure that only one transition is possible 
@@ -339,7 +339,7 @@ class State(ABC):
                     notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
                     sendNotification = False
                     if notificationPreferences is not None:
-                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][NotificationTargets.event] == True:
+                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][UserNotificationTargets.event] == True:
                             sendNotification = True # client whishes to be informed
                     WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
                     break # Ensure that only one transition is possible 
@@ -375,7 +375,7 @@ class State(ABC):
         clientMail = ProfileManagementBase.getEMailAddress(process.client)
 
         if notificationPreferences is not None:
-            if notificationType in notificationPreferences and notificationPreferences[notificationType][NotificationTargets.email] == False:
+            if notificationType in notificationPreferences and notificationPreferences[notificationType][UserNotificationTargets.email] == False:
                 return # client whishes no email for that
         clientName = ProfileManagementBase.getUserNameViaHash(process.client)
         processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
@@ -405,7 +405,7 @@ class State(ABC):
         # Send mail to contractor
         notificationPreferences = ProfileManagementOrganization.getNotificationPreferences(process.contractor.hashedID)
         if notificationPreferences is not None:
-            if notificationType in notificationPreferences and notificationPreferences[notificationType][NotificationTargets.email] == False:
+            if notificationType in notificationPreferences and notificationPreferences[notificationType][UserNotificationTargets.email] == False:
                 return # contractor whishes no email for that
         contractorMail = ProfileManagementOrganization.getEMailAddress(process.contractor.hashedID)
         contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor.hashedID)
