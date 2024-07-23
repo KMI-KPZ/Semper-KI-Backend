@@ -247,15 +247,11 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                             return ("", False)
                         sendNotification = False
                         if elem == ProcessUpdates.messages:
-                            process = interface.getProcessObj(projectID, processID)
-                            # if current client is process client, the contractor gets the message and vice versa
-                            clientOrContractorGetsMessage = process.contractor.hashedID if contentManager.getClient() == process.client else contentManager.getClient() 
-                            notificationPreferences = pgProfiles.ProfileManagementBase.getNotificationPreferences(clientOrContractorGetsMessage)
-                            sendNotification = False
-                            if notificationPreferences is not None:
-                                if NotificationSettingsUserSemperKI.newMessage in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.newMessage][UserNotificationTargets.event] == True:
-                                    sendNotification = True # client whishes to be informed
-                        WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem, sendNotification)
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
+                        elif elem == ProcessUpdates.processStatus:
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
+                        else:
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):

@@ -7,7 +7,6 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
-from Generic_Backend.code_General.definitions import NotificationSettingsUser, NotificationSettingsOrganizations
 
 ###################################################
 # Version of the backend
@@ -240,7 +239,7 @@ class MapPermissionsToOrgaNotifications():
     """
     permissionsToNotifications = {
         # all: [x.value for x in NotificationSettingsOrgaSemperKI]
-        PermissionsEnum.proccessesRead: [NotificationSettingsOrgaSemperKI.processReceived.value, NotificationSettingsOrgaSemperKI.responseFromClient.value, NotificationSettingsOrgaSemperKI.statusChange.value], 
+        PermissionsEnum.proccessesRead: [NotificationSettingsOrgaSemperKI.processReceived.value, NotificationSettingsOrgaSemperKI.responseFromClient.value, NotificationSettingsOrgaSemperKI.statusChange.value, NotificationSettingsUserSemperKI.verification.value, NotificationSettingsUserSemperKI.processSent.value, NotificationSettingsUserSemperKI.responseFromContractor.value], 
         PermissionsEnum.processesFiles: [], 
         PermissionsEnum.processesMessages: [NotificationSettingsOrgaSemperKI.newMessage.value], 
         PermissionsEnum.processesEdit : [NotificationSettingsOrgaSemperKI.actionReminder.value, NotificationSettingsOrgaSemperKI.errorOccurred.value], 

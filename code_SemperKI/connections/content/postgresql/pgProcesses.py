@@ -21,7 +21,7 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
 
 
-from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserSubIDsAndNotificationPreference
+from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
 from ....modelFiles.projectModel import Project, ProjectInterface
 from ....modelFiles.processModel import Process, ProcessInterface
 from ....modelFiles.dataModel import Data
@@ -799,7 +799,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str, clientOnly:bool):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -819,17 +819,17 @@ class ProcessManagementBase(AbstractContentInterface):
         dictForEventsAsOutput = {}
         processObj = Process.objects.get(processID=processID)
         clientID = processObj.client
-        dictOfUserIDsAndPreference = gatherUserSubIDsAndNotificationPreference(clientID, notification, UserNotificationTargets.event)
+        dictOfUserIDsAndPreference = gatherUserHashIDsAndNotificationPreference(clientID, notification, UserNotificationTargets.event)
         dictOfUsersThatBelongToContractor = {}
-        if processObj.contractor != None:
-            dictOfUsersThatBelongToContractor = gatherUserSubIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
+        if processObj.contractor != None and clientOnly == False:
+            dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
-        for userSubID in dictOfUserIDsAndPreference:
-            dictForEventsAsOutput[userSubID] = {"triggerEvent": dictOfUserIDsAndPreference[userSubID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+        for userHashID in dictOfUserIDsAndPreference:
+            dictForEventsAsOutput[userHashID] = {"triggerEvent": dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
 
-        for userThatBelongsToContractorSubID in dictOfUsersThatBelongToContractor:
-            dictForEventsAsOutput[userThatBelongsToContractorSubID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorSubID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
-  
+        for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
+            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+    
         return dictForEventsAsOutput
     
     ##############################################

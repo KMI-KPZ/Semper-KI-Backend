@@ -112,7 +112,7 @@ def updateOrgaDetailsSemperKI(orgaHashID:str, session):
         return None
 
 ####################################################################################
-def gatherUserSubIDsAndNotificationPreference(orgaOrUserID:str, notification:str, notificationType:str):
+def gatherUserHashIDsAndNotificationPreference(orgaOrUserID:str, notification:str, notificationType:str):
     """
     Gather all IDs for either a user or members of an organization and their preference for a certain notification
 
@@ -136,25 +136,19 @@ def gatherUserSubIDsAndNotificationPreference(orgaOrUserID:str, notification:str
             for user in organizationObj.users.all():
                 hashedIDOfUser = user.hashedID
                 preferencesOfUserAsPartOfOrga = user.details[UserDetails.notificationSettings][ProfileClasses.organization]
-                subIDOfUser = ProfileManagementBase.getUserKeyViaHash(hashedIDOfUser)
-                if isinstance(subIDOfUser, Exception):
-                    raise subIDOfUser
                 if notification in preferencesOfUserAsPartOfOrga and preferencesOfUserAsPartOfOrga[notification][notificationType]:
-                    resultDict[subIDOfUser] = True
+                    resultDict[hashedIDOfUser] = True
                 else:
-                    resultDict[subIDOfUser] = False
+                    resultDict[hashedIDOfUser] = False
             return resultDict
         else:
             preferencesOfUser = ProfileManagementBase.getNotificationPreferences(orgaOrUserID)
             if preferencesOfUser is None:
                 raise Exception("Error in getting user preferences")
-            subIDOfUser = ProfileManagementBase.getUserKeyViaHash(orgaOrUserID)
-            if isinstance(subIDOfUser, Exception):
-                    raise subIDOfUser
             if notification in preferencesOfUser and preferencesOfUser[notification][notificationType]:
-                return {subIDOfUser: True}
+                return {orgaOrUserID: True}
             else:
-                return {subIDOfUser: False}
+                return {orgaOrUserID: False}
     except Exception as error:
         logger.error(f'could not gather notification settings: {str(error)}')
         return error

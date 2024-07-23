@@ -299,13 +299,7 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
-
-                    notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
-                    sendNotification = False
-                    if notificationPreferences is not None:
-                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][UserNotificationTargets.event] == True:
-                            sendNotification = True # client whishes to be informed
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -335,83 +329,13 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
-                    
-                    notificationPreferences = ProfileManagementBase.getNotificationPreferences(currentClient)
-                    sendNotification = False
-                    if notificationPreferences is not None:
-                        if NotificationSettingsUserSemperKI.statusChange in notificationPreferences and notificationPreferences[NotificationSettingsUserSemperKI.statusChange][UserNotificationTargets.event] == True:
-                            sendNotification = True # client whishes to be informed
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus, "", sendNotification)
+                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
         except (Exception) as error:
             loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
             return self
-
-    ###################################################
-    def sendMailToClient(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, notificationType:str, reason:str, message:str):
-        """
-        Send a mail to the client
-
-        :param interface: The session or database interface
-        :type interface: ProcessManagementSession | ProcessManagementBase
-        :param process: The process object
-        :type process: Process | ProcessInterface
-        :param locale: The locale string for that user
-        :type locale: str
-        :param notificationType: What type of notification is given here?
-        :type notificationType: str
-        :param reason: What is the reason for the mail
-        :type reason: str
-        :param message: The content of the message
-        :type message: str
-        :return: Nothing
-        :rtype: None
-        
-        """
-        # Send mail to client if so desired
-        notificationPreferences = ProfileManagementBase.getNotificationPreferences(process.client)
-        clientMail = ProfileManagementBase.getEMailAddress(process.client)
-
-        if notificationPreferences is not None:
-            if notificationType in notificationPreferences and notificationPreferences[notificationType][UserNotificationTargets.email] == False:
-                return # client whishes no email for that
-        clientName = ProfileManagementBase.getUserNameViaHash(process.client)
-        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(clientMail, f"{reason} '{processTitle}'", clientName, locale, message)
-        
-    ###################################################
-    def sendMailToContractor(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, notificationType:str, reason:str, message:str):
-        """
-        Send a mail to the contractor
-
-        :param interface: The session or database interface
-        :type interface: ProcessManagementSession | ProcessManagementBase
-        :param process: The process object
-        :type process: Process | ProcessInterface
-        :param locale: The locale string for that user
-        :type locale: str
-        :param notificationType: What type of notification is given here?
-        :type notificationType: str
-        :param reason: What is the reason for the mail
-        :type reason: str
-        :param message: The content of the message
-        :type message: str
-        :return: Nothing
-        :rtype: None
-        
-        """
-        # Send mail to contractor
-        notificationPreferences = ProfileManagementOrganization.getNotificationPreferences(process.contractor.hashedID)
-        if notificationPreferences is not None:
-            if notificationType in notificationPreferences and notificationPreferences[notificationType][UserNotificationTargets.email] == False:
-                return # contractor whishes no email for that
-        contractorMail = ProfileManagementOrganization.getEMailAddress(process.contractor.hashedID)
-        contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor.hashedID)
-        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(contractorMail, f"{reason} '{processTitle}'", contracorName, locale, message)
-        
 
     ###################################################
     def __repr__(self):
@@ -1590,10 +1514,9 @@ class REQUEST_COMPLETED(State):
         To: OFFER_COMPLETED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.responseFromContractor, subject, message)
+        subject = ["email","subjects","confirmedByContractor"]
+        message = ["email","content","confirmedByContractor"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.responseFromContractor, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
 
     ###################################################
@@ -1604,10 +1527,9 @@ class REQUEST_COMPLETED(State):
         To: OFFER_REJECTED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.responseFromContractor, subject, message)
+        subject = ["email","subjects","declinedByContractor"]
+        message = ["email","content","declinedByContractor"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.responseFromContractor, subject, message, process.processDetails[ProcessDetails.title])        
         return stateDict[ProcessStatusAsString.OFFER_REJECTED]
 
     ###################################################
@@ -1712,8 +1634,8 @@ class REQUEST_COMPLETED(State):
 
 #         """
 #         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-#         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
-#         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
+#         subject = ["email","subjects","confirmedByContractor"])
+#         message = ["email","content","confirmedByContractor"])
 #         self.sendMailToClient(interface, process, userLocale, subject, message)
 #         return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
 
@@ -1726,8 +1648,8 @@ class REQUEST_COMPLETED(State):
 
 #         """
 #         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-#         subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
-#         message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
+#         subject = ["email","subjects","declinedByContractor"])
+#         message = ["email","content","declinedByContractor"])
 #         self.sendMailToClient(interface, process, userLocale, subject, message)
 #         return stateDict[ProcessStatusAsString.OFFER_REJECTED]
 
@@ -1832,10 +1754,9 @@ class OFFER_COMPLETED(State):
         To: CONFIRMATION_COMPLETED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByClient"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message)
+        subject = ["email","subjects","confirmedByClient"]
+        message = ["email","content","confirmedByClient"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.CONFIRMATION_COMPLETED]
 
     ###################################################
@@ -1846,10 +1767,9 @@ class OFFER_COMPLETED(State):
         To: CONFIRMATION_REJECTED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByClient"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message)
+        subject = ["email","subjects","declinedByClient"]
+        message = ["email","content","declinedByClient"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.CONFIRMATION_REJECTED]
 
     ###################################################
@@ -2014,10 +1934,9 @@ class CONFIRMATION_COMPLETED(State):
         To: PRODUCTION_IN_PROGRESS
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inProduction"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inProduction"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","inProduction"]
+        message = ["email","content","inProduction"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.PRODUCTION_IN_PROGRESS]
 
     ###################################################
@@ -2206,10 +2125,9 @@ class PRODUCTION_IN_PROGRESS(State):
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","productionFailed"]
+        message = ["email","content","productionFailed"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2313,9 +2231,9 @@ class PRODUCTION_COMPLETED(State):
 
         """
         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inDelivery"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inDelivery"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","inDelivery"]
+        message = ["email","content","inDelivery"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.DELIVERY_IN_PROGRESS]
 
     ###################################################
@@ -2326,10 +2244,9 @@ class PRODUCTION_COMPLETED(State):
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
-        self.sendMailToClient(interface, process, userLocale, NotificationSettingsUserSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","productionFailed"]
+        message = ["email","content","productionFailed"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2541,10 +2458,9 @@ class DELIVERY_COMPLETED(State):
         # signal to dependent processes, that this one is finished
         signalCompleteToDependentProcesses(interface, process)
 
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2555,10 +2471,9 @@ class DELIVERY_COMPLETED(State):
         To: DISPUTE
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","dispute"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","dispute"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
+        subject = ["email","subjects","dispute"]
+        message = ["email","content","dispute"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.DISPUTE]
 
     ###################################################
@@ -2569,10 +2484,9 @@ class DELIVERY_COMPLETED(State):
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
+        subject = ["email","subjects","failed"]
+        message = ["email","content","failed"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2679,10 +2593,9 @@ class DISPUTE(State):
         # signal to dependent processes, that this one is finished
         signalCompleteToDependentProcesses(interface, process)
 
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.statusChange, subject, message)
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2693,10 +2606,10 @@ class DISPUTE(State):
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message)
+
+        subject = ["email","subjects","failed"]
+        message = ["email","content","failed"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
