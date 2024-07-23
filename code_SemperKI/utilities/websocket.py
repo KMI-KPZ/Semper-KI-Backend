@@ -50,7 +50,7 @@ def fireWebsocketEvents(projectID, processID, session, event, notification:str="
         channel_layer = get_channel_layer()
         for userID in dictForEvents: # user/orga that is associated with that process
             values = dictForEvents[userID] # message, formatted for frontend
-            async_to_sync(channel_layer.group_send)(userID, {
+            async_to_sync(channel_layer.group_send)(userID[:80], {
                 "type": "sendMessageJSON",
                 "dict": values,
             })

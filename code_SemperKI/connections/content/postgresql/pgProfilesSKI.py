@@ -67,7 +67,7 @@ def updateUserDetailsSemperKI(userHashID:str, session):
         return None
 
 ####################################################################################
-def updateOrgaDetailsSemperKI(orgaHashID:str, session):
+def updateOrgaDetailsSemperKI(orgaHashID:str):
     """
     Look for orga, update details according to Semper-KI specific fields
 

@@ -248,7 +248,9 @@ class State(ABC):
     Abstract State class providing the implementation interface
     """
 
-    statusCode = 0
+    statusCode = 0 # the integer representation of the state
+    name = "" # the string representation of the state
+    fireEvent = True # if it should fire an event when transitioned to
 
     ###################################################
     def __init__(self):
@@ -299,7 +301,8 @@ class State(ABC):
                 if resultOfTransition != self:
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                    if returnState.fireEvent:
+                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -329,7 +332,8 @@ class State(ABC):
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                    if returnState.fireEvent:
+                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -363,6 +367,7 @@ class DRAFT(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DRAFT)
     name = ProcessStatusAsString.DRAFT
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -444,6 +449,7 @@ class SERVICE_IN_PROGRESS(State):
     
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
+    fireEvent = False
     
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -580,6 +586,7 @@ class SERVICE_READY(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_READY)
     name = ProcessStatusAsString.SERVICE_READY
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -711,6 +718,7 @@ class SERVICE_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
+    fireEvent = False
 
     ###################################################
     def checkIfButtonIsActive(self, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -860,6 +868,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -997,6 +1006,7 @@ class SERVICE_COMPLICATION(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
     name = ProcessStatusAsString.SERVICE_COMPLICATION
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1098,6 +1108,7 @@ class CONTRACTOR_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_COMPLETED)
     name = ProcessStatusAsString.CONTRACTOR_COMPLETED
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1206,6 +1217,7 @@ class VERIFYING(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
     name = ProcessStatusAsString.VERIFYING
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1313,6 +1325,7 @@ class VERIFICATION_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED)
     name = ProcessStatusAsString.VERIFICATION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1423,6 +1436,7 @@ class REQUEST_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.REQUEST_COMPLETED)
     name = ProcessStatusAsString.REQUEST_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1673,6 +1687,7 @@ class OFFER_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.OFFER_COMPLETED)
     name = ProcessStatusAsString.OFFER_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1792,6 +1807,7 @@ class OFFER_REJECTED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.OFFER_REJECTED)
     name = ProcessStatusAsString.OFFER_REJECTED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1868,6 +1884,7 @@ class CONFIRMATION_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMATION_COMPLETED)
     name = ProcessStatusAsString.CONFIRMATION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1959,6 +1976,7 @@ class CONFIRMATION_REJECTED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMATION_REJECTED)
     name = ProcessStatusAsString.CONFIRMATION_REJECTED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2035,6 +2053,7 @@ class PRODUCTION_IN_PROGRESS(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION_IN_PROGRESS)
     name = ProcessStatusAsString.PRODUCTION_IN_PROGRESS
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2150,6 +2169,7 @@ class PRODUCTION_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION_COMPLETED)
     name = ProcessStatusAsString.PRODUCTION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2269,6 +2289,7 @@ class DELIVERY_IN_PROGRESS(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_IN_PROGRESS)
     name = ProcessStatusAsString.DELIVERY_IN_PROGRESS
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2359,6 +2380,7 @@ class DELIVERY_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_COMPLETED)
     name = ProcessStatusAsString.DELIVERY_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2509,6 +2531,7 @@ class DISPUTE(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DISPUTE)
     name = ProcessStatusAsString.DISPUTE
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2632,6 +2655,7 @@ class COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.COMPLETED)
     name = ProcessStatusAsString.COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2705,6 +2729,7 @@ class FAILED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.FAILED)
     name = ProcessStatusAsString.FAILED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2778,6 +2803,7 @@ class CANCELED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CANCELED)
     name = ProcessStatusAsString.CANCELED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
