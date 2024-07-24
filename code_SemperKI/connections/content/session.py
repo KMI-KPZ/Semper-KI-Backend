@@ -13,7 +13,7 @@ from Generic_Backend.code_General.definitions import SessionContent, FileObjectC
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
 
-from ...definitions import SessionContentSemperKI
+from ...definitions import SessionContentSemperKI, MessageInterfaceFromFrontend
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
@@ -583,7 +583,17 @@ class ProcessManagementSession(AbstractContentInterface):
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
             if updateType == ProcessUpdates.messages:
-                currentProcess[ProcessDescription.messages]["messages"].append(content)
+                if MessageInterfaceFromFrontend.origin in content:
+                    origin = content[MessageInterfaceFromFrontend.origin]
+                    if origin in currentProcess[ProcessDescription.messages]:
+                        currentProcess[ProcessDescription.messages][origin].append(content)
+                    else:
+                        currentProcess[ProcessDescription.messages][origin] = [content]
+                else:
+                    if MessageInterfaceFromFrontend.messages in currentProcess[ProcessDescription.messages]:
+                        currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages].append(content)
+                    else:
+                        currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages] = [content]
             
             elif updateType == ProcessUpdates.files:
                 for entry in content:
@@ -673,7 +683,8 @@ class ProcessManagementSession(AbstractContentInterface):
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
             if updateType == ProcessUpdates.messages:
-                currentProcess[ProcessDescription.messages]["messages"] = []
+                origin = content['origin']
+                currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend[origin]] = []
         
             elif updateType == ProcessUpdates.files:
                 for entry in content:

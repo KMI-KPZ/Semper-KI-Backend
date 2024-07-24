@@ -625,9 +625,17 @@ class ProcessManagementBase(AbstractContentInterface):
             dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
-                # check key: content["origin"] -> key
-                # currentProcess.messages[key].append(content["origin"]["key"])
-                currentProcess.messages["messages"].append(content)
+                if MessageInterfaceFromFrontend.origin in content:
+                    origin = content[MessageInterfaceFromFrontend.origin]
+                    if origin in currentProcess.messages:
+                        currentProcess.messages[origin].append(content)
+                    else:
+                        currentProcess.messages[origin] = [content]
+                else:
+                    if MessageInterfaceFromFrontend.messages in currentProcess.messages:
+                        currentProcess.messages[MessageInterfaceFromFrontend.messages].append(content)
+                    else:
+                        currentProcess.messages[MessageInterfaceFromFrontend.messages] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
             elif updateType == ProcessUpdates.files:
