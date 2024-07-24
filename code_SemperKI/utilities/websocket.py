@@ -49,6 +49,8 @@ def fireWebsocketEvents(projectID, processID, session, event, notification:str="
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, notification, clientOnly)
         channel_layer = get_channel_layer()
         for userID in dictForEvents: # user/orga that is associated with that process
+            if notification == NotificationSettingsUserSemperKI.newMessage and userID == ProfileManagementBase.getUserHashID(session=session):
+                continue # If you wrote a message, you shouldn't get a notification for yourself
             values = dictForEvents[userID] # message, formatted for frontend
             async_to_sync(channel_layer.group_send)(userID[:80], {
                 "type": "sendMessageJSON",

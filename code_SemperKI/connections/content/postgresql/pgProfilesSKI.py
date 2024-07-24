@@ -11,6 +11,7 @@ import copy
 from ....definitions import NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, MapPermissionsToOrgaNotifications
 from Generic_Backend.code_General.definitions import OrganizationDetails, UserDetails, UserNotificationTargets, OrganizationNotificationTargets, SessionContent, ProfileClasses
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
 from logging import getLogger
 logger = getLogger("errors")
@@ -29,33 +30,54 @@ def updateUserDetailsSemperKI(userHashID:str, session):
         user, _ = ProfileManagementBase.getUserViaHash(userHashID)
         existingDetails = copy.deepcopy(user.details)
 
+        if UserDetails.notificationSettings in existingDetails:
+            existingDetails = existingDetails[UserDetails.notificationSettings]
+            if ProfileClasses.user in existingDetails:
+                existingDetails = existingDetails[ProfileClasses.user]
+            else:
+                user.details[UserDetails.notificationSettings][ProfileClasses.user] = {}
+        else:
+            user.details[UserDetails.notificationSettings] = {}
+            user.details[UserDetails.notificationSettings][ProfileClasses.user] = {}
+        
         for entry in NotificationSettingsUserSemperKI:
             setting = entry.value
-            if setting in existingDetails[UserDetails.notificationSettings]:
+            if setting in existingDetails:
                 user.details[UserDetails.notificationSettings][ProfileClasses.user][setting] = {}
-                if UserNotificationTargets.email in existingDetails[UserDetails.notificationSettings][ProfileClasses.user][setting]:
-                    user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.email] = existingDetails[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.email]
+                if UserNotificationTargets.email in existingDetails[setting]:
+                    user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.email] = existingDetails[setting][UserNotificationTargets.email]
                 else:
                     user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.email] = True
-                if UserNotificationTargets.event in existingDetails[UserDetails.notificationSettings][ProfileClasses.user][setting]:
-                    user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.event] = existingDetails[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.event]
+                if UserNotificationTargets.event in existingDetails[setting]:
+                    user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.event] = existingDetails[setting][UserNotificationTargets.event]
                 else:
                     user.details[UserDetails.notificationSettings][ProfileClasses.user][setting][UserNotificationTargets.event] = True
             else:
                 user.details[UserDetails.notificationSettings][ProfileClasses.user][setting] = {UserNotificationTargets.email: True, UserNotificationTargets.event: True}
 
         if session[SessionContent.IS_PART_OF_ORGANIZATION]:
+            existingDetails = copy.deepcopy(user.details)
+            if OrganizationDetails.notificationSettings in existingDetails:
+                existingDetails = existingDetails[OrganizationDetails.notificationSettings]
+                if ProfileClasses.organization in existingDetails:
+                    existingDetails = existingDetails[ProfileClasses.organization]
+                else:
+                    user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization] = {}
+            else:
+                user.details[OrganizationDetails.notificationSettings] = {}
+                user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization] = {}
+            
             for permission in session[SessionContent.USER_PERMISSIONS]:
                 listOfPermittedNotifications = MapPermissionsToOrgaNotifications.permissionsToNotifications[permission]
                 for setting in listOfPermittedNotifications:
-                    if setting in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization]:
+                    if setting in existingDetails:
                         user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting] = {}
-                        if OrganizationNotificationTargets.email in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting]:
-                            user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email]
+                        if OrganizationNotificationTargets.email in existingDetails[setting]:
+                            user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = existingDetails[setting][OrganizationNotificationTargets.email]
                         else:
                             user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = True
-                        if OrganizationNotificationTargets.event in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting]:
-                            user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event]
+                        if OrganizationNotificationTargets.event in existingDetails[setting]:
+                            user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = existingDetails[setting][OrganizationNotificationTargets.event]
                         else:
                             user.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = True
                     else:
@@ -80,21 +102,32 @@ def updateOrgaDetailsSemperKI(orgaHashID:str):
         orga, _ = ProfileManagementBase.getUserViaHash(orgaHashID)
         existingDetails = copy.deepcopy(orga.details)
 
+        if OrganizationDetails.notificationSettings in existingDetails:
+            existingDetails = existingDetails[OrganizationDetails.notificationSettings]
+            if ProfileClasses.organization in existingDetails:
+                existingDetails = existingDetails[ProfileClasses.organization]
+            else:
+                orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization] = {}
+        else:
+            orga.details[OrganizationDetails.notificationSettings] = {}
+            orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization] = {}
+        
         for entry in NotificationSettingsOrgaSemperKI:
             setting = entry.value
-            if setting in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization]:
+            if setting in existingDetails:
                 orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting] = {}
-                if OrganizationNotificationTargets.email in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting]:
-                    orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email]
+                if OrganizationNotificationTargets.email in existingDetails[setting]:
+                    orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = existingDetails[setting][OrganizationNotificationTargets.email]
                 else:
                     orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.email] = True
-                if OrganizationNotificationTargets.event in existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting]:
-                    orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = existingDetails[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event]
+                if OrganizationNotificationTargets.event in existingDetails[setting]:
+                    orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = existingDetails[setting][OrganizationNotificationTargets.event]
                 else:
                     orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting][OrganizationNotificationTargets.event] = True
             else:
                 orga.details[OrganizationDetails.notificationSettings][ProfileClasses.organization][setting] = {OrganizationNotificationTargets.email: True, OrganizationNotificationTargets.event: True}
 
+        existingDetails = copy.deepcopy(orga.details)
         for entry in PrioritiesForOrganizationSemperKI:
             setting = entry.value
             if setting in existingDetails[OrganizationDetails.priorities]:
@@ -135,11 +168,14 @@ def gatherUserHashIDsAndNotificationPreference(orgaOrUserID:str, notification:st
             resultDict = {}
             for user in organizationObj.users.all():
                 hashedIDOfUser = user.hashedID
-                preferencesOfUserAsPartOfOrga = user.details[UserDetails.notificationSettings][ProfileClasses.organization]
-                if notification in preferencesOfUserAsPartOfOrga and preferencesOfUserAsPartOfOrga[notification][notificationType]:
-                    resultDict[hashedIDOfUser] = True
+                if checkIfNestedKeyExists(user.details, UserDetails.notificationSettings, ProfileClasses.organization):
+                    preferencesOfUserAsPartOfOrga = user.details[UserDetails.notificationSettings][ProfileClasses.organization]
+                    if notification in preferencesOfUserAsPartOfOrga and preferencesOfUserAsPartOfOrga[notification][notificationType]:
+                        resultDict[hashedIDOfUser] = True
+                    else:
+                        resultDict[hashedIDOfUser] = False
                 else:
-                    resultDict[hashedIDOfUser] = False
+                    resultDict[hashedIDOfUser] = True
             return resultDict
         else:
             preferencesOfUser = ProfileManagementBase.getNotificationPreferences(orgaOrUserID)
