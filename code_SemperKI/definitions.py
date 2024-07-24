@@ -127,7 +127,7 @@ class MessageContent(StrEnumExactlyAsDefined):
 
 ####################################################################################
 #Enum for MessageOrigin
-class MessageInterfaceFromFrontend(StrEnumExactylAsDefined):
+class MessageInterfaceFromFrontend(StrEnumExactlyAsDefined):
     """
     What does a message origin consist of?
     
