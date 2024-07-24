@@ -127,13 +127,13 @@ class MessageContent(StrEnumExactylAsDefined):
 
 ####################################################################################
 #Enum for MessageOrigin
-class MessageOrigin(StrEnumExactylAsDefined):
+class MessageInterfaceFromFrontend(StrEnumExactylAsDefined):
     """
     What does a message origin consist of?
     
     """
-    Clarification = enum.auto()
-    Proudction = enum.auto()
+    messages = enum.auto()
+    origin = enum.auto()
     
 ####################################################################################
 # Enum for session content

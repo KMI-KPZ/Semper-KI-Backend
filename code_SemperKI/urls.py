@@ -30,7 +30,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .handlers import frontpage
 from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
-from .payments.pay_views import create_order, capture_order
 from .handlers.private import testResponse
 from MSQ.handlers import interface
 
@@ -39,9 +38,6 @@ newPaths= {
     #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
     "schema": ('private/schema/', SpectacularAPIView.as_view(api_version='0.3')),
     "swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
-    
-    "createOrder": ("public/payment/create/", create_order),
-    "captureOrder": ("public/payment/capture/<str:orderID>/", capture_order),
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),
