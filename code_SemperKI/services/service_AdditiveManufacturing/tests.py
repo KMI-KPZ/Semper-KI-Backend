@@ -66,9 +66,14 @@ class TestAdditiveManufacturing(TestCase):
     #######################################################
     @staticmethod
     def createProjectAndProcess(client:Client):
-        projectObj = json.loads(client.get("/"+paths["createProjectID"][0]).content)
+        #projectObj = json.loads(client.post("/"+paths["createProjectID"][0]).content)
+        projectObj = json.loads(client.post("/"+paths["createProjectID"][0], data= {"title": "my_title"}).content)
+        #print(projectObj.items()) # .keys() returned dict_keys(['detail'])
+        #print("Printed Keys of the Project object ^^")
         processPathSplit = paths["createProcessID"][0].split("/")
-        processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
+        #processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+projectObj.projectID+"/"
+        processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+processPathSplit[2]+"/"+projectObj[ProjectDescription.projectID]+"/"
+        #                   KeyError: <ProjectDescription.projectID: 'projectID'>                    ^^^^^^^^^
         processObj = json.loads(client.get("/"+processPath).content)
         return (projectObj, processObj)
 
@@ -81,7 +86,8 @@ class TestAdditiveManufacturing(TestCase):
 
     # Tests!
     #######################################################
-    def test_uploadAndDeleteModel(self):
+    def test_uploadAndDeleteModel(self): #Failure
+        print("####Start test_uploadAndDeleteModel####")
         client = Client()
         self.createUser(client, self.test_uploadAndDeleteModel.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -89,11 +95,13 @@ class TestAdditiveManufacturing(TestCase):
         # set service type
         changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
         response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes))
-        self.assertIs(response.status_code == 200, True)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") #assertionerror not 200 got 500
 
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], FileObjectContent.tags: "", FileObjectContent.licenses: "", FileObjectContent.certificates: "", "attachment": self.testFile}
+        print("/"+paths["uploadModel"][0])
+        print(uploadBody)
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        self.assertIs(response.status_code == 200, True)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         getProjPathSplit = paths["getProject"][0].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
@@ -102,6 +110,7 @@ class TestAdditiveManufacturing(TestCase):
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
         deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
         response = client.delete("/" + deleteModelPath)
-        self.assertIs(response.status_code == 200, True)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+getProjPath).content)
         self.assertIs(ServiceDetails.models not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)
+        print("!!!!Success test_uploadAndDeleteModel!!!!")
