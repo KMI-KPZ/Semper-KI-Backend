@@ -84,7 +84,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         inSerializer = SReqPostProcessingsFilter(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {retrievePostProcessingsWithFilter.cls.__name__}"
-            exception = "Verification failed"
+            exception = f"Verification failed {inSerializer.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():

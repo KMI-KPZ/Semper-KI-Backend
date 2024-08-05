@@ -9,10 +9,10 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ###################################################
-class ProjectDescription(StrEnumExactylAsDefined):
+class ProjectDescription(StrEnumExactlyAsDefined):
     """
     What does a project consists of?
 

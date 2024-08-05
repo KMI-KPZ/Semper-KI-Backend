@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from Generic_Backend.code_General.utilities import basics
-from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription
+from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
@@ -21,19 +21,16 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
 
 
+from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
 from ....modelFiles.projectModel import Project, ProjectInterface
 from ....modelFiles.processModel import Process, ProcessInterface
 from ....modelFiles.dataModel import Data
-
 from ....definitions import *
-
 from ....serviceManager import serviceManager
-
 import code_SemperKI.states.stateDescriptions as StateDescriptions
-
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
-from ....tasks.processTasks import verificationOfProcess, sendProcess, sendLocalFileToRemote
+from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
 
 import logging
 logger = logging.getLogger("errors")
@@ -628,9 +625,17 @@ class ProcessManagementBase(AbstractContentInterface):
             dataID = crypto.generateURLFriendlyRandomString()
 
             if updateType == ProcessUpdates.messages:
-                # check key: content["origin"] -> key
-                # currentProcess.messages[key].append(content["origin"]["key"])
-                currentProcess.messages["messages"].append(content)
+                if MessageInterfaceFromFrontend.origin in content:
+                    origin = content[MessageInterfaceFromFrontend.origin]
+                    if origin in currentProcess.messages:
+                        currentProcess.messages[origin].append(content)
+                    else:
+                        currentProcess.messages[origin] = [content]
+                else:
+                    if MessageInterfaceFromFrontend.messages in currentProcess.messages:
+                        currentProcess.messages[MessageInterfaceFromFrontend.messages].append(content)
+                    else:
+                        currentProcess.messages[MessageInterfaceFromFrontend.messages] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 
             elif updateType == ProcessUpdates.files:
@@ -802,43 +807,37 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID, affectedProcessesIDs:list, event):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str, clientOnly:bool):
         """
         Retrieve information about the users connected to the project from the database. 
 
         :param projectID: project ID to retrieve data from
         :type projectID: str
+        :param processID: The process ID affected
+        :type processID: str
+        :param event: the event that happens
+        :type event: str
+        :param notification: The notification that wants to be send
+        :type notification: str
         :return: Dictionary of users with project ID and processes in order for the websocket to fire events
         :rtype: Dict
 
         """
         # outputList for events
         dictForEventsAsOutput = {}
+        processObj = Process.objects.get(processID=processID)
+        clientID = processObj.client
+        dictOfUserIDsAndPreference = gatherUserHashIDsAndNotificationPreference(clientID, notification, UserNotificationTargets.event)
+        dictOfUsersThatBelongToContractor = {}
+        if processObj.contractor != None and clientOnly == False:
+            dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
+        
+        for userHashID in dictOfUserIDsAndPreference:
+            dictForEventsAsOutput[userHashID] = {"triggerEvent": dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
 
-        projectObj = Project.objects.get(projectID=projectID)
-        dictForEventsAsOutput[projectObj.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-        dictForEventsAsOutput[projectObj.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [] }]
-        for process in projectObj.processes.all():
-            if process.processID in affectedProcessesIDs:
-                if projectObj.client != process.client:
-                    if process.client not in dictForEventsAsOutput:
-                        dictForEventsAsOutput[process.client] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                        dictForEventsAsOutput[process.client][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                    else:
-                        dictForEventsAsOutput[process.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
-                else:
-                    dictForEventsAsOutput[projectObj.client][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
-                
-                # only signal contractors that received the process 
-                contractorID = ""
-                if process.contractor != None:
-                    contractorID = process.contractor.hashedID
-                    if projectObj.client != contractorID:
-                        if contractorID not in dictForEventsAsOutput:
-                            dictForEventsAsOutput[contractorID] = {EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: []}
-                            dictForEventsAsOutput[contractorID][EventsDescription.events] = [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: process.processID, event: 1}] }]
-                        else:
-                            dictForEventsAsOutput[contractorID][EventsDescription.events][0][SessionContentSemperKI.processes].append({ProcessDescription.processID: process.processID, event: 1})
+        for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
+            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+    
         return dictForEventsAsOutput
     
     ##############################################
@@ -1078,6 +1077,8 @@ class ProcessManagementBase(AbstractContentInterface):
                 # Code specific for orgas
                 # Add projects where the organization is registered as contractor
                 organizationObj = ProfileManagementBase.getOrganizationObject(session)
+                if isinstance(organizationObj, Exception):
+                    raise organizationObj
                 receivedProjects = {}
                 for processAsContractor in organizationObj.asContractor.all():
                     project = processAsContractor.project
@@ -1169,8 +1170,8 @@ class ProcessManagementBase(AbstractContentInterface):
             returnValue = []
             for entry in listOfSuitableContractors:
                 detailsOfOrganization = {}
-                if OrganizationDetails.address in entry.details:
-                    detailsOfOrganization[OrganizationDetails.address] = entry.details[OrganizationDetails.address]
+                if OrganizationDetails.addresses in entry.details:
+                    detailsOfOrganization[OrganizationDetails.addresses] = entry.details[OrganizationDetails.addresses]
                 returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: detailsOfOrganization})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")
@@ -1220,7 +1221,7 @@ class ProcessManagementBase(AbstractContentInterface):
         try:
 
             # Check if process is verified
-            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFIED):
+            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
@@ -1241,7 +1242,7 @@ class ProcessManagementBase(AbstractContentInterface):
             processObj.save()
 
             # send the rest (e-mails and such) asyncronously
-            sendProcess(processObj, contractorObj, session)
+            sendProcessEMails(processObj, contractorObj, session)
 
             return None
             

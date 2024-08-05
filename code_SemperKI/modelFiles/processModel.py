@@ -13,10 +13,10 @@ from django.contrib.postgres.fields import ArrayField
 from .projectModel import Project, ProjectInterface
 from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ###################################################
-class ProcessDescription(StrEnumExactylAsDefined):
+class ProcessDescription(StrEnumExactlyAsDefined):
     """
     What makes up a process object for creation in the database
 
@@ -184,7 +184,7 @@ class ProcessInterface():
     client = ""
     
     files = {}
-    messages = {"messages": []}
+    messages = {}
 
     createdWhen = ""
     updatedWhen = ""
@@ -203,7 +203,7 @@ class ProcessInterface():
         self.dependenciesOut = ManyToManySimulation()
         self.client = client
         self.files = {}
-        self.messages = {"messages": []}
+        self.messages = {}
         self.createdWhen = currentTime
         self.updatedWhen = currentTime
         self.accessedWhen = currentTime

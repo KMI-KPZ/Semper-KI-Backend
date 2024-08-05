@@ -7,7 +7,7 @@ Contains: Metaclass that handles the services
 """
 import enum, copy
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 from abc import ABC, abstractmethod
 
@@ -86,7 +86,7 @@ class ServiceBase(ABC):
         pass
 
 ###################################################
-class ServicesStructure(StrEnumExactylAsDefined):
+class ServicesStructure(StrEnumExactlyAsDefined):
     """
     How the services dictionary is structured
 

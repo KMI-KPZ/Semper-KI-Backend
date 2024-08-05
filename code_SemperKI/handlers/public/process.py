@@ -245,7 +245,13 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                         if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
-                        WebSocketEvents.fireWebsocketEvents(projectID, [processID], request.session, elem, elem)
+                        sendNotification = False
+                        if elem == ProcessUpdates.messages:
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
+                        elif elem == ProcessUpdates.processStatus:
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
+                        else:
+                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):
@@ -302,7 +308,7 @@ def updateProcess(request:Request):
         inSerializer = SReqUpdateProcess(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateProcess.cls.__name__}"
-            exception = "Verification failed"
+            exception = f"Verification failed {inSerializer.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
