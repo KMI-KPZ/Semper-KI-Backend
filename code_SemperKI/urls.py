@@ -30,7 +30,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .handlers import frontpage
 from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
-from .handlers.private import testResponse
+from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
 newPaths= {
@@ -67,6 +67,19 @@ newPaths= {
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
+
+    "getNode": ("private/nodes/get/<str:nodeID>/", knowledgeGraphDB.getNode),
+    "getNodeByType": ("private/nodes/get/<str:nodeType>/", knowledgeGraphDB.getNodeByType),
+    "getNodeByProperty": ("private/nodes/get/<str:property>/", knowledgeGraphDB.getNodeByProperty),
+    "createNode": ("private/nodes/create/", knowledgeGraphDB.createNode),
+    "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
+    "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
+    "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
+    "createEdge": ("private/edges/create/", knowledgeGraphDB.createEdge),
+    "deleteEdge": ("private/edges/delete/<str:nodeID>/<str:nodeID2>/", knowledgeGraphDB.deleteEdge),
+    "getGraph": ("private/graph/get/", knowledgeGraphDB.getGraph),
+    "createGraph": ("private/graph/create/", knowledgeGraphDB.createGraph),
+    "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 

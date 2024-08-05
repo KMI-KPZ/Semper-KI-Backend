@@ -13,6 +13,7 @@ Contains: link to model files for django to handle
 from .modelFiles.processModel import *
 from .modelFiles.projectModel import *
 from .modelFiles.dataModel import *
+from .modelFiles.nodesModel import *
 
 #class BaseModel(models.Model):
 

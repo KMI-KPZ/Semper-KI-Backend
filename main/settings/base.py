@@ -354,6 +354,11 @@ LOGGING = {
             'propagate': False,
             'level': 'INFO',
         },
+        'performance': {
+            'handlers': ['file', 'console'],
+            'propagate': False,
+            'level': 'INFO'
+        },
         'django': {
             'handlers': ['console'],
             'propagate': False,
