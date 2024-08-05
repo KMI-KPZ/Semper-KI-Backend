@@ -243,7 +243,7 @@ def orga_addMaterialToPrinter(request:Request):
         serializedInput = SReqOrgaAddMaterial(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addMaterialToPrinter.cls.__name__}"
-            exception = "Verification failed"
+            exception = f"Verification failed {serializedInput.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
@@ -320,7 +320,7 @@ def orga_updateMaterialAndPrinter(request:Request):
         serializedInput = SReqOrgaAddMaterial(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_updateMaterialAndPrinter.cls.__name__}"
-            exception = "Verification failed"
+            exception = f"Verification failed {serializedInput.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():

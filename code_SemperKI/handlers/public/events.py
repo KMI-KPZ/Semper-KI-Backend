@@ -78,7 +78,9 @@ def getMissedEvents(request:Request):
             currentProcess = {}
             currentProcess[ProcessDescription.processID] = process[ProcessDescription.processID]
             newMessagesCount = 0
-            chat = process[ProcessDescription.messages]["messages"]
+            chat = []
+            for key in process[ProcessDescription.messages]:
+                chat.extend(process[ProcessDescription.messages][key])  
             for messages in chat:
                 if MessageContent.date in messages and lastLogin < timezone.make_aware(datetime.strptime(messages[MessageContent.date], '%Y-%m-%dT%H:%M:%S.%fZ')) and messages[MessageContent.userID] != user[UserDescription.hashedID]:
                     newMessagesCount += 1

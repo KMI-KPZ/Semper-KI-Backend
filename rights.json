@@ -174,7 +174,9 @@
             "organizations_deleteUser",
             "organizations_addUser",
             "organizations_getInviteLink",
-            "updateDetailsOfOrganization"
+            "updateDetailsOfOrganization",
+            "organizations_fetchInvitees",
+            "organizations_deleteInvite"
          ]
       },
       {

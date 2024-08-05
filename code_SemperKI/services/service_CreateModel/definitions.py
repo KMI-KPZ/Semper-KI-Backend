@@ -10,9 +10,9 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 # What makes up the 3D print service
 import enum
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
-class ServiceDetails(StrEnumExactylAsDefined):
+class ServiceDetails(StrEnumExactlyAsDefined):
     """
     What does the service consists of 
 

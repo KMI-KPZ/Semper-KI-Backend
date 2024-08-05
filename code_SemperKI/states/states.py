@@ -13,7 +13,7 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.definitions import Logging
+from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
@@ -27,7 +27,7 @@ import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
 
-from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus
+from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -104,6 +104,8 @@ def signalDependencyToOtherProcesses(interface:SessionInterface.ProcessManagemen
     :type interface: ProcessManagementSession | ProcessManagementBase
     :param processObj: The current process
     :type processObj: Process | ProcessInterface
+    :param currentClient: Who is ordering that?
+    :type currentClient: str
     :return: Nothing
     :rtype: None
     
@@ -212,6 +214,10 @@ class StateMachine(object):
         :type interface: ProcessManagementSession | ProcessManagementBase
         :param process: The process object
         :type process: Process | ProcessInterface
+        :param currentClient: Who is ordering that update?
+        :type currentClient: str
+        :return: Nothing
+        :rtype: None
         """
 
         # The next state will be the result of the onEvent function.
@@ -223,6 +229,14 @@ class StateMachine(object):
 
         :param event: The button pressed, as ProcessStatusAsString
         :type event: str
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :param currentClient: Who is ordering that update?
+        :type currentClient: str
+        :return: Nothing
+        :rtype: None
 
         """
         self.state = self.state.onButtonEvent(event, interface, process)
@@ -234,7 +248,9 @@ class State(ABC):
     Abstract State class providing the implementation interface
     """
 
-    statusCode = 0
+    statusCode = 0 # the integer representation of the state
+    name = "" # the string representation of the state
+    fireEvent = True # if it should fire an event when transitioned to
 
     ###################################################
     def __init__(self):
@@ -278,14 +294,16 @@ class State(ABC):
 
         """
         try:
+            currentClient = interface.getUserID()
             returnState = self
             for t in self.updateTransitions:
                 resultOfTransition = t(self, interface, process)
                 if resultOfTransition != self:
                     returnState = resultOfTransition
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
-                    break #TODO: Ensure that only one transition is possible 
+                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    if returnState.fireEvent:
+                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                    break # Ensure that only one transition is possible 
             
             return returnState
         except (Exception) as error:
@@ -308,72 +326,20 @@ class State(ABC):
 
         """
         try:
+            currentClient = interface.getUserID()
             returnState = self
             for t in self.buttonTransitions:
                 if event == t:
                     returnState = self.buttonTransitions[t](self, interface, process)
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, process.client)
-                    WebsocketEvents.fireWebsocketEvents(process.project.projectID, [process.processID], interface.getSession(), ProcessUpdates.processStatus)
-                    break #TODO: Ensure that only one transition is possible 
+                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    if returnState.fireEvent:
+                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                    break # Ensure that only one transition is possible 
             
             return returnState
         except (Exception) as error:
             loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
             return self
-
-    ###################################################
-    def sendMailToClient(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
-        """
-        Send a mail to the client
-
-        :param interface: The session or database interface
-        :type interface: ProcessManagementSession | ProcessManagementBase
-        :param process: The process object
-        :type process: Process | ProcessInterface
-        :param locale: The locale string for that user
-        :type locale: str
-        :param reason: What is the reason for the mail
-        :type reason: str
-        :param message: The content of the message
-        :type message: str
-        :return: Nothing
-        :rtype: None
-        
-        """
-        # Send mail to client
-        if ProfileManagementBase.checkIfHashIDBelongsToOrganization(process.client):
-            clientMail = ProfileManagementOrganization.getEMailAddress(process.client)
-        else:
-            clientMail = ProfileManagementUser.getEMailAddress(process.client)
-        clientName = ProfileManagementBase.getUserNameViaHash(process.client)
-        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(clientMail, f"{reason} '{processTitle}'", clientName, locale, message)
-        
-    ###################################################
-    def sendMailToContractor(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, locale:str, reason:str, message:str):
-        """
-        Send a mail to the contractor
-
-        :param interface: The session or database interface
-        :type interface: ProcessManagementSession | ProcessManagementBase
-        :param process: The process object
-        :type process: Process | ProcessInterface
-        :param locale: The locale string for that user
-        :type locale: str
-        :param reason: What is the reason for the mail
-        :type reason: str
-        :param message: The content of the message
-        :type message: str
-        :return: Nothing
-        :rtype: None
-        
-        """
-        # Send mail to contractor
-        contractorMail = ProfileManagementOrganization.getEMailAddress(process.contractor.hashedID)
-        contracorName = ProfileManagementBase.getUserNameViaHash(process.contractor.hashedID)
-        processTitle = process.processDetails[ProcessDetails.title] if ProcessDetails.title in process.processDetails else process.processID
-        ProcessTasks.sendEMail(contractorMail, f"{reason} '{processTitle}'", contracorName, locale, message)
-        
 
     ###################################################
     def __repr__(self):
@@ -401,6 +367,7 @@ class DRAFT(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DRAFT)
     name = ProcessStatusAsString.DRAFT
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -467,10 +434,10 @@ class DRAFT(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
     
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
     
 #######################################################
@@ -482,6 +449,7 @@ class SERVICE_IN_PROGRESS(State):
     
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
+    fireEvent = False
     
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -607,7 +575,7 @@ class SERVICE_IN_PROGRESS(State):
         return super().onUpdateEvent(interface,process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -618,6 +586,7 @@ class SERVICE_READY(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_READY)
     name = ProcessStatusAsString.SERVICE_READY
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -735,10 +704,10 @@ class SERVICE_READY(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -749,6 +718,7 @@ class SERVICE_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
+    fireEvent = False
 
     ###################################################
     def checkIfButtonIsActive(self, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -797,13 +767,13 @@ class SERVICE_COMPLETED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                 "icon": IconType.DoneAllIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
                     },
                 },
                 "active": False,
@@ -834,14 +804,14 @@ class SERVICE_COMPLETED(State):
 
     # Transitions
     ###################################################
-    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        SERVICE_READY | CONTRACTOR_SELECTED:
+    def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY | CONTRACTOR_COMPLETED:
         """
         Contractor was selected
 
         """
         if self.checkIfButtonIsActive(process):
-            return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
+            return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
         return self
     
     ###################################################
@@ -879,14 +849,14 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED}
+    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process)
+        return super().onUpdateEvent(interface, process)
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process)
 
 #######################################################
@@ -898,6 +868,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS)
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1020,10 +991,10 @@ class WAITING_FOR_OTHER_PROCESS(State):
     
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1035,6 +1006,7 @@ class SERVICE_COMPLICATION(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION)
     name = ProcessStatusAsString.SERVICE_COMPLICATION
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1122,25 +1094,26 @@ class SERVICE_COMPLICATION(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class CONTRACTOR_SELECTED(State):
+class CONTRACTOR_COMPLETED(State):
     """
     Contractor has been chosen (opens page for verification in frontend)
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_SELECTED)
-    name = ProcessStatusAsString.CONTRACTOR_SELECTED
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_COMPLETED)
+    name = ProcessStatusAsString.CONTRACTOR_COMPLETED
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for  CONTRACTOR_SELECTED 
+        Buttons for  CONTRACTOR_COMPLETED 
 
         """
         return [
@@ -1207,7 +1180,7 @@ class CONTRACTOR_SELECTED(State):
           VERIFYING: 
         """
         Starts verification
-        From: CONTRACTOR_SELECTED
+        From: CONTRACTOR_COMPLETED
         To: VERIFYING
 
         """
@@ -1229,10 +1202,10 @@ class CONTRACTOR_SELECTED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -1244,6 +1217,7 @@ class VERIFYING(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFYING)
     name = ProcessStatusAsString.VERIFYING
+    fireEvent = False
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1253,13 +1227,13 @@ class VERIFYING(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
                     },
                 },
                 "active": True,
@@ -1278,7 +1252,7 @@ class VERIFYING(State):
                 "showIn": "project",
             },
             { # this button shall not do anything
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
                 "icon": IconType.MailIcon,
                 "action": {
                     "type": "request",
@@ -1311,46 +1285,47 @@ class VERIFYING(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_VERIFIED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          VERIFYING | VERIFIED:
+    def to_VERIFICATION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFYING | VERIFICATION_COMPLETED:
         """
         From: VERIFYING
-        To: VERIFIED
+        To: VERIFICATION_COMPLETED
 
         """
         # TODO Can only be set by admins (admins need to see buttons)
 
-        return stateDict[ProcessStatusAsString.VERIFIED]
+        return stateDict[ProcessStatusAsString.VERIFICATION_COMPLETED]
 
     ###################################################
-    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONTRACTOR_SELECTED:
+    def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_COMPLETED:
         """
-        To: CONTRACTOR_SELECTED
+        To: CONTRACTOR_COMPLETED
         
         """
-        return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
+        return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
 
     ###################################################
-    updateTransitions = [to_VERIFIED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED }
+    updateTransitions = [to_VERIFICATION_COMPLETED]
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class VERIFIED(State):
+class VERIFICATION_COMPLETED(State):
     """
     Process has been verified
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFIED)
-    name = ProcessStatusAsString.VERIFIED
+    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED)
+    name = ProcessStatusAsString.VERIFICATION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1360,13 +1335,13 @@ class VERIFIED(State):
         """
         return [
             {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_SELECTED,
+                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_SELECTED,
+                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
                     },
                 },
                 "active": True,
@@ -1385,13 +1360,13 @@ class VERIFIED(State):
                 "showIn": "project",
             },
             {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUESTED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
                 "icon": IconType.MailIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.REQUESTED,
+                        "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
                     },
                 },
                 "active": True,
@@ -1418,54 +1393,55 @@ class VERIFIED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_REQUESTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          VERIFIED | REQUESTED:
+    def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFICATION_COMPLETED | REQUEST_COMPLETED:
         """
-        From: VERIFIED
-        To: REQUESTED
+        From: VERIFICATION_COMPLETED
+        To: REQUEST_COMPLETED
 
         Is called from the outside by a finished verification
         """
         retVal = interface.sendProcess(process, interface.getSession() , interface.getUserID())
         if isinstance(retVal, Exception):
-            return stateDict[ProcessStatusAsString.VERIFIED]
-        return stateDict[ProcessStatusAsString.REQUESTED]
+            return stateDict[ProcessStatusAsString.VERIFICATION_COMPLETED]
+        return stateDict[ProcessStatusAsString.REQUEST_COMPLETED]
 
     ###################################################
-    def to_CONTRACTOR_SELECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONTRACTOR_SELECTED:
+    def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_COMPLETED:
         """
-        To: CONTRACTOR_SELECTED
+        To: CONTRACTOR_COMPLETED
         
         """
         # TODO discard verification
-        return stateDict[ProcessStatusAsString.CONTRACTOR_SELECTED]
+        return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
 
     ###################################################
-    updateTransitions = [to_REQUESTED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_SELECTED: to_CONTRACTOR_SELECTED, ProcessStatusAsString.REQUESTED: to_REQUESTED} # TODO add functions that are called on button click, leave empty if none exist
+    updateTransitions = [to_REQUEST_COMPLETED]
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class REQUESTED(State):
+class REQUEST_COMPLETED(State):
     """
     Contractor was informed about possible contract
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.REQUESTED)
-    name = ProcessStatusAsString.REQUESTED
+    statusCode = processStatusAsInt(ProcessStatusAsString.REQUEST_COMPLETED)
+    name = ProcessStatusAsString.REQUEST_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for REQUESTED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
+        Buttons for REQUEST_COMPLETED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
         """
         outArr = []
@@ -1497,27 +1473,13 @@ class REQUESTED(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CLARIFICATION,
-                    "icon": IconType.QuestionAnswerIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CLARIFICATION,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
+                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
                         },
                     },
                     "active": True,
@@ -1525,13 +1487,13 @@ class REQUESTED(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
+                            "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
                         },
                     },
                     "active": True,
@@ -1559,193 +1521,178 @@ class REQUESTED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CLARIFICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REQUESTED | CLARIFICATION: 
+    def to_OFFER_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUEST_COMPLETED | OFFER_COMPLETED:
         """
-        From: REQUESTED
-        To: CLARIFICATION
+        From: REQUEST_COMPLETED
+        To: OFFER_COMPLETED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","questionsFromContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","questionsFromContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.CLARIFICATION]
-
-    ###################################################
-    def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REQUESTED | CONFIRMED_BY_CONTRACTOR:
-        """
-        From: REQUESTED
-        To: CONFIRMED_BY_CONTRACTOR
-
-        """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
+        subject = ["email","subjects","confirmedByContractor"]
+        message = ["email","content","confirmedByContractor"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.responseFromContractor, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
 
     ###################################################
-    def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REQUESTED | REJECTED_BY_CONTRACTOR:
+    def to_OFFER_REJECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          REQUEST_COMPLETED | OFFER_REJECTED:
         """
-        From: REQUESTED
-        To: REJECTED_BY_CONTRACTOR
+        From: REQUEST_COMPLETED
+        To: OFFER_REJECTED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
+        subject = ["email","subjects","declinedByContractor"]
+        message = ["email","content","declinedByContractor"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.responseFromContractor, subject, message, process.processDetails[ProcessDetails.title])        
+        return stateDict[ProcessStatusAsString.OFFER_REJECTED]
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.CLARIFICATION: to_CLARIFICATION, ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR}
+    buttonTransitions = {ProcessStatusAsString.OFFER_COMPLETED: to_OFFER_COMPLETED, ProcessStatusAsString.OFFER_REJECTED: to_OFFER_REJECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
-#######################################################
-class CLARIFICATION(State):
-    """
-    Clarification needed by Contractor
+# #######################################################
+# class CLARIFICATION(State):
+#     """
+#     Clarification needed by Contractor
 
-    """
+#     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
-    name = ProcessStatusAsString.CLARIFICATION
+#     statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
+#     name = ProcessStatusAsString.CLARIFICATION
 
-    ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
-        """
-        Buttons for CLARIFICATION
+#     ###################################################
+#     def buttons(self, process, client=True, admin=False) -> list:
+#         """
+#         Buttons for CLARIFICATION
 
-        """
-        outArr = []
-        if client or admin:
-            outArr.extend([
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-            ])
-        if not client or admin:
-            outArr.extend([
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CONTRACTOR,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
-            ])
-        return outArr
+#         """
+#         outArr = []
+#         if client or admin:
+#             outArr.extend([
+#                 {
+#                     "title": ButtonLabels.DELETE, # do not change
+#                     "icon": IconType.DeleteIcon,
+#                     "action": {
+#                         "type": "request",
+#                         "data": { "type": "deleteProcess" },
+#                     },
+#                     "active": True,
+#                     "buttonVariant": ButtonTypes.primary,
+#                     "showIn": "project",
+#                 },
+#             ])
+#         if not client or admin:
+#             outArr.extend([
+#                 {
+#                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
+#                     "icon": IconType.DoneAllIcon,
+#                     "action": {
+#                         "type": "request",
+#                         "data": {
+#                             "type": "forwardStatus",
+#                             "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
+#                         },
+#                     },
+#                     "active": True,
+#                     "buttonVariant": ButtonTypes.primary,
+#                     "showIn": "both",
+#                 },
+#                 {
+#                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
+#                     "icon": IconType.CancelIcon,
+#                     "action": {
+#                         "type": "request",
+#                         "data": {
+#                             "type": "forwardStatus",
+#                             "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
+#                         },
+#                     },
+#                     "active": True,
+#                     "buttonVariant": ButtonTypes.primary,
+#                     "showIn": "both",
+#                 }
+#             ])
+#         return outArr
     
-    ###################################################
-    def getFlatStatus(self, client:bool) -> str:
-        """
-        Get code string if something is required from the user for that status
+#     ###################################################
+#     def getFlatStatus(self, client:bool) -> str:
+#         """
+#         Get code string if something is required from the user for that status
 
-        :param client: Signals, if the user is the client of the process or not
-        :type client: Bool
-        :returns: The flat status string from FlatProcessStatus
-        :rtype: str
-        """
-        if client:
-            return FlatProcessStatus.ACTION_REQUIRED
-        else:
-            return FlatProcessStatus.WAITING_CLIENT
+#         :param client: Signals, if the user is the client of the process or not
+#         :type client: Bool
+#         :returns: The flat status string from FlatProcessStatus
+#         :rtype: str
+#         """
+#         if client:
+#             return FlatProcessStatus.ACTION_REQUIRED
+#         else:
+#             return FlatProcessStatus.WAITING_CLIENT
     
-    ###################################################
-    # Transitions
-    ###################################################
-    def to_CONFIRMED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CLARIFICATION | CONFIRMED_BY_CONTRACTOR:
-        """
-        From: CLARIFICATION
-        To: CONFIRMED_BY_CONTRACTOR
+#     ###################################################
+#     # Transitions
+#     ###################################################
+#     def to_OFFER_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+#           CLARIFICATION | OFFER_COMPLETED:
+#         """
+#         From: CLARIFICATION
+#         To: OFFER_COMPLETED
 
-        """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR]
+#         """
+#         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+#         subject = ["email","subjects","confirmedByContractor"])
+#         message = ["email","content","confirmedByContractor"])
+#         self.sendMailToClient(interface, process, userLocale, subject, message)
+#         return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
 
-    ###################################################
-    def to_REJECTED_BY_CONTRACTOR(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CLARIFICATION | REJECTED_BY_CONTRACTOR:
-        """
-        From: CLARIFICATION
-        To: REJECTED_BY_CONTRACTOR
+#     ###################################################
+#     def to_OFFER_REJECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+#           CLARIFICATION | OFFER_REJECTED:
+#         """
+#         From: CLARIFICATION
+#         To: OFFER_REJECTED
 
-        """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByContractor"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByContractor"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.REJECTED_BY_CONTRACTOR]
+#         """
+#         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+#         subject = ["email","subjects","declinedByContractor"])
+#         message = ["email","content","declinedByContractor"])
+#         self.sendMailToClient(interface, process, userLocale, subject, message)
+#         return stateDict[ProcessStatusAsString.OFFER_REJECTED]
 
-    ###################################################
-    updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
-    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR: to_CONFIRMED_BY_CONTRACTOR, ProcessStatusAsString.REJECTED_BY_CONTRACTOR: to_REJECTED_BY_CONTRACTOR} # TODO add functions that are called on button click, leave empty if none exist
+#     ###################################################
+#     updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
+#     buttonTransitions = {ProcessStatusAsString.OFFER_COMPLETED: to_OFFER_COMPLETED, ProcessStatusAsString.OFFER_REJECTED: to_OFFER_REJECTED} # TODO add functions that are called on button click, leave empty if none exist
 
-    ###################################################
-    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+#     ###################################################
+#     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+#         return super().onUpdateEvent(interface, process) # do not change
         
-    ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onButtonEvent(event, interface, process) # do not change
+#     ###################################################
+#     def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+#         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class CONFIRMED_BY_CONTRACTOR(State):
+class OFFER_COMPLETED(State):
     """
     Order Confirmed by Contractor
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR)
-    name = ProcessStatusAsString.CONFIRMED_BY_CONTRACTOR
+    statusCode = processStatusAsInt(ProcessStatusAsString.OFFER_COMPLETED)
+    name = ProcessStatusAsString.OFFER_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for CONFIRMED_BY_CONTRACTOR, no Back-Button
+        Buttons for OFFER_COMPLETED, no Back-Button
 
         """
         outArr = []
@@ -1763,13 +1710,13 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
                     "icon": IconType.DoneAllIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMED_BY_CLIENT,
+                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
                         },
                     },
                     "active": True,
@@ -1777,13 +1724,13 @@ class CONFIRMED_BY_CONTRACTOR(State):
                     "showIn": "both",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REJECTED_BY_CLIENT,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
                     "icon": IconType.CancelIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REJECTED_BY_CLIENT,
+                            "targetStatus": ProcessStatusAsString.CONFIRMATION_REJECTED,
                         },
                     },
                     "active": True,
@@ -1815,53 +1762,52 @@ class CONFIRMED_BY_CONTRACTOR(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CONFIRMED_BY_CLIENT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONFIRMED_BY_CONTRACTOR | CONFIRMED_BY_CLIENT:
+    def to_CONFIRMATION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          OFFER_COMPLETED | CONFIRMATION_COMPLETED:
         """
-        From: CONFIRMED_BY_CONTRACTOR
-        To: CONFIRMED_BY_CLIENT
+        From: OFFER_COMPLETED
+        To: CONFIRMATION_COMPLETED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","confirmedByClient"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","confirmedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.CONFIRMED_BY_CLIENT]
+        subject = ["email","subjects","confirmedByClient"]
+        message = ["email","content","confirmedByClient"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.CONFIRMATION_COMPLETED]
 
     ###################################################
-    def to_REJECTED_BY_CLIENT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONFIRMED_BY_CONTRACTOR | REJECTED_BY_CLIENT:
+    def to_CONFIRMATION_REJECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          OFFER_COMPLETED | CONFIRMATION_REJECTED:
         """
-        From: CONFIRMED_BY_CONTRACTOR
-        To: REJECTED_BY_CLIENT
+        From: OFFER_COMPLETED
+        To: CONFIRMATION_REJECTED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.contractor.hashedID)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","declinedByClient"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","declinedByClient"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.REJECTED_BY_CLIENT]
+        subject = ["email","subjects","declinedByClient"]
+        message = ["email","content","declinedByClient"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.responseFromClient, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.CONFIRMATION_REJECTED]
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.CONFIRMED_BY_CLIENT: to_CONFIRMED_BY_CLIENT, ProcessStatusAsString.REJECTED_BY_CLIENT: to_REJECTED_BY_CLIENT}
+    buttonTransitions = {ProcessStatusAsString.CONFIRMATION_COMPLETED: to_CONFIRMATION_COMPLETED, ProcessStatusAsString.CONFIRMATION_REJECTED: to_CONFIRMATION_REJECTED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class REJECTED_BY_CONTRACTOR(State):
+class OFFER_REJECTED(State):
     """
     Order Rejected by Contractor
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CONTRACTOR)
-    name = ProcessStatusAsString.REJECTED_BY_CONTRACTOR
+    statusCode = processStatusAsInt(ProcessStatusAsString.OFFER_REJECTED)
+    name = ProcessStatusAsString.OFFER_REJECTED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -1909,10 +1855,10 @@ class REJECTED_BY_CONTRACTOR(State):
     # Transitions
     ###################################################
     def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REJECTED_BY_CONTRACTOR | CANCELED:
+          OFFER_REJECTED | CANCELED:
         """
-        From: REJECTED_BY_CONTRACTOR
-        To: CANCELLED
+        From: OFFER_REJECTED
+        To: CANCELED
 
         """
         # TODO do stuff to clean up
@@ -1924,25 +1870,26 @@ class REJECTED_BY_CONTRACTOR(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class CONFIRMED_BY_CLIENT(State):
+class CONFIRMATION_COMPLETED(State):
     """
     Order Confirmed by Client
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMED_BY_CLIENT)
-    name = ProcessStatusAsString.CONFIRMED_BY_CLIENT
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMATION_COMPLETED)
+    name = ProcessStatusAsString.CONFIRMATION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for CONFIRMED_BY_CLIENT, no Back-Button
+        Buttons for CONFIRMATION_COMPLETED, no Back-Button
 
         """
         outArr = []
@@ -1963,13 +1910,13 @@ class CONFIRMED_BY_CLIENT(State):
         if not client or admin:
             outArr.extend( [
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
                     "icon": IconType.FactoryIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION,
+                            "targetStatus": ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
                         },
                     },
                     "active": True,
@@ -1997,39 +1944,39 @@ class CONFIRMED_BY_CLIENT(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_PRODUCTION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONFIRMED_BY_CLIENT | PRODUCTION:
+    def to_PRODUCTION_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONFIRMATION_COMPLETED | PRODUCTION_IN_PROGRESS:
         """
-        From: CONFIRMED_BY_CLIENT
-        To: PRODUCTION
+        From: CONFIRMATION_COMPLETED
+        To: PRODUCTION_IN_PROGRESS
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inProduction"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inProduction"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.PRODUCTION]
+        subject = ["email","subjects","inProduction"]
+        message = ["email","content","inProduction"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.PRODUCTION_IN_PROGRESS]
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.PRODUCTION: to_PRODUCTION}
+    buttonTransitions = {ProcessStatusAsString.PRODUCTION_IN_PROGRESS: to_PRODUCTION_IN_PROGRESS}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class REJECTED_BY_CLIENT(State):
+class CONFIRMATION_REJECTED(State):
     """
     Order rejected by Client
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.REJECTED_BY_CLIENT)
-    name = ProcessStatusAsString.REJECTED_BY_CLIENT
+    statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMATION_REJECTED)
+    name = ProcessStatusAsString.CONFIRMATION_REJECTED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2077,9 +2024,9 @@ class REJECTED_BY_CLIENT(State):
     # Transitions
     ###################################################
     def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          REJECTED_BY_CLIENT | CANCELED:
+          CONFIRMATION_REJECTED | CANCELED:
         """
-        From: REJECTED_BY_CLIENT
+        From: CONFIRMATION_REJECTED
         To: CANCELLED
 
         """
@@ -2092,25 +2039,26 @@ class REJECTED_BY_CLIENT(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class PRODUCTION(State):
+class PRODUCTION_IN_PROGRESS(State):
     """
     Order is in Production
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION)
-    name = ProcessStatusAsString.PRODUCTION
+    statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION_IN_PROGRESS)
+    name = ProcessStatusAsString.PRODUCTION_IN_PROGRESS
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for PRODUCTION, no Back-Button
+        Buttons for PRODUCTION_IN_PROGRESS, no Back-Button
 
         """
         outArr = []
@@ -2131,13 +2079,13 @@ class PRODUCTION(State):
                     "showIn": "project",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY,
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
                     "icon": IconType.LocalShippingIcon,
                     "action": {
                         "type": "request",
                         "data": {
                             "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY,
+                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
                         },
                     },
                     "active": True,
@@ -2179,58 +2127,265 @@ class PRODUCTION(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_DELIVERY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          PRODUCTION | DELIVERY:
+    def to_PRODUCTION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          PRODUCTION_IN_PROGRESS | PRODUCTION_COMPLETED:
         """
-        From: PRODUCTION
-        To: DELIVERY
+        From: PRODUCTION_IN_PROGRESS
+        To: DELIVERY_IN_PROGRESS
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","inDelivery"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","inDelivery"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
-        return stateDict[ProcessStatusAsString.DELIVERY]
+        return stateDict[ProcessStatusAsString.PRODUCTION_COMPLETED]
 
     ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          PRODUCTION | FAILED:
+          PRODUCTION_IN_PROGRESS | FAILED:
         """
-        From: PRODUCTION
+        From: PRODUCTION_IN_PROGRESS
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","productionFailed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","productionFailed"])
-        self.sendMailToClient(interface, process, userLocale, subject, message)
+        subject = ["email","subjects","productionFailed"]
+        message = ["email","content","productionFailed"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.DELIVERY: to_DELIVERY, ProcessStatusAsString.FAILED: to_FAILED}
+    buttonTransitions = {ProcessStatusAsString.PRODUCTION_COMPLETED: to_PRODUCTION_COMPLETED, ProcessStatusAsString.FAILED: to_FAILED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
-class DELIVERY(State):
+class PRODUCTION_COMPLETED(State):
     """
-    Order is being delivered
+    Order is in Production
     """
 
-    statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY)
-    name = ProcessStatusAsString.DELIVERY
+    statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION_COMPLETED)
+    name = ProcessStatusAsString.PRODUCTION_COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
         """
-        Buttons for DELIVERY, no Back-Button
+        Buttons for PRODUCTION_COMPLETED, no Back-Button
+
+        """
+        outArr = []
+        if client or admin:
+            outArr.extend( [
+            ])
+        if not client or admin:
+            outArr.extend( [
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
+                    "icon": IconType.LocalShippingIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
+                    "icon": IconType.CancelIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] )
+        return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.WAITING_CONTRACTOR
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_DELIVERY_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          PRODUCTION_COMPLETED | DELIVERY_IN_PROGRESS:
+        """
+        From: PRODUCTION_IN_PROGRESS
+        To: DELIVERY_IN_PROGRESS
+
+        """
+        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        subject = ["email","subjects","inDelivery"]
+        message = ["email","content","inDelivery"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.DELIVERY_IN_PROGRESS]
+
+    ###################################################
+    def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          PRODUCTION_COMPLETED | FAILED:
+        """
+        From: PRODUCTION_COMPLETED
+        To: FAILED
+
+        """
+        subject = ["email","subjects","productionFailed"]
+        message = ["email","content","productionFailed"]
+        ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
+        return stateDict[ProcessStatusAsString.FAILED]
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.DELIVERY_IN_PROGRESS: to_DELIVERY_IN_PROGRESS, ProcessStatusAsString.FAILED: to_FAILED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface, process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class DELIVERY_IN_PROGRESS(State):
+    """
+    Order is being delivered
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_IN_PROGRESS)
+    name = ProcessStatusAsString.DELIVERY_IN_PROGRESS
+    fireEvent = True
+
+    ###################################################
+    def buttons(self, process, client=True, admin=False) -> list:
+        """
+        Buttons for DELIVERY_IN_PROGRESS, no Back-Button
+
+        """
+        outArr = []
+        if client or admin:
+            outArr.extend( [
+                {
+                    "title": ButtonLabels.DELETE,
+                    "icon": IconType.DeleteIcon,
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "project",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
+                    "icon": IconType.DoneAllIcon,
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DELIVERY_COMPLETED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "both",
+                }
+            ] )
+        if not client or admin:
+            outArr.extend([
+
+            ])
+        return outArr
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.WAITING_CLIENT
+
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_DELIVERY_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          DELIVERY_IN_PROGRESS | DELIVERY_COMPLETED:
+        """
+        From: DELIVERY_IN_PROGRESS
+        To: DELIVERY_COMPLETED
+
+        """
+        # TODO maybe set from outside
+        return stateDict[ProcessStatusAsString.DELIVERY_COMPLETED]
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.DELIVERY_COMPLETED: to_DELIVERY_COMPLETED}
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface, process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class DELIVERY_COMPLETED(State):
+    """
+    Order is being delivered
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_COMPLETED)
+    name = ProcessStatusAsString.DELIVERY_COMPLETED
+    fireEvent = True
+
+    ###################################################
+    def buttons(self, process, client=True, admin=False) -> list:
+        """
+        Buttons for DELIVERY_COMPLETED, no Back-Button
 
         """
         outArr = []
@@ -2315,9 +2470,9 @@ class DELIVERY(State):
     # Transitions
     ###################################################
     def to_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DELIVERY | COMPLETED:
+          DELIVERY_COMPLETED | COMPLETED:
         """
-        From: DELIVERY
+        From: DELIVERY_COMPLETED
         To: COMPLETED
 
         """
@@ -2325,38 +2480,35 @@ class DELIVERY(State):
         # signal to dependent processes, that this one is finished
         signalCompleteToDependentProcesses(interface, process)
 
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
     def to_DISPUTE(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DELIVERY | DISPUTE:
+          DELIVERY_COMPLETED | DISPUTE:
         """
-        From: DELIVERY
+        From: DELIVERY_COMPLETED
         To: DISPUTE
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","dispute"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","dispute"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        subject = ["email","subjects","dispute"]
+        message = ["email","content","dispute"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.DISPUTE]
 
     ###################################################
     def to_FAILED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          DELIVERY | FAILED:
+          DELIVERY_COMPLETED | FAILED:
         """
-        From: DELIVERY
+        From: DELIVERY_COMPLETED
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        subject = ["email","subjects","failed"]
+        message = ["email","content","failed"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2365,10 +2517,10 @@ class DELIVERY(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2379,6 +2531,7 @@ class DISPUTE(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.DISPUTE)
     name = ProcessStatusAsString.DISPUTE
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2463,10 +2616,9 @@ class DISPUTE(State):
         # signal to dependent processes, that this one is finished
         signalCompleteToDependentProcesses(interface, process)
 
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","processFinished"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","processFinished"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2477,10 +2629,10 @@ class DISPUTE(State):
         To: FAILED
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-        subject = Locales.manageTranslations.getTranslation(userLocale, ["email","subjects","failed"])
-        message = Locales.manageTranslations.getTranslation(userLocale, ["email","content","failed"])
-        self.sendMailToContractor(interface, process, userLocale, subject, message)
+
+        subject = ["email","subjects","failed"]
+        message = ["email","content","failed"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.errorOccurred, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.FAILED]
 
     ###################################################
@@ -2489,10 +2641,10 @@ class DISPUTE(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2503,6 +2655,7 @@ class COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.COMPLETED)
     name = ProcessStatusAsString.COMPLETED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2562,10 +2715,10 @@ class COMPLETED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2576,6 +2729,7 @@ class FAILED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.FAILED)
     name = ProcessStatusAsString.FAILED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2635,10 +2789,10 @@ class FAILED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
@@ -2649,6 +2803,7 @@ class CANCELED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.CANCELED)
     name = ProcessStatusAsString.CANCELED
+    fireEvent = True
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -2708,10 +2863,10 @@ class CANCELED(State):
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-        return super().onUpdateEvent(interface,process) # do not change
+        return super().onUpdateEvent(interface, process) # do not change
         
     ###################################################
-    def onButtonEvent(self, event: str, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
 # fill dictionary

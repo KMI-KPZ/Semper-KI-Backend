@@ -8,12 +8,12 @@ Contains: Services using the sparql endpoint regarding 3D Printer Data
 
 import enum
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 import code_SemperKI.connections.cmem as SKICmem
 
 ##################################################
-class SparqlParameters(StrEnumExactylAsDefined):
+class SparqlParameters(StrEnumExactlyAsDefined):
     """
     All parameters that could be important for a query. Not all are used every time.
     """

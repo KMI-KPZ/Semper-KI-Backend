@@ -6,7 +6,7 @@ Silvio Weging 2023
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
 """
 import enum
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ###################################################
 # Version of the backend
@@ -63,7 +63,7 @@ def dataTypeToString(dataType:DataType):
 
 ####################################################################################
 # Enum for updateProcess
-class ProjectUpdates(StrEnumExactylAsDefined):
+class ProjectUpdates(StrEnumExactlyAsDefined):
     """
     What types of updates are there for a project?
 
@@ -73,7 +73,7 @@ class ProjectUpdates(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for updateProcess
-class ProcessUpdates(StrEnumExactylAsDefined):
+class ProcessUpdates(StrEnumExactlyAsDefined):
     """
     What types of updates are there for a process? 
     
@@ -91,7 +91,7 @@ class ProcessUpdates(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for processDetails
-class ProjectDetails(StrEnumExactylAsDefined):
+class ProjectDetails(StrEnumExactlyAsDefined):
     """
     What Details can a Project have?
     
@@ -100,7 +100,7 @@ class ProjectDetails(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for processDetails
-class ProcessDetails(StrEnumExactylAsDefined):
+class ProcessDetails(StrEnumExactlyAsDefined):
     """
     What Details can a Process have?
     
@@ -115,7 +115,7 @@ class ProcessDetails(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for messages
-class MessageContent(StrEnumExactylAsDefined):
+class MessageContent(StrEnumExactlyAsDefined):
     """
     What does a message consists of?
     
@@ -126,8 +126,18 @@ class MessageContent(StrEnumExactylAsDefined):
     text = enum.auto()
 
 ####################################################################################
+#Enum for MessageOrigin
+class MessageInterfaceFromFrontend(StrEnumExactlyAsDefined):
+    """
+    What does a message origin consist of?
+    
+    """
+    messages = enum.auto()
+    origin = enum.auto()
+    
+####################################################################################
 # Enum for session content
-class SessionContentSemperKI(StrEnumExactylAsDefined):
+class SessionContentSemperKI(StrEnumExactlyAsDefined):
     """
     Name of all added keys to the session for uniform naming
     
@@ -137,7 +147,7 @@ class SessionContentSemperKI(StrEnumExactylAsDefined):
 
 ####################################################################################
 # Enum for events
-class EventsDescription(StrEnumExactylAsDefined):
+class EventsDescription(StrEnumExactlyAsDefined):
     """
     Websocket events and missed events should be in the same format
 
@@ -149,7 +159,7 @@ class EventsDescription(StrEnumExactylAsDefined):
     
 ####################################################################################
 # Enum for flat process status
-class FlatProcessStatus(StrEnumExactylAsDefined):
+class FlatProcessStatus(StrEnumExactlyAsDefined):
     """
     For Frontend
     
@@ -160,3 +170,93 @@ class FlatProcessStatus(StrEnumExactylAsDefined):
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
     COMPLETED = enum.auto()
+
+####################################################################################
+# Enum for notification settings
+class NotificationSettingsUserSemperKI(StrEnumExactlyAsDefined):
+    """
+    Which notifications exist for users?
+    
+    """
+    verification = enum.auto()
+    processSent = enum.auto()
+    responseFromContractor = enum.auto()
+    statusChange = enum.auto()
+    newMessage = enum.auto()
+    actionReminder = enum.auto()
+    errorOccurred = enum.auto()
+
+####################################################################################
+# Enum for notification settings
+class NotificationSettingsOrgaSemperKI(StrEnumExactlyAsDefined):
+    """
+    Which notifications exist for orgas?
+    
+    """
+    processReceived = enum.auto()
+    responseFromClient = enum.auto()
+    statusChange = enum.auto()
+    newMessage = enum.auto()
+    actionReminder = enum.auto()
+    errorOccurred = enum.auto()
+
+###################################################
+# Enum for priorities for orgas
+class PrioritiesForOrganizationSemperKI(StrEnumExactlyAsDefined):
+    """
+    If the organization has some priorities, they can be set here
+    Is used for calculations
+    """
+    cost = enum.auto()
+    time = enum.auto()
+    quality = enum.auto()
+    quantity = enum.auto()
+    resilience = enum.auto()
+    sustainability = enum.auto()
+
+##################################################
+# Enum for values of priorities
+class PriorityTargetsSemperKI(StrEnumExactlyAsDefined):
+    """
+    What does every priority contain
+    
+    """
+    value = enum.auto() # the integer value
+
+##################################################
+# Permission enum
+class PermissionsEnum(enum.StrEnum):
+    """
+    What permissions are there?
+    
+    """
+    proccessesRead = "processes:read"
+    processesFiles = "processes:files"
+    processesMessages = "processes:messages"
+    processesEdit = "processes:edit"
+    processesDelete = "processes:delete"
+    orgaEdit = "orga:edit"
+    orgaDelete = "orga:delete"
+    orgaRead = "orga:read"
+    resourcesRead = "resources:read"
+    resourcesEdit = "resources:edit"
+
+##################################################
+# Class that contains a dictionary which maps the permissions to the notifications
+class MapPermissionsToOrgaNotifications():
+    """
+    Contains a dictionary which maps the permissions to the notifications
+    """
+    permissionsToNotifications = {
+        # all: [x.value for x in NotificationSettingsOrgaSemperKI]
+        PermissionsEnum.proccessesRead: [NotificationSettingsOrgaSemperKI.processReceived.value, NotificationSettingsOrgaSemperKI.responseFromClient.value, NotificationSettingsOrgaSemperKI.statusChange.value, NotificationSettingsUserSemperKI.verification.value, NotificationSettingsUserSemperKI.processSent.value, NotificationSettingsUserSemperKI.responseFromContractor.value], 
+        PermissionsEnum.processesFiles: [], 
+        PermissionsEnum.processesMessages: [NotificationSettingsOrgaSemperKI.newMessage.value], 
+        PermissionsEnum.processesEdit : [NotificationSettingsOrgaSemperKI.actionReminder.value, NotificationSettingsOrgaSemperKI.errorOccurred.value], 
+        PermissionsEnum.processesDelete: [], 
+        PermissionsEnum.orgaEdit: [],
+        PermissionsEnum.orgaDelete: [],
+        PermissionsEnum.orgaRead: [],
+        PermissionsEnum.resourcesRead: [], 
+        PermissionsEnum.resourcesEdit: [],	
+    }
