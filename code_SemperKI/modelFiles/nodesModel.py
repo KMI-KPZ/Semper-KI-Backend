@@ -34,9 +34,11 @@ class NodeType(StrEnumExactlyAsDefined):
     What are the possible types of a node?
     
     """
+    organization = enum.auto()
     printer = enum.auto()
     material = enum.auto()
     additionalRequirement = enum.auto()
+    color = enum.auto()
 
 ##################################################
 class NodeProperties(StrEnumExactlyAsDefined):
@@ -44,10 +46,16 @@ class NodeProperties(StrEnumExactlyAsDefined):
     What are the properties, a node can have?
 
     """
-    foodSafe = enum.auto()
-    heatResistant = enum.auto()
-    flexible = enum.auto()
-    smooth = enum.auto()
+    foodSafe = enum.auto() #"FDA;10/2011"
+    heatResistant = enum.auto() #250
+    flexible = enum.auto() # 0.5Z50;0.7Z100;4.8XY50;3.7XY100
+    smooth = enum.auto() # 20Ra
+    eModul = enum.auto() # 1358Z;2030XY
+    poissonRatio = enum.auto() #0.35
+    color = enum.auto() # 9005RAL;Black
+
+    buildVolume = enum.auto() # 100x100x100
+    technology = enum.auto() # FDM
 
 ##################################################
 class Node(models.Model):

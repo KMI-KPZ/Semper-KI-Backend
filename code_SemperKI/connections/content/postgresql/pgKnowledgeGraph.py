@@ -20,6 +20,7 @@ from code_SemperKI.utilities.basics import *
 from code_SemperKI.modelFiles.nodesModel import *
 
 logger = logging.getLogger("logToFile")
+loggerConsole = logging.getLogger("django")
 loggerError = logging.getLogger("errors")
 loggerPerformance = logging.getLogger("performance")
 #######################################################
@@ -43,10 +44,10 @@ def getNode(nodeID:str):
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Get Node;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Got node with id {nodeID}")
+        loggerConsole.info(f"Got node with id {nodeID}")
         return node
     except Exception as error:
-        logger.error(f'could not get node: {str(error)}')
+        loggerError.error(f'could not get node: {str(error)}')
         return error
 
 ##################################################
@@ -73,27 +74,31 @@ def createNode(information:dict):
 
         for content in information:
             match content:
+                case "nodeID":
+                    nodeID = information[NodeDescription.nodeID]
+                case "nodeTempID":
+                    pass
                 case "nodeName":
-                    nodeName = content[NodeDescription.nodeName]
+                    nodeName = information[NodeDescription.nodeName]
                 case "nodeType":
-                    nodeType = content[NodeDescription.nodeType]
+                    nodeType = information[NodeDescription.nodeType]
                 case "context":
-                    context = content[NodeDescription.context]
+                    context = information[NodeDescription.context]
                 case "properties":
-                    properties = content[NodeDescription.properties]
+                    properties = information[NodeDescription.properties]
                 case _:
                     raise Exception("wrong content in information")
-        
-        createdNode = Node.objects.create(nodeID=nodeID, nodeName=nodeName, nodeType=nodeType, context=context, properties=properties, updatedWhen=updatedWhen)
+
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "updatedWhen": updatedWhen})
         
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Create Node;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Created node with id {nodeID}")
+        loggerConsole.info(f"Created node with id {nodeID}")
         return createdNode
     except (Exception) as error:
-        logger.error(f'could not create node: {str(error)}')
+        loggerError.error(f'could not create node: {str(error)}')
         return error
         
 ##################################################
@@ -115,25 +120,28 @@ def updateNode(nodeID:str, information:dict):
         node = Node.objects.get(nodeID=nodeID)
         for content in information:
             match content:
+                case "nodeID":
+                    pass
                 case "nodeName":
-                    node.nodeName = content[NodeDescription.nodeName]
+                    node.nodeName = information[NodeDescription.nodeName]
                 case "nodeType":
-                    node.nodeType = content[NodeDescription.nodeType]
+                    node.nodeType = information[NodeDescription.nodeType]
                 case "context":
-                    node.context = content[NodeDescription.context]
+                    node.context = information[NodeDescription.context]
                 case "properties":
-                    node.properties = content[NodeDescription.properties]
+                    node.properties.update(information[NodeDescription.properties])
                 case _:
                     raise Exception("wrong content in information")
+        node.updatedWhen = timezone.now()
         node.save()
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Update Node;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Updated node with id: {nodeID}")	
+        loggerConsole.info(f"Updated node with id: {nodeID}")	
         return node
     except (Exception) as error:
-        logger.error(f'could not update node: {str(error)}')
+        loggerError.error(f'could not update node: {str(error)}')
         return error	
 
 
@@ -158,10 +166,39 @@ def deleteNode(nodeID:str):
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Delete Node;{endPC-startPC};{endPT-startPT}")
-        logger.info(f'Deleted node with id {nodeID}')
+        loggerConsole.info(f'Deleted node with id {nodeID}')
         return None
     except (Exception) as error:
-        logger.error(f'could not delete node: {str(error)}')
+        loggerError.error(f'could not delete node: {str(error)}')
+        return error
+    
+##################################################
+def getEdgesForNode(nodeID:str) -> list[dict]:
+    """
+    Return all neighbors to a node
+
+    :param nodeID: The id of the node
+    :type nodeID: str
+    :return: List with all neighbors and their info
+    :rtype: list of dicts
+    
+    """
+    try:
+        startPC = time.perf_counter_ns()
+        startPT = time.process_time_ns()
+
+        node = Node.objects.get(nodeID=nodeID)
+        outList = list()
+        for entry in node.edges.all():
+            outList.append(entry.toDict())
+
+        endPC = time.perf_counter_ns()
+        endPT = time.process_time_ns()
+        loggerPerformance.info(f"DB;Get Edges;{endPC-startPC};{endPT-startPT}")
+        loggerConsole.info(f"Gathered all neighbors of: {nodeID}")	
+        return outList
+    except (Exception) as error:
+        loggerError.error(f'could not get neighbors: {str(error)}')
         return error
 
 ##################################################
@@ -184,15 +221,16 @@ def createEdge(nodeID1:str, nodeID2:str):
         node2 = Node.objects.get(nodeID=nodeID2)
         
         node1.edges.add(node2)
+        node1.updatedWhen = timezone.now()
         node1.save()
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Create Edge;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Linked nodes with id: {nodeID1} and {nodeID2}")	
+        loggerConsole.info(f"Linked nodes with id: {nodeID1} and {nodeID2}")	
         return None
     except (Exception) as error:
-        logger.error(f'could not link the two nodes: {str(error)}')
+        loggerError.error(f'could not link the two nodes: {str(error)}')
         return error
     
 ##################################################
@@ -220,10 +258,10 @@ def deleteEdge(nodeID1:str, nodeID2:str):
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Delete Edge;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Unlinked nodes with id: {nodeID1} and {nodeID2}")	
+        loggerConsole.info(f"Unlinked nodes with id: {nodeID1} and {nodeID2}")	
         return None
     except (Exception) as error:
-        logger.error(f'could not delete link between the two nodes: {str(error)}')
+        loggerError.error(f'could not delete link between the two nodes: {str(error)}')
         return error
 
 ##################################################
@@ -249,10 +287,10 @@ def getNodesByType(nodeType:str) -> list[dict]:
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Get Nodes By Type;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Gathered all nodes by type: {nodeType}")	
+        loggerConsole.info(f"Gathered all nodes by type: {nodeType}")	
         return outList
     except (Exception) as error:
-        logger.error(f'could not get nodes by type: {str(error)}')
+        loggerError.error(f'could not get nodes by type: {str(error)}')
         return error
 
 ##################################################
@@ -270,7 +308,7 @@ def getNodesByProperty(property:str) -> list[dict]:
         startPC = time.perf_counter_ns()
         startPT = time.process_time_ns()
 
-        nodes = Node.objects.filter(properties__contains=property)
+        nodes = Node.objects.filter(properties__icontains=property)
         outList = list()
         for entry in nodes:
             outList.append(entry.toDict())
@@ -278,10 +316,10 @@ def getNodesByProperty(property:str) -> list[dict]:
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Get Nodes By Property;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Gathered all nodes by property: {property}")	
+        loggerConsole.info(f"Gathered all nodes by property: {property}")	
         return outList
     except (Exception) as error:
-        logger.error(f'could not get nodes by property: {str(error)}')
+        loggerError.error(f'could not get nodes by property: {str(error)}')
         return error
 
 ##################################################
@@ -301,17 +339,17 @@ def getSpecificNeighborsByType(nodeID:str, neighborNodeType:str):
         startPT = time.process_time_ns()
         
         outList = []
-        for entry in Node.objects.filter(nodeID=nodeID):	
-            for neighbor in entry.edges.filter(nodeType=neighborNodeType):
-                outList.append(neighbor.toDict())
+        node = Node.objects.get(nodeID=nodeID)	
+        for neighbor in node.edges.filter(nodeType=neighborNodeType):
+            outList.append(neighbor.toDict())
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Get Neighbors By Type;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Gathered all neighbors for {nodeID} by type: {neighborNodeType}")	
+        loggerConsole.info(f"Gathered all neighbors for {nodeID} by type: {neighborNodeType}")	
         return outList
     except (Exception) as error:
-        logger.error(f'could not get neighbors by type for node: {str(error)}')
+        loggerError.error(f'could not get neighbors by type for node: {str(error)}')
         return error
 
 ##################################################
@@ -331,17 +369,17 @@ def getSpecificNeighborsByProperty(nodeID:str, neighborProperty:str):
         startPT = time.process_time_ns()
         
         outList = []
-        for entry in Node.objects.filter(nodeID=nodeID):	
-            for neighbor in entry.edges.filter(properties__contains=neighborProperty):
-                outList.append(neighbor.toDict())
+        node = Node.objects.get(nodeID=nodeID)	
+        for neighbor in node.edges.filter(properties__icontains=neighborProperty):
+            outList.append(neighbor.toDict())
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Get Neighbors By Property;{endPC-startPC};{endPT-startPT}")
-        logger.info(f"Gathered all neighbors for {nodeID} by property: {neighborProperty}")	
+        loggerConsole.info(f"Gathered all neighbors for {nodeID} by property: {neighborProperty}")	
         return outList
     except (Exception) as error:
-        logger.error(f'could not get neighbors by property for node: {str(error)}')
+        loggerError.error(f'could not get neighbors by property for node: {str(error)}')
         return error
 
 ##################################################
@@ -350,7 +388,7 @@ def getGraph():
     Return the whole graph
 
     :return: The graph as Dictionary of nodes and edges
-    :rtype: Dict
+    :rtype: Dict | Exception
     """
     try:
         startPC = time.perf_counter_ns()
@@ -366,15 +404,55 @@ def getGraph():
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Generate Graph;{endPC-startPC};{endPT-startPT}")
-        logger.info("Fetched the whole graph")	
+        loggerConsole.info("Fetched the whole graph")	
         return outDict
     except (Exception) as error:
-        logger.error(f'could not return graph: {str(error)}')
+        loggerError.error(f'could not return graph: {str(error)}')
         return error
     
 ##################################################
-def createGraph():
-    pass #TODO
+def createGraph(graph:list):
+    """
+    Create graph from input
+
+    :param graph: The graph
+    :type graph: list of the nodes and their edges
+    :return: Created Graph or Exception
+    :rtype: Dict | Exception
+    """
+    try:
+        alreadySeenNodes = {}
+        for entry in graph:
+            node = entry["node"]
+            
+            # dont create a node twice
+            if node["nodeTempID"] not in alreadySeenNodes:
+                node1 = createNode(node)
+                if isinstance(node1, Exception):
+                    raise node1
+                alreadySeenNodes[node["nodeTempID"]] = node1.nodeID
+            else:
+                node1 = getNode(alreadySeenNodes[node["nodeTempID"]])
+
+            for neighbor in entry["edges"]:
+                if neighbor["nodeTempID"] not in alreadySeenNodes:
+                    node2 = createNode(neighbor)
+                    if isinstance(node2, Exception):
+                        raise node2
+                    alreadySeenNodes[neighbor["nodeTempID"]] = node2.nodeID
+                else:
+                    node2 = getNode(alreadySeenNodes[neighbor["nodeTempID"]])
+                
+                result = createEdge(node1.nodeID, node2.nodeID)
+                if isinstance(result, Exception):
+                    raise result
+        newGraph = getGraph()
+        if isinstance(newGraph, Exception):
+            raise newGraph
+        return newGraph
+    except (Exception) as error:
+        loggerError.error(f'could not create graph: {str(error)}')
+        return error
     
 ##################################################
 def deleteGraph():
@@ -388,13 +466,13 @@ def deleteGraph():
         startPC = time.perf_counter_ns()
         startPT = time.process_time_ns()
 
-        Node.objects.delete()
+        Node.objects.all().delete()
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()
         loggerPerformance.info(f"DB;Delete Graph;{endPC-startPC};{endPT-startPT}")
-        logger.info("Deleted the whole graph")	
+        loggerConsole.info("Deleted the whole graph")	
         return None
     except (Exception) as error:
-        logger.error(f'could not delete graph: {str(error)}')
+        loggerError.error(f'could not delete graph: {str(error)}')
         return error
