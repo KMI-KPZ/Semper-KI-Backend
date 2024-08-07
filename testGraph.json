@@ -1,0 +1,88 @@
+[
+  {
+    "node": {
+      "nodeTempID": 0,
+      "nodeName": "InfAI e.V.",
+      "nodeType": "organization",
+      "context": "Our base organization",
+      "properties": {}
+    },
+    "edges": [
+      {
+        "nodeTempID": 1,
+        "nodeName": "Snapmaker Artisan 2.0",
+        "nodeType": "printer",
+        "context": "Printer at the InfAI e.V.",
+        "properties": {
+          "buildVolume": "400x400x400",
+          "technology": "FDM"
+        }
+      },
+      {
+        "nodeTempID": 2,
+        "nodeName": "Remove Support",
+        "nodeType": "additionalRequirement",
+        "context": "Removing the white stuff",
+        "properties": {
+          "technology": "FDM"
+        }
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 1,
+      "nodeName": "Snapmaker Artisan 2.0",
+      "nodeType": "printer",
+      "context": "Printer at the InfAI e.V.",
+      "properties": {
+        "buildVolume": "400x400x400",
+        "technology": "FDM"
+      }
+    },
+    "edges": [
+      {
+        "nodeTempID": 3,
+        "nodeName": "PLA",
+        "nodeType": "material",
+        "context": "Our main printing material",
+        "properties": {
+          "foodSafe": "NA",
+          "heatResistant": "215",
+          "flexible": "NA",
+          "smooth": "NA",
+          "eModul": "2367Z;2432XY",
+          "poissonRatio": "0.34"
+        }
+      }
+    ]
+  },
+  {
+    "node":{
+      "nodeTempID": 3,
+      "nodeName": "PLA",
+      "nodeType": "material",
+      "context": "Our main printing material",
+      "properties": {
+        "foodSafe": "NA",
+        "heatResistant": "215",
+        "flexible": "NA",
+        "smooth": "NA",
+        "eModul": "2367Z;2432XY",
+        "poissonRatio": "0.34"
+      }
+    },
+    "edges":[
+      {
+        "nodeTempID": 4,
+        "nodeName": "PLA - Black",
+        "nodeType": "color",
+        "context": "The default color",
+        "properties": {
+          "foodSafe": "No",
+          "color": "9005RAL;Black"
+        }
+      }
+    ]
+  }
+]

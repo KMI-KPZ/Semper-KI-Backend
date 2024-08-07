@@ -673,26 +673,17 @@ def getGraph(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
-class SResInitialNodesData(serializers.Serializer):
-    label = serializers.CharField(max_length=200)
-#######################################################
-class SResInitialNodesPosition(serializers.Serializer):
-    x = serializers.IntegerField()
-    y = serializers.IntegerField()
-#######################################################
 class SResInitialNodes(serializers.Serializer):
     id = serializers.CharField(max_length=200)
-    data = SResInitialNodesData()
-    position = SResInitialNodesPosition()
+    name = serializers.CharField(max_length=200)
 #######################################################
 class SResInitialEdges(serializers.Serializer):
-    id = serializers.CharField(max_length=200)
     source = serializers.CharField(max_length=200)
     target = serializers.CharField(max_length=200)
 #######################################################
 class SResGraphForFrontend(serializers.Serializer):
-    initialNodes = serializers.ListField(child=SResInitialNodes())
-    initialEdges = serializers.ListField(child=SResInitialEdges())
+    Nodes = serializers.ListField(child=SResInitialNodes())
+    Edges = serializers.ListField(child=SResInitialEdges())
 #######################################################
 @extend_schema(
     summary="Returns the graph for frontend",
@@ -723,15 +714,13 @@ def getGraphForFrontend(request:Request):
         result = pgKnowledgeGraph.getGraph()
         if isinstance(result, Exception):
             raise result
-        outDict = {"initialNodes": [], "initialEdges": []}
-        idCounter = 0
+        outDict = {"Nodes": [], "Edges": []}
         for entry in result["nodes"]:
-            outEntry = {"id": entry[NodeDescription.nodeID], "data": {"label": entry[NodeDescription.nodeName]}, "position": {"x": 0, "y": 0}}
-            outDict["initialNodes"].append(outEntry)
+            outEntry = {"id": entry[NodeDescription.nodeID], "name": entry[NodeDescription.nodeName]}
+            outDict["Nodes"].append(outEntry)
         for entry in result["edges"]:
-            outEntry = {"id": idCounter, "source": entry[0], "target": entry[1]}
-            idCounter += 1
-            outDict["initialEdges"].append(outEntry)
+            outEntry = {"source": entry[0], "target": entry[1]}
+            outDict["Edges"].append(outEntry)
 
         outSerializer = SResGraphForFrontend(data=outDict)
         if outSerializer.is_valid():

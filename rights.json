@@ -206,12 +206,7 @@
             "HomeAuthorizedResources"
          ],
          "paths": [
-            "orga_getMaterials",
-            "orga_getPrinters",
-            "onto_getMaterial",
-            "onto_getPrinter",
-            "onto_getPrinters",
-            "onto_getMaterials",
+            "onto_getResource",
             "orga_getResources"
          ]
       },
@@ -227,18 +222,9 @@
             "ResourcesButtonAddPrinter"
          ],
          "paths": [
-            "orga_removeMaterial",
-            "orga_createMaterial",
-            "orga_addMaterialEdit",
-            "orga_addMaterial",
-            "orga_removePrinter",
-            "orga_createPrinter",
-            "orga_addPrinterEdit",
-            "orga_addPrinter",
-            "orga_addMaterialToPrinter",
-            "orga_updateMaterialAndPrinter",
-            "orga_removeLinkToPrinter",
-            "orga_removeLinkToMaterial",
+            "onto_addEdge",
+            "orga_addEdgesToOrga",
+            "orga_removeEdge",
             "orga_removeAll"
          ]
       }
