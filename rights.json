@@ -207,6 +207,7 @@
          ],
          "paths": [
             "onto_getResource",
+            "onto_getAssociatedResources",
             "orga_getResources"
          ]
       },
@@ -222,8 +223,10 @@
             "ResourcesButtonAddPrinter"
          ],
          "paths": [
-            "onto_addEdge",
             "orga_addEdgesToOrga",
+            "orga_createNode",
+            "orga_updateNode",
+            "orga_deleteNode",
             "orga_removeEdge",
             "orga_removeAll"
          ]

@@ -14,6 +14,7 @@ from django.conf import settings
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 from Generic_Backend.code_General.utilities.crypto import generateURLFriendlyRandomString
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
@@ -51,7 +52,7 @@ def getNode(nodeID:str):
         return error
 
 ##################################################
-def createNode(information:dict):
+def createNode(information:dict, createdBy="SYSTEM"):
     """
     Creates a node
 
@@ -89,7 +90,7 @@ def createNode(information:dict):
                 case _:
                     raise Exception("wrong content in information")
 
-        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "updatedWhen": updatedWhen})
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "updatedWhen": updatedWhen})
         
         
         endPC = time.perf_counter_ns()
@@ -100,6 +101,23 @@ def createNode(information:dict):
     except (Exception) as error:
         loggerError.error(f'could not create node: {str(error)}')
         return error
+    
+##################################################
+def createOrganizationNode(orgaID:str):
+    """
+    Create a node for an organization
+
+    :param orgaID: The ID of the organization
+    :type orgaID: str
+    :return: None
+    :rtype: None
+    
+    """
+    result = getNode(orgaID)
+    if isinstance(result, Exception):
+        orgaName = pgProfiles.ProfileManagementBase.getOrganizationName(orgaID)
+        information = {NodeDescription.nodeID: orgaID, NodeDescription.nodeName: orgaName, NodeDescription.nodeType: NodeType.organization}
+        createNode(information, orgaID)
         
 ##################################################
 def updateNode(nodeID:str, information:dict):

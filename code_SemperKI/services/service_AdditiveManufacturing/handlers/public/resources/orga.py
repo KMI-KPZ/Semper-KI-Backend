@@ -26,6 +26,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSuffic
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
+from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -47,7 +48,7 @@ class SResOrgaResources(serializers.Serializer):
 @extend_schema(
     summary="Retrieve all KG information about connected resources for an organization",
     description=" ",
-    tags=['FE - AM Resources'],
+    tags=['FE - AM Resources Organization'],
     request=None,
     responses={
         200: SResOrgaResources,
@@ -106,6 +107,259 @@ def orga_getResources(request:Request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+#######################################################
+@extend_schema(
+    summary="Creates a new node for the organization in the knowledge graph",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=SReqCreateNode,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["POST"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["POST"])
+@checkVersion(0.3)
+def orga_createNode(request:Request):
+    """
+    Creates a new node for the organization in the knowledge graph
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Succes or not
+    :rtype: HTTP Response
+
+    """
+    try:
+
+        serializedInput = SReqCreateNode(data=request.data)
+        if not serializedInput.is_valid():
+            message = f"Verification failed in {orga_createNode.cls.__name__}"
+            exception = f"Verification failed {serializedInput.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = serializedInput.data
+
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+        #orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_createNode.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # sparqlQueries.createEntryForContractor.sendQuery(
+        #     {sparqlQueries.SparqlParameters.ID: orgaID, 
+        #      sparqlQueries.SparqlParameters.name: orgaName,
+        #      sparqlQueries.SparqlParameters.Material: materialName, 
+        #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
+            
+        # create node for the orga and link it
+        result = pgKnowledgeGraph.createNode(validatedInput, orgaID)
+        if isinstance(result, Exception):
+            raise result
+        result = pgKnowledgeGraph.createEdge(orgaID, result.nodeID) 
+        if isinstance(result, Exception):
+            raise result
+        
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {orga_createNode.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
+    summary="Updates a node from the organization in the knowledge graph",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=SReqUpdateNode,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["PATCH"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["PATCH"])
+@checkVersion(0.3)
+def orga_updateNode(request:Request):
+    """
+    Updates a new node for the organization in the knowledge graph
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Succes or not
+    :rtype: HTTP Response
+
+    """
+    try:
+
+        serializedInput = SReqUpdateNode(data=request.data)
+        if not serializedInput.is_valid():
+            message = f"Verification failed in {orga_updateNode.cls.__name__}"
+            exception = f"Verification failed {serializedInput.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = serializedInput.data
+
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+        #orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_updateNode.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # sparqlQueries.createEntryForContractor.sendQuery(
+        #     {sparqlQueries.SparqlParameters.ID: orgaID, 
+        #      sparqlQueries.SparqlParameters.name: orgaName,
+        #      sparqlQueries.SparqlParameters.Material: materialName, 
+        #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
+        
+        # check if the node is even associated with the organization
+        result = pgKnowledgeGraph.getNode(validatedInput["nodeID"])
+        if isinstance(result, Exception):
+            raise result
+        if result[pgKnowledgeGraph.NodeDescription.createdBy] != orgaID:
+            message = f"Rights not sufficient in {orga_updateNode.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # update node for the orga
+        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        if isinstance(result, Exception):
+            raise result
+        
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {orga_updateNode.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
+    summary="Deletes a node from the graph by ID",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfRightsAreSufficient(json=False)
+@require_http_methods(["DELETE"])
+@api_view(["DELETE"])
+@checkVersion(0.3)
+def orga_deleteNode(request:Request, nodeID:str):
+    """
+    Deletes a node from the graph by ID
+
+    :param request: DELETE Request
+    :type request: HTTP DELETE
+    :param nodeID: The id of the node
+    :type nodeID: str
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+        #orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_deleteNode.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # sparqlQueries.createEntryForContractor.sendQuery(
+        #     {sparqlQueries.SparqlParameters.ID: orgaID, 
+        #      sparqlQueries.SparqlParameters.name: orgaName,
+        #      sparqlQueries.SparqlParameters.Material: materialName, 
+        #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
+        
+        # check if the node is even associated with the organization
+        result = pgKnowledgeGraph.getNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        if result[pgKnowledgeGraph.NodeDescription.createdBy] != orgaID:
+            message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        result = pgKnowledgeGraph.deleteNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {orga_deleteNode.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # set printer/material for orga (keep in mind: one item at the time for sparql)
 #######################################################
 class SReqOrgaAddEdges(serializers.Serializer):
@@ -115,7 +369,7 @@ class SReqOrgaAddEdges(serializers.Serializer):
 @extend_schema(
     summary="Links some things to an organization in the knowledge graph",
     description=" ",
-    tags=['FE - AM Resources'],
+    tags=['FE - AM Resources Organization'],
     request=SReqOrgaAddEdges,
     responses={
         200: None,
@@ -195,7 +449,7 @@ def orga_addEdgesToOrga(request:Request):
 @extend_schema(
     summary="Remove the connection of an organization to something",
     description=" ",
-    tags=['FE - AM Resources'],
+    tags=['FE - AM Resources Organization'],
     request=None,
     responses={
         200: None,
@@ -257,7 +511,7 @@ def orga_removeEdge(request:Request, entityID:str):
 @extend_schema(
     summary="Remove all connections of an organization",
     description=" ",
-    tags=['FE - AM Resources'],
+    tags=['FE - AM Resources Organization'],
     request=None,
     responses={
         200: None,

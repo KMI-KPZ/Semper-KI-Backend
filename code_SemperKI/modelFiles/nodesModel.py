@@ -24,6 +24,7 @@ class NodeDescription(StrEnumExactlyAsDefined):
     context = enum.auto()
     properties = enum.auto()
     edges = enum.auto()
+    createdBy = enum.auto()
     createdWhen = enum.auto()
     updatedWhen = enum.auto()
     accessedWhen = enum.auto()
@@ -68,6 +69,7 @@ class Node(models.Model):
     :context: Some information about the node, can be anything
     :properties: The properties that this node has, depends on the type
     :edges: The nodes connected to this one, symmetrical (so it's an undirected graph)
+    :createdBy: Who created that node? (hashedID or SYSTEM)
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
     :updatedWhen: Date and time at which the entry was updated
     :accessedWhen: Last date and time the entry was fetched from the database, automatically set
@@ -78,6 +80,7 @@ class Node(models.Model):
     context = models.CharField(max_length=10000)
     properties = models.JSONField()
     edges = models.ManyToManyField("self", symmetrical=True)
+    createdBy = models.CharField(max_length=513)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
     accessedWhen = models.DateTimeField(auto_now=True)
@@ -106,6 +109,7 @@ class Node(models.Model):
             NodeDescription.nodeType: self.nodeType,
             NodeDescription.context: self.context,
             NodeDescription.properties: self.properties,
+            NodeDescription.createdBy: self.createdBy,
             NodeDescription.createdWhen: str(self.createdWhen), 
             NodeDescription.updatedWhen: str(self.updatedWhen), 
             NodeDescription.accessedWhen: str(self.accessedWhen)
