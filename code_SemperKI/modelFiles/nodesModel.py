@@ -47,17 +47,16 @@ class NodeProperties(StrEnumExactlyAsDefined):
     What are the properties, a node can have?
 
     """
-    imgPath = enum.auto() # mocks.testPicture
-    foodSafe = enum.auto() #"FDA;10/2011"
-    heatResistant = enum.auto() #250
-    flexible = enum.auto() # 0.5Z50;0.7Z100;4.8XY50;3.7XY100
-    smooth = enum.auto() # 20Ra
-    eModul = enum.auto() # 1358Z;2030XY
-    poissonRatio = enum.auto() #0.35
-    color = enum.auto() # 9005RAL;Black
-
-    buildVolume = enum.auto() # 100x100x100
-    technology = enum.auto() # FDM
+    imgPath = enum.auto()  # mocks.testPicture  -> printer|material|additionalRequirement|color
+    foodSafe = enum.auto()  #"FDA;10/2011" -> material|color
+    heatResistant = enum.auto()  #250 -> material|color|additionalRequirement
+    flexible = enum.auto()  # 0.5Z50;0.7Z100;4.8XY50;3.7XY100 -> material
+    smooth = enum.auto()  # 20Ra -> material|additionalRequirement
+    eModul = enum.auto()  # 1358Z;2030XY -> material
+    poissonRatio = enum.auto()  #0.35 -> material
+    color = enum.auto()  # 9005RAL;Black -> color
+    buildVolume = enum.auto()  # 100x100x100 -> printer
+    technology = enum.auto()  # FDM -> printer
 
 ##################################################
 class Node(models.Model):

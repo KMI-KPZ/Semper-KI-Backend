@@ -27,6 +27,30 @@
         "properties": {
           "technology": "FDM"
         }
+      },
+      {
+        "nodeTempID": 3,
+        "nodeName": "PLA",
+        "nodeType": "material",
+        "context": "Our main printing material",
+        "properties": {
+          "foodSafe": "NA",
+          "heatResistant": "215",
+          "flexible": "NA",
+          "smooth": "NA",
+          "eModul": "2367Z;2432XY",
+          "poissonRatio": "0.34"
+        }
+      },
+      {
+        "nodeTempID": 4,
+        "nodeName": "PLA - Black",
+        "nodeType": "color",
+        "context": "The default color",
+        "properties": {
+          "foodSafe": "No",
+          "color": "9005RAL;Black"
+        }
       }
     ]
   },
