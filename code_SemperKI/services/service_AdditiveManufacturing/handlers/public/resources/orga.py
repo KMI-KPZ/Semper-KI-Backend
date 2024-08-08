@@ -286,7 +286,7 @@ def orga_updateNode(request:Request):
 @extend_schema(
     summary="Deletes a node from the graph by ID",
     description=" ",
-    tags=['FE - AM Resources Ontology'],
+    tags=['FE - AM Resources Organization'],
     request=None,
     responses={
         200: None,
