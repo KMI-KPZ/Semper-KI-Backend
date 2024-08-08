@@ -255,7 +255,7 @@ def orga_updateNode(request:Request):
         result = pgKnowledgeGraph.getNode(validatedInput["nodeID"])
         if isinstance(result, Exception):
             raise result
-        if result[pgKnowledgeGraph.NodeDescription.createdBy] != orgaID:
+        if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_updateNode.cls.__name__}"
             exception = "Unauthorized"
             logger.error(message)
@@ -336,7 +336,7 @@ def orga_deleteNode(request:Request, nodeID:str):
         result = pgKnowledgeGraph.getNode(nodeID)
         if isinstance(result, Exception):
             raise result
-        if result[pgKnowledgeGraph.NodeDescription.createdBy] != orgaID:
+        if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
             exception = "Unauthorized"
             logger.error(message)
@@ -437,6 +437,113 @@ def orga_addEdgesToOrga(request:Request):
 
     except (Exception) as error:
         message = f"Error in {orga_addEdgesToOrga.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+#######################################################
+class SReqOrgaCreateEdge(serializers.Serializer):
+    entity1ID = serializers.CharField(max_length=200)
+    entity2ID = serializers.CharField(max_length=200)
+
+#######################################################
+@extend_schema(
+    summary="Links two things for an organization in the knowledge graph",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=SReqOrgaCreateEdge,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["PATCH"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["PATCH"])
+@checkVersion(0.3)
+def orga_addEdgeForOrga(request:Request):
+    """
+    Links two things for an organization in the knowledge graph
+
+    :param request: PATCH Request
+    :type request: HTTP PATCH
+    :return: Succes or not
+    :rtype: HTTP Response
+
+    """
+    try:
+
+        serializedInput = SReqOrgaCreateEdge(data=request.data)
+        if not serializedInput.is_valid():
+            message = f"Verification failed in {orga_addEdgeForOrga.cls.__name__}"
+            exception = f"Verification failed {serializedInput.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        entity1ID = serializedInput.data["entity1ID"]
+        entity2ID = serializedInput.data["entity2ID"]
+
+        # edge already exists?
+        if pgKnowledgeGraph.getIfEdgeExists(entity1ID, entity2ID):
+            return Response("Success", status=status.HTTP_200_OK)
+
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+        #orgaName = ProfileManagementOrganization.getOrganizationName(orgaID)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_addEdgeForOrga.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # sparqlQueries.createEntryForContractor.sendQuery(
+        #     {sparqlQueries.SparqlParameters.ID: orgaID, 
+        #      sparqlQueries.SparqlParameters.name: orgaName,
+        #      sparqlQueries.SparqlParameters.Material: materialName, 
+        #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
+
+        result1 = pgKnowledgeGraph.getNode(entity1ID)
+        if isinstance(result1, Exception):
+            raise result1
+        result2 = pgKnowledgeGraph.getNode(entity2ID)
+        if isinstance(result2, Exception):
+            raise result2
+        
+        if result1.createdBy != orgaID and result2.createdBy != orgaID:
+            message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        # link the two things
+        result = pgKnowledgeGraph.createEdge(result1.nodeID, result2.nodeID) 
+        if isinstance(result, Exception):
+            raise result
+        
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {orga_addEdgeForOrga.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

@@ -225,6 +225,7 @@
          ],
          "paths": [
             "orga_addEdgesToOrga",
+            "orga_addEdgeForOrga",
             "orga_createNode",
             "orga_updateNode",
             "orga_deleteNode",

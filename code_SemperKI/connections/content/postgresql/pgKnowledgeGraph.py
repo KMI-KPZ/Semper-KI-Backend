@@ -218,6 +218,38 @@ def getEdgesForNode(nodeID:str) -> list[dict]:
     except (Exception) as error:
         loggerError.error(f'could not get neighbors: {str(error)}')
         return error
+    
+##################################################
+def getIfEdgeExists(node1ID:str, node2ID) -> bool:
+    """
+    Return if an edge exists
+
+    :param node1ID: The id of the first node
+    :type node1ID: str
+    :param node2ID: The id of the second node
+    :type node2ID: str
+    :return: If edge exists or not
+    :rtype: bool
+    
+    """
+    try:
+        startPC = time.perf_counter_ns()
+        startPT = time.process_time_ns()
+
+        node1 = Node.objects.get(nodeID=node1ID)
+        node2 = Node.objects.get(nodeID=node2ID)
+        isInside = False
+        if node2 in node1.edges.all():
+            isInside = True
+        
+        endPC = time.perf_counter_ns()
+        endPT = time.process_time_ns()
+        loggerPerformance.info(f"DB;Get Edge;{endPC-startPC};{endPT-startPT}")
+        loggerConsole.info(f"Checked if edge existed between: {node1ID} {node2ID}")	
+        return isInside
+    except (Exception) as error:
+        loggerError.error(f'could not check if edge exists: {str(error)}')
+        return error
 
 ##################################################
 def createEdge(nodeID1:str, nodeID2:str):
