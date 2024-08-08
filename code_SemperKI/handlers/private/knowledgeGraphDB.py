@@ -39,8 +39,8 @@ class SResNode(serializers.Serializer):
     nodeID = serializers.CharField(max_length=513)
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200)
-    context = serializers.CharField(max_length=10000)
-    properties = serializers.DictField()
+    context = serializers.CharField(max_length=10000, allow_blank=True)
+    properties = serializers.DictField(allow_empty=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
@@ -94,6 +94,7 @@ def getNode(request:Request, nodeID:str):
 
 #######################################################
 class SReqProperties(serializers.Serializer):
+    imgPath = serializers.CharField(max_length=1000, allow_blank=True, required=False)
     foodSafe = serializers.CharField(max_length=1000, allow_blank=True, required=False)
     heatResistant = serializers.CharField(max_length=1000, allow_blank=True, required=False)
     flexible = serializers.CharField(max_length=1000, allow_blank=True, required=False)
@@ -119,6 +120,7 @@ class SReqCreateNode(serializers.Serializer):
     request=SReqCreateNode,
     responses={
         200: SResNode,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -227,6 +229,7 @@ class SReqUpdateNode(serializers.Serializer):
     request=SReqUpdateNode,
     responses={
         200: SResNode,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -531,6 +534,7 @@ class SReqTwoNodes(serializers.Serializer):
     request=SReqTwoNodes,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -691,7 +695,7 @@ class SResGraphForFrontend(serializers.Serializer):
     tags=['FE - Graph'],
     request=None,
     responses={
-        200: None,
+        200: SResGraphForFrontend,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -739,6 +743,7 @@ def getGraphForFrontend(request:Request):
 
 #######################################################
 class SReqCreateNodeOfGraph(serializers.Serializer):
+    nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
     nodeTempID = serializers.IntegerField()
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200, default="organization|printer|material|additionalRequirement|color")
@@ -758,6 +763,7 @@ class SReqGraph(serializers.Serializer):
     request=serializers.ListSerializer(child=SReqGraph()),
     responses={
         200: SResGraph,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }

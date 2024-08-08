@@ -47,6 +47,7 @@ class NodeProperties(StrEnumExactlyAsDefined):
     What are the properties, a node can have?
 
     """
+    imgPath = enum.auto() # mocks.testPicture
     foodSafe = enum.auto() #"FDA;10/2011"
     heatResistant = enum.auto() #250
     flexible = enum.auto() # 0.5Z50;0.7Z100;4.8XY50;3.7XY100

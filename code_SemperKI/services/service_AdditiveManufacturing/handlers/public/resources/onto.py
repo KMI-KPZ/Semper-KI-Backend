@@ -154,6 +154,7 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
     request=SReqCreateNode,
     responses={
         200: SResNode,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -214,6 +215,7 @@ def onto_addNode(request:Request):
     request=SReqUpdateNode,
     responses={
         200: SResNode,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -324,6 +326,7 @@ class SReqOntoCreateEdge(serializers.Serializer):
     request=SReqOntoCreateEdge,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }

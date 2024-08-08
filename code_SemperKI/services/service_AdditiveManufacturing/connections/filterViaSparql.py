@@ -6,6 +6,7 @@ Silvio Weging 2023
 Contains: Functions using the sparql queries to filter for contractors
 """
 
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from ..utilities.sparqlQueries import *
 
 ##################################################
@@ -21,10 +22,17 @@ def filterByMaterial(resultDict:dict, chosenMaterials:dict):
     :rtype: None
     
     """
-    manufacturers = getManufacturersByMaterial.sendQuery()
-    for entry in manufacturers:
-        if entry["ID"]["value"] not in resultDict:
-            resultDict[entry["ID"]["value"]] = entry
+    #manufacturers = getManufacturersByMaterial.sendQuery()
+    # for entry in manufacturers:
+    #     if entry["ID"]["value"] not in resultDict:
+    #         resultDict[entry["ID"]["value"]] = entry
+
+    for materialID in chosenMaterials:
+        material = pgKnowledgeGraph.getNode(materialID)
+        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(material.nodeID, pgKnowledgeGraph.NodeType.organization)
+        for orga in orgas:
+            resultDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
+    
 
 ##################################################
 def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
@@ -39,7 +47,11 @@ def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
     :rtype: None
     
     """
-    return None
+    for postProcessingID in chosenPostProcessings:
+        postProcessing = pgKnowledgeGraph.getNode(postProcessingID)
+        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(postProcessing.nodeID, pgKnowledgeGraph.NodeType.organization)
+        for orga in orgas:
+            resultDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
 
 ##################################################
 def filterByBuildPlate(resultDict:dict, calculations:dict):
@@ -63,12 +75,21 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
         #         "_1": -1.0,
         #         "_2": -1.0,
         #         "_3": -1.0,
-        manufacturers = getManufacturersByBuildPlate.sendQuery({
-            SparqlParameters.min_height: calculations["measurements"]["mbbDimensions"]["_1"],
-            SparqlParameters.min_length: calculations["measurements"]["mbbDimensions"]["_2"],
-            SparqlParameters.min_width: calculations["measurements"]["mbbDimensions"]["_3"],
-            })
+        # manufacturers = getManufacturersByBuildPlate.sendQuery({
+        #     SparqlParameters.min_height: calculations["measurements"]["mbbDimensions"]["_1"],
+        #     SparqlParameters.min_length: calculations["measurements"]["mbbDimensions"]["_2"],
+        #     SparqlParameters.min_width: calculations["measurements"]["mbbDimensions"]["_3"],
+        #     })
         
-        for entry in manufacturers:
-            if entry["ID"]["value"] not in resultDict:
-                resultDict[entry["ID"]["value"]]  = entry
+        # for entry in manufacturers:
+        #     if entry["ID"]["value"] not in resultDict:
+        #         resultDict[entry["ID"]["value"]]  = entry
+        printers = pgKnowledgeGraph.getNodesByProperty(pgKnowledgeGraph.NodeProperties.buildVolume)
+        for printer in printers:
+            buildVolumeArray = printer[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.buildVolume].split("x")
+            if calculations["measurements"]["mbbDimensions"]["_1"] <= float(buildVolumeArray[0]) and \
+                calculations["measurements"]["mbbDimensions"]["_2"] <= float(buildVolumeArray[1]) and \
+                calculations["measurements"]["mbbDimensions"]["_3"] <= float(buildVolumeArray[2]):
+                    manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], pgKnowledgeGraph.NodeType.organization)
+                    for manufacturer in manufacturers:
+                        resultDict[manufacturer[pgKnowledgeGraph.NodeDescription.nodeID]] = manufacturer

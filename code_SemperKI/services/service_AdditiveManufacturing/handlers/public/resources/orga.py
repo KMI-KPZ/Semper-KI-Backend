@@ -52,6 +52,7 @@ class SResOrgaResources(serializers.Serializer):
     request=None,
     responses={
         200: SResOrgaResources,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -115,6 +116,7 @@ def orga_getResources(request:Request):
     request=SReqCreateNode,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -197,6 +199,7 @@ def orga_createNode(request:Request):
     request=SReqUpdateNode,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -373,6 +376,7 @@ class SReqOrgaAddEdges(serializers.Serializer):
     request=SReqOrgaAddEdges,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -459,6 +463,7 @@ class SReqOrgaCreateEdge(serializers.Serializer):
     request=SReqOrgaCreateEdge,
     responses={
         200: None,
+        400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }

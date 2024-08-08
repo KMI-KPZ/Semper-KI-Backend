@@ -28,6 +28,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn,
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import PostProcessDetails, ServiceDetails
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
@@ -64,6 +65,7 @@ class SResPostProcessingsWithFilters(serializers.Serializer):
     request=SReqPostProcessingsFilter,
     responses={
         200: SResPostProcessingsWithFilters,
+        400: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
@@ -106,9 +108,14 @@ def retrievePostProcessingsWithFilter(request:Request):
             resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture})
         output.update(resultsOfQueries["postProcessings"]) """
         
+        postProcessings = pgKnowledgeGraph.getNodesByType(pgKnowledgeGraph.NodeType.additionalRequirement)
+        for entry in postProcessings:
+            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.imgPath] if pgKnowledgeGraph.NodeProperties.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+            output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "valueList": entry[pgKnowledgeGraph.NodeDescription.properties].items(), "imgPath": imgPath})
+
         # mockup here:
-        mock = copy.deepcopy(mocks.postProcessingMock)
-        output.update(mock)
+        #mock = copy.deepcopy(mocks.postProcessingMock)
+        #output.update(mock)
         
         outSerializer = SResPostProcessingsWithFilters(data=output)
         if outSerializer.is_valid():

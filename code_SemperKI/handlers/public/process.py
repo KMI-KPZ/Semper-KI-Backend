@@ -560,7 +560,11 @@ def getContractors(request:Request, processID:str):
         # Therefore parse it
         listOfResultingContractors = []
         for contractor in listOfFilteredContractors:
-            idOfContractor = contractor["ID"]["value"]
+            idOfContractor = ""
+            if "ID" in contractor:
+                idOfContractor = contractor["ID"]["value"]
+            else:
+                idOfContractor = contractor["nodeID"]
             contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
