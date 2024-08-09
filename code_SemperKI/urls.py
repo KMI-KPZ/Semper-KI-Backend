@@ -58,6 +58,7 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
+    "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
