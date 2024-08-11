@@ -42,7 +42,7 @@ class TestAdditiveManufacturing(TestCase):
         mockSession.save()
         client.post("/"+paths["addOrga"][0])
         client.post("/"+paths["addUser"][0])
-        client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }')
+        client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }') #content_type="application/json"
         return mockSession
 
     #######################################################
@@ -94,14 +94,14 @@ class TestAdditiveManufacturing(TestCase):
 
         # set service type
         changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
-        response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes))
-        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") #assertionerror not 200 got 500
+        response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], FileObjectContent.tags: "", FileObjectContent.licenses: "", FileObjectContent.certificates: "", "attachment": self.testFile}
         print("/"+paths["uploadModel"][0])
-        print(uploadBody)
+        print(f"uploadbody in test_uploadAndDeleteModel{uploadBody}")
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") #assertionerror not 200 got 500
         getProjPathSplit = paths["getProject"][0].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
