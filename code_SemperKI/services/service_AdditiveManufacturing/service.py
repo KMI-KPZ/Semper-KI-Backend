@@ -9,7 +9,7 @@ import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 
 from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
+from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import ServiceDetails
 

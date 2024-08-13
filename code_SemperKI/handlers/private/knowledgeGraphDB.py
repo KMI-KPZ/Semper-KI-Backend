@@ -41,6 +41,7 @@ class SResNode(serializers.Serializer):
     nodeType = serializers.CharField(max_length=200)
     context = serializers.CharField(max_length=10000, allow_blank=True)
     properties = serializers.DictField(allow_empty=True)
+    createdBy = serializers.CharField(max_length=513, required=False, allow_blank=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)

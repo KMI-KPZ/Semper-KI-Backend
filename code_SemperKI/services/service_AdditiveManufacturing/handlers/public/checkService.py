@@ -222,3 +222,20 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+def checkIfSelectionIsAvailable(processObj:pgProcesses.Process|pgProcesses.ProcessInterface):
+    """
+    Check if the selection really is available or not.
+    Currently a dummy
+
+    :param processObj: The process in question
+    :type processObj: Process or ProcessInterface
+    :return: True if everything is in order, False if something is missing
+    :rtype: bool
+    
+    """
+    serviceDetails = processObj.serviceDetails
+    processDetails = processObj.processDetails
+    # TODO
+    return True

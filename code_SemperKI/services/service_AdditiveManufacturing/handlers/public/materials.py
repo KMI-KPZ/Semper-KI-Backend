@@ -27,7 +27,7 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, ServiceDetails
@@ -103,6 +103,8 @@ def retrieveMaterialsWithFilter(request:Request):
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
+
+        # filter by selection of post-processing
 
         materialList = pgKnowledgeGraph.getNodesByType(pgKnowledgeGraph.NodeType.material)
         for entry in materialList:

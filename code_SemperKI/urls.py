@@ -28,7 +28,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import frontpage
 from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
