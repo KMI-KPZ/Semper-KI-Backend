@@ -6,7 +6,7 @@
       "nodeName": "InfAI e.V.",
       "nodeType": "organization",
       "context": "Our base organization",
-      "properties": {}
+      "properties": []
     },
     "edges": [
       {
@@ -14,43 +14,43 @@
         "nodeName": "Snapmaker Artisan 2.0",
         "nodeType": "printer",
         "context": "Printer at the InfAI e.V.",
-        "properties": {
-          "buildVolume": "400x400x400",
-          "technology": "FDM"
-        }
+        "properties": [
+          {"name": "buildVolume", "value": "400x400x400", "type": "string"},
+          {"name": "technology", "value": "FDM", "type": "string"}
+        ]
       },
       {
         "nodeTempID": 2,
         "nodeName": "Remove Support",
         "nodeType": "additionalRequirement",
         "context": "Removing the white stuff",
-        "properties": {
-          "technology": "FDM"
-        }
+        "properties": [
+          {"name": "technology", "value": "FDM", "type": "string"}
+        ]
       },
       {
         "nodeTempID": 3,
         "nodeName": "PLA",
         "nodeType": "material",
         "context": "Our main printing material",
-        "properties": {
-          "foodSafe": "NA",
-          "heatResistant": "215",
-          "flexible": "NA",
-          "smooth": "NA",
-          "eModul": "2367Z;2432XY",
-          "poissonRatio": "0.34"
-        }
+        "properties": [
+          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
+          {"name": "heatResistant", "value": "215 °C", "type": "string"},
+          {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
+          {"name": "smooth", "value": "20 Ra", "type": "string"},
+          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
+          {"name": "poissonRatio", "value": "0.35", "type": "number"}
+        ]
       },
       {
         "nodeTempID": 4,
         "nodeName": "PLA - Black",
         "nodeType": "color",
         "context": "The default color",
-        "properties": {
-          "foodSafe": "No",
-          "color": "9005RAL;Black"
-        }
+        "properties": [
+          {"name": "foodSafe", "value": "", "type": "string"},
+          {"name": "color", "value": "9005RAL;#000000", "type": "string"}
+        ]
       }
     ]
   },
@@ -60,10 +60,10 @@
       "nodeName": "Snapmaker Artisan 2.0",
       "nodeType": "printer",
       "context": "Printer at the InfAI e.V.",
-      "properties": {
-        "buildVolume": "400x400x400",
-        "technology": "FDM"
-      }
+      "properties": [
+        {"name": "buildVolume", "value": "400x400x400", "type": "string"},
+        {"name": "technology", "value": "FDM", "type": "string"}
+      ]
     },
     "edges": [
       {
@@ -71,14 +71,14 @@
         "nodeName": "PLA",
         "nodeType": "material",
         "context": "Our main printing material",
-        "properties": {
-          "foodSafe": "NA",
-          "heatResistant": "215",
-          "flexible": "NA",
-          "smooth": "NA",
-          "eModul": "2367Z;2432XY",
-          "poissonRatio": "0.34"
-        }
+        "properties": [
+          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
+          {"name": "heatResistant", "value": "215 °C", "type": "string"},
+          {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
+          {"name": "smooth", "value": "20 Ra", "type": "string"},
+          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
+          {"name": "poissonRatio", "value": "0.35", "type": "number"}
+          ]
       }
     ]
   },
@@ -88,14 +88,14 @@
       "nodeName": "PLA",
       "nodeType": "material",
       "context": "Our main printing material",
-      "properties": {
-        "foodSafe": "NA",
-        "heatResistant": "215",
-        "flexible": "NA",
-        "smooth": "NA",
-        "eModul": "2367Z;2432XY",
-        "poissonRatio": "0.34"
-      }
+      "properties": [
+        {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
+         {"name": "heatResistant", "value": "215 °C", "type": "string"},
+         {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
+         {"name": "smooth", "value": "20 Ra", "type": "string"},
+          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
+          {"name": "poissonRatio", "value": "0.35", "type": "number"}
+        ]
     },
     "edges":[
       {
@@ -103,10 +103,10 @@
         "nodeName": "PLA - Black",
         "nodeType": "color",
         "context": "The default color",
-        "properties": {
-          "foodSafe": "No",
-          "color": "9005RAL;Black"
-        }
+        "properties": [
+          {"name": "foodSafe", "value": "", "type": "string"},
+          {"name": "color", "value": "9005RAL;#000000", "type": "string"}
+        ]
       }
     ]
   }

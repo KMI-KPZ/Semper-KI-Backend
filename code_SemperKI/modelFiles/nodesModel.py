@@ -59,6 +59,16 @@ class NodeProperties(StrEnumExactlyAsDefined):
     technology = enum.auto()  # FDM -> printer
 
 ##################################################
+class NodePropertyDescription(StrEnumExactlyAsDefined):
+    """
+    How is a property structured?
+    
+    """
+    name = enum.auto()
+    value = enum.auto()
+    type = enum.auto()
+
+##################################################
 class Node(models.Model):
     """
     The class of a node containing different information, depending on it's type.
@@ -108,7 +118,7 @@ class Node(models.Model):
             NodeDescription.nodeName: self.nodeName,
             NodeDescription.nodeType: self.nodeType,
             NodeDescription.context: self.context,
-            NodeDescription.properties: self.properties,
+            NodeDescription.properties: list(self.properties.values()),
             NodeDescription.createdBy: self.createdBy,
             NodeDescription.createdWhen: str(self.createdWhen), 
             NodeDescription.updatedWhen: str(self.updatedWhen), 

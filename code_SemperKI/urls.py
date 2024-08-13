@@ -71,6 +71,7 @@ newPaths= {
     "getNode": ("private/nodes/get/<str:nodeID>/", knowledgeGraphDB.getNode),
     "getNodesByType": ("private/nodes/get/by-type/<str:nodeType>/", knowledgeGraphDB.getNodesByType),
     "getNodesByProperty": ("private/nodes/get/by-property/<str:property>/", knowledgeGraphDB.getNodesByProperty),
+    "getPropertyDefinitionFrontend": ("public/nodes/properties/get/by-type/<str:nodeType>/", knowledgeGraphDB.getPropertyDefinitionFrontend),
     "createNode": ("private/nodes/create/", knowledgeGraphDB.createNode),
     "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
     "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),

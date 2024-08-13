@@ -86,7 +86,9 @@ def createNode(information:dict, createdBy="SYSTEM"):
                 case "context":
                     context = information[NodeDescription.context]
                 case "properties":
-                    properties = information[NodeDescription.properties]
+                    assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
+                    for entry in information[NodeDescription.properties]:
+                        properties[entry[NodePropertyDescription.name]] = entry
                 case _:
                     raise Exception("wrong content in information")
 
@@ -138,16 +140,18 @@ def updateNode(nodeID:str, information:dict):
         node = Node.objects.get(nodeID=nodeID)
         for content in information:
             match content:
-                case "nodeID":
+                case NodeDescription.nodeID:
                     pass
-                case "nodeName":
+                case NodeDescription.nodeName:
                     node.nodeName = information[NodeDescription.nodeName]
-                case "nodeType":
+                case NodeDescription.nodeType:
                     node.nodeType = information[NodeDescription.nodeType]
-                case "context":
+                case NodeDescription.context:
                     node.context = information[NodeDescription.context]
-                case "properties":
-                    node.properties.update(information[NodeDescription.properties])
+                case NodeDescription.properties:
+                    assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
+                    for entry in information[NodeDescription.properties]:
+                        node.properties[entry[NodePropertyDescription.name]] = entry
                 case _:
                     raise Exception("wrong content in information")
         node.updatedWhen = timezone.now()
@@ -526,3 +530,80 @@ def deleteGraph():
     except (Exception) as error:
         loggerError.error(f'could not delete graph: {str(error)}')
         return error
+    
+##################################################
+def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
+    """
+    For different node types, different properties are important. 
+    Retrieve those, especially for the Frontend.
+
+    :param nodeType: The type of the node
+    :type nodeType: str
+    :return: A list of the properties, defined properly
+    :rtype: list[dict] / JSON
+    
+    """
+    outList = []
+    match nodeType:
+        case NodeType.organization:
+            pass
+        case NodeType.printer:
+            outList.append({"name": NodeProperties.imgPath,
+                            "value": "",
+                            "type": "url"})
+            outList.append({"name": NodeProperties.buildVolume,
+                            "value": "int x int x int",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.technology,
+                            "value": "",
+                            "type": "string"})
+        case NodeType.material:
+            outList.append({"name": NodeProperties.imgPath,
+                            "value": "",
+                            "type": "url"})
+            outList.append({"name": NodeProperties.foodSafe,
+                            "value": "License;License;...",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.heatResistant,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.flexible,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.smooth,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.eModul,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.poissonRatio,
+                            "value": "",
+                            "type": "number"})
+        case NodeType.additionalRequirement:
+            outList.append({"name": NodeProperties.imgPath,
+                            "value": "",
+                            "type": "url"})
+            outList.append({"name": NodeProperties.foodSafe,
+                            "value": "License;License;...",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.heatResistant,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.smooth,
+                            "value": "",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.technology,
+                            "value": "",
+                            "type": "string"})
+        case NodeType.color:
+            outList.append({"name": NodeProperties.imgPath,
+                            "value": "",
+                            "type": "url"})
+            outList.append({"name": NodeProperties.foodSafe,
+                            "value": "License;License;...",
+                            "type": "string"})
+            outList.append({"name": NodeProperties.color,
+                            "value": "Number RAL;#Hex",
+                            "type": "color"})
+
+    return outList

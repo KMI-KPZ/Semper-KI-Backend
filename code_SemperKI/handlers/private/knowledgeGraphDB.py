@@ -35,12 +35,18 @@ loggerError = logging.getLogger("errors")
 #######################################################
 
 #######################################################
+class SResProperties(serializers.Serializer):
+    name = serializers.CharField(max_length=200)
+    value = serializers.CharField(max_length=200, allow_blank=True)
+    type = serializers.CharField(max_length=200)
+
+#######################################################
 class SResNode(serializers.Serializer):
     nodeID = serializers.CharField(max_length=513)
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200)
     context = serializers.CharField(max_length=10000, allow_blank=True)
-    properties = serializers.DictField(allow_empty=True)
+    properties = serializers.ListField(child=SResProperties(), allow_empty=True)
     createdBy = serializers.CharField(max_length=513, required=False, allow_blank=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
@@ -94,24 +100,11 @@ def getNode(request:Request, nodeID:str):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
-class SReqProperties(serializers.Serializer):
-    imgPath = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    foodSafe = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    heatResistant = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    flexible = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    smooth = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    eModul = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    poissonRatio = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    color = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    buildVolume = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-    technology = serializers.CharField(max_length=1000, allow_blank=True, required=False)
-
-#######################################################
 class SReqCreateNode(serializers.Serializer):
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200, default="organization|printer|material|additionalRequirement|color")
     context = serializers.CharField(max_length=10000)
-    properties = SReqProperties()
+    properties = serializers.ListField(child=SResProperties(), allow_empty=True)
 
 #######################################################
 @extend_schema(
@@ -221,7 +214,7 @@ class SReqUpdateNode(serializers.Serializer):
     nodeName = serializers.CharField(max_length=200, required=False)
     nodeType = serializers.CharField(max_length=200, required=False)
     context = serializers.CharField(max_length=10000, required=False)
-    properties = SReqProperties(required=False)
+    properties = serializers.ListField(child=SResProperties(), allow_empty=True, required=False)
 #######################################################
 @extend_schema(
     summary="Updates the values of a node",
@@ -743,13 +736,55 @@ def getGraphForFrontend(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
+@extend_schema(
+    summary="Retrieves the definition of possible properties for a specific node type",
+    description=" ",
+    tags=['FE - Graph'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def getPropertyDefinitionFrontend(request:Request, nodeType:str):
+    """
+    Retrieves the definition of possible properties for a specific node type
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON
+    :rtype: Response
+
+    """
+    try:
+        propertyDefinitions = pgKnowledgeGraph.getPropertyDefinitionForNodeType(nodeType)
+        outSerializer = SResProperties(data=propertyDefinitions, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {getPropertyDefinitionFrontend.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
 class SReqCreateNodeOfGraph(serializers.Serializer):
     nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
     nodeTempID = serializers.IntegerField()
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200, default="organization|printer|material|additionalRequirement|color")
     context = serializers.CharField(max_length=10000)
-    properties = SReqProperties()
+    properties = serializers.ListField(child=SResProperties(), allow_empty=True)
 
 #######################################################
 class SReqGraph(serializers.Serializer):
