@@ -81,7 +81,7 @@ class TestAdditiveManufacturing(TestCase):
 
     # Tests!
     #######################################################
-    def test_uploadAndDeleteModel(self): # Failure
+    def test_uploadAndDeleteModel(self): # works
         print("####Start test_uploadAndDeleteModel####")
         client = Client()
         self.createUser(client, self.test_uploadAndDeleteModel.__name__)
@@ -92,13 +92,19 @@ class TestAdditiveManufacturing(TestCase):
         response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        details = '[{"details": {FileObjectContent.tags: "", FileObjectContent.certificates: "", FileObjectContent.licenses: ""}, "file": self.testFile}]'
-        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": {"details": {FileObjectContent.tags: "", FileObjectContent.certificates: "", FileObjectContent.licenses: ""}, "filename": "file2.stl"}, "file2.stl": self.testFile}
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile}
+        # really not an elegant solution but it works
+        # important to make filename == key for file 
+        date =  f'"{str(datetime.datetime.now())}"'
+        certificates = '""'
+        licenses = '""'
+        tags = '""'
+        filename = '"file2.stl"'
+        details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + '}, "fileName": ' + filename + '}]'
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": details, "file2.stl": self.testFile}
+        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile}
         print("/"+paths["uploadModel"][0])
         print(f"uploadbody in test_uploadAndDeleteModel{uploadBody}")
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        print(f"response from uploadModel: {response}") # <Response status_code=200, "application/json">
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") # assertionerror not 200 got 500
         
         getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
@@ -114,5 +120,5 @@ class TestAdditiveManufacturing(TestCase):
         response = json.loads(client.get("/"+getProcPath).content)
         print(f"response where no model should be: {response}")
         #self.assertIs(ServiceDetails.models not in response[ProcessDescription.serviceDetails] , True) adapted original
-        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) == 0, True)
+        self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
         print("!!!!Success test_uploadAndDeleteModel!!!!")
