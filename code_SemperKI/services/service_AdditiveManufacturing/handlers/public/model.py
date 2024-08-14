@@ -87,7 +87,6 @@ def uploadModels(request:Request):
         if not serializedContent.is_valid():
             message = "Validation failed"
             exception = "Validation failed"
-            print(f"serializedContent.errors(): {serializedContent.errors()}")
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
@@ -95,16 +94,10 @@ def uploadModels(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        print("Survived Serializer")
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
-        print(projectID)
         processID = info[ProcessDescription.processID]
-        print(processID)
         origin = info["origin"]
-        print(origin)
-        print(info.keys())
-        print(info["details"])
 
         content = ManageContent(request.session)
         interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
@@ -118,19 +111,14 @@ def uploadModels(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        print("Survived interface check")
         if interface.checkIfFilesAreRemote(projectID, processID):
             remote = True
         else:
             remote = False
         
-        print("Survived checkIfFilesAreRemote")
-        detailsOfAllFiles = json.loads(info["details"])    
-        print("Survived detailsofAllFiles")
+        detailsOfAllFiles = json.loads(info["details"])
         modelNames = list(request.FILES.keys())
-        print("Survived modelNames")
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-        print("Survived getUserName")
         
         # check if duplicates exist
         existingFileNames = set()
@@ -148,10 +136,8 @@ def uploadModels(request:Request):
             value = processContent[ProcessDescription.files][key]
             existingFileNames.add(value[FileObjectContent.fileName])
 
-        print("Survived Duplicates")
         modelsToBeSaved = {}
-        for fileName in modelNames: print(f"filename: {fileName}") #file
-        for fileName in modelNames: #should happen only once
+        for fileName in modelNames:
             # rename duplicates
             counterForFileName = 1
             nameOfFile = fileName
@@ -170,51 +156,29 @@ def uploadModels(request:Request):
                         pass
                 nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
                 counterForFileName += 1
-            print("Survived while NameOfFile Loop")
             for model in request.FILES.getlist(fileName):
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    for key in detail:
-                        print(key)
-                        print(detail[key])
-                    print(detail)
-                    print(fileName)
-                    print(detail["fileName"])
-                    if detail["fileName"] == fileName or fileName == "file.stl": 
+                    if detail["fileName"] == fileName or detail["fileName"] == "file.stl": # is this correct? (makes the default case work automatically)
                         details = detail["details"]
-                        print("successfully took details")
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID+"/"+processID+"/"+fileID
                 
                 modelsToBeSaved[fileID] = {}
-                print("Survived modelsToBeSaved {}")
                 modelsToBeSaved[fileID][FileObjectContent.id] = fileID
-                print("Survived modelsToBeSaved path")
                 modelsToBeSaved[fileID][FileObjectContent.path] = filePath
-                print("Survived modelsToBeSaved filename")
                 modelsToBeSaved[fileID][FileObjectContent.fileName] = nameOfFile
-                print("Survived modelsToBeSaved name")
                 modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
-                print("Survived modelsToBeSaved imgPath")
                 modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
-                print("Survived modelsToBeSaved tags")
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
-                print("Survived modelsToBeSaved licenses")
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
-                print("Survived modelsToBeSaved cert")
                 modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
-                print("Survived modelsToBeSaved date")
                 modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
-                print("Survived modelsToBeSaved createdBy")
                 modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()
-                print("Survived modelsToBeSaved cByID")
                 modelsToBeSaved[fileID][FileObjectContent.size] = model.size
-                print("Survived modelsToBeSaved size")
                 modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
-                print("Survived modelsToBeSaved type")
                 modelsToBeSaved[fileID][FileObjectContent.origin] = origin
-                print("Survived modelsToBeSaved origin")
                 if remote:
                     modelsToBeSaved[fileID][FileObjectContent.remote] = True
                     returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
@@ -228,7 +192,6 @@ def uploadModels(request:Request):
                 
         changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.models: modelsToBeSaved}}}
 
-        print("Survived until after Changes")
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False: # this should not happen
@@ -244,7 +207,6 @@ def uploadModels(request:Request):
             raise message
         
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},models,"+str(datetime.now()))
-        print("Survived everything")
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:

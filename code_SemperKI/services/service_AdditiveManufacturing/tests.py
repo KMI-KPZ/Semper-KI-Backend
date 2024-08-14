@@ -81,8 +81,7 @@ class TestAdditiveManufacturing(TestCase):
 
     # Tests!
     #######################################################
-    def test_uploadAndDeleteModel(self): # works
-        print("####Start test_uploadAndDeleteModel####")
+    def test_uploadAndDeleteModel(self):
         client = Client()
         self.createUser(client, self.test_uploadAndDeleteModel.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -92,22 +91,18 @@ class TestAdditiveManufacturing(TestCase):
         response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        # really not an elegant solution but it works
-        # important to make filename == key for file 
         date =  f'"{str(datetime.datetime.now())}"'
         certificates = '""'
         licenses = '""'
         tags = '""'
         filename = '"file2.stl"'
         details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + '}, "fileName": ' + filename + '}]'
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": details, "file2.stl": self.testFile}
-        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile}
-        print("/"+paths["uploadModel"][0])
-        print(f"uploadbody in test_uploadAndDeleteModel{uploadBody}")
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": details, "file2.stl": self.testFile} # non-default case
+        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") # assertionerror not 200 got 500
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         
-        getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
+        getProcPathSplit = paths["getProcess"][0].split("/")
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
         fileID = list(response[ProcessDescription.files].keys())[0]
@@ -118,7 +113,4 @@ class TestAdditiveManufacturing(TestCase):
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+getProcPath).content)
-        print(f"response where no model should be: {response}")
-        #self.assertIs(ServiceDetails.models not in response[ProcessDescription.serviceDetails] , True) adapted original
         self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
-        print("!!!!Success test_uploadAndDeleteModel!!!!")

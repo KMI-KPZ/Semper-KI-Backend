@@ -80,8 +80,7 @@ class TestProjects(TestCase):
 
     # Tests!
     #######################################################
-    def test_getProject(self): # works
-        print("####Start test_getProject####")
+    def test_getProject(self):
         client = Client()
         self.createUser(client, self.test_getProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -95,11 +94,9 @@ class TestProjects(TestCase):
         response = json.loads(client.get("/"+getProjPath).content)
         self.assertIs(response[ProjectDescription.projectID] == projectObj[ProjectDescription.projectID], True, f'Expected projectID to be the same for response and projectObj. Instead got {response[ProjectDescription.projectID]} for response and {projectObj[ProjectDescription.projectID]} for projectObj')
         self.assertIs(response[SessionContentSemperKI.processes][0][ProcessDescription.processID] == processObj[ProcessDescription.processID], True, f'Expected processID to be the same for response and processObj. Instead got {response[SessionContentSemperKI.processes][0][ProcessDescription.processID]} for response and {processObj[ProcessDescription.processID]} for processObj')
-        print("!!!!Success test_getProject!!!!")
 
     #######################################################
-    def test_getFlatProjects(self): # works
-        print("####Start test_getFlatProjects####")
+    def test_getFlatProjects(self):
         client = Client()
         self.createUser(client, self.test_getFlatProjects.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -109,11 +106,9 @@ class TestProjects(TestCase):
         client.get("/"+paths["saveProjects"][0])
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
         self.assertIs(response["projects"][0][ProjectDescription.projectID] == projectObj[ProjectDescription.projectID], True, f'{response["projects"][0][ProjectDescription.projectID]} != {projectObj[ProjectDescription.projectID]}')
-        print("!!!!Success test_getFlatProjects!!!!")
 
     #######################################################
-    def test_updateProject(self): # works
-        print("####Start test_updateProject####")
+    def test_updateProject(self):
         client = Client()
         self.createUser(client, self.test_updateProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -129,11 +124,9 @@ class TestProjects(TestCase):
         client.patch("/"+paths["updateProject"][0], changes, content_type="application/json")
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
         self.assertIs(response["projects"][0][ProjectDescription.projectDetails]["title"] == "test2", True, f'got: {response["projects"][0][ProjectDescription.projectDetails]["title"]}')
-        print("!!!!Success test_updateProject!!!!")
 
     #######################################################
-    def test_deleteProjects(self): # works
-        print("####Start test_deleteProjects####")
+    def test_deleteProjects(self):
         client = Client()
         self.createUser(client, self.test_deleteProjects.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -148,11 +141,9 @@ class TestProjects(TestCase):
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
         self.assertIs(response["projects"] == [], True, f'{response["projects"]}')
-        print("!!!!Success test_deleteProjects!!!!")
 
     #######################################################
-    def test_updateProcess(self): # works
-        print("####Start test_updateProcess####")
+    def test_updateProcess(self):
         client = Client()
         self.createUser(client, self.test_updateProcess.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -165,17 +156,14 @@ class TestProjects(TestCase):
         response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
+        getProcPathSplit = paths["getProcess"][0].split("/")
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
-        print(f"response in test_updateProcess {response}")
         self.assertIs(response[ProcessDescription.serviceType] == 1, True, f'{response[ProcessDescription.serviceType]}')
-        self.assertIs(response[ProcessDescription.processStatus] == 1, False, f'processStatus should not get changed anymore{response[ProcessDescription.processStatus]}') # Status is not allowed to be changed anymore, see process.py/updateProcess()
-        print("!!!!Success test_updateProcess!!!!")
+        self.assertIs(response[ProcessDescription.processStatus] == 1, False, f'processStatus should not get changed anymore{response[ProcessDescription.processStatus]}')
 
     #######################################################
-    def test_deleteProcesses(self): # works
-        print("####Start test_deleteProcess####")
+    def test_deleteProcesses(self):
         client = Client()
         self.createUser(client, self.test_deleteProcesses.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -196,22 +184,20 @@ class TestProjects(TestCase):
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + getProjPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
         self.assertIs(len(response[SessionContentSemperKI.processes]) == 0, True, f'{len(response[SessionContentSemperKI.processes])}')
-        print("!!!!Success test_deleteProcesses!!!!")
 
     #######################################################
-    def test_uploadAndDownloadFile(self): # works
-        print("####Starting test_uploadAndDownloadFile####")
+    def test_uploadAndDownloadFile(self):
         client = Client()
         self.createUser(client, self.test_uploadAndDownloadFile.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": self.testFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
-        getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
+        getProcPathSplit = paths["getProcess"][0].split("/")
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
 
-        fileID = list(response[ProcessDescription.files].keys())[0] # takes the first file's ID
+        fileID = list(response[ProcessDescription.files].keys())[0]
 
         downloadPathSplit = paths["downloadFile"][0].split("/")
         downloadPath = downloadPathSplit[0] + "/" + downloadPathSplit[1] + "/" + downloadPathSplit[2] + "/" + downloadPathSplit[3] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
@@ -229,7 +215,7 @@ class TestProjects(TestCase):
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
-        getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
+        getProcPathSplit = paths["getProcess"][0].split("/")
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
         fileID = list(response[ProcessDescription.files].keys())[0]
@@ -242,13 +228,11 @@ class TestProjects(TestCase):
             self.testFile.seek(0)
             contentOfTestFile = self.testFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
-        print("!!!!Success test_UploadandDownloadFile!!!!")
 
         
         
     #######################################################
-    def test_sendProject(self): # works without commented out sections
-        print("####Start test_sendProject####")
+    def test_sendProject(self):
         client = Client()
         self.createUser(client, self.test_sendProject.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
@@ -281,7 +265,6 @@ class TestProjects(TestCase):
 #        print(response)
 #        self.assertIs(response["events"][0][SessionContentSemperKI.processes][0][ProcessDescription.processStatus] > 0, True, f'{response["events"][0][SessionContentSemperKI.processes][0][ProcessDescription.processStatus]}') 
 #        # index out of Range  ~~~~~~~~^^^^^ Meaning ["events"] must be empty, which it is -> see print(response): {'eventType': 'projectEvent', 'events': []}
-        print("!!!!Success test_sendProject!!!!")
 
 
 # class TestFilters(TestCase):
