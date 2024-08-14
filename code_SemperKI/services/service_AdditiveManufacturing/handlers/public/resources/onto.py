@@ -123,7 +123,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         nodeInfo = pgKnowledgeGraph.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
-        outSerializer = SResNode(data=nodeInfo)
+        outSerializer = SResNode(data=nodeInfo.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
