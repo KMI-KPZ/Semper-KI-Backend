@@ -92,20 +92,27 @@ class TestAdditiveManufacturing(TestCase):
         response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], FileObjectContent.tags: "", FileObjectContent.licenses: "", FileObjectContent.certificates: "", "attachment": self.testFile}
+        details = '[{"details": {FileObjectContent.tags: "", FileObjectContent.certificates: "", FileObjectContent.licenses: ""}, "file": self.testFile}]'
+        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": {"details": {FileObjectContent.tags: "", FileObjectContent.certificates: "", FileObjectContent.licenses: ""}, "filename": "file2.stl"}, "file2.stl": self.testFile}
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile}
         print("/"+paths["uploadModel"][0])
         print(f"uploadbody in test_uploadAndDeleteModel{uploadBody}")
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
+        print(f"response from uploadModel: {response}") # <Response status_code=200, "application/json">
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") # assertionerror not 200 got 500
-        getProjPathSplit = paths["getProject"][0].split("/")
-        getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
-        response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
+        
+        getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        fileID = list(response[ProcessDescription.files].keys())[0]
+        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
 
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
-        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
+        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + deleteModelPathSplit[2] + "/" + deleteModelPathSplit[3] + "/" + deleteModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-        response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(ServiceDetails.models not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)
+        response = json.loads(client.get("/"+getProcPath).content)
+        print(f"response where no model should be: {response}")
+        #self.assertIs(ServiceDetails.models not in response[ProcessDescription.serviceDetails] , True) adapted original
+        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) == 0, True)
         print("!!!!Success test_uploadAndDeleteModel!!!!")

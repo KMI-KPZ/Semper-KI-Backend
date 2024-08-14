@@ -205,14 +205,11 @@ class TestProjects(TestCase):
         self.createUser(client, self.test_uploadAndDownloadFile.__name__)
         projectObj, processObj = self.createProjectAndProcess(client)
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": self.testFile, "origin": "my_origin"}
-        print(uploadBody)
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
         getProcPathSplit = paths["getProcess"][0].split("/") # switch to getProcess to get file infos
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
-        print(f"response in test_uploadAndDownloadFile {response}")
-        print(response[ProcessDescription.files].keys())
 
         fileID = list(response[ProcessDescription.files].keys())[0] # takes the first file's ID
 
