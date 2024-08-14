@@ -15,6 +15,7 @@
         "nodeType": "printer",
         "context": "Printer at the InfAI e.V.",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
           {"name": "buildVolume", "value": "400x400x400", "type": "string"},
           {"name": "technology", "value": "FDM", "type": "string"}
         ]
@@ -25,6 +26,7 @@
         "nodeType": "additionalRequirement",
         "context": "Removing the white stuff",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
           {"name": "technology", "value": "FDM", "type": "string"}
         ]
       },
@@ -34,6 +36,7 @@
         "nodeType": "material",
         "context": "Our main printing material",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
           {"name": "heatResistant", "value": "215 °C", "type": "string"},
           {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
@@ -48,6 +51,7 @@
         "nodeType": "color",
         "context": "The default color",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "", "type": "string"},
           {"name": "color", "value": "9005RAL;#000000", "type": "string"}
         ]
@@ -61,6 +65,7 @@
       "nodeType": "printer",
       "context": "Printer at the InfAI e.V.",
       "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
         {"name": "buildVolume", "value": "400x400x400", "type": "string"},
         {"name": "technology", "value": "FDM", "type": "string"}
       ]
@@ -72,6 +77,7 @@
         "nodeType": "material",
         "context": "Our main printing material",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
           {"name": "heatResistant", "value": "215 °C", "type": "string"},
           {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
@@ -89,6 +95,7 @@
       "nodeType": "material",
       "context": "Our main printing material",
       "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
         {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
          {"name": "heatResistant", "value": "215 °C", "type": "string"},
          {"name": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "value": "", "type": "string"},
@@ -104,6 +111,7 @@
         "nodeType": "color",
         "context": "The default color",
         "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "", "type": "string"},
           {"name": "color", "value": "9005RAL;#000000", "type": "string"}
         ]

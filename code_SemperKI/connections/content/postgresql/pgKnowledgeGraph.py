@@ -553,7 +553,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeType.printer:
             outList.append({"name": NodeProperties.imgPath,
                             "value": "",
-                            "type": "url"})
+                            "type": "text"})
             outList.append({"name": NodeProperties.buildVolume,
                             "value": "int x int x int",
                             "type": "string"})
@@ -563,7 +563,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeType.material:
             outList.append({"name": NodeProperties.imgPath,
                             "value": "",
-                            "type": "url"})
+                            "type": "text"})
             outList.append({"name": NodeProperties.foodSafe,
                             "value": "License;License;...",
                             "type": "string"})
@@ -585,7 +585,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeType.additionalRequirement:
             outList.append({"name": NodeProperties.imgPath,
                             "value": "",
-                            "type": "url"})
+                            "type": "text"})
             outList.append({"name": NodeProperties.foodSafe,
                             "value": "License;License;...",
                             "type": "string"})
@@ -601,7 +601,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeType.color:
             outList.append({"name": NodeProperties.imgPath,
                             "value": "",
-                            "type": "url"})
+                            "type": "text"})
             outList.append({"name": NodeProperties.foodSafe,
                             "value": "License;License;...",
                             "type": "string"})
