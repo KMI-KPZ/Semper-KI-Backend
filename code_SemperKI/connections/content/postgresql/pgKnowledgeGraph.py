@@ -151,7 +151,10 @@ def updateNode(nodeID:str, information:dict):
                 case NodeDescription.properties:
                     assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
                     for entry in information[NodeDescription.properties]:
-                        node.properties[entry[NodePropertyDescription.name]] = entry
+                        if entry[NodePropertyDescription.value] == "":
+                            del node.properties [entry[NodePropertyDescription.name]]
+                        else:
+                            node.properties[entry[NodePropertyDescription.name]] = entry
                 case _:
                     raise Exception("wrong content in information")
         node.updatedWhen = timezone.now()

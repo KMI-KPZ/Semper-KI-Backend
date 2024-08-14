@@ -50,7 +50,8 @@ newPaths = {
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
-    "onto_getResources": ("public/service/additive-manufacturing/resources/onto/nodes/get/<str:resourceType>/",onto.onto_getResources),
+    "onto_getResources": ("public/service/additive-manufacturing/resources/onto/nodes/get/by-type/<str:resourceType>/",onto.onto_getResources),
+    "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/nodes/get/by-id/<str:nodeID>/", onto.onto_getNodeViaID),
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
     "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
     "onto_removeEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),

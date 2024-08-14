@@ -94,6 +94,52 @@ def onto_getResources(request:Request, resourceType:str):
 
 #######################################################
 @extend_schema(
+    summary="Retrieve all info about a node via its ID",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: SResNode,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_getNodeViaID(request:Request, nodeID:str):
+    """
+    Retrieve all info about a node via its ID
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Json
+    :rtype: Response
+
+    """
+    try:
+        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        if isinstance(nodeInfo, Exception):
+            raise nodeInfo
+        outSerializer = SResNode(data=nodeInfo)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {onto_getNodeViaID.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
     summary="Gather neighboring resources of a certain type from the KG",
     description=" ",
     tags=['FE - AM Resources Ontology'],
