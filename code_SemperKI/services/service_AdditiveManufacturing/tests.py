@@ -66,14 +66,9 @@ class TestAdditiveManufacturing(TestCase):
     #######################################################
     @staticmethod
     def createProjectAndProcess(client:Client):
-        #projectObj = json.loads(client.post("/"+paths["createProjectID"][0]).content)
         projectObj = json.loads(client.post("/"+paths["createProjectID"][0], data= {"title": "my_title"}).content)
-        #print(projectObj.items()) # .keys() returned dict_keys(['detail'])
-        #print("Printed Keys of the Project object ^^")
         processPathSplit = paths["createProcessID"][0].split("/")
-        #processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+projectObj.projectID+"/"
         processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+processPathSplit[2]+"/"+projectObj[ProjectDescription.projectID]+"/"
-        #                   KeyError: <ProjectDescription.projectID: 'projectID'>                    ^^^^^^^^^
         processObj = json.loads(client.get("/"+processPath).content)
         return (projectObj, processObj)
 
@@ -86,7 +81,7 @@ class TestAdditiveManufacturing(TestCase):
 
     # Tests!
     #######################################################
-    def test_uploadAndDeleteModel(self): #Failure
+    def test_uploadAndDeleteModel(self): # Failure
         print("####Start test_uploadAndDeleteModel####")
         client = Client()
         self.createUser(client, self.test_uploadAndDeleteModel.__name__)
@@ -101,7 +96,7 @@ class TestAdditiveManufacturing(TestCase):
         print("/"+paths["uploadModel"][0])
         print(f"uploadbody in test_uploadAndDeleteModel{uploadBody}")
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") #assertionerror not 200 got 500
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}") # assertionerror not 200 got 500
         getProjPathSplit = paths["getProject"][0].split("/")
         getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
         response = json.loads(client.get("/"+getProjPath).content)
