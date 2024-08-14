@@ -6,8 +6,7 @@ Akshay NS 2024
 Contains: Handlers for processes
 """
 
-import json, logging, copy
-import json, logging, copy
+import json, logging, copy, numpy
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
@@ -555,7 +554,7 @@ def getContractors(request:Request, processID:str):
         if serviceType == serviceManager.getNone():
             return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
 
-        listOfFilteredContractors = service.getFilteredContractors(processObj)
+        listOfFilteredContractors = [] #service.getFilteredContractors(processObj)
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
         # Therefore parse it
         listOfResultingContractors = []
@@ -576,6 +575,22 @@ def getContractors(request:Request, processID:str):
         if len(listOfFilteredContractors) == 0 or settings.DEBUG:
             listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
+        # Calculation of order of contractors based on priorities
+        # TODO get user priorities from somewhere
+        numberOfPriorities = len(PrioritiesForOrganizationSemperKI)
+        userPrioritiesVector = [3 for i in range(numberOfPriorities)]
+        listOfContractorsWithPriorities = []
+        for entry in listOfResultingContractors:
+            if OrganizationDetails.priorities in entry[OrganizationDescription.details]:
+                prioList = []
+                for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
+                    prioList.append(entry[OrganizationDescription.details][OrganizationDetails.priorities][priority][PriorityTargetsSemperKI.value])
+                # calculate vector distance
+                distanceFromUserPrios = numpy.linalg.norm(numpy.array(userPrioritiesVector) - numpy.array(prioList))
+                listOfContractorsWithPriorities.append((entry, distanceFromUserPrios))
+        # sort ascending via distance (the shorter, the better)
+        listOfContractorsWithPriorities.sort(key=lambda x: x[1])
+        listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
         # TODO add serializers
         return Response(listOfResultingContractors)
     except (Exception) as error:

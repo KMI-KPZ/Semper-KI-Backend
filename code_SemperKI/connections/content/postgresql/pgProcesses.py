@@ -1172,6 +1172,8 @@ class ProcessManagementBase(AbstractContentInterface):
                 detailsOfOrganization = {}
                 if OrganizationDetails.addresses in entry.details:
                     detailsOfOrganization[OrganizationDetails.addresses] = entry.details[OrganizationDetails.addresses]
+                if OrganizationDetails.priorities in entry.details:
+                    detailsOfOrganization[OrganizationDetails.priorities] = entry.details[OrganizationDetails.priorities]
                 returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: detailsOfOrganization})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")
