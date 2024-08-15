@@ -156,11 +156,10 @@ def uploadModels(request:Request):
                         pass
                 nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
                 counterForFileName += 1
-                
             for model in request.FILES.getlist(fileName):
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    if detail["fileName"] == fileName or fileName == "file":
+                    if detail["fileName"] == fileName or detail["fileName"] == "file.stl": # is this correct? (makes the default case work automatically)
                         details = detail["details"]
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
@@ -180,7 +179,6 @@ def uploadModels(request:Request):
                 modelsToBeSaved[fileID][FileObjectContent.size] = model.size
                 modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
                 modelsToBeSaved[fileID][FileObjectContent.origin] = origin
-
                 if remote:
                     modelsToBeSaved[fileID][FileObjectContent.remote] = True
                     returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
@@ -197,7 +195,7 @@ def uploadModels(request:Request):
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False: # this should not happen
-            message = "Rights not sufficient for uploadModel"
+            message = "Rights not sufficient for uploadModels"
             exception = "Unauthorized"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -212,7 +210,7 @@ def uploadModels(request:Request):
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
-        message = f"Error in uploadModel: {str(error)}"
+        message = f"Error in uploadModels: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
