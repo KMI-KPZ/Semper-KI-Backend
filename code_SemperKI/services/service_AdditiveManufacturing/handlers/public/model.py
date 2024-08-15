@@ -159,7 +159,7 @@ def uploadModels(request:Request):
             for model in request.FILES.getlist(fileName):
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    if detail["fileName"] == fileName or detail["fileName"] == "file.stl": # is this correct? (makes the default case work automatically)
+                    if detail["fileName"] == fileName or detail["fileName"] == "file":
                         details = detail["details"]
                         break
                 fileID = crypto.generateURLFriendlyRandomString()

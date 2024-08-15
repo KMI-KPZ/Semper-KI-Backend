@@ -49,7 +49,7 @@ class SReqPostProcessingsContent(serializers.Serializer):
     title = serializers.CharField(max_length=100)
     checked = serializers.BooleanField()
     selectedValue = serializers.CharField(allow_blank=True)
-    valueList = serializers.ListField()
+    propList = serializers.ListField()
     type = serializers.CharField(allow_blank=True)
     imgPath = serializers.CharField(max_length=200) 
 
@@ -111,7 +111,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         postProcessings = pgKnowledgeGraph.getNodesByType(pgKnowledgeGraph.NodeType.additionalRequirement)
         for entry in postProcessings:
             imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.imgPath] if pgKnowledgeGraph.NodeProperties.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-            output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "valueList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
+            output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
 
         # mockup here:
         #mock = copy.deepcopy(mocks.postProcessingMock)

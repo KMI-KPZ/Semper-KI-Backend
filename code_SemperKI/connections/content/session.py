@@ -9,9 +9,10 @@ Contains: Offers an interface to access the session dictionary in a structured w
 from django.utils import timezone
 import logging, copy
 
-from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
+from Generic_Backend.code_General.definitions import GlobalDefaults, SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 
 from ...definitions import SessionContentSemperKI, MessageInterfaceFromFrontend
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
@@ -274,8 +275,11 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
-
+        if manualCheckifLoggedIn(self.structuredSessionObj.getSession()):
+            return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
+        else:
+            return GlobalDefaults.anonymous
+        
     #######################################################
     def getIfContentIsInSession(self) -> bool:
         """

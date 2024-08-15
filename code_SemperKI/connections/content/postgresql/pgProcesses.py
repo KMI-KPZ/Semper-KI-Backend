@@ -18,7 +18,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
 
 
 from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
@@ -63,8 +63,10 @@ class ProcessManagementBase(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
-    
+        if manualCheckifLoggedIn(self.structuredSessionObj):
+            return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
+        else:
+            return GlobalDefaults.anonymous
     ##############################################
     @staticmethod
     def checkIfUserIsClient(userHashID, projectID="", processID=""):

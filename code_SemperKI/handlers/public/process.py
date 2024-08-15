@@ -585,8 +585,8 @@ def getContractors(request:Request, processID:str):
                 prioList = []
                 for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
                     prioList.append(entry[OrganizationDescription.details][OrganizationDetails.priorities][priority][PriorityTargetsSemperKI.value])
-                # calculate vector distance
-                distanceFromUserPrios = numpy.linalg.norm(numpy.array(userPrioritiesVector) - numpy.array(prioList))
+                # calculate vector 'distance' (I avoid the square root, see Wikipedia on euclidean distance)
+                distanceFromUserPrios = numpy.sum(numpy.square(numpy.array(userPrioritiesVector) - numpy.array(prioList)))
                 listOfContractorsWithPriorities.append((entry, distanceFromUserPrios))
         # sort ascending via distance (the shorter, the better)
         listOfContractorsWithPriorities.sort(key=lambda x: x[1])

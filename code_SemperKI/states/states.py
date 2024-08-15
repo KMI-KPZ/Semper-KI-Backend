@@ -307,7 +307,7 @@ class State(ABC):
             
             return returnState
         except (Exception) as error:
-            loggerError.error(f"{self.__str__} {self.onUpdateEvent.__name__}: {str(error)}")
+            loggerError.error(f"{self.__str__} {self.onUpdateEvent.__name__}: {error}")
             return self
 
     ###################################################
@@ -338,7 +338,7 @@ class State(ABC):
             
             return returnState
         except (Exception) as error:
-            loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
+            loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {error}")
             return self
 
     ###################################################

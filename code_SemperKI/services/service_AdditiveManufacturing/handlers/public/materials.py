@@ -109,7 +109,7 @@ def retrieveMaterialsWithFilter(request:Request):
         materialList = pgKnowledgeGraph.getNodesByType(pgKnowledgeGraph.NodeType.material)
         for entry in materialList:
             imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.imgPath] if pgKnowledgeGraph.NodeProperties.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-            output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": list(entry[pgKnowledgeGraph.NodeDescription.properties]), "imgPath": imgPath})
+            output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
         
         
         # mockup here:

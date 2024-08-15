@@ -27,40 +27,27 @@ class TestAdditiveManufacturing(TestCase):
     @classmethod
     def createOrganization(self, client:Client, id="", userID = ""):
         mockSession = client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "org_id": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testOrga" if userID == "" else userID
-        mockSession["user"]["userinfo"]["nickname"] = "testOrga"
-        mockSession["user"]["userinfo"]["email"] = "testOrga@test.de"
-        mockSession["user"]["userinfo"]["org_id"] = "id123" if id == "" else id
-        mockSession[SessionContent.USER_PERMISSIONS] = {"processes:read": "", "processes:files": "", "processes:messages": "", "processes:edit" : "", "processes:delete": "", "orga:edit": "", "orga:delete": "", "orga:read": "", "resources:read": "", "resources:edit": ""}
+        mockSession[SessionContent.MOCKED_LOGIN] = True
+        mockSession[SessionContent.IS_PART_OF_ORGANIZATION] = True
+        mockSession[SessionContent.PG_PROFILE_CLASS] = "organization"
         mockSession[SessionContent.usertype] = "organization"
-        mockSession[SessionContent.ORGANIZATION_NAME] = "testOrga"
-        mockSession[SessionContent.INITIALIZED] = True
-        mockSession[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.organization
-        currentTime = datetime.datetime.now()
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        mockSession[SessionContent.PATH_AFTER_LOGIN] = "127.0.0.1:3000" # no real use but needs to be set
         mockSession.save()
-        client.post("/"+paths["addOrga"][0])
-        client.post("/"+paths["addUser"][0])
-        client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }') #content_type="application/json"
+        client.get("/"+paths["callbackLogin"][0])
+        client.patch("/"+paths["updateDetailsOfOrga"][0], data={"changes": { "supportedServices": [1] } }, content_type="application/json")
         return mockSession
 
     #######################################################
     @staticmethod
-    def createUser(client:Client, sub="", name=""):
+    def createUser(client:Client):
         mockSession = client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser" if sub == "" else sub
-        mockSession["user"]["userinfo"]["nickname"] = "testuser" if name == "" else name
-        mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
-        mockSession[SessionContent.USER_PERMISSIONS] = {"processes:read": "", "processes:files": "", "processes:messages": "", "processes:edit" : "", "processes:delete": "", "orga:edit": "", "orga:delete": "", "orga:read": "", "resources:read": "", "resources:edit": ""}
+        mockSession[SessionContent.MOCKED_LOGIN] = True
+        mockSession[SessionContent.IS_PART_OF_ORGANIZATION] = False
+        mockSession[SessionContent.PG_PROFILE_CLASS] = "user"
         mockSession[SessionContent.usertype] = "user"
-        mockSession[SessionContent.INITIALIZED] = True
-        mockSession[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.user
-        currentTime = datetime.datetime.now()
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        mockSession[SessionContent.PATH_AFTER_LOGIN] = "127.0.0.1:3000" # no real use but needs to be set
         mockSession.save()
-        client.post("/"+paths["addUser"][0])
+        client.get("/"+paths["callbackLogin"][0])
         return mockSession
     
     #######################################################
@@ -78,12 +65,13 @@ class TestAdditiveManufacturing(TestCase):
         super().setUpClass()
         self.orgaClient = Client()
         self.createOrganization(self.orgaClient)
+        
 
     # Tests!
     #######################################################
     def test_uploadAndDeleteModel(self):
-        client = Client()
-        self.createUser(client, self.test_uploadAndDeleteModel.__name__)
+        client = self.orgaClient
+        
         projectObj, processObj = self.createProjectAndProcess(client)
 
         # set service type
@@ -114,3 +102,5 @@ class TestAdditiveManufacturing(TestCase):
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+getProcPath).content)
         self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
+
+    # TODO: get, set, delete for Materials and Post-Processing; onto and orga functions
