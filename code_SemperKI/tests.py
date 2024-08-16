@@ -212,4 +212,33 @@ class TestProjects(TestCase):
             contentOfTestFile = self.testFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
 
-    # TODO: getProcessHistory, getContractors, statemachine, events, celery stuff?
+    # TODO: getProcessHistory, (getContractors), statemachine, (events), (celery stuff?)
+
+    ##################################################
+    def test_processHistory(self):
+        client = Client()
+
+        # Create user, project and process
+        self.createUser(client)
+        projectObj, processObj = self.createProjectAndProcess(client)
+        
+        # TODO: call getProcessHistory as get with processID in path
+
+        # TODO: Check return value for creation of process
+
+    ##################################################
+    def test_stateMachine(self):
+        client = Client()
+
+        # create project and process but no user as it's not necessary
+        projectObj, processObj = self.createProjectAndProcess(client)
+
+        # TODO: call updateProcess with selected service 1
+
+        # TODO: call getProcess and get buttons
+
+        # TODO: "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
+
+        # TODO: call getProcess and check if processStatus code is correct (see StateDescription for the integer value)
+
+
