@@ -69,6 +69,9 @@ class NodePropertyDescription(StrEnumExactlyAsDefined):
     type = enum.auto()
 
 ##################################################
+defaultOwner = "SYSTEM"
+
+##################################################
 class Node(models.Model):
     """
     The class of a node containing different information, depending on it's type.

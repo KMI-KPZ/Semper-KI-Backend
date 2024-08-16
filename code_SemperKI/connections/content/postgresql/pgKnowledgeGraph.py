@@ -52,7 +52,7 @@ def getNode(nodeID:str):
         return error
 
 ##################################################
-def createNode(information:dict, createdBy="SYSTEM"):
+def createNode(information:dict, createdBy=defaultOwner):
     """
     Creates a node
 
@@ -102,6 +102,41 @@ def createNode(information:dict, createdBy="SYSTEM"):
         return createdNode
     except (Exception) as error:
         loggerError.error(f'could not create node: {str(error)}')
+        return error
+    
+##################################################
+def copyNode(node:Node, createdBy:str=defaultOwner):
+    """
+    Copy an existing node, therefore giving it a new creator and nodeiD
+
+    :param node: The existing node
+    :type node: Node
+    :param createdBy: Who ordered the copy (usually an organization)
+    :type createdBy: str
+    :return: New Node
+    :rtype: Node|Exception
+    
+    """
+    try:
+        startPC = time.perf_counter_ns()
+        startPT = time.process_time_ns()
+        
+        nodeID = generateURLFriendlyRandomString()
+        nodeName = node.nodeName
+        nodeType = node.nodeType
+        context = node.context
+        properties = node.properties
+        updatedWhen = timezone.now()
+
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "updatedWhen": updatedWhen})
+        
+        endPC = time.perf_counter_ns()
+        endPT = time.process_time_ns()
+        loggerPerformance.info(f"DB;Copy Node;{endPC-startPC};{endPT-startPT}")
+        loggerConsole.info(f"Copied node with new id {nodeID}")
+        return createdNode
+    except (Exception) as error:
+        loggerError.error(f'could not copy node: {str(error)}')
         return error
     
 ##################################################

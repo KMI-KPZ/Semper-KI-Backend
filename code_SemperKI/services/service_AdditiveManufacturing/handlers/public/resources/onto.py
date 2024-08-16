@@ -52,8 +52,8 @@ loggerError = logging.getLogger("errors")
     }
 )
 @checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 @checkVersion(0.3)
 def onto_getResources(request:Request, resourceType:str):
@@ -105,8 +105,8 @@ def onto_getResources(request:Request, resourceType:str):
     }
 )
 @checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 @checkVersion(0.3)
 def onto_getNodeViaID(request:Request, nodeID:str):
@@ -151,8 +151,8 @@ def onto_getNodeViaID(request:Request, nodeID:str):
     }
 )
 @checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
 @require_http_methods(["GET"])
-@checkIfRightsAreSufficient(json=False)
 @api_view(["GET"])
 @checkVersion(0.3)
 def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):

@@ -26,7 +26,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSuffic
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode
+from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResNode
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -54,6 +54,7 @@ class SResOrgaResources(serializers.Serializer):
         200: SResOrgaResources,
         400: ExceptionSerializer,
         401: ExceptionSerializer,
+        404: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
@@ -100,6 +101,210 @@ def orga_getResources(request:Request):
             raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {orga_getResources.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Retrieve all nodes from either the system or the orga of a certain type",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: SResNode,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+@checkVersion(0.3)
+def orga_getNodes(request:Request, resourceType:str):
+    """
+    Retrieve all nodes from either the system or the orga of a certain type
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: List of nodes
+    :rtype: Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_getNodes.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        resultsOfQueries = {"resources": []}
+        # materialsRes = sparqlQueries.getAllMaterials.sendQuery()
+        # for elem in materialsRes:
+        #     title = elem["Material"]["value"]
+        #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
+        result = pgKnowledgeGraph.getNodesByType(resourceType)
+        if isinstance(result, Exception):
+            raise result
+        # remove nodes not belonging to the system or the orga
+        filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+                
+        outSerializer = SResNode(data=filteredOutput, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+
+    except (Exception) as error:
+        message = f"Error in {orga_getNodes.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+#######################################################
+@extend_schema(
+    summary="Retrieve all info about a node via its ID",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: SResNode,
+        401: ExceptionSerializer,
+        404: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+@checkVersion(0.3)
+def orga_getNodeViaID(request:Request, nodeID:str):
+    """
+    Retrieve all info about a node via its ID
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Json
+    :rtype: Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_getNodeViaID.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        if isinstance(nodeInfo, Exception):
+            raise nodeInfo
+        if nodeInfo.createdBy != orgaID or nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
+            message = f"Rights not sufficient in {orga_getNodeViaID.cls.__name__}"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        outSerializer = SResNode(data=nodeInfo.toDict())
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {orga_getNodeViaID.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+#######################################################
+@extend_schema(
+    summary="Gather neighboring resources of a certain type from the KG",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+@checkVersion(0.3)
+def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
+    """
+    Gather neighboring resources of a certain type from the KG
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON with resource of the type available
+    :rtype: JSON Response
+
+    """
+    try:
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
+
+        #Check that this orga provides AM as service
+        if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
+            message = f"Orga does not offer service in {orga_getNodeViaID.cls.__name__}"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
+        if isinstance(result, Exception):
+            raise result
+        
+        # remove nodes not belonging to the system or the orga
+        filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+                
+        outSerializer = SResNode(data=result, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+
+    except (Exception) as error:
+        message = f"Error in {orga_getAssociatedResources.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -388,7 +593,7 @@ class SReqOrgaAddEdges(serializers.Serializer):
 @checkVersion(0.3)
 def orga_addEdgesToOrga(request:Request):
     """
-    Edges some things to an organization in the knowledge graph
+    Links some things to an organization in the knowledge graph
 
     :param request: POST Request
     :type request: HTTP POST
@@ -433,7 +638,14 @@ def orga_addEdgesToOrga(request:Request):
             
         # link the printer to the orga
         for entry in entityIDs:
-            result = pgKnowledgeGraph.createEdge(orgaID, entry) 
+            nodeIDToBeLinked = entry
+            nodeOfEntity = pgKnowledgeGraph.getNode(entry)
+            # check if node belongs to SYSTEM or the orga
+            if nodeOfEntity.createdBy != orgaID:
+                # if it doesn't belong to the orga, create a copy for it
+                newNode = pgKnowledgeGraph.copyNode(nodeOfEntity, orgaID)
+                nodeIDToBeLinked = newNode.nodeID
+            result = pgKnowledgeGraph.createEdge(orgaID, nodeIDToBeLinked) 
             if isinstance(result, Exception):
                 raise result
         
@@ -530,18 +742,20 @@ def orga_addEdgeForOrga(request:Request):
         if isinstance(result2, Exception):
             raise result2
         
-        if result1.createdBy != orgaID and result2.createdBy != orgaID:
-            message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        node1IDToBeLinked = result1.nodeID
+        # check if the node belongs to the orga
+        if result1.createdBy != orgaID:
+            # if it doesn't belong to the orga, create a copy for it
+            newNode = pgKnowledgeGraph.copyNode(result1, orgaID)
+            node1IDToBeLinked = newNode.nodeID
+        
+        node2IDToBeLinked = result2.nodeID
+        if result2.createdBy != orgaID:
+            newNode = pgKnowledgeGraph.copyNode(result2, orgaID)
+            node2IDToBeLinked = newNode.nodeID
             
         # link the two things
-        result = pgKnowledgeGraph.createEdge(result1.nodeID, result2.nodeID) 
+        result = pgKnowledgeGraph.createEdge(node1IDToBeLinked, node2IDToBeLinked) 
         if isinstance(result, Exception):
             raise result
         
