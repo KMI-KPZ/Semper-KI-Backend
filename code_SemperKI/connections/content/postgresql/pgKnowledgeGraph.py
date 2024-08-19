@@ -1,3 +1,4 @@
+from __future__ import annotations 
 """
 Part of Semper-KI software
 
@@ -155,6 +156,34 @@ def createOrganizationNode(orgaID:str):
         orgaName = pgProfiles.ProfileManagementBase.getOrganizationName(orgaID)
         information = {NodeDescription.nodeID: orgaID, NodeDescription.nodeName: orgaName, NodeDescription.nodeType: NodeType.organization}
         createNode(information, orgaID)
+
+###################################################################################
+def deleteAllNodesFromOrganization(orgaID:str):
+    """
+    Gather all nodes belonging to an organization and delete them
+
+    :param orgaID: The ID of the organization
+    :type orgaID: str
+    :return: None
+    :rtype: None
+    
+    """
+    try:
+        nodes = getEdgesForNode(orgaID)
+        if isinstance(nodes, Exception):
+            raise nodes
+        for entry in nodes:
+            nodeID = entry[NodeDescription.nodeID]
+            owner = entry[NodeDescription.createdBy]
+            if owner == orgaID:
+                result = deleteNode(nodeID)
+                if isinstance(result, Exception):
+                    raise result
+        result = deleteNode(orgaID)
+        if isinstance(result, Exception):
+            raise result
+    except Exception as error:
+        logger.error(f"Could not delete nodes of orga: {error}")
         
 ##################################################
 def updateNode(nodeID:str, information:dict):

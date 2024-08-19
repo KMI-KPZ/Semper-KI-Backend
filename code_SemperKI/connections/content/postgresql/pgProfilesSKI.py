@@ -13,6 +13,8 @@ from Generic_Backend.code_General.definitions import OrganizationDetails, UserDe
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
+
 from logging import getLogger
 logger = getLogger("errors")
 
@@ -188,3 +190,4 @@ def gatherUserHashIDsAndNotificationPreference(orgaOrUserID:str, notification:st
     except Exception as error:
         logger.error(f'could not gather notification settings: {str(error)}')
         return error
+    
