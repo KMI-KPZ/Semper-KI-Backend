@@ -8,6 +8,8 @@ Contains: Functions using the sparql queries to filter for contractors
 
 import copy
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
+
+from ..definitions import NodeTypesAM, NodePropertiesAM
 from ..utilities.sparqlQueries import *
 
 ##################################################
@@ -30,7 +32,7 @@ def filterByMaterial(resultDict:dict, chosenMaterials:dict):
 
     for materialID in chosenMaterials:
         material = pgKnowledgeGraph.getNode(materialID)
-        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(material.nodeID, pgKnowledgeGraph.NodeType.organization)
+        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(material.nodeID, NodeTypesAM.organization)
         for orga in orgas:
             resultDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
     
@@ -51,7 +53,7 @@ def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
     tempDict = {}
     for postProcessingID in chosenPostProcessings:
         postProcessing = pgKnowledgeGraph.getNode(postProcessingID)
-        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(postProcessing.nodeID, pgKnowledgeGraph.NodeType.organization)
+        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(postProcessing.nodeID, NodeTypesAM.organization)
         for orga in orgas:
             tempDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
     
@@ -99,13 +101,13 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
             #     if entry["ID"]["value"] not in manufacturersWhichCanDoAll:
             #         manufacturersWhichCanDoAll[entry["ID"]["value"]]  = entry
             setOfManufacturerIDs = set()
-            printers = pgKnowledgeGraph.getNodesByProperty(pgKnowledgeGraph.NodeProperties.buildVolume)
+            printers = pgKnowledgeGraph.getNodesByProperty(NodePropertiesAM.buildVolume)
             for printer in printers:
-                buildVolumeArray = printer[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.buildVolume].split("x")
+                buildVolumeArray = printer[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.buildVolume].split("x")
                 if calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"] <= float(buildVolumeArray[0]) and \
                     calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"] <= float(buildVolumeArray[1]) and \
                     calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"] <= float(buildVolumeArray[2]):
-                        manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], pgKnowledgeGraph.NodeType.organization)
+                        manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.organization)
                         for manufacturer in manufacturers:
                             setOfManufacturerIDs.add(manufacturer[pgKnowledgeGraph.NodeDescription.nodeID])
                             manufacturersCollection[manufacturer[pgKnowledgeGraph.NodeDescription.nodeID]] = manufacturer

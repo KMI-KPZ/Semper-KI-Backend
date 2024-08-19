@@ -21,7 +21,7 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers.public.resources import orga, onto
+from .handlers.public.resources import orga, onto, kgDBAM
 from .handlers.public import materials, checkService, filter, model, postProcessings
 
 from code_SemperKI.urls import paths, urlpatterns
@@ -50,6 +50,8 @@ newPaths = {
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
+    "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
+    
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/get/by-type/<str:resourceType>/",onto.onto_getResources),
     "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/get/by-id/<str:nodeID>/", onto.onto_getNodeViaID),
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
@@ -68,7 +70,7 @@ newPaths = {
     #"orga_addMaterialEdit": ("public/orga/addMaterialEdit/",resources.orga_addMaterialEdit),
     #"orga_createMaterial": ("public/orga/createMaterial/",resources.orga_createMaterial),
     #"orga_removeMaterial": ("public/orga/removeMaterial/",resources.orga_removeMaterial),
-        "orga_getResources": ("public/service/additive-manufacturing/resources/orga/get/", orga.orga_getResources),
+    "orga_getResources": ("public/service/additive-manufacturing/resources/orga/get/", orga.orga_getResources),
     "orga_getNodes": ("public/service/additive-manufacturing/resources/orga/nodes/get/by-type/<str:resourceType>/",orga.orga_getNodes),
     "orga_getNodeViaID": ("public/service/additive-manufacturing/resources/orga/nodes/get/by-id/<str:nodeID>/", orga.orga_getNodeViaID),
     "orga_getAssociatedResources": ("public/service/additive-manufacturing/resources/orga/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", orga.orga_getAssociatedResources),

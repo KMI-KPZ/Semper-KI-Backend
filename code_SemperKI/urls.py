@@ -71,7 +71,6 @@ newPaths= {
     "getNode": ("private/nodes/get/<str:nodeID>/", knowledgeGraphDB.getNode),
     "getNodesByType": ("private/nodes/get/by-type/<str:nodeType>/", knowledgeGraphDB.getNodesByType),
     "getNodesByProperty": ("private/nodes/get/by-property/<str:property>/", knowledgeGraphDB.getNodesByProperty),
-    "getPropertyDefinitionFrontend": ("public/nodes/properties/get/by-type/<str:nodeType>/", knowledgeGraphDB.getPropertyDefinitionFrontend),
     "createNode": ("private/nodes/create/", knowledgeGraphDB.createNode),
     "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
     "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
@@ -80,8 +79,8 @@ newPaths= {
     "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
     "createEdge": ("private/edges/create/", knowledgeGraphDB.createEdge),
     "deleteEdge": ("private/edges/delete/<str:nodeID1>/<str:nodeID2>/", knowledgeGraphDB.deleteEdge),
-    "getGraph": ("private/graph/get/", knowledgeGraphDB.getGraph),
-    "getGraphForFrontend": ("public/graph/get/", knowledgeGraphDB.getGraphForFrontend),
+    "getGraph": ("private/graph/get/for-backend/", knowledgeGraphDB.getGraph),
+    "getGraphForFrontend": ("private/graph/get/", knowledgeGraphDB.getGraphForFrontend),
     "createGraph": ("private/graph/create/", knowledgeGraphDB.createGraph),
     "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 

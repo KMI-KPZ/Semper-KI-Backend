@@ -35,6 +35,8 @@ from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
+from ...definitions import NodeTypesAM, NodePropertiesAM
+
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
@@ -108,9 +110,9 @@ def retrievePostProcessingsWithFilter(request:Request):
             resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture})
         output.update(resultsOfQueries["postProcessings"]) """
         
-        postProcessings = pgKnowledgeGraph.getNodesByType(pgKnowledgeGraph.NodeType.additionalRequirement)
+        postProcessings = pgKnowledgeGraph.getNodesByType(NodeTypesAM.additionalRequirement)
         for entry in postProcessings:
-            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][pgKnowledgeGraph.NodeProperties.imgPath] if pgKnowledgeGraph.NodeProperties.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
             output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
 
         # mockup here:

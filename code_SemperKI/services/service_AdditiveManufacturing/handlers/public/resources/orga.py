@@ -150,7 +150,7 @@ def orga_getNodes(request:Request, resourceType:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-        resultsOfQueries = {"resources": []}
+        # resultsOfQueries = {"resources": []}
         # materialsRes = sparqlQueries.getAllMaterials.sendQuery()
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
