@@ -210,7 +210,10 @@
             "onto_getResources",
             "onto_getAssociatedResources",
             "orga_getResources",
-            "onto_getNodeViaID"
+            "onto_getNodeViaID",
+            "orga_getNodes",
+            "orga_getNodeViaID",
+            "orga_getAssociatedResources"
          ]
       },
       {
