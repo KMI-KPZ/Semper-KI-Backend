@@ -223,7 +223,7 @@ def orga_getNodeViaID(request:Request, nodeID:str):
         nodeInfo = pgKnowledgeGraph.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
-        if nodeInfo.createdBy != orgaID or nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
+        if nodeInfo.createdBy != orgaID and nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
             message = f"Rights not sufficient in {orga_getNodeViaID.cls.__name__}"
             exception = "Unauthorized"
             logger.error(message)
