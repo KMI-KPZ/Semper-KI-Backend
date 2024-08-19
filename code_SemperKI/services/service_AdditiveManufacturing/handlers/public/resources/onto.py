@@ -26,7 +26,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSuffic
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResNode
+from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -38,6 +38,60 @@ logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
 
+
+#######################################################
+@extend_schema(
+    summary="Returns the graph for frontend",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: SResGraphForFrontend,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_getGraph(request:Request):
+    """
+    Returns the graph for frontend
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON with graph
+    :rtype: Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.getGraph()
+        if isinstance(result, Exception):
+            raise result
+        outDict = {"Nodes": [], "Edges": []}
+        for entry in result["nodes"]:
+            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName]}
+            outDict["Nodes"].append(outEntry)
+        for entry in result["edges"]:
+            outEntry = {"source": entry[0], "target": entry[1]}
+            outDict["Edges"].append(outEntry)
+
+        outSerializer = SResGraphForFrontend(data=outDict)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {onto_getGraph.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
 @extend_schema(

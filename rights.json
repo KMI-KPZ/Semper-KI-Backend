@@ -206,14 +206,12 @@
             "HomeAuthorizedResources"
          ],
          "paths": [
-            "onto_getResource",
-            "onto_getResources",
-            "onto_getAssociatedResources",
+            "orga_getGraph",
             "orga_getResources",
-            "onto_getNodeViaID",
             "orga_getNodes",
             "orga_getNodeViaID",
-            "orga_getAssociatedResources"
+            "orga_getAssociatedResources",
+            "orga_getNeighbors"
          ]
       },
       {
@@ -228,11 +226,12 @@
             "ResourcesButtonAddPrinter"
          ],
          "paths": [
-            "orga_addEdgesToOrga",
-            "orga_addEdgeForOrga",
             "orga_createNode",
             "orga_updateNode",
             "orga_deleteNode",
+            "orga_addEdgesToOrga",
+            "orga_addEdgeForOrga",
+            "orga_removeEdgeToOrga",
             "orga_removeEdge",
             "orga_removeAll"
          ]

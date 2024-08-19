@@ -48,6 +48,7 @@ class SResNode(serializers.Serializer):
     context = serializers.CharField(max_length=10000, allow_blank=True)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True)
     createdBy = serializers.CharField(max_length=513, required=False, allow_blank=True)
+    active = serializers.CharField()
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
@@ -214,6 +215,7 @@ class SReqUpdateNode(serializers.Serializer):
     nodeName = serializers.CharField(max_length=200, required=False)
     nodeType = serializers.CharField(max_length=200, required=False)
     context = serializers.CharField(max_length=10000, required=False)
+    active = serializers.BooleanField(required=False)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True, required=False)
 #######################################################
 @extend_schema(
@@ -742,6 +744,7 @@ class SReqCreateNodeOfGraph(serializers.Serializer):
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200, default="organization|printer|material|additionalRequirement|color")
     context = serializers.CharField(max_length=10000)
+    active = serializers.BooleanField()
     properties = serializers.ListField(child=SResProperties(), allow_empty=True)
 
 #######################################################

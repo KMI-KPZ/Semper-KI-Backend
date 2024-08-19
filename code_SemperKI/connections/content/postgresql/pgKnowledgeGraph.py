@@ -72,28 +72,31 @@ def createNode(information:dict, createdBy=defaultOwner):
         nodeType = ""
         context = ""
         properties = {}
+        active = True
         updatedWhen = timezone.now()
 
         for content in information:
             match content:
-                case "nodeID":
+                case NodeDescription.nodeID:
                     nodeID = information[NodeDescription.nodeID]
-                case "nodeTempID":
+                case "nodeTempID": # for testGraph
                     pass
-                case "nodeName":
+                case NodeDescription.nodeName:
                     nodeName = information[NodeDescription.nodeName]
-                case "nodeType":
+                case NodeDescription.nodeType:
                     nodeType = information[NodeDescription.nodeType]
-                case "context":
+                case NodeDescription.context:
                     context = information[NodeDescription.context]
-                case "properties":
+                case NodeDescription.active:
+                    active = information[NodeDescription.active]
+                case NodeDescription.properties:
                     assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
                     for entry in information[NodeDescription.properties]:
                         properties[entry[NodePropertyDescription.name]] = entry
                 case _:
                     raise Exception("wrong content in information")
 
-        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "updatedWhen": updatedWhen})
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "active": active, "updatedWhen": updatedWhen})
         
         
         endPC = time.perf_counter_ns()
@@ -212,6 +215,8 @@ def updateNode(nodeID:str, information:dict):
                     node.nodeType = information[NodeDescription.nodeType]
                 case NodeDescription.context:
                     node.context = information[NodeDescription.context]
+                case NodeDescription.active:
+                    node.active = information[NodeDescription.active]
                 case NodeDescription.properties:
                     assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
                     for entry in information[NodeDescription.properties]:
@@ -504,7 +509,7 @@ def getSpecificNeighborsByProperty(nodeID:str, neighborProperty:str):
         return error
 
 ##################################################
-def getGraph():
+def getGraph(createdBy=""):
     """
     Return the whole graph
 
@@ -518,8 +523,12 @@ def getGraph():
         allNodes = Node.objects.all()
         outDict = {"nodes": [], "edges": []}
         for entry in allNodes:
+            if createdBy != "" and entry.createdBy != createdBy:
+                continue
             outDict["nodes"].append(entry.toDict())
             for neighbor in entry.edges.all():
+                if createdBy != "" and neighbor.createdBy != createdBy:
+                    continue
                 outDict["edges"].append([entry.nodeID,neighbor.nodeID])
         
         endPC = time.perf_counter_ns()
