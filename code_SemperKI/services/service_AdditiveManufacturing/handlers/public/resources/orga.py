@@ -318,7 +318,7 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
                 
-        outSerializer = SResNode(data=result, many=True)
+        outSerializer = SResNode(data=filteredOutput, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -373,7 +373,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
                 
-        outSerializer = SResNode(data=result, many=True)
+        outSerializer = SResNode(data=filteredOutput, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
