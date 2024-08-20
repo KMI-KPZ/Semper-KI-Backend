@@ -33,9 +33,9 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({"name": NodePropertiesAM.buildVolume,
                             "value": "int x int x int",
                             "type": "string"})
-            outList.append({"name": NodePropertiesAM.technology,
+            outList.append({"name": NodePropertiesAM.nozzleDiameter,
                             "value": "",
-                            "type": "string"})
+                            "type": "number"})
         case NodeTypesAM.material:
             outList.append({"name": NodePropertiesAM.imgPath,
                             "value": "",
@@ -71,9 +71,6 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({"name": NodePropertiesAM.smooth,
                             "value": "",
                             "type": "string"})
-            outList.append({"name": NodePropertiesAM.technology,
-                            "value": "",
-                            "type": "string"})
         case NodeTypesAM.color:
             outList.append({"name": NodePropertiesAM.imgPath,
                             "value": "",
@@ -84,5 +81,17 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({"name": NodePropertiesAM.color,
                             "value": "Number RAL;#Hex",
                             "type": "color"})
+        case NodeTypesAM.materialType:
+            outList.append({"name": NodePropertiesAM.imgPath,
+                            "value": "",
+                            "type": "text"})
+        case NodeTypesAM.materialCategory:
+            outList.append({"name": NodePropertiesAM.imgPath,
+                            "value": "",
+                            "type": "text"})
+        case NodeTypesAM.technology:
+            outList.append({"name": NodePropertiesAM.imgPath,
+                            "value": "",
+                            "type": "text"})
 
     return outList

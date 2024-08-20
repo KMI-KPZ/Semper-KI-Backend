@@ -109,7 +109,7 @@ def retrieveMaterialsWithFilter(request:Request):
         # filter by selection of post-processing
 
         materialList = pgKnowledgeGraph.getNodesByType(NodeTypesAM.material)
-        filteredOutput = [entry for entry in materialList if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner] # use only entries from orgas
+        filteredOutput = [entry for entry in materialList if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from orgas
         for entry in filteredOutput:
             imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
             output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})

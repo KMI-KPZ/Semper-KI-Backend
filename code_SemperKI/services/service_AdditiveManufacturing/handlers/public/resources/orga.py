@@ -396,7 +396,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
     tags=['FE - AM Resources Organization'],
     request=SReqCreateNode,
     responses={
-        200: None,
+        200: SResNode,
         400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
@@ -443,14 +443,18 @@ def orga_createNode(request:Request):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
             
         # create node for the orga and link it
-        result = pgKnowledgeGraph.createNode(validatedInput, orgaID)
-        if isinstance(result, Exception):
-            raise result
-        result = pgKnowledgeGraph.createEdge(orgaID, result.nodeID) 
+        resultNode = pgKnowledgeGraph.createNode(validatedInput, orgaID)
+        if isinstance(resultNode, Exception):
+            raise resultNode
+        result = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
         if isinstance(result, Exception):
             raise result
         
-        return Response("Success", status=status.HTTP_200_OK)
+        outSerializer = SResNode(data=resultNode.toDict())
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
 
     except (Exception) as error:
         message = f"Error in {orga_createNode.cls.__name__}: {str(error)}"

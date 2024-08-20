@@ -211,7 +211,7 @@ def deleteNode(request:Request, nodeID:str):
         
 #######################################################
 class SReqUpdateNode(serializers.Serializer):
-    nodeID = serializers.CharField(max_length=200)
+    nodeID = serializers.CharField(max_length=200, required=True)
     nodeName = serializers.CharField(max_length=200, required=False)
     nodeType = serializers.CharField(max_length=200, required=False)
     context = serializers.CharField(max_length=10000, required=False)

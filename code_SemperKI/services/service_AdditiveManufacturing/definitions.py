@@ -54,11 +54,14 @@ class NodeTypesAM(StrEnumExactlyAsDefined):
     What possible types can a node have in the AM service?
     
     """
-    organization = enum.auto()
-    printer = enum.auto()
-    material = enum.auto()
-    additionalRequirement = enum.auto()
-    color = enum.auto()
+    organization = enum.auto() # the orga node
+    printer = enum.auto() # a 3d printer
+    material = enum.auto() # a 3d printing material
+    additionalRequirement = enum.auto() # what can be done after the print?
+    color = enum.auto() # what color should the material have?
+    materialCategory = enum.auto() # is the material plastics, metal, ...?
+    technology = enum.auto() # Powder Bed, Extrusion, ...
+    materialType = enum.auto() # What type is the material, e.g. PLA, ABS, ...?
 
 ##################################################
 class NodePropertiesAM(StrEnumExactlyAsDefined):
@@ -75,6 +78,7 @@ class NodePropertiesAM(StrEnumExactlyAsDefined):
     poissonRatio = enum.auto()  #0.35 -> material
     color = enum.auto()  # 9005RAL;Black -> color
     buildVolume = enum.auto()  # 100x100x100 -> printer
-    technology = enum.auto()  # FDM -> printer
+    nozzleDiameter = enum.auto() # 0.4 mm -> printer
+    certificates = enum.auto() # CE, MD, ... -> printer, material, ...
 
 # TODO: Service Status Codes
