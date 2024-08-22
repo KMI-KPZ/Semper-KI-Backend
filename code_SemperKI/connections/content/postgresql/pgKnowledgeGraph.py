@@ -94,7 +94,7 @@ def createNode(information:dict, createdBy=defaultOwner):
                     for entry in information[NodeDescription.properties]:
                         properties[entry[NodePropertyDescription.name]] = entry
                 case _:
-                    raise Exception("wrong content in information")
+                    pass
 
         createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "active": active, "updatedWhen": updatedWhen})
         
@@ -225,7 +225,7 @@ def updateNode(nodeID:str, information:dict):
                         else:
                             node.properties[entry[NodePropertyDescription.name]] = entry
                 case _:
-                    raise Exception("wrong content in information")
+                    pass
         node.updatedWhen = timezone.now()
         node.save()
         
