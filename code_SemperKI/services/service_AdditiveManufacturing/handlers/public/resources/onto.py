@@ -199,7 +199,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
     tags=['FE - AM Resources Ontology'],
     request=None,
     responses={
-        200: None,
+        200: serializers.ListSerializer(child=SResNode()),
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }

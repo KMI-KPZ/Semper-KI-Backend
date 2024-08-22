@@ -42,7 +42,7 @@ loggerError = logging.getLogger("errors")
     tags=['FE - Graph'],
     request=None,
     responses={
-        200: None,
+        200: serializers.ListSerializer(child=SResProperties()),
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }

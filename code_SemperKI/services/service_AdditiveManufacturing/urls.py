@@ -82,7 +82,7 @@ newPaths = {
     "orga_deleteNode": ("public/service/additive-manufacturing/resources/orga/nodes/delete/<str:nodeID>/", orga.orga_deleteNode),
     "orga_addLinksToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/create/", orga.orga_addEdgesToOrga),
     "orga_addEdgeForOrga": ("public/service/additive-manufacturing/resources/orga/edge/between-entities/create/", orga.orga_addEdgeForOrga),
-    #"orga_updateLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link/patch/", resources.orga_updateMaterialAndPrinter),
+    "orga_createOrUpdateAndLinkNodes": ("public/service/additive-manufacturing/resources/orga/nodes/create-and-link/", orga.orga_createOrUpdateAndLinkNodes),
     "orga_removeLink": ("public/service/additive-manufacturing/resources/orga/edge/between-entities/delete/<str:entity1ID>/<str:entity2ID>/", orga.orga_removeEdge),
     "orga_deleteLinkToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/delete/<str:entityID>/", orga.orga_removeEdgeToOrga),
     "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll)
