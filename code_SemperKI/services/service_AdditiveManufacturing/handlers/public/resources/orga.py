@@ -455,6 +455,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         
         if validatedInput["type"] == "create":
             # create node for the orga and link it to the orga
+            del validatedInput["node"]["nodeID"]
             resultNode = pgKnowledgeGraph.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
