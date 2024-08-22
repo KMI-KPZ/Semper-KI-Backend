@@ -233,7 +233,8 @@
             "orga_addEdgeForOrga",
             "orga_removeEdgeToOrga",
             "orga_removeEdge",
-            "orga_removeAll"
+            "orga_removeAll",
+            "orga_createOrUpdateAndLinkNodes"
          ]
       }
    ]
