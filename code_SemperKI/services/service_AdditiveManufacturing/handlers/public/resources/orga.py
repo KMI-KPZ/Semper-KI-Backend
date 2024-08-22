@@ -392,7 +392,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
 #######################################################
 class SReqNodeFE(serializers.Serializer):
     nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    name = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    nodeName = serializers.CharField(max_length=200, required=False, allow_blank=True)
     context = serializers.CharField(max_length=1000, required=False, allow_blank=True)
     nodeType = serializers.CharField(max_length=200, required=False, allow_blank=True)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True, required=False)
