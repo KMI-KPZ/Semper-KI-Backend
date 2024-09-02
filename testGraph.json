@@ -6,7 +6,8 @@
       "nodeName": "InfAI e.V.",
       "nodeType": "organization",
       "context": "Our base organization",
-      "properties": []
+      "properties": [],
+      "active": true
     },
     "edges": [
       {
@@ -18,7 +19,8 @@
           {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
           {"name": "buildVolume", "value": "400x400x400", "type": "string"},
           {"name": "technology", "value": "FDM", "type": "string"}
-        ]
+        ],
+        "active": true
       },
       {
         "nodeTempID": 2,
@@ -28,7 +30,8 @@
         "properties": [
           {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
           {"name": "technology", "value": "FDM", "type": "string"}
-        ]
+        ],
+        "active": true
       },
       {
         "nodeTempID": 3,
@@ -43,7 +46,8 @@
           {"name": "smooth", "value": "20 Ra", "type": "string"},
           {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
           {"name": "poissonRatio", "value": "0.35", "type": "number"}
-        ]
+        ],
+        "active": true
       },
       {
         "nodeTempID": 4,
@@ -54,7 +58,8 @@
           {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "", "type": "string"},
           {"name": "color", "value": "9005RAL;#000000", "type": "string"}
-        ]
+        ],
+        "active": true
       }
     ]
   },
@@ -68,7 +73,8 @@
         {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
         {"name": "buildVolume", "value": "400x400x400", "type": "string"},
         {"name": "technology", "value": "FDM", "type": "string"}
-      ]
+      ],
+      "active": true
     },
     "edges": [
       {
@@ -84,7 +90,8 @@
           {"name": "smooth", "value": "20 Ra", "type": "string"},
           {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
           {"name": "poissonRatio", "value": "0.35", "type": "number"}
-          ]
+          ],
+          "active": true
       }
     ]
   },
@@ -102,7 +109,8 @@
          {"name": "smooth", "value": "20 Ra", "type": "string"},
           {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
           {"name": "poissonRatio", "value": "0.35", "type": "number"}
-        ]
+        ],
+        "active": true
     },
     "edges":[
       {
@@ -114,7 +122,8 @@
           {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
           {"name": "foodSafe", "value": "", "type": "string"},
           {"name": "color", "value": "9005RAL;#000000", "type": "string"}
-        ]
+        ],
+        "active": true
       }
     ]
   }
