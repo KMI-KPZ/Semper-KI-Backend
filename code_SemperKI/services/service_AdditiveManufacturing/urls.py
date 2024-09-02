@@ -30,7 +30,9 @@ from code_SemperKI.urls import paths, urlpatterns
 newPaths = {
     #"getProcessData": ('public/getProcessData/',filter.getProcessData),
     #"getModels": ('public/getModels/',filter.getModels),
-    #"getFilters": ('public/getFilters/',filter.getFilters),
+    
+    "getFilters": ("public/service/additive-manufacturing/filters/get/", filter.getFilters),
+
     "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
     "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
     "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
