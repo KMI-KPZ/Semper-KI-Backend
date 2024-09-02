@@ -113,7 +113,7 @@ class Node(models.Model):
             NodeDescription.context: self.context,
             NodeDescription.properties: list(self.properties.values()),
             NodeDescription.createdBy: self.createdBy,
-            NodeDescription.active: str(self.active),
+            NodeDescription.active: self.active,
             NodeDescription.createdWhen: str(self.createdWhen), 
             NodeDescription.updatedWhen: str(self.updatedWhen), 
             NodeDescription.accessedWhen: str(self.accessedWhen)

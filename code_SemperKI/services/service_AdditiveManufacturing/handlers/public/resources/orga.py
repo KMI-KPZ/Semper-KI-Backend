@@ -475,7 +475,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(orgaID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
 
@@ -496,7 +496,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(orgaID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
         else:
