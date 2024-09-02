@@ -78,6 +78,8 @@ def onto_getGraph(request:Request):
             outEntry = {"source": entry[0], "target": entry[1]}
             outDict["Edges"].append(outEntry)
 
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},graph," + str(datetime.now()))
+
         outSerializer = SResGraphForFrontend(data=outDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -130,6 +132,8 @@ def onto_getResources(request:Request, resourceType:str):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType}," + str(datetime.now()))
+
         outSerializer = SResNode(data=result, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -177,6 +181,9 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         nodeInfo = pgKnowledgeGraph.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=nodeInfo.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -228,6 +235,9 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighbor nodes of {nodeID} of type {resourceType}," + str(datetime.now()))
+
         outSerializer = SResNode(data=result, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -291,6 +301,9 @@ def onto_addNode(request:Request):
         result = pgKnowledgeGraph.createNode(validatedInput)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},node {result.nodeID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=result.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -353,6 +366,8 @@ def onto_updateNode(request:Request):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {validatedInput["nodeID"]}," + str(datetime.now()))
+
         outSerializer = SResNode(data=result.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -402,6 +417,9 @@ def onto_deleteNode(request:Request, nodeID:str):
         result = pgKnowledgeGraph.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {onto_deleteNode.cls.__name__}: {str(error)}"
@@ -466,6 +484,8 @@ def onto_addEdge(request:Request):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},edge from {ID1} to {ID2}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -515,6 +535,8 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         result = pgKnowledgeGraph.deleteEdge(entity1ID, entity2ID)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},edge from {entity1ID} to {entity2ID}," + str(datetime.now()))
         
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:

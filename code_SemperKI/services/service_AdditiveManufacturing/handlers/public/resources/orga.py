@@ -83,6 +83,8 @@ def orga_getGraph(request:Request):
             outEntry = {"source": entry[0], "target": entry[1]}
             outDict["Edges"].append(outEntry)
 
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},graph of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResGraphForFrontend(data=outDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -145,6 +147,8 @@ def orga_getResources(request:Request):
             raise result
         outDict["resources"].extend(result)
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},resources of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResOrgaResources(data=outDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -202,6 +206,8 @@ def orga_getNodes(request:Request, resourceType:str):
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
                 
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType} of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=filteredOutput, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -264,6 +270,8 @@ def orga_getNodeViaID(request:Request, nodeID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID} of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=nodeInfo.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -318,6 +326,8 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
                 
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},connected nodes of type {resourceType} from node {nodeID} of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=filteredOutput, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -372,7 +382,9 @@ def orga_getNeighbors(request:Request, nodeID:str):
         
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-                
+        
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID} of orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=filteredOutput, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -502,6 +514,8 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         else:
             return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
 
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_createOrUpdateAndLinkNodes.cls.__name__}: {str(error)}"
@@ -574,6 +588,8 @@ def orga_createNode(request:Request):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},node {resultNode.nodeID} for orga {orgaID}," + str(datetime.now()))
+
         outSerializer = SResNode(data=resultNode.toDict())
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -663,6 +679,8 @@ def orga_updateNode(request:Request):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {result.nodeID} of orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -732,6 +750,9 @@ def orga_deleteNode(request:Request, nodeID:str):
         result = pgKnowledgeGraph.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},node {nodeID} from orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_deleteNode.cls.__name__}: {str(error)}"
@@ -801,7 +822,7 @@ def orga_addEdgesToOrga(request:Request):
         #      sparqlQueries.SparqlParameters.Material: materialName, 
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
             
-        # link the printer to the orga
+        # link the node to the orga
         for entry in entityIDs:
             nodeIDToBeLinked = entry
             nodeOfEntity = pgKnowledgeGraph.getNode(entry)
@@ -814,6 +835,8 @@ def orga_addEdgesToOrga(request:Request):
             if isinstance(result, Exception):
                 raise result
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},edges to orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -914,6 +937,8 @@ def orga_addEdgeForOrga(request:Request):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},edge between nodes {node1IDToBeLinked} and {node2IDToBeLinked} of orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -965,6 +990,8 @@ def orga_removeEdgeToOrga(request:Request, entityID:str):
         result = pgKnowledgeGraph.deleteEdge(orgaID, entityID)
         if isinstance(result, Exception):
             raise result
+        
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},edge from {entityID} to orga {orgaID}," + str(datetime.now()))
         
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
@@ -1029,6 +1056,8 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         if isinstance(result, Exception):
             raise result
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},edge from {entity1ID} to {entity2ID} from orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_removeEdge.cls.__name__}: {str(error)}"
@@ -1081,6 +1110,8 @@ def orga_removeAll(request:Request):
             if isinstance(retVal, Exception):
                 raise retVal
         
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},graph of orga {orgaID}," + str(datetime.now()))
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_removeAll.cls.__name__}: {str(error)}"
