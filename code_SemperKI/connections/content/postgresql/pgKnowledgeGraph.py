@@ -68,10 +68,12 @@ def createNode(information:dict, createdBy=defaultOwner):
         startPT = time.process_time_ns()
         
         nodeID = generateURLFriendlyRandomString()
+        uniqueID = nodeID
         nodeName = ""
         nodeType = ""
         context = ""
         properties = {}
+        clonedFrom = ""
         active = True
         updatedWhen = timezone.now()
 
@@ -96,7 +98,7 @@ def createNode(information:dict, createdBy=defaultOwner):
                 case _:
                     pass
 
-        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "active": active, "updatedWhen": updatedWhen})
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"uniqueID": uniqueID, "nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "clonedFrom": clonedFrom, "active": active, "updatedWhen": updatedWhen})
         
         
         endPC = time.perf_counter_ns()
@@ -126,13 +128,15 @@ def copyNode(node:Node, createdBy:str=defaultOwner):
         startPT = time.process_time_ns()
         
         nodeID = generateURLFriendlyRandomString()
+        uniqueID = node.uniqueID
         nodeName = node.nodeName
         nodeType = node.nodeType
         context = node.context
         properties = node.properties
+        clonedFrom = node.nodeID
         updatedWhen = timezone.now()
 
-        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "updatedWhen": updatedWhen})
+        createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"uniqueID": uniqueID, "nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "clonedFrom": clonedFrom, "updatedWhen": updatedWhen})
         
         endPC = time.perf_counter_ns()
         endPT = time.process_time_ns()

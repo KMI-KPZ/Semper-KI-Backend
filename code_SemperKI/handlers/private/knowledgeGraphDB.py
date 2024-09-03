@@ -43,11 +43,13 @@ class SResProperties(serializers.Serializer):
 #######################################################
 class SResNode(serializers.Serializer):
     nodeID = serializers.CharField(max_length=513)
+    uniqueID = serializers.CharField(max_length=513, allow_blank=True)
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200)
     context = serializers.CharField(max_length=10000, allow_blank=True)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True)
     createdBy = serializers.CharField(max_length=513, required=False, allow_blank=True)
+    clonedFrom = serializers.CharField(max_length=513, allow_blank=True)
     active = serializers.BooleanField()
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)

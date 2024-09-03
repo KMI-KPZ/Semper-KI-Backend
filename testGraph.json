@@ -126,5 +126,35 @@
         "active": true
       }
     ]
+  },
+  {
+    "node":{
+      "nodeTempID": 5,
+      "nodeName": "Plastics",
+      "nodeType": "materialCategory",
+      "context": "All materials made of polyester and such",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[
+      {
+        "nodeTempID": 3,
+        "nodeName": "PLA",
+        "nodeType": "material",
+        "context": "Our main printing material",
+        "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
+          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
+          {"name": "heatResistant", "value": "215 °C", "type": "string"},
+          {"name": "flexibility", "value": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "type": "string"},
+          {"name": "smooth", "value": "20 Ra", "type": "string"},
+            {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
+            {"name": "poissonRatio", "value": "0.35", "type": "number"}
+          ],
+          "active": true
+      }
+    ]
   }
 ]

@@ -653,7 +653,6 @@ class ProcessManagementSession(AbstractContentInterface):
                         dependentProcess[ProcessDescription.dependenciesIn].append(processID)
                 else:
                     dependentProcess[ProcessDescription.dependenciesIn] = [processID]
-
             else:
                 raise Exception("updateProcess " + updateType + " not implemented")
             

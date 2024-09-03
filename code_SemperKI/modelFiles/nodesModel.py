@@ -19,12 +19,14 @@ class NodeDescription(StrEnumExactlyAsDefined):
 
     """
     nodeID = enum.auto()
+    uniqueID = enum.auto()
     nodeName = enum.auto()
     nodeType = enum.auto()
     context = enum.auto()
     properties = enum.auto()
     edges = enum.auto()
     createdBy = enum.auto()
+    clonedFrom = enum.auto()
     active = enum.auto()
     createdWhen = enum.auto()
     updatedWhen = enum.auto()
@@ -65,24 +67,28 @@ class Node(models.Model):
     The class of a node containing different information, depending on it's type.
     
     :nodeID: The ID for that node
+    :uniqueID: An ID, that is resistant to cloning
     :nodeName: The name of that node
     :nodeType: The type of the node as described in the respective Enum
     :context: Some information about the node, can be anything
     :properties: The properties that this node has, depends on the type
     :edges: The nodes connected to this one, symmetrical (so it's an undirected graph)
     :createdBy: Who created that node? (hashedID or SYSTEM)
+    :clonedFrom: Parent from which the node was cloned
     :active: Is that node currently active or not?
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
     :updatedWhen: Date and time at which the entry was updated
     :accessedWhen: Last date and time the entry was fetched from the database, automatically set
     """
     nodeID = models.CharField(primary_key=True,max_length=513)
+    uniqueID = models.CharField(max_length=513)
     nodeName = models.CharField(max_length=513)
     nodeType = models.CharField(max_length=513)
     context = models.CharField(max_length=10000)
     properties = models.JSONField()
     edges = models.ManyToManyField("self", symmetrical=True)
     createdBy = models.CharField(max_length=513)
+    clonedFrom = models.CharField(max_length=513)
     active = models.BooleanField(default=True)
     createdWhen = models.DateTimeField(auto_now_add=True)
     updatedWhen = models.DateTimeField()
@@ -108,11 +114,13 @@ class Node(models.Model):
         """
         return {
             NodeDescription.nodeID: self.nodeID,
+            NodeDescription.uniqueID: self.uniqueID,
             NodeDescription.nodeName: self.nodeName,
             NodeDescription.nodeType: self.nodeType,
             NodeDescription.context: self.context,
             NodeDescription.properties: list(self.properties.values()),
             NodeDescription.createdBy: self.createdBy,
+            NodeDescription.clonedFrom: self.clonedFrom,
             NodeDescription.active: self.active,
             NodeDescription.createdWhen: str(self.createdWhen), 
             NodeDescription.updatedWhen: str(self.updatedWhen), 
