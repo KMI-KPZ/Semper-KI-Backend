@@ -472,17 +472,28 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             resultNode = pgKnowledgeGraph.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
-            result = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
-            if isinstance(result, Exception):
-                raise result
+            exceptionOrNone = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
+            if isinstance(exceptionOrNone, Exception):
+                raise exceptionOrNone
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
+                # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
+                otherNode = pgKnowledgeGraph.getNode(nodeIDFromEdge)
+                if isinstance(otherNode, Exception):
+                    raise otherNode
+                nodeIDToBeConnected = otherNode.nodeID
+                if otherNode.createdBy != orgaID:
+                    copiedNode = pgKnowledgeGraph.copyNode(otherNode, orgaID)
+                    if isinstance(copiedNode, Exception):
+                        raise copiedNode
+                    nodeIDToBeConnected = copiedNode.nodeID
+
                 # create edge to new node
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, resultNode.nodeID) 
+                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
                 # create edge to orga
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, orgaID)
+                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, orgaID)
                 if isinstance(result, Exception):
                     raise result
             # remove edges

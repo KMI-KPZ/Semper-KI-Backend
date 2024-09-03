@@ -366,7 +366,7 @@ def onto_updateNode(request:Request):
         if isinstance(result, Exception):
             raise result
         
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {validatedInput["nodeID"]}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {validatedInput['nodeID']}," + str(datetime.now()))
 
         outSerializer = SResNode(data=result.toDict())
         if outSerializer.is_valid():
