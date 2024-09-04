@@ -117,6 +117,9 @@ def uploadModels(request:Request):
             remote = False
         
         detailsOfAllFiles = json.loads(info["details"])
+
+        # TODO: if the file is a repo file, then create a local copy
+
         modelNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
