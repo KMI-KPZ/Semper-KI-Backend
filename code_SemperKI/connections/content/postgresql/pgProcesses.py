@@ -651,7 +651,15 @@ class ProcessManagementBase(AbstractContentInterface):
                 
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
-                    currentProcess.processDetails[entry] = content[entry]
+                    if entry == ProcessDetails.priorities:
+                        if ProcessDetails.priorities in currentProcess.processDetails:
+                            # update only one priority, the for loop is a shortcut to getting the key/priority
+                            for prio in content[entry]:
+                                currentProcess.processDetails[ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                        else:
+                            currentProcess.processDetails[ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
+                    else:
+                        currentProcess.processDetails[entry] = content[entry]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
 
             elif updateType == ProcessUpdates.serviceType:

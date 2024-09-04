@@ -63,6 +63,7 @@ newPaths = {
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
     "onto_deleteNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    
     #"orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
     #"orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
     #"orga_addPrinterEdit": ("public/orga/addPrinterEdit/",resources.orga_addPrinterEdit),
@@ -87,7 +88,9 @@ newPaths = {
     "orga_createOrUpdateAndLinkNodes": ("public/service/additive-manufacturing/resources/orga/nodes/create-and-link/", orga.orga_createOrUpdateAndLinkNodes),
     "orga_removeLink": ("public/service/additive-manufacturing/resources/orga/edge/between-entities/delete/<str:entity1ID>/<str:entity2ID>/", orga.orga_removeEdge),
     "orga_deleteLinkToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/delete/<str:entityID>/", orga.orga_removeEdgeToOrga),
-    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll)
+    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
+    "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
+    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions)
 
 }
 

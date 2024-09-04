@@ -511,6 +511,36 @@ def getSpecificNeighborsByProperty(nodeID:str, neighborProperty:str):
     except (Exception) as error:
         loggerError.error(f'could not get neighbors by property for node: {str(error)}')
         return error
+    
+##################################################
+def getAllNodesThatShareTheUniqueID(uniqueID:str):
+    """
+    Gather all nodes that share a unique ID
+
+    :param uniqueID: The ID that is unique across all copies
+    :type uniqueID: str
+    :return: list of nodes in dict format
+    :rtype: list[dict] | Exception
+    
+    """
+    try:
+        startPC = time.perf_counter_ns()
+        startPT = time.process_time_ns()
+        
+        outList = []
+        nodes = Node.objects.filter(uniqueID=uniqueID)	
+        for node in nodes:
+            outList.append(node.toDict())
+        
+        endPC = time.perf_counter_ns()
+        endPT = time.process_time_ns()
+        loggerPerformance.info(f"DB;Get Nodes with same uniqueID;{endPC-startPC};{endPT-startPT}")
+        loggerConsole.info(f"Gathered all nodes with the unique ID {uniqueID}")	
+        return outList
+    except (Exception) as error:
+        loggerError.error(f'could not get all nodes with the same unqiue ID: {str(error)}')
+        return error
+
 
 ##################################################
 def getGraph(createdBy=""):

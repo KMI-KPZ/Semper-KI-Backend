@@ -108,7 +108,7 @@ def createProcessID(request:Request, projectID):
             interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
 
         # set default priorities here
-        userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 3} for prio in PrioritiesForOrganizationSemperKI}
+        userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
         interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
@@ -584,7 +584,7 @@ def getContractors(request:Request, processID:str):
             userPrioritiesVector = [processObj.processDetails[ProcessDetails.priorities][entry][PriorityTargetsSemperKI.value] for entry in processObj.processDetails[ProcessDetails.priorities]]
         else:
             numberOfPriorities = len(PrioritiesForOrganizationSemperKI)
-            userPrioritiesVector = [3 for i in range(numberOfPriorities)]
+            userPrioritiesVector = [4 for i in range(numberOfPriorities)]
         listOfContractorsWithPriorities = []
         for entry in listOfResultingContractors:
             if OrganizationDetails.priorities in entry[OrganizationDescription.details]:

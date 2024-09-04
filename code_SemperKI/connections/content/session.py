@@ -14,7 +14,7 @@ from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 
-from ...definitions import SessionContentSemperKI, MessageInterfaceFromFrontend
+from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
@@ -618,7 +618,15 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
-                    currentProcess[ProcessDescription.processDetails][entry] = content[entry]
+                    if entry == ProcessDetails.priorities:
+                        if ProcessDetails.priorities in currentProcess[ProcessDescription.processDetails]:
+                            # update only one priority, the for loop is a shortcut to getting the key/priority
+                            for prio in content[entry]:
+                                currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                        else:
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
+                    else:
+                        currentProcess[ProcessDescription.processDetails][entry] = content[entry]
             
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = content

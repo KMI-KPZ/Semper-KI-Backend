@@ -86,7 +86,7 @@ def getFilters(request:Request):
                      "category":"MATERIAL", # TODO define somewhere
                      "type":"SELECTION", # TODO define somewhere
                      "range":None,
-                     "values":[{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.nodeID]} for entry in pgKnowledgeGraph.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner],
+                     "values":[{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner],
                      "units":None
                      },
                 "answer":None

@@ -164,6 +164,7 @@ def orga_getResources(request:Request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 #######################################################
 @extend_schema(
     summary="Retrieve all nodes from either the system or the orga of a certain type",
@@ -481,6 +482,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 otherNode = pgKnowledgeGraph.getNode(nodeIDFromEdge)
                 if isinstance(otherNode, Exception):
                     raise otherNode
+
                 nodeIDToBeConnected = otherNode.nodeID
                 if otherNode.createdBy != orgaID:
                     copiedNode = pgKnowledgeGraph.copyNode(otherNode, orgaID)
@@ -1126,6 +1128,105 @@ def orga_removeAll(request:Request):
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_removeAll.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+#######################################################
+@extend_schema(
+    summary="Shows the current requests for adding stuff to the KG",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["GET"])
+@checkVersion(0.3)
+def orga_getRequestsForAdditions(request:Request):
+    """
+    Shows the current requests for adding stuff to the KG
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON
+    :rtype: Response
+
+    """
+    try:
+        return Response({}, status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {orga_getRequestsForAdditions.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+class SReqRequestForAddition(serializers.Serializer):
+    manufacturer = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    type = serializers.CharField(max_length=200)
+    url = serializers.CharField(max_length=200)
+
+#######################################################
+@extend_schema(
+    summary="Receive a request to add something",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=SReqRequestForAddition,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["POST"])
+@checkIfRightsAreSufficient(json=False)
+@api_view(["POST"])
+@checkVersion(0.3)
+def orga_makeRequestForAdditions(request:Request):
+    """
+    Receive a request to add something
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        inSerializer = SReqRequestForAddition(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {orga_makeRequestForAdditions.cls.__name__   }"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        # TODO: Do something
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {orga_makeRequestForAdditions.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

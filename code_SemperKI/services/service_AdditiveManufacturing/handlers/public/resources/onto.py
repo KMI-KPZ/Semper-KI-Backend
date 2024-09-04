@@ -548,3 +548,4 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        

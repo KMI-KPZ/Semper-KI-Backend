@@ -94,26 +94,64 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
+        # format:
+        # "filters":[ {"id":0,
+        #          "isChecked":False,
+        #          "isOpen":False,
+        #          "question":{
+        #              "isSelectable":True,
+        #              "title":"materialCategory",
+        #              "category":"MATERIAL",
+        #              "type":"SELECTION",
+        #              "range":None,
+        #              "values":[{"name": <nodeName>, "id": <nodeID>}, ...],
+        #              "units":None
+        #              },
+        #         "answer":None
+        #         },...
+        # ]
         output = {"materials": []}
         
         #filtersForSparql = []
         #for entry in filters["filters"]:
         #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
         #TODO ask via sparql with most general filter and then iteratively filter response
-        resultsOfQueries = {"materials": []}
+        #resultsOfQueries = {"materials": []}
         #materialsRes = sparqlQueries.getAllMaterials.sendQuery()
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
 
         # filter by selection of post-processing
-
+ 
         materialList = pgKnowledgeGraph.getNodesByType(NodeTypesAM.material)
-        filteredOutput = [entry for entry in materialList if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from orgas
-        for entry in filteredOutput:
-            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-            output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
-        
+        for entry in materialList:
+            # use only entries from orgas
+            if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True:
+                # adhere to the filters:
+                append = True
+                for filter in filters["filters"]:
+                    # see if filter is selected and the value has not been rules out somewhere
+                    if filter["isChecked"] == True and append == True:
+                        # filter for material category
+                        if filter["question"]["title"] == "materialCategory":
+                            appendViaThisFilter = False
+                            if filter["answer"] != None:
+                                categoryID = filter["answer"]["value"] # contains the id of the chosen category node
+                                categoriesOfEntry = pgKnowledgeGraph.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
+                                if isinstance(categoriesOfEntry, Exception):
+                                    raise categoriesOfEntry
+
+                                for category in categoriesOfEntry:
+                                    if categoryID == category[pgKnowledgeGraph.NodeDescription.uniqueID]:
+                                        appendViaThisFilter = True
+                                        break
+                            append = appendViaThisFilter
+
+                if append:
+                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
+            
         
         # mockup here:
         #mock = copy.deepcopy(mocks.materialMock)

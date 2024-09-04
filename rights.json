@@ -211,7 +211,8 @@
             "orga_getNodes",
             "orga_getNodeViaID",
             "orga_getAssociatedResources",
-            "orga_getNeighbors"
+            "orga_getNeighbors",
+            "orga_getRequestsForAdditions"
          ]
       },
       {
@@ -234,7 +235,8 @@
             "orga_removeEdgeToOrga",
             "orga_removeEdge",
             "orga_removeAll",
-            "orga_createOrUpdateAndLinkNodes"
+            "orga_createOrUpdateAndLinkNodes",
+            "orga_makeRequestForAdditions"
          ]
       }
    ]
