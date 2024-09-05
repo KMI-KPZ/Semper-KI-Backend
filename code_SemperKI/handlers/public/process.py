@@ -111,6 +111,11 @@ def createProcessID(request:Request, projectID):
         userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
         interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
 
+        # set default title of the process
+        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID}, client)
+
+
+
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
         #return just the id for the frontend
