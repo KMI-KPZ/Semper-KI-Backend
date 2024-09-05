@@ -67,7 +67,7 @@ class SResNode(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -122,7 +122,7 @@ class SReqCreateNode(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["POST"])
 @api_view(["POST"])
 @checkVersion(0.3)
@@ -180,7 +180,7 @@ def createNode(request:Request):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
@@ -232,7 +232,7 @@ class SReqUpdateNode(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["PATCH"])
 @api_view(["PATCH"])
 @checkVersion(0.3)
@@ -290,7 +290,7 @@ def updateNode(request:Request):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -338,7 +338,7 @@ def getNodesByType(request:Request, nodeType:str):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -386,7 +386,7 @@ def getNodesByProperty(request:Request, property:str):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -433,7 +433,7 @@ def getEdgesForNode(request:Request, nodeID:str):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -482,7 +482,7 @@ def getSpecificNeighborsByType(request:Request, nodeID:str, nodeType:str):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -537,7 +537,7 @@ class SReqTwoNodes(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["POST"])
 @api_view(["POST"])
 @checkVersion(0.3)
@@ -592,7 +592,7 @@ def createEdge(request:Request):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
@@ -641,7 +641,7 @@ class SResGraph(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -698,7 +698,7 @@ class SResGraphForFrontend(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -767,7 +767,7 @@ class SReqGraph(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["POST"])
 @api_view(["POST"])
 @checkVersion(0.3)
@@ -824,7 +824,7 @@ def createGraph(request:Request):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
+
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
