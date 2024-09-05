@@ -82,6 +82,7 @@ newPaths= {
     "getGraph": ("private/graph/get/for-backend/", knowledgeGraphDB.getGraph),
     "getGraphForFrontend": ("private/graph/get/", knowledgeGraphDB.getGraphForFrontend),
     "createGraph": ("private/graph/create/", knowledgeGraphDB.createGraph),
+    "loadTestGraph": ("private/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
     "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),

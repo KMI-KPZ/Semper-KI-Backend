@@ -61,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: ./MSQ/Dockerfile.MSQ.Server
-    container_name: local-celery-worker
+    container_name: local-celery-worker-staging
     entrypoint: celery
     env_file:
       - .env.staging
