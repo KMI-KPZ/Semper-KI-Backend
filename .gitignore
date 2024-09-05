@@ -147,3 +147,13 @@ localstack/
 backend.code-workspace
 
 redis/data*
+
+.VSCodeCounter/
+
+minio
+
+mesh.json
+
+*.vtk
+
+*.stl

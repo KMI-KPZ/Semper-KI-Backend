@@ -7,7 +7,8 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails
+from .connections.postgresql.pgService import updateServiceDetails as CM_updateServiceDetails, deleteServiceDetails as CM_deleteServiceDetails, serviceReady as CM_serviceReady, cloneServiceDetails as CM_cloneServiceDetails
+from .handlers.checkService import checkIfSelectionIsAvailable as CM_checkIfSelectionIsAvailable
 
 ###################################################
 class CreateModel(Semper.ServiceBase):
@@ -37,5 +38,46 @@ class CreateModel(Semper.ServiceBase):
 
         return CM_deleteServiceDetails(existingContent, newContent)
     
+    ###################################################
+    def serviceReady(self, existingContent) -> bool:
+        """
+        Checks, if service is completely defined
+        
+        """
+        return CM_serviceReady(existingContent)
+    
+    ###################################################
+    def checkIfSelectionIsAvailable(self, processObj) -> bool:
+        """
+        Checks, if the selection of the service is available (material, ...)
+        
+        """
+        return CM_checkIfSelectionIsAvailable(processObj)
+    
+    ####################################################################################
+    def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
+        """
+        Clone content of the service
 
-Semper.serviceManager.register("CREATE_MODEL", 2, CreateModel())
+        :param existingContent: What the process currently holds about the service
+        :type existingContent: dict
+        :param newProcess: The new process as object
+        :type newProcess: Process|ProcessInterface
+        :return: The copy of the service details
+        :rtype: dict
+        
+        """
+        return CM_cloneServiceDetails(existingContent, newProcess)
+
+    ###################################################
+    def getFilteredContractors(self, processObj) -> list:
+        """
+        Get a list of contractors that can do the job
+
+        """
+        return []
+
+SERVICE_NAME = "CREATE_MODEL"
+SERVICE_NUMBER = 2
+
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, CreateModel())

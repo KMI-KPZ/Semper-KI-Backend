@@ -10,12 +10,12 @@ import json, enum
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactylAsDefined
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 from .processModel import Process
 
 ###################################################
-class DataDescription(StrEnumExactylAsDefined):
+class DataDescription(StrEnumExactlyAsDefined):
     """
     What does a data entry consists of?
 

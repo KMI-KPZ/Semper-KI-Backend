@@ -6,12 +6,14 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: ["-e local_container"]
+    command: ["bash","run/run.sh","-e local_container", "-m", "-c"]
     ports:
       - 127.0.0.1:8000:8000
     volumes:
       - .:/app
     networks:
       - semper-ki-dev-network
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
 networks:
     semper-ki-dev-network:

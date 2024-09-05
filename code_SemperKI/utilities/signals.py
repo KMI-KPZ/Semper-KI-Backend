@@ -8,7 +8,9 @@ Contains: Signals that can be sent to other apps
 
 import django.dispatch
 import Generic_Backend.code_General.utilities.signals as GeneralSignals
-from ..handlers.projectAndProcessManagement import saveProjects, saveProjectsViaWebsocket
+from ..handlers.public.project import saveProjects, saveProjectsViaWebsocket
+from ..connections.content.postgresql.pgProfilesSKI import updateOrgaDetailsSemperKI, updateUserDetailsSemperKI
+from ..connections.content.postgresql.pgKnowledgeGraph import createOrganizationNode, deleteAllNodesFromOrganization
 
 ################################################################################################
 
@@ -64,6 +66,39 @@ class SemperKISignalReceivers():
         """
         saveProjectsViaWebsocket(session=kwargs["session"])
 
+    ###########################################################
+    @staticmethod
+    def receiverForUserDetailsUpdate(sender, **kwargs):
+        """
+        If a user gets initialized or updated, set the SemperKI specific details
+        """
+        updateUserDetailsSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
+
+    ###########################################################
+    @staticmethod
+    def receiverForOrgaDetailsUpdate(sender, **kwargs):
+        """
+        If a user gets initialized or updated, set the SemperKI specific details
+        """
+        updateOrgaDetailsSemperKI(orgaHashID=kwargs["orgaID"])
+        createOrganizationNode(orgaID=kwargs["orgaID"])
+    
+    ###########################################################
+    @staticmethod
+    def receiverForOrgaDeleted(sender, **kwargs):
+        """
+        If an organization is deleted, delete all nodes
+        """
+        deleteAllNodesFromOrganization(orgaID=kwargs["orgaID"])
+    
+    ###########################################################
+    @staticmethod
+    def receiverForUserDeleted(sender, **kwargs):
+        """
+        If a user is deleted, do something
+        """
+        userID = kwargs["userID"]
+        pass
 
     ###########################################################
     def __init__(self) -> None:
@@ -75,6 +110,10 @@ class SemperKISignalReceivers():
         GeneralSignals.signalDispatcher.userLoggedOut.connect(self.receiverForLogout, dispatch_uid="2")
         GeneralSignals.signalDispatcher.websocketConnected.connect(self.receiverForWebsocketConnect, dispatch_uid="3")
         GeneralSignals.signalDispatcher.websocketDisconnected.connect(self.receiverForWebsocketDisconnect, dispatch_uid="4")
+        GeneralSignals.signalDispatcher.userUpdated.connect(self.receiverForUserDetailsUpdate, dispatch_uid="5")
+        GeneralSignals.signalDispatcher.orgaUpdated.connect(self.receiverForOrgaDetailsUpdate, dispatch_uid="6")
+        GeneralSignals.signalDispatcher.userDeleted.connect(self.receiverForUserDeleted, dispatch_uid="7")
+        GeneralSignals.signalDispatcher.orgaDeleted.connect(self.receiverForOrgaDeleted, dispatch_uid="8")
 
 semperKISignalReceiver = SemperKISignalReceivers()
     
