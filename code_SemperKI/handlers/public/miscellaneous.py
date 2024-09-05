@@ -6,8 +6,9 @@ Akshay NS 2024
 Contains: Handlers for miscellaneous [services, statusbuttons]
 """
 
+from django.conf import settings
 import logging, platform, subprocess, json, requests
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 
 from rest_framework import status, serializers
@@ -135,3 +136,41 @@ def getServices(request:Request):
 #         return JsonResponse(response)
         
 ##############################################
+        
+
+
+#######################################################
+@extend_schema(
+    summary="Retrieve the results from the questionnaire made by KMI",
+    description=" ",
+    tags=['BE - Questionnaire'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["POST"])
+@api_view(["POST"])
+def retrieveResultsFromQuestionnaire(request:Request):
+    """
+    Retrieve the results from the questionnaire made by KMI
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Nothing
+    :rtype: ResponseRedirect
+
+    """
+    try:
+        return HttpResponseRedirect(settings.FORWARD_URL)
+    except (Exception) as error:
+        message = f"Error in {retrieveResultsFromQuestionnaire.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

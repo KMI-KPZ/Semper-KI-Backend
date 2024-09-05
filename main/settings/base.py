@@ -337,6 +337,11 @@ LOGGING = {
                 'class': 'logging.FileHandler',
                 'filename': "logs/info.log",
             },
+            'performance': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': "logs/performance.log"
+            }
     },
     'loggers': {
         '': {
@@ -353,6 +358,11 @@ LOGGING = {
             'handlers': ['file','console'],
             'propagate': False,
             'level': 'INFO',
+        },
+        'performance': {
+            'handlers': ['performance', 'console'],
+            'propagate': False,
+            'level': 'INFO'
         },
         'django': {
             'handlers': ['console'],

@@ -28,9 +28,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers import frontpage
 from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events
-from .handlers.private import testResponse
+from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
 newPaths= {
@@ -58,6 +57,7 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
+    "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
@@ -67,6 +67,22 @@ newPaths= {
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
+
+    "getNode": ("private/nodes/get/<str:nodeID>/", knowledgeGraphDB.getNode),
+    "getNodesByType": ("private/nodes/get/by-type/<str:nodeType>/", knowledgeGraphDB.getNodesByType),
+    "getNodesByProperty": ("private/nodes/get/by-property/<str:property>/", knowledgeGraphDB.getNodesByProperty),
+    "createNode": ("private/nodes/create/", knowledgeGraphDB.createNode),
+    "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
+    "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
+    "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
+    "getSpecificNeighborsByType": ("private/edges/get/by-type/<str:nodeID>/<str:nodeType>/", knowledgeGraphDB.getSpecificNeighborsByType),
+    "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
+    "createEdge": ("private/edges/create/", knowledgeGraphDB.createEdge),
+    "deleteEdge": ("private/edges/delete/<str:nodeID1>/<str:nodeID2>/", knowledgeGraphDB.deleteEdge),
+    "getGraph": ("private/graph/get/for-backend/", knowledgeGraphDB.getGraph),
+    "getGraphForFrontend": ("private/graph/get/", knowledgeGraphDB.getGraphForFrontend),
+    "createGraph": ("private/graph/create/", knowledgeGraphDB.createGraph),
+    "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 

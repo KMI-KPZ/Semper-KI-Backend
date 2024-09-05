@@ -18,7 +18,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
 
 
 from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
@@ -63,8 +63,10 @@ class ProcessManagementBase(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
-    
+        if manualCheckifLoggedIn(self.structuredSessionObj):
+            return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
+        else:
+            return GlobalDefaults.anonymous
     ##############################################
     @staticmethod
     def checkIfUserIsClient(userHashID, projectID="", processID=""):
@@ -649,7 +651,15 @@ class ProcessManagementBase(AbstractContentInterface):
                 
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
-                    currentProcess.processDetails[entry] = content[entry]
+                    if entry == ProcessDetails.priorities:
+                        if ProcessDetails.priorities in currentProcess.processDetails:
+                            # update only one priority, the for loop is a shortcut to getting the key/priority
+                            for prio in content[entry]:
+                                currentProcess.processDetails[ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                        else:
+                            currentProcess.processDetails[ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
+                    else:
+                        currentProcess.processDetails[entry] = content[entry]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
 
             elif updateType == ProcessUpdates.serviceType:
@@ -1172,6 +1182,8 @@ class ProcessManagementBase(AbstractContentInterface):
                 detailsOfOrganization = {}
                 if OrganizationDetails.addresses in entry.details:
                     detailsOfOrganization[OrganizationDetails.addresses] = entry.details[OrganizationDetails.addresses]
+                if OrganizationDetails.priorities in entry.details:
+                    detailsOfOrganization[OrganizationDetails.priorities] = entry.details[OrganizationDetails.priorities]
                 returnValue.append({OrganizationDescription.hashedID: entry.hashedID, OrganizationDescription.name: entry.name, OrganizationDescription.details: detailsOfOrganization})
         except (Exception) as error:
             logger.error(f"Error getting all contractors: {str(error)}")

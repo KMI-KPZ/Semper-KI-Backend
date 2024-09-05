@@ -158,47 +158,42 @@ class StateMachine(object):
         
         """
         try:
-            outDict = {"nodes": [], "edges": []}
-            edgeID = -1
+            outDict = {"Nodes": [], "Edges": []}
 
             for node in stateDict:
-                outDict["nodes"].append({"id": node})
+                outDict["Nodes"].append({"id": node, "name": node})
 
                 for transition in stateDict[node].updateTransitions:
-                    edgeID += 1
                     transitionTypesArr = transition.__annotations__["return"].split("|")
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         target = transitionTypesArr[1].lstrip(" ")
-                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["Edges"].append({"source": source, "target": target})
                     elif len(transitionTypesArr) > 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         for entryIdx in range(1,len(transitionTypesArr)):
                             target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
-                            outDict["edges"].append({"id": edgeID, "source": source, "target": target})
-                            edgeID += 1
+                            outDict["Edges"].append({"source": source, "target": target})
                     else:
                         source = node
                         target = transitionTypesArr[0].rstrip(" ")
-                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["Edges"].append({"source": source, "target": target})
                 for transitionKey in stateDict[node].buttonTransitions:
                     transition = stateDict[node].buttonTransitions[transitionKey]
-                    edgeID += 1
                     transitionTypesArr = transition.__annotations__["return"].split("|")
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         target = transitionTypesArr[1].lstrip(" ")
-                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["Edges"].append({"source": source, "target": target})
                     elif len(transitionTypesArr) > 2:
                         source = transitionTypesArr[0].rstrip(" ")
                         for entryIdx in range(1,len(transitionTypesArr)):
                             target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
-                            outDict["edges"].append({"id": edgeID, "source": source, "target": target})
-                            edgeID += 1
+                            outDict["Edges"].append({"source": source, "target": target})
                     else:
                         source = node
                         target = transitionTypesArr[0].rstrip(" ")
-                        outDict["edges"].append({"id": edgeID, "source": source, "target": target})
+                        outDict["Edges"].append({"source": source, "target": target})
 
             return outDict
         except Exception as e:
@@ -307,7 +302,7 @@ class State(ABC):
             
             return returnState
         except (Exception) as error:
-            loggerError.error(f"{self.__str__} {self.onUpdateEvent.__name__}: {str(error)}")
+            loggerError.error(f"{self.__str__} {self.onUpdateEvent.__name__}: {error}")
             return self
 
     ###################################################
@@ -338,7 +333,7 @@ class State(ABC):
             
             return returnState
         except (Exception) as error:
-            loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {str(error)}")
+            loggerError.error(f"{self.__str__} {self.onButtonEvent.__name__}: {error}")
             return self
 
     ###################################################

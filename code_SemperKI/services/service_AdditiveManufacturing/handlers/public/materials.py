@@ -27,12 +27,15 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, ServiceDetails
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
+
+from ...definitions import NodeTypesAM, NodePropertiesAM
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -44,8 +47,8 @@ class SReqMaterialsFilter(serializers.Serializer):
 
 #######################################################
 class SReqMaterialContent(serializers.Serializer):
-    id = serializers.CharField(max_length=100)
-    title = serializers.CharField(max_length=100)
+    id = serializers.CharField(max_length=200)
+    title = serializers.CharField(max_length=200)
     propList = serializers.ListField()
     imgPath = serializers.CharField(max_length=200) 
 
@@ -61,6 +64,7 @@ class SResMaterialsWithFilters(serializers.Serializer):
     request=SReqMaterialsFilter,
     responses={
         200: SResMaterialsWithFilters,
+        400: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
@@ -90,23 +94,69 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
+        # format:
+        # "filters":[ {"id":0,
+        #          "isChecked":False,
+        #          "isOpen":False,
+        #          "question":{
+        #              "isSelectable":True,
+        #              "title":"materialCategory",
+        #              "category":"MATERIAL",
+        #              "type":"SELECTION",
+        #              "range":None,
+        #              "values":[{"name": <nodeName>, "id": <nodeID>}, ...],
+        #              "units":None
+        #              },
+        #         "answer":None
+        #         },...
+        # ]
         output = {"materials": []}
         
         #filtersForSparql = []
         #for entry in filters["filters"]:
         #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
         #TODO ask via sparql with most general filter and then iteratively filter response
-        resultsOfQueries = {"materials": []}
-        materialsRes = sparqlQueries.getAllMaterials.sendQuery()
-        for elem in materialsRes:
-            title = elem["Material"]["value"]
-            resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
+        #resultsOfQueries = {"materials": []}
+        #materialsRes = sparqlQueries.getAllMaterials.sendQuery()
+        # for elem in materialsRes:
+        #     title = elem["Material"]["value"]
+        #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
 
+        # filter by selection of post-processing
+ 
+        materialList = pgKnowledgeGraph.getNodesByType(NodeTypesAM.material)
+        for entry in materialList:
+            # use only entries from orgas
+            if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True:
+                # adhere to the filters:
+                append = True
+                for filter in filters["filters"]:
+                    # see if filter is selected and the value has not been rules out somewhere
+                    if filter["isChecked"] == True and append == True:
+                        # filter for material category
+                        if filter["question"]["title"] == "materialCategory":
+                            appendViaThisFilter = False
+                            if filter["answer"] != None:
+                                categoryID = filter["answer"]["value"] # contains the id of the chosen category node
+                                categoriesOfEntry = pgKnowledgeGraph.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
+                                if isinstance(categoriesOfEntry, Exception):
+                                    raise categoriesOfEntry
+
+                                for category in categoriesOfEntry:
+                                    if categoryID == category[pgKnowledgeGraph.NodeDescription.uniqueID]:
+                                        appendViaThisFilter = True
+                                        break
+                            append = appendViaThisFilter
+
+                if append:
+                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
+            
         
         # mockup here:
-        mock = copy.deepcopy(mocks.materialMock)
-        mock["materials"].extend(resultsOfQueries["materials"])
-        output.update(mock)
+        #mock = copy.deepcopy(mocks.materialMock)
+        #mock["materials"].extend(resultsOfQueries["materials"])
+        #output.update(mock)
 
         outSerializer = SResMaterialsWithFilters(data=output)
         if outSerializer.is_valid():

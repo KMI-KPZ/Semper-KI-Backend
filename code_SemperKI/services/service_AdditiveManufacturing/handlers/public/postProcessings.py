@@ -27,12 +27,15 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.projectAndProcessManagement import updateProcessFunction
+from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import PostProcessDetails, ServiceDetails
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
+
+from ...definitions import NodeTypesAM, NodePropertiesAM
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -48,7 +51,7 @@ class SReqPostProcessingsContent(serializers.Serializer):
     title = serializers.CharField(max_length=100)
     checked = serializers.BooleanField()
     selectedValue = serializers.CharField(allow_blank=True)
-    valueList = serializers.ListField()
+    propList = serializers.ListField()
     type = serializers.CharField(allow_blank=True)
     imgPath = serializers.CharField(max_length=200) 
 
@@ -64,6 +67,7 @@ class SResPostProcessingsWithFilters(serializers.Serializer):
     request=SReqPostProcessingsFilter,
     responses={
         200: SResPostProcessingsWithFilters,
+        400: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
@@ -106,9 +110,16 @@ def retrievePostProcessingsWithFilter(request:Request):
             resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture})
         output.update(resultsOfQueries["postProcessings"]) """
         
+        postProcessings = pgKnowledgeGraph.getNodesByType(NodeTypesAM.additionalRequirement)
+        filteredOutput = [entry for entry in postProcessings if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from orgas
+
+        for entry in filteredOutput:
+            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+            output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
+
         # mockup here:
-        mock = copy.deepcopy(mocks.postProcessingMock)
-        output.update(mock)
+        #mock = copy.deepcopy(mocks.postProcessingMock)
+        #output.update(mock)
         
         outSerializer = SResPostProcessingsWithFilters(data=output)
         if outSerializer.is_valid():

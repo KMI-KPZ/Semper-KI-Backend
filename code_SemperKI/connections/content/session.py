@@ -9,11 +9,12 @@ Contains: Offers an interface to access the session dictionary in a structured w
 from django.utils import timezone
 import logging, copy
 
-from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
+from Generic_Backend.code_General.definitions import GlobalDefaults, SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 
-from ...definitions import SessionContentSemperKI, MessageInterfaceFromFrontend
+from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
@@ -274,8 +275,11 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
-
+        if manualCheckifLoggedIn(self.structuredSessionObj.getSession()):
+            return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
+        else:
+            return GlobalDefaults.anonymous
+        
     #######################################################
     def getIfContentIsInSession(self) -> bool:
         """
@@ -614,7 +618,15 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
-                    currentProcess[ProcessDescription.processDetails][entry] = content[entry]
+                    if entry == ProcessDetails.priorities:
+                        if ProcessDetails.priorities in currentProcess[ProcessDescription.processDetails]:
+                            # update only one priority, the for loop is a shortcut to getting the key/priority
+                            for prio in content[entry]:
+                                currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                        else:
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
+                    else:
+                        currentProcess[ProcessDescription.processDetails][entry] = content[entry]
             
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = content
@@ -649,7 +661,6 @@ class ProcessManagementSession(AbstractContentInterface):
                         dependentProcess[ProcessDescription.dependenciesIn].append(processID)
                 else:
                     dependentProcess[ProcessDescription.dependenciesIn] = [processID]
-
             else:
                 raise Exception("updateProcess " + updateType + " not implemented")
             

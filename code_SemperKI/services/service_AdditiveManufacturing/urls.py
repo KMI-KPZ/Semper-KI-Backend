@@ -21,8 +21,8 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers import filter
-from .handlers.public import materials, checkService, filter, model, postProcessings, resources
+from .handlers.public.resources import orga, onto, kgDBAM
+from .handlers.public import materials, checkService, filter, model, postProcessings
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -30,7 +30,9 @@ from code_SemperKI.urls import paths, urlpatterns
 newPaths = {
     #"getProcessData": ('public/getProcessData/',filter.getProcessData),
     #"getModels": ('public/getModels/',filter.getModels),
-    #"getFilters": ('public/getFilters/',filter.getFilters),
+    
+    "getFilters": ("public/service/additive-manufacturing/filters/get/", filter.getFilters),
+
     "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
     "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
     "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
@@ -50,10 +52,18 @@ newPaths = {
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
-    "onto_getPrinters": ("public/service/additive-manufacturing/resources/onto/printers/get/",resources.onto_getPrinters),
-    #"onto_getPrinter": ("public/onto/getPrinter/",resources.onto_getPrinter),
-    "onto_getMaterials": ("public/service/additive-manufacturing/resources/onto/materials/get/",resources.onto_getMaterials),
-    #"onto_getMaterial": ("public/onto/getMaterial/",resources.onto_getMaterial),
+    "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
+    
+    "onto_getGraph": ("public/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
+    "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
+    "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
+    "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
+    "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
+    "onto_removeEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
+    "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
+    "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
+    "onto_deleteNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    
     #"orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
     #"orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
     #"orga_addPrinterEdit": ("public/orga/addPrinterEdit/",resources.orga_addPrinterEdit),
@@ -64,12 +74,23 @@ newPaths = {
     #"orga_addMaterialEdit": ("public/orga/addMaterialEdit/",resources.orga_addMaterialEdit),
     #"orga_createMaterial": ("public/orga/createMaterial/",resources.orga_createMaterial),
     #"orga_removeMaterial": ("public/orga/removeMaterial/",resources.orga_removeMaterial),
-    "orga_getResources": ("public/service/additive-manufacturing/resources/orga/get/", resources.orga_getResources),
-    "orga_createLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/create/", resources.orga_addMaterialToPrinter),
-    "orga_updateLinkFromPrinterToMaterial": ("public/service/additive-manufacturing/resources/orga/link-printer-material/patch/", resources.orga_updateMaterialAndPrinter),
-    "orga_deletePrinterFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/printer/delete/<str:printer>/", resources.orga_removeLinkToPrinter),
-    "orga_deleteLinkToMaterialFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/material/delete/<str:printer>/<str:material>/", resources.orga_removeLinkToMaterial),
-    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/link-printer-material/all/delete/", resources.orga_removeAll)
+    "orga_getGraph": ("public/service/additive-manufacturing/resources/orga/graph/get/", orga.orga_getGraph),
+    "orga_getResources": ("public/service/additive-manufacturing/resources/orga/nodes/all/get/", orga.orga_getResources),
+    "orga_getNodes": ("public/service/additive-manufacturing/resources/orga/nodes/by-type/get/<str:resourceType>/",orga.orga_getNodes),
+    "orga_getNodeViaID": ("public/service/additive-manufacturing/resources/orga/nodes/by-id/get/<str:nodeID>/", orga.orga_getNodeViaID),
+    "orga_getAssociatedResources": ("public/service/additive-manufacturing/resources/orga/nodes/neighbors/by-type/get/<str:nodeID>/<str:resourceType>/", orga.orga_getAssociatedResources),
+    "orga_getNeighbors": ("public/service/additive-manufacturing/resources/orga/nodes/neighbors/all/get/<str:nodeID>/", orga.orga_getNeighbors),
+    "orga_createNode": ("public/service/additive-manufacturing/resources/orga/nodes/create/", orga.orga_createNode),
+    "orga_updateNode": ("public/service/additive-manufacturing/resources/orga/nodes/update/", orga.orga_updateNode),
+    "orga_deleteNode": ("public/service/additive-manufacturing/resources/orga/nodes/delete/<str:nodeID>/", orga.orga_deleteNode),
+    "orga_addLinksToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/create/", orga.orga_addEdgesToOrga),
+    "orga_addEdgeForOrga": ("public/service/additive-manufacturing/resources/orga/edge/between-entities/create/", orga.orga_addEdgeForOrga),
+    "orga_createOrUpdateAndLinkNodes": ("public/service/additive-manufacturing/resources/orga/nodes/create-and-link/", orga.orga_createOrUpdateAndLinkNodes),
+    "orga_removeLink": ("public/service/additive-manufacturing/resources/orga/edge/between-entities/delete/<str:entity1ID>/<str:entity2ID>/", orga.orga_removeEdge),
+    "orga_deleteLinkToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/delete/<str:entityID>/", orga.orga_removeEdgeToOrga),
+    "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
+    "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
+    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions)
 
 }
 

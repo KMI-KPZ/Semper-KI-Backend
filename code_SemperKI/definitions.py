@@ -111,6 +111,7 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     clientBillingAddress = enum.auto()
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
+    priorities = enum.auto()
 
 
 ####################################################################################

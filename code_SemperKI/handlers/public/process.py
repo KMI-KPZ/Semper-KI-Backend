@@ -6,8 +6,7 @@ Akshay NS 2024
 Contains: Handlers for processes
 """
 
-import json, logging, copy
-import json, logging, copy
+import json, logging, copy, numpy
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
@@ -108,6 +107,9 @@ def createProcessID(request:Request, projectID):
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
             interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
 
+        # set default priorities here
+        userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
+        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -555,12 +557,16 @@ def getContractors(request:Request, processID:str):
         if serviceType == serviceManager.getNone():
             return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
 
-        listOfFilteredContractors = service.getFilteredContractors(processObj)
+        listOfFilteredContractors = [] #service.getFilteredContractors(processObj)
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
         # Therefore parse it
         listOfResultingContractors = []
         for contractor in listOfFilteredContractors:
-            idOfContractor = contractor["ID"]["value"]
+            idOfContractor = ""
+            if "ID" in contractor:
+                idOfContractor = contractor["ID"]["value"]
+            else:
+                idOfContractor = contractor["nodeID"]
             contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
@@ -572,6 +578,25 @@ def getContractors(request:Request, processID:str):
         if len(listOfFilteredContractors) == 0 or settings.DEBUG:
             listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
+        # Calculation of order of contractors based on priorities
+        if ProcessDetails.priorities in processObj.processDetails:
+            # This works since the order of keys in a dictionary is guaranteed to be the same as the insertion order for Python version >= 3.7
+            userPrioritiesVector = [processObj.processDetails[ProcessDetails.priorities][entry][PriorityTargetsSemperKI.value] for entry in processObj.processDetails[ProcessDetails.priorities]]
+        else:
+            numberOfPriorities = len(PrioritiesForOrganizationSemperKI)
+            userPrioritiesVector = [4 for i in range(numberOfPriorities)]
+        listOfContractorsWithPriorities = []
+        for entry in listOfResultingContractors:
+            if OrganizationDetails.priorities in entry[OrganizationDescription.details]:
+                prioList = []
+                for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
+                    prioList.append(entry[OrganizationDescription.details][OrganizationDetails.priorities][priority][PriorityTargetsSemperKI.value])
+                # calculate vector 'distance' (I avoid the square root, see Wikipedia on euclidean distance)
+                distanceFromUserPrios = numpy.sum(numpy.square(numpy.array(userPrioritiesVector) - numpy.array(prioList)))
+                listOfContractorsWithPriorities.append((entry, distanceFromUserPrios))
+        # sort ascending via distance (the shorter, the better)
+        listOfContractorsWithPriorities.sort(key=lambda x: x[1])
+        listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
         # TODO add serializers
         return Response(listOfResultingContractors)
     except (Exception) as error:

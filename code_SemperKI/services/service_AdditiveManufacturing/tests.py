@@ -27,48 +27,35 @@ class TestAdditiveManufacturing(TestCase):
     @classmethod
     def createOrganization(self, client:Client, id="", userID = ""):
         mockSession = client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": "", "org_id": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testOrga" if userID == "" else userID
-        mockSession["user"]["userinfo"]["nickname"] = "testOrga"
-        mockSession["user"]["userinfo"]["email"] = "testOrga@test.de"
-        mockSession["user"]["userinfo"]["org_id"] = "id123" if id == "" else id
-        mockSession[SessionContent.USER_PERMISSIONS] = {"processes:read": "", "processes:files": "", "processes:messages": "", "processes:edit" : "", "processes:delete": "", "orga:edit": "", "orga:delete": "", "orga:read": "", "resources:read": "", "resources:edit": ""}
+        mockSession[SessionContent.MOCKED_LOGIN] = True
+        mockSession[SessionContent.IS_PART_OF_ORGANIZATION] = True
+        mockSession[SessionContent.PG_PROFILE_CLASS] = "organization"
         mockSession[SessionContent.usertype] = "organization"
-        mockSession[SessionContent.ORGANIZATION_NAME] = "testOrga"
-        mockSession[SessionContent.INITIALIZED] = True
-        mockSession[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.organization
-        currentTime = datetime.datetime.now()
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        mockSession[SessionContent.PATH_AFTER_LOGIN] = "127.0.0.1:3000" # no real use but needs to be set
         mockSession.save()
-        client.post("/"+paths["addOrga"][0])
-        client.post("/"+paths["addUser"][0])
-        client.patch("/"+paths["updateDetailsOfOrga"][0], '{"data": {"content": { "supportedServices": [1] } } }')
+        client.get("/"+paths["callbackLogin"][0])
+        client.patch("/"+paths["updateDetailsOfOrga"][0], data={"changes": { "supportedServices": [1] } }, content_type="application/json")
         return mockSession
 
     #######################################################
     @staticmethod
-    def createUser(client:Client, sub="", name=""):
+    def createUser(client:Client):
         mockSession = client.session
-        mockSession["user"] = {"userinfo": {"sub": "", "nickname": "", "email": ""}}
-        mockSession["user"]["userinfo"]["sub"] = "auth0|testuser" if sub == "" else sub
-        mockSession["user"]["userinfo"]["nickname"] = "testuser" if name == "" else name
-        mockSession["user"]["userinfo"]["email"] = "testuser@test.de"
-        mockSession[SessionContent.USER_PERMISSIONS] = {"processes:read": "", "processes:files": "", "processes:messages": "", "processes:edit" : "", "processes:delete": "", "orga:edit": "", "orga:delete": "", "orga:read": "", "resources:read": "", "resources:edit": ""}
+        mockSession[SessionContent.MOCKED_LOGIN] = True
+        mockSession[SessionContent.IS_PART_OF_ORGANIZATION] = False
+        mockSession[SessionContent.PG_PROFILE_CLASS] = "user"
         mockSession[SessionContent.usertype] = "user"
-        mockSession[SessionContent.INITIALIZED] = True
-        mockSession[SessionContent.PG_PROFILE_CLASS] = ProfileClasses.user
-        currentTime = datetime.datetime.now()
-        mockSession["user"]["tokenExpiresOn"] = str(datetime.datetime(currentTime.year+1, currentTime.month, currentTime.day, currentTime.hour, currentTime.minute, currentTime.second, tzinfo=datetime.timezone.utc))
+        mockSession[SessionContent.PATH_AFTER_LOGIN] = "127.0.0.1:3000" # no real use but needs to be set
         mockSession.save()
-        client.post("/"+paths["addUser"][0])
+        client.get("/"+paths["callbackLogin"][0])
         return mockSession
     
     #######################################################
     @staticmethod
     def createProjectAndProcess(client:Client):
-        projectObj = json.loads(client.get("/"+paths["createProjectID"][0]).content)
+        projectObj = json.loads(client.post("/"+paths["createProjectID"][0], data= {"title": "my_title"}).content)
         processPathSplit = paths["createProcessID"][0].split("/")
-        processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+projectObj[ProjectDescription.projectID]+"/"
+        processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+processPathSplit[2]+"/"+projectObj[ProjectDescription.projectID]+"/"
         processObj = json.loads(client.get("/"+processPath).content)
         return (projectObj, processObj)
 
@@ -78,30 +65,42 @@ class TestAdditiveManufacturing(TestCase):
         super().setUpClass()
         self.orgaClient = Client()
         self.createOrganization(self.orgaClient)
+        
 
     # Tests!
     #######################################################
     def test_uploadAndDeleteModel(self):
-        client = Client()
-        self.createUser(client, self.test_uploadAndDeleteModel.__name__)
+        client = self.orgaClient
+        
         projectObj, processObj = self.createProjectAndProcess(client)
 
         # set service type
         changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
-        response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes))
-        self.assertIs(response.status_code == 200, True)
+        response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], FileObjectContent.tags: "", FileObjectContent.licenses: "", FileObjectContent.certificates: "", "attachment": self.testFile}
+        date =  f'"{str(datetime.datetime.now())}"'
+        certificates = '""'
+        licenses = '""'
+        tags = '""'
+        filename = '"file2.stl"'
+        details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + '}, "fileName": ' + filename + '}]'
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": details, "file2.stl": self.testFile} # non-default case
+        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
-        self.assertIs(response.status_code == 200, True)
-        getProjPathSplit = paths["getProject"][0].split("/")
-        getProjPath = getProjPathSplit[0] + "/" + getProjPathSplit[1] + "/" + projectObj[ProjectDescription.projectID] +"/"
-        response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(len(response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        
+        getProcPathSplit = paths["getProcess"][0].split("/")
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        fileID = list(response[ProcessDescription.files].keys())[0]
+        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
 
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
-        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + processObj[ProcessDescription.processID] + "/"
+        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + deleteModelPathSplit[2] + "/" + deleteModelPathSplit[3] + "/" + deleteModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
         response = client.delete("/" + deleteModelPath)
-        self.assertIs(response.status_code == 200, True)
-        response = json.loads(client.get("/"+getProjPath).content)
-        self.assertIs(ServiceDetails.models not in response[SessionContentSemperKI.processes][0][ProcessDescription.serviceDetails] , True)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
+
+    # TODO: get, set, delete for Materials and Post-Processing; onto and orga functions

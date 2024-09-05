@@ -117,7 +117,7 @@ def serviceReady(existingContent:dict) -> bool:
                 if len(existingContent[ServiceDetails.postProcessings]) > 0:
                     checks += 0 # optional
             else:
-                raise NotImplementedError("This service detail does not exist (yet).")
+                continue
             
         return True if checks >= 2 else False
     except (Exception) as error:
