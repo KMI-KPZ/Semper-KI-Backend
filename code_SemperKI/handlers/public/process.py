@@ -112,7 +112,7 @@ def createProcessID(request:Request, projectID):
         interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
 
         # set default title of the process
-        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID}, client)
+        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
 
 
 
