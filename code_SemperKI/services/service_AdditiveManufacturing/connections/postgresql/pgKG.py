@@ -8,7 +8,7 @@ Contains: Am specific database knowledge graph stuff
 
 #from code_SemperKI.connections.content.postgresql.pgKnowledgeGraph import 
 
-from ...definitions import NodeTypesAM, NodePropertiesAM
+from ...definitions import NodePropertiesAMObjectDefinition, NodePropertiesAMTypesOfEntries, NodeTypesAM, NodePropertiesAM
 
 ##################################################
 def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
@@ -27,71 +27,71 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeTypesAM.organization:
             pass
         case NodeTypesAM.printer:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
-            outList.append({"name": NodePropertiesAM.buildVolume,
-                            "value": "int x int x int",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.nozzleDiameter,
-                            "value": "",
-                            "type": "number"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.buildVolume,
+                            NodePropertiesAMObjectDefinition.value: "int x int x int",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.nozzleDiameter,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.number})
         case NodeTypesAM.material:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
-            outList.append({"name": NodePropertiesAM.foodSafe,
-                            "value": "License;License;...",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.heatResistant,
-                            "value": "",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.flexible,
-                            "value": "",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.smooth,
-                            "value": "",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.eModul,
-                            "value": "",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.poissonRatio,
-                            "value": "",
-                            "type": "number"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.foodSafe,
+                            NodePropertiesAMObjectDefinition.value: "License;License;...",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.heatResistant,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.flexible,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.smooth,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.eModul,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.poissonRatio,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.number})
         case NodeTypesAM.additionalRequirement:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
-            outList.append({"name": NodePropertiesAM.foodSafe,
-                            "value": "License;License;...",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.heatResistant,
-                            "value": "",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.smooth,
-                            "value": "",
-                            "type": "string"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.foodSafe,
+                            NodePropertiesAMObjectDefinition.value: "License;License;...",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.heatResistant,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.smooth,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
         case NodeTypesAM.color:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
-            outList.append({"name": NodePropertiesAM.foodSafe,
-                            "value": "License;License;...",
-                            "type": "string"})
-            outList.append({"name": NodePropertiesAM.color,
-                            "value": "Number RAL;#Hex",
-                            "type": "color"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.foodSafe,
+                            NodePropertiesAMObjectDefinition.value: "License;License;...",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.string})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.color,
+                            NodePropertiesAMObjectDefinition.value: "Number RAL;#Hex",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.color})
         case NodeTypesAM.materialType:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
         case NodeTypesAM.materialCategory:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
         case NodeTypesAM.technology:
-            outList.append({"name": NodePropertiesAM.imgPath,
-                            "value": "",
-                            "type": "text"})
+            outList.append({NodePropertiesAMObjectDefinition.name: NodePropertiesAM.imgPath,
+                            NodePropertiesAMObjectDefinition.value: "",
+                            NodePropertiesAMObjectDefinition.type: NodePropertiesAMTypesOfEntries.text})
 
     return outList

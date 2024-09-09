@@ -126,8 +126,8 @@ def retrieveMaterialsWithFilter(request:Request):
  
         materialList = pgKnowledgeGraph.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
-            # use only entries from orgas
-            if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True:
+            # use only entries from system
+            if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner: #and entry[pgKnowledgeGraph.NodeDescription.active] == True:
                 # adhere to the filters:
                 append = True
                 for filter in filters["filters"]:

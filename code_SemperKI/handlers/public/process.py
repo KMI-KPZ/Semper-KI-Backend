@@ -562,7 +562,7 @@ def getContractors(request:Request, processID:str):
         if serviceType == serviceManager.getNone():
             return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
 
-        listOfFilteredContractors = [] #service.getFilteredContractors(processObj)
+        listOfFilteredContractors = service.getFilteredContractors(processObj)
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
         # Therefore parse it
         listOfResultingContractors = []
@@ -571,7 +571,7 @@ def getContractors(request:Request, processID:str):
             if "ID" in contractor:
                 idOfContractor = contractor["ID"]["value"]
             else:
-                idOfContractor = contractor["nodeID"]
+                idOfContractor = contractor
             contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
@@ -580,8 +580,8 @@ def getContractors(request:Request, processID:str):
                                    OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
             listOfResultingContractors.append(contractorToBeAdded)
         
-        if len(listOfFilteredContractors) == 0 or settings.DEBUG:
-            listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
+        #if settings.DEBUG:
+        #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
         # Calculation of order of contractors based on priorities
         if ProcessDetails.priorities in processObj.processDetails:
