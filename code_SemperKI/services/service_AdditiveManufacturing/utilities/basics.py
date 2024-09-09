@@ -8,6 +8,7 @@ Contains: Basic implementations regarding the AM service
 
 from functools import wraps
 
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -36,9 +37,9 @@ def checkIfOrgaHasAMAsService():
                 exception = "Not found"
                 exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
                 if exceptionSerializer.is_valid():
-                    return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+                    return JsonResponse(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
                 else:
-                    return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return JsonResponse(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             return func(request, *args, **kwargs)
             

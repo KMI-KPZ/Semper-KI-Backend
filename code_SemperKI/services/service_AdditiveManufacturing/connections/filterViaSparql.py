@@ -8,8 +8,9 @@ Contains: Functions using the sparql queries to filter for contractors
 
 import copy
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
+from code_SemperKI.modelFiles.nodesModel import NodeDescription
 
-from ..definitions import NodeTypesAM, NodePropertiesAM
+from ..definitions import NodeTypesAM, NodePropertiesAM, NodePropertiesAMObjectDefinition
 from ..utilities.sparqlQueries import *
 
 ##################################################
@@ -30,11 +31,35 @@ def filterByMaterial(resultDict:dict, chosenMaterials:dict):
     #     if entry["ID"]["value"] not in resultDict:
     #         resultDict[entry["ID"]["value"]] = entry
 
+    # they must have all selected materials
+    listOfSetsForManufacturers:list[set] = [] 
+
     for materialID in chosenMaterials:
+        setOfManufacturerIDs = set()
         material = pgKnowledgeGraph.getNode(materialID)
-        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(material.nodeID, NodeTypesAM.organization)
-        for orga in orgas:
-            resultDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
+        nodesWithTheSameUID = pgKnowledgeGraph.getAllNodesThatShareTheUniqueID(material.uniqueID)
+        # filter for those of orgas and retrieve the orgaID
+        for entry in nodesWithTheSameUID:
+            if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+                setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+        
+        listOfSetsForManufacturers.append(setOfManufacturerIDs)
+    
+    if len(listOfSetsForManufacturers) > 0:
+        manufacturersWhoCanDoItAll = listOfSetsForManufacturers[0].intersection(*listOfSetsForManufacturers[1:])
+
+        if len(manufacturersWhoCanDoItAll) > 0:
+            if len(resultDict) > 0:
+                copiedDict = copy.deepcopy(resultDict)
+                for alreadyFilteredManufacturer in resultDict:
+                    if alreadyFilteredManufacturer not in manufacturersWhoCanDoItAll:
+                        copiedDict.pop(alreadyFilteredManufacturer)
+                resultDict.clear()
+                resultDict.update(copiedDict)
+            else:
+                for manufacturer in manufacturersWhoCanDoItAll:
+                    resultDict[manufacturer] = manufacturer
+            
     
 
 ##################################################
@@ -50,19 +75,33 @@ def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
     :rtype: None
     
     """
-    tempDict = {}
+    listOfSetsForManufacturers:list[set] = [] 
+
     for postProcessingID in chosenPostProcessings:
+        setOfManufacturerIDs = set()
         postProcessing = pgKnowledgeGraph.getNode(postProcessingID)
-        orgas = pgKnowledgeGraph.getSpecificNeighborsByType(postProcessing.nodeID, NodeTypesAM.organization)
-        for orga in orgas:
-            tempDict[orga[pgKnowledgeGraph.NodeDescription.nodeID]] = orga
+        nodesWithTheSameUID = pgKnowledgeGraph.getAllNodesThatShareTheUniqueID(postProcessing.uniqueID)
+        # filter for those of orgas and retrieve the orgaID
+        for entry in nodesWithTheSameUID:
+            if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+                setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+        
+        listOfSetsForManufacturers.append(setOfManufacturerIDs)
     
-    copiedDict = copy.deepcopy(resultDict)
-    for alreadyFilteredManufacturer in resultDict:
-        if alreadyFilteredManufacturer not in tempDict:
-            copiedDict.pop(alreadyFilteredManufacturer)
-    resultDict.clear()
-    resultDict.update(copiedDict)
+    if len(listOfSetsForManufacturers) > 0:
+        manufacturersWhoCanDoItAll = listOfSetsForManufacturers[0].intersection(*listOfSetsForManufacturers[1:])
+
+        if len(manufacturersWhoCanDoItAll) > 0:
+            if len(resultDict) > 0:
+                copiedDict = copy.deepcopy(resultDict)
+                for alreadyFilteredManufacturer in resultDict:
+                    if alreadyFilteredManufacturer not in manufacturersWhoCanDoItAll:
+                        copiedDict.pop(alreadyFilteredManufacturer)
+                resultDict.clear()
+                resultDict.update(copiedDict)
+            else:
+                for manufacturer in manufacturersWhoCanDoItAll:
+                    resultDict[manufacturer] = manufacturer
             
 
 ##################################################
@@ -78,7 +117,6 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
     :rtype: None
     
     """
-    manufacturersCollection = {}
     listOfSetsForManufacturers:list[set] = []
     for fileID in calculations:
         calculatedValuesForFile = calculations[fileID]
@@ -103,14 +141,15 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
             setOfManufacturerIDs = set()
             printers = pgKnowledgeGraph.getNodesByProperty(NodePropertiesAM.buildVolume)
             for printer in printers:
-                buildVolumeArray = printer[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.buildVolume].split("x")
-                if calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"] <= float(buildVolumeArray[0]) and \
-                    calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"] <= float(buildVolumeArray[1]) and \
-                    calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"] <= float(buildVolumeArray[2]):
-                        manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.organization)
-                        for manufacturer in manufacturers:
-                            setOfManufacturerIDs.add(manufacturer[pgKnowledgeGraph.NodeDescription.nodeID])
-                            manufacturersCollection[manufacturer[pgKnowledgeGraph.NodeDescription.nodeID]] = manufacturer
+                for property in printer[pgKnowledgeGraph.NodeDescription.properties]:
+                    if property[NodePropertiesAMObjectDefinition.name] == NodePropertiesAM.buildVolume:
+                        buildVolumeArray = property[NodePropertiesAMObjectDefinition.value].split("x")
+                        if calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"] <= float(buildVolumeArray[0]) and \
+                            calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"] <= float(buildVolumeArray[1]) and \
+                            calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"] <= float(buildVolumeArray[2]):
+                                manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.organization)
+                                for manufacturer in manufacturers:
+                                    setOfManufacturerIDs.add(manufacturer[pgKnowledgeGraph.NodeDescription.nodeID])
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
     
     if len(listOfSetsForManufacturers) > 0:
