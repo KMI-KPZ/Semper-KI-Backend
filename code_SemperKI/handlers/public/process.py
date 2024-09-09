@@ -443,13 +443,13 @@ def deleteProcesses(request:Request, projectID):
 # getProcessHistory
 #"getProcessHistory": ("public/getProcessHistory/<str:processID>/", process.getProcessHistory),
 #########################################################################
-#TODO Add serializer for getProcessHistory
+# serializer for getProcessHistory
 #######################################################
 class SResHistoryEntry(serializers.Serializer):
     createdBy = serializers.CharField(max_length=200)
     createdWhen = serializers.CharField(max_length=200)
     type = serializers.IntegerField()
-    data = serializers.DictField()
+    data = serializers.DictField(allow_empty=True)
 #######################################################
 class SResProcessHistory(serializers.Serializer):
     history = serializers.ListField(child=SResHistoryEntry())
@@ -496,11 +496,11 @@ def getProcessHistory(request:Request, processID):
             outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
             outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
             outDatum[DataDescription.type] = entry[DataDescription.type]
-            outDatum[DataDescription.data] = entry[DataDescription.data]
+            outDatum[DataDescription.data] = entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
             listOfData[index] = outDatum # overwrite
 
         outObj = {"history": listOfData}
-        outSerializer = SResHistoryEntry(data=outObj)
+        outSerializer = SResProcessHistory(data=outObj)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -562,7 +562,7 @@ def getContractors(request:Request, processID:str):
         if serviceType == serviceManager.getNone():
             return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
 
-        listOfFilteredContractors = [] #service.getFilteredContractors(processObj)
+        listOfFilteredContractors = service.getFilteredContractors(processObj)
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
         # Therefore parse it
         listOfResultingContractors = []
@@ -571,7 +571,7 @@ def getContractors(request:Request, processID:str):
             if "ID" in contractor:
                 idOfContractor = contractor["ID"]["value"]
             else:
-                idOfContractor = contractor["nodeID"]
+                idOfContractor = contractor
             contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
@@ -580,8 +580,8 @@ def getContractors(request:Request, processID:str):
                                    OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
             listOfResultingContractors.append(contractorToBeAdded)
         
-        if len(listOfFilteredContractors) == 0 or settings.DEBUG:
-            listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
+        #if settings.DEBUG:
+        #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
 
         # Calculation of order of contractors based on priorities
         if ProcessDetails.priorities in processObj.processDetails:

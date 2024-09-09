@@ -81,4 +81,26 @@ class NodePropertiesAM(StrEnumExactlyAsDefined):
     nozzleDiameter = enum.auto() # 0.4 mm -> printer
     certificates = enum.auto() # CE, MD, ... -> printer, material, ...
 
+##################################################
+class NodePropertiesAMObjectDefinition(StrEnumExactlyAsDefined):
+    """
+    How is every property structured?
+    
+    """
+    name = enum.auto()
+    value = enum.auto()
+    type = enum.auto()
+
+##################################################
+class NodePropertiesAMTypesOfEntries(StrEnumExactlyAsDefined):
+    """
+    What types can a property object have?
+    
+    """
+    number = enum.auto()
+    text = enum.auto()
+    string = enum.auto()
+    color = enum.auto()
+
+
 # TODO: Service Status Codes

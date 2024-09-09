@@ -111,7 +111,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         output.update(resultsOfQueries["postProcessings"]) """
         
         postProcessings = pgKnowledgeGraph.getNodesByType(NodeTypesAM.additionalRequirement)
-        filteredOutput = [entry for entry in postProcessings if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from orgas
+        filteredOutput = [entry for entry in postProcessings if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner] # and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from system
 
         for entry in filteredOutput:
             imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture

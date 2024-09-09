@@ -7,6 +7,8 @@ Contains: Handlers using simulation to check the processes
 """
 
 import json, logging, copy, requests, random
+import numpy as np
+from stl import mesh
 from io import BytesIO
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
@@ -26,6 +28,7 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfNestedKeyExists, checkVersion, getNestedValue
 from Generic_Backend.code_General.connections import redis
 from Generic_Backend.code_General.definitions import FileObjectContent
+from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -72,6 +75,51 @@ def getBoundaryData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
         result["status_code"] = 200
 
     return result
+
+##################################################
+def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSize:int) -> dict:
+    """
+    Calculate some of the stuff ourselves
+
+    :param readableObject: The model to be sent to the service with a .read() method
+    :type readableObject: BytesIO | EncryptionAdapter
+    :param filename: The file name
+    :type filename: str
+    :param fileSize: The size of the file  
+    :type fileSize: int
+    :return: data obtained by IWU service
+    :rtype: Dict
+    
+    """
+    completeFile = readableObject.read(fileSize)
+    fileAsBytesObject = BytesIO(completeFile)
+    your_mesh = mesh.Mesh.from_file(fileName, fh=fileAsBytesObject)
+ 
+    # Calculate the surface area by summing up the area of all triangles
+    surface_area = np.sum(your_mesh.areas)
+    
+    # Calculate the bounding box
+    min_bound = np.min(your_mesh.points.reshape(-1, 3), axis=0)
+    max_bound = np.max(your_mesh.points.reshape(-1, 3), axis=0)
+    bounding_box = max_bound - min_bound
+    volume = bounding_box[0]*bounding_box[1]*bounding_box[2]
+
+    result = {
+            "filename": fileName,
+            "measurements": {
+                "volume": float(volume),
+                "surfaceArea": float(surface_area),
+                "mbbDimensions": {
+                    "_1": float(bounding_box[0]),
+                    "_2": float(bounding_box[1]),
+                    "_3": float(bounding_box[2]),
+                },
+                "mbbVolume": float(volume),
+            },
+            "status_code": 200
+        }
+    return result
+
 
 #######################################################
 class mbbDimensionsSerializer(serializers.Serializer):
@@ -166,16 +214,16 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
             "status_code": 200
         }
 
-        if settings.IWS_ENDPOINT is None:
-            outputSerializer = SResCheckModel(data=mock)
-            if outputSerializer.is_valid():
-                return Response(outputSerializer.data, status=status.HTTP_200_OK)
-            else:
-                raise Exception("Validation failed")
+        # if settings.IWS_ENDPOINT is None:
+        #     outputSerializer = SResCheckModel(data=mock)
+        #     if outputSerializer.is_valid():
+        #         return Response(outputSerializer.data, status=status.HTTP_200_OK)
+        #     else:
+        #         raise Exception("Validation failed")
 
         fileContent, flag = getFileReadableStream(request, projectID, processID, model[FileObjectContent.id])
         if flag:
-            resultData = getBoundaryData(fileContent, modelName)
+            resultData = calculateBoundaryData(fileContent, modelName, model[FileObjectContent.size]) # getBoundaryData(fileContent, modelName)
         else:
             message = f"Error while accessing file {modelName}: {str(error)}"
             exception = str(error)
