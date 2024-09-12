@@ -139,7 +139,7 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
             # for entry in manufacturers:
             #     if entry["ID"]["value"] not in manufacturersWhichCanDoAll:
             #         manufacturersWhichCanDoAll[entry["ID"]["value"]]  = entry
-            setOfManufacturerIDs = pgKG.LogicAM.checkBuildVolume([calculations["measurements"]["mbbDimensions"]["_1"],calculations["measurements"]["mbbDimensions"]["_2"],calculations["measurements"]["mbbDimensions"]["_3"]])
+            setOfManufacturerIDs = pgKG.LogicAM.checkBuildVolume([calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"]])
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
     
     if len(listOfSetsForManufacturers) > 0:
