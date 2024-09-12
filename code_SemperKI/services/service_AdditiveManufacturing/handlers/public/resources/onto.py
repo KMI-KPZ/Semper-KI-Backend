@@ -67,7 +67,7 @@ def onto_getGraph(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.getGraph()
+        result = pgKnowledgeGraph.Basics.getGraph()
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -128,7 +128,7 @@ def onto_getResources(request:Request, resourceType:str):
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-        result = pgKnowledgeGraph.getNodesByType(resourceType)
+        result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -178,7 +178,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
 
     """
     try:
-        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
         
@@ -232,7 +232,7 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
 
-        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -298,7 +298,7 @@ def onto_addNode(request:Request):
         
         validatedInput = inSerializer.data
         # TODO Sparql
-        result = pgKnowledgeGraph.createNode(validatedInput)
+        result = pgKnowledgeGraph.Basics.createNode(validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -362,7 +362,7 @@ def onto_updateNode(request:Request):
         
         validatedInput = inSerializer.data
         # TODO KG
-        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -414,7 +414,7 @@ def onto_deleteNode(request:Request, nodeID:str):
     """
     try:
         # TODO KG
-        result = pgKnowledgeGraph.deleteNode(nodeID)
+        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -480,7 +480,7 @@ def onto_addEdge(request:Request):
         ID1 = serializedInput.data["ID1"]
         ID2 = serializedInput.data["ID2"]
         # TODO Sparql
-        result = pgKnowledgeGraph.createEdge(ID1, ID2) 
+        result = pgKnowledgeGraph.Basics.createEdge(ID1, ID2) 
         if isinstance(result, Exception):
             raise result
         
@@ -532,7 +532,7 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
     """
     try:
         # TODO Sparql
-        result = pgKnowledgeGraph.deleteEdge(entity1ID, entity2ID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(entity1ID, entity2ID)
         if isinstance(result, Exception):
             raise result
         
