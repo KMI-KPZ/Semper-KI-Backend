@@ -137,9 +137,9 @@ def updateOrgaDetailsSemperKI(orgaHashID:str):
                 if PriorityTargetsSemperKI.value in existingDetails[OrganizationDetails.priorities][setting]:
                     orga.details[OrganizationDetails.priorities][setting][PriorityTargetsSemperKI.value] = existingDetails[OrganizationDetails.priorities][setting][PriorityTargetsSemperKI.value]
                 else:
-                    orga.details[OrganizationDetails.priorities][setting][PriorityTargetsSemperKI.value] = 3
+                    orga.details[OrganizationDetails.priorities][setting][PriorityTargetsSemperKI.value] = 4
             else:
-                orga.details[OrganizationDetails.priorities][setting] = {PriorityTargetsSemperKI.value: 3}
+                orga.details[OrganizationDetails.priorities][setting] = {PriorityTargetsSemperKI.value: 4}
 
         orga.save()
     except Exception as error:
