@@ -7,4 +7,4 @@ Contains: Modules that need to be imported
 
 """
 
-import code_SemperKI.services.service_Quality_Control.service
+import code_SemperKI.services.service_QualityControl.service

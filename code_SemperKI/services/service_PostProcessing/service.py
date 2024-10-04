@@ -7,11 +7,11 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 
-from .connections.postgresql.pgService import updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
+from .connections.postgresql.pgService import updateServiceDetails as PP_updateServiceDetails, deleteServiceDetails as PP_deleteServiceDetails, serviceReady as PP_serviceReady, cloneServiceDetails as PP_cloneServiceDetails
+from .handlers.checkService import checkIfSelectionIsAvailable as PP_checkIfSelectionIsAvailable
 
 ###################################################
-class After_Sales(Semper.ServiceBase):
+class PostProcessing(Semper.ServiceBase):
     """
     All connections of this service that Semper-KI should know about
     
@@ -27,7 +27,7 @@ class After_Sales(Semper.ServiceBase):
 
         """
 
-        return AS_updateServiceDetails(existingContent, newContent)
+        return PP_updateServiceDetails(existingContent, newContent)
     
     ###################################################
     def deleteServiceDetails(self, existingContent, newContent):
@@ -36,7 +36,7 @@ class After_Sales(Semper.ServiceBase):
 
         """
 
-        return AS_deleteServiceDetails(existingContent, newContent)
+        return PP_deleteServiceDetails(existingContent, newContent)
     
     ###################################################
     def serviceReady(self, existingContent) -> bool:
@@ -44,7 +44,7 @@ class After_Sales(Semper.ServiceBase):
         Checks, if service is completely defined
         
         """
-        return AS_serviceReady(existingContent)
+        return PP_serviceReady(existingContent)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -52,7 +52,7 @@ class After_Sales(Semper.ServiceBase):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        return AS_checkIfSelectionIsAvailable(processObj)
+        return PP_checkIfSelectionIsAvailable(processObj)
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -67,7 +67,7 @@ class After_Sales(Semper.ServiceBase):
         :rtype: dict
         
         """
-        return AS_cloneServiceDetails(existingContent, newProcess)
+        return PP_cloneServiceDetails(existingContent, newProcess)
 
     ###################################################
     def getFilteredContractors(self, processObj) -> list:
@@ -77,7 +77,7 @@ class After_Sales(Semper.ServiceBase):
         """
         return []
 
-SERVICE_NAME = "AFTER_SALES"
-SERVICE_NUMBER = 7
+SERVICE_NAME = "POST_PROCESSING"
+SERVICE_NUMBER = 4
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, After_Sales())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, PostProcessing())
