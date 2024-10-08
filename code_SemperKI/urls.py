@@ -93,6 +93,10 @@ newPaths= {
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
+
+    ########################## API ##############################
+    "apiCreateProject": ("public/api/project/create/", project.createProjectID),
+    "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
 }
 
 # add paths

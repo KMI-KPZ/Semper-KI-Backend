@@ -24,6 +24,7 @@ from drf_spectacular.utils import OpenApiParameter
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.connections.content.manageContent import ManageContent
@@ -237,6 +238,7 @@ class SResCreateProjectID(serializers.Serializer):
         500: ExceptionSerializer
     },
 )
+@loginViaAPITokenIfAvailable()
 @api_view([HTTPMethod.POST])
 @checkVersion(0.3)
 def createProjectID(request:Request):
