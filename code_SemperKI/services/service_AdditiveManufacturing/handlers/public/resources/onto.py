@@ -254,8 +254,60 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-############################################################################################
-# ADMIN ONLY!
+#######################################################
+@extend_schema(
+    summary="Gather all neighbors of a node from the KG",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_getNeighbors(request:Request, nodeID:str):
+    """
+    Gather all neighbors of a node inside an orga from the KG
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON with neighbors
+    :rtype: JSON Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        
+        # remove nodes not belonging to the system
+        filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID}," + str(datetime.now()))
+
+        outSerializer = SResNode(data=filteredOutput, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+
+    except (Exception) as error:
+        message = f"Error in {onto_getNeighbors.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 #######################################################
 @extend_schema(
     summary="Creates a node in the knowledge graph",
