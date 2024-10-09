@@ -9,20 +9,19 @@ Contains: Offers an interface to access the session dictionary in a structured w
 from django.utils import timezone
 import logging, copy
 
-from Generic_Backend.code_General.definitions import SessionContent, FileObjectContent
+from Generic_Backend.code_General.definitions import GlobalDefaults, SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities import crypto
 
-from ...definitions import SessionContentSemperKI, MessageInterfaceFromFrontend
+from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
-from ...definitions import *
-from Generic_Backend.code_General.definitions import FileObjectContent, SessionContent
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...serviceManager import serviceManager
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
-from Generic_Backend.code_General.utilities import crypto
 
 logger = logging.getLogger("errors")
 # TODO: history alias Data
@@ -34,45 +33,24 @@ class StructuredSession():
 
     """
 
-    # currentSession : dict = {}
+    currentSession : dict = {}
 
-    # #######################################################
-    def __init__(self, session):
+#######################################################
+    def __init__(self, session) -> None:
+        """
+        Initialize with existing session
+        
+        """
+
         self.currentSession = session
-        if SessionContentSemperKI.CURRENT_PROJECTS not in self.currentSession:
-            self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS] = {}
     
     #######################################################
-    def _get_nested(self, keys, default=None):
-        current = self.currentSession
-        for key in keys:
-            if isinstance(current, dict) and key in current:
-                current = current[key]
-            else:
-                return default
-        return current
-
-    ################################################################
-    def _set_nested(self, keys, value):
-        """Helper method to safely set nested dictionary values"""
-        current = self.currentSession
-        for key in keys[:-1]:
-            current = current.setdefault(key, {})
-        current[keys[-1]] = value
-        
-    ################################################################    
     def getSession(self):
         """
         Return current session
         
         """
         return self.currentSession
-    
-    #######################################################
-    def save_session(self):
-        if hasattr(self.currentSession, 'save'):
-            self.currentSession.save()
-        logger.debug("Session saved")
     
     #######################################################
     def getIfContentIsInSession(self) -> bool:
@@ -84,7 +62,7 @@ class StructuredSession():
         
         """
 
-        return SessionContentSemperKI.CURRENT_PROJECTS in self.currentSession
+        return True if SessionContentSemperKI.CURRENT_PROJECTS in self.currentSession else False
 
     #######################################################
     def clearContentFromSession(self) -> None:
@@ -95,12 +73,12 @@ class StructuredSession():
         :rtype: None
         
         """
-        if SessionContentSemperKI.CURRENT_PROJECTS in self.currentSession:
-            del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]
+        self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS].clear()
+        del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]
         self.currentSession.modified = True
 
     #######################################################
-    def getProject(self, projectID: str) -> dict:
+    def getProject(self, projectID:str) -> dict:
         """
         Return specific project from session
 
@@ -108,18 +86,12 @@ class StructuredSession():
         :type projectID: str
         :return: Dictionary with project in it
         :rtype: dict
+
         """
-        logger.debug(f"Current session structure: {self.currentSession}")
-        logger.debug(f"Attempting to get project with ID: {projectID}")
-        if SessionContentSemperKI.CURRENT_PROJECTS not in self.currentSession:
-            logger.warning(f"No projects found in session")
+        if projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
+        else:
             return {}
-        if projectID not in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
-            logger.warning(f"Project with ID {projectID} not found in session")
-            return {}
-        project = self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
-        logger.debug(f"Retrieved project: {project}")
-        return project
 
     #######################################################
     def getProjects(self) -> list:
@@ -148,8 +120,8 @@ class StructuredSession():
 
         if SessionContentSemperKI.CURRENT_PROJECTS not in self.currentSession:
             self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS] = {}
+        
         self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID] = content
-        self.save_session()
 
     #######################################################
     def deleteProject(self, projectID:str):
@@ -162,8 +134,6 @@ class StructuredSession():
         :rtype: None
         """
 
-        # if projectID in self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS], {}):
-        #     del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
         del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]
 
     #######################################################
@@ -177,8 +147,10 @@ class StructuredSession():
         :rtype: dict
 
         """
-        # return self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS, projectID, SessionContentSemperKI.processes], {})
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]
+        else:
+            return {}
 ###################################################################
     #######################################################
     def getProcess(self, projectID:str, processID:str):
@@ -193,9 +165,10 @@ class StructuredSession():
         :rtype: Dict
 
         """
-        # return self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS, projectID, SessionContentSemperKI.processes, processID], {})
-        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
-        
+        if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
+        else:
+            return {}
     #######################################################
     def getProcessPerID(self, processID:str):
         """
@@ -207,9 +180,12 @@ class StructuredSession():
         :rtype: dict
         
         """
-        for projectID, project in self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS], {}).items():
-            if processID in project.get(SessionContentSemperKI.processes, {}):
-                return project[SessionContentSemperKI.processes][processID]
+        for projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+                for currentProcessID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
+                    if currentProcessID == processID:
+                        return self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID]
+
         return {}
     
     #######################################################
@@ -223,9 +199,12 @@ class StructuredSession():
         :rtype: (str,dict)
         
         """
-        for projectID, project in self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS], {}).items():
-            if processID in project.get(SessionContentSemperKI.processes, {}):
-                return (projectID, project[SessionContentSemperKI.processes][processID])
+        for projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+                for currentProcessID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
+                    if currentProcessID == processID:
+                        return (projectID, self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID])
+
         return (None, None)
 
     #######################################################
@@ -242,10 +221,13 @@ class StructuredSession():
         :return: Nothing
         :rtype: None
         """
-        self._set_nested([SessionContentSemperKI.CURRENT_PROJECTS, projectID, SessionContentSemperKI.processes, processID], content)
+        if SessionContentSemperKI.processes not in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+            self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes] = {}
+
+        self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][processID] = content
 
     #######################################################
-    def deleteProcess(self, projectID, processID):
+    def deleteProcess(self, processID:str):
         """
         Delete one specific process
 
@@ -255,9 +237,14 @@ class StructuredSession():
         :rtype: None
         
         """
-        processes = self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS, projectID, SessionContentSemperKI.processes], {})
-        if processID in processes:
-            del processes[processID]
+        for projectID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+            if SessionContentSemperKI.processes in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID]:
+                for currentProcessID in self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes]:
+                    if currentProcessID == processID:
+                        del self.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][projectID][SessionContentSemperKI.processes][currentProcessID]
+                        break
+
+
 
 #######################################################
 class ProcessManagementSession(AbstractContentInterface):
@@ -267,7 +254,7 @@ class ProcessManagementSession(AbstractContentInterface):
     """
 
     #######################################################
-    def __init__(self, session):
+    def __init__(self, session) -> None:
         self.structuredSessionObj = StructuredSession(session)
 
     #######################################################
@@ -280,6 +267,7 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         return self.structuredSessionObj.getSession()
 
+
     ##############################################
     def getUserID(self) -> str:
         """
@@ -288,14 +276,10 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        session = self.structuredSessionObj.getSession()
-        
-        profile_class = session.get(SessionContent.PG_PROFILE_CLASS)
-        if profile_class and profile_class in profileManagement:
-            return profileManagement[profile_class].getClientID(session)
+        if manualCheckifLoggedIn(self.structuredSessionObj.getSession()):
+            return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
         else:
-            logger.error(f"Invalid profile class in session: {profile_class}")
-            return ""
+            return GlobalDefaults.anonymous
         
     def checkIfUserIsClient(self, userHashID, projectID="", processID=""):
         """
@@ -312,14 +296,14 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         if projectID:
             project = self.structuredSessionObj.getProject(projectID)
-            return project.get(ProjectDescription.client) == userHashID
+            return project[ProjectDescription.client] == userHashID
         if processID:
             projectID, process = self.structuredSessionObj.getProcessAndProjectPerID(processID)
-            return process.get(ProcessDescription.client) == userHashID
+            return process[ProcessDescription.client] == userHashID
         return False    
     
     #######################################################
-    def getData(self, processID):
+    def getData(self, processID, processObject=None):
         """
         Get all data entries for a process
 
@@ -328,9 +312,19 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: List of data entries
         :rtype: list
         """
-        process = self.structuredSessionObj.getProcessPerID(processID)
-        return process.get(ProcessDescription.data, [])
-    
+        try:
+            if processObject != None:
+                processObj = processObject
+            else:
+                processObj = self.structuredSessionObj.getProcessPerID(processID)
+            outList = []
+            outList.append(processObj)
+            return outList
+        except (Exception) as error:
+            logger.error(f'Generic error in getData: {str(error)}')
+
+        return []
+
     #######################################################
     def getDataWithContentID(self, processID, contentID):
         """
@@ -404,20 +398,27 @@ class ProcessManagementSession(AbstractContentInterface):
             returnObj = ProjectInterface(projectID, content[ProjectDescription.createdWhen], content[ProjectDescription.client])
             returnObj.setValues(content[ProjectDescription.projectStatus], content[ProjectDescription.client], content[ProjectDescription.projectDetails], content[ProjectDescription.updatedWhen], content[ProjectDescription.accessedWhen])
             return returnObj
-        except Exception as error:
+        except (Exception) as error:
             logger.error(f"Could not get project object: {str(error)}")
             return None
 
     #######################################################
     def createProject(self, projectID:str, client:str):
-        now = timezone.now()
-        project_dict = ProjectInterface(projectID, str(now), client).toDict()
-        self.structuredSessionObj.setProject(projectID, project_dict)
-        logger.debug(f"Created project: {project_dict}")
-        # Verify the project was added correctly
-        # saved_project = self.structuredSessionObj.getProject(projectID)
-        # logger.debug(f"Verified saved project: {saved_project}")
+        """
+        Create the project
 
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param client: anonymous client, necessary for interface
+        :type client: str
+        :return: Nothing
+        :rtype: None
+        
+        """
+        now = timezone.now()
+
+        self.structuredSessionObj.setProject(projectID, ProjectInterface(projectID, str(now), client).toDict())
+    
     #######################################################
     def getProject(self, projectID:str) -> dict:
         """
@@ -427,54 +428,18 @@ class ProcessManagementSession(AbstractContentInterface):
         :type projectID: str
         :return: dict with info about that project
         :rtype: dict
+
         """
-        try:
-            logger.debug(f"Attempting to get project with ID: {projectID}")
-            savedProject = self.structuredSessionObj.getProject(projectID)
-            if not savedProject:
-                logger.warning(f"Project with ID {projectID} not found or empty")
-                return {}
-            
-            savedProject = copy.deepcopy(savedProject)
-            logger.debug(f"Retrieved project before processing: {savedProject}")
-            
-            if SessionContentSemperKI.processes in savedProject:
-                savedProject[SessionContentSemperKI.processes] = list(savedProject[SessionContentSemperKI.processes].values())
-            else:
-                savedProject[SessionContentSemperKI.processes] = []
-            
-            logger.debug(f"Processed project: {savedProject}")
+        try: 
+            savedProject = copy.deepcopy(self.structuredSessionObj.getProject(projectID))
+            savedProject[SessionContentSemperKI.processes] = [savedProject[SessionContentSemperKI.processes][process] for process in savedProject[SessionContentSemperKI.processes]]
             return savedProject
-        except Exception as error:
-            logger.error(f'Could not get project: {str(error)}', exc_info=True)
-            return {}
-
-    ##############################################
-    def getProjectForContractor(self, projectID, contractorHashID):
-        """
-        Get info about one project for an organization as a contractor.
-
-        :param projectID: ID of the project
-        :type projectID: str
-        :param contractorHashID: The ID of the contractor
-        :type contractorHashID: str
-        :return: dict with info about that project
-        :rtype: dict
-        """
-        try:
-            projectObj = self.structuredSessionObj.getProject(projectID)
-            output = projectObj.copy()
-            processesOfThatProject = []
-            for entry in projectObj.get(SessionContentSemperKI.processes, {}).values():
-                if entry.get(ProcessDescription.contractor) == contractorHashID:
-                    processesOfThatProject.append(entry)
-            output[SessionContentSemperKI.processes] = processesOfThatProject
-            return output
-        except Exception as error:
-            logger.error(f'could not get project for contractor: {str(error)}')
-            return {}
         
-        ####################################################################################
+        except (Exception) as error:
+            logger.error(f'could not get project: {str(error)}')
+            return error
+        
+    ######################################################################################
     def getAllUsersOfProject(self, projectID):
         """
         Get all user IDs that are connected to that project.
@@ -504,45 +469,68 @@ class ProcessManagementSession(AbstractContentInterface):
             return users
         except Exception as error:
             logger.error(f'could not get all users of project: {str(error)}')
-        return set()
-        #############################################################################
+        return set()    
+    ####################################################################################
+    # def getAllUsersOfProcess(self, processID):
+    #     """
+    #     Get all user IDs that are connected to that processID.
+
+    #     :param processID: unique process ID
+    #     :type processID: str
+    #     :return: Set of all user IDs
+    #     :rtype: Set
+
+    #     """
+    #     try:
+    #         currentProcess = self.structuredSessionObj.getProcess(processID)
+    #         users = set()
+    #         # userObj, orgaOrUser = ProfileManagementBase.getUserViaHash(currentProcess.client)
+    #         # if userObj != None:
+    #         #     if orgaOrUser:
+    #         #         # Is organization, add all people
+    #         #         for user in userObj.users.all():
+    #         #             users.update({user.hashedID})
+    #         #     users.update({userObj.hashedID})
+    #         # if currentProcess.contractor != None:
+    #         #     for user in currentProcess.contractor.users.all():
+    #         #         users.update({user.hashedID})
+    #         #     users.update({currentProcess.contractor.hashedID})
+
+    #         return users
+    #     except (Exception) as error:
+    #         logger.error(f'could not get all users of process: {str(error)}')
+    #     return set()
+    
+    ##############################################
     def updateProject(self, projectID:str, updateType: ProjectUpdates, content:dict):
         """
-        Change details of a project like its status.
+        Change details of an project like its status. 
 
         :param projectID: project ID that this project belongs to
         :type projectID: str
         :param updateType: changed project details
-        :type updateType: ProjectUpdates
+        :type updateType: EnumUpdates
         :param content: changed project, can be many stuff
         :type content: json dict
         :return: Flag if it worked or not
         :rtype: Bool
+
         """
         updated = timezone.now()
         try:
-            # currentProject = self.structuredSessionObj.getProject(projectID)
-            # if not currentProject:
-            #     logger.error(f"Project with ID {projectID} not found")
-            #     return False
-
             if updateType == ProjectUpdates.projectStatus:
                 currentProject = self.structuredSessionObj.getProject(projectID)
                 currentProject[ProjectDescription.projectStatus] = content
+                currentProject[ProjectDescription.updatedWhen] = updated
+
             elif updateType == ProjectUpdates.projectDetails:
                 currentProject = self.structuredSessionObj.getProject(projectID)
-                if ProjectDescription.projectDetails not in currentProject:
-                    currentProject[ProjectDescription.projectDetails] = {}
-                currentProject[ProjectDescription.projectDetails].update(content)
+                for key in content:
+                    currentProject[ProjectDescription.projectDetails][key] = content[key]
                 currentProject[ProjectDescription.updatedWhen] = str(updated)
-            else:
-                raise ValueError(f"updateProject {updateType} not implemented")
-
-             ######shift this line in updatetype details
-            self.structuredSessionObj.setProject(projectID, currentProject)
             return True
-        except Exception as error:
-            logger.error(f'Could not update project: {str(error)}')
+        except (Exception) as error:
+            logger.error(f'could not update project: {str(error)}')
             return error
 
     #######################################################
@@ -583,132 +571,61 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             allProjects = self.structuredSessionObj.getProjects()
-            for idx, entry in enumerate(allProjects):
+            for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
                 allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
                 if SessionContentSemperKI.processes in allProjects[idx]:
-                    del allProjects[idx][SessionContentSemperKI.processes]
+                    del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
             
             return allProjects
-        except Exception as error:
+        except (Exception) as error:
             logger.error(f"could not get all flat projects: {str(error)}")
             return error
 
     #######################################################
-    def verifyProcess(self, processID, session, userID):
-        """
-        Verify the process.
-
-        :param processID: The ID of the process
-        :type processID: str
-        :param session: Session of this user
-        :type session: dict
-        :param userID: The ID of the user verifying the process
-        :type userID: str
-        :return: None or Error
-        :rtype: None or Exception
-        """
-        try:
-            dataID = crypto.generateURLFriendlyRandomString()
-            self.createDataEntry("Verification started", dataID, processID, DataType.STATUS, userID)
-            # In a session-based approach, we might need to handle verification differently
-            # For now, we'll just update the process status
-            projectID, process = self.structuredSessionObj.getProcessAndProjectPerID(processID)
-            process[ProcessDescription.processStatus] = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED)
-            self.structuredSessionObj.setProcess(projectID, processID, process)
-            return None
-        except Exception as error:
-            logger.error(f"verifyProcess: {str(error)}")
-            return error
-        
-    #######################################################################
-    def sendProcess(self, processID, session, userID):
-        """
-        Send the process to its contractor(s).
-
-        :param processID: The ID of the process
-        :type processID: str
-        :param session: Who ordered the sendaway
-        :type session: dict
-        :param userID: Who ordered the sendaway
-        :type userID: str
-        :return: None or Error
-        :rtype: None or Exception
-        """
-        try:
-            projectID, process = self.structuredSessionObj.getProcessAndProjectPerID(processID)
-            if process[ProcessDescription.processStatus] < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
-                raise Exception("Not verified yet!")
-
-            contractorID = process[ProcessDescription.processDetails].get(ProcessDetails.provisionalContractor)
-            if not contractorID:
-                raise Exception("No provisional contractor set!")
-
-            dataID = crypto.generateURLFriendlyRandomString()
-            self.createDataEntry({"Action": "SendToContractor", "ID": contractorID}, dataID, processID, DataType.OTHER, userID, {})
-
-            # Update process status
-            process[ProcessDescription.processStatus] = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.SENT_TO_CONTRACTOR)
-            self.structuredSessionObj.setProcess(projectID, processID, process)
-
-            # In a session-based approach, we might need to handle file transfer differently
-            # For now, we'll just update the file status
-            for fileKey in process.get(ProcessDescription.files, {}):
-                process[ProcessDescription.files][fileKey][FileObjectContent.remote] = True
-
-            self.structuredSessionObj.setProcess(projectID, processID, process)
-
-            # TODO: Implement email sending logic
-            return None
-        except Exception as error:
-            logger.error(f"sendProcess: {str(error)}")
-            return error
-        
-    #############################################################################
-    def getProcessObj(self, projectID: str, processID: str) ->ProcessInterface:
+    def getProcessObj(self, projectID: str, processID: str) -> ProcessInterface:
         """
         Return the process and all its details
 
-        :param projectID: The ID of the project
+        :param projectID: The ID of the project (can be empty)
         :type projectID: str
         :param processID: The ID of the process
         :type processID: str
-        :return: Process Object or Exception if an error occurs
-        :rtype: Union[ProcessInterface, Exception]
+        :return: Process Object
+        :rtype: ProcessInterface
         """
         try:
-            content = self.structuredSessionObj.getProcess(projectID, processID)
-            if not content:
-                logger.warning(f"Process not found (projectID: {projectID}, processID: {processID})")
-                return None
+            # Check if projectID is available
+            if not projectID:
+                # If not, attempt to find it using getProcessPerID logic
+                for proj_id in self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
+                    if (SessionContentSemperKI.processes in 
+                        self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][proj_id]):
+                        for current_process_id in self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][proj_id][SessionContentSemperKI.processes]:
+                            if current_process_id == processID:
+                                projectID = proj_id
+                                break
+                        if projectID:
+                            break
+                
+                if not projectID:
+                    raise Exception(f"Could not find project ID for process {processID}")
 
-            returnObj = ProcessInterface(
-                ProjectInterface(projectID, content[ProcessDescription.createdWhen], content[ProcessDescription.client]),
-                processID,
-                content[ProcessDescription.createdWhen],
-                content[ProcessDescription.client]
-            )
+            # Original logic continues here
+            content = self.structuredSessionObj.getProcess(projectID, processID)
+            returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen], content[ProcessDescription.client]), processID, content[ProcessDescription.createdWhen], content[ProcessDescription.client])
             
             # dependencies are saved as list of processIDs 
-            dependenciesIn = content.get(ProcessDescription.dependenciesIn, [])
-            dependenciesOut = content.get(ProcessDescription.dependenciesOut, [])
+            if ProcessDescription.dependenciesIn in content:
+                dependenciesIn = content[ProcessDescription.dependenciesIn]
+                dependenciesOut = content[ProcessDescription.dependenciesOut]
+            else:
+                dependenciesIn = []
+                dependenciesOut = []
             
-            returnObj.setValues(
-                content.get(ProcessDescription.processDetails, {}),
-                content.get(ProcessDescription.processStatus),
-                content.get(ProcessDescription.serviceDetails, {}),
-                content.get(ProcessDescription.serviceStatus),
-                content.get(ProcessDescription.serviceType),
-                content.get(ProcessDescription.client),
-                content.get(ProcessDescription.files, {}),
-                content.get(ProcessDescription.messages, {}),
-                dependenciesIn,
-                dependenciesOut,
-                content.get(ProcessDescription.updatedWhen),
-                content.get(ProcessDescription.accessedWhen)
-            )
+            returnObj.setValues(content[ProcessDescription.processDetails], content[ProcessDescription.processStatus], content[ProcessDescription.serviceDetails], content[ProcessDescription.serviceStatus], content[ProcessDescription.serviceType], content[ProcessDescription.client], content[ProcessDescription.files], content[ProcessDescription.messages], dependenciesIn, dependenciesOut, content[ProcessDescription.updatedWhen], content[ProcessDescription.accessedWhen])
             return returnObj
-        except Exception as error:
-            logger.error(f"Could not fetch process (projectID: {projectID}, processID: {processID}): {str(error)}")
+        except (Exception) as error:
+            logger.error(f"Could not fetch process: {str(error)}")
             return error
         
     #######################################################
@@ -725,10 +642,12 @@ class ProcessManagementSession(AbstractContentInterface):
 
         """
         try:
-            return self._get_nested([SessionContentSemperKI.CURRENT_PROJECTS, projectID, SessionContentSemperKI.processes, processID], {})
-        except Exception as error:
-            logger.error(f"Error fetching process (projectID: {projectID}, processID: {processID}): {str(error)}")
-            return {}
+            processObj = self.getProcessObj(projectID, processID)
+            return processObj.toDict()
+
+        except (Exception) as error:
+            logger.error(f"Could not fetch process: {str(error)}")
+            return error
 
     #######################################################
     def getProcessDependencies(self, projectID:str, processID:str) -> tuple[list[ProcessInterface],list[ProcessInterface]]:
@@ -744,13 +663,27 @@ class ProcessManagementSession(AbstractContentInterface):
 
         """
         try:
-            processObject = self.structuredSessionObj.getProcess(projectID, processID)
-            dependenciesIn = [self.structuredSessionObj.getProcess(projectID, depID) for depID in processObject.get(ProcessDescription.dependenciesIn, [])]
-            dependenciesOut = [self.structuredSessionObj.getProcess(projectID, depID) for depID in processObject.get(ProcessDescription.dependenciesOut, [])]
+            processObject = self.getProcessObj(projectID, processID)
+            if isinstance(processObject, Exception):
+                raise processObject
+            dependenciesIn = []
+            dependenciesOut = []
+            for dependentProcessID in processObject.dependenciesIn.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesIn.append(dependentProcess)
+            for dependentProcessID in processObject.dependenciesOut.all():
+                dependentProcess = self.getProcessObj(projectID, dependentProcessID)
+                if isinstance(dependentProcess, Exception):
+                    raise dependentProcess
+                dependenciesOut.append(dependentProcess)
+
             return (dependenciesIn, dependenciesOut)
-        except Exception as error:
+
+        except (Exception) as error:
             logger.error(f"Could not fetch dependencies: {str(error)}")
-            return ([], [])
+            return ([],[])
         
 
     #######################################################
@@ -770,9 +703,9 @@ class ProcessManagementSession(AbstractContentInterface):
         """
 
         now = timezone.now()
-        processInterface = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
-        self.structuredSessionObj.setProcess(projectID, processID, processInterface.toDict())
-        
+
+        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client).toDict())
+
     ###################################################
     def deleteProcess(self, processID:str, processObj=None):
         """
@@ -785,17 +718,18 @@ class ProcessManagementSession(AbstractContentInterface):
 
         """
         try:
-            projectID, currentProcess = self.structuredSessionObj.getProcessAndProjectPerID(processID)
-            files = currentProcess.get(ProcessDescription.files, {})
-            for fileKey, fileObj in files.items():
+            currentProcess = self.structuredSessionObj.getProcessPerID(processID)
+            files = currentProcess[ProcessDescription.files]
+            for fileKey in files:
+                fileObj = files[fileKey]
                 if fileObj[FileObjectContent.remote]:
                     s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
                 else:
                     s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
-            self.structuredSessionObj.deleteProcess(projectID, processID)
-            return True
-        except Exception as error:
-            logger.error(f'could not delete process: {str(error)}')
+            self.structuredSessionObj.deleteProcess(processID)
+
+        except (Exception) as error:
+            logger.error(f'could not delete project: {str(error)}')
             return error
 
     ##############################################
@@ -823,44 +757,60 @@ class ProcessManagementSession(AbstractContentInterface):
             dataID = crypto.generateURLFriendlyRandomString()
             
             if updateType == ProcessUpdates.messages:
-                if 'origin' in content:
-                    origin = content['origin']
-                    if origin not in currentProcess.get(ProcessDescription.messages, {}):
-                        currentProcess.setdefault(ProcessDescription.messages, {})[origin] = []
-                    currentProcess[ProcessDescription.messages][origin].append(content)
+                if MessageInterfaceFromFrontend.origin in content:
+                    origin = content[MessageInterfaceFromFrontend.origin]
+                    if origin in currentProcess[ProcessDescription.messages]:
+                        currentProcess[ProcessDescription.messages][origin].append(content)
+                    else:
+                        currentProcess[ProcessDescription.messages][origin] = [content]
                 else:
-                    currentProcess.setdefault(ProcessDescription.messages, {}).setdefault(MessageInterfaceFromFrontend.messages, []).append(content)
-                self.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
-                
+                    if MessageInterfaceFromFrontend.messages in currentProcess[ProcessDescription.messages]:
+                        currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages].append(content)
+                    else:
+                        currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages] = [content]
+                    self.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
+                    
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    currentProcess.setdefault(ProcessDescription.files, {})[content[entry][FileObjectContent.id]] = content[entry]
+                    currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
                     self.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
-
+            
+            elif updateType == ProcessUpdates.serviceType:
+                currentProcess[ProcessDescription.serviceType] = content
+            
             elif updateType == ProcessUpdates.serviceDetails:
-                serviceType = currentProcess.get(ProcessDescription.serviceType)
+                serviceType = currentProcess[ProcessDescription.serviceType]
                 if serviceType != serviceManager.getNone():
-                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(
-                        currentProcess.get(ProcessDescription.serviceDetails, {}), content
-                    )
+                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
                     self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
                 else:
                     raise Exception("No Service chosen!")
-                
+            
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess[ProcessDescription.serviceStatus] = content
                 self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
                 
             elif updateType == ProcessUpdates.processDetails:
-                currentProcess.setdefault(ProcessDescription.processDetails, {}).update(content)
-                self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
-
+                for entry in content:
+                    if entry == ProcessDetails.priorities:
+                        if ProcessDetails.priorities in currentProcess[ProcessDescription.processDetails]:
+                            # update only one priority, the for loop is a shortcut to getting the key/priority
+                            for prio in content[entry]:
+                                currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                                self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
+                        else:
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities] = content[entry]
+                            self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)# is set during creation and therefore complete
+                    else:
+                        currentProcess[ProcessDescription.processDetails][entry] = content[entry]
+                        self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
+            
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = content
                 self.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
             
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.setdefault(ProcessDescription.processDetails, {})[ProcessDetails.provisionalContractor] = content
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
                 self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
                                 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
@@ -881,12 +831,29 @@ class ProcessManagementSession(AbstractContentInterface):
             self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
             
             return True
-        except Exception as error:
+        except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
             return error
         
     ##############################################
     def deleteFromProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, deletedBy:str):
+        """
+        Delete details of a process like its status, or content. 
+
+        :param projectID: Project that this process belongs to
+        :type projectID: str
+        :param processID: unique process ID to be edited
+        :type processID: str
+        :param updateType: changed process details
+        :type updateType: EnumUpdates
+        :param content: deletions
+        :type content: json dict
+        :param deletedBy: ID of the person who deleted from the process (for history)
+        :type deletedBy: str
+        :return: Flag if it worked or not
+        :rtype: Bool
+
+        """
         try:
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
@@ -948,7 +915,7 @@ class ProcessManagementSession(AbstractContentInterface):
             self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
 
             return True
-        except Exception as error:
+        except (Exception) as error:
             logger.error(f"could not delete from process: {str(error)}")
             return error
         
@@ -996,19 +963,6 @@ class ProcessManagementSession(AbstractContentInterface):
         return dictForEventsAsOutput
     
     ##############################################
-    @staticmethod
-    def getAllProjectsFlat():
-        """
-        Return flat list of all projects, for admins
-
-        :return: Json with all projects and their data
-        :rtype: list
-        """
-        # In a session-based approach, we don't have access to all projects.
-        # This method might need to be removed or significantly modified.
-        raise NotImplementedError("getAllProjectsFlat is not applicable in a session-based approach")
-    
-    #############################################
     def getProcessesPerPID(self, projectID):
         """
         Retrieve infos about one project, for admins
@@ -1036,11 +990,12 @@ class ProcessManagementSession(AbstractContentInterface):
         """
         try:
             processObj = self.structuredSessionObj.getProcess(projectID, processID)
-            for fileKey in processObj.get(ProcessDescription.files, {}):
-                if processObj[ProcessDescription.files][fileKey].get(FileObjectContent.remote, False):
+            for fileKey in processObj[ProcessDescription.files]:
+                if processObj[ProcessDescription.files][fileKey][FileObjectContent.remote]:
                     return True
+                
             return False
-        except Exception as error:
+        except (Exception) as error:
             logger.error(f'could not check if files are remote: {str(error)}')
             return False
         
