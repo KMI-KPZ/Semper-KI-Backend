@@ -30,6 +30,7 @@ from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
+from code_SemperKI.connections.content.session import ProcessManagementSession
 from code_SemperKI.handlers.public.project import *
 import code_SemperKI.utilities.websocket as WebSocketEvents
 
@@ -466,9 +467,6 @@ class SResProcessHistory(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
-@checkIfRightsAreSufficient(json=True)
-@checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
 @checkVersion(0.3)
 def getProcessHistory(request:Request, processID):
@@ -484,23 +482,35 @@ def getProcessHistory(request:Request, processID):
 
     """
     try:
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
+        content_manager = ManageContent(request.session)
+        interface = content_manager.getCorrectInterface(getProcessHistory.cls.__name__)
+        if interface is None:
+            logger.error("Rights not sufficient in getProcessHistory")
+            return Response("Insufficient rights", status=status.HTTP_401_UNAUTHORIZED)
 
-        if processObj == None:
+        process_obj = interface.getProcessObj("", processID)
+        if process_obj is None:
             raise Exception("Process not found in DB!")
-        
-        listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
-        # parse for frontend
-        for index, entry in enumerate(listOfData):
-            outDatum = {}
-            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
-            outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
-            outDatum[DataDescription.type] = entry[DataDescription.type]
-            outDatum[DataDescription.data] = entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
-            listOfData[index] = outDatum # overwrite
 
-        outObj = {"history": listOfData}
-        outSerializer = SResProcessHistory(data=outObj)
+        if isinstance(interface, ProcessManagementSession):
+            list_of_data = request.session['data_history']
+        else:
+            list_of_data = interface.getData(processID, process_obj)
+
+        out_data = []
+        for entry in list_of_data:
+            out_datum = {
+                DataDescription.createdBy: entry[DataDescription.createdBy],
+                DataDescription.createdWhen: entry[DataDescription.createdWhen],
+                DataDescription.type: entry[DataDescription.type],
+                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
+            }
+            if not isinstance(interface, ProcessManagementSession):
+                out_datum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            out_data.append(out_datum)
+
+        out_obj = {"history": out_data}
+        outSerializer = SResProcessHistory(data=out_obj)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
