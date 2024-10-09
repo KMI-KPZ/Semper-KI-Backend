@@ -67,7 +67,7 @@ def onto_getGraph(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.getGraph()
+        result = pgKnowledgeGraph.Basics.getGraph()
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -128,7 +128,7 @@ def onto_getResources(request:Request, resourceType:str):
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-        result = pgKnowledgeGraph.getNodesByType(resourceType)
+        result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -178,7 +178,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
 
     """
     try:
-        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
         
@@ -232,7 +232,7 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
 
-        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -254,8 +254,60 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-############################################################################################
-# ADMIN ONLY!
+#######################################################
+@extend_schema(
+    summary="Gather all neighbors of a node from the KG",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_getNeighbors(request:Request, nodeID:str):
+    """
+    Gather all neighbors of a node inside an orga from the KG
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON with neighbors
+    :rtype: JSON Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        
+        # remove nodes not belonging to the system
+        filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        
+        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID}," + str(datetime.now()))
+
+        outSerializer = SResNode(data=filteredOutput, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+
+    except (Exception) as error:
+        message = f"Error in {onto_getNeighbors.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 #######################################################
 @extend_schema(
     summary="Creates a node in the knowledge graph",
@@ -298,7 +350,7 @@ def onto_addNode(request:Request):
         
         validatedInput = inSerializer.data
         # TODO Sparql
-        result = pgKnowledgeGraph.createNode(validatedInput)
+        result = pgKnowledgeGraph.Basics.createNode(validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -362,7 +414,7 @@ def onto_updateNode(request:Request):
         
         validatedInput = inSerializer.data
         # TODO KG
-        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -414,7 +466,7 @@ def onto_deleteNode(request:Request, nodeID:str):
     """
     try:
         # TODO KG
-        result = pgKnowledgeGraph.deleteNode(nodeID)
+        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -480,7 +532,7 @@ def onto_addEdge(request:Request):
         ID1 = serializedInput.data["ID1"]
         ID2 = serializedInput.data["ID2"]
         # TODO Sparql
-        result = pgKnowledgeGraph.createEdge(ID1, ID2) 
+        result = pgKnowledgeGraph.Basics.createEdge(ID1, ID2) 
         if isinstance(result, Exception):
             raise result
         
@@ -532,7 +584,7 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
     """
     try:
         # TODO Sparql
-        result = pgKnowledgeGraph.deleteEdge(entity1ID, entity2ID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(entity1ID, entity2ID)
         if isinstance(result, Exception):
             raise result
         

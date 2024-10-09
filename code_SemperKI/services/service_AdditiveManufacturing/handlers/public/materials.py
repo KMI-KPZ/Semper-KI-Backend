@@ -124,7 +124,7 @@ def retrieveMaterialsWithFilter(request:Request):
 
         # filter by selection of post-processing
  
-        materialList = pgKnowledgeGraph.getNodesByType(NodeTypesAM.material)
+        materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
             # use only entries from system
             if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner: #and entry[pgKnowledgeGraph.NodeDescription.active] == True:
@@ -138,7 +138,7 @@ def retrieveMaterialsWithFilter(request:Request):
                             appendViaThisFilter = False
                             if filter["answer"] != None:
                                 categoryID = filter["answer"]["value"] # contains the id of the chosen category node
-                                categoriesOfEntry = pgKnowledgeGraph.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
+                                categoriesOfEntry = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
                                 if isinstance(categoriesOfEntry, Exception):
                                     raise categoriesOfEntry
 

@@ -72,7 +72,7 @@ def orga_getGraph(request:Request):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getGraph(orgaID)
+        result = pgKnowledgeGraph.Basics.getGraph(orgaID)
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -142,7 +142,7 @@ def orga_getResources(request:Request):
         outDict = {"resources": []}
         #result = sparqlQueries.getServiceProviders.sendQuery({sparqlQueries.SparqlParameters.ID: orgaID})
         # TODO: Parse and serialize output
-        result = pgKnowledgeGraph.getEdgesForNode(orgaID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(orgaID)
         if isinstance(result, Exception):
             raise result
         outDict["resources"].extend(result)
@@ -201,7 +201,7 @@ def orga_getNodes(request:Request, resourceType:str):
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-        result = pgKnowledgeGraph.getNodesByType(resourceType)
+        result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
         if isinstance(result, Exception):
             raise result
         # remove nodes not belonging to the system or the orga
@@ -258,7 +258,7 @@ def orga_getNodeViaID(request:Request, nodeID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
         if nodeInfo.createdBy != orgaID and nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
@@ -320,7 +320,7 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -377,7 +377,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getEdgesForNode(nodeID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -470,58 +470,58 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             # create node for the orga and link it to the orga
             if "nodeID" in validatedInput["node"]:
                 del validatedInput["node"]["nodeID"]
-            resultNode = pgKnowledgeGraph.createNode(validatedInput["node"], orgaID)
+            resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
-            exceptionOrNone = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
+            exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
-                otherNode = pgKnowledgeGraph.getNode(nodeIDFromEdge)
+                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(otherNode, Exception):
                     raise otherNode
 
                 nodeIDToBeConnected = otherNode.nodeID
                 if otherNode.createdBy != orgaID:
-                    copiedNode = pgKnowledgeGraph.copyNode(otherNode, orgaID)
+                    copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
                     if isinstance(copiedNode, Exception):
                         raise copiedNode
                     nodeIDToBeConnected = copiedNode.nodeID
 
                 # create edge to new node
-                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
                 # create edge to orga
-                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, orgaID)
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
                 if isinstance(result, Exception):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
 
         elif validatedInput["type"] == "update":
             # update node
-            resultNode = pgKnowledgeGraph.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
+            resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
             if isinstance(resultNode, Exception):
                 raise resultNode
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # create edge to new node
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, resultNode.nodeID) 
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
                 # create edge to orga
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, orgaID)
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
                 if isinstance(result, Exception):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
         else:
@@ -594,10 +594,10 @@ def orga_createNode(request:Request):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
             
         # create node for the orga and link it
-        resultNode = pgKnowledgeGraph.createNode(validatedInput, orgaID)
+        resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput, orgaID)
         if isinstance(resultNode, Exception):
             raise resultNode
-        result = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
+        result = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
         if isinstance(result, Exception):
             raise result
         
@@ -674,7 +674,7 @@ def orga_updateNode(request:Request):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         # check if the node is even associated with the organization
-        result = pgKnowledgeGraph.getNode(validatedInput["nodeID"])
+        result = pgKnowledgeGraph.Basics.getNode(validatedInput["nodeID"])
         if isinstance(result, Exception):
             raise result
         if result.createdBy != orgaID:
@@ -688,7 +688,7 @@ def orga_updateNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # update node for the orga
-        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -747,7 +747,7 @@ def orga_deleteNode(request:Request, nodeID:str):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         # check if the node is even associated with the organization
-        result = pgKnowledgeGraph.getNode(nodeID)
+        result = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(result, Exception):
             raise result
         if result.createdBy != orgaID:
@@ -760,7 +760,7 @@ def orga_deleteNode(request:Request, nodeID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-        result = pgKnowledgeGraph.deleteNode(nodeID)
+        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -838,13 +838,13 @@ def orga_addEdgesToOrga(request:Request):
         # link the node to the orga
         for entry in entityIDs:
             nodeIDToBeLinked = entry
-            nodeOfEntity = pgKnowledgeGraph.getNode(entry)
+            nodeOfEntity = pgKnowledgeGraph.Basics.getNode(entry)
             # check if node belongs to SYSTEM or the orga
             if nodeOfEntity.createdBy != orgaID:
                 # if it doesn't belong to the orga, create a copy for it
-                newNode = pgKnowledgeGraph.copyNode(nodeOfEntity, orgaID)
+                newNode = pgKnowledgeGraph.Basics.copyNode(nodeOfEntity, orgaID)
                 nodeIDToBeLinked = newNode.nodeID
-            result = pgKnowledgeGraph.createEdge(orgaID, nodeIDToBeLinked) 
+            result = pgKnowledgeGraph.Basics.createEdge(orgaID, nodeIDToBeLinked) 
             if isinstance(result, Exception):
                 raise result
         
@@ -914,7 +914,7 @@ def orga_addEdgeForOrga(request:Request):
         entity2ID = serializedInput.data["entity2ID"]
 
         # edge already exists?
-        if pgKnowledgeGraph.getIfEdgeExists(entity1ID, entity2ID):
+        if pgKnowledgeGraph.Basics.getIfEdgeExists(entity1ID, entity2ID):
             return Response("Success", status=status.HTTP_200_OK)
 
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
@@ -926,10 +926,10 @@ def orga_addEdgeForOrga(request:Request):
         #      sparqlQueries.SparqlParameters.Material: materialName, 
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
 
-        result1 = pgKnowledgeGraph.getNode(entity1ID)
+        result1 = pgKnowledgeGraph.Basics.getNode(entity1ID)
         if isinstance(result1, Exception):
             raise result1
-        result2 = pgKnowledgeGraph.getNode(entity2ID)
+        result2 = pgKnowledgeGraph.Basics.getNode(entity2ID)
         if isinstance(result2, Exception):
             raise result2
         
@@ -937,16 +937,16 @@ def orga_addEdgeForOrga(request:Request):
         # check if the node belongs to the orga
         if result1.createdBy != orgaID:
             # if it doesn't belong to the orga, create a copy for it
-            newNode = pgKnowledgeGraph.copyNode(result1, orgaID)
+            newNode = pgKnowledgeGraph.Basics.copyNode(result1, orgaID)
             node1IDToBeLinked = newNode.nodeID
         
         node2IDToBeLinked = result2.nodeID
         if result2.createdBy != orgaID:
-            newNode = pgKnowledgeGraph.copyNode(result2, orgaID)
+            newNode = pgKnowledgeGraph.Basics.copyNode(result2, orgaID)
             node2IDToBeLinked = newNode.nodeID
             
         # link the two things
-        result = pgKnowledgeGraph.createEdge(node1IDToBeLinked, node2IDToBeLinked) 
+        result = pgKnowledgeGraph.Basics.createEdge(node1IDToBeLinked, node2IDToBeLinked) 
         if isinstance(result, Exception):
             raise result
         
@@ -1000,7 +1000,7 @@ def orga_removeEdgeToOrga(request:Request, entityID:str):
         #sparqlQueries.deletePrinterOfContractor.sendQuery(
         #    {sparqlQueries.SparqlParameters.ID: orgaID, 
         #     sparqlQueries.SparqlParameters.PrinterModel: printer})
-        result = pgKnowledgeGraph.deleteEdge(orgaID, entityID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(orgaID, entityID)
         if isinstance(result, Exception):
             raise result
         
@@ -1048,10 +1048,10 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result1 = pgKnowledgeGraph.getNode(entity1ID)
+        result1 = pgKnowledgeGraph.Basics.getNode(entity1ID)
         if isinstance(result1, Exception):
             raise result1
-        result2 = pgKnowledgeGraph.getNode(entity2ID)
+        result2 = pgKnowledgeGraph.Basics.getNode(entity2ID)
         if isinstance(result2, Exception):
             raise result2
         
@@ -1065,7 +1065,7 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        result = pgKnowledgeGraph.deleteEdge(entity1ID,entity2ID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(entity1ID,entity2ID)
         if isinstance(result, Exception):
             raise result
         
@@ -1115,11 +1115,11 @@ def orga_removeAll(request:Request):
         
         # sparqlQueries.deleteAllFromContractor.sendQuery(
         #     {sparqlQueries.SparqlParameters.ID: orgaID})
-        result = pgKnowledgeGraph.getEdgesForNode(orgaID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(orgaID)
         if isinstance(result, Exception):
             raise result
         for entry in result:
-            retVal = pgKnowledgeGraph.deleteEdge(orgaID, entry[pgKnowledgeGraph.NodeDescription.nodeID])
+            retVal = pgKnowledgeGraph.Basics.deleteEdge(orgaID, entry[pgKnowledgeGraph.NodeDescription.nodeID])
             if isinstance(retVal, Exception):
                 raise retVal
         

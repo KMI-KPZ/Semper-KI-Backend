@@ -8,9 +8,10 @@ Contains: Functions using the sparql queries to filter for contractors
 
 import copy
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
-from code_SemperKI.modelFiles.nodesModel import NodeDescription
+from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 
-from ..definitions import NodeTypesAM, NodePropertiesAM, NodePropertiesAMObjectDefinition
+from ..connections.postgresql import pgKG
+from ..definitions import NodeTypesAM, NodePropertiesAM
 from ..utilities.sparqlQueries import *
 
 ##################################################
@@ -36,8 +37,8 @@ def filterByMaterial(resultDict:dict, chosenMaterials:dict):
 
     for materialID in chosenMaterials:
         setOfManufacturerIDs = set()
-        material = pgKnowledgeGraph.getNode(materialID)
-        nodesWithTheSameUID = pgKnowledgeGraph.getAllNodesThatShareTheUniqueID(material.uniqueID)
+        material = pgKnowledgeGraph.Basics.getNode(materialID)
+        nodesWithTheSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(material.uniqueID)
         # filter for those of orgas and retrieve the orgaID
         for entry in nodesWithTheSameUID:
             if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
@@ -79,8 +80,8 @@ def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
 
     for postProcessingID in chosenPostProcessings:
         setOfManufacturerIDs = set()
-        postProcessing = pgKnowledgeGraph.getNode(postProcessingID)
-        nodesWithTheSameUID = pgKnowledgeGraph.getAllNodesThatShareTheUniqueID(postProcessing.uniqueID)
+        postProcessing = pgKnowledgeGraph.Basics.getNode(postProcessingID)
+        nodesWithTheSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(postProcessing.uniqueID)
         # filter for those of orgas and retrieve the orgaID
         for entry in nodesWithTheSameUID:
             if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
@@ -138,18 +139,7 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
             # for entry in manufacturers:
             #     if entry["ID"]["value"] not in manufacturersWhichCanDoAll:
             #         manufacturersWhichCanDoAll[entry["ID"]["value"]]  = entry
-            setOfManufacturerIDs = set()
-            printers = pgKnowledgeGraph.getNodesByProperty(NodePropertiesAM.buildVolume)
-            for printer in printers:
-                for property in printer[pgKnowledgeGraph.NodeDescription.properties]:
-                    if property[NodePropertiesAMObjectDefinition.name] == NodePropertiesAM.buildVolume:
-                        buildVolumeArray = property[NodePropertiesAMObjectDefinition.value].split("x")
-                        if calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"] <= float(buildVolumeArray[0]) and \
-                            calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"] <= float(buildVolumeArray[1]) and \
-                            calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"] <= float(buildVolumeArray[2]):
-                                manufacturers = pgKnowledgeGraph.getSpecificNeighborsByType(printer[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.organization)
-                                for manufacturer in manufacturers:
-                                    setOfManufacturerIDs.add(manufacturer[pgKnowledgeGraph.NodeDescription.nodeID])
+            setOfManufacturerIDs = pgKG.LogicAM.checkBuildVolume([calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"]])
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
     
     if len(listOfSetsForManufacturers) > 0:

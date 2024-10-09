@@ -244,7 +244,7 @@ class ProcessManagementBase(AbstractContentInterface):
         :rtype: None
         """
         try:
-            affectedEntries = Data.objects.delete(dataID=dataID)
+            affectedEntries = Data.objects.filter(dataID=dataID).delete()
         except (Exception) as error:
             logger.error(f'could not delete data entry: {str(error)}')
         

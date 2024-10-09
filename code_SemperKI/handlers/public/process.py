@@ -60,6 +60,7 @@ class SResProcessID(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @api_view(["GET"])
 @checkVersion(0.3)
 def createProcessID(request:Request, projectID):

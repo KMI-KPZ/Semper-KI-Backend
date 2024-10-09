@@ -13,6 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from django.conf import settings
 
+import requests
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
@@ -84,7 +85,7 @@ def getNode(request:Request, nodeID:str):
 
     """
     try:
-        node = pgKnowledgeGraph.getNode(nodeID)
+        node = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(node, Exception):
             raise node
         outSerializer = SResNode(data=node.toDict())
@@ -149,7 +150,7 @@ def createNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        result = pgKnowledgeGraph.createNode(validatedInput)
+        result = pgKnowledgeGraph.Basics.createNode(validatedInput)
         if isinstance(result, Exception):
             raise result
         outSerializer = SResNode(data=result.toDict())
@@ -197,7 +198,7 @@ def deleteNode(request:Request, nodeID:str):
 
     """
     try:
-        result = pgKnowledgeGraph.deleteNode(nodeID)
+        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
         return Response("Success", status=status.HTTP_200_OK)
@@ -259,7 +260,7 @@ def updateNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
         if isinstance(result, Exception):
             raise result
         
@@ -307,7 +308,7 @@ def getNodesByType(request:Request, nodeType:str):
 
     """
     try:
-        result = pgKnowledgeGraph.getNodesByType(nodeType)
+        result = pgKnowledgeGraph.Basics.getNodesByType(nodeType)
         if isinstance(result, Exception):
             raise result
 
@@ -355,7 +356,58 @@ def getNodesByProperty(request:Request, property:str):
 
     """
     try:
-        result = pgKnowledgeGraph.getNodesByProperty(property)
+        result = pgKnowledgeGraph.Basics.getNodesByProperty(property)
+        if isinstance(result, Exception):
+            raise result
+
+        outSerializer = SResNode(data=result, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {getNodesByProperty.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Get all nodes with a certain property",
+    description=" ",
+    tags=['BE - Graph'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def getNodesByTypeAndProperty(request:Request, nodeType:str, nodeProperty:str, value:str):
+    """
+    Get all nodes with a certain property
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param nodeType: The type of the node
+    :type nodeType: str
+    :param value: The value of the property
+    :type value: str
+    :param nodeProperty: The property of the node
+    :type nodeProperty: str
+    :return: list of nodes
+    :rtype: Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.Basics.getNodesByTypeAndProperty(nodeType, nodeProperty, value)
         if isinstance(result, Exception):
             raise result
 
@@ -403,7 +455,7 @@ def getEdgesForNode(request:Request, nodeID:str):
 
     """
     try:
-        result = pgKnowledgeGraph.getEdgesForNode(nodeID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
         if isinstance(result,Exception):
             raise result
         outSerializer = SResNode(data=result, many=True)
@@ -452,7 +504,7 @@ def getSpecificNeighborsByType(request:Request, nodeID:str, nodeType:str):
 
     """
     try:
-        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, nodeType)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, nodeType)
         if isinstance(result, Exception):
             raise result
         outSerializer = SResNode(data=result, many=True)
@@ -501,7 +553,7 @@ def getSpecificNeighborsByProperty(request:Request, nodeID:str, property:str):
 
     """
     try:
-        result = pgKnowledgeGraph.getSpecificNeighborsByProperty(nodeID, property)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByProperty(nodeID, property)
         if isinstance(result, Exception):
             raise result
         outSerializer = SResNode(data=result, many=True)
@@ -564,7 +616,7 @@ def createEdge(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        result = pgKnowledgeGraph.createEdge(validatedInput["nodeID1"], validatedInput["nodeID2"])
+        result = pgKnowledgeGraph.Basics.createEdge(validatedInput["nodeID1"], validatedInput["nodeID2"])
         if isinstance(result, Exception):
             raise result
         return Response("Success", status=status.HTTP_200_OK)
@@ -611,7 +663,7 @@ def deleteEdge(request:Request, nodeID1:str, nodeID2:str):
 
     """
     try:
-        result = pgKnowledgeGraph.deleteEdge(nodeID1,nodeID2)
+        result = pgKnowledgeGraph.Basics.deleteEdge(nodeID1,nodeID2)
         if isinstance(result, Exception):
             raise result
         return Response("Success", status=status.HTTP_200_OK)
@@ -656,7 +708,7 @@ def getGraph(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.getGraph()
+        result = pgKnowledgeGraph.Basics.getGraph()
         if isinstance(result, Exception):
             raise result
         outSerializer = SResGraph(data=result)
@@ -713,7 +765,7 @@ def getGraphForFrontend(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.getGraph()
+        result = pgKnowledgeGraph.Basics.getGraph()
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -794,7 +846,7 @@ def createGraph(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        result = pgKnowledgeGraph.createGraph(validatedInput)
+        result = pgKnowledgeGraph.Basics.createGraph(validatedInput)
         if isinstance(result, Exception):
             raise result
         outSerializer = SResGraph(data=result)
@@ -841,7 +893,7 @@ def loadTestGraph(request:Request):
     try:
         testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
         tGAsDict = json.loads(testGraph)
-        result = pgKnowledgeGraph.createGraph(tGAsDict)
+        result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -881,7 +933,7 @@ def deleteGraph(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.deleteGraph()
+        result = pgKnowledgeGraph.Basics.deleteGraph()
         if isinstance(result, Exception):
             raise result
         return Response("Success", status=status.HTTP_200_OK)
@@ -894,3 +946,4 @@ def deleteGraph(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
