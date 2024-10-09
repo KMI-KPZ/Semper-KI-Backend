@@ -270,3 +270,17 @@ class AbstractContentInterface(ABC):
         
         """
         pass
+
+    ##################################################
+    @abstractmethod
+    def getData(self, processID:str, processObj=None) -> list:
+        """
+        Get all data associated with the process (aka history).
+
+        :param processID: process ID for a process
+        :type processID: str
+        :return: list of all data
+        :rtype: list
+        
+        """
+        pass

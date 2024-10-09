@@ -22,6 +22,7 @@ class DataDescription(StrEnumExactlyAsDefined):
     """
     dataID = enum.auto()
     process = enum.auto()
+    processID = enum.auto() # interface only
     
     type = enum.auto()
     data = enum.auto()
@@ -86,4 +87,43 @@ class Data(models.Model):
                 DataDescription.createdBy: self.createdBy,
                 DataDescription.contentID: self.contentID,
                 DataDescription.createdWhen: str(self.createdWhen), DataDescription.updatedWhen: str(self.updatedWhen), DataDescription.accessedWhen: str(self.accessedWhen)}
+    
+##################################################
+class DataInterface():
+    """
+    Data management class as an interface
+    
+    :dataID: Primary Key with hash
+    :processID: Link to the process that created this entry
+    :type: Type of data, defined in another enum
+    :data: The data itself
+    :details: Meta data and other information
+    :createdBy: Who created this data
+    :contentID: ID of a file for example, makes searching easier
+    :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+    """
+
+    ##################################################
+    def __init__(self, dataID, processID, type, data, details, createdBy, contentID, createdWhen) -> None:
+        self.dataID:str = dataID
+        self.processID:str = processID
+        
+        self.type:int = type
+        self.data:dict = data
+        self.details:dict = details
+        self.createdBy:str = createdBy
+        self.contentID:str = contentID
+
+        self.createdWhen:str = createdWhen
+
+    ##################################################
+    def toDict(self):
+        return {DataDescription.dataID: self.dataID, 
+                DataDescription.processID: self.processID, 
+                DataDescription.type: self.type, 
+                DataDescription.data: self.data,
+                DataDescription.details: self.details, 
+                DataDescription.createdBy: self.createdBy,
+                DataDescription.contentID: self.contentID,
+                DataDescription.createdWhen: str(self.createdWhen)}
     

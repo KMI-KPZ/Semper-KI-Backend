@@ -13,17 +13,18 @@ from Generic_Backend.code_General.definitions import GlobalDefaults, SessionCont
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities import crypto
 
-from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend
+from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
+from ...modelFiles.dataModel import DataInterface, DataDescription
 from ...serviceManager import serviceManager
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
-# TODO: history alias Data
 
 #######################################################
 class StructuredSession():
@@ -34,7 +35,7 @@ class StructuredSession():
 
     currentSession : dict = {}
 
-    #######################################################
+#######################################################
     def __init__(self, session) -> None:
         """
         Initialize with existing session
@@ -280,6 +281,94 @@ class ProcessManagementSession(AbstractContentInterface):
         else:
             return GlobalDefaults.anonymous
         
+    ##################################################
+    def checkIfUserIsClient(self, userHashID, projectID="", processID=""):
+        """
+        See if the user is the client of either the project or the process
+
+        :param userHashID: The hashed ID of the user/organization
+        :type userHashID: str
+        :param projectID: The ID of the project
+        :type projectID: str
+        :param processID: The ID of the process
+        :type processID: str
+        :return: True if user is client, false if not
+        :rtype: bool
+        """
+        if projectID:
+            project = self.structuredSessionObj.getProject(projectID)
+            return project[ProjectDescription.client] == userHashID
+        if processID:
+            projectID, process = self.structuredSessionObj.getProcessAndProjectPerID(processID)
+            return process[ProcessDescription.client] == userHashID
+        return False    
+    
+    #######################################################
+    def getData(self, processID, processObj=None):
+        """
+        Get all data entries for a process
+
+        :param processID: The ID of the process
+        :type processID: str
+        :return: List of data entries
+        :rtype: list
+        """
+        try:
+            outList = []
+            for entry in self.structuredSessionObj.currentSession['data_history']:
+                if entry[DataDescription.processID] == processID:
+                    outList.append(entry)
+            return outList
+        except (Exception) as error:
+            logger.error(f'Generic error in getData: {str(error)}')
+
+        return []
+
+    #######################################################
+    def getDataWithContentID(self, processID, contentID):
+        """
+        Get data entries for a process with a specific content ID
+
+        :param processID: The ID of the process
+        :type processID: str
+        :param contentID: The content ID to search for
+        :type contentID: str
+        :return: List of matching data entries
+        :rtype: list
+        """
+        data = self.structuredSessionObj.currentSession['data_history']
+        return [entry for entry in data if entry.get('contentID') == contentID]
+    
+    #######################################################
+    def getDataWithID(self, processID, dataID):
+        """
+        Get a specific data entry for a process
+
+        :param processID: The ID of the process
+        :type processID: str
+        :param dataID: The data ID to search for
+        :type dataID: str
+        :return: The matching data entry or None
+        :rtype: dict or None
+        """
+        data = self.structuredSessionObj.currentSession['data_history']
+        return next((entry for entry in data if entry.get('dataID') == dataID), None)
+    
+    #######################################################
+    def getDataByType(self, processID, dataType):
+        """
+        Get data entries for a process of a specific type
+
+        :param processID: The ID of the process
+        :type processID: str
+        :param dataType: The data type to search for
+        :type dataType: DataType
+        :return: List of matching data entries
+        :rtype: list
+        """
+        data = self.structuredSessionObj.currentSession['data_history']
+        return [entry for entry in data if entry.get('dataType') == dataType]
+    
     #######################################################
     def getIfContentIsInSession(self) -> bool:
         """
@@ -348,7 +437,7 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f'could not get project: {str(error)}')
             return error
-
+        
     ##############################################
     def updateProject(self, projectID:str, updateType: ProjectUpdates, content:dict):
         """
@@ -430,20 +519,22 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     #######################################################
-    def getProcessObj(self, projectID:str, processID:str) -> ProcessInterface:
+    def getProcessObj(self, projectID: str, processID: str) -> ProcessInterface:
         """
         Return the process and all its details
 
-        :param projectID: The ID of the project
+        :param projectID: The ID of the project (can be empty)
         :type projectID: str
         :param processID: The ID of the process
         :type processID: str
         :return: Process Object
         :rtype: ProcessInterface
-
         """
         try:
-            content = self.structuredSessionObj.getProcess(projectID, processID)
+            if projectID == "":
+                content = self.structuredSessionObj.getProcessPerID(processID)
+            else:
+                content = self.structuredSessionObj.getProcess(projectID, processID)
             returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen], content[ProcessDescription.client]), processID, content[ProcessDescription.createdWhen], content[ProcessDescription.client])
             
             # dependencies are saved as list of processIDs 
@@ -586,6 +677,8 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
+            dataID = crypto.generateURLFriendlyRandomString()
+            
             if updateType == ProcessUpdates.messages:
                 if MessageInterfaceFromFrontend.origin in content:
                     origin = content[MessageInterfaceFromFrontend.origin]
@@ -598,10 +691,12 @@ class ProcessManagementSession(AbstractContentInterface):
                         currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages].append(content)
                     else:
                         currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages] = [content]
-            
+                    self.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
+                    
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
+                    self.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
             
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
@@ -610,12 +705,14 @@ class ProcessManagementSession(AbstractContentInterface):
                 serviceType = currentProcess[ProcessDescription.serviceType]
                 if serviceType != serviceManager.getNone():
                     currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
+                    self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
                 else:
                     raise Exception("No Service chosen!")
             
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess[ProcessDescription.serviceStatus] = content
-            
+                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
+                
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     if entry == ProcessDetails.priorities:
@@ -623,49 +720,39 @@ class ProcessManagementSession(AbstractContentInterface):
                             # update only one priority, the for loop is a shortcut to getting the key/priority
                             for prio in content[entry]:
                                 currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities][prio][PriorityTargetsSemperKI.value] = content[entry][prio][PriorityTargetsSemperKI.value]
+                                self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
                         else:
-                            currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.priorities] = content[entry]
+                            self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)# is set during creation and therefore complete
                     else:
                         currentProcess[ProcessDescription.processDetails][entry] = content[entry]
+                        self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
             
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = content
+                self.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
-            
-            elif updateType == ProcessUpdates.dependenciesIn:
-                if ProcessDescription.dependenciesIn in currentProcess:
-                    if content not in currentProcess[ProcessDescription.dependenciesIn]:
-                        currentProcess[ProcessDescription.dependenciesIn].append(content)
-                else:
-                    currentProcess[ProcessDescription.dependenciesIn] = [content]
+                self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
+                                
+            elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
+                dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
+                oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                
+                if content not in currentProcess.setdefault(dependencyKey, []):
+                    currentProcess[dependencyKey].append(content)
                 
                 dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
-                if ProcessDescription.dependenciesOut in dependentProcess:
-                    if processID not in dependentProcess[ProcessDescription.dependenciesOut]:
-                        dependentProcess[ProcessDescription.dependenciesOut].append(processID)
-                else:
-                    dependentProcess[ProcessDescription.dependenciesOut] = [processID]
-
-            elif updateType == ProcessUpdates.dependenciesOut:
-                if ProcessDescription.dependenciesOut in currentProcess:
-                    if content not in currentProcess[ProcessDescription.dependenciesOut]:
-                        currentProcess[ProcessDescription.dependenciesOut].append(content)
-                else:
-                    currentProcess[ProcessDescription.dependenciesOut] = [content]
-                
-                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
-                if ProcessDescription.dependenciesIn in dependentProcess:
-                    if processID not in dependentProcess[ProcessDescription.dependenciesIn]:
-                        dependentProcess[ProcessDescription.dependenciesIn].append(processID)
-                else:
-                    dependentProcess[ProcessDescription.dependenciesIn] = [processID]
+                if processID not in dependentProcess.setdefault(oppositeKey, []):
+                    dependentProcess[oppositeKey].append(processID)
+                self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
             else:
-                raise Exception("updateProcess " + updateType + " not implemented")
+                raise Exception(f"updateProcess {updateType} not implemented")
             
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
-
+            self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
+            
             return True
         except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
@@ -693,10 +780,13 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
+            dataID = crypto.generateURLFriendlyRandomString()
+
             if updateType == ProcessUpdates.messages:
                 origin = content['origin']
                 currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend[origin]] = []
-        
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.MESSAGE, "content": content})
+
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
@@ -704,52 +794,68 @@ class ProcessManagementSession(AbstractContentInterface):
                     else:
                         s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
                     del currentProcess[ProcessDescription.files][entry]
-            
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
+
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = serviceManager.getNone()
-            
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
+
             elif updateType == ProcessUpdates.serviceDetails:
                 serviceType = currentProcess[ProcessDescription.serviceType]
                 if serviceType != serviceManager.getNone():
                     currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceDetails})
                 else:
                     raise Exception("No Service chosen!")
-            
+
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess[ProcessDescription.serviceStatus] = 0
-            
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceStatus})
+
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     del currentProcess[ProcessDescription.processDetails][entry]
-            
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DETAILS, "content": ProcessUpdates.processDetails})
+
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
-            
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
+
             elif updateType == ProcessUpdates.provisionalContractor:
                 del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
-            
-            elif updateType == ProcessUpdates.dependenciesIn:
-                if ProcessDescription.dependenciesIn in currentProcess:
-                    currentProcess[ProcessDescription.dependenciesIn].remove(content)
-                else:
-                    currentProcess[ProcessDescription.dependenciesIn] = []
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
-            elif updateType == ProcessUpdates.dependenciesOut:
-                if ProcessDescription.dependenciesOut in currentProcess:
-                    currentProcess[ProcessDescription.dependenciesOut].remove(content)
-                else:
-                    currentProcess[ProcessDescription.dependenciesOut] = []
+            elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
+                dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
+                if content in currentProcess.get(dependencyKey, []):
+                    currentProcess[dependencyKey].remove(content)
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
 
             else:
-                raise Exception("updateProcess delete " + updateType + " not implemented")
+                raise Exception(f"deleteFromProcess {updateType} not implemented")
 
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
+            self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
 
             return True
         except (Exception) as error:
             logger.error(f"could not delete from process: {str(error)}")
             return error
         
+    
+    ##############################################
+    def getProcessesPerPID(self, projectID):
+        """
+        Retrieve infos about one project, for admins
+
+        :param projectID: project of interest
+        :type projectID: str
+        :return: list of all processes of that project
+        :rtype: list
+        """
+        processes = self.structuredSessionObj.getProcesses(projectID)
+        return list(processes.values())
+    
     ##############################################
     def checkIfFilesAreRemote(self, projectID:str, processID:str) -> bool:
         """
@@ -773,3 +879,39 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f'could not check if files are remote: {str(error)}')
             return False
+    
+    ##################################################
+    def createDataEntry(self, data, dataID, processID, typeOfData:DataType, createdBy:str, details={}, IDofData=""):
+        """
+        Create an entry in the Data history
+
+        :param data: The data itself
+        :type data: Dict in JSON
+        :param dataID: The ID of that date
+        :type dataID: Str
+        :param processID: process it belongs to
+        :type processID: str
+        :param typeOfData: The type of this data
+        :type typeOfData: DataType
+        :param createdBy: Who created it (hashed ID)
+        :type createdBy: Str
+        :param details: Some metadata
+        :type details: JSON Dict
+        :param IDofData: If the data has an id, save it
+        :type IDofData: Str
+        :return: Nothing
+        :rtype: None
+        """
+        try:
+            if 'data_history' not in self.structuredSessionObj.currentSession:
+                self.structuredSessionObj.currentSession['data_history'] = []
+            
+            dataEntry = DataInterface(dataID, processID, typeOfData, data, details, createdBy, IDofData, str(timezone.now()))
+            
+            self.structuredSessionObj.currentSession['data_history'].append(dataEntry.toDict())
+            self.structuredSessionObj.currentSession.modified = True
+
+        except Exception as error:
+            logger.error(f'could not create data entry: {str(error)}')
+        
+        return None
