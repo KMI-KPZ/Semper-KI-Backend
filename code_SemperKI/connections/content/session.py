@@ -19,12 +19,12 @@ from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, Mess
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
+from ...modelFiles.dataModel import DataInterface, DataDescription
 from ...serviceManager import serviceManager
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
 logger = logging.getLogger("errors")
-# TODO: history alias Data
 
 #######################################################
 class StructuredSession():
@@ -281,6 +281,7 @@ class ProcessManagementSession(AbstractContentInterface):
         else:
             return GlobalDefaults.anonymous
         
+    ##################################################
     def checkIfUserIsClient(self, userHashID, projectID="", processID=""):
         """
         See if the user is the client of either the project or the process
@@ -303,7 +304,7 @@ class ProcessManagementSession(AbstractContentInterface):
         return False    
     
     #######################################################
-    def getData(self, processID, processObject=None):
+    def getData(self, processID, processObj=None):
         """
         Get all data entries for a process
 
@@ -313,12 +314,10 @@ class ProcessManagementSession(AbstractContentInterface):
         :rtype: list
         """
         try:
-            if processObject != None:
-                processObj = processObject
-            else:
-                processObj = self.structuredSessionObj.getProcessPerID(processID)
             outList = []
-            outList.append(processObj)
+            for entry in self.structuredSessionObj.currentSession['data_history']:
+                if entry[DataDescription.processID] == processID:
+                    outList.append(entry)
             return outList
         except (Exception) as error:
             logger.error(f'Generic error in getData: {str(error)}')
@@ -337,7 +336,7 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: List of matching data entries
         :rtype: list
         """
-        data = self.getData(processID)
+        data = self.structuredSessionObj.currentSession['data_history']
         return [entry for entry in data if entry.get('contentID') == contentID]
     
     #######################################################
@@ -352,7 +351,7 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: The matching data entry or None
         :rtype: dict or None
         """
-        data = self.getData(processID)
+        data = self.structuredSessionObj.currentSession['data_history']
         return next((entry for entry in data if entry.get('dataID') == dataID), None)
     
     #######################################################
@@ -367,7 +366,7 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: List of matching data entries
         :rtype: list
         """
-        data = self.getData(processID)
+        data = self.structuredSessionObj.currentSession['data_history']
         return [entry for entry in data if entry.get('dataType') == dataType]
     
     #######################################################
@@ -439,68 +438,6 @@ class ProcessManagementSession(AbstractContentInterface):
             logger.error(f'could not get project: {str(error)}')
             return error
         
-    ######################################################################################
-    def getAllUsersOfProject(self, projectID):
-        """
-        Get all user IDs that are connected to that project.
-
-        :param projectID: unique project ID
-        :type projectID: str
-        :return: Set of all user IDs
-        :rtype: Set
-        """
-        try:
-            currentProject = self.structuredSessionObj.getProject(projectID)
-            users = set()
-            
-            # Assuming client ID is stored directly in the project
-            clientID = currentProject.get(ProjectDescription.client)
-            
-            if clientID:
-                users.add(clientID)
-                
-                # If we need to handle organizations, we would need to store this information in the session
-                # This is a placeholder for how we might handle it:
-                if SessionContentSemperKI.ORGANIZATIONS in self.structuredSessionObj.getSession():
-                    org = self.structuredSessionObj.getSession()[SessionContentSemperKI.ORGANIZATIONS].get(clientID)
-                    if org:
-                        users.update(org.get('users', []))
-            
-            return users
-        except Exception as error:
-            logger.error(f'could not get all users of project: {str(error)}')
-        return set()    
-    ####################################################################################
-    # def getAllUsersOfProcess(self, processID):
-    #     """
-    #     Get all user IDs that are connected to that processID.
-
-    #     :param processID: unique process ID
-    #     :type processID: str
-    #     :return: Set of all user IDs
-    #     :rtype: Set
-
-    #     """
-    #     try:
-    #         currentProcess = self.structuredSessionObj.getProcess(processID)
-    #         users = set()
-    #         # userObj, orgaOrUser = ProfileManagementBase.getUserViaHash(currentProcess.client)
-    #         # if userObj != None:
-    #         #     if orgaOrUser:
-    #         #         # Is organization, add all people
-    #         #         for user in userObj.users.all():
-    #         #             users.update({user.hashedID})
-    #         #     users.update({userObj.hashedID})
-    #         # if currentProcess.contractor != None:
-    #         #     for user in currentProcess.contractor.users.all():
-    #         #         users.update({user.hashedID})
-    #         #     users.update({currentProcess.contractor.hashedID})
-
-    #         return users
-    #     except (Exception) as error:
-    #         logger.error(f'could not get all users of process: {str(error)}')
-    #     return set()
-    
     ##############################################
     def updateProject(self, projectID:str, updateType: ProjectUpdates, content:dict):
         """
@@ -594,24 +531,10 @@ class ProcessManagementSession(AbstractContentInterface):
         :rtype: ProcessInterface
         """
         try:
-            # Check if projectID is available
-            if not projectID:
-                # If not, attempt to find it using getProcessPerID logic
-                for proj_id in self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS]:
-                    if (SessionContentSemperKI.processes in 
-                        self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][proj_id]):
-                        for current_process_id in self.structuredSessionObj.currentSession[SessionContentSemperKI.CURRENT_PROJECTS][proj_id][SessionContentSemperKI.processes]:
-                            if current_process_id == processID:
-                                projectID = proj_id
-                                break
-                        if projectID:
-                            break
-                
-                if not projectID:
-                    raise Exception(f"Could not find project ID for process {processID}")
-
-            # Original logic continues here
-            content = self.structuredSessionObj.getProcess(projectID, processID)
+            if projectID == "":
+                content = self.structuredSessionObj.getProcessPerID(processID)
+            else:
+                content = self.structuredSessionObj.getProcess(projectID, processID)
             returnObj = ProcessInterface(ProjectInterface(projectID, content[ProcessDescription.createdWhen], content[ProcessDescription.client]), processID, content[ProcessDescription.createdWhen], content[ProcessDescription.client])
             
             # dependencies are saved as list of processIDs 
@@ -814,15 +737,15 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
                                 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
-                dependency_key = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
-                opposite_key = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
+                oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
                 
-                if content not in currentProcess.setdefault(dependency_key, []):
-                    currentProcess[dependency_key].append(content)
+                if content not in currentProcess.setdefault(dependencyKey, []):
+                    currentProcess[dependencyKey].append(content)
                 
                 dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
-                if processID not in dependentProcess.setdefault(opposite_key, []):
-                    dependentProcess[opposite_key].append(processID)
+                if processID not in dependentProcess.setdefault(oppositeKey, []):
+                    dependentProcess[oppositeKey].append(processID)
                 self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
             else:
                 raise Exception(f"updateProcess {updateType} not implemented")
@@ -903,9 +826,9 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
-                dependency_key = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
-                if content in currentProcess.get(dependency_key, []):
-                    currentProcess[dependency_key].remove(content)
+                dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
+                if content in currentProcess.get(dependencyKey, []):
+                    currentProcess[dependencyKey].remove(content)
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
 
             else:
@@ -919,48 +842,6 @@ class ProcessManagementSession(AbstractContentInterface):
             logger.error(f"could not delete from process: {str(error)}")
             return error
         
-    ##############################################
-    def getInfoAboutProjectForWebsocket(self, projectID, processID, event, notification, clientOnly):
-        """
-        Retrieve information about the users connected to the project from the session.
-
-        :param projectID: project ID to retrieve data from
-        :type projectID: str
-        :param processID: The process ID affected
-        :type processID: str
-        :param event: the event that happens
-        :type event: str
-        :param notification: The notification that wants to be sent
-        :type notification: str
-        :param clientOnly: Whether to include only the client or also the contractor
-        :type clientOnly: bool
-        :return: Dictionary of users with project ID and processes for the websocket to fire events
-        :rtype: dict
-        """
-        dictForEventsAsOutput = {}
-        process = self.structuredSessionObj.getProcess(projectID, processID)
-        clientID = process.get(ProcessDescription.client)
-        
-        # In a session-based approach, we might not have access to all user preferences.
-        # For this example, we'll assume all users want to receive notifications.
-        dictForEventsAsOutput[clientID] = {
-            "triggerEvent": True,
-            EventsDescription.eventType: EventsDescription.projectEvent,
-            EventsDescription.events: [{
-                ProjectDescription.projectID: projectID,
-                SessionContentSemperKI.processes: [{
-                    ProcessDescription.processID: processID,
-                    event: 1
-                }]
-            }]
-        }
-
-        if not clientOnly:
-            contractorID = process.get(ProcessDescription.processDetails, {}).get(ProcessDetails.provisionalContractor)
-            if contractorID:
-                dictForEventsAsOutput[contractorID] = dictForEventsAsOutput[clientID]
-
-        return dictForEventsAsOutput
     
     ##############################################
     def getProcessesPerPID(self, projectID):
@@ -998,7 +879,8 @@ class ProcessManagementSession(AbstractContentInterface):
         except (Exception) as error:
             logger.error(f'could not check if files are remote: {str(error)}')
             return False
-        
+    
+    ##################################################
     def createDataEntry(self, data, dataID, processID, typeOfData:DataType, createdBy:str, details={}, IDofData=""):
         """
         Create an entry in the Data history
@@ -1024,18 +906,9 @@ class ProcessManagementSession(AbstractContentInterface):
             if 'data_history' not in self.structuredSessionObj.currentSession:
                 self.structuredSessionObj.currentSession['data_history'] = []
             
-            dataEntry = {
-                'dataID': dataID,
-                'processID': processID,
-                'type': typeOfData,
-                'data': data,
-                'details': details,
-                'createdBy': createdBy,
-                'contentID': IDofData,
-                'createdWhen': str(timezone.now())
-            }
+            dataEntry = DataInterface(dataID, processID, typeOfData, data, details, createdBy, IDofData, str(timezone.now()))
             
-            self.structuredSessionObj.currentSession['data_history'].append(dataEntry)
+            self.structuredSessionObj.currentSession['data_history'].append(dataEntry.toDict())
             self.structuredSessionObj.currentSession.modified = True
 
         except Exception as error:

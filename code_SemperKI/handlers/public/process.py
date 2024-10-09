@@ -382,8 +382,8 @@ def deleteProcessFunction(session, processIDs:list[str]):
         return HttpResponse("Success")
     
     except Exception as e:
-        return e        
-        
+        return e
+            
 #########################################################################
 # deleteProcess
 #"deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses),
@@ -482,35 +482,32 @@ def getProcessHistory(request:Request, processID):
 
     """
     try:
-        content_manager = ManageContent(request.session)
-        interface = content_manager.getCorrectInterface(getProcessHistory.cls.__name__)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(getProcessHistory.cls.__name__)
         if interface is None:
             logger.error("Rights not sufficient in getProcessHistory")
             return Response("Insufficient rights", status=status.HTTP_401_UNAUTHORIZED)
 
-        process_obj = interface.getProcessObj("", processID)
-        if process_obj is None:
+        processObj = interface.getProcessObj("", processID)
+        if processObj is None:
             raise Exception("Process not found in DB!")
 
-        if isinstance(interface, ProcessManagementSession):
-            list_of_data = request.session['data_history']
-        else:
-            list_of_data = interface.getData(processID, process_obj)
+        listOfData = interface.getData(processID, processObj)
 
-        out_data = []
-        for entry in list_of_data:
-            out_datum = {
+        outData = []
+        for entry in listOfData:
+            outDatum = {
                 DataDescription.createdBy: entry[DataDescription.createdBy],
                 DataDescription.createdWhen: entry[DataDescription.createdWhen],
                 DataDescription.type: entry[DataDescription.type],
                 DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
             }
             if not isinstance(interface, ProcessManagementSession):
-                out_datum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
-            out_data.append(out_datum)
+                outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            outData.append(outDatum)
 
-        out_obj = {"history": out_data}
-        outSerializer = SResProcessHistory(data=out_obj)
+        outObj = {"history": outData}
+        outSerializer = SResProcessHistory(data=outObj)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:

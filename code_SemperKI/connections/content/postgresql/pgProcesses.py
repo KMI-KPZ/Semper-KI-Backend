@@ -101,7 +101,7 @@ class ProcessManagementBase(AbstractContentInterface):
     @staticmethod
     def getData(processID, processObject=None):
         """
-        Get all files.
+        Get all data associated with the process (aka history).
 
         :param processID: process ID for a process
         :type processID: str
