@@ -174,3 +174,4 @@ def retrieveResultsFromQuestionnaire(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        

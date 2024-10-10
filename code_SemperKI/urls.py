@@ -77,6 +77,7 @@ newPaths= {
     "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
     "getSpecificNeighborsByType": ("private/edges/get/by-type/<str:nodeID>/<str:nodeType>/", knowledgeGraphDB.getSpecificNeighborsByType),
     "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
+    "getNodesByTypeAndProperty": ("private/edges/get/by-property-and-type/<str:nodeType>/<str:nodeProperty>/<str:value>/", knowledgeGraphDB.getNodesByTypeAndProperty),
     "createEdge": ("private/edges/create/", knowledgeGraphDB.createEdge),
     "deleteEdge": ("private/edges/delete/<str:nodeID1>/<str:nodeID2>/", knowledgeGraphDB.deleteEdge),
     "getGraph": ("private/graph/get/for-backend/", knowledgeGraphDB.getGraph),
@@ -92,6 +93,10 @@ newPaths= {
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
+
+    ########################## API ##############################
+    "apiCreateProject": ("public/api/project/create/", project.createProjectID),
+    "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
 }
 
 # add paths

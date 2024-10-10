@@ -101,7 +101,7 @@ class ProcessManagementBase(AbstractContentInterface):
     @staticmethod
     def getData(processID, processObject=None):
         """
-        Get all files.
+        Get all data associated with the process (aka history).
 
         :param processID: process ID for a process
         :type processID: str
@@ -244,7 +244,7 @@ class ProcessManagementBase(AbstractContentInterface):
         :rtype: None
         """
         try:
-            affectedEntries = Data.objects.delete(dataID=dataID)
+            affectedEntries = Data.objects.filter(dataID=dataID).delete()
         except (Exception) as error:
             logger.error(f'could not delete data entry: {str(error)}')
         

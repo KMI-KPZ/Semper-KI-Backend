@@ -58,6 +58,7 @@ newPaths = {
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
     "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
+    "onto_getNeighbors": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
     "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
     "onto_removeEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),

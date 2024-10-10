@@ -110,7 +110,7 @@ def retrievePostProcessingsWithFilter(request:Request):
             resultsOfQueries["postProcessings"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testpicture})
         output.update(resultsOfQueries["postProcessings"]) """
         
-        postProcessings = pgKnowledgeGraph.getNodesByType(NodeTypesAM.additionalRequirement)
+        postProcessings = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.additionalRequirement)
         filteredOutput = [entry for entry in postProcessings if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner] # and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from system
 
         for entry in filteredOutput:

@@ -30,6 +30,7 @@ from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
+from code_SemperKI.connections.content.session import ProcessManagementSession
 from code_SemperKI.handlers.public.project import *
 import code_SemperKI.utilities.websocket as WebSocketEvents
 
@@ -60,6 +61,7 @@ class SResProcessID(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @api_view(["GET"])
 @checkVersion(0.3)
 def createProcessID(request:Request, projectID):
@@ -381,8 +383,8 @@ def deleteProcessFunction(session, processIDs:list[str]):
         return HttpResponse("Success")
     
     except Exception as e:
-        return e        
-        
+        return e
+            
 #########################################################################
 # deleteProcess
 #"deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses),
@@ -466,9 +468,6 @@ class SResProcessHistory(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
-@checkIfRightsAreSufficient(json=True)
-@checkIfUserMaySeeProcess(json=True)
 @api_view(["GET"])
 @checkVersion(0.3)
 def getProcessHistory(request:Request, processID):
@@ -484,22 +483,31 @@ def getProcessHistory(request:Request, processID):
 
     """
     try:
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj("", processID)
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(getProcessHistory.cls.__name__)
+        if interface is None:
+            logger.error("Rights not sufficient in getProcessHistory")
+            return Response("Insufficient rights", status=status.HTTP_401_UNAUTHORIZED)
 
-        if processObj == None:
+        processObj = interface.getProcessObj("", processID)
+        if processObj is None:
             raise Exception("Process not found in DB!")
-        
-        listOfData = pgProcesses.ProcessManagementBase.getData(processID, processObj)
-        # parse for frontend
-        for index, entry in enumerate(listOfData):
-            outDatum = {}
-            outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
-            outDatum[DataDescription.createdWhen] = entry[DataDescription.createdWhen]
-            outDatum[DataDescription.type] = entry[DataDescription.type]
-            outDatum[DataDescription.data] = entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
-            listOfData[index] = outDatum # overwrite
 
-        outObj = {"history": listOfData}
+        listOfData = interface.getData(processID, processObj)
+
+        outData = []
+        for entry in listOfData:
+            outDatum = {
+                DataDescription.createdBy: entry[DataDescription.createdBy],
+                DataDescription.createdWhen: entry[DataDescription.createdWhen],
+                DataDescription.type: entry[DataDescription.type],
+                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
+            }
+            if not isinstance(interface, ProcessManagementSession):
+                outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
+            outData.append(outDatum)
+
+        outObj = {"history": outData}
         outSerializer = SResProcessHistory(data=outObj)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
