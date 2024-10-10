@@ -45,7 +45,7 @@ class BackendDjangoConfig(AppConfig, BackendConfigHelper):
         """
         currentDirectory = os.getcwd()  # current working directory
         if settings.DEBUG: # this is faster for debugging
-            listOfImports = ["code_SemperKI/imports.py", "code_SemperKI/services/service_AdditiveManufacturing/imports.py", "code_SemperKI/services/service_CreateModel/imports.py", "Generic_Backend/code_General/imports.py"]
+            listOfImports = ["code_SemperKI/imports.py", "code_SemperKI/services/service_AdditiveManufacturing/imports.py", "code_SemperKI/services/service_CreateModel/imports.py", "code_SemperKI/services/service_Delivery/imports.py", "code_SemperKI/services/service_PostProcessing/imports.py", "code_SemperKI/services/service_Packaging/imports.py", "code_SemperKI/services/service_QualityControl/imports.py", "code_SemperKI/services/service_Assembly/imports.py", "code_SemperKI/services/service_AfterSales/imports.py", "Generic_Backend/code_General/imports.py"]
             for entry in listOfImports:
                 serviceFilePath = os.path.join(settings.BASE_DIR, entry)
 
