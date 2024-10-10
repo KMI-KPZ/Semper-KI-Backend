@@ -35,8 +35,8 @@ from MSQ.handlers import interface
 newPaths= {
     #"rest-test": ("public/resttest/<str:dummy>/", testResponse.restTest),
     #"rest-test2": ("public/resttest2/<str:dummy>/", testResponse.restTestAPI.as_view()),
-    "schema": ('private/schema/', SpectacularAPIView.as_view(api_version='0.3')),
-    "swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
+    #"schema": ('private/schema/', SpectacularAPIView.as_view(api_version='0.3')),
+    #"swagger-ui": ('private/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema')),
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),

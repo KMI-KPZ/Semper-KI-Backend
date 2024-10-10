@@ -60,6 +60,7 @@ newPaths = {
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
     "onto_getNeighbors": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
     "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
+    "onto_createOrUpdateAndLinkNodes": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create-and-link/", onto.onto_createOrUpdateAndLinkNodes),
     "onto_removeEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),

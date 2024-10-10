@@ -26,7 +26,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSuffic
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode
+from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -372,6 +372,126 @@ def onto_addNode(request:Request):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+#######################################################
+class SReqNodeFEAdmin(serializers.Serializer):
+    nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    nodeName = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    context = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    nodeType = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    properties = serializers.ListField(child=SResProperties(), allow_empty=True, required=False)
+    createdBy = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    active = serializers.BooleanField(required=False)
+
+#######################################################
+class SReqEdgesFEAdmin(serializers.Serializer):
+    create = serializers.ListField(child=serializers.CharField(max_length=200))
+    delete = serializers.ListField(child=serializers.CharField(max_length=200))
+
+#######################################################
+class SReqCreateOrUpdateAndLinkAdmin(serializers.Serializer):
+    type = serializers.CharField(max_length=200)
+    node = SReqNodeFEAdmin()
+    edges = SReqEdgesFEAdmin()
+
+#######################################################
+@extend_schema(
+    summary="Combined access for frontend to create and update together with linking",
+    description=" ",
+    tags=['FE - AM Resources Organization'],
+    request=SReqCreateOrUpdateAndLinkAdmin,
+    responses={
+        200: None,
+        400: ExceptionSerializer,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["POST"])
+@checkIfUserIsAdmin()
+@api_view(["POST"])
+@checkVersion(0.3)
+def onto_createOrUpdateAndLinkNodes(request:Request):
+    """
+    Combined access for frontend to create and update together with linking
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: JSON
+    :rtype: Response
+
+    """
+    try:
+        inSerializer = SReqCreateOrUpdateAndLinkAdmin(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {onto_createOrUpdateAndLinkNodes.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        validatedInput = inSerializer.data
+        
+        if validatedInput["type"] == "create":
+            # create node for the system
+            if "nodeID" in validatedInput["node"]:
+                del validatedInput["node"]["nodeID"]
+            resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], pgKnowledgeGraph.defaultOwner)
+            if isinstance(resultNode, Exception):
+                raise resultNode
+            # create edges
+            for nodeIDFromEdge in validatedInput["edges"]["create"]:
+                # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
+                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
+                if isinstance(otherNode, Exception):
+                    raise otherNode
+
+                # create edge to new node
+                result = pgKnowledgeGraph.Basics.createEdge(otherNode.nodeID, resultNode.nodeID) 
+                if isinstance(result, Exception):
+                    raise result
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
+
+        elif validatedInput["type"] == "update":
+            # update node
+            resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
+            if isinstance(resultNode, Exception):
+                raise resultNode
+            # create edges
+            for nodeIDFromEdge in validatedInput["edges"]["create"]:
+                # create edge to new node
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
+                if isinstance(result, Exception):
+                    raise result
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
+        else:
+            return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
+
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga {orgaID}," + str(datetime.now()))
+
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {onto_createOrUpdateAndLinkNodes.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 #######################################################
 @extend_schema(
     summary="Updates the values of a node",
@@ -485,8 +605,7 @@ def onto_deleteNode(request:Request, nodeID:str):
 
 #######################################################
 class SReqOntoCreateEdge(serializers.Serializer):
-    ID1 = serializers.CharField(max_length=200)
-    ID2 = serializers.CharField(max_length=200)
+    entityIDs = serializers.ListField(child=serializers.CharField(max_length=200),min_length=2)
 
 #######################################################
 @extend_schema(
@@ -529,8 +648,9 @@ def onto_addEdge(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        ID1 = serializedInput.data["ID1"]
-        ID2 = serializedInput.data["ID2"]
+        entityIDs = serializedInput.data["entityIDs"]
+        ID1 = entityIDs[0]
+        ID2 = entityIDs[1]
         # TODO Sparql
         result = pgKnowledgeGraph.Basics.createEdge(ID1, ID2) 
         if isinstance(result, Exception):

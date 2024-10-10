@@ -403,7 +403,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
-class SReqNodeFE(serializers.Serializer):
+class SReqNodeFEOrga(serializers.Serializer):
     nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
     nodeName = serializers.CharField(max_length=200, required=False, allow_blank=True)
     context = serializers.CharField(max_length=1000, required=False, allow_blank=True)
@@ -413,22 +413,22 @@ class SReqNodeFE(serializers.Serializer):
     active = serializers.BooleanField(required=False)
 
 #######################################################
-class SReqEdgesFE(serializers.Serializer):
+class SReqEdgesFEOrga(serializers.Serializer):
     create = serializers.ListField(child=serializers.CharField(max_length=200))
     delete = serializers.ListField(child=serializers.CharField(max_length=200))
 
 #######################################################
-class SReqCreateOrUpdateAndLink(serializers.Serializer):
+class SReqCreateOrUpdateAndLinkOrga(serializers.Serializer):
     type = serializers.CharField(max_length=200)
-    node = SReqNodeFE()
-    edges = SReqEdgesFE()
+    node = SReqNodeFEOrga()
+    edges = SReqEdgesFEOrga()
 
 #######################################################
 @extend_schema(
     summary="Combined access for frontend to create and update together with linking",
     description=" ",
     tags=['FE - AM Resources Organization'],
-    request=SReqCreateOrUpdateAndLink,
+    request=SReqCreateOrUpdateAndLinkOrga,
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -452,7 +452,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
 
     """
     try:
-        inSerializer = SReqCreateOrUpdateAndLink(data=request.data)
+        inSerializer = SReqCreateOrUpdateAndLinkOrga(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
@@ -626,7 +626,7 @@ def orga_createNode(request:Request):
     tags=['FE - AM Resources Organization'],
     request=SReqUpdateNode,
     responses={
-        200: None,
+        200: SResNode,
         400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
@@ -694,7 +694,11 @@ def orga_updateNode(request:Request):
         
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {result.nodeID} of orga {orgaID}," + str(datetime.now()))
 
-        return Response("Success", status=status.HTTP_200_OK)
+        outSerializer = SResNode(data=result.toDict())
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
 
     except (Exception) as error:
         message = f"Error in {orga_updateNode.cls.__name__}: {str(error)}"
@@ -780,7 +784,7 @@ def orga_deleteNode(request:Request, nodeID:str):
 # set printer/material for orga (keep in mind: one item at the time for sparql)
 #######################################################
 class SReqOrgaAddEdges(serializers.Serializer):
-    entityIDs = serializers.ListField(child=serializers.CharField(max_length=200))
+    entityIDs = serializers.ListField(child=serializers.CharField(max_length=200),min_length=2)
 
 #######################################################
 @extend_schema(
@@ -863,17 +867,13 @@ def orga_addEdgesToOrga(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-#######################################################
-class SReqOrgaCreateEdge(serializers.Serializer):
-    entity1ID = serializers.CharField(max_length=200)
-    entity2ID = serializers.CharField(max_length=200)
 
 #######################################################
 @extend_schema(
     summary="Links two things for an organization in the knowledge graph",
     description=" ",
     tags=['FE - AM Resources Organization'],
-    request=SReqOrgaCreateEdge,
+    request=SReqOrgaAddEdges,
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -899,7 +899,7 @@ def orga_addEdgeForOrga(request:Request):
     """
     try:
 
-        serializedInput = SReqOrgaCreateEdge(data=request.data)
+        serializedInput = SReqOrgaAddEdges(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgeForOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
@@ -910,8 +910,8 @@ def orga_addEdgeForOrga(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        entity1ID = serializedInput.data["entity1ID"]
-        entity2ID = serializedInput.data["entity2ID"]
+        entity1ID = serializedInput.data["entityIDs"][0]
+        entity2ID = serializedInput.data["entityIDs"][1]
 
         # edge already exists?
         if pgKnowledgeGraph.Basics.getIfEdgeExists(entity1ID, entity2ID):
