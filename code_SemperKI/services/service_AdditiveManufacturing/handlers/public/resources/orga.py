@@ -77,7 +77,7 @@ def orga_getGraph(request:Request):
             raise result
         outDict = {"Nodes": [], "Edges": []}
         for entry in result["nodes"]:
-            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName]}
+            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "type": entry[pgKnowledgeGraph.NodeDescription.nodeType]}
             outDict["Nodes"].append(outEntry)
         for entry in result["edges"]:
             outEntry = {"source": entry[0], "target": entry[1]}
