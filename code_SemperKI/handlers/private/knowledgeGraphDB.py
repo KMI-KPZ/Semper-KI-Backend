@@ -730,6 +730,7 @@ def getGraph(request:Request):
 class SResInitialNodes(serializers.Serializer):
     id = serializers.CharField(max_length=200)
     name = serializers.CharField(max_length=200)
+    type = serializers.CharField(max_length=200)
 #######################################################
 class SResInitialEdges(serializers.Serializer):
     source = serializers.CharField(max_length=200)
@@ -770,7 +771,7 @@ def getGraphForFrontend(request:Request):
             raise result
         outDict = {"Nodes": [], "Edges": []}
         for entry in result["nodes"]:
-            outEntry = {"id": entry[NodeDescription.nodeID], "name": entry[NodeDescription.nodeName]}
+            outEntry = {"id": entry[NodeDescription.nodeID], "name": entry[NodeDescription.nodeName], "type": entry[NodeDescription.nodeType]}
             outDict["Nodes"].append(outEntry)
         for entry in result["edges"]:
             outEntry = {"source": entry[0], "target": entry[1]}
