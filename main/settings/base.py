@@ -91,6 +91,9 @@ class BackendConfigHelper(ConfigHelper):
         'EMAIL_USE_TLS': {'var': 'EMAIL_USE_TLS', 'hint': 'Email use tls for sending emails', 'default': False,'required': False, 'type': 'bool'},
         'EMAIL_USE_SSL': {'var': 'EMAIL_USE_SSL', 'hint': 'Email use ssl for sending emails', 'default': False,'required': False, 'type': 'bool'},
         'EMAIL_ADDR_SUPPORT' : {'var': 'EMAIL_ADDR_SUPPORT', 'hint': 'Email address for support, i.e. for contact form', 'default': 'semper-ki@infai.org'},
+        'OPENAI_API_KEY': {'var': 'OPENAI_API_KEY', 'hint': 'OpenAI API Key', 'default': False, 'required': False},
+        'LLAMA_CLOUD_API_KEY': {'var': 'LLAMA_CLOUD_API_KEY', 'hint': 'Llama API Key', 'default': False, 'required': False}
+
     }
     env_vars_internal = {
         'DJANGO_SECRET': {'var': 'SECRET_KEY', 'hint': 'Django secret key used for hashing and encryption',
