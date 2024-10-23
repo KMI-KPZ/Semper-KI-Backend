@@ -169,6 +169,7 @@ def gatherUserHashIDsAndNotificationPreference(orgaOrUserID:str, notification:st
                 raise organizationObj
             resultDict = {}
             for user in organizationObj.users.all():
+                print(user)
                 hashedIDOfUser = user.hashedID
                 if checkIfNestedKeyExists(user.details, UserDetails.notificationSettings, ProfileClasses.organization):
                     preferencesOfUserAsPartOfOrga = user.details[UserDetails.notificationSettings][ProfileClasses.organization]

@@ -452,6 +452,7 @@ class SResHistoryEntry(serializers.Serializer):
     createdWhen = serializers.CharField(max_length=200)
     type = serializers.IntegerField()
     data = serializers.DictField(allow_empty=True)
+    details = serializers.DictField(allow_empty=True, required=False)
 #######################################################
 class SResProcessHistory(serializers.Serializer):
     history = serializers.ListField(child=SResHistoryEntry())
@@ -501,7 +502,8 @@ def getProcessHistory(request:Request, processID):
                 DataDescription.createdBy: entry[DataDescription.createdBy],
                 DataDescription.createdWhen: entry[DataDescription.createdWhen],
                 DataDescription.type: entry[DataDescription.type],
-                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
+                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]},
+                DataDescription.details: entry[DataDescription.details]
             }
             if not isinstance(interface, ProcessManagementSession):
                 outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])

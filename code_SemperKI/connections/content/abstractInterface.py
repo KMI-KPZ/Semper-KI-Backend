@@ -284,3 +284,28 @@ class AbstractContentInterface(ABC):
         
         """
         pass
+
+        ##############################################
+    @abstractmethod
+    def createDataEntry(self, data, dataID, processID, typeOfData, createdBy:str, details={}, IDofData=""):
+        """
+        Create an entry in the Data table
+
+        :param data: The data itself
+        :type data: Dict in JSON
+        :param dataID: The ID of that date
+        :type dataID: Str
+        :param processID: process it belongs to
+        :type processID: str
+        :param typeOfData: The type of this data
+        :type typeOfData: DataType
+        :param createdBy: Who created it (hashed ID)
+        :type createdBy: Str
+        :param details: Some metadata
+        :type details: JSON Dict
+        :param IDofData: If the data has an id, save it
+        :type IDofData: Str
+        :return: Nothing
+        :rtype: None
+        """
+        pass

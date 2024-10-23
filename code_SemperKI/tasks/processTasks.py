@@ -51,6 +51,7 @@ def sendEMail(IDOfReceiver:str, notification:str, subject:list[str], message:lis
     """
     try:
         dictOfPreferences = DBProcessesAccess.gatherUserHashIDsAndNotificationPreference(IDOfReceiver, notification, UserNotificationTargets.email)
+        print(dictOfPreferences)
         for hashedID in dictOfPreferences:
             if dictOfPreferences[hashedID]: # person wants to receive an email about this
                 userEMailAddress = ProfileManagementBase.getEMailAddress(hashedID)

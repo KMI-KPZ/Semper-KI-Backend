@@ -705,13 +705,13 @@ class ProcessManagementSession(AbstractContentInterface):
                 serviceType = currentProcess[ProcessDescription.serviceType]
                 if serviceType != serviceManager.getNone():
                     currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
-                    self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
+                    self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: content})
                 else:
                     raise Exception("No Service chosen!")
             
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess[ProcessDescription.serviceStatus] = content
-                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
+                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: content})
                 
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
@@ -734,7 +734,7 @@ class ProcessManagementSession(AbstractContentInterface):
             
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
-                self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
+                self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
                                 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
