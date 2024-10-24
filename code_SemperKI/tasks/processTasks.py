@@ -83,7 +83,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     try:
         valid = True
         # Check if service was correctly defined
-        if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails):
+        if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails)[0]:
             valid = False
 
         # Check if parameters make sense

@@ -14,6 +14,7 @@ from .modelFiles.processModel import *
 from .modelFiles.projectModel import *
 from .modelFiles.dataModel import *
 from .modelFiles.nodesModel import *
+from .modelFiles.eventModel import *
 
 #class BaseModel(models.Model):
 

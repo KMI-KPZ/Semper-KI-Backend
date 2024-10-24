@@ -13,6 +13,9 @@ from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_chec
 from .connections.filterViaSparql import *
 from .definitions import ServiceDetails
 
+SERVICE_NAME = "ADDITIVE_MANUFACTURING"
+SERVICE_NUMBER = 1
+
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
     """
@@ -38,12 +41,17 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return AM_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
-    def serviceReady(self, existingContent) -> bool:
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks if the service is completely defined
         
         """
-        return AM_serviceIsReady(existingContent)
+        completeOrNot, listOfMissingStuff = AM_serviceIsReady(existingContent)
+        if completeOrNot is False:
+            for idx, entry in enumerate(listOfMissingStuff):
+                listOfMissingStuff[idx] = "Service" + "-" + SERVICE_NAME + "-" + entry
+        
+        return (completeOrNot, listOfMissingStuff)
 
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj:ProcessInterface|Process) -> bool:
@@ -91,7 +99,6 @@ class AdditiveManufacturing(Semper.ServiceBase):
             filterByBuildPlate(resultDict, processObj.serviceDetails[ServiceDetails.calculations])
         
         return list(resultDict.values())
-SERVICE_NAME = "ADDITIVE_MANUFACTURING"
-SERVICE_NUMBER = 1
+
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing())

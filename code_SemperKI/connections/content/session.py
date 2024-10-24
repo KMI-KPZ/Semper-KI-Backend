@@ -915,3 +915,24 @@ class ProcessManagementSession(AbstractContentInterface):
             logger.error(f'could not create data entry: {str(error)}')
         
         return None
+    
+    ##################################################
+    def deleteAllDataEntriesOfProcess(self, processID:str) -> None:
+        """
+        Delete all entries in history of the process from session
+        
+        """
+        try:
+            newList = []
+            if 'data_history' in self.structuredSessionObj.currentSession:
+                for entry in self.structuredSessionObj.currentSession['data_history']:
+                    if entry[DataDescription.processID] != processID:
+                        newList.append(entry)
+                if len(newList) == 0:
+                    del self.structuredSessionObj.currentSession['data_history']
+                else:
+                    self.structuredSessionObj.currentSession['data_history'] = newList
+                
+        except (Exception) as error:
+            logger.error(f'could not delete data entries: {str(error)}')
+

@@ -11,15 +11,16 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities import rights
+#from Generic_Backend.code_General.utilities import rights
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
-from Generic_Backend.code_General.connections.postgresql import pgProfiles
+#from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import *
-import code_SemperKI.handlers.public.process as ProcessFunctions
+#import code_SemperKI.handlers.public.process as ProcessFunctions
 from code_SemperKI.utilities.basics import *
+from code_SemperKI.connections.content.postgresql import pgEvents
 
 
 logger = logging.getLogger("logToFile")
@@ -48,13 +49,13 @@ def fireWebsocketEvents(projectID, processID, session, event, notification:str="
     if manualCheckifLoggedIn(session):
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, notification, clientOnly)
         channelLayer = get_channel_layer()
-        for userID in dictForEvents: # user/orga that is associated with that process
+        for userID, values in dictForEvents.items(): # user/orga that is associated with that process
             if notification == NotificationSettingsUserSemperKI.newMessage and userID == ProfileManagementBase.getUserHashID(session=session):
                 continue # If you wrote a message, you shouldn't get a notification for yourself
-            values = dictForEvents[userID] # message, formatted for frontend
+            pgEvents.createEventEntry(userID, values) # create an entry in the event queue for that user
             async_to_sync(channelLayer.group_send)(userID[:80], {
                 "type": "sendMessageJSON",
-                "dict": values,
+                "dict": values, # message, formatted for frontend
             })
     # not logged in therefore no websockets to fire
                         

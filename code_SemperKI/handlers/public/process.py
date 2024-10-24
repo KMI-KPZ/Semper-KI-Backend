@@ -23,7 +23,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString, getButtonsForProcess
+from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString, getButtonsForProcess, getMissingElements
 from code_SemperKI.definitions import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
@@ -186,9 +186,15 @@ def getProcess(request:Request, projectID, processID):
         if isinstance(process, Exception):
             raise process
 
+        # add buttons
         buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
         outDict = process.toDict()
         outDict["processStatusButtons"] = buttons
+
+        # add what's missing to continue
+        missingElements = getMissingElements(interface, process)
+        outDict["processErrors"] = missingElements
+        
         ###TODO: add outserializers.
         return Response(outDict, status=status.HTTP_200_OK)
         # outSerializer = SResGetProcess(data=process)

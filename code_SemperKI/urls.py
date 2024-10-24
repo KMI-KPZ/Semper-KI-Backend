@@ -56,7 +56,6 @@ newPaths= {
     "statusButtonRequest": ("public/states/buttons/get/", statemachine.statusButtonRequest), 
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
-    "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
@@ -86,6 +85,12 @@ newPaths= {
     "loadTestGraph": ("private/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
     "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 
+    "getAllEventsForUser": ("public/events/all/get/", events.getAllEventsForUser),
+    "getOneEventOfUser": ("public/events/get/<str:eventID>/", events.getOneEventOfUser),
+    "createEvent": ("public/events/post/", events.createEvent),
+    "deleteOneEvent": ("public/events/delete/<str:eventID>/", events.deleteOneEvent),
+    "deleteAllEventsForAUser": ("public/events/all/delete/", events.deleteAllEventsForAUser),
+    
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),

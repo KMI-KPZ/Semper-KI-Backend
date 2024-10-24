@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for database calls
 """
-import enum
+import enum, logging
 
 from datetime import datetime
 from django.utils import timezone
@@ -32,7 +32,6 @@ from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
 
-import logging
 logger = logging.getLogger("errors")
 
 
@@ -1029,16 +1028,12 @@ class ProcessManagementBase(AbstractContentInterface):
 
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
                     listOfProcessObjects.append( (processObj, dependenciesIn, dependenciesOut) )
-                    ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
 
                     # generate entries in data
-                    for elem in process[ProcessDescription.files]:
-                        fileEntry = process[ProcessDescription.files][elem]
-                        if fileEntry[FileObjectContent.createdBy] == GlobalDefaults.anonymous:
-                            fileEntry[FileObjectContent.createdBy] = clientName
-                            fileEntry[FileObjectContent.createdByID] = clientID
-                        dataID = crypto.generateURLFriendlyRandomString()
-                        ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
+                    dataEntriesInSession = contentOfSession.getData(processID)
+                    for elem in dataEntriesInSession:
+                        ProcessManagementBase.createDataEntry(elem[DataDescription.data],elem[DataDescription.dataID],processID, elem[DataDescription.type], clientID, elem[DataDescription.details], elem[DataDescription.contentID])
+                    contentOfSession.deleteAllDataEntriesOfProcess(processID)
 
                 # link dependencies
                 for processObj, dependenciesListIn, dependenciesListOut in listOfProcessObjects:

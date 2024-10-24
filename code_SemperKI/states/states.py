@@ -36,7 +36,7 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, admin=False) -> None: #is changed in place
+def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, admin=False):
     """
     Look at process status of every process of a project and add respective buttons
 
@@ -53,6 +53,22 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
 
     processStatusAsString = processStatusFromIntToStr(process.processStatus)
     return stateDict[processStatusAsString].buttons(process, client, admin)
+
+##################################################
+def getMissingElements(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+    """
+    Ask the state what it needs to move forward
+
+    :param interface: The session or database interface
+    :type interface: ProcessManagementSession | ProcessManagementBase
+    :param process: The current process in question
+    :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+    :return: list of elements that are missing, coded for frontend
+    :rtype: list[str]
+    
+    """
+    processStatusAsString = processStatusFromIntToStr(process.processStatus)
+    return stateDict[processStatusAsString].missingForCompletion(interface, process)
 
 #######################################################
 def getFlatStatus(processStatusCode:int, client=True) -> str:
@@ -160,10 +176,10 @@ class StateMachine(object):
         try:
             outDict = {"Nodes": [], "Edges": []}
 
-            for node in stateDict:
-                outDict["Nodes"].append({"id": node, "name": node})
+            for nodeID, node in stateDict.items():
+                outDict["Nodes"].append({"id": nodeID, "name": nodeID})
 
-                for transition in stateDict[node].updateTransitions:
+                for transition in node.updateTransitions:
                     transitionTypesArr = transition.__annotations__["return"].split("|")
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
@@ -175,11 +191,11 @@ class StateMachine(object):
                             target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
                             outDict["Edges"].append({"source": source, "target": target})
                     else:
-                        source = node
+                        source = nodeID
                         target = transitionTypesArr[0].rstrip(" ")
                         outDict["Edges"].append({"source": source, "target": target})
-                for transitionKey in stateDict[node].buttonTransitions:
-                    transition = stateDict[node].buttonTransitions[transitionKey]
+                for transitionKey in node.buttonTransitions:
+                    transition = node.buttonTransitions[transitionKey]
                     transitionTypesArr = transition.__annotations__["return"].split("|")
                     if len(transitionTypesArr) == 2:
                         source = transitionTypesArr[0].rstrip(" ")
@@ -191,13 +207,13 @@ class StateMachine(object):
                             target = transitionTypesArr[entryIdx].lstrip(" ").rstrip(" ")
                             outDict["Edges"].append({"source": source, "target": target})
                     else:
-                        source = node
+                        source = nodeID
                         target = transitionTypesArr[0].rstrip(" ")
                         outDict["Edges"].append({"source": source, "target": target})
 
             return outDict
         except Exception as e:
-            print(node, e)
+            print(nodeID, e)
             return outDict
 
     ###################################################
@@ -253,13 +269,28 @@ class State(ABC):
         pass
 
     ###################################################
+    @abstractmethod
     def buttons(self, process, client=True, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
         pass
 
+    ##################################################
+    @abstractmethod
+    def missingForCompletion(self, interface:SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        pass
+
     ###################################################
+    @abstractmethod
     def getFlatStatus(self, client:bool) -> str:
         """
         Get code string if something is required from the user for that status
@@ -323,9 +354,9 @@ class State(ABC):
         try:
             currentClient = interface.getUserID()
             returnState = self
-            for t in self.buttonTransitions:
+            for t, func in self.buttonTransitions.items():
                 if event == t:
-                    returnState = self.buttonTransitions[t](self, interface, process)
+                    returnState = func(self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
                     if returnState.fireEvent:
                         WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
@@ -395,6 +426,18 @@ class DRAFT(State):
             return FlatProcessStatus.ACTION_REQUIRED
         else:
             return FlatProcessStatus.ACTION_REQUIRED
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return ["Process-ServiceType"]
 
     ###################################################
     # Transitions
@@ -509,6 +552,18 @@ class SERVICE_IN_PROGRESS(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[1]
+        
     ###################################################
     # Transitions
 
@@ -531,7 +586,7 @@ class SERVICE_IN_PROGRESS(State):
         Check if service has been fully defined
 
         """
-        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
             return stateDict[ProcessStatusAsString.SERVICE_READY]
         return self
     
@@ -646,6 +701,18 @@ class SERVICE_READY(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ##################################################
@@ -654,7 +721,7 @@ class SERVICE_READY(State):
         """
         Service changed	
         """
-        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         else:
             return self
@@ -713,21 +780,32 @@ class SERVICE_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
-    fireEvent = False
+    fireEvent = False    
 
-    ###################################################
-    def checkIfButtonIsActive(self, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
         """
-        Check if all requirements are met for the state to advance
+        Ask the state what it needs to move forward
 
-        :param process: The process containing the information
-        :type process: ProcessModel.Process | ProcessModel.ProcessInterface
-        :return: True if conditions are met, false if not
-        :rtype: Bool
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
         """
-        return ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] != "" \
-            and ProcessDetails.clientBillingAddress in process.processDetails and process.processDetails[ProcessDetails.clientBillingAddress] != {} \
-            and ProcessDetails.clientDeliverAddress in process.processDetails and process.processDetails[ProcessDetails.clientDeliverAddress] != {}       
+        listOfMissingThings = []
+        if ProcessDetails.provisionalContractor not in process.processDetails:
+            listOfMissingThings.append("Process-Contractor")
+        elif process.processDetails[ProcessDetails.provisionalContractor] == "":
+            listOfMissingThings.append("Process-Contractor")
+        if ProcessDetails.clientBillingAddress not in process.processDetails:
+            listOfMissingThings.append("Process-Address-Billing")
+        elif process.processDetails[ProcessDetails.clientBillingAddress] == {}:
+            listOfMissingThings.append("Process-Address-Billing")
+        if ProcessDetails.clientDeliverAddress not in process.processDetails:
+            listOfMissingThings.append("Process-Address-Deliver")
+        elif process.processDetails[ProcessDetails.clientDeliverAddress] == {}:
+            listOfMissingThings.append("Process-Address-Deliver")
+        return listOfMissingThings
 
     ###################################################
     def buttons(self, process, client=True, admin=False) -> list:
@@ -777,7 +855,7 @@ class SERVICE_COMPLETED(State):
             },
         ]
         
-        if self.checkIfButtonIsActive(process):
+        if len(self.missingForCompletion("", process)) == 0:
             buttonsList[2]["active"] = True #set forward button to active
 
         return buttonsList
@@ -797,6 +875,7 @@ class SERVICE_COMPLETED(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
 
+
     # Transitions
     ###################################################
     def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -805,7 +884,7 @@ class SERVICE_COMPLETED(State):
         Contractor was selected
 
         """
-        if self.checkIfButtonIsActive(process):
+        if len(self.missingForCompletion(interface, process)) == 0:
             return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
         return self
     
@@ -827,7 +906,7 @@ class SERVICE_COMPLETED(State):
         """
         Service changed	
         """
-        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if process.serviceType == ServiceManager.serviceManager.getNone() or not ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         else:
             return self
@@ -914,6 +993,24 @@ class WAITING_FOR_OTHER_PROCESS(State):
         else:
             return FlatProcessStatus.WAITING_PROCESS
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        listOfMissingStuff = []
+        dependenciesIn, dependenciesOut = interface.getProcessDependencies(process.project.projectID, process.processID)
+        for priorProcess in dependenciesIn:
+            if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
+                listOfMissingStuff.append("Process-Dependency-"+priorProcess.processID)
+        return listOfMissingStuff
+        
+
     ###################################################
     # Transitions
     ###################################################
@@ -928,7 +1025,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
             if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
                 return self # there are processes that this one depends on and they're not finished (yet)
 
-        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+        if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
             return stateDict[ProcessStatusAsString.SERVICE_READY]
         return self
 
@@ -1051,6 +1148,21 @@ class SERVICE_COMPLICATION(State):
             return FlatProcessStatus.ACTION_REQUIRED
         else:
             return FlatProcessStatus.ACTION_REQUIRED
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        if process.serviceType != ServiceManager.serviceManager.getNone():
+            return ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[1]
+        else:
+            return ["Process-ServiceType"]
     
     ###################################################
     # Transitions
@@ -1076,7 +1188,7 @@ class SERVICE_COMPLICATION(State):
 
         """
         if ServiceManager.serviceManager.getService(process.serviceType).checkIfSelectionIsAvailable(process):
-            if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails):
+            if process.serviceType != ServiceManager.serviceManager.getNone() and ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
                 return stateDict[ProcessStatusAsString.SERVICE_READY]
             else:
                 return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
@@ -1168,6 +1280,18 @@ class CONTRACTOR_COMPLETED(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -1277,6 +1401,18 @@ class VERIFYING(State):
         else:
             return FlatProcessStatus.WAITING_PROCESS
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -1385,6 +1521,18 @@ class VERIFICATION_COMPLETED(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -1513,6 +1661,18 @@ class REQUEST_COMPLETED(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -1754,6 +1914,18 @@ class OFFER_COMPLETED(State):
         else:
             return FlatProcessStatus.WAITING_CLIENT
 
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -1845,6 +2017,18 @@ class OFFER_REJECTED(State):
             return FlatProcessStatus.ACTION_REQUIRED
         else:
             return FlatProcessStatus.COMPLETED
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
     
     ###################################################
     # Transitions
@@ -1935,6 +2119,18 @@ class CONFIRMATION_COMPLETED(State):
             return FlatProcessStatus.WAITING_CONTRACTOR
         else:
             return FlatProcessStatus.ACTION_REQUIRED
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
     
     ###################################################
     # Transitions
@@ -2014,6 +2210,18 @@ class CONFIRMATION_REJECTED(State):
             return FlatProcessStatus.COMPLETED
         else:
             return FlatProcessStatus.ACTION_REQUIRED
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
     
     ###################################################
     # Transitions
@@ -2118,6 +2326,18 @@ class PRODUCTION_IN_PROGRESS(State):
             return FlatProcessStatus.WAITING_CONTRACTOR
         else:
             return FlatProcessStatus.ACTION_REQUIRED
+    
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
     
     ###################################################
     # Transitions
@@ -2235,6 +2455,18 @@ class PRODUCTION_COMPLETED(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
     ###################################################
@@ -2341,6 +2573,18 @@ class DELIVERY_IN_PROGRESS(State):
             return FlatProcessStatus.ACTION_REQUIRED
         else:
             return FlatProcessStatus.WAITING_CLIENT
+
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
 
     ###################################################
     # Transitions
@@ -2460,6 +2704,18 @@ class DELIVERY_COMPLETED(State):
             return FlatProcessStatus.ACTION_REQUIRED
         else:
             return FlatProcessStatus.WAITING_CLIENT
+
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
 
     ###################################################
     # Transitions
@@ -2598,6 +2854,19 @@ class DISPUTE(State):
         else:
             return FlatProcessStatus.ACTION_REQUIRED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
+
     ###################################################
     # Transitions
     ###################################################
@@ -2701,6 +2970,18 @@ class COMPLETED(State):
         else:
             return FlatProcessStatus.COMPLETED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
 
@@ -2775,6 +3056,18 @@ class FAILED(State):
         else:
             return FlatProcessStatus.COMPLETED
     
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
 
@@ -2848,7 +3141,19 @@ class CANCELED(State):
             return FlatProcessStatus.COMPLETED
         else:
             return FlatProcessStatus.COMPLETED
-    
+        
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
     ###################################################
     # Transitions
 
