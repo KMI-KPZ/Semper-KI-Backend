@@ -157,6 +157,7 @@ class EventsDescription(StrEnumExactlyAsDefined):
     events = enum.auto()
     projectEvent = enum.auto()
     orgaEvent = enum.auto()
+    triggerEvent = enum.auto()
     
 ####################################################################################
 # Enum for flat process status

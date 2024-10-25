@@ -842,10 +842,10 @@ class ProcessManagementBase(AbstractContentInterface):
             dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
         for userHashID in dictOfUserIDsAndPreference:
-            dictForEventsAsOutput[userHashID] = {"triggerEvent": dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            dictForEventsAsOutput[userHashID] = {EventsDescription.triggerEvent: dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
-            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {EventsDescription.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
     
         return dictForEventsAsOutput
     

@@ -11,6 +11,7 @@ import Generic_Backend.code_General.utilities.signals as GeneralSignals
 from ..handlers.public.project import saveProjects, saveProjectsViaWebsocket
 from ..connections.content.postgresql.pgProfilesSKI import updateOrgaDetailsSemperKI, updateUserDetailsSemperKI
 from ..connections.content.postgresql.pgKnowledgeGraph import Basics
+from ..connections.content.postgresql.pgEvents import createEventEntry
 
 ################################################################################################
 
@@ -56,6 +57,14 @@ class SemperKISignalReceivers():
 
         """
         saveProjectsViaWebsocket(session=kwargs["session"])
+
+    ##################################################
+    @staticmethod
+    def receiverForWebsocketEvent(sender, **kwargs):
+        """
+        Some event was send through the websocket, create an event object
+        """
+        createEventEntry(kwargs["userHashedID"], kwargs["event"])
 
     ###########################################################
     @staticmethod
@@ -114,6 +123,7 @@ class SemperKISignalReceivers():
         GeneralSignals.signalDispatcher.orgaUpdated.connect(self.receiverForOrgaDetailsUpdate, dispatch_uid="6")
         GeneralSignals.signalDispatcher.userDeleted.connect(self.receiverForUserDeleted, dispatch_uid="7")
         GeneralSignals.signalDispatcher.orgaDeleted.connect(self.receiverForOrgaDeleted, dispatch_uid="8")
+        GeneralSignals.signalDispatcher.websocketEvent.connect(self.receiverForWebsocketEvent, dispatch_uid="9")
 
 semperKISignalReceiver = SemperKISignalReceivers()
     

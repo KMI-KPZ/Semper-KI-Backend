@@ -107,13 +107,18 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
+#######################################################
+class SReqsEventContent(serializers.Serializer):
+    events = serializers.ListField(child=serializers.DictField())
+    eventType = serializers.CharField(max_length=200)
+    triggerEvent = serializers.BooleanField()
 
 #######################################################
 class SReqsOneEvent(serializers.Serializer):
     #pgEvents.EventDescription.event, pgEvents.EventDescription.userHashedID, pgEvents.EventDescription.eventID, pgEvents.EventDescription.createdWhen
     eventID = serializers.CharField(max_length=513, required=False)
     userHashedID = serializers.CharField(max_length=513, required=False)
-    event = serializers.DictField() # TODO
+    event = SReqsEventContent()
     createdWhen = serializers.CharField(max_length=200, required=False)
 
 #######################################################
