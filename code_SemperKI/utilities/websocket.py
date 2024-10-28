@@ -26,7 +26,7 @@ from code_SemperKI.connections.content.postgresql import pgEvents
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-def fireWebsocketEvents(projectID, processID, session, event, notification:str="", clientOnly:bool=False):
+def fireWebsocketEventsForProcess(projectID, processID, session, event, notification:str="", clientOnly:bool=False):
     """
     Fire websocket event from a list for a specific project and process. 
     

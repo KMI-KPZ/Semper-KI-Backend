@@ -328,7 +328,7 @@ class State(ABC):
                     returnState = resultOfTransition
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -359,7 +359,7 @@ class State(ABC):
                     returnState = func(self, interface, process)
                     interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEvents(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState

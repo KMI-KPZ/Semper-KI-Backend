@@ -51,7 +51,6 @@ def sendEMail(IDOfReceiver:str, notification:str, subject:list[str], message:lis
     """
     try:
         dictOfPreferences = DBProcessesAccess.gatherUserHashIDsAndNotificationPreference(IDOfReceiver, notification, UserNotificationTargets.email)
-        print(dictOfPreferences)
         for hashedID in dictOfPreferences:
             if dictOfPreferences[hashedID]: # person wants to receive an email about this
                 userEMailAddress = ProfileManagementBase.getEMailAddress(hashedID)
@@ -115,7 +114,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         
         # send out mail & Websocket event 
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
-        websocket.fireWebsocketEvents(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.verification, True)  
+        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.verification, True)  
         
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")

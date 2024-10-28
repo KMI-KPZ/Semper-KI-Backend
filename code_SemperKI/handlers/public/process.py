@@ -262,11 +262,11 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                             return ("", False)
                         sendNotification = False
                         if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
                         elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
                         else:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem)
                     
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):

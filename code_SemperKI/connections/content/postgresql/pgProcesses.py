@@ -842,10 +842,24 @@ class ProcessManagementBase(AbstractContentInterface):
             dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
         for userHashID in dictOfUserIDsAndPreference:
-            dictForEventsAsOutput[userHashID] = {EventsDescription.triggerEvent: dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            dictForEventsAsOutput[userHashID] = {
+                EventsDescription.triggerEvent: dictOfUserIDsAndPreference[userHashID],
+                EventsDescription.eventType: EventsDescription.processEvent,
+                EventsDescription.primaryID: projectID,
+                EventsDescription.secondaryID: processID,
+                EventsDescription.reason: event,
+                EventsDescription.reasonValue: 1
+            }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
-            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {EventsDescription.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {
+                EventsDescription.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
+                EventsDescription.eventType: EventsDescription.processEvent,
+                EventsDescription.primaryID: projectID,
+                EventsDescription.secondaryID: processID,
+                EventsDescription.reason: event,
+                EventsDescription.reasonValue: 1
+            }
     
         return dictForEventsAsOutput
     

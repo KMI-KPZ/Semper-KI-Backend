@@ -107,19 +107,35 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
+class EventContentForFrontend(StrEnumExactlyAsDefined):
+    eventType = enum.auto()
+    eventID = enum.auto()
+    userHashedID = enum.auto()
+    eventData = enum.auto()
+    createdWhen = enum.auto()
+    triggerEvent = enum.auto()
+    primaryID = enum.auto()
+    secondaryID = enum.auto()
+    reason = enum.auto()
+    reasonValue = enum.auto()
+
+##################################################
 #######################################################
 class SReqsEventContent(serializers.Serializer):
-    events = serializers.ListField(child=serializers.DictField())
-    eventType = serializers.CharField(max_length=200)
-    triggerEvent = serializers.BooleanField()
+    primaryID =  serializers.CharField(max_length=513)
+    secondaryID = serializers.CharField(max_length=513,  required=False)
+    reason = serializers.CharField(max_length=513, required=False)
+    reasonValue = serializers.IntegerField(required=False)
 
 #######################################################
 class SReqsOneEvent(serializers.Serializer):
     #pgEvents.EventDescription.event, pgEvents.EventDescription.userHashedID, pgEvents.EventDescription.eventID, pgEvents.EventDescription.createdWhen
+    eventType = serializers.CharField(max_length=200)
     eventID = serializers.CharField(max_length=513, required=False)
     userHashedID = serializers.CharField(max_length=513, required=False)
-    event = SReqsEventContent()
+    eventData = SReqsEventContent()
     createdWhen = serializers.CharField(max_length=200, required=False)
+    triggerEvent = serializers.BooleanField()
 
 #######################################################
 @extend_schema(
@@ -151,7 +167,30 @@ def getAllEventsForUser(request:Request):
         listOfEvents = pgEvents.getAllEventsOfAUser(userHashedID)
         if isinstance(listOfEvents, Exception):
             raise listOfEvents
-        outSerializer = SReqsOneEvent(data=listOfEvents, many=True)
+        outList = []
+        for entry in listOfEvents:
+            outEntry = {
+                EventContentForFrontend.eventType: entry[pgEvents.EventDescription.event][EventsDescription.eventType],
+                EventContentForFrontend.eventID: entry[pgEvents.EventDescription.eventID],
+                EventContentForFrontend.userHashedID: entry[pgEvents.EventDescription.userHashedID],
+                EventContentForFrontend.eventData: {
+                    EventContentForFrontend.primaryID: entry[pgEvents.EventDescription.event][EventsDescription.primaryID],
+                },
+                EventContentForFrontend.createdWhen: entry[pgEvents.EventDescription.createdWhen],
+                EventContentForFrontend.triggerEvent: entry[pgEvents.EventDescription.event][EventsDescription.triggerEvent]
+            }
+            if EventContentForFrontend.secondaryID in entry[pgEvents.EventDescription.event]:
+                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.secondaryID] = entry[pgEvents.EventDescription.event][EventsDescription.secondaryID]
+
+            if EventContentForFrontend.reason in entry[pgEvents.EventDescription.event]:
+                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = entry[pgEvents.EventDescription.event][EventsDescription.reason]
+            
+            if EventContentForFrontend.reasonValue in entry[pgEvents.EventDescription.event]:
+                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reasonValue] = entry[pgEvents.EventDescription.event][EventsDescription.reasonValue]
+            
+            outList.append(outEntry)
+
+        outSerializer = SReqsOneEvent(data=outList, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -195,7 +234,26 @@ def getOneEventOfUser(request:Request, eventID:str):
         event = pgEvents.getOneEvent(eventID)
         if isinstance(event, Exception):
             raise event
-        outSerializer = SReqsOneEvent(data=event)
+        outEntry = {
+            EventContentForFrontend.eventType: event[pgEvents.EventDescription.event][EventsDescription.eventType],
+            EventContentForFrontend.eventID: event[pgEvents.EventDescription.eventID],
+            EventContentForFrontend.userHashedID: event[pgEvents.EventDescription.userHashedID],
+            EventContentForFrontend.eventData: {
+                EventContentForFrontend.primaryID: event[pgEvents.EventDescription.event][EventsDescription.primaryID],
+            },
+            EventContentForFrontend.createdWhen: event[pgEvents.EventDescription.createdWhen],
+            EventContentForFrontend.triggerEvent: event[pgEvents.EventDescription.event][EventsDescription.triggerEvent]
+        }
+        if EventContentForFrontend.secondaryID in event[pgEvents.EventDescription.event]:
+            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.secondaryID] = event[pgEvents.EventDescription.event][EventsDescription.secondaryID]
+
+        if EventContentForFrontend.reason in event[pgEvents.EventDescription.event]:
+            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = event[pgEvents.EventDescription.event][EventsDescription.reason]
+
+        if EventContentForFrontend.reasonValue in event[pgEvents.EventDescription.event]:
+            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reasonValue] = event[pgEvents.EventDescription.event][EventsDescription.reasonValue]
+
+        outSerializer = SReqsOneEvent(data=outEntry)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -248,8 +306,26 @@ def createEvent(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        event = validatedInput["event"]
-        userHashedID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        event = {
+            EventsDescription.eventType: validatedInput[EventContentForFrontend.eventType],
+            EventsDescription.primaryID: validatedInput[EventContentForFrontend.eventData][EventContentForFrontend.primaryID],
+            EventContentForFrontend.triggerEvent: validatedInput[EventContentForFrontend.triggerEvent]
+        }
+        if EventContentForFrontend.secondaryID in validatedInput[EventContentForFrontend.eventData]:
+            event[EventContentForFrontend.secondaryID] = validatedInput[EventContentForFrontend.eventData][EventsDescription.secondaryID]
+
+        if EventContentForFrontend.reason in validatedInput[EventContentForFrontend.eventData]:
+            event[EventContentForFrontend.reason] = validatedInput[EventContentForFrontend.eventData][EventsDescription.reason]
+
+        if EventContentForFrontend.reasonValue in validatedInput[EventContentForFrontend.eventData]:
+            event[EventContentForFrontend.reasonValue] = validatedInput[EventContentForFrontend.eventData][EventsDescription.reasonValue]
+
+        
+        if EventContentForFrontend.userHashedID in validatedInput:
+            userHashedID = validatedInput[EventContentForFrontend.userHashedID]
+        else:
+            userHashedID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+
         retVal = pgEvents.createEventEntry(userHashedID, event)
         if isinstance(retVal, Exception):
             raise retVal

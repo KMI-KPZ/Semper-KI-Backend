@@ -154,10 +154,14 @@ class EventsDescription(StrEnumExactlyAsDefined):
 
     """
     eventType = enum.auto()
-    events = enum.auto()
     projectEvent = enum.auto()
+    processEvent = enum.auto()
     orgaEvent = enum.auto()
     triggerEvent = enum.auto()
+    primaryID = enum.auto()
+    secondaryID = enum.auto()
+    reason = enum.auto()
+    reasonValue = enum.auto()
     
 ####################################################################################
 # Enum for flat process status
