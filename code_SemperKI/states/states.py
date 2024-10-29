@@ -326,9 +326,11 @@ class State(ABC):
                 resultOfTransition = t(self, interface, process)
                 if resultOfTransition != self:
                     returnState = resultOfTransition
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    retVal = interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    if isinstance(retVal, Exception):
+                        raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -357,9 +359,11 @@ class State(ABC):
             for t, func in self.buttonTransitions.items():
                 if event == t:
                     returnState = func(self, interface, process)
-                    interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    retVal = interface.updateProcess(process.project.projectID, process.processID, ProcessUpdates.processStatus, returnState.statusCode, currentClient)
+                    if isinstance(retVal, Exception):
+                        raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
                     break # Ensure that only one transition is possible 
             
             return returnState

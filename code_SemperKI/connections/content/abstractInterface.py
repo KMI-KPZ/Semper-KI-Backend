@@ -202,7 +202,7 @@ class AbstractContentInterface(ABC):
 
     ##############################################
     @abstractmethod
-    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> str|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -216,8 +216,8 @@ class AbstractContentInterface(ABC):
         :type content: json dict
         :param updatedBy: ID of the person who updated the process (for history)
         :type updatedBy: str
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: Content that is relevant to an event
+        :rtype: str | Exception
 
         """
         pass

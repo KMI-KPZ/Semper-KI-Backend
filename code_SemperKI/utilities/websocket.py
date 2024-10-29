@@ -26,7 +26,7 @@ from code_SemperKI.connections.content.postgresql import pgEvents
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-def fireWebsocketEventsForProcess(projectID, processID, session, event, notification:str="", clientOnly:bool=False):
+def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, eventContent, notification:str="", clientOnly:bool=False):
     """
     Fire websocket event from a list for a specific project and process. 
     
@@ -38,6 +38,8 @@ def fireWebsocketEventsForProcess(projectID, processID, session, event, notifica
     :type session: Dict
     :param event: The event to fire
     :type event: Str
+    :param eventContent: The content that triggered this event, for event queue
+    :type eventContent: Any
     :param notification: The type of notification
     :type notification: str
     :param clientOnly: Should the event fire only for the client, not the contractor
@@ -47,7 +49,7 @@ def fireWebsocketEventsForProcess(projectID, processID, session, event, notifica
     """
     # TODO Fix calls to this function, set channels correctly with only userSubID, emails
     if manualCheckifLoggedIn(session):
-        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, notification, clientOnly)
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, eventContent, notification, clientOnly)
         channelLayer = get_channel_layer()
         for userID, values in dictForEvents.items(): # user/orga that is associated with that process
             if notification == NotificationSettingsUserSemperKI.newMessage and userID == ProfileManagementBase.getUserHashID(session=session):

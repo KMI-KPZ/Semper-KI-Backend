@@ -135,6 +135,10 @@ class MessageInterfaceFromFrontend(StrEnumExactlyAsDefined):
     """
     messages = enum.auto()
     origin = enum.auto()
+    date = enum.auto()
+    text = enum.auto()
+    userID = enum.auto()
+    userName = enum.auto()
     
 ####################################################################################
 # Enum for session content
@@ -161,7 +165,7 @@ class EventsDescription(StrEnumExactlyAsDefined):
     primaryID = enum.auto()
     secondaryID = enum.auto()
     reason = enum.auto()
-    reasonValue = enum.auto()
+    content = enum.auto()
     
 ####################################################################################
 # Enum for flat process status

@@ -117,7 +117,7 @@ class EventContentForFrontend(StrEnumExactlyAsDefined):
     primaryID = enum.auto()
     secondaryID = enum.auto()
     reason = enum.auto()
-    reasonValue = enum.auto()
+    content = enum.auto()
 
 ##################################################
 #######################################################
@@ -125,7 +125,7 @@ class SReqsEventContent(serializers.Serializer):
     primaryID =  serializers.CharField(max_length=513)
     secondaryID = serializers.CharField(max_length=513,  required=False)
     reason = serializers.CharField(max_length=513, required=False)
-    reasonValue = serializers.IntegerField(required=False)
+    content = serializers.CharField(max_length=513, required=False)
 
 #######################################################
 class SReqsOneEvent(serializers.Serializer):
@@ -184,9 +184,9 @@ def getAllEventsForUser(request:Request):
 
             if EventContentForFrontend.reason in entry[pgEvents.EventDescription.event]:
                 outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = entry[pgEvents.EventDescription.event][EventsDescription.reason]
-            
-            if EventContentForFrontend.reasonValue in entry[pgEvents.EventDescription.event]:
-                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reasonValue] = entry[pgEvents.EventDescription.event][EventsDescription.reasonValue]
+
+            if EventContentForFrontend.content in entry[pgEvents.EventDescription.event]:
+                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.content] = str(entry[pgEvents.EventDescription.event][EventsDescription.content])
             
             outList.append(outEntry)
 
@@ -250,8 +250,8 @@ def getOneEventOfUser(request:Request, eventID:str):
         if EventContentForFrontend.reason in event[pgEvents.EventDescription.event]:
             outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = event[pgEvents.EventDescription.event][EventsDescription.reason]
 
-        if EventContentForFrontend.reasonValue in event[pgEvents.EventDescription.event]:
-            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reasonValue] = event[pgEvents.EventDescription.event][EventsDescription.reasonValue]
+        if EventContentForFrontend.content in event[pgEvents.EventDescription.event]:
+            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.content] = event[pgEvents.EventDescription.event][EventsDescription.content]
 
         outSerializer = SReqsOneEvent(data=outEntry)
         if outSerializer.is_valid():
@@ -317,8 +317,8 @@ def createEvent(request:Request):
         if EventContentForFrontend.reason in validatedInput[EventContentForFrontend.eventData]:
             event[EventContentForFrontend.reason] = validatedInput[EventContentForFrontend.eventData][EventsDescription.reason]
 
-        if EventContentForFrontend.reasonValue in validatedInput[EventContentForFrontend.eventData]:
-            event[EventContentForFrontend.reasonValue] = validatedInput[EventContentForFrontend.eventData][EventsDescription.reasonValue]
+        if EventContentForFrontend.content in validatedInput[EventContentForFrontend.eventData]:
+            event[EventContentForFrontend.content] = validatedInput[EventContentForFrontend.eventData][EventsDescription.content]
 
         
         if EventContentForFrontend.userHashedID in validatedInput:

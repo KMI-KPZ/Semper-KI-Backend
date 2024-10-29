@@ -107,15 +107,18 @@ def createProcessID(request:Request, projectID):
                         defaultAddress = entry
                         break
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
-            interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
-
+            errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
+            if isinstance(errorOrNot, Exception):
+                raise errorOrNot
         # set default priorities here
         userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
-        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
-
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
         # set default title of the process
-        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
-
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
 
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
@@ -141,7 +144,50 @@ def createProcessID(request:Request, projectID):
 # getProcess
 #"getProcess": ("public/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
 ###############serializer#######################################
-#TODO Add serializer for getProcess
+
+#######################################################
+class SResProcessDetails(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResDependencies(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResFiles(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResMessages(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResProcessStatusButtons(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResProcessErrors(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SResProcess(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processID = serializers.CharField(max_length=200)
+    serviceDetails = serializers.DictField(allow_empty=True) 
+    processStatus = serializers.IntegerField()
+    serviceType = serializers.IntegerField()
+    serviceStatus = serializers.IntegerField()
+    processDetails = SResProcessDetails
+    dependenciesIn = SResDependencies()
+    dependenciesOut = SResDependencies()
+    client = serializers.CharField(max_length=513)
+    files = SResFiles()
+    messages = SResMessages()
+    createdWhen = serializers.CharField(max_length=200)
+    updatedWhen = serializers.CharField(max_length=200)
+    accessesWhen = serializers.CharField(max_length=200)
+    processStatusButtons = SResProcessStatusButtons()
+    processErrors = SResProcessErrors()
 ########################################################
 # Handler
 @extend_schema(
@@ -254,24 +300,25 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
 
             if "changes" in changes:
                 for elem in changes["changes"]:
+                    fireEvent = False
                     # for websocket events
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
                         # exclude people not having sufficient rights for that specific operation
                         if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
-                        sendNotification = False
-                        if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
-                        elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
-                        else:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem)
-                    
+                        fireEvent = True
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):
                         raise returnVal
-            
+                    if fireEvent:
+                        if elem == ProcessUpdates.messages:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage)
+                        elif elem == ProcessUpdates.processStatus:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange)
+                        else:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal)
+                    
             # change state for this process if necessary
             process = interface.getProcessObj(projectID, processID)
             currentState = StateMachine(initialAsInt=process.processStatus)

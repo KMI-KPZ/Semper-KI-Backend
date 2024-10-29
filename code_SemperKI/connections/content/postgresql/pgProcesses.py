@@ -603,7 +603,7 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
-    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy):
+    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy) -> str|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -615,12 +615,13 @@ class ProcessManagementBase(AbstractContentInterface):
         :type updateType: EnumUpdates
         :param content: changed process, can be many stuff
         :type content: json dict
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: The relevant thing that got updated, for event queue
+        :rtype: Str|Exception
 
         """
         updated = timezone.now()
         try:
+            outContent = ""
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
             dataID = crypto.generateURLFriendlyRandomString()
@@ -638,16 +639,20 @@ class ProcessManagementBase(AbstractContentInterface):
                     else:
                         currentProcess.messages[MessageInterfaceFromFrontend.messages] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
-                
+                outContent = content[MessageInterfaceFromFrontend.text]
+
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
+                    outContent += content[entry][FileObjectContent.fileName] + ","
+                outContent = outContent.rstrip(",")
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
-                
+                outContent = str(content)
+
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     if entry == ProcessDetails.priorities:
@@ -659,23 +664,35 @@ class ProcessManagementBase(AbstractContentInterface):
                             currentProcess.processDetails[ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
                     else:
                         currentProcess.processDetails[entry] = content[entry]
+                    outContent += entry + ","
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
+                outContent = outContent.rstrip(",")
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
-                      
+                outContent = content
+
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: content})
+                outContent = str(content)
 
             elif updateType == ProcessUpdates.serviceDetails:
-                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: content})
+                serviceType = currentProcess[ProcessDescription.serviceType]
+                if serviceType != serviceManager.getNone():
+                    currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
+                    ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: content})
+                    for entry in content:
+                        outContent += entry + ","
+                    outContent = outContent.rstrip(",")
+                else:
+                    raise Exception("No Service chosen!")
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
+                outContent = content
 
             elif updateType == ProcessUpdates.dependenciesIn:
                 connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
@@ -683,6 +700,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 connectedProcess.dependenciesOut.add(currentProcess)
                 connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesIn: content})
+                outContent = content
 
             elif updateType == ProcessUpdates.dependenciesOut:
                 connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
@@ -690,9 +708,10 @@ class ProcessManagementBase(AbstractContentInterface):
                 connectedProcess.dependenciesIn.add(currentProcess)
                 connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
+                outContent = content
 
             currentProcess.save()
-            return True
+            return outContent
         except (Exception) as error:
             logger.error(f'could not update process: {str(error)}')
             return error
@@ -816,7 +835,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str, clientOnly:bool):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -826,6 +845,8 @@ class ProcessManagementBase(AbstractContentInterface):
         :type processID: str
         :param event: the event that happens
         :type event: str
+        :param eventContent: The content that triggered the event
+        :type eventContent: Any
         :param notification: The notification that wants to be send
         :type notification: str
         :return: Dictionary of users with project ID and processes in order for the websocket to fire events
@@ -848,7 +869,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 EventsDescription.primaryID: projectID,
                 EventsDescription.secondaryID: processID,
                 EventsDescription.reason: event,
-                EventsDescription.reasonValue: 1
+                EventsDescription.content: eventContent
             }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
@@ -858,7 +879,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 EventsDescription.primaryID: projectID,
                 EventsDescription.secondaryID: processID,
                 EventsDescription.reason: event,
-                EventsDescription.reasonValue: 1
+                EventsDescription.content: eventContent
             }
     
         return dictForEventsAsOutput

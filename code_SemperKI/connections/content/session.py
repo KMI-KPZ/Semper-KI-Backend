@@ -656,7 +656,7 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     ##############################################
-    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> str|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -670,11 +670,12 @@ class ProcessManagementSession(AbstractContentInterface):
         :type content: json dict
         :param updatedBy: ID of the person who updated the process (for history)
         :type updatedBy: str
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: The relevant thing that got updated, for event queue
+        :rtype: Str|Exception
 
         """
         try:
+            outContent = ""
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
             dataID = crypto.generateURLFriendlyRandomString()
@@ -692,27 +693,35 @@ class ProcessManagementSession(AbstractContentInterface):
                     else:
                         currentProcess[ProcessDescription.messages][MessageInterfaceFromFrontend.messages] = [content]
                     self.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
-                    
+                outContent = content[MessageInterfaceFromFrontend.text]
+
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
                     self.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
-            
+                    outContent += content[entry][FileObjectContent.fileName] + ","
+                outContent = outContent.rstrip(",")
+
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
+                outContent = content
             
             elif updateType == ProcessUpdates.serviceDetails:
                 serviceType = currentProcess[ProcessDescription.serviceType]
                 if serviceType != serviceManager.getNone():
                     currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).updateServiceDetails(currentProcess[ProcessDescription.serviceDetails], content)
                     self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: content})
+                    for entry in content:
+                        outContent += entry + ","
+                    outContent = outContent.rstrip(",")
                 else:
                     raise Exception("No Service chosen!")
             
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess[ProcessDescription.serviceStatus] = content
                 self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: content})
-                
+                outContent = str(content)
+
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     if entry == ProcessDetails.priorities:
@@ -727,15 +736,19 @@ class ProcessManagementSession(AbstractContentInterface):
                     else:
                         currentProcess[ProcessDescription.processDetails][entry] = content[entry]
                         self.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
-            
+                    outContent += entry + ","
+                outContent = outContent.rstrip(",")
+
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess[ProcessDescription.processStatus] = content
                 self.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
-            
+                outContent = str(content)
+
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] = content
                 self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
-                                
+                outContent = content
+
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
                 oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
@@ -747,13 +760,14 @@ class ProcessManagementSession(AbstractContentInterface):
                 if processID not in dependentProcess.setdefault(oppositeKey, []):
                     dependentProcess[oppositeKey].append(processID)
                 self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
+                outContent = content
             else:
                 raise Exception(f"updateProcess {updateType} not implemented")
             
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
             self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
             
-            return True
+            return outContent
         except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
             return error
