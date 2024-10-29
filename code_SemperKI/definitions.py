@@ -270,3 +270,16 @@ class MapPermissionsToOrgaNotifications():
         PermissionsEnum.resourcesRead: [], 
         PermissionsEnum.resourcesEdit: [],	
     }
+
+##################################################
+class EventContentForFrontend(StrEnumExactlyAsDefined):
+    eventType = enum.auto()
+    eventID = enum.auto()
+    userHashedID = enum.auto()
+    eventData = enum.auto()
+    createdWhen = enum.auto()
+    triggerEvent = enum.auto()
+    primaryID = enum.auto()
+    secondaryID = enum.auto()
+    reason = enum.auto()
+    content = enum.auto()

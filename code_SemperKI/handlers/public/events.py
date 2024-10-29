@@ -26,8 +26,9 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
-from code_SemperKI.connections.content.postgresql import pgProcesses
+#from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.connections.content.postgresql import pgEvents
+from code_SemperKI.utilities.websocket import transformEventsForFrontend
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -107,19 +108,6 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
-class EventContentForFrontend(StrEnumExactlyAsDefined):
-    eventType = enum.auto()
-    eventID = enum.auto()
-    userHashedID = enum.auto()
-    eventData = enum.auto()
-    createdWhen = enum.auto()
-    triggerEvent = enum.auto()
-    primaryID = enum.auto()
-    secondaryID = enum.auto()
-    reason = enum.auto()
-    content = enum.auto()
-
-##################################################
 #######################################################
 class SReqsEventContent(serializers.Serializer):
     primaryID =  serializers.CharField(max_length=513)
@@ -169,26 +157,7 @@ def getAllEventsForUser(request:Request):
             raise listOfEvents
         outList = []
         for entry in listOfEvents:
-            outEntry = {
-                EventContentForFrontend.eventType: entry[pgEvents.EventDescription.event][EventsDescription.eventType],
-                EventContentForFrontend.eventID: entry[pgEvents.EventDescription.eventID],
-                EventContentForFrontend.userHashedID: entry[pgEvents.EventDescription.userHashedID],
-                EventContentForFrontend.eventData: {
-                    EventContentForFrontend.primaryID: entry[pgEvents.EventDescription.event][EventsDescription.primaryID],
-                },
-                EventContentForFrontend.createdWhen: entry[pgEvents.EventDescription.createdWhen],
-                EventContentForFrontend.triggerEvent: entry[pgEvents.EventDescription.event][EventsDescription.triggerEvent]
-            }
-            if EventContentForFrontend.secondaryID in entry[pgEvents.EventDescription.event]:
-                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.secondaryID] = entry[pgEvents.EventDescription.event][EventsDescription.secondaryID]
-
-            if EventContentForFrontend.reason in entry[pgEvents.EventDescription.event]:
-                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = entry[pgEvents.EventDescription.event][EventsDescription.reason]
-
-            if EventContentForFrontend.content in entry[pgEvents.EventDescription.event]:
-                outEntry[EventContentForFrontend.eventData][EventContentForFrontend.content] = str(entry[pgEvents.EventDescription.event][EventsDescription.content])
-            
-            outList.append(outEntry)
+            outList.append(transformEventsForFrontend(entry))
 
         outSerializer = SReqsOneEvent(data=outList, many=True)
         if outSerializer.is_valid():
@@ -234,25 +203,7 @@ def getOneEventOfUser(request:Request, eventID:str):
         event = pgEvents.getOneEvent(eventID)
         if isinstance(event, Exception):
             raise event
-        outEntry = {
-            EventContentForFrontend.eventType: event[pgEvents.EventDescription.event][EventsDescription.eventType],
-            EventContentForFrontend.eventID: event[pgEvents.EventDescription.eventID],
-            EventContentForFrontend.userHashedID: event[pgEvents.EventDescription.userHashedID],
-            EventContentForFrontend.eventData: {
-                EventContentForFrontend.primaryID: event[pgEvents.EventDescription.event][EventsDescription.primaryID],
-            },
-            EventContentForFrontend.createdWhen: event[pgEvents.EventDescription.createdWhen],
-            EventContentForFrontend.triggerEvent: event[pgEvents.EventDescription.event][EventsDescription.triggerEvent]
-        }
-        if EventContentForFrontend.secondaryID in event[pgEvents.EventDescription.event]:
-            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.secondaryID] = event[pgEvents.EventDescription.event][EventsDescription.secondaryID]
-
-        if EventContentForFrontend.reason in event[pgEvents.EventDescription.event]:
-            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = event[pgEvents.EventDescription.event][EventsDescription.reason]
-
-        if EventContentForFrontend.content in event[pgEvents.EventDescription.event]:
-            outEntry[EventContentForFrontend.eventData][EventContentForFrontend.content] = event[pgEvents.EventDescription.event][EventsDescription.content]
-
+        outEntry = transformEventsForFrontend(event)
         outSerializer = SReqsOneEvent(data=outEntry)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)

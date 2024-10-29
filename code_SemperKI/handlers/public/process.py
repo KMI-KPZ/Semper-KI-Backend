@@ -147,47 +147,55 @@ def createProcessID(request:Request, projectID):
 
 #######################################################
 class SResProcessDetails(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
-
-#######################################################
-class SResDependencies(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
+    provisionalContractor = serializers.CharField(max_length=200, required=False)
+    amount = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=200, required=False)
+    clientBillingAddress = serializers.DictField(allow_empty=True, required=False)
+    clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)
+    imagePath = serializers.URLField(required=False)
+    priorities = serializers.DictField(allow_empty=True, required=False)
 
 #######################################################
 class SResFiles(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
+    pass
 
 #######################################################
 class SResMessages(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
+    pass
 
+#######################################################
+class SResButtonAction(serializers.Serializer):
+    type = serializers.CharField(max_length=200)
+    data = serializers.DictField()
 #######################################################
 class SResProcessStatusButtons(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
-
-#######################################################
-class SResProcessErrors(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
+    title = serializers.CharField(max_length=200)
+    icon = serializers.CharField(max_length=200)
+    action = SResButtonAction()
+    active = serializers.BooleanField()
+    buttonVariant = serializers.CharField(max_length=200)
+    showIn = serializers.CharField(max_length=200)
 
 #######################################################
 class SResProcess(serializers.Serializer):
-    projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
-    serviceDetails = serializers.DictField(allow_empty=True) 
+    project = serializers.DictField(required=False)
+    serviceDetails = serializers.DictField(allow_empty=True, required=False)
     processStatus = serializers.IntegerField()
     serviceType = serializers.IntegerField()
     serviceStatus = serializers.IntegerField()
-    processDetails = SResProcessDetails
-    dependenciesIn = SResDependencies()
-    dependenciesOut = SResDependencies()
+    processDetails = SResProcessDetails()
+    dependenciesIn = serializers.ListField(allow_empty=True, required=False)
+    dependenciesOut = serializers.ListField(allow_empty=True, required=False)
     client = serializers.CharField(max_length=513)
-    files = SResFiles()
-    messages = SResMessages()
+    files = serializers.DictField(required=False, allow_empty=True)#SResFiles()
+    messages = serializers.DictField(required=False, allow_empty=True)#SResMessages()
+    contractor = serializers.CharField(required=False, allow_blank=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
-    accessesWhen = serializers.CharField(max_length=200)
-    processStatusButtons = SResProcessStatusButtons()
-    processErrors = SResProcessErrors()
+    accessedWhen = serializers.CharField(max_length=200)
+    processStatusButtons = serializers.ListField(child=SResProcessStatusButtons(), allow_empty=True)
+    processErrors = serializers.ListField(child=serializers.CharField(max_length=200), allow_empty=True)
 ########################################################
 # Handler
 @extend_schema(
@@ -196,7 +204,7 @@ class SResProcess(serializers.Serializer):
     request=None,
     tags=['FE - Processes'],
     responses={
-        200: None,
+        200: SResProcess,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -241,13 +249,11 @@ def getProcess(request:Request, projectID, processID):
         missingElements = getMissingElements(interface, process)
         outDict["processErrors"] = missingElements
         
-        ###TODO: add outserializers.
-        return Response(outDict, status=status.HTTP_200_OK)
-        # outSerializer = SResGetProcess(data=process)
-        # if outSerializer.is_valid():
-        #     return Response(outSerializer.data, status=status.HTTP_200_OK)
-        # else:
-        #     raise Exception(outSerializer.errors)    
+        outSerializer = SResProcess(data=outDict)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors) 
     except (Exception) as error:
         message = f"Error in getProcess: {str(error)}"
         exception = str(error)

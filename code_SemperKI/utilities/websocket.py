@@ -25,6 +25,42 @@ from code_SemperKI.connections.content.postgresql import pgEvents
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
+##################################################
+
+##################################################
+def transformEventsForFrontend(eventFromDB:dict) -> dict:
+    """
+    Transforms an event from the database to one that the frontend can read, 
+    including websocket events
+
+    :param eventFromDB: The event in form of the database entry
+    :type eventFromDB: dict
+    :return: The transformed dictionary
+    :rtype: dict
+    
+    """
+
+    outEntry = {
+        EventContentForFrontend.eventType: eventFromDB[pgEvents.EventDescription.event][EventsDescription.eventType],
+        EventContentForFrontend.eventID: eventFromDB[pgEvents.EventDescription.eventID],
+        EventContentForFrontend.userHashedID: eventFromDB[pgEvents.EventDescription.userHashedID],
+        EventContentForFrontend.eventData: {
+            EventContentForFrontend.primaryID: eventFromDB[pgEvents.EventDescription.event][EventsDescription.primaryID],
+        },
+        EventContentForFrontend.createdWhen: eventFromDB[pgEvents.EventDescription.createdWhen],
+        EventContentForFrontend.triggerEvent: eventFromDB[pgEvents.EventDescription.event][EventsDescription.triggerEvent]
+    }
+    if EventContentForFrontend.secondaryID in eventFromDB[pgEvents.EventDescription.event]:
+        outEntry[EventContentForFrontend.eventData][EventContentForFrontend.secondaryID] = eventFromDB[pgEvents.EventDescription.event][EventsDescription.secondaryID]
+
+    if EventContentForFrontend.reason in eventFromDB[pgEvents.EventDescription.event]:
+        outEntry[EventContentForFrontend.eventData][EventContentForFrontend.reason] = eventFromDB[pgEvents.EventDescription.event][EventsDescription.reason]
+
+    if EventContentForFrontend.content in eventFromDB[pgEvents.EventDescription.event]:
+        outEntry[EventContentForFrontend.eventData][EventContentForFrontend.content] = str(eventFromDB[pgEvents.EventDescription.event][EventsDescription.content])
+    
+    return outEntry
+
 #######################################################
 def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, eventContent, notification:str="", clientOnly:bool=False):
     """
@@ -47,7 +83,7 @@ def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, 
     :return: Nothing
     :rtype: None
     """
-    # TODO Fix calls to this function, set channels correctly with only userSubID, emails
+
     if manualCheckifLoggedIn(session):
         dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, eventContent, notification, clientOnly)
         channelLayer = get_channel_layer()
@@ -57,7 +93,7 @@ def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, 
             pgEvents.createEventEntry(userID, values) # create an entry in the event queue for that user
             async_to_sync(channelLayer.group_send)(userID[:80], {
                 "type": "sendMessageJSON",
-                "dict": values, # message, formatted for frontend
+                "dict": transformEventsForFrontend(values), # message, formatted for frontend
             })
     # not logged in therefore no websockets to fire
                         

@@ -102,9 +102,9 @@ class Process(models.Model):
         return ""
     
     def toDict(self):
-        return {ProcessDescription.processID: self.processID, 
-                ProcessDescription.project: self.project.toDict(), 
-                ProcessDescription.serviceDetails: self.serviceDetails, 
+        return {ProcessDescription.processID: self.processID,
+                ProcessDescription.project: self.project.toDict(),
+                ProcessDescription.serviceDetails: self.serviceDetails,
                 ProcessDescription.processStatus: self.processStatus,
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,

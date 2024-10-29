@@ -56,9 +56,22 @@ class SResGetProject(serializers.Serializer):
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processes = serializers.ListField()
+
+#######################################################
+class SResFlatProjectsEntry(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    projectStatus = serializers.IntegerField()
+    client = serializers.CharField(max_length=200)
+    projectDetails = ProjectDetailsSerializer()
+    createdWhen = serializers.CharField(max_length=200)
+    updatedWhen = serializers.CharField(max_length=200)
+    accessedWhen = serializers.CharField(max_length=200)
+    processesCount = serializers.IntegerField()
+    owner = serializers.BooleanField()
+
 ########################################################
 class SResGetFlatProjects(serializers.Serializer):
-    projects = serializers.ListField()#TODO specify further
+    projects = serializers.ListField(child=SResFlatProjectsEntry(), allow_empty=True)
 
 ########################################################
 # Handler
@@ -311,9 +324,15 @@ def createProjectID(request:Request):
 #"updateProject": ("public/updateProject/" ,project.updateProject),
 ########################################################
 # Serializers
+#######################################################
+class SReqUpdateProjectChanges(serializers.Serializer):
+    projectStatus = serializers.IntegerField()
+    projectDetails = serializers.DictField()
+
+##################################################
 class SReqUpdateProject(serializers.Serializer):
-    projectID = serializers.CharField(required=True, max_length=100)
-    changes = serializers.JSONField(required=True)
+    projectID = serializers.CharField(max_length=513)
+    changes = SReqUpdateProjectChanges()
 
 ########################################################
 # Handler
