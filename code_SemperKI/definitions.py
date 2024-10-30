@@ -150,22 +150,6 @@ class SessionContentSemperKI(StrEnumExactlyAsDefined):
     CURRENT_PROJECTS = enum.auto()
     processes = enum.auto()
 
-####################################################################################
-# Enum for events
-class EventsDescription(StrEnumExactlyAsDefined):
-    """
-    Websocket events and missed events should be in the same format
-
-    """
-    eventType = enum.auto()
-    projectEvent = enum.auto()
-    processEvent = enum.auto()
-    orgaEvent = enum.auto()
-    triggerEvent = enum.auto()
-    primaryID = enum.auto()
-    secondaryID = enum.auto()
-    reason = enum.auto()
-    content = enum.auto()
     
 ####################################################################################
 # Enum for flat process status
@@ -271,15 +255,3 @@ class MapPermissionsToOrgaNotifications():
         PermissionsEnum.resourcesEdit: [],	
     }
 
-##################################################
-class EventContentForFrontend(StrEnumExactlyAsDefined):
-    eventType = enum.auto()
-    eventID = enum.auto()
-    userHashedID = enum.auto()
-    eventData = enum.auto()
-    createdWhen = enum.auto()
-    triggerEvent = enum.auto()
-    primaryID = enum.auto()
-    secondaryID = enum.auto()
-    reason = enum.auto()
-    content = enum.auto()

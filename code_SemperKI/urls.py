@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events, pdfPipeline
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -85,12 +85,6 @@ newPaths= {
     "loadTestGraph": ("private/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
     "deleteGraph": ("private/graph/delete/", knowledgeGraphDB.deleteGraph),
 
-    "getAllEventsForUser": ("public/events/all/get/", events.getAllEventsForUser),
-    "getOneEventOfUser": ("public/events/get/<str:eventID>/", events.getOneEventOfUser),
-    "createEvent": ("public/events/post/", events.createEvent),
-    "deleteOneEvent": ("public/events/delete/<str:eventID>/", events.deleteOneEvent),
-    "deleteAllEventsForAUser": ("public/events/all/delete/", events.deleteAllEventsForAUser),
-    
     #"isMagazineUp": ("public/isMagazineUp/",testResponse.isMagazineUp),
 
     #"getResultsBack": ("public/getResults/<taskID>/", interface.getResultsBack),

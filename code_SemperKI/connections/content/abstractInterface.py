@@ -202,7 +202,7 @@ class AbstractContentInterface(ABC):
 
     ##############################################
     @abstractmethod
-    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> str|Exception:
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> tuple[str,dict]|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -217,7 +217,7 @@ class AbstractContentInterface(ABC):
         :param updatedBy: ID of the person who updated the process (for history)
         :type updatedBy: str
         :return: Content that is relevant to an event
-        :rtype: str | Exception
+        :rtype: tuple[str,dict] | Exception
 
         """
         pass

@@ -656,7 +656,7 @@ class ProcessManagementSession(AbstractContentInterface):
             return error
 
     ##############################################
-    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> str|Exception:
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> tuple[str,dict]|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -671,11 +671,12 @@ class ProcessManagementSession(AbstractContentInterface):
         :param updatedBy: ID of the person who updated the process (for history)
         :type updatedBy: str
         :return: The relevant thing that got updated, for event queue
-        :rtype: Str|Exception
+        :rtype: tuple[str,dict]|Exception
 
         """
         try:
             outContent = ""
+            outAdditionalInformation = {}
             updated = timezone.now()
             currentProcess = self.structuredSessionObj.getProcess(projectID, processID)
             dataID = crypto.generateURLFriendlyRandomString()
@@ -767,7 +768,7 @@ class ProcessManagementSession(AbstractContentInterface):
             currentProcess[ProcessDescription.updatedWhen] = str(updated)
             self.structuredSessionObj.setProcess(projectID, processID, currentProcess)
             
-            return outContent
+            return (outContent, outAdditionalInformation)
         except (Exception) as error:
             logger.error(f"could not update process: {str(error)}")
             return error

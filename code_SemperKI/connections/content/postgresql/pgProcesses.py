@@ -15,7 +15,7 @@ from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
+from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
@@ -603,7 +603,7 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
-    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy) -> str|Exception:
+    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy) -> tuple[str,dict]|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -616,12 +616,13 @@ class ProcessManagementBase(AbstractContentInterface):
         :param content: changed process, can be many stuff
         :type content: json dict
         :return: The relevant thing that got updated, for event queue
-        :rtype: Str|Exception
+        :rtype: tuple[str,dict]|Exception
 
         """
         updated = timezone.now()
         try:
             outContent = ""
+            outAdditionalInformation = {}
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
             dataID = crypto.generateURLFriendlyRandomString()
@@ -711,7 +712,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 outContent = content
 
             currentProcess.save()
-            return outContent
+            return (outContent, outAdditionalInformation)
         except (Exception) as error:
             logger.error(f'could not update process: {str(error)}')
             return error
@@ -864,22 +865,28 @@ class ProcessManagementBase(AbstractContentInterface):
         
         for userHashID in dictOfUserIDsAndPreference:
             dictForEventsAsOutput[userHashID] = {
-                EventsDescription.triggerEvent: dictOfUserIDsAndPreference[userHashID],
-                EventsDescription.eventType: EventsDescription.processEvent,
-                EventsDescription.primaryID: projectID,
-                EventsDescription.secondaryID: processID,
-                EventsDescription.reason: event,
-                EventsDescription.content: eventContent
+                EventsDescriptionGeneric.triggerEvent: dictOfUserIDsAndPreference[userHashID],
+                EventsDescriptionGeneric.eventType: "processEvent",
+                EventsDescriptionGeneric.eventData: {
+                    EventsDescriptionGeneric.primaryID: projectID,
+                    EventsDescriptionGeneric.secondaryID: processID,
+                    EventsDescriptionGeneric.reason: event,
+                    EventsDescriptionGeneric.content: eventContent[0],
+                    EventsDescriptionGeneric.additionalInformation: eventContent[1]
+                }
             }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
             dictForEventsAsOutput[userThatBelongsToContractorHashID] = {
-                EventsDescription.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
-                EventsDescription.eventType: EventsDescription.processEvent,
-                EventsDescription.primaryID: projectID,
-                EventsDescription.secondaryID: processID,
-                EventsDescription.reason: event,
-                EventsDescription.content: eventContent
+                EventsDescriptionGeneric.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
+                EventsDescriptionGeneric.eventType: "processEvent",
+                EventsDescriptionGeneric.eventData: {
+                    EventsDescriptionGeneric.primaryID: projectID,
+                    EventsDescriptionGeneric.secondaryID: processID,
+                    EventsDescriptionGeneric.reason: event,
+                    EventsDescriptionGeneric.content: eventContent[0],
+                    EventsDescriptionGeneric.additionalInformation: eventContent[1]
+                }
             }
     
         return dictForEventsAsOutput

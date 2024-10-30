@@ -588,7 +588,12 @@ def getProcessHistory(request:Request, processID):
 # getContractors
 #"getContractors": ("public/getContractors/<str:processID>/", process.getContractors),
 #########################################################################
-#TODO Add serializer for getContractors
+#######################################################
+class SResContractors(serializers.Serializer):
+    hashedID = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    details = serializers.DictField()
+
 #########################################################################
 # Handler    
 @extend_schema(
@@ -597,7 +602,7 @@ def getProcessHistory(request:Request, processID):
     tags=['FE - Processes'],
     request=None,
     responses={
-        200: None,
+        200: SResContractors,
         500: ExceptionSerializer
     }
 )
@@ -671,8 +676,12 @@ def getContractors(request:Request, processID:str):
         # sort ascending via distance (the shorter, the better)
         listOfContractorsWithPriorities.sort(key=lambda x: x[1])
         listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
-        # TODO add serializers
-        return Response(listOfResultingContractors)
+        
+        outSerializer = SResContractors(data=listOfResultingContractors, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in getContractors: {str(error)}"
         exception = str(error)
