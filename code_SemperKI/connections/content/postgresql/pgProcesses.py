@@ -641,14 +641,19 @@ class ProcessManagementBase(AbstractContentInterface):
                         currentProcess.messages[MessageInterfaceFromFrontend.messages] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 outContent = content[MessageInterfaceFromFrontend.text]
+                outAdditionalInformation[MessageInterfaceFromFrontend.origin] = content[MessageInterfaceFromFrontend.origin]
+                outAdditionalInformation[MessageInterfaceFromFrontend.userName] = content[MessageInterfaceFromFrontend.userName]
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     outContent += content[entry][FileObjectContent.fileName] + ","
+                    outAdditionalInformation[FileObjectContent.fileName] = {}
+                    outAdditionalInformation[FileObjectContent.fileName][FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
+                    outAdditionalInformation[FileObjectContent.fileName][FileObjectContent.origin] = content[entry][FileObjectContent.origin]
                 outContent = outContent.rstrip(",")
-
+                
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
