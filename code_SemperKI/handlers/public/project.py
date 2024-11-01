@@ -192,18 +192,30 @@ def getProject(request, projectID):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         processList = projectAsDict[SessionContentSemperKI.processes]
         listOfFlatProcesses = []
+        if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+            currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
+        else:
+            currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        
         for entry in processList:
-            flatProcessDict = {
-                ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
-                ProcessDescription.processID: entry[ProcessDescription.processID],
-                ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
-                ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
-                ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
-                "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
-                ProcessDetails.amount: entry[ProcessDescription.processDetails][ProcessDetails.amount] if ProcessDetails.amount in entry[ProcessDescription.processDetails] else 1,
-                ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
-            }
-            listOfFlatProcesses.append(flatProcessDict)
+            # list only processes that either the user or the receiving organization should see
+
+            if entry[ProcessDescription.client] == currentUserID or \
+                ( ProcessDescription.contractor in entry and \
+                 len(entry[ProcessDescription.contractor]) != 0 and \
+                    entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
+
+                flatProcessDict = {
+                    ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
+                    ProcessDescription.processID: entry[ProcessDescription.processID],
+                    ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
+                    ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
+                    ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
+                    "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
+                    ProcessDetails.amount: entry[ProcessDescription.processDetails][ProcessDetails.amount] if ProcessDetails.amount in entry[ProcessDescription.processDetails] else 1,
+                    ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
+                }
+                listOfFlatProcesses.append(flatProcessDict)
 
         projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
 

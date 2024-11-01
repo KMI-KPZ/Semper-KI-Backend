@@ -177,6 +177,11 @@ class SResProcessStatusButtons(serializers.Serializer):
     showIn = serializers.CharField(max_length=200)
 
 #######################################################
+class SResContractor(serializers.Serializer):
+    name = serializers.CharField(max_length=200)
+    hashedID = serializers.CharField(max_length=513)
+
+#######################################################
 class SResProcess(serializers.Serializer):
     processID = serializers.CharField(max_length=200)
     project = serializers.DictField(required=False)
@@ -190,7 +195,7 @@ class SResProcess(serializers.Serializer):
     client = serializers.CharField(max_length=513)
     files = serializers.DictField(required=False, allow_empty=True)#SResFiles()
     messages = serializers.DictField(required=False, allow_empty=True)#SResMessages()
-    contractor = serializers.CharField(required=False, allow_blank=True)
+    contractor = SResContractor(required=False)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)

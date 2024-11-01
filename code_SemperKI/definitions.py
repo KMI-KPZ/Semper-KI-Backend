@@ -139,6 +139,7 @@ class MessageInterfaceFromFrontend(StrEnumExactlyAsDefined):
     text = enum.auto()
     userID = enum.auto()
     userName = enum.auto()
+    createdBy = enum.auto()
     
 ####################################################################################
 # Enum for session content

@@ -12,7 +12,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project, ProjectInterface
 from ..serviceManager import serviceManager
-from Generic_Backend.code_General.modelFiles.organizationModel import Organization
+from Generic_Backend.code_General.modelFiles.organizationModel import Organization, OrganizationDescription
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ###################################################
@@ -112,7 +112,7 @@ class Process(models.Model):
                 ProcessDescription.dependenciesIn: [ process.processID for process in self.dependenciesIn.all()],
                 ProcessDescription.dependenciesOut: [ process.processID for process in self.dependenciesOut.all()],
                 ProcessDescription.client: self.client,
-                ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
+                ProcessDescription.contractor: {OrganizationDescription.name: self.contractor.name, OrganizationDescription.hashedID: self.contractor.hashedID} if self.contractor is not None else {},
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}

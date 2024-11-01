@@ -642,17 +642,22 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
                 outContent = content[MessageInterfaceFromFrontend.text]
                 outAdditionalInformation[MessageInterfaceFromFrontend.origin] = content[MessageInterfaceFromFrontend.origin]
-                outAdditionalInformation[MessageInterfaceFromFrontend.userName] = content[MessageInterfaceFromFrontend.userName]
+                outAdditionalInformation[MessageInterfaceFromFrontend.createdBy] = content[MessageInterfaceFromFrontend.userName]
 
             elif updateType == ProcessUpdates.files:
+                getAdditionalInformation = False
+                if len(content) == 1:
+                    outContent = "file"
+                    getAdditionalInformation = True
+                elif len(content) > 1:
+                    outContent = "files"
+
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
-                    outContent += content[entry][FileObjectContent.fileName] + ","
-                    outAdditionalInformation[FileObjectContent.fileName] = {}
-                    outAdditionalInformation[FileObjectContent.fileName][FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
-                    outAdditionalInformation[FileObjectContent.fileName][FileObjectContent.origin] = content[entry][FileObjectContent.origin]
-                outContent = outContent.rstrip(",")
+                    if getAdditionalInformation:
+                        outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
+                        outAdditionalInformation[FileObjectContent.origin] = content[entry][FileObjectContent.origin]
                 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
