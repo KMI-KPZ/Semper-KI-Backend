@@ -67,7 +67,7 @@ class SResFlatProjectsEntry(serializers.Serializer):
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processesCount = serializers.IntegerField()
-    owner = serializers.BooleanField()
+    owner = serializers.BooleanField(required=False)
 
 ########################################################
 class SResGetFlatProjects(serializers.Serializer):
@@ -192,10 +192,13 @@ def getProject(request, projectID):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         processList = projectAsDict[SessionContentSemperKI.processes]
         listOfFlatProcesses = []
-        if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-            currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
+        if manualCheckifLoggedIn(request.session):
+            if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+                currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
+            else:
+                currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
         else:
-            currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+            currentUserID = GlobalDefaults.anonymous
         
         for entry in processList:
             # list only processes that either the user or the receiving organization should see
