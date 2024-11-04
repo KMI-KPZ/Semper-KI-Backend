@@ -178,8 +178,8 @@ class SResProcessStatusButtons(serializers.Serializer):
 
 #######################################################
 class SResContractor(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    hashedID = serializers.CharField(max_length=513)
+    name = serializers.CharField(max_length=200, required=False)
+    hashedID = serializers.CharField(max_length=513, required=False)
 
 #######################################################
 class SResProcess(serializers.Serializer):
