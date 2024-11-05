@@ -341,8 +341,8 @@ def createProjectID(request:Request):
 # Serializers
 #######################################################
 class SReqUpdateProjectChanges(serializers.Serializer):
-    projectStatus = serializers.IntegerField()
-    projectDetails = serializers.DictField()
+    projectStatus = serializers.IntegerField(required=False)
+    projectDetails = serializers.DictField(required=False)
 
 ##################################################
 class SReqUpdateProject(serializers.Serializer):
