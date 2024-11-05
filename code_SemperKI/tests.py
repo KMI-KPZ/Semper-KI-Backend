@@ -97,7 +97,8 @@ class TestProjects(TestCase):
         client = Client()
         projectObj, processObj = self.createProjectAndProcess(client)
         changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.projectDetails + '": {"title": "test"} } }'
-        client.patch("/"+paths["updateProject"][0], changes, content_type="application/json")
+        response = client.patch("/"+paths["updateProject"][0], changes, content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
         self.assertIs(response["projects"][0][ProjectDescription.projectDetails]["title"] == "test", True, f'got: {response["projects"][0][ProjectDescription.projectDetails]["title"]}')
