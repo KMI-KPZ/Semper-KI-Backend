@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, events, pdfPipeline
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -56,7 +56,6 @@ newPaths= {
     "statusButtonRequest": ("public/states/buttons/get/", statemachine.statusButtonRequest), 
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
-    "getMissedEvents": ("public/events/missed/get/", events.getMissedEvents),
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),

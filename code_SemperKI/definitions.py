@@ -135,6 +135,11 @@ class MessageInterfaceFromFrontend(StrEnumExactlyAsDefined):
     """
     messages = enum.auto()
     origin = enum.auto()
+    date = enum.auto()
+    text = enum.auto()
+    userID = enum.auto()
+    userName = enum.auto()
+    createdBy = enum.auto()
     
 ####################################################################################
 # Enum for session content
@@ -146,17 +151,6 @@ class SessionContentSemperKI(StrEnumExactlyAsDefined):
     CURRENT_PROJECTS = enum.auto()
     processes = enum.auto()
 
-####################################################################################
-# Enum for events
-class EventsDescription(StrEnumExactlyAsDefined):
-    """
-    Websocket events and missed events should be in the same format
-
-    """
-    eventType = enum.auto()
-    events = enum.auto()
-    projectEvent = enum.auto()
-    orgaEvent = enum.auto()
     
 ####################################################################################
 # Enum for flat process status
@@ -261,3 +255,4 @@ class MapPermissionsToOrgaNotifications():
         PermissionsEnum.resourcesRead: [], 
         PermissionsEnum.resourcesEdit: [],	
     }
+

@@ -202,7 +202,7 @@ class AbstractContentInterface(ABC):
 
     ##############################################
     @abstractmethod
-    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str):
+    def updateProcess(self, projectID:str, processID:str, updateType: ProcessUpdates, content:dict, updatedBy:str) -> tuple[str,dict]|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -216,8 +216,8 @@ class AbstractContentInterface(ABC):
         :type content: json dict
         :param updatedBy: ID of the person who updated the process (for history)
         :type updatedBy: str
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: Content that is relevant to an event
+        :rtype: tuple[str,dict] | Exception
 
         """
         pass
@@ -282,5 +282,30 @@ class AbstractContentInterface(ABC):
         :return: list of all data
         :rtype: list
         
+        """
+        pass
+
+        ##############################################
+    @abstractmethod
+    def createDataEntry(self, data, dataID, processID, typeOfData, createdBy:str, details={}, IDofData=""):
+        """
+        Create an entry in the Data table
+
+        :param data: The data itself
+        :type data: Dict in JSON
+        :param dataID: The ID of that date
+        :type dataID: Str
+        :param processID: process it belongs to
+        :type processID: str
+        :param typeOfData: The type of this data
+        :type typeOfData: DataType
+        :param createdBy: Who created it (hashed ID)
+        :type createdBy: Str
+        :param details: Some metadata
+        :type details: JSON Dict
+        :param IDofData: If the data has an id, save it
+        :type IDofData: Str
+        :return: Nothing
+        :rtype: None
         """
         pass

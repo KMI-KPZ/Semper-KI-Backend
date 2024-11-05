@@ -48,7 +48,8 @@
 					{ "containerPath": "/app", "localPath": "${workspaceFolder}"}
 				],
 				"env": {
-					"MODE" :"local_container"
+					"MODE" :"local_container",
+					"WATCHFILES_IGNORE_PERMISSION_DENIED": "True"
 				},
 				"network": "vs-code-dev-services_semper-ki-dev-network"
 			},

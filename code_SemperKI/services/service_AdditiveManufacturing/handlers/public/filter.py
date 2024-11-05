@@ -34,7 +34,7 @@ from ...definitions import NodeTypesAM
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-
+# TODO serializers
 #######################################################
 @extend_schema(
     summary="Retrieve the filters used for this service",

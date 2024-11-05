@@ -56,9 +56,22 @@ class SResGetProject(serializers.Serializer):
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processes = serializers.ListField()
+
+#######################################################
+class SResFlatProjectsEntry(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    projectStatus = serializers.IntegerField()
+    client = serializers.CharField(max_length=200)
+    projectDetails = ProjectDetailsSerializer()
+    createdWhen = serializers.CharField(max_length=200)
+    updatedWhen = serializers.CharField(max_length=200)
+    accessedWhen = serializers.CharField(max_length=200)
+    processesCount = serializers.IntegerField()
+    owner = serializers.BooleanField(required=False)
+
 ########################################################
 class SResGetFlatProjects(serializers.Serializer):
-    projects = serializers.ListField()#TODO specify further
+    projects = serializers.ListField(child=SResFlatProjectsEntry(), allow_empty=True)
 
 ########################################################
 # Handler
@@ -179,18 +192,33 @@ def getProject(request, projectID):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         processList = projectAsDict[SessionContentSemperKI.processes]
         listOfFlatProcesses = []
+        if manualCheckifLoggedIn(request.session):
+            if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+                currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
+            else:
+                currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        else:
+            currentUserID = GlobalDefaults.anonymous
+        
         for entry in processList:
-            flatProcessDict = {
-                ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
-                ProcessDescription.processID: entry[ProcessDescription.processID],
-                ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
-                ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
-                ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
-                "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
-                ProcessDetails.amount: entry[ProcessDescription.processDetails][ProcessDetails.amount] if ProcessDetails.amount in entry[ProcessDescription.processDetails] else 1,
-                ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
-            }
-            listOfFlatProcesses.append(flatProcessDict)
+            # list only processes that either the user or the receiving organization should see
+
+            if entry[ProcessDescription.client] == currentUserID or \
+                ( ProcessDescription.contractor in entry and \
+                 len(entry[ProcessDescription.contractor]) != 0 and \
+                    entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
+
+                flatProcessDict = {
+                    ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
+                    ProcessDescription.processID: entry[ProcessDescription.processID],
+                    ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
+                    ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
+                    ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
+                    "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
+                    ProcessDetails.amount: entry[ProcessDescription.processDetails][ProcessDetails.amount] if ProcessDetails.amount in entry[ProcessDescription.processDetails] else 1,
+                    ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
+                }
+                listOfFlatProcesses.append(flatProcessDict)
 
         projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
 
@@ -311,9 +339,15 @@ def createProjectID(request:Request):
 #"updateProject": ("public/updateProject/" ,project.updateProject),
 ########################################################
 # Serializers
+#######################################################
+class SReqUpdateProjectChanges(serializers.Serializer):
+    projectStatus = serializers.IntegerField()
+    projectDetails = serializers.DictField()
+
+##################################################
 class SReqUpdateProject(serializers.Serializer):
-    projectID = serializers.CharField(required=True, max_length=100)
-    changes = serializers.JSONField(required=True)
+    projectID = serializers.CharField(max_length=513)
+    changes = SReqUpdateProjectChanges()
 
 ########################################################
 # Handler

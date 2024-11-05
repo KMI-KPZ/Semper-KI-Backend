@@ -82,7 +82,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     try:
         valid = True
         # Check if service was correctly defined
-        if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails):
+        if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails)[0]:
             valid = False
 
         # Check if parameters make sense
@@ -105,16 +105,22 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Get all details and set status in database    
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = ["email","subjects","statusUpdate"]
+        contentForEvent = ""
         if valid:
             message = ["email","content","verificationSuccessful"]
-            DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
+            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
+            if isinstance(retVal, Exception):
+                raise retVal
+            contentForEvent = retVal
         else: # Else: set to failed
             message = ["email","content","verificationFailed"]
-            DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
-        
+            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
+            if isinstance(retVal, Exception):
+                raise retVal
+            contentForEvent = retVal
         # send out mail & Websocket event 
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
-        websocket.fireWebsocketEvents(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, NotificationSettingsUserSemperKI.verification, True)  
+        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, contentForEvent, NotificationSettingsUserSemperKI.verification, True)  
         
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")
