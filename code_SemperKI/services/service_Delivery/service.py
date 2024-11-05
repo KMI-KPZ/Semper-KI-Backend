@@ -39,7 +39,7 @@ class Delivery(Semper.ServiceBase):
         return D_deleteServiceDetails(existingContent, newContent)
     
     ###################################################
-    def serviceReady(self, existingContent) -> bool:
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks, if service is completely defined
         

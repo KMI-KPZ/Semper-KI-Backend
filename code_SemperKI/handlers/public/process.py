@@ -23,7 +23,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString, getButtonsForProcess
+from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString, getButtonsForProcess, getMissingElements
 from code_SemperKI.definitions import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
@@ -107,15 +107,18 @@ def createProcessID(request:Request, projectID):
                         defaultAddress = entry
                         break
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
-            interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
-
+            errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
+            if isinstance(errorOrNot, Exception):
+                raise errorOrNot
         # set default priorities here
         userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
-        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
-
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
         # set default title of the process
-        interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
-
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
 
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
@@ -141,7 +144,63 @@ def createProcessID(request:Request, projectID):
 # getProcess
 #"getProcess": ("public/getProcess/<str:projectID>/<str:processID>/", process.getProcess),
 ###############serializer#######################################
-#TODO Add serializer for getProcess
+
+#######################################################
+class SResProcessDetails(serializers.Serializer):
+    provisionalContractor = serializers.CharField(max_length=200, required=False)
+    amount = serializers.IntegerField(required=False)
+    title = serializers.CharField(max_length=200, required=False)
+    clientBillingAddress = serializers.DictField(allow_empty=True, required=False)
+    clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)
+    imagePath = serializers.URLField(required=False)
+    priorities = serializers.DictField(allow_empty=True, required=False)
+
+#######################################################
+class SResFiles(serializers.Serializer):
+    pass
+
+#######################################################
+class SResMessages(serializers.Serializer):
+    pass
+
+#######################################################
+class SResButtonAction(serializers.Serializer):
+    type = serializers.CharField(max_length=200)
+    data = serializers.DictField()
+#######################################################
+class SResProcessStatusButtons(serializers.Serializer):
+    title = serializers.CharField(max_length=200)
+    icon = serializers.CharField(max_length=200)
+    action = SResButtonAction()
+    active = serializers.BooleanField()
+    buttonVariant = serializers.CharField(max_length=200)
+    showIn = serializers.CharField(max_length=200)
+
+#######################################################
+class SResContractor(serializers.Serializer):
+    name = serializers.CharField(max_length=200, required=False)
+    hashedID = serializers.CharField(max_length=513, required=False)
+
+#######################################################
+class SResProcess(serializers.Serializer):
+    processID = serializers.CharField(max_length=200)
+    project = serializers.DictField(required=False)
+    serviceDetails = serializers.DictField(allow_empty=True, required=False)
+    processStatus = serializers.IntegerField()
+    serviceType = serializers.IntegerField()
+    serviceStatus = serializers.IntegerField()
+    processDetails = SResProcessDetails()
+    dependenciesIn = serializers.ListField(allow_empty=True, required=False)
+    dependenciesOut = serializers.ListField(allow_empty=True, required=False)
+    client = serializers.CharField(max_length=513)
+    files = serializers.DictField(required=False, allow_empty=True)#SResFiles()
+    messages = serializers.DictField(required=False, allow_empty=True)#SResMessages()
+    contractor = SResContractor(required=False)
+    createdWhen = serializers.CharField(max_length=200)
+    updatedWhen = serializers.CharField(max_length=200)
+    accessedWhen = serializers.CharField(max_length=200)
+    processStatusButtons = serializers.ListField(child=SResProcessStatusButtons(), allow_empty=True)
+    processErrors = serializers.ListField(child=serializers.CharField(max_length=200), allow_empty=True)
 ########################################################
 # Handler
 @extend_schema(
@@ -150,7 +209,7 @@ def createProcessID(request:Request, projectID):
     request=None,
     tags=['FE - Processes'],
     responses={
-        200: None,
+        200: SResProcess,
         401: ExceptionSerializer,
         500: ExceptionSerializer
     }
@@ -186,16 +245,20 @@ def getProcess(request:Request, projectID, processID):
         if isinstance(process, Exception):
             raise process
 
+        # add buttons
         buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
         outDict = process.toDict()
         outDict["processStatusButtons"] = buttons
-        ###TODO: add outserializers.
-        return Response(outDict, status=status.HTTP_200_OK)
-        # outSerializer = SResGetProcess(data=process)
-        # if outSerializer.is_valid():
-        #     return Response(outSerializer.data, status=status.HTTP_200_OK)
-        # else:
-        #     raise Exception(outSerializer.errors)    
+
+        # add what's missing to continue
+        missingElements = getMissingElements(interface, process)
+        outDict["processErrors"] = missingElements
+        
+        outSerializer = SResProcess(data=outDict)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors) 
     except (Exception) as error:
         message = f"Error in getProcess: {str(error)}"
         exception = str(error)
@@ -248,24 +311,25 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
 
             if "changes" in changes:
                 for elem in changes["changes"]:
+                    fireEvent = False
                     # for websocket events
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
                         # exclude people not having sufficient rights for that specific operation
                         if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
                             logger.error("Rights not sufficient in updateProcess")
                             return ("", False)
-                        sendNotification = False
-                        if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.newMessage)
-                        elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem, NotificationSettingsUserSemperKI.statusChange)
-                        else:
-                            WebSocketEvents.fireWebsocketEvents(projectID, processID, request.session, elem)
-                    
+                        fireEvent = True
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):
                         raise returnVal
-            
+                    if fireEvent:
+                        if elem == ProcessUpdates.messages:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage)
+                        elif elem == ProcessUpdates.processStatus:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange)
+                        else:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal)
+                    
             # change state for this process if necessary
             process = interface.getProcessObj(projectID, processID)
             currentState = StateMachine(initialAsInt=process.processStatus)
@@ -452,6 +516,7 @@ class SResHistoryEntry(serializers.Serializer):
     createdWhen = serializers.CharField(max_length=200)
     type = serializers.IntegerField()
     data = serializers.DictField(allow_empty=True)
+    details = serializers.DictField(allow_empty=True, required=False)
 #######################################################
 class SResProcessHistory(serializers.Serializer):
     history = serializers.ListField(child=SResHistoryEntry())
@@ -501,7 +566,8 @@ def getProcessHistory(request:Request, processID):
                 DataDescription.createdBy: entry[DataDescription.createdBy],
                 DataDescription.createdWhen: entry[DataDescription.createdWhen],
                 DataDescription.type: entry[DataDescription.type],
-                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]}
+                DataDescription.data: entry[DataDescription.data] if isinstance(entry[DataDescription.data], dict) else {"value": entry[DataDescription.data]},
+                DataDescription.details: entry[DataDescription.details]
             }
             if not isinstance(interface, ProcessManagementSession):
                 outDatum[DataDescription.createdBy] = pgProfiles.ProfileManagementBase.getUserNameViaHash(entry[DataDescription.createdBy])
@@ -527,7 +593,12 @@ def getProcessHistory(request:Request, processID):
 # getContractors
 #"getContractors": ("public/getContractors/<str:processID>/", process.getContractors),
 #########################################################################
-#TODO Add serializer for getContractors
+#######################################################
+class SResContractors(serializers.Serializer):
+    hashedID = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    details = serializers.DictField()
+
 #########################################################################
 # Handler    
 @extend_schema(
@@ -536,7 +607,7 @@ def getProcessHistory(request:Request, processID):
     tags=['FE - Processes'],
     request=None,
     responses={
-        200: None,
+        200: SResContractors,
         500: ExceptionSerializer
     }
 )
@@ -610,8 +681,12 @@ def getContractors(request:Request, processID:str):
         # sort ascending via distance (the shorter, the better)
         listOfContractorsWithPriorities.sort(key=lambda x: x[1])
         listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
-        # TODO add serializers
-        return Response(listOfResultingContractors)
+        
+        outSerializer = SResContractors(data=listOfResultingContractors, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in getContractors: {str(error)}"
         exception = str(error)

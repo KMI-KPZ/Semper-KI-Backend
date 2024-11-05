@@ -39,7 +39,7 @@ class AfterSales(Semper.ServiceBase):
         return AS_deleteServiceDetails(existingContent, newContent)
     
     ###################################################
-    def serviceReady(self, existingContent) -> bool:
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks, if service is completely defined
         

@@ -94,32 +94,37 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     return existingContent
 
 ####################################################################################
-def serviceReady(existingContent:dict) -> bool:
+def serviceReady(existingContent:dict) -> tuple[bool, list[str]]:
     """
     Check if everything is there
 
     :param existingContent: What the process currently holds about the service
     :type existingContent: Dict
-    :return: True if all components are there
-    :rtype: Bool
+    :return: Tuple of True if all components are there and a list what's missing
+    :rtype: Tuple[bool,list[str]]
     """
 
     try:
-        checks = 0
-        for entry in existingContent:
-            if entry == ServiceDetails.models:
-                if len(existingContent[ServiceDetails.models]) > 0:
-                    checks += 1
-            elif entry == ServiceDetails.materials:
-                if len(existingContent[ServiceDetails.materials]) > 0:
-                    checks += 1
-            elif entry == ServiceDetails.postProcessings:
-                if len(existingContent[ServiceDetails.postProcessings]) > 0:
-                    checks += 0 # optional
-            else:
-                continue
+        listOfWhatIsMissing = []
+        
+        if ServiceDetails.models in existingContent:
+            if len(existingContent[ServiceDetails.models]) == 0:
+                listOfWhatIsMissing.append(ServiceDetails.models)
+        else:
+            listOfWhatIsMissing.append(ServiceDetails.models)
+        
+        if ServiceDetails.materials in existingContent:
+            if len(existingContent[ServiceDetails.materials]) == 0:
+                listOfWhatIsMissing.append(ServiceDetails.materials)
+        else:
+            listOfWhatIsMissing.append(ServiceDetails.materials)
+        if ServiceDetails.postProcessings in existingContent:
+            if len(existingContent[ServiceDetails.postProcessings]) == 0:
+                pass # TODO, current optional
+        else:
+            pass
             
-        return True if checks >= 2 else False
+        return (True, listOfWhatIsMissing) if len(listOfWhatIsMissing) == 0 else (False, listOfWhatIsMissing)
     except (Exception) as error:
         logger.error(f'Generic error in serviceReady(3D Print): {str(error)}')
         return False

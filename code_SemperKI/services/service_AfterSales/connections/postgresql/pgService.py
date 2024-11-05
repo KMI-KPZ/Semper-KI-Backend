@@ -41,17 +41,17 @@ def deleteServiceDetails(existingContent, deletedContent):
     return existingContent
 
 ####################################################################################
-def serviceReady(existingContent) -> bool:
+def serviceReady(existingContent) -> tuple[bool, list[str]]:
     """
     Check if everything is there
 
     :param existingContent: What the process currently holds about the service
     :type existingContent: Dict
     :return: True if all components are there
-    :rtype: Bool
+    :rtype: tuple[bool, list[str]]
     """
     # TODO
-    return True
+    return (True, [])
 
 ####################################################################################
 def cloneServiceDetails(existingContent:dict, newProcess) -> dict:

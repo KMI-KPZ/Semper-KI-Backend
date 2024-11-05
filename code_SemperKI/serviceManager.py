@@ -53,7 +53,7 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
-    def serviceReady(self, existingContent) -> bool:
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Check if a service has been defined completely
 

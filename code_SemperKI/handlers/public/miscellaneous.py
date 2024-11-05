@@ -50,7 +50,7 @@ class SResServices(serializers.Serializer):
     request=None,
     tags = ['FE - Miscellaneous'],
     responses={
-        200: SResServices,
+        200: serializers.ListSerializer(child=SResServices()),
         500: ExceptionSerializer
     }
 )

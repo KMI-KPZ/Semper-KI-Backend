@@ -94,6 +94,7 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
     completeFile = readableObject.read(fileSize)
     fileAsBytesObject = BytesIO(completeFile)
     your_mesh = mesh.Mesh.from_file(fileName, fh=fileAsBytesObject)
+    volume, _, _ = your_mesh.get_mass_properties()
  
     # Calculate the surface area by summing up the area of all triangles
     surface_area = np.sum(your_mesh.areas)
@@ -102,7 +103,7 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
     min_bound = np.min(your_mesh.points.reshape(-1, 3), axis=0)
     max_bound = np.max(your_mesh.points.reshape(-1, 3), axis=0)
     bounding_box = max_bound - min_bound
-    volume = bounding_box[0]*bounding_box[1]*bounding_box[2]
+    volumeBB = bounding_box[0]*bounding_box[1]*bounding_box[2]
 
     result = {
             "filename": fileName,
@@ -114,7 +115,7 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
                     "_2": float(bounding_box[1]),
                     "_3": float(bounding_box[2]),
                 },
-                "mbbVolume": float(volume),
+                "mbbVolume": float(volumeBB),
             },
             "status_code": 200
         }

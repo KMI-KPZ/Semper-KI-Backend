@@ -57,6 +57,7 @@ class SemperKISignalReceivers():
         """
         saveProjectsViaWebsocket(session=kwargs["session"])
 
+
     ###########################################################
     @staticmethod
     def receiverForWebsocketDisconnect(sender, **kwargs):
