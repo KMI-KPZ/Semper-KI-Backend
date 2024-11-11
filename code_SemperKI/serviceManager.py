@@ -28,7 +28,6 @@ class ServiceBase(ABC):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        pass
 
     ##############################################################
     # Connections
@@ -40,7 +39,6 @@ class ServiceBase(ABC):
         Update a service
 
         """
-        pass
 
     ###################################################
     @abstractmethod
@@ -49,7 +47,6 @@ class ServiceBase(ABC):
         Delete stuff from a service
 
         """
-        pass
 
     ###################################################
     @abstractmethod
@@ -58,9 +55,8 @@ class ServiceBase(ABC):
         Check if a service has been defined completely
 
         """
-        pass
 
-    ####################################################################################
+    ###################################################
     @abstractmethod
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
         """
@@ -74,7 +70,20 @@ class ServiceBase(ABC):
         :rtype: dict
         
         """
-        pass
+
+    ##################################################
+    @abstractmethod
+    def calculatePriceForService(self, process, additionalArguments:dict) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :return: Dictionary with all pricing details
+        :rtype: dict
+        """
 
     ###################################################
     @abstractmethod
@@ -83,7 +92,6 @@ class ServiceBase(ABC):
         Get a list of contractors that can do the job
 
         """
-        pass
 
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):

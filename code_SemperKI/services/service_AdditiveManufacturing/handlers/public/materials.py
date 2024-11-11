@@ -122,7 +122,8 @@ def retrieveMaterialsWithFilter(request:Request):
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
 
-        # filter by selection of post-processing
+        # TODO filter by selection of post-processing
+        # TODO calculate prices of materials
  
         materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:

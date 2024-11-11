@@ -68,6 +68,21 @@ class Packaging(Semper.ServiceBase):
         
         """
         return P_cloneServiceDetails(existingContent, newProcess)
+    
+    ##################################################
+    def calculatePriceForService(self, process, additionalArguments:dict) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :return: Dictionary with all pricing details
+        :rtype: dict
+
+        """
+        return {}
 
     ###################################################
     def getFilteredContractors(self, processObj) -> list:

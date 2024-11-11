@@ -12,6 +12,7 @@ from .connections.postgresql.pgService import updateServiceDetails as AM_updateS
 from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import ServiceDetails
+from .logics import costs
 
 SERVICE_NAME = "ADDITIVE_MANUFACTURING"
 SERVICE_NUMBER = 1
@@ -61,7 +62,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         return AM_checkIfSelectionIsAvailable(processObj)
     
-    ####################################################################################
+    ###################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess:ProcessInterface|Process) -> dict:
         """
         Clone content of the service
@@ -75,6 +76,25 @@ class AdditiveManufacturing(Semper.ServiceBase):
         
         """
         return AM_cloneServiceDetails(existingContent, newProcess)
+    
+    ##################################################
+    def calculatePriceForService(self, process:ProcessInterface|Process, additionalArguments:dict) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :return: Dictionary with all pricing details
+        :rtype: dict
+
+        """
+        return { "Material": costs.calculateCostsForMaterial(process, additionalArguments),
+                 "Printer": costs.calculateCostsForPrinter(process, additionalArguments),
+                 "PostProcessing": costs.calculateCostsForPostProcessings(process, additionalArguments)
+        }
+
 
     ###################################################
     def getFilteredContractors(self, processObj:ProcessInterface|Process) -> list:
