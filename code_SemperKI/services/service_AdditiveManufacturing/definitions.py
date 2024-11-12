@@ -64,23 +64,113 @@ class NodeTypesAM(StrEnumExactlyAsDefined):
     materialType = enum.auto() # What type is the material, e.g. PLA, ABS, ...?
 
 ##################################################
-class NodePropertiesAM(StrEnumExactlyAsDefined):
+class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
     """
-    What are the properties, a node can have?
+    What are the properties, a printer node can have?
 
     """
-    imgPath = enum.auto()  # mocks.testPicture  -> printer|material|additionalRequirement|color
-    foodSafe = enum.auto()  #"FDA;10/2011" -> material|color
-    heatResistant = enum.auto()  #250 -> material|color|additionalRequirement
-    flexible = enum.auto()  # 0.5Z50;0.7Z100;4.8XY50;3.7XY100 -> material
-    smooth = enum.auto()  # 20Ra -> material|additionalRequirement
-    eModul = enum.auto()  # 1358Z;2030XY -> material
-    poissonRatio = enum.auto()  #0.35 -> material
-    color = enum.auto()  # 9005RAL;Black -> color
-    buildVolume = enum.auto()  # 100x100x100 -> printer
-    nozzleDiameter = enum.auto() # 0.4 mm -> printer
-    certificates = enum.auto() # CE, MD, ... -> printer, material, ...
+    imgPath = enum.auto()  # mocks.testPicture
+    buildVolume = enum.auto()  # 100x100x100
+    nozzleDiameter = enum.auto() # 0.4 mm
+    certificates = enum.auto() # CE, MD, ...
+    lossOfMaterial = enum.auto() # 0.1%
+    fixedCosts = enum.auto() # 1000
+    machineBatchDistance = enum.auto() # 0.1 mm
+    fillRate = enum.auto() # 0.5
+    chamberBuildHeight = enum.auto() # 100 mm
+    chamberBuildWidth = enum.auto() # 100 mm
+    chamberBuildLength = enum.auto() # 100 mm
+    buildRate = enum.auto() # cm³/h
+    powerCosts = enum.auto() # €/kWh
+    possibleLayerHeights = enum.auto() # [0.1, 0.2, 0.3, 0.4, 0.5]
+    machineUsageCosts = enum.auto() # €/h
+    scanSpeed = enum.auto() # mm/s
+    machineSize = enum.auto() # 100x100x100
+    simpleMachineSetUp = enum.auto() # 0.1 h
+    complexMachineSetUp = enum.auto() # 0.5 h
+    machineHourlyRate = enum.auto() # €/h
+
+##################################################
+class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a material node can have?
+    """
+    imgPath = enum.auto() # mocks.testPicture
+    foodSafe = enum.auto() #"FDA;10/2011"
+    heatResistant = enum.auto() #250
+    flexible = enum.auto()  # 0.5Z50;0.7Z100;4.8XY50;3.7XY100
+    smooth = enum.auto()  # 20Ra
+    eModul = enum.auto()  # 1358Z;2030XY
+    poissonRatio = enum.auto()  #0.35
+    certificates = enum.auto() # CE, MD, ...
+    supportStructurePartRate = enum.auto() # 0.1
+    density = enum.auto() # 1.2 g/cm³
+    printingSpeed = enum.auto() # 100 cm³/h
+    acquisitionCosts = enum.auto() # €/kg
+
+##################################################
+class NodePropertiesAMAdditionalRequirement(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a additional requirement node can have?
+    """
+    imgPath = enum.auto() # mocks.testPicture
+    heatResistant = enum.auto()  #250
+    smooth = enum.auto()  # 20Ra
+    foodSafe = enum.auto() #"FDA;10/2011"
+    certificates = enum.auto() # CE, MD, ...
+    treatmentCosts = enum.auto() # €/h
+    fixedCosts = enum.auto() # €
+
+##################################################
+class NodePropertiesAMColor(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a color node can have?
+    """
+    imgPath = enum.auto() # mocks.testPicture
+    foodSafe = enum.auto() #"FDA;10/2011"
+    heatResistant = enum.auto() #250 
+    color = enum.auto()  # 9005RAL;Black
+    certificates = enum.auto() # CE, MD, ...
+
+##################################################
+class NodePropertiesAMMaterialCategory(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a material category node can have?
+    """
+    imgPath = enum.auto()  # mocks.testPicture
+
+##################################################
+class NodePropertiesAMTechnology(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a technology node can have?
+    """
+    imgPath = enum.auto()  # mocks.testPicture
+
+##################################################
+class NodePropertiesAMMaterialType(StrEnumExactlyAsDefined):
+    """
+    What are the properties, a material type node can have?
+    """
+    imgPath = enum.auto()  # mocks.testPicture
 
 
+##################################################
+class OrganizationDetailsAM(StrEnumExactlyAsDefined):
+    """
+    What are the details of an organization?
+    
+    """
+    powerCosts = enum.auto()
+    margin = enum.auto()
+    personnelCosts = enum.auto()
+    costRatePersonnelEngineering = enum.auto()
+    repairCosts = enum.auto()
+    personnelPreProcessCosts = enum.auto()
+    amortizationRate = enum.auto()
+    additionalFixedCosts = enum.auto()
+    costRateEquipmentEngineering = enum.auto()
+    fixedCostsEquipmentEngineering = enum.auto()
+    safetyGasCosts = enum.auto()
+    roomCosts = enum.auto()
 
 # TODO: Service Status Codes

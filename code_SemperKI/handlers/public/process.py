@@ -148,7 +148,8 @@ def createProcessID(request:Request, projectID):
 #######################################################
 class SResProcessDetails(serializers.Serializer):
     provisionalContractor = serializers.CharField(max_length=200, required=False)
-    amount = serializers.IntegerField(required=False)
+    amount = serializers.IntegerField(required=False) # deprecated
+    inputParameters = serializers.DictField(allow_empty=True, required=False)
     title = serializers.CharField(max_length=200, required=False)
     clientBillingAddress = serializers.DictField(allow_empty=True, required=False)
     clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)

@@ -46,7 +46,7 @@ loggerError = logging.getLogger("errors")
 class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
-    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"fileName":"file.stl"}]', max_length=10000)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)
     # multipart/form-data
@@ -176,6 +176,7 @@ def uploadModels(request:Request):
                 modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
+                modelsToBeSaved[fileID][FileObjectContent.quantity] = details["quantity"]
                 modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
                 modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
                 modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()

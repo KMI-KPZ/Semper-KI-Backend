@@ -35,7 +35,7 @@ from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from ...definitions import NodeTypesAM, NodePropertiesAM
+from ...definitions import NodeTypesAM, NodePropertiesAMAdditionalRequirement
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -116,7 +116,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         filteredOutput = [entry for entry in postProcessings if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner] # and entry[pgKnowledgeGraph.NodeDescription.active] == True] # use only entries from system
 
         for entry in filteredOutput:
-            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+            imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMAdditionalRequirement.imgPath] if NodePropertiesAMAdditionalRequirement.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
             output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
 
         # mockup here:

@@ -8,6 +8,9 @@ Contains: Signals send by the other apps which relate to the Additive Manufactur
 
 import Generic_Backend.code_General.utilities.signals as GeneralSignals
 
+from ..service import SERVICE_NUMBER
+from ..connections.postgresql.pgProfilesSKIAM import updateOrgaDetailsSemperKIAM
+
 ################################################################################################
 
 class AdditiveManufacturingSignalReceivers():
@@ -22,7 +25,11 @@ class AdditiveManufacturingSignalReceivers():
         If an organization selects a service, what shall be done?
 
         """
-        pass
+        selectedServices = kwargs["details"]
+        orgaID = kwargs["orgaID"]
+        for service in selectedServices:
+            if service == SERVICE_NUMBER:
+                updateOrgaDetailsSemperKIAM(orgaID)
 
     ##################################################
     def __init__(self) -> None:

@@ -11,7 +11,7 @@ from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 
 from ..connections.postgresql import pgKG
-from ..definitions import NodeTypesAM, NodePropertiesAM
+from ..definitions import NodeTypesAM
 from ..utilities.sparqlQueries import *
 
 ##################################################

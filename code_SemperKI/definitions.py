@@ -106,13 +106,35 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     
     """
     provisionalContractor = enum.auto()
-    amount = enum.auto()
     title = enum.auto()
     clientBillingAddress = enum.auto()
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
+    generalInputParameters = enum.auto()
+    inputParametersNoModel = enum.auto()
 
+
+####################################################################################
+# Enum for general input parameters
+class GeneralInputParameters(StrEnumExactlyAsDefined):
+    """
+    What general input parameters can a process have?
+    
+    """
+    levelOfDetail = enum.auto()
+
+
+####################################################################################
+# Enum for input parameters without model
+class InputParametersNoModel(StrEnumExactlyAsDefined):
+    """
+    What input parameters can a process have without a model?
+    
+    """
+    quantity = enum.auto()
+    complexity = enum.auto()
+    dimensions = enum.auto()
 
 ####################################################################################
 # Enum for messages
@@ -256,3 +278,31 @@ class MapPermissionsToOrgaNotifications():
         PermissionsEnum.resourcesEdit: [],	
     }
 
+##################################################
+# Class that contains the structure of service specific fields for organization details
+class ServiceSpecificFields(StrEnumExactlyAsDefined):
+    """
+    Contains the structure of service specific fields for organization details
+    """
+    key = enum.auto()
+    name = enum.auto()
+    unit = enum.auto()
+    value = enum.auto()
+
+##################################################
+# Class that contains all units used for price calculation
+class UnitsForPriceCalculation(enum.Enum):
+    """
+    Contains all units used for price calculation
+    """
+    euroPerkWh = "€/kWh"
+    euroPerHour = "€/h"
+    percent = "%"
+    euroPerKilogram = "€/kg"
+    euro = "€"
+    cubicCentimeterPerHour = "cm³/h"
+    millimeter = "mm"
+    cubicCentimeter = "cm³"
+    grammPerCubicCentimeter = "g/cm³"
+    euroPerHourPerSquareMeter = "€/(h*m²)"
+    

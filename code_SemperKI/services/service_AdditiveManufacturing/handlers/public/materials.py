@@ -35,7 +35,7 @@ from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from ...definitions import NodeTypesAM, NodePropertiesAM
+from ...definitions import NodeTypesAM, NodePropertiesAMMaterial
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -150,7 +150,7 @@ def retrieveMaterialsWithFilter(request:Request):
                             append = appendViaThisFilter
 
                 if append:
-                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMMaterial.imgPath] if NodePropertiesAMMaterial.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
                     output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
             
         
