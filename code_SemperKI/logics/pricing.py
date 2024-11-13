@@ -18,6 +18,8 @@ from ..serviceManager import serviceManager
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
+################################################################################
+
 
 ##################################################
 def logicOfPriceCalculation(process:Process, contractorID:str, additionalArguments:dict):

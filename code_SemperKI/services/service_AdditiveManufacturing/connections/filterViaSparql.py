@@ -11,7 +11,7 @@ from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 
 from ..connections.postgresql import pgKG
-from ..definitions import NodeTypesAM
+from ..definitions import *
 from ..utilities.sparqlQueries import *
 
 ##################################################
@@ -106,9 +106,9 @@ def filterByPostProcessings(resultDict:dict, chosenPostProcessings:dict):
             
 
 ##################################################
-def filterByBuildPlate(resultDict:dict, calculations:dict):
+def filterByPrinter(resultDict:dict, calculations:dict):
     """
-    Filter by dimension of the build plate of the printers, must be called after filterByPostProcessings
+    Filter by checking properties of the available printers, must be called after filterByPostProcessings
 
     :param resultDict: Where the found manufacturers go
     :type resultDict: dict
@@ -118,6 +118,7 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
     :rtype: None
     
     """
+    # Contractor must be able to print all files!
     listOfSetsForManufacturers:list[set] = []
     for fileID in calculations:
         calculatedValuesForFile = calculations[fileID]
@@ -139,7 +140,7 @@ def filterByBuildPlate(resultDict:dict, calculations:dict):
             # for entry in manufacturers:
             #     if entry["ID"]["value"] not in manufacturersWhichCanDoAll:
             #         manufacturersWhichCanDoAll[entry["ID"]["value"]]  = entry
-            setOfManufacturerIDs = pgKG.LogicAM.checkBuildVolume([calculatedValuesForFile["measurements"]["mbbDimensions"]["_1"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_2"],calculatedValuesForFile["measurements"]["mbbDimensions"]["_3"]])
+            setOfManufacturerIDs = pgKG.LogicAM.getManufacturersWithViablePrinters([calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._1],calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._2],calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._3]])
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
     
     if len(listOfSetsForManufacturers) > 0:

@@ -23,6 +23,37 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     calculations = enum.auto()
 
 ##################################################
+# How do the calculations look like?
+class Calculations(StrEnumExactlyAsDefined):
+    """
+    What does a calculation entry contain?
+    """
+    filename = enum.auto()
+    measurements = enum.auto()
+    status_code = enum.auto()
+
+##################################################
+# How do measurements look like?
+class Measurements(StrEnumExactlyAsDefined):
+    """
+    What does a measurement entry contain?
+    """
+    volume = enum.auto()
+    surfaceArea = enum.auto()
+    mbbDimensions = enum.auto()
+    mbbVolume = enum.auto()
+
+##################################################
+# How do mbbDimensions look like?
+class MbbDimensions(StrEnumExactlyAsDefined):
+    """
+    What does a mbbDimensions entry contain?
+    """
+    _1 = enum.auto()
+    _2 = enum.auto()
+    _3 = enum.auto()
+
+##################################################
 # What defines a material?
 class MaterialDetails(StrEnumExactlyAsDefined):
     """
@@ -81,7 +112,7 @@ class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
     chamberBuildWidth = enum.auto() # 100 mm
     chamberBuildLength = enum.auto() # 100 mm
     buildRate = enum.auto() # cm³/h
-    powerCosts = enum.auto() # €/kWh
+    averagePowerConsumption = enum.auto() # €/kWh
     possibleLayerHeights = enum.auto() # [0.1, 0.2, 0.3, 0.4, 0.5]
     machineUsageCosts = enum.auto() # €/h
     scanSpeed = enum.auto() # mm/s
@@ -89,6 +120,8 @@ class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
     simpleMachineSetUp = enum.auto() # 0.1 h
     complexMachineSetUp = enum.auto() # 0.5 h
     machineHourlyRate = enum.auto() # €/h
+    costRatePersonalMachine = enum.auto() # €/h
+    coatingTime = enum.auto() # 0.1 h
 
 ##################################################
 class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
@@ -166,7 +199,6 @@ class OrganizationDetailsAM(StrEnumExactlyAsDefined):
     costRatePersonnelEngineering = enum.auto()
     repairCosts = enum.auto()
     personnelPreProcessCosts = enum.auto()
-    amortizationRate = enum.auto()
     additionalFixedCosts = enum.auto()
     costRateEquipmentEngineering = enum.auto()
     fixedCostsEquipmentEngineering = enum.auto()

@@ -116,7 +116,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
             filterByPostProcessings(resultDict, processObj.serviceDetails[ServiceDetails.postProcessings])
 
         if ServiceDetails.calculations in processObj.serviceDetails:
-            filterByBuildPlate(resultDict, processObj.serviceDetails[ServiceDetails.calculations])
+            filterByPrinter(resultDict, processObj.serviceDetails[ServiceDetails.calculations])
         
         return list(resultDict.values())
 

@@ -134,7 +134,10 @@ class InputParametersNoModel(StrEnumExactlyAsDefined):
     """
     quantity = enum.auto()
     complexity = enum.auto()
-    dimensions = enum.auto()
+    partWidth = enum.auto()
+    partHeight = enum.auto()
+    partLength = enum.auto()
+    partVolume = enum.auto()
 
 ####################################################################################
 # Enum for messages
