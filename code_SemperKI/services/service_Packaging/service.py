@@ -70,7 +70,7 @@ class Packaging(Semper.ServiceBase):
         return P_cloneServiceDetails(existingContent, newProcess)
     
     ##################################################
-    def calculatePriceForService(self, process, additionalArguments:dict) -> dict:
+    def calculatePriceForService(self, process, additionalArguments:dict, transferObject:object) -> dict:
         """
         Calculate the price for all content of the service
         
@@ -78,6 +78,8 @@ class Packaging(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
+        :param transferObject: The object that is used to transfer data between services
+        :type transferObject: object
         :return: Dictionary with all pricing details
         :rtype: dict
 
@@ -85,12 +87,12 @@ class Packaging(Semper.ServiceBase):
         return {}
 
     ###################################################
-    def getFilteredContractors(self, processObj) -> list:
+    def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
         """
-        return []
+        return [], {}
 
 SERVICE_NAME = "PACKAGING"
 SERVICE_NUMBER = 5

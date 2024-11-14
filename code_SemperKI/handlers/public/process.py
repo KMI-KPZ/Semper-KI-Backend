@@ -32,6 +32,7 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.connections.content.session import ProcessManagementSession
 from code_SemperKI.handlers.public.project import *
+from code_SemperKI.logics.processLogics import *
 import code_SemperKI.utilities.websocket as WebSocketEvents
 
 
@@ -608,7 +609,7 @@ class SResContractors(serializers.Serializer):
     tags=['FE - Processes'],
     request=None,
     responses={
-        200: SResContractors,
+        200: serializers.ListSerializer(child=SResContractors),
         500: ExceptionSerializer
     }
 )
@@ -636,53 +637,8 @@ def getContractors(request:Request, processID:str):
         if processObj == None:
             raise Exception("Process ID not found in session or db")
  
-        serviceType = processObj.serviceType
-        service = serviceManager.getService(processObj.serviceType)
-        
-        if serviceType == serviceManager.getNone():
-            return Response("No Service selected!", status=status.HTTP_404_NOT_FOUND)
-
-        listOfFilteredContractors = service.getFilteredContractors(processObj)
-        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
-        # Therefore parse it
-        listOfResultingContractors = []
-        for contractor in listOfFilteredContractors:
-            idOfContractor = ""
-            if "ID" in contractor:
-                idOfContractor = contractor["ID"]["value"]
-            else:
-                idOfContractor = contractor
-            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
-            if isinstance(contractorContentFromDB, Exception):
-                raise contractorContentFromDB
-            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name]+"_filtered",
-                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details]}
-            listOfResultingContractors.append(contractorToBeAdded)
-        
-        #if settings.DEBUG:
-        #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
-
-        # Calculation of order of contractors based on priorities
-        if ProcessDetails.priorities in processObj.processDetails:
-            # This works since the order of keys in a dictionary is guaranteed to be the same as the insertion order for Python version >= 3.7
-            userPrioritiesVector = [processObj.processDetails[ProcessDetails.priorities][entry][PriorityTargetsSemperKI.value] for entry in processObj.processDetails[ProcessDetails.priorities]]
-        else:
-            numberOfPriorities = len(PrioritiesForOrganizationSemperKI)
-            userPrioritiesVector = [4 for i in range(numberOfPriorities)]
-        listOfContractorsWithPriorities = []
-        for entry in listOfResultingContractors:
-            if OrganizationDetails.priorities in entry[OrganizationDescription.details]:
-                prioList = []
-                for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
-                    prioList.append(entry[OrganizationDescription.details][OrganizationDetails.priorities][priority][PriorityTargetsSemperKI.value])
-                # calculate vector 'distance' (I avoid the square root, see Wikipedia on euclidean distance)
-                distanceFromUserPrios = numpy.sum(numpy.square(numpy.array(userPrioritiesVector) - numpy.array(prioList)))
-                listOfContractorsWithPriorities.append((entry, distanceFromUserPrios))
-        # sort ascending via distance (the shorter, the better)
-        listOfContractorsWithPriorities.sort(key=lambda x: x[1])
-        listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
-        
+        listOfResultingContractors, pricePerContractor = logicForGetContractors(processObj)
+        # TODO
         outSerializer = SResContractors(data=listOfResultingContractors, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -777,10 +733,11 @@ def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
                 newFilePath = newProcessID+"/"+fileKey
                 newFile[FileObjectContent.path] = newFilePath
                 newFile[FileObjectContent.date] = str(timezone.now())
-                if oldFile[FileObjectContent.remote]:
-                    s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
-                else:
-                    s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                if FileObjectContent.isFile not in newFile or newFile[FileObjectContent.isFile]:
+                    if oldFile[FileObjectContent.remote]:
+                        s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
+                    else:
+                        s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
                 newFileDict[fileKey] = newFile
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.files, newFileDict, oldProcess.client)
             if isinstance(errorOrNone, Exception):

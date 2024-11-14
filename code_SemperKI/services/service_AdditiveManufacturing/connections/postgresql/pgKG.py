@@ -195,85 +195,57 @@ class LogicAM(Logic):
 
     ##################################################
     @staticmethod
-    def getViablePrintersByBuildVolume(calculatedValues:dict) -> list[dict]:
-        """
-        Get a list of printers that can handle the build volume
-        
-        :param calculatedValues: The comparison values
-        :type calculatedValues: dict
-        :return: List of printer nodes
-        :rtype: list[dict]
-
-        """
-        viablePrinters = []
-        printers = Basics.getNodesByTypeAndProperty(NodeTypesAM.printer, NodePropertiesAMPrinter.buildVolume)
-        for printer in printers:
-            for property in printer[NodeDescription.properties]:
-                if property[NodePropertyDescription.name] == NodePropertiesAMPrinter.buildVolume:
-                    buildVolumeArray = property[NodePropertyDescription.value].split("x")
-                    if calculatedValues[0] <= float(buildVolumeArray[0]) and \
-                        calculatedValues[1] <= float(buildVolumeArray[1]) and \
-                        calculatedValues[2] <= float(buildVolumeArray[2]):
-                            viablePrinters.append(printer)
-        return viablePrinters
-    
-    ##################################################
-    @staticmethod
-    def getViablePrinters(calculatedValues:dict) -> list[dict]:
+    def getViablePrinters(calculatedValues:dict, listOfPrinters:list) -> list[dict]:
         """
         Get a list of printers that are viable
         
         :param calculatedValues: The comparison values
         :type calculatedValues: dict
+        :param prefilteredDictOfNodes: A dictionary containing manufacturers and their printers to be filtered further
+        :type prefilteredDictOfNodes: dict with manufacturerID as key and printer lists as values
         :return: List of printer nodes
         :rtype: list[dict]
 
         """
         listOfViablePrinters = []
         # filter by material, post-processings, build plate, etc...
-        listOfViablePrinters.extend(LogicAM.getViablePrintersByBuildVolume(calculatedValues))
+
+        for printer in listOfPrinters:
+            for printerProperty in printer[NodeDescription.properties]:
+                # filter via build volume
+                if printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.buildVolume:
+                    buildVolumeArray = printerProperty[NodePropertyDescription.value].split("x")
+                    if calculatedValues[0] <= float(buildVolumeArray[0]) and \
+                        calculatedValues[1] <= float(buildVolumeArray[1]) and \
+                        calculatedValues[2] <= float(buildVolumeArray[2]):
+                        listOfViablePrinters.append(printer)
+                        break
+                       
         return listOfViablePrinters
 
     ##################################################
     @staticmethod
-    def getManufacturersWithViablePrinters(calculatedValues:list[float]) -> set:
+    def getManufacturersWithViablePrinters(calculatedValues:list[float], prefilteredDictOfNodes:dict) -> set:
         """
-        Check if build volume is sufficient
+        Check if there are manufacturers who have printers that are sufficient
         
         :param calculatedValues: The comparison values
         :type calculatedValues: list[float]
+        :param prefilteredDictOfNodes: A dictionary containing manufacturers and their printers to be filtered further
+        :type prefilteredDictOfNodes: dict with manufacturerID as key and printer lists as values
         :return: set of IDs
         :rtype: set
 
         """
         setOfManufacturerIDs = set()
-        printers = LogicAM.getViablePrinters(calculatedValues)
-        for printer in printers:
-            manufacturers = Basics.getSpecificNeighborsByType(printer[NodeDescription.nodeID], NodeTypesAM.organization)
-            for manufacturer in manufacturers:
-                setOfManufacturerIDs.add(manufacturer[NodeDescription.nodeID])
-        return setOfManufacturerIDs
-    
-    ##################################################
-    @staticmethod
-    def getPrintersOfSpecificManufacturer(calculatedValues:list[float], manufacturerID:str) -> list[dict]:
-        """
-        Get a list of printers that are viable
-        
-        :param calculatedValues: The comparison values
-        :type calculatedValues: list[float]
-        :param manufacturerID: The ID of the manufacturer
-        :type manufacturerID: str
-        :return: List of printer nodes
-        :rtype: list[dict]
+        for manufacturerID in prefilteredDictOfNodes:
+            prefilteredDictOfNodes[manufacturerID] = LogicAM.getViablePrinters(calculatedValues, prefilteredDictOfNodes[manufacturerID])
+            if len(prefilteredDictOfNodes[manufacturerID]) > 0:
+                setOfManufacturerIDs.add(manufacturerID)
+            else:
+                # remove manufacturer from printerDict
+                prefilteredDictOfNodes.pop(manufacturerID)
 
-        """
-        listOfPrintersForThisManufacturer = []
-        printers = LogicAM.getViablePrinters(calculatedValues)
-        for printer in printers:
-            manufacturers = Basics.getSpecificNeighborsByType(printer[NodeDescription.nodeID], NodeTypesAM.organization)
-            for manufacturer in manufacturers:
-                if manufacturer[NodeDescription.nodeID] == manufacturerID:
-                    listOfPrintersForThisManufacturer.append(printer)
-        return listOfPrintersForThisManufacturer
+        return setOfManufacturerIDs
+
     

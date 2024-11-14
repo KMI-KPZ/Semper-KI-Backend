@@ -599,13 +599,14 @@ def downloadFilesAsZip(request:Request, projectID, processID):
         for elem in filesOfThisProcess:
             currentEntry = filesOfThisProcess[elem]
             if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
-                content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
-                if flag is False:
-                    content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
+                if FileObjectContent.isFile not in currentEntry or currentEntry[FileObjectContent.isFile]:
+                    content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
                     if flag is False:
-                        return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
+                        content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
+                        if flag is False:
+                            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
                 
-                filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
+                    filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
 
         if len(filesArray) == 0:
             return Response("Not found!", status=status.HTTP_404_NOT_FOUND)

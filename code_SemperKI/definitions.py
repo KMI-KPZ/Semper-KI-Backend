@@ -111,33 +111,6 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
-    generalInputParameters = enum.auto()
-    inputParametersNoModel = enum.auto()
-
-
-####################################################################################
-# Enum for general input parameters
-class GeneralInputParameters(StrEnumExactlyAsDefined):
-    """
-    What general input parameters can a process have?
-    
-    """
-    levelOfDetail = enum.auto()
-
-
-####################################################################################
-# Enum for input parameters without model
-class InputParametersNoModel(StrEnumExactlyAsDefined):
-    """
-    What input parameters can a process have without a model?
-    
-    """
-    quantity = enum.auto()
-    complexity = enum.auto()
-    partWidth = enum.auto()
-    partHeight = enum.auto()
-    partLength = enum.auto()
-    partVolume = enum.auto()
 
 ####################################################################################
 # Enum for messages

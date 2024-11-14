@@ -39,6 +39,8 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from MSQ.tasks.tasks import callfTetWild
 from MSQ.handlers.interface import returnFileFromfTetWild
 
+from ...logics.modelLogic import *
+
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 
@@ -46,7 +48,7 @@ loggerError = logging.getLogger("errors")
 class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
-    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"fileName":"file.stl"}]', max_length=10000)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)
     # multipart/form-data
@@ -177,6 +179,8 @@ def uploadModels(request:Request):
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
                 modelsToBeSaved[fileID][FileObjectContent.quantity] = details["quantity"]
+                modelsToBeSaved[fileID][FileObjectContent.levelOfDetail] = details["levelOfDetail"]
+                modelsToBeSaved[fileID][FileObjectContent.isFile] = True
                 modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
                 modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
                 modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()
@@ -221,8 +225,76 @@ def uploadModels(request:Request):
         if exceptionSerializer.is_valid():
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+
+#######################################################
+class SReqUploadWithoutFile(serializers.Serializer):
+    projectID = serializers.CharField(max_length=513)
+    processID = serializers.CharField(max_length=513)
+    levelOfDetail = serializers.FloatField()
+    width = serializers.FloatField()
+    height = serializers.FloatField()
+    length = serializers.FloatField()
+    volume = serializers.FloatField(required=False)
+    quantity = serializers.IntegerField()
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    origin = serializers.CharField(default="Service",max_length=200)
+    name = serializers.CharField(max_length=200)
+    complexity = serializers.IntegerField()
         
+#######################################################
+@extend_schema(
+    summary="Upload a model but without the file",
+    description=" ",
+    tags=['FE - AM Models'],
+    request=SReqUploadWithoutFile,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["POST"])
+@api_view(["POST"])
+@checkVersion(0.3)
+def uploadModelWithoutFile(request:Request):
+    """
+    Upload a model but without the file
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Success or not
+    :rtype: HTTPResponse
+
+    """
+    try:
+        inSerializer = SReqUploadWithoutFile(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {uploadModelWithoutFile.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        retVal = logicForUploadModelWithoutFile(validatedInput, request)
+        if retVal is not None:
+            raise retVal
+        
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {uploadModelWithoutFile.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
 @extend_schema(

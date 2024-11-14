@@ -12,7 +12,7 @@ from .connections.postgresql.pgService import updateServiceDetails as AM_updateS
 from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import ServiceDetails
-from .logics import costs
+from .logics.costs import Costs
 
 SERVICE_NAME = "ADDITIVE_MANUFACTURING"
 SERVICE_NUMBER = 1
@@ -78,7 +78,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return AM_cloneServiceDetails(existingContent, newProcess)
     
     ##################################################
-    def calculatePriceForService(self, process:ProcessInterface|Process, additionalArguments:dict) -> dict:
+    def calculatePriceForService(self, process:ProcessInterface|Process, additionalArguments:dict, transferObject:object) -> tuple[float, float]:
         """
         Calculate the price for all content of the service
         
@@ -86,39 +86,33 @@ class AdditiveManufacturing(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :param transferObject: Transfer object with additional information
+        :type transferObject: Filter
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return { "Material": costs.calculateCostsForMaterial(process, additionalArguments),
-                 "Printer": costs.calculateCostsForPrinter(process, additionalArguments),
-                 "PostProcessing": costs.calculateCostsForPostProcessings(process, additionalArguments)
-        }
-
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts()
+        return costs[1]
 
     ###################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> list:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
         """
         Get a list of contractors that are available for this service
 
         :param processObj: The process in question
         :type processObj: ProcessInterface|Process
-        :return: List of suitable contractors
-        :rtype: list
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
 
         """
         # filter by choice of material, post-processings, build plate, etc...
-        resultDict = {}
-        if ServiceDetails.materials in processObj.serviceDetails:
-            filterByMaterial(resultDict, processObj.serviceDetails[ServiceDetails.materials])
-
-        if ServiceDetails.postProcessings in processObj.serviceDetails:
-            filterByPostProcessings(resultDict, processObj.serviceDetails[ServiceDetails.postProcessings])
-
-        if ServiceDetails.calculations in processObj.serviceDetails:
-            filterByPrinter(resultDict, processObj.serviceDetails[ServiceDetails.calculations])
         
-        return list(resultDict.values())
+        filteredContractors = Filter()
+        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.materials], processObj.serviceDetails[ServiceDetails.postProcessings], processObj.serviceDetails[ServiceDetails.calculations])
+        
+        return outList, filteredContractors
 
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing())

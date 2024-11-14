@@ -486,10 +486,11 @@ class ProcessManagementSession(AbstractContentInterface):
             for currentProcess in processes:
                 files = processes[currentProcess][ProcessDescription.files]
                 for fileKey in files:
-                    if files[fileKey][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
+                    if FileObjectContent.isFile not in files[fileKey] or files[fileKey][FileObjectContent.isFile]:
+                        if files[fileKey][FileObjectContent.remote]:
+                            s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
+                        else:
+                            s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -645,10 +646,11 @@ class ProcessManagementSession(AbstractContentInterface):
             files = currentProcess[ProcessDescription.files]
             for fileKey in files:
                 fileObj = files[fileKey]
-                if fileObj[FileObjectContent.remote]:
-                    s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
-                else:
-                    s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
+                if FileObjectContent.isFile not in fileObj or fileObj[FileObjectContent.isFile]:
+                    if fileObj[FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -804,10 +806,11 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                    if FileObjectContent.isFile not in currentProcess[ProcessDescription.files][entry] or currentProcess[ProcessDescription.files][entry][FileObjectContent.isFile]:
+                        if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
+                            s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                        else:
+                            s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 

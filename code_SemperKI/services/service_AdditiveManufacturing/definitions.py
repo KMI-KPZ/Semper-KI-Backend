@@ -23,6 +23,19 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     calculations = enum.auto()
 
 ##################################################
+# Additional FileContents
+class FileContentsAM(StrEnumExactlyAsDefined):
+    """
+    What does a file contain?
+
+    """
+    width = enum.auto()
+    height = enum.auto()
+    length = enum.auto()
+    volume = enum.auto()
+    complexity = enum.auto()
+
+##################################################
 # How do the calculations look like?
 class Calculations(StrEnumExactlyAsDefined):
     """
@@ -198,7 +211,6 @@ class OrganizationDetailsAM(StrEnumExactlyAsDefined):
     personnelCosts = enum.auto()
     costRatePersonnelEngineering = enum.auto()
     repairCosts = enum.auto()
-    personnelPreProcessCosts = enum.auto()
     additionalFixedCosts = enum.auto()
     costRateEquipmentEngineering = enum.auto()
     fixedCostsEquipmentEngineering = enum.auto()
