@@ -26,6 +26,8 @@ def logicForGetContractors(processObj:Process):
     :rtype: list
     """
     try:
+        # TODO: if contractor is already selected, use that with all saved details
+
         serviceType = processObj.serviceType
         service = serviceManager.getService(processObj.serviceType)
         
@@ -33,8 +35,7 @@ def logicForGetContractors(processObj:Process):
             raise Exception("No Service selected!")
 
         listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
-        # TODO
-        pricePerContractor = service.calculatePriceForService(processObj, {}, transferObject)
+        
         # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
         # Therefore parse it
         listOfResultingContractors = []
@@ -44,7 +45,7 @@ def logicForGetContractors(processObj:Process):
                 idOfContractor = contractor["ID"]["value"]
             else:
                 idOfContractor = contractor
-            priceOfContractor = pricePerContractor[idOfContractor]
+            priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": idOfContractor}, transferObject)
             contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB

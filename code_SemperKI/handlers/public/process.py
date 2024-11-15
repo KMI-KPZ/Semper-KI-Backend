@@ -600,6 +600,8 @@ class SResContractors(serializers.Serializer):
     hashedID = serializers.CharField(max_length=200)
     name = serializers.CharField(max_length=200)
     details = serializers.DictField()
+    price = serializers.DictField()
+
 
 #########################################################################
 # Handler    
@@ -609,7 +611,7 @@ class SResContractors(serializers.Serializer):
     tags=['FE - Processes'],
     request=None,
     responses={
-        200: serializers.ListSerializer(child=SResContractors),
+        200: serializers.ListSerializer(child=SResContractors()),
         500: ExceptionSerializer
     }
 )
@@ -637,7 +639,7 @@ def getContractors(request:Request, processID:str):
         if processObj == None:
             raise Exception("Process ID not found in session or db")
  
-        listOfResultingContractors, pricePerContractor = logicForGetContractors(processObj)
+        listOfResultingContractors = logicForGetContractors(processObj)
         # TODO
         outSerializer = SResContractors(data=listOfResultingContractors, many=True)
         if outSerializer.is_valid():

@@ -267,7 +267,7 @@ class ServiceSpecificFields(StrEnumExactlyAsDefined):
 
 ##################################################
 # Class that contains all units used for price calculation
-class UnitsForPriceCalculation(enum.Enum):
+class UnitsForPriceCalculation(enum.StrEnum):
     """
     Contains all units used for price calculation
     """

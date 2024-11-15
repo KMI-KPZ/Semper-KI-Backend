@@ -215,7 +215,6 @@ def getProject(request, projectID):
                     ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
                     ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
                     "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
-                    ProcessDetails.inputParameters: entry[ProcessDescription.processDetails][ProcessDetails.inputParameters] if ProcessDetails.inputParameters in entry[ProcessDescription.processDetails] else {},
                     ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
                 }
                 listOfFlatProcesses.append(flatProcessDict)

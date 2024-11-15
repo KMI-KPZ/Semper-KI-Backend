@@ -208,9 +208,10 @@ class Filter():
             retVal = self.filterByMaterial(chosenMaterials)
             if isinstance(retVal, Exception):
                 raise retVal
-            retVal = self.filterByPostProcessings(chosenPostProcessings)
-            if isinstance(retVal, Exception):
-                raise retVal
+            if chosenPostProcessings != {}:
+                retVal = self.filterByPostProcessings(chosenPostProcessings)
+                if isinstance(retVal, Exception):
+                    raise retVal
             retVal = self.filterByPrinter(calculations)
             if isinstance(retVal, Exception):
                 raise retVal

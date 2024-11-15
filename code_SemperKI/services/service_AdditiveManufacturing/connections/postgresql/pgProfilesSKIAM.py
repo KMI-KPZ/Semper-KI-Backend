@@ -11,6 +11,7 @@ import copy
 from Generic_Backend.code_General.definitions import OrganizationDetails, UserDetails, UserNotificationTargets, OrganizationNotificationTargets, SessionContent, ProfileClasses
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
+
 from code_SemperKI.definitions import ServiceSpecificFields, UnitsForPriceCalculation
 from code_SemperKI.utilities.locales import manageTranslations
 
@@ -70,3 +71,23 @@ def updateOrgaDetailsSemperKIAM(orgaHashID:str):
         orga.save()
     except Exception as e:
         logger.error(f"Error in updateOrgaDetailsSemperKIAM: {str(e)}")
+
+####################################################################################
+def deleteOrgaDetailsSemperKIAM(orgaHashID:str):
+    """
+    Look for orga, delete details according to AM specific fields
+
+    :param orgaHashID: The ID transmitted via signal
+    :type orgaHashID: str
+    :return: Nothing
+    :rtype: None
+    """
+    try:
+        orga, _ = ProfileManagementBase.getUserViaHash(orgaHashID)
+
+        # Delete service specific field
+        del orga.details[OrganizationDetails.services][SERVICE_NAME]
+
+        orga.save()
+    except Exception as e:
+        logger.error(f"Error in deleteOrgaDetailsSemperKIAM: {str(e)}")

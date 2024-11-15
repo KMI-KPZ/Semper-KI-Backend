@@ -9,7 +9,7 @@ Contains: Signals send by the other apps which relate to the Additive Manufactur
 import Generic_Backend.code_General.utilities.signals as GeneralSignals
 
 from ..service import SERVICE_NUMBER
-from ..connections.postgresql.pgProfilesSKIAM import updateOrgaDetailsSemperKIAM
+from ..connections.postgresql.pgProfilesSKIAM import updateOrgaDetailsSemperKIAM, deleteOrgaDetailsSemperKIAM
 
 ################################################################################################
 
@@ -32,11 +32,25 @@ class AdditiveManufacturingSignalReceivers():
                 updateOrgaDetailsSemperKIAM(orgaID)
 
     ##################################################
+    @staticmethod
+    def receiverForOrgaServiceDeletion(sender, **kwargs):
+        """
+        If an organization deletes a service, what shall be done?
+
+        """
+        selectedServices = kwargs["details"]
+        orgaID = kwargs["orgaID"]
+        for service in selectedServices:
+            if service == SERVICE_NUMBER:
+                deleteOrgaDetailsSemperKIAM(orgaID)
+
+    ##################################################
     def __init__(self) -> None:
         """
         Connect all receivers
 
         """
-        GeneralSignals.signalDispatcher.orgaServiceDetails.connect(self.receiverForOrgaServiceSelection)
+        GeneralSignals.signalDispatcher.orgaServiceDetails.connect(self.receiverForOrgaServiceSelection, dispatch_uid="101")
+        GeneralSignals.signalDispatcher.orgaServiceDeletion.connect(self.receiverForOrgaServiceDeletion, dispatch_uid="102")
         
 additiveManufacturingSignalReceiver = AdditiveManufacturingSignalReceivers()

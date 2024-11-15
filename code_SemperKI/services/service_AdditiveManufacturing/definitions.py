@@ -11,6 +11,11 @@ import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ##################################################
+# Service specific definitions
+SERVICE_NAME = "ADDITIVE_MANUFACTURING"
+SERVICE_NUMBER = 1
+
+##################################################
 # What makes up the 3D print service
 class ServiceDetails(StrEnumExactlyAsDefined):
     """

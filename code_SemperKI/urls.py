@@ -28,7 +28,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline, pricing
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -63,8 +63,6 @@ newPaths= {
     "downloadFilesAsZip": ("public/files/download/zip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
     "deleteFile": ("public/files/delete/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
     "downloadProcessHistory": ("public/files/download/history/<str:processID>/", files.downloadProcessHistory), 
-
-    "calculatePriceForContractor": ("public/prices/create/", pricing.calculatePriceForContractor),
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),

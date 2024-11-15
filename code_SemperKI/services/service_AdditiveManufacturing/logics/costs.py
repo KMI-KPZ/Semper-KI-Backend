@@ -8,6 +8,8 @@ Contains: Cost calculations for this service
 import math, logging, numpy
 
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.connections.postgresql import pgProfiles
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import *
@@ -15,6 +17,7 @@ from code_SemperKI.definitions import *
 from ..definitions import *
 from ..connections.postgresql import pgKG
 from ..connections.filterViaSparql import Filter
+
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -25,7 +28,7 @@ PLATFORM_MARGIN = 10. # random value
 ##################################################
 class Costs():
     """
-    Calculate all costs associated with the additive manufacturing process
+    Calculate all costs associated with the additive manufacturing process for one organization
     
     """
 
@@ -88,38 +91,51 @@ class Costs():
         
         """
         try:
-            # TODO
             # From Organization
-            orgaParameters = self.additionalArguments["organizationParameters"]
-            self.costRatePersonnelEngineering = orgaParameters[OrganizationDetailsAM.costRatePersonnelEngineering]
-            self.costRateEquipmentEngineering = orgaParameters[OrganizationDetailsAM.costRateEquipmentEngineering]
-            self.repairCosts = orgaParameters[OrganizationDetailsAM.repairCosts]
-            self.safetyGasPerHour = orgaParameters[OrganizationDetailsAM.safetyGasCosts]
-            self.roomCosts = orgaParameters[OrganizationDetailsAM.roomCosts]
-            self.powerCosts = orgaParameters[OrganizationDetailsAM.powerCosts]
-            self.additionalFixedCosts = orgaParameters[OrganizationDetailsAM.additionalFixedCosts]
-            self.fixedCostsEquipmentEngineering = orgaParameters[OrganizationDetailsAM.fixedCostsEquipmentEngineering]
-            self.organizationMargin = orgaParameters[OrganizationDetailsAM.margin]
-            self.personnelCosts = orgaParameters[OrganizationDetailsAM.personnelCosts]
+            organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["orgaID"])
+            if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME) == True:
+                orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
+
+                self.costRatePersonnelEngineering = orgaParameters[OrganizationDetailsAM.costRatePersonnelEngineering]
+                self.costRateEquipmentEngineering = orgaParameters[OrganizationDetailsAM.costRateEquipmentEngineering]
+                self.repairCosts = orgaParameters[OrganizationDetailsAM.repairCosts]
+                self.safetyGasPerHour = orgaParameters[OrganizationDetailsAM.safetyGasCosts]
+                self.roomCosts = orgaParameters[OrganizationDetailsAM.roomCosts]
+                self.powerCosts = orgaParameters[OrganizationDetailsAM.powerCosts]
+                self.additionalFixedCosts = orgaParameters[OrganizationDetailsAM.additionalFixedCosts]
+                self.fixedCostsEquipmentEngineering = orgaParameters[OrganizationDetailsAM.fixedCostsEquipmentEngineering]
+                self.organizationMargin = orgaParameters[OrganizationDetailsAM.margin]
+                self.personnelCosts = orgaParameters[OrganizationDetailsAM.personnelCosts]
+            else:
+                self.costRatePersonnelEngineering = 1
+                self.costRateEquipmentEngineering = 1
+                self.repairCosts = 1
+                self.safetyGasPerHour = 1
+                self.roomCosts = 1
+                self.powerCosts = 1
+                self.additionalFixedCosts = 1
+                self.fixedCostsEquipmentEngineering = 1
+                self.organizationMargin = 1
+                self.personnelCosts = 1
 
             # From Printer
             viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"])
             self.listOfValuesForEveryPrinter = []
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
-                valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine] = printer[NodePropertiesAMPrinter.costRatePersonalMachine]
-                valuesForThisPrinter[self.PrinterValues.buildChamberHeight] = printer[NodePropertiesAMPrinter.chamberBuildHeight]
-                valuesForThisPrinter[self.PrinterValues.buildChamberLength] = printer[NodePropertiesAMPrinter.chamberBuildLength]
-                valuesForThisPrinter[self.PrinterValues.buildChamberWidth] = printer[NodePropertiesAMPrinter.chamberBuildWidth]
-                valuesForThisPrinter[self.PrinterValues.machineMaterialLoss] = printer[NodePropertiesAMPrinter.lossOfMaterial]
-                valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = printer[NodePropertiesAMPrinter.machineBatchDistance]
-                valuesForThisPrinter[self.PrinterValues.layerThickness] = printer[NodePropertiesAMPrinter.possibleLayerHeights][0] # TODO self.levelOfDetail
-                valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = printer[NodePropertiesAMPrinter.machineSize]
-                valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = printer[NodePropertiesAMPrinter.simpleMachineSetUp]
-                valuesForThisPrinter[self.PrinterValues.machineSetUpComplex] = printer[NodePropertiesAMPrinter.complexMachineSetUp]
-                valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = printer[NodePropertiesAMPrinter.averagePowerConsumption]
-                valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = printer[NodePropertiesAMPrinter.machineHourlyRate]
-                valuesForThisPrinter[self.PrinterValues.coatingTime] = printer[NodePropertiesAMPrinter.coatingTime]
+                valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine] = printer.get(NodePropertiesAMPrinter.costRatePersonalMachine, 1)
+                valuesForThisPrinter[self.PrinterValues.buildChamberHeight] = printer.get(NodePropertiesAMPrinter.chamberBuildHeight, 1000)
+                valuesForThisPrinter[self.PrinterValues.buildChamberLength] = printer.get(NodePropertiesAMPrinter.chamberBuildLength, 1000)
+                valuesForThisPrinter[self.PrinterValues.buildChamberWidth] = printer.get(NodePropertiesAMPrinter.chamberBuildWidth, 1000)
+                valuesForThisPrinter[self.PrinterValues.machineMaterialLoss] = printer.get(NodePropertiesAMPrinter.lossOfMaterial, 1)
+                valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = printer.get(NodePropertiesAMPrinter.machineBatchDistance, 1)
+                valuesForThisPrinter[self.PrinterValues.layerThickness] = printer.get(NodePropertiesAMPrinter.possibleLayerHeights, [1])[0] # TODO self.levelOfDetail
+                valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = printer.get(NodePropertiesAMPrinter.machineSize, 1)
+                valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = printer.get(NodePropertiesAMPrinter.simpleMachineSetUp, 1)
+                valuesForThisPrinter[self.PrinterValues.machineSetUpComplex] = printer.get(NodePropertiesAMPrinter.complexMachineSetUp, 1)
+                valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = printer.get(NodePropertiesAMPrinter.averagePowerConsumption, 1)
+                valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = printer.get(NodePropertiesAMPrinter.machineHourlyRate, 1)
+                valuesForThisPrinter[self.PrinterValues.coatingTime] = printer.get(NodePropertiesAMPrinter.coatingTime, 1)
                 self.listOfValuesForEveryPrinter.append(valuesForThisPrinter)
 
             # From Material
@@ -128,9 +144,9 @@ class Costs():
             for materialID in chosenMaterials:
                 material = chosenMaterials[materialID]
                 valuesForThisMaterial = {}
-                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material[NodePropertiesAMMaterial.acquisitionCosts]
-                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material[NodePropertiesAMMaterial.density]
-                valuesForThisMaterial[self.MaterialValues.supportStructuresPartRate] = material[NodePropertiesAMMaterial.supportStructurePartRate]
+                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.acquisitionCosts, 1)
+                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.density, 1)
+                valuesForThisMaterial[self.MaterialValues.supportStructuresPartRate] = material.get(NodePropertiesAMMaterial.supportStructurePartRate, 1)
                 self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From PostProcessing
@@ -140,8 +156,8 @@ class Costs():
                 for postProcessingID in chosenPostProcessings:
                     postProcessing = chosenPostProcessings[postProcessingID]
                     valuesForThisPostProcessing = {}
-                    valuesForThisPostProcessing[self.PostProcessingValues.fixedCostsPostProcessing] = postProcessing[NodePropertiesAMAdditionalRequirement.fixedCosts]
-                    valuesForThisPostProcessing[self.PostProcessingValues.treatmentCostsPostProcessing] = postProcessing[NodePropertiesAMAdditionalRequirement.treatmentCosts]
+                    valuesForThisPostProcessing[self.PostProcessingValues.fixedCostsPostProcessing] = postProcessing.get(NodePropertiesAMAdditionalRequirement.fixedCosts, 1)
+                    valuesForThisPostProcessing[self.PostProcessingValues.treatmentCostsPostProcessing] = postProcessing.get(NodePropertiesAMAdditionalRequirement.treatmentCosts, 1)
                     self.listOfValuesForEveryPostProcessing.append(valuesForThisPostProcessing)
         except Exception as e:
             loggerError.error("Error in fetchInformation: " + str(e))
@@ -149,7 +165,7 @@ class Costs():
 
 
     ##################################################
-    def calculateCostsForBatches(self, printer:dict, totalMachineCosts:float, exposureTime:float, partLength:float, partHeight:float, partWidth:float, partQuantity:int) -> tuple:
+    def calculateCostsForBatches(self, printer:dict, exposureTime:float, partLength:float, partHeight:float, partWidth:float, partQuantity:int) -> tuple:
         """
         Calculate the costs for the batches
         
@@ -219,13 +235,11 @@ class Costs():
             # C79 - Druckdauer Batch =C105+C108
             print_duration_batch = beschichtungszeit_batch + belichtungszeit_batch
 
-            # C112 - Maschinenkosten Druckprozess Batch =C79*C102
-            machine_costs_print_process_batch = print_duration_batch * totalMachineCosts
 
             # C103 - Anzahl an Batches C22
             #anzahl_an_batches = min_batch_quantity
 
-            return machine_costs_print_process_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch
+            return print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch
         except Exception as e:
             loggerError.error("Error in calculateCostsForBatches: " + str(e))
             return e, e, e, e
@@ -290,9 +304,9 @@ class Costs():
         try:
             printerCostsPerModel = {}
             # for all models
-            for model in self.processObj.serviceDetails[ServiceDetails.models]:
-                levelOfDetail = model[FileObjectContent.levelOfDetail]
-                if model[FileObjectContent.isFile] == False:
+            for modelID, model in self.processObj.serviceDetails[ServiceDetails.models].items():
+                levelOfDetail = model.get(FileObjectContent.levelOfDetail, 1)
+                if FileObjectContent.isFile in model and model[FileObjectContent.isFile] == False:
                     partQuantity = model[FileObjectContent.quantity]
                     productComplexity = model[FileContentsAM.complexity]
                     partHeight = model[FileContentsAM.height]
@@ -304,7 +318,7 @@ class Costs():
                         partVolume = model[FileContentsAM.volume]
                 else:
                     modelID = model[FileObjectContent.id]
-                    partQuantity = model[FileObjectContent.quantity]
+                    partQuantity = model.get(FileObjectContent.quantity, 1)
                     partVolume = 0.
                     productComplexity = 1
                     if ServiceDetails.calculations in self.processObj.serviceDetails:
@@ -322,16 +336,16 @@ class Costs():
                 # calculate costs for organization
 
                 # C60 - depends on complexity 0 = 0; 1 = 1; 2 = 2; 3 = 4
-                self.personalEngineeringHours = productComplexity if productComplexity < 3 else 4
+                personalEngineeringHours = productComplexity if productComplexity < 3 else 4
 
                 # C62 - cost for personal engineering
-                self.costPersonalEngineering = self.personalEngineeringHours * self.costRatePersonnelEngineering
+                costPersonalEngineering = personalEngineeringHours * self.costRatePersonnelEngineering
 
                 # C64 - cost for equipment engineering
-                costEquipmentEngineering = self.costRateEquipmentEngineering * self.personalEngineeringHours + self.fixedCostsEquipmentEngineering 
+                costEquipmentEngineering = self.costRateEquipmentEngineering * personalEngineeringHours + self.fixedCostsEquipmentEngineering 
 
                 # C71 - cost equipment
-                self.costEquipment = costEquipmentEngineering # TODO why should that be?! C71 = C64 in Excel sheet
+                costEquipment = costEquipmentEngineering # TODO why should that be?! C71 = C64 in Excel sheet
 
                 totalCostsForEveryPrinter = []
                 for printer in self.listOfValuesForEveryPrinter:
@@ -355,10 +369,10 @@ class Costs():
                     cost_personal_machine = printer[self.PrinterValues.costRatePersonalMachine] * (printer[self.PrinterValues.machineSetUpSimple] + printer[self.PrinterValues.machineSetUpComplex])
 
                     # C70 - cost personal pre process
-                    cost_personal_pre_process = self.costPersonalEngineering + cost_personal_machine
+                    cost_personal_pre_process = costPersonalEngineering + cost_personal_machine
 
                     # C72 - cost pre process
-                    costPreProcessTotal = cost_personal_pre_process + self.costEquipment
+                    costPreProcessTotal = cost_personal_pre_process + costEquipment
 
                     # C97 - Allgemeiner Abschreibungssatz =C76
                     amortizationRate = printer[self.PrinterValues.machineHourlyRate]
@@ -375,7 +389,7 @@ class Costs():
                     # C107 - Belichtungszeit ein Teil =((C94*C81)/3600)
                     belichtungszeit_ein_teil = (beschichtungszeit_part * schichten_part) / 3600.
 
-                    machine_costs_print_process_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(printer, gesamter_maschinenstundensatz, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity)
+                    print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(printer, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity)
 
                     # C109 - Belichtungszeit Quantity =((C94*C81)/3600)*C21
                     belichtungszeit_quantity = ((printer[self.PrinterValues.coatingTime] * schichten_part) / 3600.) * partQuantity
@@ -391,6 +405,9 @@ class Costs():
 
                     # C102 =SUMME(C96:C100)
                     gesamter_maschinenstundensatz = kosten_strom_pro_stunde + amortizationRate + reparatur + safetyGas + flaeche
+
+                    # C112 - Maschinenkosten Druckprozess Batch =C79*C102
+                    machine_costs_print_process_batch = print_duration_batch * gesamter_maschinenstundensatz
 
                     # C111 - Maschinenkosten Druckprozess Part =C78*C102
                     machine_costs_print_process_part = print_duration_part * gesamter_maschinenstundensatz
@@ -466,20 +483,20 @@ class Costs():
                 for costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial in printerCostList:
                     for total_material_cost_part, total_material_cost_quantity, total_material_cost_batch in listOfCostsForMaterial:
                         costsTotal = costsTotalForPrinterPart + total_material_cost_part + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile:
+                        if costsTotal > maximumCostsThisFile[0]:
                             maximumCostsThisFile[0] = costsTotal
-                        if costsTotal < minimumCostsPerFile:
-                            minimumCostsPerFile[0] = costsTotal
+                        if costsTotal < minimumCostsThisFile[0]:
+                            minimumCostsThisFile[0] = costsTotal
                         costsTotal = costsTotalForPrinterQuantity + total_material_cost_quantity + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile:
+                        if costsTotal > maximumCostsThisFile[1]:
                             maximumCostsThisFile[1] = costsTotal
-                        if costsTotal < minimumCostsPerFile:
-                            minimumCostsPerFile[1] = costsTotal
+                        if costsTotal < minimumCostsThisFile[1]:
+                            minimumCostsThisFile[1] = costsTotal
                         costsTotal = costsTotalForPrinterBatch + total_material_cost_batch + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile:
+                        if costsTotal > maximumCostsThisFile[2]:
                             maximumCostsThisFile[2] = costsTotal
-                        if costsTotal < minimumCostsPerFile:
-                            minimumCostsPerFile[2] = costsTotal
+                        if costsTotal < minimumCostsThisFile[2]:
+                            minimumCostsThisFile[2] = costsTotal
                 maximumCostsPerFile[fileID] = maximumCostsThisFile
                 minimumCostsPerFile[fileID] = minimumCostsThisFile
 

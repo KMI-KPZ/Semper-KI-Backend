@@ -11,11 +11,8 @@ from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
-from .definitions import ServiceDetails
+from .definitions import ServiceDetails, SERVICE_NAME, SERVICE_NUMBER
 from .logics.costs import Costs
-
-SERVICE_NAME = "ADDITIVE_MANUFACTURING"
-SERVICE_NUMBER = 1
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
@@ -78,7 +75,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return AM_cloneServiceDetails(existingContent, newProcess)
     
     ##################################################
-    def calculatePriceForService(self, process:ProcessInterface|Process, additionalArguments:dict, transferObject:object) -> tuple[float, float]:
+    def calculatePriceForService(self, process:ProcessInterface|Process, additionalArguments:dict, transferObject:object) -> dict:
         """
         Calculate the price for all content of the service
         
@@ -94,7 +91,12 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         costsObject = Costs(process, additionalArguments, transferObject)
         costs = costsObject.calculateCosts()
-        return costs[1]
+        outDict = {
+            "pricePart": costs[0],
+            "priceQuantity": costs[1],
+            "priceBatch": costs[2],
+        }
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
@@ -110,7 +112,11 @@ class AdditiveManufacturing(Semper.ServiceBase):
         # filter by choice of material, post-processings, build plate, etc...
         
         filteredContractors = Filter()
-        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.materials], processObj.serviceDetails[ServiceDetails.postProcessings], processObj.serviceDetails[ServiceDetails.calculations])
+        postProcessings = {}
+        if ServiceDetails.postProcessings in processObj.serviceDetails:
+            postProcessings = processObj.serviceDetails[ServiceDetails.postProcessings]
+
+        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.materials], postProcessings, processObj.serviceDetails[ServiceDetails.calculations])
         
         return outList, filteredContractors
 
