@@ -96,16 +96,29 @@ class Costs():
             if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME) == True:
                 orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
 
-                self.costRatePersonnelEngineering = orgaParameters[OrganizationDetailsAM.costRatePersonnelEngineering]
-                self.costRateEquipmentEngineering = orgaParameters[OrganizationDetailsAM.costRateEquipmentEngineering]
-                self.repairCosts = orgaParameters[OrganizationDetailsAM.repairCosts]
-                self.safetyGasPerHour = orgaParameters[OrganizationDetailsAM.safetyGasCosts]
-                self.roomCosts = orgaParameters[OrganizationDetailsAM.roomCosts]
-                self.powerCosts = orgaParameters[OrganizationDetailsAM.powerCosts]
-                self.additionalFixedCosts = orgaParameters[OrganizationDetailsAM.additionalFixedCosts]
-                self.fixedCostsEquipmentEngineering = orgaParameters[OrganizationDetailsAM.fixedCostsEquipmentEngineering]
-                self.organizationMargin = orgaParameters[OrganizationDetailsAM.margin]
-                self.personnelCosts = orgaParameters[OrganizationDetailsAM.personnelCosts]
+                for entry in orgaParameters:
+                    value = entry[ServiceSpecificFields.value]
+                    match entry[ServiceSpecificFields.key]:
+                        case OrganizationDetailsAM.costRatePersonnelEngineering:
+                            self.costRatePersonnelEngineering = value
+                        case OrganizationDetailsAM.costRateEquipmentEngineering:
+                            self.costRateEquipmentEngineering = value
+                        case OrganizationDetailsAM.repairCosts:
+                            self.repairCosts = value
+                        case OrganizationDetailsAM.safetyGasCosts:
+                            self.safetyGasPerHour = value
+                        case OrganizationDetailsAM.roomCosts:
+                            self.roomCosts = value
+                        case OrganizationDetailsAM.powerCosts:
+                            self.powerCosts = value
+                        case OrganizationDetailsAM.additionalFixedCosts:
+                            self.additionalFixedCosts = value
+                        case OrganizationDetailsAM.fixedCostsEquipmentEngineering:
+                            self.fixedCostsEquipmentEngineering = value
+                        case OrganizationDetailsAM.margin:
+                            self.organizationMargin = value
+                        case OrganizationDetailsAM.personnelCosts:
+                            self.personnelCosts = value
             else:
                 self.costRatePersonnelEngineering = 1
                 self.costRateEquipmentEngineering = 1

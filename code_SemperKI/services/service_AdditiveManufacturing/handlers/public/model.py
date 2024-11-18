@@ -178,8 +178,8 @@ def uploadModels(request:Request):
                 modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
-                modelsToBeSaved[fileID][FileObjectContent.quantity] = details["quantity"]
-                modelsToBeSaved[fileID][FileObjectContent.levelOfDetail] = details["levelOfDetail"]
+                modelsToBeSaved[fileID][FileObjectContent.quantity] = details["quantity"] if "quantity" in details else 1
+                modelsToBeSaved[fileID][FileObjectContent.levelOfDetail] = details["levelOfDetail"] if "levelOfDetail" in details else 1
                 modelsToBeSaved[fileID][FileObjectContent.isFile] = True
                 modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
                 modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
