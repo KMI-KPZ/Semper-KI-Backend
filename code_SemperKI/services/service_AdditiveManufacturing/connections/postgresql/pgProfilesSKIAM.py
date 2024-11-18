@@ -51,6 +51,8 @@ def updateOrgaDetailsSemperKIAM(orgaHashID:str):
             orga.details[OrganizationDetails.services] = {}
         if not checkIfNestedKeyExists(orga.details, OrganizationDetails.services, SERVICE_NAME):
             orga.details[OrganizationDetails.services][SERVICE_NAME] = []
+        else:
+            return
         locale = "de-DE"
         if OrganizationDetails.locale in orga.details:
             locale = orga.details[OrganizationDetails.locale]
