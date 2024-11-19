@@ -72,7 +72,6 @@ class Costs():
         
         priceOfSpecificMaterial = enum.auto()
         densityOfSpecificMaterial = enum.auto()
-        supportStructuresPartRate = enum.auto()
 
     ##################################################
     class PostProcessingValues(StrEnumExactlyAsDefined):
@@ -154,7 +153,7 @@ class Costs():
                             valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = value
                         case NodePropertiesAMPrinter.possibleLayerHeights:
                             valuesForThisPrinter[self.PrinterValues.layerThickness] = value[0]
-                        case NodePropertiesAMPrinter.machineSize:
+                        case NodePropertiesAMPrinter.machineSurfaceArea:
                             valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = value
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
                             valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = value
@@ -182,7 +181,7 @@ class Costs():
                     valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = 10
                 if NodePropertiesAMPrinter.possibleLayerHeights not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.layerThickness] = 75
-                if NodePropertiesAMPrinter.machineSize not in propertiesOfPrinter:
+                if NodePropertiesAMPrinter.machineSurfaceArea not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = 1.8
                 if NodePropertiesAMPrinter.simpleMachineSetUp not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = 1
@@ -205,7 +204,6 @@ class Costs():
                 valuesForThisMaterial = {}
                 valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.acquisitionCosts, 400)
                 valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.density, 4.43)
-                valuesForThisMaterial[self.MaterialValues.supportStructuresPartRate] = material.get(NodePropertiesAMMaterial.supportStructurePartRate, 10)
                 self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From PostProcessing
@@ -346,8 +344,11 @@ class Costs():
                 cost_machine_material_loss_quantity = cost_machine_material_loss_part * partQuantity
                 print("Cost machine material loss quantity: ", cost_machine_material_loss_quantity)
 
+                # C59 - support structures part rate
+                supportStructuresPartRate = productComplexity*10.
+
                 # C48 - depending on complexity 0 = 0 ; 1 = 10; 2 = 20; 3 = 30
-                cost_support_structures_part = material[self.MaterialValues.supportStructuresPartRate] * productComplexity
+                cost_support_structures_part = ((partVolume * material[self.MaterialValues.densityOfSpecificMaterial] /1000.) * material[self.MaterialValues.priceOfSpecificMaterial]) * supportStructuresPartRate/100.
                 print("Cost support structures part: ", cost_support_structures_part)
 
                 # C49 - cost for support structures per batch
@@ -511,7 +512,7 @@ class Costs():
                     print("Print duration quantity: ", print_duration_quantity)
 
                     # C99 - Schutzgas =C87
-                    safetyGas = self.safetyGasPerHour * print_duration_quantity
+                    safetyGas = self.safetyGasPerHour
                     print("Schutzgas: ", safetyGas)
 
                     # C102 =SUMME(C96:C100)

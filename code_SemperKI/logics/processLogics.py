@@ -50,8 +50,8 @@ def logicForGetContractors(processObj:Process):
             if isinstance(contractorContentFromDB, Exception):
                 raise contractorContentFromDB
             contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name]+"_filtered",
-                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
+                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                                   OrganizationDetails.branding: contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.branding],
                                    "price": priceOfContractor}
             listOfResultingContractors.append(contractorToBeAdded)
         

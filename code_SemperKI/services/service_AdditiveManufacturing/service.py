@@ -92,9 +92,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         costsObject = Costs(process, additionalArguments, transferObject)
         costs = costsObject.calculateCosts()
         outDict = {
-            "pricePart": costs[0],
             "priceQuantity": costs[1],
-            "priceBatch": costs[2],
         }
         return outDict
 

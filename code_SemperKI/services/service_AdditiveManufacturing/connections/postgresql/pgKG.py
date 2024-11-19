@@ -33,9 +33,6 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildVolume,
-                            NodePropertyDescription.value: "mm x mm x mm",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter,
                             NodePropertyDescription.value: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
@@ -78,9 +75,9 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.scanSpeed,
                             NodePropertyDescription.value: "mm/s",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSize,
-                            NodePropertyDescription.value: "500 mm x 500 mm x 500 mm",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea,
+                            NodePropertyDescription.value: "500 m²",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.simpleMachineSetUp,
                             NodePropertyDescription.value: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
@@ -122,9 +119,6 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.supportStructurePartRate,
-                            NodePropertyDescription.value: "",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.density,
                             NodePropertyDescription.value: "g/cm³",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
@@ -211,15 +205,25 @@ class LogicAM(Logic):
         # filter by material, post-processings, build plate, etc...
 
         for printer in listOfPrinters:
+            chamberHeight = 0
+            chamberWidth = 0
+            chamberLength = 0
             for printerProperty in printer[NodeDescription.properties]:
                 # filter via build volume
-                if printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.buildVolume:
-                    buildVolumeArray = printerProperty[NodePropertyDescription.value].split("x")
-                    if calculatedValues[0] <= float(buildVolumeArray[0]) and \
-                        calculatedValues[1] <= float(buildVolumeArray[1]) and \
-                        calculatedValues[2] <= float(buildVolumeArray[2]):
-                        listOfViablePrinters.append(printer)
-                        break
+                if printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildHeight:
+                    chamberHeight = float(printerProperty[NodePropertyDescription.value])
+                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildWidth:
+                    chamberWidth = float(printerProperty[NodePropertyDescription.value])
+                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildLength:
+                    chamberLength = float(printerProperty[NodePropertyDescription.value])
+
+            if (calculatedValues[0] <= float(chamberLength) and \
+                calculatedValues[1] <= float(chamberWidth)) or \
+                (calculatedValues[0] <= float(chamberWidth) and \
+                 calculatedValues[1] <= float(chamberLength)) and \
+                calculatedValues[2] <= float(chamberHeight):
+                listOfViablePrinters.append(printer)
+                break
                        
         return listOfViablePrinters
 

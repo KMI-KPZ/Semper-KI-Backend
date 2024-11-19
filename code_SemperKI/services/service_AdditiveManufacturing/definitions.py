@@ -119,7 +119,6 @@ class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
 
     """
     imgPath = enum.auto()  # mocks.testPicture
-    buildVolume = enum.auto()  # 100x100x100
     nozzleDiameter = enum.auto() # 0.4 mm
     certificates = enum.auto() # CE, MD, ...
     lossOfMaterial = enum.auto() # 0.1%
@@ -134,7 +133,7 @@ class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
     possibleLayerHeights = enum.auto() # [0.1, 0.2, 0.3, 0.4, 0.5]
     machineUsageCosts = enum.auto() # €/h
     scanSpeed = enum.auto() # mm/s
-    machineSize = enum.auto() # 100x100x100
+    machineSurfaceArea = enum.auto() # 100 m²
     simpleMachineSetUp = enum.auto() # 0.1 h
     complexMachineSetUp = enum.auto() # 0.5 h
     machineHourlyRate = enum.auto() # €/h
@@ -154,7 +153,6 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     eModul = enum.auto()  # 1358Z;2030XY
     poissonRatio = enum.auto()  #0.35
     certificates = enum.auto() # CE, MD, ...
-    supportStructurePartRate = enum.auto() # 0.1
     density = enum.auto() # 1.2 g/cm³
     printingSpeed = enum.auto() # 100 cm³/h
     acquisitionCosts = enum.auto() # €/kg
