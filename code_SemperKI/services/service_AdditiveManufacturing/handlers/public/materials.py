@@ -6,7 +6,7 @@ Silvio Weging 2024
 Contains: Handlers for AM Materials
 """
 
-import json, logging, copy
+import json, logging, copy, numpy
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -25,6 +25,7 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.public.process import updateProcessFunction
@@ -50,7 +51,8 @@ class SReqMaterialContent(serializers.Serializer):
     id = serializers.CharField(max_length=200)
     title = serializers.CharField(max_length=200)
     propList = serializers.ListField()
-    imgPath = serializers.CharField(max_length=200) 
+    imgPath = serializers.CharField(max_length=200)
+    medianPrice = serializers.FloatField(required=False)
 
 #######################################################
 class SResMaterialsWithFilters(serializers.Serializer):
@@ -123,8 +125,29 @@ def retrieveMaterialsWithFilter(request:Request):
         #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
 
         # TODO filter by selection of post-processing
-        # TODO calculate prices of materials
- 
+
+        # calculate median price if not found in redis or date is too old
+        redisConn = RedisConnection()
+        if redisConn.retrieveContentJSON("medianMaterialPrices")[1] == False or redisConn.retrieveContent("medianMaterialPricesDate")[1] == False or (timezone.now() - datetime.fromisoformat(redisConn.retrieveContent("medianMaterialPricesDate")[0])).days > 1:
+            materialPrices = {}
+            listOfAllMaterialNodes = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
+            for materialNode in listOfAllMaterialNodes:
+                if materialNode[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+                    for propertyValue in materialNode[pgKnowledgeGraph.NodeDescription.properties]:
+                        if NodePropertiesAMMaterial.acquisitionCosts == propertyValue[pgKnowledgeGraph.NodePropertyDescription.name]:
+                            if materialNode[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices:
+                                materialPrices[materialNode[pgKnowledgeGraph.NodeDescription.uniqueID]].append(float(propertyValue[pgKnowledgeGraph.NodePropertyDescription.value]))
+                            else:
+                                materialPrices[materialNode[pgKnowledgeGraph.NodeDescription.uniqueID]] = [float(propertyValue[pgKnowledgeGraph.NodePropertyDescription.value])]
+                
+            for key in materialPrices:
+                materialPrices[key] = numpy.median(materialPrices[key])
+            redisConn.addContentJSON("medianMaterialPrices", materialPrices)
+            redisConn.addContent("medianMaterialPricesDate", timezone.now().isoformat())
+        # else: take value from redis
+        else:
+            materialPrices = redisConn.retrieveContentJSON("medianMaterialPrices")[0]
+
         materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
             # use only entries from system
@@ -151,9 +174,8 @@ def retrieveMaterialsWithFilter(request:Request):
 
                 if append:
                     imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMMaterial.imgPath] if NodePropertiesAMMaterial.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
-            
-        
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+
         # mockup here:
         #mock = copy.deepcopy(mocks.materialMock)
         #mock["materials"].extend(resultsOfQueries["materials"])
