@@ -242,12 +242,16 @@ class LogicAM(Logic):
 
         """
         setOfManufacturerIDs = set()
+        throwOuts = []
         for manufacturerID in prefilteredDictOfNodes:
             prefilteredDictOfNodes[manufacturerID] = LogicAM.getViablePrinters(calculatedValues, prefilteredDictOfNodes[manufacturerID])
             if len(prefilteredDictOfNodes[manufacturerID]) > 0:
                 setOfManufacturerIDs.add(manufacturerID)
             else:
                 # remove manufacturer from printerDict
+                throwOuts.append(manufacturerID)
+        for manufacturerID in throwOuts:
+            if len(prefilteredDictOfNodes[manufacturerID]) == 0:
                 prefilteredDictOfNodes.pop(manufacturerID)
 
         return setOfManufacturerIDs

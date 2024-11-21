@@ -599,7 +599,7 @@ def getProcessHistory(request:Request, processID):
 class SResContractors(serializers.Serializer):
     hashedID = serializers.CharField(max_length=200)
     name = serializers.CharField(max_length=200)
-    details = serializers.DictField()
+    branding = serializers.DictField()
     price = serializers.DictField()
 
 

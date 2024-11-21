@@ -51,7 +51,7 @@ def logicForGetContractors(processObj:Process):
                 raise contractorContentFromDB
             contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
                                    OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
-                                   OrganizationDetails.branding: contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.branding],
+                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
                                    "price": priceOfContractor}
             listOfResultingContractors.append(contractorToBeAdded)
         
@@ -76,7 +76,16 @@ def logicForGetContractors(processObj:Process):
                 listOfContractorsWithPriorities.append((entry, distanceFromUserPrios))
         # sort ascending via distance (the shorter, the better)
         listOfContractorsWithPriorities.sort(key=lambda x: x[1])
-        listOfResultingContractors = [i[0] for i in listOfContractorsWithPriorities]
+        # parse for frontend
+        listOfResultingContractors = []
+        for contractor in listOfContractorsWithPriorities:
+            listOfResultingContractors.append({
+                OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
+                OrganizationDescription.name: contractor[0][OrganizationDescription.name],
+                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding],
+                "price": contractor[0]["price"]
+            })
+
         
         return listOfResultingContractors
 
