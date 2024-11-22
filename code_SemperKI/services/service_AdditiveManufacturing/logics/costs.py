@@ -22,6 +22,8 @@ from ..connections.filterViaSparql import Filter
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 
+# TODO: THIS WHOLE FILE IS A MESS AND NEEDS TO BE REFACTORED
+
 ##################################################
 PLATFORM_MARGIN = 10. # random value
 
@@ -49,6 +51,7 @@ class Costs():
         
         """
         
+        technology = enum.auto()
         costRatePersonalMachine = enum.auto()
         buildChamberHeight = enum.auto()
         buildChamberLength = enum.auto()
@@ -61,7 +64,13 @@ class Costs():
         machineSetUpComplex = enum.auto()
         averagePowerConsumption = enum.auto()
         machineHourlyRate = enum.auto()
+        # Powder Bed fusion only:
         coatingTime = enum.auto()
+        # FDM only:
+        buildRate = enum.auto()
+        fillRate = enum.auto()
+        nozzleDiameter = enum.auto()
+        maxPrintingSpeed = enum.auto()
 
     ##################################################
     class MaterialValues(StrEnumExactlyAsDefined):
@@ -72,6 +81,7 @@ class Costs():
         
         priceOfSpecificMaterial = enum.auto()
         densityOfSpecificMaterial = enum.auto()
+        maxPrintingSpeed = enum.auto()
 
     ##################################################
     class PostProcessingValues(StrEnumExactlyAsDefined):
@@ -130,11 +140,27 @@ class Costs():
                 self.organizationMargin = 0
                 self.personnelCosts = 0
 
+            # From Material
+            self.listOfValuesForEveryMaterial = []
+            self.minimalPrintingSpeed = float("inf")
+            chosenMaterials = self.processObj.serviceDetails[ServiceDetails.materials]
+            for materialID in chosenMaterials:
+                material = chosenMaterials[materialID]
+                valuesForThisMaterial = {}
+                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.acquisitionCosts, 400)
+                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.density, 4.43)
+                if NodePropertiesAMMaterial.printingSpeed in material and material[NodePropertiesAMMaterial.printingSpeed] < self.minimalPrintingSpeed:
+                    self.minimalPrintingSpeed = material[NodePropertiesAMMaterial.printingSpeed]
+                self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
+
             # From Printer
             viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"])
             self.listOfValuesForEveryPrinter = []
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
+                # get technology
+                technology = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)[0][pgKG.NodeDescription.nodeName]
+                valuesForThisPrinter[self.PrinterValues.technology] = technology
                 propertiesOfPrinter = printer[pgKG.NodeDescription.properties]
                 for entry in propertiesOfPrinter:
                     value = entry[pgKG.NodePropertyDescription.value]
@@ -163,8 +189,18 @@ class Costs():
                             valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = value
                         case NodePropertiesAMPrinter.machineHourlyRate:
                             valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = value
+                        # Powder Bet fusion:
                         case NodePropertiesAMPrinter.coatingTime:
                             valuesForThisPrinter[self.PrinterValues.coatingTime] = value
+                        # Extrusion only:
+                        case NodePropertiesAMPrinter.buildRate:
+                            valuesForThisPrinter[self.PrinterValues.buildRate] = value
+                        case NodePropertiesAMPrinter.fillRate:
+                            valuesForThisPrinter[self.PrinterValues.fillRate] = value / 100.
+                        case NodePropertiesAMPrinter.nozzleDiameter:
+                            valuesForThisPrinter[self.PrinterValues.nozzleDiameter] = value
+                        case NodePropertiesAMPrinter.maxPrintingSpeed:
+                            valuesForThisPrinter[self.PrinterValues.maxPrintingSpeed] = value
 
                 # default values
                 if NodePropertiesAMPrinter.costRatePersonalMachine not in propertiesOfPrinter:
@@ -191,20 +227,19 @@ class Costs():
                     valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = 5
                 if NodePropertiesAMPrinter.machineHourlyRate not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = 51.80
+                # Poweder bed fusion only:
                 if NodePropertiesAMPrinter.coatingTime not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.coatingTime] = 9
+                # Extrusion only:
+                if NodePropertiesAMPrinter.fillRate not in propertiesOfPrinter:
+                    valuesForThisPrinter[self.PrinterValues.fillRate] = 1.0
+                if NodePropertiesAMPrinter.nozzleDiameter not in propertiesOfPrinter:
+                    valuesForThisPrinter[self.PrinterValues.nozzleDiameter] = 0.4
+                if NodePropertiesAMPrinter.maxPrintingSpeed not in propertiesOfPrinter:
+                    valuesForThisPrinter[self.PrinterValues.maxPrintingSpeed] = 60
+                # build rate will be calculated in the calculateCostsForPrinter function if not set
                 
                 self.listOfValuesForEveryPrinter.append(valuesForThisPrinter)
-
-            # From Material
-            self.listOfValuesForEveryMaterial = []
-            chosenMaterials = self.processObj.serviceDetails[ServiceDetails.materials]
-            for materialID in chosenMaterials:
-                material = chosenMaterials[materialID]
-                valuesForThisMaterial = {}
-                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.acquisitionCosts, 400)
-                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.density, 4.43)
-                self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From PostProcessing
             self.listOfValuesForEveryPostProcessing = []
@@ -328,8 +363,11 @@ class Costs():
         try:
             totalCostsForEveryMaterial = []
             for material in self.listOfValuesForEveryMaterial: # this assumes that all selected materials are available for the printer
+                
+                amountOfMaterial = ( (partVolume * printer[self.PrinterValues.fillRate] * material[self.MaterialValues.densityOfSpecificMaterial]) / 1000.)
+
                 # C41 - material printing cost for the part
-                material_cost_printing_part = ( (partVolume * material[self.MaterialValues.densityOfSpecificMaterial]) / 1000.) * material[self.MaterialValues.priceOfSpecificMaterial]
+                material_cost_printing_part = amountOfMaterial * material[self.MaterialValues.priceOfSpecificMaterial]
                 print("Material cost printing part: ", material_cost_printing_part)
 
                 # C43 - material printing cost for the quantity
@@ -337,7 +375,7 @@ class Costs():
                 print("Material cost printing quantity: ", material_cost_printing_quantity)
 
                 # C44 - machine material loss for the part
-                cost_machine_material_loss_part = ((( partVolume * material[self.MaterialValues.densityOfSpecificMaterial]) / 1000.) * material[self.MaterialValues.priceOfSpecificMaterial]) * (printer[self.PrinterValues.machineMaterialLoss] / 100)
+                cost_machine_material_loss_part = material_cost_printing_part * (printer[self.PrinterValues.machineMaterialLoss] / 100)
                 print("Cost machine material loss part: ", cost_machine_material_loss_part)
 
                 # C46 - cost for material loss per quantity
@@ -348,16 +386,16 @@ class Costs():
                 supportStructuresPartRate = productComplexity*10.
 
                 # C48 - depending on complexity 0 = 0 ; 1 = 10; 2 = 20; 3 = 30
-                cost_support_structures_part = ((partVolume * material[self.MaterialValues.densityOfSpecificMaterial] /1000.) * material[self.MaterialValues.priceOfSpecificMaterial]) * supportStructuresPartRate/100.
+                cost_support_structures_part = material_cost_printing_part * supportStructuresPartRate/100.
                 print("Cost support structures part: ", cost_support_structures_part)
-
-                # C49 - cost for support structures per batch
-                cost_support_structures_batch = cost_support_structures_part * theo_max_parts_per_batch
-                print("Cost support structures batch: ", cost_support_structures_batch)
 
                 # C50 - cost for support structures per quantity
                 cost_support_structures_quantity = cost_support_structures_part * partQuantity
                 print("Cost support structures quantity: ", cost_support_structures_quantity)
+
+                # C49 - cost for support structures per batch
+                cost_support_structures_batch = cost_support_structures_part * theo_max_parts_per_batch
+                print("Cost support structures batch: ", cost_support_structures_batch)
 
                 # C42 - material printing cost for one batch
                 material_cost_printing_batch = material_cost_printing_part * theo_max_parts_per_batch
@@ -444,7 +482,19 @@ class Costs():
 
                 totalCostsForEveryPrinter = []
                 for printer in self.listOfValuesForEveryPrinter:
-                    
+
+                    printingSpeedForMaterialAndPrinter = self.minimalPrintingSpeed
+                    # if extrusion printer and build rate is not set, calculate it
+                    if printingSpeedForMaterialAndPrinter > printer[self.PrinterValues.maxPrintingSpeed]:
+                        printingSpeedForMaterialAndPrinter = printer[self.PrinterValues.maxPrintingSpeed]
+
+                    buildRateForThisPrinter = 0
+                    if printer[self.PrinterValues.technology] == "Material Extrusion":
+                        if self.PrinterValues.buildRate not in printer:
+                            buildRateForThisPrinter = (printer[self.PrinterValues.nozzleDiameter] / 10. )* (printer[self.PrinterValues.layerThickness] / 10000.) * printingSpeedForMaterialAndPrinter # converted values to cm so that unit is cm^3/h
+                        else:
+                            buildRateForThisPrinter = printer[self.PrinterValues.buildRate]
+
                     # C81 - schichten_part =AUFRUNDEN((C15*1000)/C77;0)
                     schichten_part =  math.ceil((partHeight * 1000) / printer[self.PrinterValues.layerThickness])
                     print("Schichten part: ", schichten_part)
@@ -499,17 +549,30 @@ class Costs():
 
                     print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(printer, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity)
 
+                    listOfCostsForMaterial = self.calculateCostsForMaterial(printer, theo_max_parts_per_batch, partVolume, partQuantity, productComplexity)
+
                     # C109 - Belichtungszeit Quantity =((C94*C81)/3600)*C21
                     belichtungszeit_quantity = ((printer[self.PrinterValues.coatingTime] * schichten_part) / 3600.) * partQuantity
                     print("Belichtungszeit quantity: ", belichtungszeit_quantity)
 
-                    # C78 - Druckdauer Part =C104+C107
                     print_duration_part = beschichtungszeit_part + belichtungszeit_ein_teil
-                    print("Print duration part: ", print_duration_part)
-
-                    # C80 - Druckdauer Quantity =C106+C109
                     print_duration_quantity = beschichtungszeit_quantity + belichtungszeit_quantity
-                    print("Print duration quantity: ", print_duration_quantity)
+                    if printer[self.PrinterValues.technology] == "Powder Bed Fusion":
+                        # C78 - Druckdauer Part =C104+C107
+                        print_duration_part = beschichtungszeit_part + belichtungszeit_ein_teil
+                        print("Print duration part: ", print_duration_part)
+
+                        # C80 - Druckdauer Quantity =C106+C109
+                        print_duration_quantity = beschichtungszeit_quantity + belichtungszeit_quantity
+                        print("Print duration quantity: ", print_duration_quantity)
+                    if printer[self.PrinterValues.technology] == "Material Extrusion":
+                        # C78 - Druckdauer Part =C104+C107
+                        print_duration_part = 2.5 * partVolume * printer[self.PrinterValues.fillRate] / buildRateForThisPrinter # the 2.5 is an empirical value
+                        print("Print duration part: ", print_duration_part)
+
+                        # C80 - Druckdauer Quantity =C106+C109
+                        print_duration_quantity = print_duration_part * partQuantity
+                        print("Print duration quantity: ", print_duration_quantity)
 
                     # C99 - Schutzgas =C87
                     safetyGas = self.safetyGasPerHour
@@ -534,8 +597,6 @@ class Costs():
                     # C114 - Personalkosten Druckprozess =(C22-1)*C68
                     personalkosten_print_process = (min_batch_quantity - 1) * cost_personal_machine + self.personnelCosts
                     print("Personalkosten Druckprozess: ", personalkosten_print_process)
-
-                    listOfCostsForMaterial = self.calculateCostsForMaterial(printer, theo_max_parts_per_batch, partVolume, partQuantity, productComplexity)
 
                     costsTotalForPrinterPart = machine_costs_print_process_part + personalkosten_print_process + costPreProcessTotal + self.additionalFixedCosts
                     print("Costs total for printer part: ", costsTotalForPrinterPart)

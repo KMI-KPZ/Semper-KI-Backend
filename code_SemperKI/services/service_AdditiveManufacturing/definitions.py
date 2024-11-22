@@ -132,13 +132,14 @@ class NodePropertiesAMPrinter(StrEnumExactlyAsDefined):
     averagePowerConsumption = enum.auto() # €/kWh
     possibleLayerHeights = enum.auto() # [0.1, 0.2, 0.3, 0.4, 0.5]
     machineUsageCosts = enum.auto() # €/h
-    scanSpeed = enum.auto() # mm/s
+    #scanSpeed = enum.auto() # mm/s
     machineSurfaceArea = enum.auto() # 100 m²
     simpleMachineSetUp = enum.auto() # 0.1 h
     complexMachineSetUp = enum.auto() # 0.5 h
     machineHourlyRate = enum.auto() # €/h
     costRatePersonalMachine = enum.auto() # €/h
     coatingTime = enum.auto() # 0.1 h
+    maxPrintingSpeed = enum.auto() # 100 cm/h
 
 ##################################################
 class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
@@ -154,7 +155,7 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     poissonRatio = enum.auto()  #0.35
     certificates = enum.auto() # CE, MD, ...
     density = enum.auto() # 1.2 g/cm³
-    printingSpeed = enum.auto() # 100 cm³/h
+    printingSpeed = enum.auto() # 100 cm/h
     acquisitionCosts = enum.auto() # €/kg
 
 ##################################################

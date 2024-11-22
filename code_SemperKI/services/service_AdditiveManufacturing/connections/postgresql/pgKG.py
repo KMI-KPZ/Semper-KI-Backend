@@ -67,14 +67,14 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.value: "€/kWh",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights,
-                            NodePropertyDescription.value: "0.1 mm, 0.2 mm, 0.3 mm",
+                            NodePropertyDescription.value: "15, 75 µm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineUsageCosts,
                             NodePropertyDescription.value: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.scanSpeed,
-                            NodePropertyDescription.value: "mm/s",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            #outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.scanSpeed,
+            #                NodePropertyDescription.value: "mm/s",
+            #                NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea,
                             NodePropertyDescription.value: "500 m²",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
@@ -92,6 +92,9 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime,
                             NodePropertyDescription.value: "h",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed,
+                            NodePropertyDescription.value: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             
         case NodeTypesAM.material:
@@ -111,7 +114,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.poissonRatio,
                             NodePropertyDescription.value: "",
@@ -123,7 +126,7 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.value: "g/cm³",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed,
-                            NodePropertyDescription.value: "cm³/h",
+                            NodePropertyDescription.value: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.acquisitionCosts,
                             NodePropertyDescription.value: "€/kg",
