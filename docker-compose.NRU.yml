@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.Server
-    command: ["bash","run/run.sh","-e production", "-m", "-c"]
+    command: ["bash","run/run.sh","-e nru", "-m", "-c"]
     env_file:
       - .env.nru
     ports:
