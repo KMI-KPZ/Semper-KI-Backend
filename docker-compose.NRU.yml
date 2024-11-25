@@ -1,36 +1,36 @@
 version: '3'
 
 services:
-  backend-NRU:
-    image: backend-NRU
+  backend-nru:
+    image: backend-nru
     build:
       context: .
       dockerfile: ./Dockerfile.Server
     command: ["bash","run/run.sh","-e production", "-m", "-c"]
     env_file:
-      - .env.NRU
+      - .env.nru
     ports:
       - 127.0.0.1:8003:8000
     volumes:
       - .:/app
     networks:
-      - semper-ki-NRU-network
+      - semper-ki-nru-network
 
-  db-NRU:
+  db-nru:
     image: postgres:15
     env_file:
-     - .env.NRU
+     - .env.nru
     ports:
       - 127.0.0.1:5435:5432
     volumes:
       - ./postgres/data/:/var/lib/postgresql/data/
     networks:
-      - semper-ki-NRU-network
+      - semper-ki-nru-network
 
-  redis-NRU:
+  redis-nru:
     image: redis:7
     env_file:
-      - .env.NRU
+      - .env.nru
     ports:
       - 127.0.0.1:6382:6379
     volumes:
@@ -40,36 +40,36 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - semper-ki-NRU-network
+      - semper-ki-nru-network
 
-  minio-NRU:
+  minio-nru:
     image: minio/minio
-    container_name: minio-NRU
+    container_name: minio-nru
     volumes:
       - ./minio/data:/data
       - ./minio/config:/root/.minio
       - ./docker/docker-service-minio-start.sh:/usr/local/bin/docker-service-minio-start.sh
     env_file:
-      - .env.NRU
+      - .env.nru
     ports:
       - "127.0.0.1:4572:9000"
     entrypoint: /usr/local/bin/docker-service-minio-start.sh
     networks:
-      - semper-ki-NRU-network
+      - semper-ki-nru-network
 
   celery-worker:
     build:
       context: .
       dockerfile: ./MSQ/Dockerfile.MSQ.Server
-    container_name: local-celery-worker-NRU
+    container_name: local-celery-worker-nru
     entrypoint: celery
     env_file:
-      - .env.NRU
+      - .env.nru
     command: -A MSQ.module.celery worker -n local_worker --loglevel=info
     volumes:
       - .:/app
     networks:
-      - semper-ki-NRU-network
+      - semper-ki-nru-network
 
 networks:
-  semper-ki-NRU-network:
+  semper-ki-nru-network:
