@@ -690,6 +690,13 @@ class Costs():
                 
 
             totalCosts = [(minimumCosts[0]*marginOrganization*marginPlattform, maximumCosts[0]*marginOrganization*marginPlattform), (minimumCosts[1]*marginOrganization*marginPlattform, maximumCosts[1]*marginOrganization*marginPlattform), (minimumCosts[2]*marginOrganization*marginPlattform, maximumCosts[2]*marginOrganization*marginPlattform)]
+            for i in range(len(totalCosts)):
+                left, right = totalCosts[i]
+                if numpy.isnan(left) or not numpy.isfinite(left):
+                    left = -1.
+                if numpy.isnan(right) or not numpy.isfinite(right):
+                    right = -1.
+                totalCosts[i] = (left, right)
             return totalCosts
         except Exception as e:
             loggerError.error("Error in calculateCosts: " + str(e))
