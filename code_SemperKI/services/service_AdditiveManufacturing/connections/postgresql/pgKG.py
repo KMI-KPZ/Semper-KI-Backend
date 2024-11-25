@@ -254,6 +254,10 @@ class LogicAM(Logic):
         # filter by material, post-processings, build plate, etc...
 
         for printer in listOfPrinters:
+            # filter if printer is active
+            if printer[NodeDescription.active] == False:
+                continue
+            
             chamberHeight = 0
             chamberWidth = 0
             chamberLength = 0
