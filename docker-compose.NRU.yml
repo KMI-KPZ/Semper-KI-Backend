@@ -1,0 +1,73 @@
+services:
+  backend-NRU:
+    image: backend-NRU
+    build:
+      context: .
+      dockerfile: ./Dockerfile.Server
+    command: ["bash","run/run.sh","-e production", "-m", "-c"]
+    env_file:
+      - .env.NRU
+    ports:
+      - 127.0.0.1:8003:8000
+    volumes:
+      - .:/app
+    networks:
+      - semper-ki-NRU-network
+
+  db-NRU:
+    image: postgres:15
+    env_file:
+     - .env.NRU
+    ports:
+      - 127.0.0.1:5435:5432
+    volumes:
+      - ./postgres/data/:/var/lib/postgresql/data/
+    networks:
+      - semper-ki-NRU-network
+
+  redis-NRU:
+    image: redis:7
+    env_file:
+      - .env.NRU
+    ports:
+      - 127.0.0.1:6382:6379
+    volumes:
+      - ./redis/data/:/var/lib/redis/data/
+      - ./docker/docker-service-redis-start.sh:/usr/local/bin/docker-service-redis-start.sh
+    entrypoint: /usr/local/bin/docker-service-redis-start.sh # used to pass PW from environment variable change things there if needed
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - semper-ki-NRU-network
+
+  minio-NRU:
+    image: minio/minio
+    container_name: minio-NRU
+    volumes:
+      - ./minio/data:/data
+      - ./minio/config:/root/.minio
+      - ./docker/docker-service-minio-start.sh:/usr/local/bin/docker-service-minio-start.sh
+    env_file:
+      - .env.NRU
+    ports:
+      - "127.0.0.1:4572:9000"
+    entrypoint: /usr/local/bin/docker-service-minio-start.sh
+    networks:
+      - semper-ki-NRU-network
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: ./MSQ/Dockerfile.MSQ.Server
+    container_name: local-celery-worker-NRU
+    entrypoint: celery
+    env_file:
+      - .env.NRU
+    command: -A MSQ.module.celery worker -n local_worker --loglevel=info
+    volumes:
+      - .:/app
+    networks:
+      - semper-ki-NRU-network
+
+networks:
+  semper-ki-NRU-network:

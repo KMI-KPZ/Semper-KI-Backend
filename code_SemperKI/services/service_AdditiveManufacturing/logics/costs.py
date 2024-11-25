@@ -5,7 +5,7 @@ Silvio Weging 2024
 
 Contains: Cost calculations for this service
 """
-import math, logging, numpy
+import math, logging, numpy, sys
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
@@ -142,7 +142,7 @@ class Costs():
 
             # From Material
             self.listOfValuesForEveryMaterial = []
-            self.minimalPrintingSpeed = float("inf")
+            self.minimalPrintingSpeed = sys.float_info.max # largest float
             chosenMaterials = self.processObj.serviceDetails[ServiceDetails.materials]
             for materialID in chosenMaterials:
                 material = chosenMaterials[materialID]
@@ -656,12 +656,12 @@ class Costs():
             marginPlattform = 1. + PLATFORM_MARGIN/100.
 
             maximumCosts = [0., 0., 0.] # part, quantity, batch
-            minimumCosts = [float("inf"), float("inf"), float("inf")]
+            minimumCosts = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
             maximumCostsPerFile = {}
             minimumCostsPerFile = {}
             for fileID , printerCostList in printerCostDict.items():
                 maximumCostsThisFile = [0., 0., 0.] # part, quantity, batch
-                minimumCostsThisFile = [float("inf"), float("inf"), float("inf")]
+                minimumCostsThisFile = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
                 for costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial in printerCostList:
                     for total_material_cost_part, total_material_cost_quantity, total_material_cost_batch in listOfCostsForMaterial:
                         costsTotal = costsTotalForPrinterPart + total_material_cost_part + postProcessingsCosts
