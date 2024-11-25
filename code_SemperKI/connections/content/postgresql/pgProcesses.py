@@ -757,10 +757,11 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if content[entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                    if FileObjectContent.isFile not in content[entry] or content[entry][FileObjectContent.isFile]:
+                        if content[entry][FileObjectContent.remote]:
+                            s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
+                        else:
+                            s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
 

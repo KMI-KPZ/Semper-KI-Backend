@@ -199,6 +199,16 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
                 raise Exception("Validation failed")
 
         model = process.serviceDetails[ServiceDetails.models][fileID]
+        if model[FileObjectContent.isFile] is False:
+            message = f"File {model[FileObjectContent.fileName]} is not a file"
+            exception = "Not a file"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         modelName = model[FileObjectContent.fileName]
         mock = {
             "filename": modelName,
