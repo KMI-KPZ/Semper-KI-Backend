@@ -68,14 +68,31 @@ class QualityControl(Semper.ServiceBase):
         
         """
         return QC_cloneServiceDetails(existingContent, newProcess)
+    
+    ##################################################
+    def calculatePriceForService(self, process, additionalArguments:dict, transferObject:object) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :param transferObject: Object to transfer data to the pricing function
+        :type transferObject: object
+        :return: Dictionary with all pricing details
+        :rtype: dict
+
+        """
+        return {}
 
     ###################################################
-    def getFilteredContractors(self, processObj) -> list:
+    def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
         """
-        return []
+        return [], {}
 
 SERVICE_NAME = "QUALITY_CONTROL"
 SERVICE_NUMBER = 6
