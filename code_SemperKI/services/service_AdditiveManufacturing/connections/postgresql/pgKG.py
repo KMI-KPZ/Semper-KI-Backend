@@ -32,153 +32,199 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeTypesAM.printer:
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter,
-                            NodePropertyDescription.value: "mm",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.lossOfMaterial,
-                            NodePropertyDescription.value: "%",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "%",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.fixedCosts,
-                            NodePropertyDescription.value: "€",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineBatchDistance,
-                            NodePropertyDescription.value: "mm",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.fillRate,
-                            NodePropertyDescription.value: "%",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "%",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildHeight,
-                            NodePropertyDescription.value: "mm",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildWidth,
-                            NodePropertyDescription.value: "mm",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildLength,
-                            NodePropertyDescription.value: "mm",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildRate,
-                            NodePropertyDescription.value: "cm³/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "cm³/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.averagePowerConsumption,
-                            NodePropertyDescription.value: "€/kWh",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/kWh",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights,
-                            NodePropertyDescription.value: "15, 75 µm",
+                            NodePropertyDescription.value: "15, 75",
+                            NodePropertyDescription.unit: "µm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineUsageCosts,
-                            NodePropertyDescription.value: "€/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             #outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.scanSpeed,
             #                NodePropertyDescription.value: "mm/s",
             #                NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea,
-                            NodePropertyDescription.value: "500 m²",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "m²",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.simpleMachineSetUp,
-                            NodePropertyDescription.value: "h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.complexMachineSetUp,
-                            NodePropertyDescription.value: "h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineHourlyRate,
-                            NodePropertyDescription.value: "€/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.costRatePersonalMachine,
-                            NodePropertyDescription.value: "€/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime,
-                            NodePropertyDescription.value: "h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed,
-                            NodePropertyDescription.value: "cm/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             
         case NodeTypesAM.material:
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.foodSafe,
                             NodePropertyDescription.value: "License;License;...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.heatResistant,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "°C",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexible,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.smooth,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "Ra",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul,
-                            NodePropertyDescription.value: "MPa",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.poissonRatio,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "1",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.density,
-                            NodePropertyDescription.value: "g/cm³",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "g/cm³",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed,
-                            NodePropertyDescription.value: "cm/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.acquisitionCosts,
-                            NodePropertyDescription.value: "€/kg",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/kg",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             
         case NodeTypesAM.additionalRequirement:
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.foodSafe,
                             NodePropertyDescription.value: "License;License;...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.heatResistant,
-                            NodePropertyDescription.value: "",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "°C",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.smooth,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.treatmentCosts,
-                            NodePropertyDescription.value: "€/h",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.fixedCosts,
-                            NodePropertyDescription.value: "€",
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "€",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
 
         case NodeTypesAM.color:
             outList.append({NodePropertyDescription.name: NodePropertiesAMColor.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: NodePropertiesAMColor.foodSafe,
                             NodePropertyDescription.value: "License;License;...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
             outList.append({NodePropertyDescription.name: NodePropertiesAMColor.color,
-                            NodePropertyDescription.value: "Number RAL;#Hex",
+                            NodePropertyDescription.value: "000000",
+                            NodePropertyDescription.unit: "#Hex",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.color})
             outList.append({NodePropertyDescription.name: NodePropertiesAMColor.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.materialType:
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterialType.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.materialCategory:
             outList.append({NodePropertyDescription.name: NodePropertiesAMMaterialCategory.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.technology:
             outList.append({NodePropertyDescription.name: NodePropertiesAMTechnology.imgPath,
                             NodePropertyDescription.value: "",
+                            NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
 
     return outList

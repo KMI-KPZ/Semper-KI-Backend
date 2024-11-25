@@ -39,6 +39,7 @@ loggerError = logging.getLogger("errors")
 class SResProperties(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     value = serializers.CharField(max_length=200, allow_blank=True)
+    unit = serializers.CharField(max_length=200, allow_blank=True, required=False)
     type = serializers.CharField(max_length=200)
 
 #######################################################
