@@ -17,7 +17,7 @@ CSRF_TRUSTED_ORIGINS.extend(["https://nru.semper-ki.org", "https://nru-backend.s
 CORS_ALLOWED_ORIGINS.extend(["https://nru.semper-ki.org", "https://nru-backend.semper-ki.org","https://staging.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org",
                         "https://backend.semper-ki.org", "https://staging-backend.semper-ki.org", "http://localhost:3000", "http://127.0.0.1:3000", "https://localhost:3000", "https://127.0.0.1:3000", 'https://dev-bdt24c5k0meleovv.eu.auth0.com'])
 
-CORS_ORIGIN_WHITELIST.extend("https://nru.semper-ki.org", "https://nru-backend.semper-ki.org",["https://staging.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org",
+CORS_ORIGIN_WHITELIST.extend(["https://nru.semper-ki.org", "https://nru-backend.semper-ki.org","https://staging.semper-ki.org", "https://semper-ki.org", "https://www.semper-ki.org",
                          "https://backend.semper-ki.org", "https://staging-backend.semper-ki.org", 'http://localhost:3000', 'http://127.0.0.1:3000','https://dev-bdt24c5k0meleovv.eu.auth0.com'])
 
 ADDITIONAL_TEMPLATE_DIR_SEMPER_KI = os.path.join(BASE_DIR, "code_SemperKI", "templates")
