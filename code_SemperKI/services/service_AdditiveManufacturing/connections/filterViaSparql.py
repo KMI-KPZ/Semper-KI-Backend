@@ -87,6 +87,8 @@ class Filter():
                     else:
                         for manufacturer in manufacturersWhoCanDoItAll:
                             self.resultDict[manufacturer] = manufacturer
+            else:
+                self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByMaterial: {e}")
             return e
@@ -137,6 +139,8 @@ class Filter():
                     else:
                         for manufacturer in manufacturersWhoCanDoItAll:
                             self.resultDict[manufacturer] = manufacturer
+            else:
+                self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPostProcessings: {e}")
             return e    
@@ -178,7 +182,8 @@ class Filter():
                     #     if entry["ID"]["value"] not in manufacturersWhichCanDoAll:
                     #         manufacturersWhichCanDoAll[entry["ID"]["value"]]  = entry
                     setOfManufacturerIDs = pgKG.LogicAM.getManufacturersWithViablePrinters([calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._1],calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._2],calculatedValuesForFile[Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._3]], self.printerDict)
-                    listOfSetsForManufacturers.append(setOfManufacturerIDs)
+                    if len(setOfManufacturerIDs) > 0:
+                        listOfSetsForManufacturers.append(setOfManufacturerIDs)
             
             if len(listOfSetsForManufacturers) > 0:
                 manufacturersWhoCanDoItAll = listOfSetsForManufacturers[0].intersection(*listOfSetsForManufacturers[1:])
@@ -191,6 +196,8 @@ class Filter():
                             # no need to throw out manufacturers from printerDict, as they are already filtered above
                     self.resultDict.clear()
                     self.resultDict.update(copiedDict)
+            else:
+                self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPrinter: {e}")
             return e
