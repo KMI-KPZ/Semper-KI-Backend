@@ -75,7 +75,22 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request):
         modelToBeSaved[FileContentsAM.volume] = validatedInput["volume"] if "volume" in validatedInput else 0
         modelToBeSaved[FileContentsAM.complexity] = validatedInput["complexity"]
 
-        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID: modelToBeSaved}}}}
+        fakeCalculation = {
+            "filename": validatedInput["name"],
+            "measurements": {
+                "volume": float(modelToBeSaved[FileContentsAM.volume]),
+                "surfaceArea": 0.0,
+                "mbbDimensions": {
+                    "_1": float(validatedInput["width"]),
+                    "_2": float(validatedInput["length"]),
+                    "_3": float(validatedInput["height"]),
+                },
+                "mbbVolume": float(validatedInput["width"]*validatedInput["length"]*validatedInput["height"]),
+            },
+            "status_code": 200
+        }
+
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID: modelToBeSaved}, ServiceDetails.calculations: {fileID: fakeCalculation}}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
