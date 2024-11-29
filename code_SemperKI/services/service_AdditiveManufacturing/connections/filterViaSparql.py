@@ -87,7 +87,7 @@ class Filter():
                     else:
                         for manufacturer in manufacturersWhoCanDoItAll:
                             self.resultDict[manufacturer] = manufacturer
-            else:
+            elif len(chosenMaterials) > 0:
                 self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByMaterial: {e}")
@@ -139,7 +139,7 @@ class Filter():
                     else:
                         for manufacturer in manufacturersWhoCanDoItAll:
                             self.resultDict[manufacturer] = manufacturer
-            else:
+            elif len(chosenPostProcessings) > 0:
                 self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPostProcessings: {e}")
@@ -196,7 +196,7 @@ class Filter():
                             # no need to throw out manufacturers from printerDict, as they are already filtered above
                     self.resultDict.clear()
                     self.resultDict.update(copiedDict)
-            else:
+            elif len(calculations) > 0:
                 self.resultDict.clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPrinter: {e}")
