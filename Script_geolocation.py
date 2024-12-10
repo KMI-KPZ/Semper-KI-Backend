@@ -6,7 +6,6 @@ Akshay NS 2024
 Contains:
 1. get_coordinates: This function gets the coordinates of an address using the geopy library.
 2. calculate_haversine_distance: This function calculates the Haversine distance between two addresses using the geopy library.
-3. Main: This is the main entry point for the script.
 """
 from geopy.adapters import AioHTTPAdapter
 from geopy.geocoders import Nominatim
