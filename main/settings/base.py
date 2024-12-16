@@ -126,6 +126,7 @@ class BackendConfigHelper(ConfigHelper):
         'ALLOWED_HOSTS': {'var': 'ALLOWED_HOSTS', 'hint': 'Allowed hosts for the backend API calls, comma separated',
                           'type': 'list',
                           'default': '127.0.0.1,localhost,dev.semper-ki.org,semper-ki.org,www.semper-ki.org,https://dev.semper-ki.org', 'required': False},
+        'CORS_WHITELIST': {'var': 'CORS_WHITELIST', 'hint': 'Allowed addresses for CORS, comma separated', 'type': 'list', 'default': 'host.docker.internal,localhost,127.0.0.1', 'required': True}, 
         'ENV_TOKEN': {'var': 'ENV_TOKEN', 'hint': 'A token with which you can check which env is used',
                    'default': 'DEFAULT_ENV', 'required': False},
         'FORWARD_URL': {'var': 'FORWARD_URL', 'hint': 'The URL to which Login should point',
@@ -156,6 +157,10 @@ class BackendConfigHelper(ConfigHelper):
             }
         })
 
+settings_helper = BackendConfigHelper()
+settings_helper.loadEnvVars(sys.modules[__name__])
+settings_helper.configure_database(sys.modules[__name__])
+
 # Load environment definition file
 
 file_base = os.environ.get("ENV_FILE")
@@ -183,10 +188,10 @@ DEBUG = True
 
 BACKEND_SETTINGS = "base"
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000", "https://localhost:8000", "https://127.0.0.1:8000"]
+CSRF_TRUSTED_ORIGINS = CORS_WHITELIST#["http://localhost:8000", "http://127.0.0.1:8000", "https://localhost:8000", "https://127.0.0.1:8000"]
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000", "https://localhost:8000", "https://127.0.0.1:8000"]
-CORS_ORIGIN_WHITELIST = ['http://localhost:8000', 'http://127.0.0.1:8000']
+CORS_ALLOWED_ORIGINS = CORS_WHITELIST#["http://localhost:8000", "http://127.0.0.1:8000", "https://localhost:8000", "https://127.0.0.1:8000"]
+CORS_ORIGIN_WHITELIST = CORS_WHITELIST#['http://localhost:8000', 'http://127.0.0.1:8000']
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -402,9 +407,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 WSGI_APPLICATION = 'main.wsgi.application'
 ASGI_APPLICATION = "main.asgi.application"
 
-settings_helper = BackendConfigHelper()
-settings_helper.loadEnvVars(sys.modules[__name__])
-settings_helper.configure_database(sys.modules[__name__])
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

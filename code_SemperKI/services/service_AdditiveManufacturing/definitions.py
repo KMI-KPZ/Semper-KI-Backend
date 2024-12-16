@@ -39,6 +39,7 @@ class FileContentsAM(StrEnumExactlyAsDefined):
     length = enum.auto()
     volume = enum.auto()
     complexity = enum.auto()
+    scalingFactor = enum.auto()
 
 ##################################################
 # How do the calculations look like?
