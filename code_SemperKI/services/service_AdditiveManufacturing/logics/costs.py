@@ -5,7 +5,7 @@ Silvio Weging 2024
 
 Contains: Cost calculations for this service
 """
-import math, logging, numpy
+import math, logging, numpy, sys
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
@@ -142,15 +142,15 @@ class Costs():
 
             # From Material
             self.listOfValuesForEveryMaterial = []
-            self.minimalPrintingSpeed = float("inf")
+            self.minimalPrintingSpeed = sys.float_info.max # largest float
             chosenMaterials = self.processObj.serviceDetails[ServiceDetails.materials]
             for materialID in chosenMaterials:
                 material = chosenMaterials[materialID]
                 valuesForThisMaterial = {}
-                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.acquisitionCosts, 400)
-                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = material.get(NodePropertiesAMMaterial.density, 4.43)
+                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.acquisitionCosts, 400))
+                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.density, 4.43))
                 if NodePropertiesAMMaterial.printingSpeed in material and material[NodePropertiesAMMaterial.printingSpeed] < self.minimalPrintingSpeed:
-                    self.minimalPrintingSpeed = material[NodePropertiesAMMaterial.printingSpeed]
+                    self.minimalPrintingSpeed = float(material[NodePropertiesAMMaterial.printingSpeed])
                 self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From Printer
@@ -159,48 +159,49 @@ class Costs():
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
                 # get technology
-                technology = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)[0][pgKG.NodeDescription.nodeName]
+                technologies = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)
+                technology = technologies[0][pgKG.NodeDescription.nodeName] if len(technologies) > 0 else "Material Extrusion"
                 valuesForThisPrinter[self.PrinterValues.technology] = technology
                 propertiesOfPrinter = printer[pgKG.NodeDescription.properties]
                 for entry in propertiesOfPrinter:
                     value = entry[pgKG.NodePropertyDescription.value]
                     match entry[pgKG.NodePropertyDescription.name]:
                         case NodePropertiesAMPrinter.costRatePersonalMachine:
-                            valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine] = value
+                            valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildHeight:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberHeight] = value
+                            valuesForThisPrinter[self.PrinterValues.buildChamberHeight] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildLength:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberLength] = value
+                            valuesForThisPrinter[self.PrinterValues.buildChamberLength] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildWidth:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberWidth] = value
+                            valuesForThisPrinter[self.PrinterValues.buildChamberWidth] = float(value)
                         case NodePropertiesAMPrinter.lossOfMaterial:
-                            valuesForThisPrinter[self.PrinterValues.machineMaterialLoss] = value
+                            valuesForThisPrinter[self.PrinterValues.machineMaterialLoss] = float(value)
                         case NodePropertiesAMPrinter.machineBatchDistance:
-                            valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = value
+                            valuesForThisPrinter[self.PrinterValues.machineBatchDistance] = float(value)
                         case NodePropertiesAMPrinter.possibleLayerHeights:
-                            valuesForThisPrinter[self.PrinterValues.layerThickness] = value[0]
+                            valuesForThisPrinter[self.PrinterValues.layerThickness] = float(value.split(",")[0])
                         case NodePropertiesAMPrinter.machineSurfaceArea:
-                            valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = value
+                            valuesForThisPrinter[self.PrinterValues.machineSurfaceArea] = float(value)
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
-                            valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = value
+                            valuesForThisPrinter[self.PrinterValues.machineSetUpSimple] = float(value)
                         case NodePropertiesAMPrinter.complexMachineSetUp:
-                            valuesForThisPrinter[self.PrinterValues.machineSetUpComplex] = value
+                            valuesForThisPrinter[self.PrinterValues.machineSetUpComplex] = float(value)
                         case NodePropertiesAMPrinter.averagePowerConsumption:
-                            valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = value
+                            valuesForThisPrinter[self.PrinterValues.averagePowerConsumption] = float(value)
                         case NodePropertiesAMPrinter.machineHourlyRate:
-                            valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = value
+                            valuesForThisPrinter[self.PrinterValues.machineHourlyRate] = float(value)
                         # Powder Bet fusion:
                         case NodePropertiesAMPrinter.coatingTime:
-                            valuesForThisPrinter[self.PrinterValues.coatingTime] = value
+                            valuesForThisPrinter[self.PrinterValues.coatingTime] = float(value)
                         # Extrusion only:
                         case NodePropertiesAMPrinter.buildRate:
-                            valuesForThisPrinter[self.PrinterValues.buildRate] = value
+                            valuesForThisPrinter[self.PrinterValues.buildRate] = float(value)
                         case NodePropertiesAMPrinter.fillRate:
-                            valuesForThisPrinter[self.PrinterValues.fillRate] = value / 100.
+                            valuesForThisPrinter[self.PrinterValues.fillRate] = float(value) / 100.
                         case NodePropertiesAMPrinter.nozzleDiameter:
-                            valuesForThisPrinter[self.PrinterValues.nozzleDiameter] = value
+                            valuesForThisPrinter[self.PrinterValues.nozzleDiameter] = float(value)
                         case NodePropertiesAMPrinter.maxPrintingSpeed:
-                            valuesForThisPrinter[self.PrinterValues.maxPrintingSpeed] = value
+                            valuesForThisPrinter[self.PrinterValues.maxPrintingSpeed] = float(value)
 
                 # default values
                 if NodePropertiesAMPrinter.costRatePersonalMachine not in propertiesOfPrinter:
@@ -248,8 +249,8 @@ class Costs():
                 for postProcessingID in chosenPostProcessings:
                     postProcessing = chosenPostProcessings[postProcessingID]
                     valuesForThisPostProcessing = {}
-                    valuesForThisPostProcessing[self.PostProcessingValues.fixedCostsPostProcessing] = postProcessing.get(NodePropertiesAMAdditionalRequirement.fixedCosts, 0)
-                    valuesForThisPostProcessing[self.PostProcessingValues.treatmentCostsPostProcessing] = postProcessing.get(NodePropertiesAMAdditionalRequirement.treatmentCosts, 0)
+                    valuesForThisPostProcessing[self.PostProcessingValues.fixedCostsPostProcessing] = float(postProcessing.get(NodePropertiesAMAdditionalRequirement.fixedCosts, 0))
+                    valuesForThisPostProcessing[self.PostProcessingValues.treatmentCostsPostProcessing] = float(postProcessing.get(NodePropertiesAMAdditionalRequirement.treatmentCosts, 0))
                     self.listOfValuesForEveryPostProcessing.append(valuesForThisPostProcessing)
         except Exception as e:
             loggerError.error("Error in fetchInformation: " + str(e))
@@ -655,12 +656,12 @@ class Costs():
             marginPlattform = 1. + PLATFORM_MARGIN/100.
 
             maximumCosts = [0., 0., 0.] # part, quantity, batch
-            minimumCosts = [float("inf"), float("inf"), float("inf")]
+            minimumCosts = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
             maximumCostsPerFile = {}
             minimumCostsPerFile = {}
             for fileID , printerCostList in printerCostDict.items():
                 maximumCostsThisFile = [0., 0., 0.] # part, quantity, batch
-                minimumCostsThisFile = [float("inf"), float("inf"), float("inf")]
+                minimumCostsThisFile = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
                 for costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial in printerCostList:
                     for total_material_cost_part, total_material_cost_quantity, total_material_cost_batch in listOfCostsForMaterial:
                         costsTotal = costsTotalForPrinterPart + total_material_cost_part + postProcessingsCosts
@@ -689,6 +690,13 @@ class Costs():
                 
 
             totalCosts = [(minimumCosts[0]*marginOrganization*marginPlattform, maximumCosts[0]*marginOrganization*marginPlattform), (minimumCosts[1]*marginOrganization*marginPlattform, maximumCosts[1]*marginOrganization*marginPlattform), (minimumCosts[2]*marginOrganization*marginPlattform, maximumCosts[2]*marginOrganization*marginPlattform)]
+            for i in range(len(totalCosts)):
+                left, right = totalCosts[i]
+                if numpy.isnan(left) or not numpy.isfinite(left):
+                    left = -1.
+                if numpy.isnan(right) or not numpy.isfinite(right):
+                    right = -1.
+                totalCosts[i] = (left, right)
             return totalCosts
         except Exception as e:
             loggerError.error("Error in calculateCosts: " + str(e))

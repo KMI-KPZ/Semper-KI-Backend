@@ -23,6 +23,7 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
@@ -878,7 +879,7 @@ def createGraph(request:Request):
         500: ExceptionSerializer
     }
 )
-
+@loginViaAPITokenIfAvailable()
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)

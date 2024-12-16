@@ -237,7 +237,7 @@ class SReqUploadWithoutFile(serializers.Serializer):
     length = serializers.FloatField()
     volume = serializers.FloatField(required=False)
     quantity = serializers.IntegerField()
-    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    tags = serializers.ListField(child=serializers.CharField(allow_blank=True, required=False), required=False, allow_empty=True)
     origin = serializers.CharField(default="Service",max_length=200)
     name = serializers.CharField(max_length=200)
     complexity = serializers.IntegerField()
