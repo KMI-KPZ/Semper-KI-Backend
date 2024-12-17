@@ -157,10 +157,6 @@ class BackendConfigHelper(ConfigHelper):
             }
         })
 
-settings_helper = BackendConfigHelper()
-settings_helper.loadEnvVars(sys.modules[__name__])
-settings_helper.configure_database(sys.modules[__name__])
-
 # Load environment definition file
 
 file_base = os.environ.get("ENV_FILE")
@@ -172,6 +168,10 @@ else:
 
 if ENV_FILE:
     load_dotenv(ENV_FILE)
+
+settings_helper = BackendConfigHelper()
+settings_helper.loadEnvVars(sys.modules[__name__])
+settings_helper.configure_database(sys.modules[__name__])
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
