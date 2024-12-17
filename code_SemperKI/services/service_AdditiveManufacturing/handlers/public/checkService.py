@@ -231,7 +231,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
                 raise Exception("Validation failed")
 
         model = process.serviceDetails[ServiceDetails.models][fileID]
-        scalingFactor = model[FileContentsAM.scalingFactor] if FileContentsAM.scalingFactor in model else 1.0
+        scalingFactor = model[FileContentsAM.scalingFactor]/100. if FileContentsAM.scalingFactor in model else 1.0
 
         if model[FileObjectContent.isFile] is True:
             modelName = model[FileObjectContent.fileName]

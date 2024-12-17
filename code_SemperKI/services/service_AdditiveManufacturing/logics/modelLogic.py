@@ -179,7 +179,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 modelsToBeSaved[fileID][FileObjectContent.size] = model.size
                 modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
                 modelsToBeSaved[fileID][FileObjectContent.origin] = origin
-                modelsToBeSaved[fileID][FileContentsAM.scalingFactor] = float(details["scalingFactor"])/100. if "scalingFactor" in details else 1.0
+                modelsToBeSaved[fileID][FileContentsAM.scalingFactor] = float(details["scalingFactor"]) if "scalingFactor" in details else 100.0
                 if remote:
                     modelsToBeSaved[fileID][FileObjectContent.remote] = True
                     returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
