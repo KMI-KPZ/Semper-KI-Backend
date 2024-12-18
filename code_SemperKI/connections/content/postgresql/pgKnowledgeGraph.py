@@ -510,6 +510,7 @@ class Basics():
     def getNodesByTypeAndPropertyAndValue(nodeType:str, nodeProperty:str, value:str):
         """
         Return all nodes of a given type with a certain property
+        UNUSED
 
         :param nodeType: The node type
         :type nodeType: str

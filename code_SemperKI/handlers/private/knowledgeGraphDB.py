@@ -23,6 +23,7 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
@@ -39,6 +40,7 @@ loggerError = logging.getLogger("errors")
 class SResProperties(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     value = serializers.CharField(max_length=200, allow_blank=True)
+    unit = serializers.CharField(max_length=200, allow_blank=True, required=False)
     type = serializers.CharField(max_length=200)
 
 #######################################################
@@ -46,7 +48,7 @@ class SResNode(serializers.Serializer):
     nodeID = serializers.CharField(max_length=513)
     uniqueID = serializers.CharField(max_length=513, allow_blank=True)
     nodeName = serializers.CharField(max_length=200)
-    nodeType = serializers.CharField(max_length=200)
+    nodeType = serializers.CharField(max_length=200, allow_blank=True)
     context = serializers.CharField(max_length=10000, allow_blank=True)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True)
     createdBy = serializers.CharField(max_length=513, required=False, allow_blank=True)
@@ -107,7 +109,7 @@ def getNode(request:Request, nodeID:str):
 class SReqCreateNode(serializers.Serializer):
     nodeName = serializers.CharField(max_length=200)
     nodeType = serializers.CharField(max_length=200, default="organization|printer|material|additionalRequirement|color")
-    context = serializers.CharField(max_length=10000)
+    context = serializers.CharField(max_length=10000, allow_blank=True)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True)
 
 #######################################################
@@ -728,13 +730,13 @@ def getGraph(request:Request):
 
 #######################################################
 class SResInitialNodes(serializers.Serializer):
-    id = serializers.CharField(max_length=200)
-    name = serializers.CharField(max_length=200)
-    type = serializers.CharField(max_length=200)
+    id = serializers.CharField(max_length=200, allow_blank=True)
+    name = serializers.CharField(max_length=200, allow_blank=True)
+    type = serializers.CharField(max_length=200, allow_blank=True)
 #######################################################
 class SResInitialEdges(serializers.Serializer):
-    source = serializers.CharField(max_length=200)
-    target = serializers.CharField(max_length=200)
+    source = serializers.CharField(max_length=200, allow_blank=True)
+    target = serializers.CharField(max_length=200, allow_blank=True)
 #######################################################
 class SResGraphForFrontend(serializers.Serializer):
     Nodes = serializers.ListField(child=SResInitialNodes())
@@ -877,7 +879,7 @@ def createGraph(request:Request):
         500: ExceptionSerializer
     }
 )
-
+@loginViaAPITokenIfAvailable()
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)

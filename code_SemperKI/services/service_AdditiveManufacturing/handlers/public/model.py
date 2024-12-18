@@ -34,10 +34,12 @@ from code_SemperKI.handlers.public.files import deleteFile
 from code_SemperKI.handlers.public.process import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
 from code_SemperKI.utilities.serializer import ExceptionSerializer
-from code_SemperKI.utilities.basics import testPicture
+
 from code_SemperKI.connections.content.manageContent import ManageContent
 from MSQ.tasks.tasks import callfTetWild
 from MSQ.handlers.interface import returnFileFromfTetWild
+
+from ...logics.modelLogic import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -46,7 +48,7 @@ loggerError = logging.getLogger("errors")
 class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
-    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"fileName":"file.stl"}]', max_length=10000)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"scalingFactor":1.0,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)
     # multipart/form-data
@@ -95,121 +97,17 @@ def uploadModels(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         info = serializedContent.data
-        projectID = info[ProjectDescription.projectID]
-        processID = info[ProcessDescription.processID]
-        origin = info["origin"]
-
-        content = ManageContent(request.session)
-        interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
-        if interface == None:
-            message = "Rights not sufficient in uploadModel"
-            exception = "Unauthorized"
-            logger.error(message)
+        
+        exception, value = logicForUploadModel(info, request)
+        if exception is not None:
+            message = str(exception)
+            loggerError.error(exception)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=value)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        if interface.checkIfFilesAreRemote(projectID, processID):
-            remote = True
-        else:
-            remote = False
-        
-        detailsOfAllFiles = json.loads(info["details"])
-
-        # TODO: if the file is a repo file, then create a local copy
-
-        modelNames = list(request.FILES.keys())
-        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
-        
-        # check if duplicates exist
-        existingFileNames = set()
-        processContent = interface.getProcess(projectID, processID)
-        if isinstance(processContent, Exception):
-            message = f"Process not found in {uploadModels.cls.__name__}"
-            exception = "Not found"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        for key in processContent[ProcessDescription.files]:
-            value = processContent[ProcessDescription.files][key]
-            existingFileNames.add(value[FileObjectContent.fileName])
-
-        modelsToBeSaved = {}
-        for fileName in modelNames:
-            # rename duplicates
-            counterForFileName = 1
-            nameOfFile = fileName
-            while nameOfFile in existingFileNames:
-                fileNameRoot, extension= os.path.splitext(nameOfFile)
-                if counterForFileName > 100000:
-                    raise Exception("Too many files with the same name uploaded!")
-                
-                if "_" in fileNameRoot:
-                    fileNameRootSplit = fileNameRoot.split("_")
-                    try:
-                        counterForFileName = int(fileNameRootSplit[-1])
-                        fileNameRoot = "_".join(fileNameRootSplit[:-1])
-                        counterForFileName += 1
-                    except:
-                        pass
-                nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
-                counterForFileName += 1
-            for model in request.FILES.getlist(fileName):
-                details = {}
-                for detail in detailsOfAllFiles: # details are not in the same order as the models
-                    if detail["fileName"] == fileName or detail["fileName"] == "file":
-                        details = detail["details"]
-                        break
-                fileID = crypto.generateURLFriendlyRandomString()
-                filePath = projectID+"/"+processID+"/"+fileID
-                
-                modelsToBeSaved[fileID] = {}
-                modelsToBeSaved[fileID][FileObjectContent.id] = fileID
-                modelsToBeSaved[fileID][FileObjectContent.path] = filePath
-                modelsToBeSaved[fileID][FileObjectContent.fileName] = nameOfFile
-                modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
-                modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
-                modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
-                modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
-                modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
-                modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
-                modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()
-                modelsToBeSaved[fileID][FileObjectContent.size] = model.size
-                modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
-                modelsToBeSaved[fileID][FileObjectContent.origin] = origin
-                if remote:
-                    modelsToBeSaved[fileID][FileObjectContent.remote] = True
-                    returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
-                    if returnVal is not True:
-                        raise Exception(f"File {fileName} could not be saved to remote storage")
-                else:
-                    modelsToBeSaved[fileID][FileObjectContent.remote] = False
-                    returnVal = s3.manageLocalS3.uploadFile(filePath, model)
-                    if returnVal is not True:
-                        raise Exception(f"File {fileName} could not be saved to local storage")
-                
-        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.models: modelsToBeSaved}}}
-
-        # Save into files field of the process
-        message, flag = updateProcessFunction(request, changes, projectID, [processID])
-        if flag is False: # this should not happen
-            message = "Rights not sufficient for uploadModels"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if isinstance(message, Exception):
-            raise message
-        
-        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},models,"+str(datetime.now()))
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -220,8 +118,82 @@ def uploadModels(request:Request):
         if exceptionSerializer.is_valid():
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+
+#######################################################
+class SReqUploadWithoutFile(serializers.Serializer):
+    projectID = serializers.CharField(max_length=513)
+    processID = serializers.CharField(max_length=513)
+    levelOfDetail = serializers.FloatField()
+    width = serializers.FloatField()
+    height = serializers.FloatField()
+    length = serializers.FloatField()
+    volume = serializers.FloatField(required=False)
+    quantity = serializers.IntegerField()
+    tags = serializers.ListField(child=serializers.CharField(allow_blank=True, required=False), required=False, allow_empty=True)
+    origin = serializers.CharField(default="Service",max_length=200)
+    name = serializers.CharField(max_length=200)
+    complexity = serializers.IntegerField()
         
+#######################################################
+@extend_schema(
+    summary="Upload a model but without the file",
+    description=" ",
+    tags=['FE - AM Models'],
+    request=SReqUploadWithoutFile,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["POST"])
+@api_view(["POST"])
+@checkVersion(0.3)
+def uploadModelWithoutFile(request:Request):
+    """
+    Upload a model but without the file
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Success or not
+    :rtype: HTTPResponse
+
+    """
+    try:
+        inSerializer = SReqUploadWithoutFile(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {uploadModelWithoutFile.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        retVal, value = logicForUploadModelWithoutFile(validatedInput, request)
+        if retVal is not None:
+            message = str(retVal)
+            loggerError.error(retVal)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": retVal})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=value)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {uploadModelWithoutFile.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
 @extend_schema(

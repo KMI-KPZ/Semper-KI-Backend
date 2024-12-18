@@ -194,7 +194,7 @@ class ProcessInterface():
     def __init__(self, project:ProjectInterface, processID:str, currentTime:str, client:str) -> None:
         self.processID = processID
         self.project = project
-        self.processDetails = {"amount": 1}
+        self.processDetails = {}
         self.processStatus = 0
         self.serviceDetails = {}
         self.serviceStatus = 0
