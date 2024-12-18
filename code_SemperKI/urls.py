@@ -40,10 +40,11 @@ newPaths= {
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),
-    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
+    "getFlatProjects": ("public/project/dashboard/all/get/", project.getFlatProjects),
     "updateProject": ("public/project/update/" ,project.updateProject),
     "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
     "saveProjects": ("public/project/save/", project.saveProjects),
+    "getProjectForDashboard": ("public/project/dashboard/get/<str:projectID>/", project.getProjectForDashboard),
 
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),

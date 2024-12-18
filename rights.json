@@ -20,7 +20,8 @@
             "getProcessHistory",
             "downloadProcessHistory",
             "statusButtonRequest",
-            "checkModel"
+            "checkModel",
+            "getProjectForDashboard"
          ]
       },
       {

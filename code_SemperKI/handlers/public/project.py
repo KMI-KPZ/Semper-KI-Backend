@@ -32,6 +32,7 @@ from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getFlatStatus
 from code_SemperKI.utilities.serializer import ExceptionSerializer
+from code_SemperKI.logics import projectLogics
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -68,6 +69,7 @@ class SResFlatProjectsEntry(serializers.Serializer):
     accessedWhen = serializers.CharField(max_length=200)
     processesCount = serializers.IntegerField()
     owner = serializers.BooleanField(required=False)
+    searchableData = serializers.ListField(child=serializers.CharField(), required=False, allow_empty=True)
 
 ########################################################
 class SResGetFlatProjects(serializers.Serializer):
@@ -100,24 +102,17 @@ def getFlatProjects(request:Request):
 
     """
     try:
-        outDict = {"projects": []}
-        contentManager = ManageContent(request.session)
-
-        # Gather from session...
-        if contentManager.sessionManagement.getIfContentIsInSession():
-            sessionContent = contentManager.sessionManagement.getProjectsFlat(request.session)
-            outDict["projects"].extend(sessionContent)
-        
-        # ... and from database
-        if manualCheckifLoggedIn(request.session) and manualCheckIfRightsAreSufficient(request.session, getFlatProjects.cls.__name__):           
-            objFromDB = contentManager.postgresManagement.getProjectsFlat(request.session)
-            if len(objFromDB) >= 1:
-                outDict["projects"].extend(objFromDB)
-
-        outDict["projects"] = sorted(outDict["projects"], key=lambda x: 
-                timezone.make_aware(datetime.strptime(x[ProjectDescription.createdWhen], '%Y-%m-%d %H:%M:%S.%f+00:00')), reverse=True)
-        
-        outSerializer = SResGetFlatProjects(data=outDict)
+        result, statusCode = projectLogics.logicForGetFlatProjects(request)
+        if isinstance(result, Exception):
+            message = f"Error in getFlatProjects: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=statusCode)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        outSerializer = SResGetFlatProjects(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -229,6 +224,54 @@ def getProject(request, projectID):
     
     except (Exception) as error:
         message = f"Error in getProject: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# TODO serializer
+#######################################################
+@extend_schema(
+    summary="Retrieve all projects for the dashboard",
+    description=" ",
+    tags=['FE - Projects'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@api_view(["GET"])
+@checkVersion(0.3)
+def getProjectForDashboard(request:Request, projectID):
+    """
+    Retrieve all projects for the dashboard
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response
+    :rtype: JSONResponse
+
+    """
+    try:
+        result, statusCode = projectLogics.logicForGetProjectForDashboard(request, projectID)
+        if isinstance(result, Exception):
+            message = f"Error in {getProjectForDashboard.cls.__name__}: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=statusCode)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response(result, status=statusCode)
+    except (Exception) as error:
+        message = f"Error in {getProjectForDashboard.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

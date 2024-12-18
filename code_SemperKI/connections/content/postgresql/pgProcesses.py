@@ -1185,6 +1185,8 @@ class ProcessManagementBase(AbstractContentInterface):
                 currentProject = project.toDict()
                 currentProject["processesCount"] = len(project.processes.all())
                 currentProject["owner"] = True
+                currentProject["searchableData"] = []
+                # TODO: add searchable data
                     
                 output.append(currentProject)
             
