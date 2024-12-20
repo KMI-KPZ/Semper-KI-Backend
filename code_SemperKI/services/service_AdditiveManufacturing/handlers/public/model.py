@@ -48,6 +48,7 @@ loggerError = logging.getLogger("errors")
 class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
+    groupIdx = serializers.IntegerField()
     details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"scalingFactor":1.0,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)

@@ -27,29 +27,36 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
     """
 
     try:
-        for entry in newContent:
-            if entry == ServiceDetails.models:
-                if existingContent == {} or ServiceDetails.models not in existingContent:
-                    existingContent[ServiceDetails.models] = {}
-                for fileID in newContent[ServiceDetails.models]:    
-                    existingContent[ServiceDetails.models][fileID] = newContent[entry][fileID]
-            elif entry == ServiceDetails.materials:
-                #if existingContent == {} or ServiceDetails.materials not in existingContent:
-                existingContent[ServiceDetails.materials] = {}
-                for materialID in newContent[ServiceDetails.materials]:
-                    existingContent[ServiceDetails.materials][materialID] = newContent[entry][materialID]
-            elif entry == ServiceDetails.postProcessings:
-                #if existingContent == {} or ServiceDetails.postProcessings not in existingContent:
-                existingContent[ServiceDetails.postProcessings] = {}
-                for postProcessingID in newContent[ServiceDetails.postProcessings]:
-                    existingContent[ServiceDetails.postProcessings][postProcessingID] = newContent[entry][postProcessingID]
-            elif entry == ServiceDetails.calculations:
-                if existingContent == {} or ServiceDetails.calculations not in existingContent:
-                    existingContent[ServiceDetails.calculations] = {}
-                for fileID in newContent[ServiceDetails.calculations]:
-                    existingContent[ServiceDetails.calculations][fileID] = newContent[entry][fileID]
-            else:
-                raise NotImplementedError("This service detail does not exist (yet).")
+        for idx, newContentGroup in enumerate(newContent[ServiceDetails.groups]):
+            if idx >= len(existingContent[ServiceDetails.groups]):
+                existingContent[ServiceDetails.groups].append(newContentGroup)
+                continue
+
+            existingGroup = existingContent[ServiceDetails.groups][idx]
+
+            for entry in newContentGroup:
+                if entry == ServiceDetails.models:
+                    if existingGroup == {} or ServiceDetails.models not in existingGroup:
+                        existingGroup[ServiceDetails.models] = {}
+                    for fileID in newContentGroup[ServiceDetails.models]:
+                        existingGroup[ServiceDetails.models][fileID] = newContentGroup[entry][fileID]
+                elif entry == ServiceDetails.material:
+                    #if existingGroup == {} or ServiceDetails.materials not in existingGroup:
+                    existingGroup[ServiceDetails.material] = {}
+                    for materialID in newContentGroup[ServiceDetails.material]:
+                        existingGroup[ServiceDetails.material][materialID] = newContentGroup[entry][materialID]
+                elif entry == ServiceDetails.postProcessings:
+                    #if existingGroup == {} or ServiceDetails.postProcessings not in existingGroup:
+                    existingGroup[ServiceDetails.postProcessings] = {}
+                    for postProcessingID in newContentGroup[ServiceDetails.postProcessings]:
+                        existingGroup[ServiceDetails.postProcessings][postProcessingID] = newContentGroup[entry][postProcessingID]
+                elif entry == ServiceDetails.calculations:
+                    if existingGroup == {} or ServiceDetails.calculations not in existingGroup:
+                        existingGroup[ServiceDetails.calculations] = {}
+                    for fileID in newContentGroup[ServiceDetails.calculations]:
+                        existingGroup[ServiceDetails.calculations][fileID] = newContentGroup[entry][fileID]
+                else:
+                    raise NotImplementedError("This service detail does not exist (yet).")
 
     except (Exception) as error:
         logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
@@ -70,23 +77,28 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     """
 
     try:
-        for entry in deletedContent:
-            if entry == ServiceDetails.models:
-                for fileID in deletedContent[ServiceDetails.models]:
-                    del existingContent[ServiceDetails.models][fileID]
-                if ServiceDetails.calculations in existingContent:
-                    del existingContent[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
-            elif entry == ServiceDetails.materials:
-                for materialID in deletedContent[ServiceDetails.materials]:
-                    del existingContent[ServiceDetails.materials][materialID]
-            elif entry == ServiceDetails.postProcessings:
-                for postProcessingsID in deletedContent[ServiceDetails.postProcessings]:
-                    del existingContent[ServiceDetails.postProcessings][postProcessingsID]
-            elif entry == ServiceDetails.calculations:
-                for fileID in deletedContent[ServiceDetails.calculations]:
-                    del existingContent[ServiceDetails.calculations][fileID]
-            else:
-                raise NotImplementedError("This service detail does not exist (yet).")
+        for idx, deletedContentGroup in enumerate(deletedContent[ServiceDetails.groups]):
+            if idx >= len(existingContent[ServiceDetails.groups]):
+                logger.error("The group to delete does not exist.")
+                continue
+            existingGroup = existingContent[ServiceDetails.groups][idx]
+            for entry in deletedContentGroup:
+                if entry == ServiceDetails.models:
+                    for fileID in deletedContentGroup[ServiceDetails.models]:
+                        del existingGroup[ServiceDetails.models][fileID]
+                        if ServiceDetails.calculations in existingGroup:
+                            del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
+                elif entry == ServiceDetails.material:
+                    for materialID in deletedContentGroup[ServiceDetails.material]:
+                        del existingGroup[ServiceDetails.material][materialID]
+                elif entry == ServiceDetails.postProcessings:
+                    for postProcessingsID in deletedContentGroup[ServiceDetails.postProcessings]:
+                        del existingGroup[ServiceDetails.postProcessings][postProcessingsID]
+                elif entry == ServiceDetails.calculations:
+                    for fileID in deletedContentGroup[ServiceDetails.calculations]:
+                        del existingGroup[ServiceDetails.calculations][fileID]
+                else:
+                    raise NotImplementedError("This service detail does not exist (yet).")
 
     except (Exception) as error:
         logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
@@ -107,22 +119,23 @@ def serviceReady(existingContent:dict) -> tuple[bool, list[str]]:
     try:
         listOfWhatIsMissing = []
         
-        if ServiceDetails.models in existingContent:
-            if len(existingContent[ServiceDetails.models]) == 0:
-                listOfWhatIsMissing.append(ServiceDetails.models)
-        else:
-            listOfWhatIsMissing.append(ServiceDetails.models)
-        
-        if ServiceDetails.materials in existingContent:
-            if len(existingContent[ServiceDetails.materials]) == 0:
-                listOfWhatIsMissing.append(ServiceDetails.materials)
-        else:
-            listOfWhatIsMissing.append(ServiceDetails.materials)
-        if ServiceDetails.postProcessings in existingContent:
-            if len(existingContent[ServiceDetails.postProcessings]) == 0:
-                pass # TODO, current optional
-        else:
-            pass
+        for idx, group in enumerate(existingContent[ServiceDetails.groups]):
+            if ServiceDetails.models in group:
+                if len(group[ServiceDetails.models]) == 0:
+                    listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.models))
+            else:
+                listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.models))
+            
+            if ServiceDetails.material in group:
+                if len(group[ServiceDetails.material]) == 0:
+                    listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.material))
+            else:
+                listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.material))
+            if ServiceDetails.postProcessings in group:
+                if len(group[ServiceDetails.postProcessings]) == 0:
+                    pass # TODO, current optional
+            else:
+                pass
             
         return (True, listOfWhatIsMissing) if len(listOfWhatIsMissing) == 0 else (False, listOfWhatIsMissing)
     except (Exception) as error:
@@ -143,25 +156,28 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
     
     """
     try:
-        outDict = {}
+        outDict = {ServiceDetails.groups: []}
 
         # create new model file but with the content of the old one (except path and such), also carry calculations over
-        if ServiceDetails.models in existingContent:
-            outDict[ServiceDetails.models] = {}
-            if ServiceDetails.calculations in existingContent:
-                outDict[ServiceDetails.calculations] = {}
-            oldModels = existingContent[ServiceDetails.models]
-            for fileKey in newProcess.files:
-                if fileKey in oldModels:
-                    outDict[ServiceDetails.models][fileKey] = newProcess.files[fileKey]
-                    if fileKey in existingContent[ServiceDetails.calculations]:
-                        outDict[ServiceDetails.calculations][fileKey] = existingContent[ServiceDetails.calculations][fileKey]
-        
-        # the rest can just be copied over
-        if ServiceDetails.materials in existingContent:
-            outDict[ServiceDetails.materials] = existingContent[ServiceDetails.materials]
-        if ServiceDetails.postProcessings in existingContent:
-            outDict[ServiceDetails.postProcessings] = existingContent[ServiceDetails.postProcessings]
+        for group in existingContent[ServiceDetails.groups]:
+            tempDict = {}
+            if ServiceDetails.models in group:
+                tempDict[ServiceDetails.models] = {}
+                if ServiceDetails.calculations in group:
+                    tempDict[ServiceDetails.calculations] = {}
+                oldModels = group[ServiceDetails.models]
+                for fileKey in newProcess.files:
+                    if fileKey in oldModels:
+                        tempDict[ServiceDetails.models][fileKey] = newProcess.files[fileKey]
+                        if fileKey in group[ServiceDetails.calculations]:
+                            tempDict[ServiceDetails.calculations][fileKey] = group[ServiceDetails.calculations][fileKey]
+            
+            # the rest can just be copied over
+            if ServiceDetails.material in group:
+                tempDict[ServiceDetails.material] = group[ServiceDetails.material]
+            if ServiceDetails.postProcessings in group:
+                tempDict[ServiceDetails.postProcessings] = group[ServiceDetails.postProcessings]
+            outDict[ServiceDetails.groups].append(tempDict)
     
     except Exception as error:
         logger.error(f'Generic error in cloneServiceDetails(3D Print): {str(error)}')

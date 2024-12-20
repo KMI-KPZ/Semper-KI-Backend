@@ -114,7 +114,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         if ServiceDetails.postProcessings in processObj.serviceDetails:
             postProcessings = processObj.serviceDetails[ServiceDetails.postProcessings]
 
-        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.materials], postProcessings, processObj.serviceDetails[ServiceDetails.calculations])
+        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.material], postProcessings, processObj.serviceDetails[ServiceDetails.calculations])
         
         return outList, filteredContractors
 

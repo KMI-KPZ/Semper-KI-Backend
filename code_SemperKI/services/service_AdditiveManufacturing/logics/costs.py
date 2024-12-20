@@ -143,7 +143,7 @@ class Costs():
             # From Material
             self.listOfValuesForEveryMaterial = []
             self.minimalPrintingSpeed = sys.float_info.max # largest float
-            chosenMaterials = self.processObj.serviceDetails[ServiceDetails.materials]
+            chosenMaterials = self.processObj.serviceDetails[ServiceDetails.material]
             for materialID in chosenMaterials:
                 material = chosenMaterials[materialID]
                 valuesForThisMaterial = {}

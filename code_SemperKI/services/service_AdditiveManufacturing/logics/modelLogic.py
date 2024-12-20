@@ -106,6 +106,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
         origin = validatedInput["origin"]
+        groupIdx = validatedInput["groupIdx"]
 
         content = ManageContent(request.session)
         interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
@@ -190,8 +191,10 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     returnVal = s3.manageLocalS3.uploadFile(filePath, model)
                     if returnVal is not True:
                         return (Exception(f"File {fileName} could not be saved to local storage"), 500)
-                
-        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.models: modelsToBeSaved}}}
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        changesArray[groupIdx] = {ServiceDetails.models: modelsToBeSaved}
+        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
