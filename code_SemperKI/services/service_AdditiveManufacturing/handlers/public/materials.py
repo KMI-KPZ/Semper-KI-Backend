@@ -179,7 +179,7 @@ def setMaterialSelection(request:Request):
         material = info["material"]
         
         result, statusCode = logicForSetMaterial(request, projectID, processID, groupIndex, material, setMaterialSelection.cls.__name__)
-        if isinstance(message, Exception):
+        if isinstance(result, Exception):
             message = f"Error in addMaterialToSelection: {str(result)}"
             exception = str(result)
             loggerError.error(message)
@@ -217,7 +217,7 @@ def setMaterialSelection(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,groupIdx:int,materialID:str):
+def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,groupIdx:int):
     """
     Remove a prior selected material from selection
 
@@ -229,15 +229,13 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
     :type processID: str
     :param groupIdx: Index of the group
     :type groupIdx: int
-    :param materialID: ID of the selected material
-    :type materialID: str
     :return: Success or Exception
     :rtype: HTTP Response
 
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteMaterialFromSelection.cls.__name__)
+        interface = contentManager.getCorrectInterface()
         if interface == None:
             message = "Rights not sufficient for deleteMaterialFromSelection"
             exception = "Unauthorized"
@@ -261,7 +259,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         changesArray = [{} for i in range(len(process.serviceDetails[ServiceDetails.groups]))]
-        changesArray[groupIdx] = {ServiceDetails.material: {materialID: ""}}
+        changesArray[groupIdx] = {ServiceDetails.material: {}}
         changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process

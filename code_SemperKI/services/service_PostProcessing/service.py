@@ -21,6 +21,13 @@ class PostProcessing(Semper.ServiceBase):
         super().__init__()
 
     ###################################################
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+
+    ###################################################
     def updateServiceDetails(self, existingContent, newContent):
         """
         Run service specific update of service details

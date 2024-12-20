@@ -34,6 +34,14 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
+    def initializeServiceDetails(serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+
+    ###################################################
+    @abstractmethod
     def updateServiceDetails(self, existingContent, newContent):
         """
         Update a service

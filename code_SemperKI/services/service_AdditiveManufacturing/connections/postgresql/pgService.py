@@ -14,6 +14,19 @@ import logging
 logger = logging.getLogger("errors")
 
 ####################################################################################
+def initializeService(serviceDetails:dict) -> dict:
+    """
+    Initialize the service
+    
+    """
+    try:
+        if ServiceDetails.groups not in serviceDetails:
+            serviceDetails[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}}]
+        return serviceDetails
+    except (Exception) as error:
+        logger.error(f'Generic error in initializeService(3D Print): {str(error)}')
+
+####################################################################################
 def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
     """
     Update the content of the current service in the process
@@ -27,11 +40,9 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
     """
 
     try:
+        if ServiceDetails.groups not in existingContent:
+            existingContent[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}}]
         for idx, newContentGroup in enumerate(newContent[ServiceDetails.groups]):
-            if idx >= len(existingContent[ServiceDetails.groups]):
-                existingContent[ServiceDetails.groups].append(newContentGroup)
-                continue
-
             existingGroup = existingContent[ServiceDetails.groups][idx]
 
             for entry in newContentGroup:
@@ -41,12 +52,8 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
                     for fileID in newContentGroup[ServiceDetails.models]:
                         existingGroup[ServiceDetails.models][fileID] = newContentGroup[entry][fileID]
                 elif entry == ServiceDetails.material:
-                    #if existingGroup == {} or ServiceDetails.materials not in existingGroup:
-                    existingGroup[ServiceDetails.material] = {}
-                    for materialID in newContentGroup[ServiceDetails.material]:
-                        existingGroup[ServiceDetails.material][materialID] = newContentGroup[entry][materialID]
+                    existingGroup[ServiceDetails.material] = newContentGroup[entry]
                 elif entry == ServiceDetails.postProcessings:
-                    #if existingGroup == {} or ServiceDetails.postProcessings not in existingGroup:
                     existingGroup[ServiceDetails.postProcessings] = {}
                     for postProcessingID in newContentGroup[ServiceDetails.postProcessings]:
                         existingGroup[ServiceDetails.postProcessings][postProcessingID] = newContentGroup[entry][postProcessingID]
@@ -89,8 +96,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                         if ServiceDetails.calculations in existingGroup:
                             del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
                 elif entry == ServiceDetails.material:
-                    for materialID in deletedContentGroup[ServiceDetails.material]:
-                        del existingGroup[ServiceDetails.material][materialID]
+                    del existingGroup[ServiceDetails.material]
                 elif entry == ServiceDetails.postProcessings:
                     for postProcessingsID in deletedContentGroup[ServiceDetails.postProcessings]:
                         del existingGroup[ServiceDetails.postProcessings][postProcessingsID]

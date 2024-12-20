@@ -214,7 +214,7 @@ class Filter():
         try:
             self.resultGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
             self.printerGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
-            for groupIdx in processObj.serviceDetails[ServiceDetails.groups]:
+            for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
                 retVal = self.filterByMaterial(processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.material], groupIdx)
                 if isinstance(retVal, Exception):
                     raise retVal

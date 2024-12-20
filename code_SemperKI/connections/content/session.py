@@ -711,6 +711,8 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
+                currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(currentProcess[ProcessDescription.serviceType]).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
+                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
             
             elif updateType == ProcessUpdates.serviceDetails:

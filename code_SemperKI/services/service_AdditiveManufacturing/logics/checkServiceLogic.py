@@ -179,7 +179,7 @@ def logicForCheckModel(request, functionName:str, projectID:str, processID:str, 
         for idx, group in enumerate(process.serviceDetails[ServiceDetails.groups]):
             if ServiceDetails.models in group:
                 if fileID in group[ServiceDetails.models]:
-                    model = process.serviceDetails[ServiceDetails.models][fileID]
+                    model = group[ServiceDetails.models][fileID]
                     groupWhereTheModelLies = idx
                     break
 

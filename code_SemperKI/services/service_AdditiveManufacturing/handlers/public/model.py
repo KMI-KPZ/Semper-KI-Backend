@@ -109,6 +109,7 @@ def uploadModels(request:Request):
 class SReqUploadWithoutFile(serializers.Serializer):
     projectID = serializers.CharField(max_length=513)
     processID = serializers.CharField(max_length=513)
+    groupIdx = serializers.IntegerField()
     levelOfDetail = serializers.FloatField()
     width = serializers.FloatField()
     height = serializers.FloatField()

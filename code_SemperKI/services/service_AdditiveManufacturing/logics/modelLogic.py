@@ -84,7 +84,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
         changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelToBeSaved}}
-        changes = {"changes": {ProcessUpdates.files: modelToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -199,7 +199,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
         changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelsToBeSaved}}
-        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelsToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

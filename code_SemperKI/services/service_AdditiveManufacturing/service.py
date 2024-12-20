@@ -8,7 +8,7 @@ Contains: Class which describes the service in particular
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 
-from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
+from .connections.postgresql.pgService import initializeService as AM_initializeService, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
@@ -20,6 +20,14 @@ class AdditiveManufacturing(Semper.ServiceBase):
     All functions of this service
 
     """
+
+    ###################################################
+    def initializeServiceDetails(self, serviceDetails) -> None:
+        """
+        Initialize the service
+        
+        """
+        return AM_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -91,9 +99,9 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         costsObject = Costs(process, additionalArguments, transferObject)
         costs = costsObject.calculateCosts()
-        outDict = {
-            "priceQuantity": costs[1],
-        }
+        outDict = {}
+        for groupIdx, groupCosts in enumerate(costs):
+            outDict["group "+str(groupIdx)] = groupCosts
         return outDict
 
     ###################################################

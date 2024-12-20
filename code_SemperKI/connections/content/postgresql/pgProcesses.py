@@ -681,6 +681,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).initializeServiceDetails(currentProcess.serviceDetails)
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
 

@@ -35,16 +35,16 @@ newPaths = {
 
     "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
     "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
-    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
+    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<int:groupIdx>/',materials.deleteMaterialFromSelection),
 
     "getPostProcessings": ('public/service/additive-manufacturing/post-processing/get/',postProcessings.retrievePostProcessingsWithFilter),
     "setPostProcessing": ('public/service/additive-manufacturing/post-processing/set/',postProcessings.setPostProcessingSelection),
-    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<str:postProcessingID>/',postProcessings.deletePostProcessingFromSelection),
+    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<int:groupIdx>/<str:postProcessingID>/',postProcessings.deletePostProcessingFromSelection),
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
     "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
-    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",model.deleteModel),
-    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
+    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupIdx>/<str:fileID>/",model.deleteModel),
+    #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
     "getModelRepository": ("public/service/additive-manufacturing/model/repository/get/", model.getModelRepository),
 
     #"checkPrintability": ("public/checkPrintability/",checkService.),

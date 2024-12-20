@@ -135,12 +135,9 @@ def logicForSetMaterial(request, projectID, processID, groupIndex, material, fun
         if interface == None:
             return (Exception(f"Rights not sufficient in {functionName}"), 401)
 
-        materialToBeSaved = {}
-        materialToBeSaved[material[MaterialDetails.id]] = material
-
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
-        updateArray[groupIndex] = {ServiceDetails.material: materialToBeSaved}
+        updateArray[groupIndex] = {ServiceDetails.material: material}
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process
