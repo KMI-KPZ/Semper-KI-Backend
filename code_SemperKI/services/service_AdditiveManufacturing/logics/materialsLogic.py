@@ -131,7 +131,7 @@ def logicForSetMaterial(request, projectID, processID, groupIndex, material, fun
     """
     try:
         contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(functionName)
+        interface = contentManager.getCorrectInterface()
         if interface == None:
             return (Exception(f"Rights not sufficient in {functionName}"), 401)
 

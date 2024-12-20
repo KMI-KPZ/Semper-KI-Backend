@@ -43,6 +43,46 @@ class Costs():
         self.processObj = process
         self.additionalArguments = additionalArguments
         self.filterObject = filterObject
+
+        # From Organization (do only once)
+        organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["orgaID"])
+        if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME) == True:
+            orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
+
+            for entry in orgaParameters:
+                value = entry[ServiceSpecificFields.value]
+                match entry[ServiceSpecificFields.key]:
+                    case OrganizationDetailsAM.costRatePersonnelEngineering:
+                        self.costRatePersonnelEngineering = value
+                    case OrganizationDetailsAM.costRateEquipmentEngineering:
+                        self.costRateEquipmentEngineering = value
+                    case OrganizationDetailsAM.repairCosts:
+                        self.repairCosts = value
+                    case OrganizationDetailsAM.safetyGasCosts:
+                        self.safetyGasPerHour = value
+                    case OrganizationDetailsAM.roomCosts:
+                        self.roomCosts = value
+                    case OrganizationDetailsAM.powerCosts:
+                        self.powerCosts = value
+                    case OrganizationDetailsAM.additionalFixedCosts:
+                        self.additionalFixedCosts = value
+                    case OrganizationDetailsAM.fixedCostsEquipmentEngineering:
+                        self.fixedCostsEquipmentEngineering = value
+                    case OrganizationDetailsAM.margin:
+                        self.organizationMargin = value
+                    case OrganizationDetailsAM.personnelCosts:
+                        self.personnelCosts = value
+        else:
+            self.costRatePersonnelEngineering = 35
+            self.costRateEquipmentEngineering = 2
+            self.repairCosts = 0.025
+            self.safetyGasPerHour = 20
+            self.roomCosts = 14.5
+            self.powerCosts = 0.17
+            self.additionalFixedCosts = 0
+            self.fixedCostsEquipmentEngineering = 2
+            self.organizationMargin = 0
+            self.personnelCosts = 0
         
     ##################################################
     class PrinterValues(StrEnumExactlyAsDefined):
@@ -94,67 +134,25 @@ class Costs():
         treatmentCostsPostProcessing = enum.auto()
 
     ##################################################
-    def fetchInformation(self) -> None|Exception:
+    def fetchInformation(self, groupIdx, group) -> None|Exception:
         """
         Fetch information about everything
         
         """
         try:
-            # From Organization
-            organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["orgaID"])
-            if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME) == True:
-                orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
-
-                for entry in orgaParameters:
-                    value = entry[ServiceSpecificFields.value]
-                    match entry[ServiceSpecificFields.key]:
-                        case OrganizationDetailsAM.costRatePersonnelEngineering:
-                            self.costRatePersonnelEngineering = value
-                        case OrganizationDetailsAM.costRateEquipmentEngineering:
-                            self.costRateEquipmentEngineering = value
-                        case OrganizationDetailsAM.repairCosts:
-                            self.repairCosts = value
-                        case OrganizationDetailsAM.safetyGasCosts:
-                            self.safetyGasPerHour = value
-                        case OrganizationDetailsAM.roomCosts:
-                            self.roomCosts = value
-                        case OrganizationDetailsAM.powerCosts:
-                            self.powerCosts = value
-                        case OrganizationDetailsAM.additionalFixedCosts:
-                            self.additionalFixedCosts = value
-                        case OrganizationDetailsAM.fixedCostsEquipmentEngineering:
-                            self.fixedCostsEquipmentEngineering = value
-                        case OrganizationDetailsAM.margin:
-                            self.organizationMargin = value
-                        case OrganizationDetailsAM.personnelCosts:
-                            self.personnelCosts = value
-            else:
-                self.costRatePersonnelEngineering = 35
-                self.costRateEquipmentEngineering = 2
-                self.repairCosts = 0.025
-                self.safetyGasPerHour = 20
-                self.roomCosts = 14.5
-                self.powerCosts = 0.17
-                self.additionalFixedCosts = 0
-                self.fixedCostsEquipmentEngineering = 2
-                self.organizationMargin = 0
-                self.personnelCosts = 0
-
             # From Material
             self.listOfValuesForEveryMaterial = []
             self.minimalPrintingSpeed = sys.float_info.max # largest float
-            chosenMaterials = self.processObj.serviceDetails[ServiceDetails.material]
-            for materialID in chosenMaterials:
-                material = chosenMaterials[materialID]
-                valuesForThisMaterial = {}
-                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.acquisitionCosts, 400))
-                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.density, 4.43))
-                if NodePropertiesAMMaterial.printingSpeed in material and material[NodePropertiesAMMaterial.printingSpeed] < self.minimalPrintingSpeed:
-                    self.minimalPrintingSpeed = float(material[NodePropertiesAMMaterial.printingSpeed])
-                self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
+            material = group[ServiceDetails.material]
+            valuesForThisMaterial = {}
+            valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.acquisitionCosts, 400))
+            valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial] = float(material.get(NodePropertiesAMMaterial.density, 4.43))
+            if NodePropertiesAMMaterial.printingSpeed in material and material[NodePropertiesAMMaterial.printingSpeed] < self.minimalPrintingSpeed:
+                self.minimalPrintingSpeed = float(material[NodePropertiesAMMaterial.printingSpeed])
+            self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From Printer
-            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"])
+            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"], groupIdx)
             self.listOfValuesForEveryPrinter = []
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
@@ -244,8 +242,8 @@ class Costs():
 
             # From PostProcessing
             self.listOfValuesForEveryPostProcessing = []
-            if ServiceDetails.postProcessings in self.processObj.serviceDetails:
-                chosenPostProcessings = self.processObj.serviceDetails[ServiceDetails.postProcessings]
+            if ServiceDetails.postProcessings in group:
+                chosenPostProcessings = group[ServiceDetails.postProcessings]
                 for postProcessingID in chosenPostProcessings:
                     postProcessing = chosenPostProcessings[postProcessingID]
                     valuesForThisPostProcessing = {}
@@ -425,7 +423,7 @@ class Costs():
             return e
 
     ##################################################
-    def calculateCostsForPrinter(self) -> dict[list[tuple]]:
+    def calculateCostsForPrinter(self, groupIdx, group) -> dict[list[tuple]]:
         """
         Calculate the costs for every printer
 
@@ -433,7 +431,7 @@ class Costs():
         try:
             printerCostsPerModel = {}
             # for all models
-            for modelID, model in self.processObj.serviceDetails[ServiceDetails.models].items():
+            for modelID, model in group[ServiceDetails.models].items():
                 levelOfDetail = model.get(FileObjectContent.levelOfDetail, 1)
                 if FileObjectContent.isFile in model and model[FileObjectContent.isFile] == False:
                     partQuantity = model[FileObjectContent.quantity]
@@ -450,12 +448,12 @@ class Costs():
                     partQuantity = model.get(FileObjectContent.quantity, 1)
                     partVolume = 0.
                     productComplexity = 1
-                    if ServiceDetails.calculations in self.processObj.serviceDetails:
-                        partHeight = self.processObj.serviceDetails[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._3]
-                        partLength = self.processObj.serviceDetails[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._2]
-                        partWidth = self.processObj.serviceDetails[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._1]
-                        volumeOfModel = self.processObj.serviceDetails[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.volume]
-                        boundingBoxVolume = self.processObj.serviceDetails[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbVolume]
+                    if ServiceDetails.calculations in group:
+                        partHeight = group[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._3]
+                        partLength = group[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._2]
+                        partWidth = group[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbDimensions][MbbDimensions._1]
+                        volumeOfModel = group[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.volume]
+                        boundingBoxVolume = group[ServiceDetails.calculations][modelID][Calculations.measurements][Measurements.mbbVolume]
                         machineEpsilon = 7./3 - 4./3 - 1 # Nevermind that, it just calculates the machine epsion to avoid division by zero
                         productComplexity = round( (1. - volumeOfModel / (boundingBoxVolume + machineEpsilon)) * 4.) # scale to [0,4], then assign nearest integer
                         partVolume = volumeOfModel / 1000. # to cm³
@@ -617,7 +615,7 @@ class Costs():
     ####################################################################################################
 
     ##################################################
-    def calculateCostsForPostProcessings(self) -> list[float]:
+    def calculateCostsForPostProcessings(self, groupIdx:int, group:dict) -> list[float]:
         """
         Calculate the costs for the post processings
 
@@ -641,63 +639,67 @@ class Costs():
         
         """
         try: 
-            retVal = self.fetchInformation()
-            if retVal is not None:
-                raise retVal
-            printerCostDict = self.calculateCostsForPrinter()
-            if isinstance(printerCostDict, Exception):
-                raise printerCostDict
-            postProcessingCostList = self.calculateCostsForPostProcessings()
-            if isinstance(postProcessingCostList, Exception):
-                raise postProcessingCostList
-            
-            postProcessingsCosts = numpy.sum(postProcessingCostList)
-            marginOrganization = 1. + self.organizationMargin/100.
-            marginPlattform = 1. + PLATFORM_MARGIN/100.
-
-            maximumCosts = [0., 0., 0.] # part, quantity, batch
-            minimumCosts = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
-            maximumCostsPerFile = {}
-            minimumCostsPerFile = {}
-            for fileID , printerCostList in printerCostDict.items():
-                maximumCostsThisFile = [0., 0., 0.] # part, quantity, batch
-                minimumCostsThisFile = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
-                for costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial in printerCostList:
-                    for total_material_cost_part, total_material_cost_quantity, total_material_cost_batch in listOfCostsForMaterial:
-                        costsTotal = costsTotalForPrinterPart + total_material_cost_part + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile[0]:
-                            maximumCostsThisFile[0] = costsTotal
-                        if costsTotal < minimumCostsThisFile[0]:
-                            minimumCostsThisFile[0] = costsTotal
-                        costsTotal = costsTotalForPrinterQuantity + total_material_cost_quantity + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile[1]:
-                            maximumCostsThisFile[1] = costsTotal
-                        if costsTotal < minimumCostsThisFile[1]:
-                            minimumCostsThisFile[1] = costsTotal
-                        costsTotal = costsTotalForPrinterBatch + total_material_cost_batch + postProcessingsCosts
-                        if costsTotal > maximumCostsThisFile[2]:
-                            maximumCostsThisFile[2] = costsTotal
-                        if costsTotal < minimumCostsThisFile[2]:
-                            minimumCostsThisFile[2] = costsTotal
-                maximumCostsPerFile[fileID] = maximumCostsThisFile
-                minimumCostsPerFile[fileID] = minimumCostsThisFile
-
-                for i in range(3):
-                    if maximumCostsThisFile[i] > maximumCosts[i]:
-                        maximumCosts[i] = maximumCostsThisFile[i]
-                    if minimumCostsThisFile[i] < minimumCosts[i]:
-                        minimumCosts[i] = minimumCostsThisFile[i]
+            costsPerGroup = []
+            for groupIdx, group in enumerate(self.processObj.serviceDetails[ServiceDetails.groups]):
+                retVal = self.fetchInformation(groupIdx, group)
+                if retVal is not None:
+                    raise retVal
+                printerCostDict = self.calculateCostsForPrinter(groupIdx, group)
+                if isinstance(printerCostDict, Exception):
+                    raise printerCostDict
+                postProcessingCostList = self.calculateCostsForPostProcessings(groupIdx, group)
+                if isinstance(postProcessingCostList, Exception):
+                    raise postProcessingCostList
                 
+                postProcessingsCosts = numpy.sum(postProcessingCostList)
+                marginOrganization = 1. + self.organizationMargin/100.
+                marginPlattform = 1. + PLATFORM_MARGIN/100.
 
-            totalCosts = [(minimumCosts[0]*marginOrganization*marginPlattform, maximumCosts[0]*marginOrganization*marginPlattform), (minimumCosts[1]*marginOrganization*marginPlattform, maximumCosts[1]*marginOrganization*marginPlattform), (minimumCosts[2]*marginOrganization*marginPlattform, maximumCosts[2]*marginOrganization*marginPlattform)]
-            for i in range(len(totalCosts)):
-                left, right = totalCosts[i]
-                if numpy.isnan(left) or not numpy.isfinite(left):
-                    left = -1.
-                if numpy.isnan(right) or not numpy.isfinite(right):
-                    right = -1.
-                totalCosts[i] = (left, right)
-            return totalCosts
+                maximumCosts = [0., 0., 0.] # part, quantity, batch
+                minimumCosts = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
+                maximumCostsPerFile = {}
+                minimumCostsPerFile = {}
+                for fileID , printerCostList in printerCostDict.items():
+                    maximumCostsThisFile = [0., 0., 0.] # part, quantity, batch
+                    minimumCostsThisFile = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
+                    for costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial in printerCostList:
+                        for total_material_cost_part, total_material_cost_quantity, total_material_cost_batch in listOfCostsForMaterial:
+                            costsTotal = costsTotalForPrinterPart + total_material_cost_part + postProcessingsCosts
+                            if costsTotal > maximumCostsThisFile[0]:
+                                maximumCostsThisFile[0] = costsTotal
+                            if costsTotal < minimumCostsThisFile[0]:
+                                minimumCostsThisFile[0] = costsTotal
+                            costsTotal = costsTotalForPrinterQuantity + total_material_cost_quantity + postProcessingsCosts
+                            if costsTotal > maximumCostsThisFile[1]:
+                                maximumCostsThisFile[1] = costsTotal
+                            if costsTotal < minimumCostsThisFile[1]:
+                                minimumCostsThisFile[1] = costsTotal
+                            costsTotal = costsTotalForPrinterBatch + total_material_cost_batch + postProcessingsCosts
+                            if costsTotal > maximumCostsThisFile[2]:
+                                maximumCostsThisFile[2] = costsTotal
+                            if costsTotal < minimumCostsThisFile[2]:
+                                minimumCostsThisFile[2] = costsTotal
+                    maximumCostsPerFile[fileID] = maximumCostsThisFile
+                    minimumCostsPerFile[fileID] = minimumCostsThisFile
+
+                    for i in range(3):
+                        if maximumCostsThisFile[i] > maximumCosts[i]:
+                            maximumCosts[i] = maximumCostsThisFile[i]
+                        if minimumCostsThisFile[i] < minimumCosts[i]:
+                            minimumCosts[i] = minimumCostsThisFile[i]
+                    
+
+                totalCosts = [(minimumCosts[0]*marginOrganization*marginPlattform, maximumCosts[0]*marginOrganization*marginPlattform), (minimumCosts[1]*marginOrganization*marginPlattform, maximumCosts[1]*marginOrganization*marginPlattform), (minimumCosts[2]*marginOrganization*marginPlattform, maximumCosts[2]*marginOrganization*marginPlattform)]
+                for i in range(len(totalCosts)):
+                    left, right = totalCosts[i]
+                    if numpy.isnan(left) or not numpy.isfinite(left):
+                        left = -1.
+                    if numpy.isnan(right) or not numpy.isfinite(right):
+                        right = -1.
+                    totalCosts[i] = (left, right)
+                costsPerGroup.append(totalCosts[1]) # return the costs for quantity
+                
+            return costsPerGroup
         except Exception as e:
             loggerError.error("Error in calculateCosts: " + str(e))
             return e

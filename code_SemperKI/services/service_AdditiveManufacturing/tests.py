@@ -94,13 +94,13 @@ class TestAdditiveManufacturing(TestCase):
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
         fileID = list(response[ProcessDescription.files].keys())[0]
-        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
+        self.assertIs(len(response[0][ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
 
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
         deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + deleteModelPathSplit[2] + "/" + deleteModelPathSplit[3] + "/" + deleteModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+getProcPath).content)
-        self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
+        self.assertIs(fileID not in response[0][ProcessDescription.serviceDetails][ServiceDetails.models] , True)
 
     # TODO: get, set, delete for Materials and Post-Processing; onto and orga functions

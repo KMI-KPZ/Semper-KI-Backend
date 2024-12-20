@@ -20,6 +20,7 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.public.process import updateProcessFunction
 from code_SemperKI.utilities.basics import testPicture
+from code_SemperKI.handlers.public.files import deleteFile
 
 from ..definitions import *
 
@@ -42,6 +43,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
 
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
+        groupIdx = validatedInput["groupIdx"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
         # check if duplicates exist
@@ -79,7 +81,10 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         modelToBeSaved[FileContentsAM.complexity] = validatedInput["complexity"]
         modelToBeSaved[FileContentsAM.scalingFactor] = 1.0
 
-        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID: modelToBeSaved}}}}
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelToBeSaved}}
+        changes = {"changes": {ProcessUpdates.files: modelToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -193,7 +198,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         return (Exception(f"File {fileName} could not be saved to local storage"), 500)
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        changesArray[groupIdx] = {ServiceDetails.models: modelsToBeSaved}
+        changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelsToBeSaved}}
         changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
@@ -208,3 +213,48 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
     except Exception as e:
         loggerError.error("Error in logicForUploadModel: %s" % str(e))
         return (e, 500)
+    
+
+##################################################
+def logicForDeleteModel(request, projectID, processID, groupIdx, fileID, functionName) -> tuple[Exception, int]:
+    """
+    The logic for deleting a model
+
+    :param request: The request object
+    :type request: Request
+    :param projectID: The project ID
+    :type projectID: str
+    :param processID: The process ID
+    :type processID: str
+    :param fileID: The file ID
+    :type fileID: str
+    :return: Exception and status code
+    :rtype: tuple[Exception, int]
+    
+    """
+    contentManager = ManageContent(request.session)
+    interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
+    if interface == None:
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+        
+    currentProcess = interface.getProcessObj(projectID, processID)
+    modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.models]
+    if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
+        return (Exception(f"Model not found in {functionName}"), 404)
+
+    if currentProcess.client != contentManager.getClient():
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+
+    deleteFile(request._request, projectID, processID, fileID)
+    
+    changesArray = [{} for i in range(len(currentProcess.serviceDetails[ServiceDetails.groups]))]
+    changesArray[groupIdx] = {ServiceDetails.models: {fileID: None}}
+    changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+    message, flag = updateProcessFunction(request._request, changes, projectID, [processID])
+    if flag is False:
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+    if isinstance(message, Exception):
+        raise message
+
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},model {fileID}," + str(datetime.now()))        
+    return None, 200

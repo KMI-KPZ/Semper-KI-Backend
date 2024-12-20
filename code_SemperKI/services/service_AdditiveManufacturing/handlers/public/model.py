@@ -6,38 +6,23 @@ Silvio Weging 2024
 Contains: Handling of model files
 """
 
-import json, logging, copy
-from datetime import datetime
-import os
-from django.http import HttpResponse, JsonResponse
+import logging
 from django.views.decorators.http import require_http_methods
-from django.utils import timezone
-from django.conf import settings
-from django.core.handlers.asgi import ASGIRequest
 
 from rest_framework import status, serializers
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import OpenApiParameter
+
 
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import checkVersion, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkVersion
 
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.files import deleteFile
-from code_SemperKI.handlers.public.process import updateProcessFunction
-from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from code_SemperKI.connections.content.manageContent import ManageContent
-from MSQ.tasks.tasks import callfTetWild
-from MSQ.handlers.interface import returnFileFromfTetWild
 
 from ...logics.modelLogic import *
 
@@ -49,11 +34,10 @@ class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
     groupIdx = serializers.IntegerField()
-    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"scalingFactor":1.0,"fileName":"file.stl"}]', max_length=10000)
+    details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"scalingFactor":100.0,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)
     # multipart/form-data
-
 
 #######################################################
 @extend_schema(
@@ -212,7 +196,7 @@ def uploadModelWithoutFile(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
+def deleteModel(request:Request, projectID:str, processID:str, groupIdx:str, fileID:str):
     """
     Delete the model and the file with it, if not done already
 
@@ -223,125 +207,18 @@ def deleteModel(request:Request, projectID:str, processID:str, fileID:str):
 
     """
     try:
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
-        if interface == None:
-            message = "Rights not sufficient in deleteModel"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        result, statusCode = logicForDeleteModel(request, projectID, processID, groupIdx, fileID, deleteModel.cls.__name__)
+        if result is not None:
+            message = str(result)
+            loggerError.error(result)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": result})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        currentProcess = interface.getProcessObj(projectID, processID)
-        modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
-        if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
-            message = "Model not found in deleteModel"
-            exception = "Not found"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        if currentProcess.client != contentManager.getClient():
-            message = f"Rights not sufficient in {deleteModel.cls.__name__}"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        deleteFile(request._request, projectID, processID, fileID)
-        
-        changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID}}}}
-        message, flag = updateProcessFunction(request._request, changes, projectID, [processID])
-        if flag is False:
-            message = "Rights not sufficient in deleteModel"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if isinstance(message, Exception):
-            raise message
-
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},model {fileID}," + str(datetime.now()))        
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in deleteModel: {str(error)}"
-        exception = str(error)
-        loggerError.error(message)
-        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-        if exceptionSerializer.is_valid():
-            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-#######################################################
-@extend_schema(
-    summary="Converts an uploaded stl file to a file with tetrahedral mesh",
-    description=" ",
-    tags=['BE - AM Models'],
-    request=None,
-    responses={
-        200: None,
-        401: ExceptionSerializer,
-        404: ExceptionSerializer,
-        500: ExceptionSerializer
-    }
-)
-@require_http_methods(["GET"])
-@api_view(["GET"])
-@checkVersion(0.3)
-def remeshSTLToTetraheadras(request:Request, projectID:str, processID:str, fileID:str):
-    """
-    Converts an uploaded stl file to a file with tetrahedral mesh
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: Indirectly a file (via Celery)
-    :rtype: (File)Response
-
-    """
-    try:
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
-        if interface == None:
-            message = "Rights not sufficient in deleteModel"
-            exception = "Unauthorized"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        currentProcess = interface.getProcessObj(projectID, processID)
-        modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.models]
-        if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
-            message = "Model not found in deleteModel"
-            exception = "Not found"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        modelsOfThisProcess[fileID][FileObjectContent.path]
-        filePath, _ = callfTetWild(modelsOfThisProcess[fileID][FileObjectContent.path])
-        if filePath == "":
-            raise Exception("Calculation failed!")
-        return returnFileFromfTetWild(filePath)
-        #return Response("Success")
-    except (Exception) as error:
-        message = f"Error in remeshSTLToTetraheadras: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
