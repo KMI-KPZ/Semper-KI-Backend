@@ -43,7 +43,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
 
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
-        groupIdx = validatedInput["groupIdx"]
+        groupID = validatedInput["groupID"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
         # check if duplicates exist
@@ -83,7 +83,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
 
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelToBeSaved}}
+        changesArray[groupID] = {ServiceDetails.models: {fileID: modelToBeSaved}}
         changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
@@ -111,7 +111,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
         origin = validatedInput["origin"]
-        groupIdx = validatedInput["groupIdx"]
+        groupID = validatedInput["groupID"]
 
         content = ManageContent(request.session)
         interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
@@ -198,8 +198,8 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         return (Exception(f"File {fileName} could not be saved to local storage"), 500)
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        changesArray[groupIdx] = {ServiceDetails.models: {fileID: modelsToBeSaved}}
-        changes = {"changes": {ProcessUpdates.files: {fileID: modelsToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+        changesArray[groupID] = {ServiceDetails.models: modelsToBeSaved}
+        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -216,7 +216,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
     
 
 ##################################################
-def logicForDeleteModel(request, projectID, processID, groupIdx, fileID, functionName) -> tuple[Exception, int]:
+def logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]:
     """
     The logic for deleting a model
 
@@ -226,6 +226,8 @@ def logicForDeleteModel(request, projectID, processID, groupIdx, fileID, functio
     :type projectID: str
     :param processID: The process ID
     :type processID: str
+    :param groupID: The group ID
+    :type groupID: int
     :param fileID: The file ID
     :type fileID: str
     :return: Exception and status code
@@ -238,7 +240,7 @@ def logicForDeleteModel(request, projectID, processID, groupIdx, fileID, functio
         return (Exception(f"Rights not sufficient in {functionName}"), 401)
         
     currentProcess = interface.getProcessObj(projectID, processID)
-    modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.models]
+    modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.groups][groupID][ServiceDetails.models]
     if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
         return (Exception(f"Model not found in {functionName}"), 404)
 
@@ -248,7 +250,7 @@ def logicForDeleteModel(request, projectID, processID, groupIdx, fileID, functio
     deleteFile(request._request, projectID, processID, fileID)
     
     changesArray = [{} for i in range(len(currentProcess.serviceDetails[ServiceDetails.groups]))]
-    changesArray[groupIdx] = {ServiceDetails.models: {fileID: None}}
+    changesArray[groupID] = {ServiceDetails.models: {fileID: None}}
     changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
     message, flag = updateProcessFunction(request._request, changes, projectID, [processID])
     if flag is False:

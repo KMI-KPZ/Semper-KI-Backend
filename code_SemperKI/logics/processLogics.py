@@ -9,9 +9,12 @@ import logging, numpy
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.utilities.basics import manualCheckifAdmin
 
+from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.serviceManager import serviceManager
-from code_SemperKI.definitions import ProcessDetails, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI
+from code_SemperKI.definitions import ProcessDetails, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, ProcessDescription
+from code_SemperKI.states.states import getButtonsForProcess, getMissingElements
 
 from ..modelFiles.processModel import Process
 
@@ -23,7 +26,7 @@ def logicForGetContractors(processObj:Process):
     Get the contractors for the service
 
     :return: The contractors
-    :rtype: list
+    :rtype: tuple(list|Exception, int)
     """
     try:
         # TODO: if contractor is already selected, use that with all saved details
@@ -32,7 +35,7 @@ def logicForGetContractors(processObj:Process):
         service = serviceManager.getService(processObj.serviceType)
         
         if serviceType == serviceManager.getNone():
-            raise Exception("No Service selected!")
+            raise (Exception("No Service selected!"), 400)
 
         listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
         
@@ -87,8 +90,44 @@ def logicForGetContractors(processObj:Process):
             })
 
         
-        return listOfResultingContractors
+        return (listOfResultingContractors, 200)
 
     except Exception as e:
         loggerError.error("Error in logicForGetContractors: %s" % e)
-        return e
+        return (e, 500)
+
+####################################################################################
+def logicForGetProcess(request, projectID, processID, functionName):
+    """
+    Get the process
+    
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        userID = contentManager.getClient()
+        adminOrNot = manualCheckifAdmin(request.session)
+        interface = contentManager.getCorrectInterface(functionName)
+        if interface == None:
+            return Exception("Rights not sufficient in getProcess"), 401
+            
+
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            raise process
+
+        # add buttons
+        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
+        outDict = process.toDict()
+        outDict["processStatusButtons"] = buttons
+
+        # add what's missing to continue
+        missingElements = getMissingElements(interface, process)
+        outDict["processErrors"] = missingElements
+
+        # parse for frontend
+        outDict[ProcessDescription.serviceDetails] = serviceManager.getService(process.serviceType).parseServiceDetails(process.serviceDetails)
+    
+        return (outDict, 200)
+    except Exception as e:
+        loggerError.error("Error in logicForGetProcess: %s" % e)
+        return (e, 500)

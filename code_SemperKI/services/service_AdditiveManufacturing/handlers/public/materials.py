@@ -217,7 +217,7 @@ def setMaterialSelection(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,groupIdx:int):
+def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,groupID:int):
     """
     Remove a prior selected material from selection
 
@@ -227,8 +227,8 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
     :type projectID: str
     :param processID: Process ID
     :type processID: str
-    :param groupIdx: Index of the group
-    :type groupIdx: int
+    :param groupID: Index of the group
+    :type groupID: int
     :return: Success or Exception
     :rtype: HTTP Response
 
@@ -259,7 +259,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         changesArray = [{} for i in range(len(process.serviceDetails[ServiceDetails.groups]))]
-        changesArray[groupIdx] = {ServiceDetails.material: {}}
+        changesArray[groupID] = {ServiceDetails.material: {}}
         changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process

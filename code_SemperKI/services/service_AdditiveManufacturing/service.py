@@ -47,6 +47,29 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return AM_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        outContent = {ServiceDetails.groups: []}
+        if ServiceDetails.groups in existingContent:
+            for groupIdx, group in enumerate(existingContent[ServiceDetails.groups]):
+                outEntry = {}
+                for serviceDetailType in group:
+                    match serviceDetailType:
+                        case ServiceDetails.material:
+                            outEntry[ServiceDetails.material] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.material] # take material object as given
+                        case ServiceDetails.postProcessings:
+                            outEntry[ServiceDetails.postProcessings] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]] # convert postprocessings to list
+                        case ServiceDetails.models:
+                            outEntry[ServiceDetails.models] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models]] # convert models to list
+                        case ServiceDetails.calculations:
+                            outEntry[ServiceDetails.calculations] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]] # convert calculations to list
+                outContent[ServiceDetails.groups].append(outEntry)
+        return outContent
+    
+    ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks if the service is completely defined

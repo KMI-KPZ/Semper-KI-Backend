@@ -146,7 +146,7 @@ class SReqSetPostProcessings(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
     postProcessings = serializers.ListField(child=SReqPostProcessingsContent())
-    groupIdx = serializers.IntegerField()
+    groupID = serializers.IntegerField()
     
 #######################################################
 @extend_schema(
@@ -190,7 +190,7 @@ def setPostProcessingSelection(request:Request):
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
         postProcessings = info["postProcessings"]
-        groupIdx = info["groupIdx"]
+        groupID = info["groupID"]
 
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface()
@@ -203,7 +203,7 @@ def setPostProcessingSelection(request:Request):
 
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
-        updateArray[groupIdx] = {ServiceDetails.postProcessings: postProcessingToBeSaved}
+        updateArray[groupID] = {ServiceDetails.postProcessings: postProcessingToBeSaved}
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process
@@ -249,7 +249,7 @@ def setPostProcessingSelection(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deletePostProcessingFromSelection(request:Request,projectID:str,processID:str,groupIdx:int,postProcessingID:str):
+def deletePostProcessingFromSelection(request:Request,projectID:str,processID:str,groupID:int,postProcessingID:str):
     """
     Remove a prior selected postProcessing from selection
 
@@ -261,8 +261,8 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
     :type processID: str
     :param postProcessingID: ID of the selected postProcessing
     :type postProcessingID: str
-    :param groupIdx: Index of the group
-    :type groupIdx: str
+    :param groupID: Index of the group
+    :type groupID: str
     :return: Success or Exception
     :rtype: HTTP Response
 
@@ -275,7 +275,7 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
         
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
-        updateArray[groupIdx] = {ServiceDetails.postProcessings: {postProcessingID: ""}}
+        updateArray[groupID] = {ServiceDetails.postProcessings: {postProcessingID: ""}}
         changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process

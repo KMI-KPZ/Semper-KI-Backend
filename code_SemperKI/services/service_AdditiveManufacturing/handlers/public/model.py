@@ -33,7 +33,7 @@ loggerError = logging.getLogger("errors")
 class SReqUploadModels(serializers.Serializer):
     projectID = serializers.CharField(max_length=200, required=True)
     processID = serializers.CharField(max_length=200, required=True)
-    groupIdx = serializers.IntegerField()
+    groupID = serializers.IntegerField()
     details = serializers.CharField(default='[{"details":{"date":"2024-07-10T14:09:05.252Z","certificates":[""],"licenses":["CC BY-SA"],"tags":[""]},"quantity":1,"levelOfDetail":1,"scalingFactor":100.0,"fileName":"file.stl"}]', max_length=10000)
     origin = serializers.CharField(default="Service",max_length=200)
     file = serializers.FileField(required=False)
@@ -109,7 +109,7 @@ def uploadModels(request:Request):
 class SReqUploadWithoutFile(serializers.Serializer):
     projectID = serializers.CharField(max_length=513)
     processID = serializers.CharField(max_length=513)
-    groupIdx = serializers.IntegerField()
+    groupID = serializers.IntegerField()
     levelOfDetail = serializers.FloatField()
     width = serializers.FloatField()
     height = serializers.FloatField()
@@ -197,7 +197,7 @@ def uploadModelWithoutFile(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deleteModel(request:Request, projectID:str, processID:str, groupIdx:str, fileID:str):
+def deleteModel(request:Request, projectID:str, processID:str, groupID:str, fileID:str):
     """
     Delete the model and the file with it, if not done already
 
@@ -208,7 +208,7 @@ def deleteModel(request:Request, projectID:str, processID:str, groupIdx:str, fil
 
     """
     try:
-        result, statusCode = logicForDeleteModel(request, projectID, processID, groupIdx, fileID, deleteModel.cls.__name__)
+        result, statusCode = logicForDeleteModel(request, projectID, processID, groupID, fileID, deleteModel.cls.__name__)
         if result is not None:
             message = str(result)
             loggerError.error(result)

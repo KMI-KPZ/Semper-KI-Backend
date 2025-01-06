@@ -134,7 +134,7 @@ class Costs():
         treatmentCostsPostProcessing = enum.auto()
 
     ##################################################
-    def fetchInformation(self, groupIdx, group) -> None|Exception:
+    def fetchInformation(self, groupID, group) -> None|Exception:
         """
         Fetch information about everything
         
@@ -152,7 +152,7 @@ class Costs():
             self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From Printer
-            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"], groupIdx)
+            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"], groupID)
             self.listOfValuesForEveryPrinter = []
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
@@ -423,7 +423,7 @@ class Costs():
             return e
 
     ##################################################
-    def calculateCostsForPrinter(self, groupIdx, group) -> dict[list[tuple]]:
+    def calculateCostsForPrinter(self, groupID, group) -> dict[list[tuple]]:
         """
         Calculate the costs for every printer
 
@@ -615,7 +615,7 @@ class Costs():
     ####################################################################################################
 
     ##################################################
-    def calculateCostsForPostProcessings(self, groupIdx:int, group:dict) -> list[float]:
+    def calculateCostsForPostProcessings(self, groupID:int, group:dict) -> list[float]:
         """
         Calculate the costs for the post processings
 

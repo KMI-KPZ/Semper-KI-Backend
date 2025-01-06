@@ -23,7 +23,7 @@ from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString, getButtonsForProcess, getMissingElements
+from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString
 from code_SemperKI.definitions import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
@@ -229,32 +229,16 @@ def getProcess(request:Request, projectID, processID):
 
     """
     try:
-        contentManager = ManageContent(request.session)
-        userID = contentManager.getClient()
-        adminOrNot = manualCheckifAdmin(request.session)
-        interface = contentManager.getCorrectInterface(getProject.cls.__name__)
-        if interface == None:
-            message = "Rights not sufficient in getProcess"
-            exception = "Unauthorized"
-            logger.error(message)
+        outDict, statusCode = logicForGetProcess(request, projectID, processID, getProcess.cls.__name__)
+        if isinstance(outDict, Exception):
+            message = "Error in getProcess"
+            exception = str(outDict)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        process = interface.getProcessObj(projectID, processID)
-        if isinstance(process, Exception):
-            raise process
-
-        # add buttons
-        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
-        outDict = process.toDict()
-        outDict["processStatusButtons"] = buttons
-
-        # add what's missing to continue
-        missingElements = getMissingElements(interface, process)
-        outDict["processErrors"] = missingElements
         
         outSerializer = SResProcess(data=outDict)
         if outSerializer.is_valid():
@@ -639,8 +623,17 @@ def getContractors(request:Request, processID:str):
         if processObj == None:
             raise Exception("Process ID not found in session or db")
  
-        listOfResultingContractors = logicForGetContractors(processObj)
-        # TODO
+        listOfResultingContractors, statusCode = logicForGetContractors(processObj)
+        if isinstance(listOfResultingContractors, Exception):
+            message = "Error in getContractors"
+            exception = str(listOfResultingContractors)
+            loggerError.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=statusCode)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         outSerializer = SResContractors(data=listOfResultingContractors, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)

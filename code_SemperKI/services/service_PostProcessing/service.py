@@ -54,6 +54,14 @@ class PostProcessing(Semper.ServiceBase):
         return PP_serviceReady(existingContent)
     
     ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        return {}
+    
+    ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
         """
         Checks, if the selection of the service is available (material, ...)

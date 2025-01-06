@@ -43,6 +43,8 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
         if ServiceDetails.groups not in existingContent:
             existingContent[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}}]
         for idx, newContentGroup in enumerate(newContent[ServiceDetails.groups]):
+            if idx >= len(existingContent[ServiceDetails.groups]):
+                existingContent[ServiceDetails.groups].append({ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}})
             existingGroup = existingContent[ServiceDetails.groups][idx]
 
             for entry in newContentGroup:
