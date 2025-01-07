@@ -91,7 +91,10 @@ def logicForGetProjectForDashboard(request, projectID) -> tuple[dict|Exception, 
             len(entry[ProcessDescription.contractor]) != 0 and \
                 entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
             # parse for frontend
-            entry[ProcessDescription.serviceDetails] = serviceManager.getService(entry[ProcessDescription.serviceType]).parseServiceDetails(entry[ProcessDescription.serviceDetails])
+            if entry[ProcessDescription.serviceType] == serviceManager.getNone():
+                entry[ProcessDescription.serviceDetails] = {}
+            else:
+                entry[ProcessDescription.serviceDetails] = serviceManager.getService(entry[ProcessDescription.serviceType]).parseServiceDetails(entry[ProcessDescription.serviceDetails])
             listOfFlatProcesses.append(entry)
 
     projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses

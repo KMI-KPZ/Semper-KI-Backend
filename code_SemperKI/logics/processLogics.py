@@ -125,7 +125,10 @@ def logicForGetProcess(request, projectID, processID, functionName):
         outDict["processErrors"] = missingElements
 
         # parse for frontend
-        outDict[ProcessDescription.serviceDetails] = serviceManager.getService(process.serviceType).parseServiceDetails(process.serviceDetails)
+        if process.serviceType == serviceManager.getNone():
+            outDict[ProcessDescription.serviceDetails] = {}
+        else:
+            outDict[ProcessDescription.serviceDetails] = serviceManager.getService(process.serviceType).parseServiceDetails(process.serviceDetails)
     
         return (outDict, 200)
     except Exception as e:
