@@ -44,6 +44,8 @@ newPaths= {
     "updateProject": ("public/project/update/" ,project.updateProject),
     "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
     "saveProjects": ("public/project/save/", project.saveProjects),
+    
+    "getdistance": ("public/distance/get/", miscellaneous.calculateDistanceView),
 
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
