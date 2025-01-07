@@ -120,7 +120,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
         return (e, 500)
 
 ##################################################
-def logicForSetMaterial(request, projectID, processID, groupIndex, material, functionName) -> tuple[dict|Exception, int]:
+def logicForSetMaterial(request, projectID, processID, groupID, material, functionName) -> tuple[dict|Exception, int]:
     """
     Set a material
 
@@ -137,7 +137,7 @@ def logicForSetMaterial(request, projectID, processID, groupIndex, material, fun
 
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
-        updateArray[groupIndex] = {ServiceDetails.material: material}
+        updateArray[groupID] = {ServiceDetails.material: material}
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process

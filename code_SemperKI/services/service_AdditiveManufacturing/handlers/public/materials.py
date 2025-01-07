@@ -131,7 +131,7 @@ def retrieveMaterialsWithFilter(request:Request):
 class SReqSetMaterial(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
-    groupIndex = serializers.IntegerField()
+    groupID = serializers.IntegerField()
     material = SReqMaterialContent()
     
 #######################################################
@@ -175,10 +175,10 @@ def setMaterialSelection(request:Request):
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
-        groupIndex = info["groupIndex"]
+        groupID = info["groupID"]
         material = info["material"]
         
-        result, statusCode = logicForSetMaterial(request, projectID, processID, groupIndex, material, setMaterialSelection.cls.__name__)
+        result, statusCode = logicForSetMaterial(request, projectID, processID, groupID, material, setMaterialSelection.cls.__name__)
         if isinstance(result, Exception):
             message = f"Error in addMaterialToSelection: {str(result)}"
             exception = str(result)
