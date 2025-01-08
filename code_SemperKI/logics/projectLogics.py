@@ -9,13 +9,14 @@ import logging, numpy
 
 from datetime import datetime
 from django.utils import timezone
+from django.conf import settings
 
 from rest_framework import status
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
-from Generic_Backend.code_General.utilities.basics import manualCheckIfRightsAreSufficient, manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities.basics import manualCheckIfRightsAreSufficient, manualCheckifLoggedIn, manualCheckifAdmin
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
@@ -69,6 +70,8 @@ def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Excepti
 
     contentManager = ManageContent(request.session)
     interface = contentManager.getCorrectInterface("getProjectForDashboard")
+    adminOrNot = manualCheckifAdmin(request.session)
+    userID = contentManager.getClient()
     if interface == None:
         return (Exception("Rights not sufficient in getProjectForDashboard"), 401)
     
@@ -99,6 +102,16 @@ def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Excepti
                 entry[ProcessDescription.serviceDetails] = {}
             else:
                 entry[ProcessDescription.serviceDetails] = serviceManager.getService(entry[ProcessDescription.serviceType]).parseServiceDetails(entry[ProcessDescription.serviceDetails])
+            
+            # check if costs are there and if they should be shown
+            if ProcessDetails.prices in entry[ProcessDescription.processDetails]:
+                if PricesDetails.details in entry[ProcessDescription.processDetails][ProcessDetails.prices]:
+                    if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(entry[ProcessDescription.processID], userID)):
+                        del entry[ProcessDetails.prices][PricesDetails.details]
+                    else:
+                        entry[ProcessDetails.prices][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, entry[ProcessDescription.processDetails][ProcessDetails.prices][PricesDetails.details])
+
+            
             listOfFlatProcesses.append(entry)
 
     projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses

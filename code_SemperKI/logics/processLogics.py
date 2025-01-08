@@ -14,6 +14,7 @@ from rest_framework import status
 
 from django.http import HttpResponse
 from django.utils import timezone
+from django.conf import settings
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
@@ -68,7 +69,7 @@ def logicForGetContractors(processObj:Process):
             contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
                                    OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
                                    OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
-                                   "price": priceOfContractor}
+                                   ProcessDetails.prices: priceOfContractor}
             listOfResultingContractors.append(contractorToBeAdded)
         
         #if settings.DEBUG:
@@ -94,15 +95,19 @@ def logicForGetContractors(processObj:Process):
         listOfContractorsWithPriorities.sort(key=lambda x: x[1])
         # parse for frontend
         listOfResultingContractors = []
+        processObj.processDetails[ProcessDetails.prices] = {}
         for contractor in listOfContractorsWithPriorities:
+            # save this to database
+            processObj.processDetails[ProcessDetails.prices][OrganizationDescription.hashedID] = contractor[0][ProcessDetails.prices]
+            # but parse away the details for the frontend
+            del contractor[0][ProcessDetails.prices][PricesDetails.details]
             listOfResultingContractors.append({
                 OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
                 OrganizationDescription.name: contractor[0][OrganizationDescription.name],
                 OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding],
-                "price": contractor[0]["price"]
+                ProcessDetails.prices: contractor[0][ProcessDetails.prices]
             })
 
-        
         return (listOfResultingContractors, 200)
 
     except Exception as e:
@@ -154,6 +159,14 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
         else:
             outDict[ProcessDescription.serviceDetails] = serviceManager.getService(process.serviceType).parseServiceDetails(process.serviceDetails)
     
+        # check if costs are there and if they should be shown
+        if ProcessDetails.prices in process.processDetails:
+            if PricesDetails.details in process.processDetails[ProcessDetails.prices]:
+                if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processID, userID)):
+                    del outDict[ProcessDetails.prices][PricesDetails.details]
+                else:
+                    outDict[ProcessDetails.prices][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, process.processDetails[ProcessDetails.prices][PricesDetails.details])
+
         return (outDict, 200)
     except Exception as e:
         loggerError.error("Error in logicForGetProcess: %s" % e)

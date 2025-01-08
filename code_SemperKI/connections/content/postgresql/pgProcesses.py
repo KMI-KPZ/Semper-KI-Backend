@@ -419,6 +419,31 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
+    def checkIfCurrentUserIsContractorOfProcess(processID:str, currentUserHashedID:str):
+        """
+        Get info if the current User may see the contractors side of the process
+
+        :param processID: ID of the process
+        :type processID: str
+        :param currentUserHashedID: The ID of the current user
+        :type currentUserHashedID: str
+        :return: True if the user is the contractor, false if not
+        :rtype: Bool
+        
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            if currentProcess.contractor is not None and currentProcess.contractor.hashedID == currentUserHashedID:
+                return True
+            else:
+                return False
+        except (Exception) as error:
+            logger.error(f'could not check if user is contractor: {str(error)}')
+        
+        return False
+    
+    ##############################################
+    @staticmethod
     def getAllUsersOfProject(projectID):
         """
         Get all user IDs that are connected to that project.
@@ -703,6 +728,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
+                currentProcess.processDetails[ProcessDetails.prices] = {content: currentProcess.processDetails[ProcessDetails.prices][content]} # delete prices of other contractors and reduce to this one
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
                 outContent = content
 

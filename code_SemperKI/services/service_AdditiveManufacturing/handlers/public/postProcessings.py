@@ -178,7 +178,7 @@ def setPostProcessingSelection(request:Request):
         serializedContent = SReqSetPostProcessings(data=request.data)
         if not serializedContent.is_valid():
             message = "Validation failed in setPostProcessingSelection"
-            exception = "Validation failed"
+            exception = f"Validation failed {serializedContent.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():

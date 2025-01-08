@@ -363,7 +363,7 @@ def updateProject(request:Request):
         inSerializer = SReqUpdateProject(data=request.data)
         if not inSerializer.is_valid():
             message = "Validation failed"
-            exception = "Validation failed"
+            exception = inSerializer.errors
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():

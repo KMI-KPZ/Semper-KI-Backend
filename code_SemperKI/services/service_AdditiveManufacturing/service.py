@@ -7,6 +7,7 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
 
 from .connections.postgresql.pgService import initializeService as AM_initializeService, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
@@ -78,7 +79,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         completeOrNot, listOfMissingStuff = AM_serviceIsReady(existingContent)
         if completeOrNot is False:
             for idx, entry in enumerate(listOfMissingStuff):
-                listOfMissingStuff[idx] = "Service" + "-" + SERVICE_NAME + "-" + entry
+                listOfMissingStuff[idx]["key"] = "Service" + "-" + SERVICE_NAME + "-" + entry["key"]
         
         return (completeOrNot, listOfMissingStuff)
 
@@ -125,6 +126,8 @@ class AdditiveManufacturing(Semper.ServiceBase):
         outDict = {}
         for groupIdx, groupCosts in enumerate(costs):
             outDict["group "+str(groupIdx)] = groupCosts
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
         return outDict
 
     ###################################################

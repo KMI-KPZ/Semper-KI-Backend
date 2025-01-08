@@ -114,7 +114,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     return existingContent
 
 ####################################################################################
-def serviceReady(existingContent:dict) -> tuple[bool, list[str]]:
+def serviceReady(existingContent:dict) -> tuple[bool, list[dict]]:
     """
     Check if everything is there
 
@@ -130,15 +130,15 @@ def serviceReady(existingContent:dict) -> tuple[bool, list[str]]:
         for idx, group in enumerate(existingContent[ServiceDetails.groups]):
             if ServiceDetails.models in group:
                 if len(group[ServiceDetails.models]) == 0:
-                    listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.models))
+                    listOfWhatIsMissing.append({"groupID": idx, "key": str(ServiceDetails.models)})
             else:
-                listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.models))
+                listOfWhatIsMissing.append({"groupID": idx, "key": str(ServiceDetails.models)})
             
             if ServiceDetails.material in group:
                 if len(group[ServiceDetails.material]) == 0:
-                    listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.material))
+                    listOfWhatIsMissing.append({"groupID": idx, "key": str(ServiceDetails.material)})
             else:
-                listOfWhatIsMissing.append(str(idx)+" "+str(ServiceDetails.material))
+                listOfWhatIsMissing.append({"groupID": idx, "key": str(ServiceDetails.material)})
             if ServiceDetails.postProcessings in group:
                 if len(group[ServiceDetails.postProcessings]) == 0:
                     pass # TODO, current optional

@@ -111,6 +111,7 @@ class SResProcessDetails(serializers.Serializer):
     clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)
     imagePath = serializers.URLField(required=False)
     priorities = serializers.DictField(allow_empty=True, required=False)
+    prices = serializers.DictField(allow_empty=True, required=False)
 
 #######################################################
 class SResFiles(serializers.Serializer):
@@ -157,7 +158,7 @@ class SResProcess(serializers.Serializer):
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processStatusButtons = serializers.ListField(child=SResProcessStatusButtons(), allow_empty=True)
-    processErrors = serializers.ListField(child=serializers.CharField(max_length=200), allow_empty=True)
+    processErrors = serializers.ListField(child=serializers.DictField(allow_empty=True), allow_empty=True)
 ########################################################
 # Handler
 @extend_schema(

@@ -111,6 +111,16 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
+    prices = enum.auto()
+
+####################################################################################
+# Enum for prices
+class PricesDetails(StrEnumExactlyAsDefined):
+    """
+    What should the prices object contain?
+    
+    """
+    details = enum.auto()
 
 ####################################################################################
 # Enum for messages

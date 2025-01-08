@@ -94,7 +94,7 @@ def checkModel(request:Request, projectID:str, processID:str, fileID:str):
         if outputSerializer.is_valid():
             return Response(outputSerializer.data, status=status.HTTP_200_OK)
         else:
-            raise Exception("Validation failed")
+            raise Exception("Validation failed " + str(outputSerializer.errors))
     except (Exception) as error:
         message = f"Error in {checkModel.cls.__name__}: {str(error)}"
         exception = str(error)

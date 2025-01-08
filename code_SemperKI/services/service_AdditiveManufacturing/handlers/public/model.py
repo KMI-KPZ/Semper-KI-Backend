@@ -73,7 +73,7 @@ def uploadModels(request:Request):
         serializedContent = SReqUploadModels(data=request.data)
         if not serializedContent.is_valid():
             message = "Validation failed"
-            exception = "Validation failed"
+            exception = f"Validation failed {serializedContent.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
