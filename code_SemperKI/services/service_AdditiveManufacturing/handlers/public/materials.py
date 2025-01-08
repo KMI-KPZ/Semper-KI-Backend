@@ -29,7 +29,7 @@ from Generic_Backend.code_General.connections.redis import RedisConnection
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, ServiceDetails

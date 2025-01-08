@@ -5,16 +5,29 @@ Silvio Weging 2024
 
 Contains: Logic for the processes
 """
-import logging, numpy
+import logging, numpy, copy
+
+from datetime import datetime
+
+from rest_framework.request import Request
+from rest_framework import status
+
+from django.http import HttpResponse
+from django.utils import timezone
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import manualCheckifAdmin
+from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, manualCheckIfRightsAreSufficientForSpecificOperation, manualCheckifAdmin, manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.connections import s3
 
+from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.serviceManager import serviceManager
-from code_SemperKI.definitions import ProcessDetails, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, ProcessDescription
+from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getButtonsForProcess, getMissingElements
+from code_SemperKI.connections.content.postgresql import pgProcesses
+import code_SemperKI.utilities.websocket as WebSocketEvents
 
 from ..modelFiles.processModel import Process
 
@@ -35,7 +48,7 @@ def logicForGetContractors(processObj:Process):
         service = serviceManager.getService(processObj.serviceType)
         
         if serviceType == serviceManager.getNone():
-            raise (Exception("No Service selected!"), 400)
+            return Exception("No Service selected!"), 400
 
         listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
         
@@ -97,9 +110,20 @@ def logicForGetContractors(processObj:Process):
         return (e, 500)
 
 ####################################################################################
-def logicForGetProcess(request, projectID, processID, functionName):
+def logicForGetProcess(request:Request, projectID:str, processID:str, functionName:str):
     """
     Get the process
+
+    :param request: The request
+    :type request: Request
+    :param projectID: The project ID
+    :type projectID: str
+    :param processID: The process ID
+    :type processID: str
+    :param functionName: The function name
+    :type functionName: str
+    :return: The process and statusCode
+    :rtype: tuple(dict|Exception, int)
     
     """
     try:
@@ -133,4 +157,284 @@ def logicForGetProcess(request, projectID, processID, functionName):
         return (outDict, 200)
     except Exception as e:
         loggerError.error("Error in logicForGetProcess: %s" % e)
+        return (e, 500)
+    
+####################################################################################
+def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
+    """
+    Create a process and an ID with it
+
+    :param request: The request
+    :type request: Request
+    :param projectID: The project ID
+    :type projectID: str
+    :param functionName: The function name
+    :type functionName: str
+    :return: The processID and statusCode
+    :rtype: tuple(dict|Exception, int)
+    
+    """
+    try:
+        # generate ID, timestamp and template for process
+        processID = crypto.generateURLFriendlyRandomString()
+        
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(functionName)
+        if interface == None:
+            return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
+            
+        client = contentManager.getClient()
+        interface.createProcess(projectID, processID, client)
+
+        # set default addresses here
+        if manualCheckifLoggedIn(request.session):
+            clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
+            defaultAddress = {}
+            if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
+                clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
+                for key in clientAddresses:
+                    entry = clientAddresses[key]
+                    if entry["standard"]:
+                        defaultAddress = entry
+                        break
+            addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
+            errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
+            if isinstance(errorOrNot, Exception):
+                raise errorOrNot
+        # set default priorities here
+        userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
+        # set default title of the process
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
+
+
+        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+
+        #return just the id for the frontend
+        output = {ProcessDescription.processID: processID}
+
+        return (output, 200)
+    except Exception as e:
+        loggerError.error("Error in logicsForCreateProcessID: %s" % e)
+        return (e, 500)
+    
+####################################################################################
+######################################
+#updateProcessFunction
+def updateProcessFunction(request:Request, changes:dict, projectID:str, processIDs:list[str]):
+    """
+    Update process logic
+    
+    :param projectID: Project ID
+    :type projectID: Str
+    :param projectID: Process ID
+    :type projectID: Str
+    :return: Message if it worked or not
+    :rtype: Str, bool or Error
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface("updateProcess")
+        if interface == None:
+            logger.error("Rights not sufficient in updateProcess")
+            return ("", False)
+        
+        client = contentManager.getClient()
+        
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in updateProcess")
+                return ("", False)
+
+            if "deletions" in changes:
+                for elem in changes["deletions"]:
+                    # exclude people not having sufficient rights for that specific operation
+                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
+                        if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
+                            logger.error("Rights not sufficient in updateProcess")
+                            return ("", False)
+                        
+                    returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
+
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
+
+            if "changes" in changes:
+                for elem in changes["changes"]:
+                    fireEvent = False
+                    # for websocket events
+                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
+                        # exclude people not having sufficient rights for that specific operation
+                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
+                            logger.error("Rights not sufficient in updateProcess")
+                            return ("", False)
+                        fireEvent = True
+                    returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
+                    if isinstance(returnVal, Exception):
+                        raise returnVal
+                    if fireEvent:
+                        if elem == ProcessUpdates.messages:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage)
+                        elif elem == ProcessUpdates.processStatus:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange)
+                        else:
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal)
+                    
+            # change state for this process if necessary
+            process = interface.getProcessObj(projectID, processID)
+            currentState = StateMachine(initialAsInt=process.processStatus)
+            currentState.onUpdateEvent(interface, process)
+            signalDependencyToOtherProcesses(interface, process)
+
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+
+        return ("", True)
+    except (Exception) as error:
+        return (error, True)       
+    
+#######################################################
+#deleteProcessFunction
+def deleteProcessFunction(session, processIDs:list[str]):
+    """
+    Delete the processes
+
+    :param session: The session
+    :type session: Django session object (dict-like)
+    :param processIDs: Array of proccess IDs 
+    :type processIDs: list[str]
+    :return: The response
+    :rtype: HttpResponse | Exception
+
+    """
+    try:
+        contentManager = ManageContent(session)
+        interface = contentManager.getCorrectInterface("deleteProcesses")
+        if interface == None:
+            logger.error("Rights not sufficient in deleteProcesses")
+            return HttpResponse("Insufficient rights!", status=401)
+
+        for processID in processIDs:
+            if not contentManager.checkRightsForProcess(processID):
+                logger.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            interface.deleteProcess(processID)
+            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
+        return HttpResponse("Success")
+    
+    except Exception as e:
+        return e
+    
+#######################################################
+def logicForCloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str], functionName:str):
+    """
+    Duplicate selected processes. Works only for logged in users.
+
+    :param request: POST request from statusButtonRequest
+    :type request: HTTP POST
+    :param projectID: The project ID of the project the processes belonged to
+    :type projectID: str
+    :param processIDs: List of processes to be cloned
+    :type processIDs: list of strings
+    :param functionName: The function name
+    :type functionName: str
+    :return: ResultDict or Exception and statusCode
+    :rtype: tuple(dict|Exception, int)
+    
+    """
+    try:
+        outDict = {"projectID": "", "processIDs": []}
+
+        # create new project with old information
+        oldProject = pgProcesses.ProcessManagementBase.getProjectObj(oldProjectID)
+        newProjectID = crypto.generateURLFriendlyRandomString()
+        outDict["projectID"] = newProjectID
+        errorOrNone = pgProcesses.ProcessManagementBase.createProject(newProjectID, oldProject.client)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, oldProject.projectDetails)
+        if isinstance(errorOrNone, Exception):
+            raise errorOrNone
+        
+        mapOfOldProcessIDsToNewOnes = {}
+        # for every old process, create new process with old information
+        for processID in oldProcessIDs:
+            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, processID) 
+            newProcessID = crypto.generateURLFriendlyRandomString()
+            outDict["processIDs"].append(newProcessID)
+            mapOfOldProcessIDsToNewOnes[processID] = newProcessID
+            errorOrNone = pgProcesses.ProcessManagementBase.createProcess(newProjectID, newProcessID, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
+            del oldProcessDetails[ProcessDetails.provisionalContractor]
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # copy files but with new fileID
+            newFileDict = {}
+            for fileKey in oldProcess.files:
+                oldFile = oldProcess.files[fileKey]
+                newFile = copy.deepcopy(oldFile)
+                #newFileID = crypto.generateURLFriendlyRandomString()
+                newFile[FileObjectContent.id] = fileKey
+                newFilePath = newProcessID+"/"+fileKey
+                newFile[FileObjectContent.path] = newFilePath
+                newFile[FileObjectContent.date] = str(timezone.now())
+                if FileObjectContent.isFile not in newFile or newFile[FileObjectContent.isFile]:
+                    if oldFile[FileObjectContent.remote]:
+                        s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
+                    else:
+                        s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
+                newFileDict[fileKey] = newFile
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.files, newFileDict, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            
+            # set service specific stuff
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceType, oldProcess.serviceType, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            # set service details -> implementation in service (cloneServiceDetails)
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID) 
+            errorOrNewDetails = serviceManager.getService(oldProcess.serviceType).cloneServiceDetails(oldProcess.serviceDetails, newProcess)
+            if isinstance(errorOrNewDetails, Exception):
+                raise errorOrNewDetails
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceDetails, errorOrNewDetails, oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+
+        # all new processes must already be created here in order to link them accordingly
+        for oldProcessID, newProcessID in mapOfOldProcessIDsToNewOnes.items():
+            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, oldProcessID)
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
+            # connect the processes if they where dependend before
+            for connectedOldProcessIn in oldProcess.dependenciesIn.all():
+                if connectedOldProcessIn.processID in oldProcessIDs:
+                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
+                    newProcess.dependenciesIn.add(newConnectedProcess)
+            for connectedOldProcessIn in oldProcess.dependenciesOut.all():
+                if connectedOldProcessIn.processID in oldProcessIDs:
+                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
+                    newProcess.dependenciesOut.add(newConnectedProcess)
+            newProcess.save()
+
+            # set process state through state machine (could be complete or waiting or in conflict and so on)
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS), oldProcess.client)
+            if isinstance(errorOrNone, Exception):
+                raise errorOrNone
+            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
+            currentState = StateMachine(initialAsInt=newProcess.processStatus)
+            contentManager = ManageContent(request.session)
+            interface = contentManager.getCorrectInterface(functionName)
+            currentState.onUpdateEvent(interface, newProcess)
+
+        return (outDict, 200)
+    except Exception as e:
+        loggerError.error("Error in logicForCloneProcess: %s" % e)
         return (e, 500)

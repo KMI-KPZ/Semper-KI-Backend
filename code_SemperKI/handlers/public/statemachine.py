@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Akshay NS 2024
 
-Contains: 
+Contains: State machine handlers
 """
 import logging
 
@@ -22,6 +22,7 @@ from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.handlers.public.process import cloneProcess, deleteProcessFunction
 from code_SemperKI.states.states import StateMachine, InterfaceForStateChange
+from code_SemperKI.logics.statemachineLogics import logicForStatusButtonRequest
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -123,30 +124,8 @@ def statusButtonRequest(request:Request):
         
         info = inSerializer.data
 
-        projectID = info[InterfaceForStateChange.projectID]
-        processIDs = info[InterfaceForStateChange.processIDs]
-        buttonData = info[InterfaceForStateChange.buttonData]
-        if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
-            retVal = deleteProcessFunction(request.session, processIDs)
-            if isinstance(retVal, Exception):
-                raise retVal
-            return retVal
-        elif "cloneProcess" in buttonData[InterfaceForStateChange.type]:
-            retVal = cloneProcess(request, projectID, processIDs)
-            if isinstance(retVal, Exception):
-                raise retVal
-            return retVal
-        else:
-            nextState = buttonData[InterfaceForStateChange.targetStatus]
-
-            contentManager = ManageContent(request.session)
-            interface = contentManager.getCorrectInterface(statusButtonRequest.cls.__name__)
-            for processID in processIDs:
-                process = interface.getProcessObj(projectID, processID)
-                sm = StateMachine(initialAsInt=process.processStatus)
-                sm.onButtonEvent(nextState, interface, process)
-
-        return Response({}, status=status.HTTP_200_OK)
+        return logicForStatusButtonRequest(request, info, statusButtonRequest.cls.__name__)
+        
     except (Exception) as error:
         message = f"Error in statusButtonRequest: {str(error)}"
         exception = str(error)

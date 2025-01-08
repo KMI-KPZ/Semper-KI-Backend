@@ -162,61 +162,18 @@ def getProject(request, projectID):
 
     """
     try:
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(getProject.cls.__name__)
-        if interface == None:
-            message = "Rights not sufficient in getProject"
-            exception = "Unauthorized"
-            logger.error(message)
+        result, statusCode = projectLogics.logicForGetProject(request, projectID, getProject.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in getProject: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        
-        projectAsDict = interface.getProject(projectID)
-        if isinstance(projectAsDict, Exception):
-            message = f"Project not found in {getProject.cls.__name__}"
-            exception = "Not found"
-            logger.error(message)
-            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-            if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        processList = projectAsDict[SessionContentSemperKI.processes]
-        listOfFlatProcesses = []
-        if manualCheckifLoggedIn(request.session):
-            if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-                currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
-            else:
-                currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-        else:
-            currentUserID = GlobalDefaults.anonymous
-        
-        for entry in processList:
-            # list only processes that either the user or the receiving organization should see
-
-            if entry[ProcessDescription.client] == currentUserID or \
-                ( ProcessDescription.contractor in entry and \
-                 len(entry[ProcessDescription.contractor]) != 0 and \
-                    entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
-
-                flatProcessDict = {
-                    ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
-                    ProcessDescription.processID: entry[ProcessDescription.processID],
-                    ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
-                    ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
-                    ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
-                    "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
-                    ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
-                }
-                listOfFlatProcesses.append(flatProcessDict)
-
-        projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
-
-        outSerializer = SResGetProject(data=projectAsDict)
+            
+        outSerializer = SResGetProject(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -334,33 +291,18 @@ def createProjectID(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        projectTitle = validatedInput[ProjectDetails.title]
-
-        # generate ID string, make timestamp and create template for project
-        projectID = crypto.generateURLFriendlyRandomString()
-        #now = timezone.now()
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(createProjectID.cls.__name__)
-        if interface == None:
-            message = "Rights not sufficient in createProjectID"
-            exception = "Unauthorized"
-            logger.error(message)
+        result, statusCode = projectLogics.logicForCreateProjectID(request, validatedInput, createProjectID.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in createProjectID: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-        
-        client = contentManager.getClient()
-        interface.createProject(projectID, client)
-        interface.updateProject(projectID, ProjectUpdates.projectDetails, {ProjectDetails.title: projectTitle})
-
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-
-        #return just the id for the frontend
-        output = {ProjectDescription.projectID: projectID}
-        outSerializer = SResCreateProjectID(data=output)
+        outSerializer = SResCreateProjectID(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -430,42 +372,19 @@ def updateProject(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         validatedInput = inSerializer.data
-        projectID = validatedInput[ProjectDescription.projectID]
-
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProject.cls.__name__)
-        if interface == None or not contentManager.checkRightsForProject(projectID):
-            message = "Rights not sufficient in updateProject"
-            exception = "Unauthorized"
-            logger.error(message)
+        result, statusCode = projectLogics.logicForUpdateProject(request, validatedInput, updateProject.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in updateProject: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        for entry in validatedInput["changes"]:
-            returnVal = interface.updateProject(projectID, entry, validatedInput["changes"][entry])
-            if isinstance(returnVal, Exception):
-                raise returnVal
             
-        # TODO send to websockets that are active, that a new message/status is available for that project
-        # outputDict = {EventsDescription.eventType: "projectEvent"}
-        # outputDict["projectID"] = projectID
-        # outputDict["projects"] = [{"projectID": projectID, "status": 1, "messages": 0}]
-        # channel_layer = get_channel_layer()
-        # listOfUsers = pgProcesses.ProcessManagementBase.getAllUsersOfProject(projectID)
-        # for user in listOfUsers:
-        #     if user.subID != pgProfiles.ProfileManagementBase.getUserKey(session=request.session):
-        #         async_to_sync(channel_layer.group_send)(pgProfiles.ProfileManagementBase.getUserKeyWOSC(uID=user.subID), {
-        #             "type": "sendMessageJSON",
-        #             "dict": outputDict,
-        #         })
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-
         return Response("Success")
             
-
     except (Exception) as error:
         message = f"Error in updateProject: {str(error)}"
         exception = str(error)
@@ -516,37 +435,17 @@ def deleteProjects(request:Request):
 
     """
     try:
-        
-        projectIDs = request.GET['projectIDs'].split(",")
-        #loggedIn = False # don't check rights in every iteration
-
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(deleteProjects.cls.__name__)
-        if interface == None:
-            message = "Rights not sufficient in updateProject"
-            exception = "Unauthorized"
-            logger.error(message)
+        result, statusCode = projectLogics.logicForDeleteProjects(request, deleteProjects.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in deleteProjects: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        
-        for projectID in projectIDs:
-            if not contentManager.checkRightsForProject(projectID):
-                message = "Rights not sufficient in updateProject"
-                exception = "Unauthorized"
-                logger.error(message)
-                exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-                if exceptionSerializer.is_valid():
-                    return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
-                else:
-                    return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            interface.deleteProject(projectID)
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
-        
+            
         return Response("Success", status=status.HTTP_200_OK)
     
     except (Exception) as error:
@@ -591,16 +490,9 @@ def saveProjects(request:Request):
 
     """
     try:
-        contentManager = ManageContent(request.session)
-        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession():
-            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(request.session)
-            if isinstance(error, Exception):
-                raise error
-
-            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
-
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
-        
+        result = projectLogics.logicForSaveProjects(request.session)
+        if isinstance(result, Exception):
+            raise result
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in saveProjects: {str(error)}"
@@ -624,15 +516,9 @@ def saveProjectsViaWebsocket(session):
 
     """
     try:
-        contentManager = ManageContent(session)
-        if contentManager.sessionManagement.structuredSessionObj.getIfContentIsInSession() and contentManager.checkRights("saveProjects"):
-            error = pgProcesses.ProcessManagementBase.addProjectToDatabase(session)
-            if isinstance(error, Exception):
-                raise error
-            
-            contentManager.sessionManagement.structuredSessionObj.clearContentFromSession()
-
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.PREDICATE},saved,{Logging.Object.OBJECT},their projects," + str(datetime.now()))
+        result = projectLogics.logicForSaveProjects(session)
+        if isinstance(result, Exception):
+            raise result
         return None
     
     except (Exception) as error:

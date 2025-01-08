@@ -6,10 +6,7 @@ Akshay NS 2024
 Contains: Handlers for processes
 """
 
-import json, logging, copy, numpy
-from datetime import datetime
-from django.http import HttpResponse, JsonResponse
-from django.conf import settings
+import logging
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -18,23 +15,18 @@ from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, checkIfUserIsLoggedIn, checkIfRightsAreSufficient, manualCheckifAdmin, manualCheckIfRightsAreSufficientForSpecificOperation
-from Generic_Backend.code_General.utilities import crypto
+
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 
-from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString
 from code_SemperKI.definitions import *
-from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.basics import checkIfUserMaySeeProcess
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.connections.content.postgresql import pgProcesses
+
 from code_SemperKI.connections.content.session import ProcessManagementSession
 from code_SemperKI.handlers.public.project import *
 from code_SemperKI.logics.processLogics import *
-import code_SemperKI.utilities.websocket as WebSocketEvents
-
 
 
 logger = logging.getLogger("logToFile")
@@ -78,61 +70,24 @@ def createProcessID(request:Request, projectID):
 
     """
     try:
-        # generate ID, timestamp and template for process
-        processID = crypto.generateURLFriendlyRandomString()
-        
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(createProcessID.cls.__name__)
-        if interface == None:
-            message = "Rights not sufficient in createProcessID"
-            exception = "Unauthorized"
-            logger.error(message)
+        result, statusCode = logicForCreateProcessID(request, projectID, createProcessID.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in {createProcessID.cls.__name__}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        client = contentManager.getClient()
-        interface.createProcess(projectID, processID, client)
-
-        # set default addresses here
-        if manualCheckifLoggedIn(request.session):
-            clientObject = pgProfiles.ProfileManagementBase.getUser(request.session)
-            defaultAddress = {}
-            if checkIfNestedKeyExists(clientObject, UserDescription.details, UserDetails.addresses):
-                clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
-                for key in clientAddresses:
-                    entry = clientAddresses[key]
-                    if entry["standard"]:
-                        defaultAddress = entry
-                        break
-            addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
-            errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, addressesForProcess, client)
-            if isinstance(errorOrNot, Exception):
-                raise errorOrNot
-        # set default priorities here
-        userPrioritiesObject = { prio:{PriorityTargetsSemperKI.value: 4} for prio in PrioritiesForOrganizationSemperKI}
-        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.priorities: userPrioritiesObject}, client)
-        if isinstance(errorOrNot, Exception):
-            raise errorOrNot
-        # set default title of the process
-        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
-        if isinstance(errorOrNot, Exception):
-            raise errorOrNot
-
-
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
-
-        #return just the id for the frontend
-        output = {ProcessDescription.processID: processID}
-        outSerializer = SResProcessID(data=output)
+        outSerializer = SResProcessID(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
             raise Exception(outSerializer.errors)
     except (Exception) as error:
-        message = f"Error in createProcessID: {str(error)}"
+        message = f"Error in {createProcessID.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -255,79 +210,7 @@ def getProcess(request:Request, projectID, processID):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)      
         
-######################################
-#updateProcessFunction
-def updateProcessFunction(request:Request, changes:dict, projectID:str, processIDs:list[str]):
-    """
-    Update process logic
-    
-    :param projectID: Project ID
-    :type projectID: Str
-    :param projectID: Process ID
-    :type projectID: Str
-    :return: Message if it worked or not
-    :rtype: Str, bool or Error
-    """
-    try:
-        contentManager = ManageContent(request.session)
-        interface = contentManager.getCorrectInterface(updateProcess.cls.__name__)
-        if interface == None:
-            logger.error("Rights not sufficient in updateProcess")
-            return ("", False)
-        
-        client = contentManager.getClient()
-        
-        for processID in processIDs:
-            if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in updateProcess")
-                return ("", False)
-
-            if "deletions" in changes:
-                for elem in changes["deletions"]:
-                    # exclude people not having sufficient rights for that specific operation
-                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
-                        if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
-                            return ("", False)
-                        
-                    returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
-
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-
-            if "changes" in changes:
-                for elem in changes["changes"]:
-                    fireEvent = False
-                    # for websocket events
-                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
-                        # exclude people not having sufficient rights for that specific operation
-                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, updateProcess.cls.__name__, str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
-                            return ("", False)
-                        fireEvent = True
-                    returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
-                    if isinstance(returnVal, Exception):
-                        raise returnVal
-                    if fireEvent:
-                        if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage)
-                        elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange)
-                        else:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal)
-                    
-            # change state for this process if necessary
-            process = interface.getProcessObj(projectID, processID)
-            currentState = StateMachine(initialAsInt=process.processStatus)
-            currentState.onUpdateEvent(interface, process)
-            signalDependencyToOtherProcesses(interface, process)
-
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
-
-        return ("", True)
-    except (Exception) as error:
-        return (error, True)        
-        
+ 
 #########################################################################
 # updateProcess
 #"updateProcess": ("public/updateProcess/", process.updateProcess),
@@ -402,39 +285,7 @@ def updateProcess(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-#######################################################
-#deleteProcessFunction
-def deleteProcessFunction(session, processIDs:list[str]):
-    """
-    Delete the processes
-
-    :param session: The session
-    :type session: Django session object (dict-like)
-    :param processIDs: Array of proccess IDs 
-    :type processIDs: list[str]
-    :return: The response
-    :rtype: HttpResponse | Exception
-
-    """
-    try:
-        contentManager = ManageContent(session)
-        interface = contentManager.getCorrectInterface(deleteProcesses.cls.__name__)
-        if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
-            return HttpResponse("Insufficient rights!", status=401)
-
-        for processID in processIDs:
-            if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
-                return HttpResponse("Insufficient rights!", status=401)
-            interface.deleteProcess(processID)
-            logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
-        return HttpResponse("Success")
-    
-    except Exception as e:
-        return e
-            
+              
 #########################################################################
 # deleteProcess
 #"deleteProcesses": ("public/deleteProcesses/<str:projectID>/", process.deleteProcesses),
@@ -688,96 +539,18 @@ def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
     
     """
     try:
-        outDict = {"projectID": "", "processIDs": []}
-
-        # create new project with old information
-        oldProject = pgProcesses.ProcessManagementBase.getProjectObj(oldProjectID)
-        newProjectID = crypto.generateURLFriendlyRandomString()
-        outDict["projectID"] = newProjectID
-        errorOrNone = pgProcesses.ProcessManagementBase.createProject(newProjectID, oldProject.client)
-        if isinstance(errorOrNone, Exception):
-            raise errorOrNone
-        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, oldProject.projectDetails)
-        if isinstance(errorOrNone, Exception):
-            raise errorOrNone
-        
-        mapOfOldProcessIDsToNewOnes = {}
-        # for every old process, create new process with old information
-        for processID in oldProcessIDs:
-            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, processID) 
-            newProcessID = crypto.generateURLFriendlyRandomString()
-            outDict["processIDs"].append(newProcessID)
-            mapOfOldProcessIDsToNewOnes[processID] = newProcessID
-            errorOrNone = pgProcesses.ProcessManagementBase.createProcess(newProjectID, newProcessID, oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
+        result, statusCode = logicForCloneProcess(request, oldProjectID, oldProcessIDs, cloneProcess.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in {cloneProcess.cls.__name__}"
+            exception = str(result)
+            loggerError.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=statusCode)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
-            del oldProcessDetails[ProcessDetails.provisionalContractor]
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
-            
-            # copy files but with new fileID
-            newFileDict = {}
-            for fileKey in oldProcess.files:
-                oldFile = oldProcess.files[fileKey]
-                newFile = copy.deepcopy(oldFile)
-                #newFileID = crypto.generateURLFriendlyRandomString()
-                newFile[FileObjectContent.id] = fileKey
-                newFilePath = newProcessID+"/"+fileKey
-                newFile[FileObjectContent.path] = newFilePath
-                newFile[FileObjectContent.date] = str(timezone.now())
-                if FileObjectContent.isFile not in newFile or newFile[FileObjectContent.isFile]:
-                    if oldFile[FileObjectContent.remote]:
-                        s3.manageRemoteS3.copyFile("kiss/"+oldFile[FileObjectContent.path], newFilePath)
-                    else:
-                        s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
-                newFileDict[fileKey] = newFile
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.files, newFileDict, oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
-            
-            # set service specific stuff
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceType, oldProcess.serviceType, oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
-            # set service details -> implementation in service (cloneServiceDetails)
-            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID) 
-            errorOrNewDetails = serviceManager.getService(oldProcess.serviceType).cloneServiceDetails(oldProcess.serviceDetails, newProcess)
-            if isinstance(errorOrNewDetails, Exception):
-                raise errorOrNewDetails
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceDetails, errorOrNewDetails, oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
-
-        # all new processes must already be created here in order to link them accordingly
-        for oldProcessID in mapOfOldProcessIDsToNewOnes:
-            newProcessID = mapOfOldProcessIDsToNewOnes[oldProcessID]
-            oldProcess = pgProcesses.ProcessManagementBase.getProcessObj(oldProjectID, oldProcessID)
-            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
-            # connect the processes if they where dependend before
-            for connectedOldProcessIn in oldProcess.dependenciesIn.all():
-                if connectedOldProcessIn.processID in oldProcessIDs:
-                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
-                    newProcess.dependenciesIn.add(newConnectedProcess)
-            for connectedOldProcessIn in oldProcess.dependenciesOut.all():
-                if connectedOldProcessIn.processID in oldProcessIDs:
-                    newConnectedProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, mapOfOldProcessIDsToNewOnes[connectedOldProcessIn.processID])
-                    newProcess.dependenciesOut.add(newConnectedProcess)
-            newProcess.save()
-
-            # set process state through state machine (could be complete or waiting or in conflict and so on)
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS), oldProcess.client)
-            if isinstance(errorOrNone, Exception):
-                raise errorOrNone
-            newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)
-            currentState = StateMachine(initialAsInt=newProcess.processStatus)
-            contentManager = ManageContent(request.session)
-            interface = contentManager.getCorrectInterface(cloneProcess.cls.__name__)
-            currentState.onUpdateEvent(interface, newProcess)
-
-        outSerializer = SResCloneProcess(data=outDict)
+        outSerializer = SResCloneProcess(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:

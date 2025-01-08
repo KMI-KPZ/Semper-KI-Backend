@@ -18,7 +18,7 @@ from Generic_Backend.code_General.connections import s3
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.basics import testPicture
 from code_SemperKI.handlers.public.files import deleteFile
 
