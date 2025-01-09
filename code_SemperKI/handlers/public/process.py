@@ -221,7 +221,8 @@ def getProcess(request:Request, projectID, processID):
 class SReqUpdateProcess(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)   
     processIDs = serializers.ListField(child=serializers.CharField(max_length=200))
-    changes = serializers.DictField() # TODO: list all updateTypes with optional and such
+    changes = serializers.DictField(required=False, allow_empty=True) # TODO: list all updateTypes with optional and such
+    deletions = serializers.DictField(required=False, allow_empty=True)
 #########################################################################
 # Handler    
 @extend_schema(
@@ -265,9 +266,7 @@ def updateProcess(request:Request):
         assert projectID != "", f"In {updateProcess.cls.__name__}: non-empty projectID expected"
         assert len(processIDs) != 0, f"In {updateProcess.cls.__name__}: non-empty list of processIDs expected"
         
-        # TODO remove
-        assert "changes" in changes.keys(), f"In {updateProcess.cls.__name__}: changes not in request"
-        if ProcessUpdates.processStatus in changes["changes"]:
+        if "changes" in changes and ProcessUpdates.processStatus in changes["changes"]:
             del changes["changes"][ProcessUpdates.processStatus] # frontend shall not change status any more
 
         message, flag = updateProcessFunction(request, changes, projectID, processIDs)

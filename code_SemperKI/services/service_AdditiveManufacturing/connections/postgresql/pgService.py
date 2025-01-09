@@ -86,14 +86,16 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     """
 
     try:
-        for idx, deletedContentGroup in enumerate(deletedContent[ServiceDetails.groups]):
-            if idx >= len(existingContent[ServiceDetails.groups]):
+        groupIdxForExistingContent = 0
+        for idx in range(len(deletedContent[ServiceDetails.groups])):
+            deletedContentGroup = deletedContent[ServiceDetails.groups][idx]
+            if groupIdxForExistingContent >= len(existingContent[ServiceDetails.groups]):
                 logger.error("The group to delete does not exist.")
                 continue
-            existingGroup = existingContent[ServiceDetails.groups][idx]
-            if len(deletedContentGroup) == 0:
-                del existingContent[ServiceDetails.groups][idx]
-                break
+            existingGroup = existingContent[ServiceDetails.groups][groupIdxForExistingContent]
+            if "delete" in deletedContentGroup and deletedContentGroup["delete"] is True:
+                del existingContent[ServiceDetails.groups][groupIdxForExistingContent]
+                continue
             for entry in deletedContentGroup:
                 match entry:
                     case ServiceDetails.models:
@@ -111,6 +113,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                             del existingGroup[ServiceDetails.calculations][fileID]
                     case _:
                         raise NotImplementedError("This service detail does not exist (yet).")
+            groupIdxForExistingContent += 1
 
     except (Exception) as error:
         logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
