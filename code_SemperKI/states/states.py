@@ -441,7 +441,7 @@ class DRAFT(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return ["Process-ServiceType"]
+        return [{"key":"Process-ServiceType"}]
 
     ###################################################
     # Transitions
@@ -798,17 +798,17 @@ class SERVICE_COMPLETED(State):
         """
         listOfMissingThings = []
         if ProcessDetails.provisionalContractor not in process.processDetails:
-            listOfMissingThings.append("Process-Contractor")
+            listOfMissingThings.append({"key": "Process-Contractor"})
         elif process.processDetails[ProcessDetails.provisionalContractor] == "":
-            listOfMissingThings.append("Process-Contractor")
+            listOfMissingThings.append({"key": "Process-Contractor"})
         if ProcessDetails.clientBillingAddress not in process.processDetails:
-            listOfMissingThings.append("Process-Address-Billing")
+            listOfMissingThings.append({"key": "Process-Address-Billing"})
         elif process.processDetails[ProcessDetails.clientBillingAddress] == {}:
-            listOfMissingThings.append("Process-Address-Billing")
+            listOfMissingThings.append({"key": "Process-Address-Billing"})
         if ProcessDetails.clientDeliverAddress not in process.processDetails:
-            listOfMissingThings.append("Process-Address-Deliver")
+            listOfMissingThings.append({"key": "Process-Address-Deliver"})
         elif process.processDetails[ProcessDetails.clientDeliverAddress] == {}:
-            listOfMissingThings.append("Process-Address-Deliver")
+            listOfMissingThings.append({"key": "Process-Address-Deliver"})
         return listOfMissingThings
 
     ###################################################
@@ -1011,7 +1011,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         dependenciesIn, dependenciesOut = interface.getProcessDependencies(process.project.projectID, process.processID)
         for priorProcess in dependenciesIn:
             if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                listOfMissingStuff.append("Process-Dependency-"+priorProcess.processID)
+                listOfMissingStuff.append({"key": "Process-Dependency-"+priorProcess.processID})
         return listOfMissingStuff
         
 
@@ -1166,7 +1166,7 @@ class SERVICE_COMPLICATION(State):
         if process.serviceType != ServiceManager.serviceManager.getNone():
             return ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[1]
         else:
-            return ["Process-ServiceType"]
+            return [{"key": "Process-ServiceType"}]
     
     ###################################################
     # Transitions

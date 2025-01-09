@@ -91,22 +91,26 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                 logger.error("The group to delete does not exist.")
                 continue
             existingGroup = existingContent[ServiceDetails.groups][idx]
+            if len(deletedContentGroup) == 0:
+                del existingContent[ServiceDetails.groups][idx]
+                break
             for entry in deletedContentGroup:
-                if entry == ServiceDetails.models:
-                    for fileID in deletedContentGroup[ServiceDetails.models]:
-                        del existingGroup[ServiceDetails.models][fileID]
-                        if ServiceDetails.calculations in existingGroup:
-                            del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
-                elif entry == ServiceDetails.material:
-                    del existingGroup[ServiceDetails.material]
-                elif entry == ServiceDetails.postProcessings:
-                    for postProcessingsID in deletedContentGroup[ServiceDetails.postProcessings]:
-                        del existingGroup[ServiceDetails.postProcessings][postProcessingsID]
-                elif entry == ServiceDetails.calculations:
-                    for fileID in deletedContentGroup[ServiceDetails.calculations]:
-                        del existingGroup[ServiceDetails.calculations][fileID]
-                else:
-                    raise NotImplementedError("This service detail does not exist (yet).")
+                match entry:
+                    case ServiceDetails.models:
+                        for fileID in deletedContentGroup[ServiceDetails.models]:
+                            del existingGroup[ServiceDetails.models][fileID]
+                            if ServiceDetails.calculations in existingGroup:
+                                del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
+                    case ServiceDetails.material:
+                        del existingGroup[ServiceDetails.material]
+                    case ServiceDetails.postProcessings:
+                        for postProcessingsID in deletedContentGroup[ServiceDetails.postProcessings]:
+                            del existingGroup[ServiceDetails.postProcessings][postProcessingsID]
+                    case ServiceDetails.calculations:
+                        for fileID in deletedContentGroup[ServiceDetails.calculations]:
+                            del existingGroup[ServiceDetails.calculations][fileID]
+                    case _:
+                        raise NotImplementedError("This service detail does not exist (yet).")
 
     except (Exception) as error:
         logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
