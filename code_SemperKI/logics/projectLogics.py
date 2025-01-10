@@ -22,7 +22,7 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.definitions import *
-from code_SemperKI.states.states import getFlatStatus
+from code_SemperKI.states.states import getFlatStatus, getMissingElements
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -103,6 +103,10 @@ def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Excepti
             else:
                 entry[ProcessDescription.serviceDetails] = serviceManager.getService(entry[ProcessDescription.serviceType]).parseServiceDetails(entry[ProcessDescription.serviceDetails])
             
+            processObj = interface.getProcessObj(projectID, entry[ProcessDescription.processID])
+            missingElements = getMissingElements(interface, processObj)
+            entry["processErrors"] = missingElements
+
             # check if costs are there and if they should be shown
             if ProcessDetails.prices in entry[ProcessDescription.processDetails]:
                 if PricesDetails.details in entry[ProcessDescription.processDetails][ProcessDetails.prices]:
