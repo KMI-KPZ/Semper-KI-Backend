@@ -89,6 +89,9 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
         groupIdxForExistingContent = 0
         for idx in range(len(deletedContent[ServiceDetails.groups])):
             deletedContentGroup = deletedContent[ServiceDetails.groups][idx]
+            if deletedContentGroup is None:
+                groupIdxForExistingContent += 1
+                continue
             if groupIdxForExistingContent >= len(existingContent[ServiceDetails.groups]):
                 logger.error("The group to delete does not exist.")
                 continue

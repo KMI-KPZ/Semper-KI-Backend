@@ -317,8 +317,8 @@ def deleteFile(request:Request, projectID, processID, fileID):
     """
     try:
         result, statusCode = logicForDeleteFile(request, projectID, processID, fileID, deleteFile.__name__)
-        if isinstance(result, Response):
-            message = f"Error while detelting files: {str(result)}"
+        if isinstance(result, Exception):
+            message = f"Error while deleting files: {str(result)}"
             exception = str(result)
             loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

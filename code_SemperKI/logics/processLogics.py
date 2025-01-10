@@ -137,7 +137,7 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
         adminOrNot = manualCheckifAdmin(request.session)
         interface = contentManager.getCorrectInterface(functionName)
         if interface == None:
-            return Exception("Rights not sufficient in getProcess"), 401
+            return Exception(f"Rights not sufficient in {functionName}"), 401
             
 
         process = interface.getProcessObj(projectID, processID)
