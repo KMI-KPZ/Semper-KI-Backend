@@ -334,7 +334,9 @@ def deleteProcessFunction(session, processIDs:list[str]):
             if not contentManager.checkRightsForProcess(processID):
                 logger.error("Rights not sufficient in deleteProcesses")
                 return HttpResponse("Insufficient rights!", status=401)
-            interface.deleteProcess(processID)
+            result = interface.deleteProcess(processID)
+            if result is False:
+                raise Exception("Error in deleteProcessFunction")
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
         return HttpResponse("Success")
     

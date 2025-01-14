@@ -104,7 +104,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                             if ServiceDetails.calculations in existingGroup:
                                 del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
                     case ServiceDetails.material:
-                        del existingGroup[ServiceDetails.material]
+                        existingGroup[ServiceDetails.material] = {}
                     case ServiceDetails.postProcessings:
                         for postProcessingsID in deletedContentGroup[ServiceDetails.postProcessings]:
                             del existingGroup[ServiceDetails.postProcessings][postProcessingsID]

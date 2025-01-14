@@ -435,7 +435,7 @@ class SResContractors(serializers.Serializer):
     hashedID = serializers.CharField(max_length=200)
     name = serializers.CharField(max_length=200)
     branding = serializers.DictField()
-    price = serializers.DictField()
+    prices = serializers.DictField()
 
 
 #########################################################################

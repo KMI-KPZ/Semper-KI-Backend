@@ -542,10 +542,11 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                if allFiles[entry][FileObjectContent.remote]:
-                    s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                else:
-                    s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                if FileObjectContent.isFile not in allFiles[entry] or allFiles[entry][FileObjectContent.isFile]:
+                    if allFiles[entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
