@@ -98,7 +98,7 @@ def logicForGetContractors(processObj:Process):
         processObj.processDetails[ProcessDetails.prices] = {}
         for contractor in listOfContractorsWithPriorities:
             # save this to database
-            processObj.processDetails[ProcessDetails.prices][OrganizationDescription.hashedID] = contractor[0][ProcessDetails.prices]
+            processObj.processDetails[ProcessDetails.prices][contractor[0][OrganizationDescription.hashedID]] = copy.deepcopy(contractor[0][ProcessDetails.prices])
             # but parse away the details for the frontend
             del contractor[0][ProcessDetails.prices][PricesDetails.details]
             listOfResultingContractors.append({
@@ -107,7 +107,7 @@ def logicForGetContractors(processObj:Process):
                 OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding],
                 ProcessDetails.prices: contractor[0][ProcessDetails.prices]
             })
-
+        processObj.save()
         return (listOfResultingContractors, 200)
 
     except Exception as e:
@@ -161,11 +161,12 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
     
         # check if costs are there and if they should be shown
         if ProcessDetails.prices in process.processDetails:
-            if PricesDetails.details in process.processDetails[ProcessDetails.prices]:
-                if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processID, userID)):
-                    del outDict[ProcessDetails.prices][PricesDetails.details]
-                else:
-                    outDict[ProcessDetails.prices][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, process.processDetails[ProcessDetails.prices][PricesDetails.details])
+            for contractorID in process.processDetails[ProcessDetails.prices]:
+                if PricesDetails.details in process.processDetails[ProcessDetails.prices][contractorID]:
+                    if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processID, userID)):
+                        del outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details]
+                    else:
+                        outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, process.processDetails[ProcessDetails.prices][contractorID][PricesDetails.details])
 
         return (outDict, 200)
     except Exception as e:

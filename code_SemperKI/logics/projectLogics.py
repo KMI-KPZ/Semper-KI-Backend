@@ -108,12 +108,13 @@ def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Excepti
             entry["processErrors"] = missingElements
 
             # check if costs are there and if they should be shown
-            if ProcessDetails.prices in entry[ProcessDescription.processDetails]:
-                if PricesDetails.details in entry[ProcessDescription.processDetails][ProcessDetails.prices]:
-                    if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(entry[ProcessDescription.processID], userID)):
-                        del entry[ProcessDetails.prices][PricesDetails.details]
-                    else:
-                        entry[ProcessDetails.prices][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, entry[ProcessDescription.processDetails][ProcessDetails.prices][PricesDetails.details])
+            if ProcessDetails.prices in processObj.processDetails:
+                for contractorID in processObj.processDetails[ProcessDetails.prices]:
+                    if PricesDetails.details in processObj.processDetails[ProcessDetails.prices][contractorID]:
+                        if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processObj.processID, userID)):
+                            del entry[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details]
+                        else:
+                            entry[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, processObj.processDetails[ProcessDetails.prices][contractorID][PricesDetails.details])
 
             
             listOfFlatProcesses.append(entry)
