@@ -93,8 +93,8 @@ newPaths = {
     "orga_deleteLinkToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/delete/<str:entityID>/", orga.orga_removeEdgeToOrga),
     "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
     "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
-    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions)
-
+    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions),
+    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests)
 }
 
 # add paths

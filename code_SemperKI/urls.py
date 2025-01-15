@@ -98,7 +98,7 @@ newPaths= {
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
     "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
-    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
+    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
 
 }
 

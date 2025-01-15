@@ -123,9 +123,9 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         costsObject = Costs(process, additionalArguments, transferObject)
         costs = costsObject.calculateCosts()
-        outDict = {}
-        for groupIdx, groupCosts in enumerate(costs):
-            outDict["group "+str(groupIdx)] = groupCosts
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
         # detailed overview, encrypted
         outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
         return outDict

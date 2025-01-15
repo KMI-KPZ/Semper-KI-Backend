@@ -104,7 +104,7 @@ def uploadFiles(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         info = inSerializer.data
-        result, statusCode = logicForUploadFiles(request, info, uploadFiles.__name__)
+        result, statusCode = logicForUploadFiles(request, info, uploadFiles.cls.__name__)
         if result is not None:
             message = f"Error while uploading files: {str(result)}"
             exception = str(result)

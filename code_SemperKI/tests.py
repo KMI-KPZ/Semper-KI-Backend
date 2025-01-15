@@ -10,6 +10,9 @@ Contains: Tests for various functions and services
 from django.test import TestCase, Client
 import datetime
 import json, io
+
+from code_SemperKI.modelFiles.dataModel import DataDescription
+from code_SemperKI.states.stateDescriptions import ProcessStatusAsString
 from .urls import paths
 
 from Generic_Backend.code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
@@ -213,8 +216,6 @@ class TestProjects(TestCase):
             contentOfTestFile = self.testFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
 
-    # TODO: getProcessHistory, (getContractors), statemachine, (events), (celery stuff?)
-
     ##################################################
     def test_processHistory(self):
         client = Client()
@@ -222,10 +223,26 @@ class TestProjects(TestCase):
         # Create user, project and process
         self.createUser(client)
         projectObj, processObj = self.createProjectAndProcess(client)
-        
-        # TODO: call getProcessHistory as get with processID in path
+        # call getProcessHistory as get with processID in path
+        historyPath = paths["getProcessHistory"][0].split("/")
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = client.get("/"+historyPath)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        print(response.content)
+        response = json.loads(response.content)
+        # Check return value for length of history
+        self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
 
-        # TODO: Check return value for creation of process
+        # save stuff
+        self.createUser(client)
+        # call getProcessHistory as get with processID in path
+        historyPath = paths["getProcessHistory"][0].split("/")
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+historyPath).content)
+        # Check return value for length of history
+        self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
+
+
 
     ##################################################
     def test_stateMachine(self):
@@ -234,12 +251,27 @@ class TestProjects(TestCase):
         # create project and process but no user as it's not necessary
         projectObj, processObj = self.createProjectAndProcess(client)
 
-        # TODO: call updateProcess with selected service 1
+        # call updateProcess with selected service 1
+        changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
+        response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        # TODO: call getProcess and get buttons
+        # call getProcess and get buttons
+        getProcPathSplit = paths["getProcess"][0].split("/")
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs(response[ProcessDescription.serviceType] == 1, True, f'{response[ProcessDescription.serviceType]}')
 
-        # TODO: "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
+        self.assertIs("processStatusButtons" in response and len(response["processStatusButtons"]) > 0 and "action" in response["processStatusButtons"][0], True, f'{response}')
+        buttonData = response["processStatusButtons"][0]["action"]["data"]
 
-        # TODO: call getProcess and check if processStatus code is correct (see StateDescription for the integer value)
+        # "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
+        button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processID": processObj[ProcessDescription.processID]}
+        response = client.post("/"+paths["statusButtonRequest"][0], json.dumps(button), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # call getProcess and check if processStatus code is correct (see StateDescription for the integer value)
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs(response[ProcessDescription.processStatus] == 0, True, f'{response[ProcessDescription.processStatus]}')
 
 
