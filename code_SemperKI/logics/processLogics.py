@@ -104,7 +104,7 @@ def logicForGetContractors(processObj:Process):
             listOfResultingContractors.append({
                 OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
                 OrganizationDescription.name: contractor[0][OrganizationDescription.name],
-                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding],
+                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
                 ProcessDetails.prices: contractor[0][ProcessDetails.prices]
             })
         processObj.save()

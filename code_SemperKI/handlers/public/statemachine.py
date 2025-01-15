@@ -113,7 +113,7 @@ def statusButtonRequest(request:Request):
         # get from info, create correct object, initialize statemachine, switch state accordingly
         inSerializer = SReqStatusButtons(data=request.data)
         if not inSerializer.is_valid():
-            message = "Verification failed in createProjectID"
+            message = "Verification failed in statusButtonRequest"
             exception = f"Verification failed {inSerializer.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

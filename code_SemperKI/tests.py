@@ -197,8 +197,8 @@ class TestProjects(TestCase):
         
         self.testFile.seek(0)
         # saved stuff
-        projectObj, processObj = self.createProjectAndProcess(client)
         self.createUser(client)
+        projectObj, processObj = self.createProjectAndProcess(client)
         uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
@@ -225,10 +225,9 @@ class TestProjects(TestCase):
         projectObj, processObj = self.createProjectAndProcess(client)
         # call getProcessHistory as get with processID in path
         historyPath = paths["getProcessHistory"][0].split("/")
-        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + processObj[ProcessDescription.processID] + "/"
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/"+ historyPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
         response = client.get("/"+historyPath)
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-        print(response.content)
         response = json.loads(response.content)
         # Check return value for length of history
         self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
@@ -237,7 +236,7 @@ class TestProjects(TestCase):
         self.createUser(client)
         # call getProcessHistory as get with processID in path
         historyPath = paths["getProcessHistory"][0].split("/")
-        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + processObj[ProcessDescription.processID] + "/"
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + historyPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+historyPath).content)
         # Check return value for length of history
         self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
@@ -266,7 +265,7 @@ class TestProjects(TestCase):
         buttonData = response["processStatusButtons"][0]["action"]["data"]
 
         # "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
-        button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processID": processObj[ProcessDescription.processID]}
+        button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]]}
         response = client.post("/"+paths["statusButtonRequest"][0], json.dumps(button), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
