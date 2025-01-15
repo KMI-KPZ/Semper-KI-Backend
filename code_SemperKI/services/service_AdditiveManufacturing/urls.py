@@ -44,13 +44,14 @@ newPaths = {
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
     "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
     "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:fileID>/",model.deleteModel),
+    "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
     #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
     "getModelRepository": ("public/service/additive-manufacturing/model/repository/get/", model.getModelRepository),
 
     #"checkPrintability": ("public/checkPrintability/",checkService.),
     #"checkPrices": ("public/checkPrices/",checkService.checkPrice),
     #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
+    
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
