@@ -86,6 +86,8 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     """
 
     try:
+        if existingContent == deletedContent:
+            existingContent = {}
         groupIdxForExistingContent = 0
         for idx in range(len(deletedContent[ServiceDetails.groups])):
             deletedContentGroup = deletedContent[ServiceDetails.groups][idx]
@@ -101,7 +103,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                     case ServiceDetails.models:
                         for fileID in deletedContentGroup[ServiceDetails.models]:
                             del existingGroup[ServiceDetails.models][fileID]
-                            if ServiceDetails.calculations in existingGroup:
+                            if ServiceDetails.calculations in existingGroup and ServiceDetails.calculations not in deletedContentGroup:
                                 del existingGroup[ServiceDetails.calculations][fileID] # invalidate calculations since the model doesn't exist anymore
                     case ServiceDetails.material:
                         existingGroup[ServiceDetails.material] = {}
