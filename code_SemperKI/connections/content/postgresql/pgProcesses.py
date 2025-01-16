@@ -875,7 +875,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool, creatorOfEvent:str):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -903,6 +903,8 @@ class ProcessManagementBase(AbstractContentInterface):
             dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
         for userHashID in dictOfUserIDsAndPreference:
+            if userHashID == creatorOfEvent:
+                continue
             dictForEventsAsOutput[userHashID] = {
                 EventsDescriptionGeneric.triggerEvent: dictOfUserIDsAndPreference[userHashID],
                 EventsDescriptionGeneric.eventType: "processEvent",
@@ -916,6 +918,8 @@ class ProcessManagementBase(AbstractContentInterface):
             }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
+            if userThatBelongsToContractorHashID == creatorOfEvent:
+                continue
             dictForEventsAsOutput[userThatBelongsToContractorHashID] = {
                 EventsDescriptionGeneric.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
                 EventsDescriptionGeneric.eventType: "processEvent",

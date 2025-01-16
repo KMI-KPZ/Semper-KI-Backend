@@ -279,24 +279,24 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
 
             if "changes" in changes:
                 for elem in changes["changes"]:
+                    # exclude people not having sufficient rights for that specific operation
+                    if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
+                        logger.error("Rights not sufficient in updateProcess")
+                        return ("", False)
                     fireEvent = False
                     # for websocket events
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files or elem == ProcessUpdates.processStatus or elem == ProcessUpdates.serviceStatus):
-                        # exclude people not having sufficient rights for that specific operation
-                        if (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
-                            return ("", False)
                         fireEvent = True
                     returnVal = interface.updateProcess(projectID, processID, elem, changes["changes"][elem], client)
                     if isinstance(returnVal, Exception):
                         raise returnVal
                     if fireEvent:
                         if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage, creatorOfEvent=client)
                         elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=client)
                         else:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, creatorOfEvent=client)
                     
             # change state for this process if necessary
             process = interface.getProcessObj(projectID, processID)

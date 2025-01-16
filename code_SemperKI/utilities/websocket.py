@@ -28,7 +28,7 @@ loggerError = logging.getLogger("errors")
 ##################################################
 
 #######################################################
-def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, eventContent, notification:str="", clientOnly:bool=False):
+def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, eventContent, notification:str="", clientOnly:bool=False, creatorOfEvent:str=""):
     """
     Fire websocket event from a list for a specific project and process. 
     
@@ -46,16 +46,18 @@ def fireWebsocketEventsForProcess(projectID:str, processID:str, session, event, 
     :type notification: str
     :param clientOnly: Should the event fire only for the client, not the contractor
     :type clientOnly: Bool
+    :param creatorOfEvent: The user that triggered the event
+    :type creatorOfEvent: Str
     :return: Nothing
     :rtype: None
     """
 
     if manualCheckifLoggedIn(session):
-        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, eventContent, notification, clientOnly)
+        dictForEvents = pgProcesses.ProcessManagementBase.getInfoAboutProjectForWebsocket(projectID, processID, event, eventContent, notification, clientOnly, creatorOfEvent)
         channelLayer = get_channel_layer()
         for userID, values in dictForEvents.items(): # user/orga that is associated with that process
-            if notification == NotificationSettingsUserSemperKI.newMessage and userID == ProfileManagementBase.getUserHashID(session=session):
-                continue # If you wrote a message, you shouldn't get a notification for yourself
+            if (notification == NotificationSettingsUserSemperKI.newMessage or notification == NotificationSettingsUserSemperKI.statusChange) and userID == ProfileManagementBase.getUserHashID(session=session):
+                continue # If you wrote a message or forwared the process, you shouldn't get a notification for yourself
             # create an entry in the event queue for that user
             createdEvent = pgEvents.createEventEntry(userHashedID=userID, eventType=values[EventsDescriptionGeneric.eventType], eventData=values[EventsDescriptionGeneric.eventData], triggerEvent=values[EventsDescriptionGeneric.triggerEvent]) 
             async_to_sync(channelLayer.group_send)(userID[:80], {

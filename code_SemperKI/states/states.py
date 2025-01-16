@@ -330,7 +330,7 @@ class State(ABC):
                     if isinstance(retVal, Exception):
                         raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -363,7 +363,7 @@ class State(ABC):
                     if isinstance(retVal, Exception):
                         raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
                     break # Ensure that only one transition is possible 
             
             return returnState
