@@ -9,7 +9,7 @@ import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
 
-from .connections.postgresql.pgService import initializeService as AM_initializeService, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
+from .connections.postgresql.pgService import initializeService as AM_initializeService, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
@@ -46,6 +46,14 @@ class AdditiveManufacturing(Semper.ServiceBase):
 
         """
         return AM_deleteServiceDetails(existingContent, deletedContent)
+    
+    ###################################################
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+        return AM_isFileRelevantForService(existingContent, fileID)
     
     ###################################################
     def parseServiceDetails(self, existingContent) -> dict:

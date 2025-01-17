@@ -38,6 +38,7 @@ from ..connections.content.postgresql import pgProcesses
 from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDescription, dataTypeToString
 from ..utilities.basics import testPicture
 from django.http.request import HttpRequest
+from ..serviceManager import serviceManager
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -508,10 +509,17 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
         if flag == False:
             return Exception(str(fileOfThisProcess.content)), fileOfThisProcess.status_code # Response if something went wrong
 
+        # check if the file is relevant to the service and if so, dont delete it
+        processObj = pgProcesses.ProcessManagementBase.getProcessObj(projectID, processID)
+        serviceType = processObj.serviceType
+        if serviceType == serviceManager.getNone():
+            return Exception("No Service selected!"), 400
+        service = serviceManager.getService(processObj.serviceType)
+        if service.isFileRelevantForService(processObj.serviceDetails, fileOfThisProcess[FileObjectContent.id]):
+            return Exception("File is relevant for service!"), 400
+
         deletions = {"changes": {}, "deletions": {}}
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
-        
-        
         message, flag = updateProcessFunction(request, deletions, projectID, [processID])
         if flag is False:
             return Exception("Not logged in"), status.HTTP_401_UNAUTHORIZED

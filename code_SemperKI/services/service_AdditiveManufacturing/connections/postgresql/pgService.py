@@ -123,6 +123,32 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
     return existingContent
 
 ####################################################################################
+def isFileRelevantForService(existingContent:dict, fileID:str) -> bool:
+    """
+    Check if a file is relevant for the service
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :param fileID: The file ID
+    :type fileID: Str
+    :return: True if the file is relevant
+    :rtype: Bool
+    """
+
+    try:
+        for group in existingContent[ServiceDetails.groups]:
+            if ServiceDetails.models in group:
+                if fileID in group[ServiceDetails.models]:
+                    return True
+            if ServiceDetails.calculations in group:
+                if fileID in group[ServiceDetails.calculations]:
+                    return True
+        return False
+    except (Exception) as error:
+        logger.error(f'Generic error in isFileRelevantForService(3D Print): {str(error)}')
+        return False
+
+####################################################################################
 def serviceReady(existingContent:dict) -> tuple[bool, list[dict]]:
     """
     Check if everything is there

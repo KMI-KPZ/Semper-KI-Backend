@@ -55,6 +55,14 @@ class ServiceBase(ABC):
         Delete stuff from a service
 
         """
+
+    ###################################################
+    @abstractmethod
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
     
     ###################################################
     @abstractmethod

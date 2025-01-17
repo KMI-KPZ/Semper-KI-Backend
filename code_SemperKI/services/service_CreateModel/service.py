@@ -26,6 +26,7 @@ class CreateModel(Semper.ServiceBase):
         Initialize the service
 
         """
+        return {}
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -44,6 +45,14 @@ class CreateModel(Semper.ServiceBase):
         """
 
         return CM_deleteServiceDetails(existingContent, newContent)
+    
+    ###################################################
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+        return False
     
     ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:

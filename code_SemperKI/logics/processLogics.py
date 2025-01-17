@@ -46,10 +46,10 @@ def logicForGetContractors(processObj:Process):
         # TODO: if contractor is already selected, use that with all saved details
 
         serviceType = processObj.serviceType
-        service = serviceManager.getService(processObj.serviceType)
-        
         if serviceType == serviceManager.getNone():
             return Exception("No Service selected!"), 400
+        
+        service = serviceManager.getService(serviceType)
 
         listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
         
