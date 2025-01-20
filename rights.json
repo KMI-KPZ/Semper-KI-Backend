@@ -166,18 +166,18 @@
             "OrganizationButtonDeleteRole"
          ],
          "paths": [
-            "organizations_setPermissionsForRole",
-            "organizations_deleteRole",
-            "organizations_editRole",
-            "organizations_removeRole",
-            "organizations_assignRole",
-            "organizations_createRole",
-            "organizations_deleteUser",
-            "organizations_addUser",
-            "organizations_getInviteLink",
+            "organizationsSetPermissionsForRole",
+            "organizationsDeleteRole",
+            "organizationsEditRole",
+            "organizationsRemoveRole",
+            "organizationsAssignRole",
+            "organizationsCreateRole",
+            "organizationsDeleteUser",
+            "organizationsAddUser",
+            "organizationsGetInviteLink",
             "updateDetailsOfOrganization",
-            "organizations_fetchInvitees",
-            "organizations_deleteInvite"
+            "organizationsFetchInvitees",
+            "organizationsDeleteInvite"
          ]
       },
       {
@@ -191,10 +191,10 @@
             "OrganizationRoles"
          ],
          "paths": [
-            "organizations_getPermissionsForRole",
-            "organizations_getPermissions",
-            "organizations_getRoles",
-            "organizations_fetchUsers"
+            "organizationsGetPermissionsForRole",
+            "organizationsGetPermissions",
+            "organizationsGetRoles",
+            "organizationsFetchUsers"
          ]
       },
       {
