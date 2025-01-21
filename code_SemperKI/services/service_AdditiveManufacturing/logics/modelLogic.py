@@ -269,7 +269,9 @@ def logicForDeleteModel(request, projectID, processID, groupID, fileID, function
     if currentProcess.client != contentManager.getClient():
         return (Exception(f"Rights not sufficient in {functionName}"), 401)
 
-    logicForDeleteFile(request, projectID, processID, fileID, functionName)
+    exception, statusCode = logicForDeleteFile(request, projectID, processID, fileID, functionName, True)
+    if exception is not None:
+        return (exception, statusCode)
     
     changesArray = [{} for i in range(len(currentProcess.serviceDetails[ServiceDetails.groups]))]
     changesArray[groupID] = {ServiceDetails.models: {fileID: None}}

@@ -730,7 +730,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
-                currentProcess.processDetails[ProcessDetails.prices] = {content: currentProcess.processDetails[ProcessDetails.prices][content]} # delete prices of other contractors and reduce to this one
+                if OrganizationDescription.hashedID in content and ProcessDetails.prices in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.prices] = {content[OrganizationDescription.hashedID]: currentProcess.processDetails[ProcessDetails.prices][content[OrganizationDescription.hashedID]]} # delete prices of other contractors and reduce to this one
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
                 outContent = content
 

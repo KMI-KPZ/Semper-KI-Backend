@@ -485,7 +485,7 @@ def logicForDownloadProcessHistory(request:Request, processID:str, functionName:
         return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
-def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str, functionName:str):
+def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str, functionName:str, serviceRequestsDeletion = False):
     """
     Logics for deleting a file
 
@@ -514,9 +514,11 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
         serviceType = processObj.serviceType
         if serviceType == serviceManager.getNone():
             return Exception("No Service selected!"), 400
-        service = serviceManager.getService(processObj.serviceType)
-        if service.isFileRelevantForService(processObj.serviceDetails, fileOfThisProcess[FileObjectContent.id]):
-            return Exception("File is relevant for service!"), 400
+        
+        if serviceRequestsDeletion is False: # should the service requests this, the check is unnecessary
+            service = serviceManager.getService(processObj.serviceType)
+            if service.isFileRelevantForService(processObj.serviceDetails, fileOfThisProcess[FileObjectContent.id]):
+                return Exception("File is relevant for service!"), 400
 
         deletions = {"changes": {}, "deletions": {}}
         deletions["deletions"][ProcessUpdates.files] = {fileOfThisProcess[FileObjectContent.id]: fileOfThisProcess}
