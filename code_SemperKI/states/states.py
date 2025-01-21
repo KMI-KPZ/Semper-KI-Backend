@@ -415,7 +415,7 @@ class DRAFT(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             }]
     
     ###################################################
@@ -455,6 +455,8 @@ class DRAFT(State):
 
         """
         if process.serviceType != ServiceManager.serviceManager.getNone():
+            if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
+                return stateDict[ProcessStatusAsString.SERVICE_READY]
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         return self
 
@@ -525,21 +527,21 @@ class SERVICE_IN_PROGRESS(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_READY,
                 "icon": IconType.FactoryIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
+                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
                     },
                 },
                 "active": False,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             }
         ]
     
@@ -674,7 +676,7 @@ class SERVICE_READY(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
@@ -688,7 +690,7 @@ class SERVICE_READY(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             }
         ] 
     
@@ -843,7 +845,7 @@ class SERVICE_COMPLETED(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
@@ -885,7 +887,7 @@ class SERVICE_COMPLETED(State):
     # Transitions
     ###################################################
     def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        SERVICE_READY | CONTRACTOR_COMPLETED:
+        SERVICE_COMPLETED | CONTRACTOR_COMPLETED:
         """
         Contractor was selected
 
@@ -896,7 +898,7 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+          SERVICE_COMPLETED | SERVICE_COMPLICATION:
         """
         Service Conditions not OK
 
@@ -908,7 +910,7 @@ class SERVICE_COMPLETED(State):
         
     ##################################################
     def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
-        SERVICE_IN_PROGRESS:
+        SERVICE_IN_PROGRESS | SERVICE_COMPLETED:
         """
         Service changed	
         """
@@ -980,7 +982,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             }
         ] 
     
@@ -1122,7 +1124,7 @@ class SERVICE_COMPLICATION(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
@@ -1136,7 +1138,7 @@ class SERVICE_COMPLICATION(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             },
         ] 
     
@@ -1253,7 +1255,7 @@ class CONTRACTOR_COMPLETED(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
@@ -1267,7 +1269,7 @@ class CONTRACTOR_COMPLETED(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             }
         ] 
     
@@ -1374,7 +1376,7 @@ class VERIFYING(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             { # this button shall not do anything
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
@@ -1388,7 +1390,7 @@ class VERIFYING(State):
                 },
                 "active": False,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             }
         ] 
     
@@ -1494,7 +1496,7 @@ class VERIFICATION_COMPLETED(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
+                "showIn": "process",
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
@@ -1508,7 +1510,7 @@ class VERIFICATION_COMPLETED(State):
                 },
                 "active": True,
                 "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
+                "showIn": "process",
             }
         ] 
     
@@ -1605,7 +1607,7 @@ class REQUEST_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ])
         if contractor or admin: # contractor
@@ -1620,7 +1622,7 @@ class REQUEST_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
@@ -1634,7 +1636,7 @@ class REQUEST_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
@@ -1648,7 +1650,7 @@ class REQUEST_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ])
         return outArr
@@ -1748,7 +1750,7 @@ class REQUEST_COMPLETED(State):
 #                     },
 #                     "active": True,
 #                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "project",
+#                     "showIn": "process",
 #                 },
 #             ])
 #         if not client or admin:
@@ -1765,7 +1767,7 @@ class REQUEST_COMPLETED(State):
 #                     },
 #                     "active": True,
 #                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "both",
+#                     "showIn": "process",
 #                 },
 #                 {
 #                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
@@ -1779,7 +1781,7 @@ class REQUEST_COMPLETED(State):
 #                     },
 #                     "active": True,
 #                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "both",
+#                     "showIn": "process",
 #                 }
 #             ])
 #         return outArr
@@ -1869,7 +1871,7 @@ class OFFER_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
@@ -1883,7 +1885,7 @@ class OFFER_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
@@ -1897,7 +1899,7 @@ class OFFER_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ])
         if contractor:
@@ -2001,7 +2003,7 @@ class OFFER_REJECTED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ] )
         if contractor or admin:
@@ -2090,7 +2092,7 @@ class CONFIRMATION_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
             ])
         if contractor or admin:
@@ -2107,7 +2109,7 @@ class CONFIRMATION_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         return outArr
@@ -2194,7 +2196,7 @@ class CONFIRMATION_REJECTED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ] )
         if contractor or admin:
@@ -2286,7 +2288,7 @@ class PRODUCTION_IN_PROGRESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
@@ -2300,7 +2302,7 @@ class PRODUCTION_IN_PROGRESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
@@ -2314,7 +2316,7 @@ class PRODUCTION_IN_PROGRESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         return outArr
@@ -2414,7 +2416,7 @@ class PRODUCTION_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
@@ -2428,7 +2430,7 @@ class PRODUCTION_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
@@ -2442,7 +2444,7 @@ class PRODUCTION_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         return outArr
@@ -2543,7 +2545,7 @@ class DELIVERY_IN_PROGRESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
@@ -2557,7 +2559,7 @@ class DELIVERY_IN_PROGRESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         if contractor or admin:
@@ -2646,7 +2648,7 @@ class DELIVERY_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
@@ -2660,7 +2662,7 @@ class DELIVERY_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
@@ -2674,7 +2676,7 @@ class DELIVERY_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
@@ -2688,7 +2690,7 @@ class DELIVERY_COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         if contractor or admin:
@@ -2809,7 +2811,7 @@ class DISPUTE(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
@@ -2823,7 +2825,7 @@ class DISPUTE(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
@@ -2837,7 +2839,7 @@ class DISPUTE(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
+                    "showIn": "process",
                 }
             ] )
         if contractor or admin:
@@ -2945,7 +2947,7 @@ class COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.CLONE,
@@ -2956,7 +2958,7 @@ class COMPLETED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ] 
         else:
@@ -3031,7 +3033,7 @@ class FAILED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.CLONE,
@@ -3042,7 +3044,7 @@ class FAILED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ] 
         else:
@@ -3117,7 +3119,7 @@ class CANCELED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 },
                 {
                     "title": ButtonLabels.CLONE,
@@ -3128,7 +3130,7 @@ class CANCELED(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
+                    "showIn": "process",
                 }
             ] 
         else:

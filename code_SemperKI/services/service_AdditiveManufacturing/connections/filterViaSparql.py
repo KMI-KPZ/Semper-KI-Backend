@@ -61,14 +61,15 @@ class Filter():
             nodesWithTheSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(material.uniqueID)
             # filter for those of orgas and retrieve the orgaID
             for entry in nodesWithTheSameUID:
-                if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
-                    setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
-                    # Save found printers that can print the selected material
-                    printersThatSupportThisMaterial = pgKG.Basics.getSpecificNeighborsByType(entry[NodeDescription.nodeID], NodeTypesAM.printer)
-                    if entry[NodeDescription.createdBy] in self.printerGroups[groupIdx]:
-                        self.printerGroups[groupIdx][entry[NodeDescription.createdBy]].extend(printersThatSupportThisMaterial)
-                    else:
-                        self.printerGroups[groupIdx][entry[NodeDescription.createdBy]] = printersThatSupportThisMaterial
+                if NodeDescription.active in entry and entry[NodeDescription.active]:
+                    if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+                        setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+                        # Save found printers that can print the selected material
+                        printersThatSupportThisMaterial = pgKG.Basics.getSpecificNeighborsByType(entry[NodeDescription.nodeID], NodeTypesAM.printer)
+                        if entry[NodeDescription.createdBy] in self.printerGroups[groupIdx]:
+                            self.printerGroups[groupIdx][entry[NodeDescription.createdBy]].extend(printersThatSupportThisMaterial)
+                        else:
+                            self.printerGroups[groupIdx][entry[NodeDescription.createdBy]] = printersThatSupportThisMaterial
                         
                 
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
