@@ -1,4 +1,6 @@
-from __future__ import annotations 
+from __future__ import annotations
+
+
 """
 Part of Semper-KI software
 
@@ -16,6 +18,7 @@ from abc import ABC, abstractmethod
 from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
+from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription 
 
 import code_SemperKI.utilities.websocket as WebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
@@ -803,7 +806,7 @@ class SERVICE_COMPLETED(State):
         listOfMissingThings = []
         if ProcessDetails.provisionalContractor not in process.processDetails:
             listOfMissingThings.append({"key": "Process-Contractor"})
-        elif process.processDetails[ProcessDetails.provisionalContractor] == "":
+        elif process.processDetails[ProcessDetails.provisionalContractor] == {}:
             listOfMissingThings.append({"key": "Process-Contractor"})
         if ProcessDetails.clientBillingAddress not in process.processDetails:
             listOfMissingThings.append({"key": "Process-Address-Billing"})
@@ -926,7 +929,7 @@ class SERVICE_COMPLETED(State):
         Button was pressed, go back
 
         """
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: {}}, process.client)
         return stateDict[ProcessStatusAsString.SERVICE_READY]
     
     ###################################################

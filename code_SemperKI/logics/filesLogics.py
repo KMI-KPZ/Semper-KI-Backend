@@ -529,5 +529,5 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return None, status.HTTP_200_OK
     except Exception as e:
-        logger.error(f"Error in {functionName}: {str(e)}")
+        logger.error(f"Error in {logicForDeleteFile.__name__}: {str(e)}")
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR

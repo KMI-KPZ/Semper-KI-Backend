@@ -846,7 +846,7 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
+                currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = {}
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:

@@ -43,8 +43,6 @@ def logicForGetContractors(processObj:Process):
     :rtype: tuple(list|Exception, int)
     """
     try:
-        # TODO: if contractor is already selected, use that with all saved details
-
         serviceType = processObj.serviceType
         if serviceType == serviceManager.getNone():
             return Exception("No Service selected!"), 400

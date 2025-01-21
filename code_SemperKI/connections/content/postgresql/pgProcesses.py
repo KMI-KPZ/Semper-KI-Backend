@@ -794,7 +794,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()
-                    
+
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
@@ -817,7 +817,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
+                currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
@@ -1320,11 +1320,11 @@ class ProcessManagementBase(AbstractContentInterface):
             if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID])
 
             # Create history entry
             dataID = crypto.generateURLFriendlyRandomString()
-            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID]}, dataID, processObj.processID, DataType.OTHER, userID, {})
             
             # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
             processObj.contractor = contractorObj

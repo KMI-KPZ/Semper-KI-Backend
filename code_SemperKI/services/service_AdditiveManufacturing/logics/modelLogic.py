@@ -29,8 +29,7 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
 from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.basics import testPicture
-from code_SemperKI.handlers.public.files import deleteFile
-from code_SemperKI.handlers.public.files import getFileReadableStream
+from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream
 from code_SemperKI.logics.processLogics import updateProcessFunction
 
 from ..definitions import *
@@ -270,12 +269,12 @@ def logicForDeleteModel(request, projectID, processID, groupID, fileID, function
     if currentProcess.client != contentManager.getClient():
         return (Exception(f"Rights not sufficient in {functionName}"), 401)
 
-    deleteFile(request._request, projectID, processID, fileID)
+    logicForDeleteFile(request, projectID, processID, fileID, functionName)
     
     changesArray = [{} for i in range(len(currentProcess.serviceDetails[ServiceDetails.groups]))]
     changesArray[groupID] = {ServiceDetails.models: {fileID: None}}
     changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
-    message, flag = updateProcessFunction(request._request, changes, projectID, [processID])
+    message, flag = updateProcessFunction(request, changes, projectID, [processID])
     if flag is False:
         return (Exception(f"Rights not sufficient in {functionName}"), 401)
     if isinstance(message, Exception):
