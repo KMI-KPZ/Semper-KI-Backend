@@ -36,7 +36,7 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, admin=False):
+def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, contractor=False, admin=False):
     """
     Look at process status of every process of a project and add respective buttons
 
@@ -44,6 +44,8 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
     :type process: ProcessModel.Process|ProcessModel.ProcessInterface
     :param client: Whether the current user is the client or the contractor
     :type client: Bool
+    :param contractor: Whether the current user is the contractor
+    :type contractor: Bool
     :param admin: Whether the current user is an admin (which may see all buttons) or not
     :type admin: Bool
     :return: The buttons corresponding to the status
@@ -52,7 +54,7 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
     """
 
     processStatusAsString = processStatusFromIntToStr(process.processStatus)
-    return stateDict[processStatusAsString].buttons(process, client, admin)
+    return stateDict[processStatusAsString].buttons(process, client, contractor, admin)
 
 ##################################################
 def getMissingElements(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
@@ -270,7 +272,7 @@ class State(ABC):
 
     ###################################################
     @abstractmethod
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -400,7 +402,7 @@ class DRAFT(State):
     fireEvent = False
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         None
         """
@@ -494,7 +496,7 @@ class SERVICE_IN_PROGRESS(State):
     fireEvent = False
     
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to draft
 
@@ -643,7 +645,7 @@ class SERVICE_READY(State):
     fireEvent = False
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Finish this service and go to overview
 
@@ -812,7 +814,7 @@ class SERVICE_COMPLETED(State):
         return listOfMissingThings
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Choose contractor
 
@@ -949,7 +951,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
     fireEvent = False
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
@@ -1105,7 +1107,7 @@ class SERVICE_COMPLICATION(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to Draft
 
@@ -1222,7 +1224,7 @@ class CONTRACTOR_COMPLETED(State):
     fireEvent = False
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for  CONTRACTOR_COMPLETED 
 
@@ -1343,7 +1345,7 @@ class VERIFYING(State):
     fireEvent = False
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for VERIFYING
 
@@ -1463,7 +1465,7 @@ class VERIFICATION_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Manual Request
 
@@ -1586,7 +1588,7 @@ class REQUEST_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for REQUEST_COMPLETED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
@@ -1606,7 +1608,8 @@ class REQUEST_COMPLETED(State):
                     "showIn": "project",
                 }
             ])
-        if not client or admin: # contractor
+        if contractor or admin: # contractor
+            outArr = [] # reset as to not duplicate the button
             outArr.extend([
                 {
                     "title": ButtonLabels.DELETE, # do not change
@@ -1849,7 +1852,7 @@ class OFFER_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for OFFER_COMPLETED, no Back-Button
 
@@ -1897,7 +1900,7 @@ class OFFER_COMPLETED(State):
                     "showIn": "both",
                 }
             ])
-        if not client or admin:
+        if contractor:
             outArr.extend(
             [
             ])
@@ -1981,7 +1984,7 @@ class OFFER_REJECTED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         No Buttons only CANCELED
 
@@ -2001,7 +2004,7 @@ class OFFER_REJECTED(State):
                     "showIn": "project",
                 }
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2070,7 +2073,7 @@ class CONFIRMATION_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for CONFIRMATION_COMPLETED, no Back-Button
 
@@ -2090,7 +2093,7 @@ class CONFIRMATION_COMPLETED(State):
                     "showIn": "project",
                 },
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
@@ -2174,7 +2177,7 @@ class CONFIRMATION_REJECTED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         No Buttons only CANCELED
 
@@ -2194,7 +2197,7 @@ class CONFIRMATION_REJECTED(State):
                     "showIn": "project",
                 }
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2263,7 +2266,7 @@ class PRODUCTION_IN_PROGRESS(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_IN_PROGRESS, no Back-Button
 
@@ -2272,7 +2275,7 @@ class PRODUCTION_IN_PROGRESS(State):
         if client or admin:
             outArr.extend( [
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
@@ -2391,7 +2394,7 @@ class PRODUCTION_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_COMPLETED, no Back-Button
 
@@ -2400,7 +2403,7 @@ class PRODUCTION_COMPLETED(State):
         if client or admin:
             outArr.extend( [
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
                 {
                     "title": ButtonLabels.DELETE, # do not change
@@ -2523,7 +2526,7 @@ class DELIVERY_IN_PROGRESS(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_IN_PROGRESS, no Back-Button
 
@@ -2557,7 +2560,7 @@ class DELIVERY_IN_PROGRESS(State):
                     "showIn": "both",
                 }
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2626,7 +2629,7 @@ class DELIVERY_COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_COMPLETED, no Back-Button
 
@@ -2688,7 +2691,7 @@ class DELIVERY_COMPLETED(State):
                     "showIn": "both",
                 }
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2789,7 +2792,7 @@ class DISPUTE(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
@@ -2837,7 +2840,7 @@ class DISPUTE(State):
                     "showIn": "both",
                 }
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2926,7 +2929,7 @@ class COMPLETED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -2949,7 +2952,7 @@ class COMPLETED(State):
                     "icon": IconType.ReplayIcon,
                     "action": {
                         "type": "request",
-                        "data": { "type": "cloneProcess" },
+                        "data": { "type": "cloneProcesses" },
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
@@ -3012,7 +3015,7 @@ class FAILED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -3035,7 +3038,7 @@ class FAILED(State):
                     "icon": IconType.ReplayIcon,
                     "action": {
                         "type": "request",
-                        "data": { "type": "cloneProcess" },
+                        "data": { "type": "cloneProcesses" },
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
@@ -3098,7 +3101,7 @@ class CANCELED(State):
     fireEvent = True
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -3121,7 +3124,7 @@ class CANCELED(State):
                     "icon": IconType.ReplayIcon,
                     "action": {
                         "type": "request",
-                        "data": { "type": "cloneProcess" },
+                        "data": { "type": "cloneProcesses" },
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,

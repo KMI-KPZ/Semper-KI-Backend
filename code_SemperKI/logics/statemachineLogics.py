@@ -16,7 +16,7 @@ from Generic_Backend.code_General.definitions import *
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.public.process import cloneProcess, deleteProcessFunction
+from code_SemperKI.handlers.public.process import logicForCloneProcesses, deleteProcessFunction
 from code_SemperKI.states.states import StateMachine, InterfaceForStateChange
 
 logger = logging.getLogger("logToFile")
@@ -46,7 +46,7 @@ def logicForStatusButtonRequest(request:Request, validatedInput:dict, functionNa
                 raise retVal
             return retVal
         elif "cloneProcess" in buttonData[InterfaceForStateChange.type]:
-            retVal = cloneProcess(request, projectID, processIDs)
+            retVal = logicForCloneProcesses(request, projectID, processIDs, "cloneProcesses")
             return retVal
         else:
             nextState = buttonData[InterfaceForStateChange.targetStatus]

@@ -505,7 +505,7 @@ def getContractors(request:Request, processID:str):
 #########################################################################
 #TODO Add serializer for cloneProcess
 #######################################################
-class SResCloneProcess(serializers.Serializer):
+class SReqsCloneProcess(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processIDs = serializers.ListField(child=serializers.CharField(max_length=200))
 #########################################################################
@@ -514,17 +514,17 @@ class SResCloneProcess(serializers.Serializer):
     summary="Duplicate selected processes. Works only for logged in users.",
     description=" ",
     tags=['FE - Processes'],
-    request=None,
+    request=SReqsCloneProcess,
     responses={
-        200: SResCloneProcess,
+        200: SReqsCloneProcess,
         500: ExceptionSerializer
     }
 )
 @checkIfUserIsLoggedIn()
 @checkIfRightsAreSufficient(json=True)
-@api_view(["GET"])
+@api_view(["POST"])
 @checkVersion(0.3)
-def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
+def cloneProcesses(request:Request):
     """
     Duplicate selected processes. Works only for logged in users.
 
@@ -539,9 +539,22 @@ def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
     
     """
     try:
-        result, statusCode = logicForCloneProcess(request, oldProjectID, oldProcessIDs, cloneProcess.cls.__name__)
+        inSerializer = SReqsCloneProcess(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {cloneProcesses.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        validatedInput = inSerializer.data
+        oldProjectID = validatedInput["projectID"]
+        oldProcessIDs = validatedInput["processIDs"]
+        result, statusCode = logicForCloneProcesses(request, oldProjectID, oldProcessIDs, cloneProcesses.cls.__name__)
         if isinstance(result, Exception):
-            message = f"Error in {cloneProcess.cls.__name__}"
+            message = f"Error in {cloneProcesses.cls.__name__}"
             exception = str(result)
             loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -550,7 +563,7 @@ def cloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str]):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-        outSerializer = SResCloneProcess(data=result)
+        outSerializer = SReqsCloneProcess(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:

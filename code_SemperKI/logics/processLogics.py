@@ -145,7 +145,10 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
             raise process
 
         # add buttons
-        buttons = getButtonsForProcess(process, process.client == userID, adminOrNot) # calls current node of the state machine
+        contractor = False
+        if process.contractor is not None:
+            contractor = process.contractor.hashedID == userID
+        buttons = getButtonsForProcess(process, process.client == userID, contractor, adminOrNot) # calls current node of the state machine
         outDict = process.toDict()
         outDict["processStatusButtons"] = buttons
 
@@ -345,7 +348,7 @@ def deleteProcessFunction(session, processIDs:list[str]):
         return e
     
 #######################################################
-def logicForCloneProcess(request:Request, oldProjectID:str, oldProcessIDs:list[str], functionName:str):
+def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list[str], functionName:str):
     """
     Duplicate selected processes. Works only for logged in users.
 

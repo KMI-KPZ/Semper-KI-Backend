@@ -684,6 +684,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     if getAdditionalInformation:
                         outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
                         outAdditionalInformation[FileObjectContent.origin] = content[entry][FileObjectContent.origin]
+                    dataID = crypto.generateURLFriendlyRandomString()
                 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
@@ -792,7 +793,8 @@ class ProcessManagementBase(AbstractContentInterface):
                             s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
-
+                    dataID = crypto.generateURLFriendlyRandomString()
+                    
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})

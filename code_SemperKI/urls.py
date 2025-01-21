@@ -50,6 +50,7 @@ newPaths= {
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
     "deleteProcesses": ("public/process/delete/<str:projectID>/", process.deleteProcesses), 
+    "cloneProcesses": ("public/process/clone/", process.cloneProcesses),
     "getProcessHistory": ("public/process/history/get/<str:processID>/", process.getProcessHistory),
     "getContractors": ("public/process/contractors/get/<str:processID>/", process.getContractors),
 

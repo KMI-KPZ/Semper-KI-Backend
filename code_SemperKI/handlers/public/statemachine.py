@@ -20,7 +20,7 @@ from Generic_Backend.code_General.utilities.basics import checkVersion
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.public.process import cloneProcess, deleteProcessFunction
+from code_SemperKI.handlers.public.process import cloneProcesses, deleteProcessFunction
 from code_SemperKI.states.states import StateMachine, InterfaceForStateChange
 from code_SemperKI.logics.statemachineLogics import logicForStatusButtonRequest
 
