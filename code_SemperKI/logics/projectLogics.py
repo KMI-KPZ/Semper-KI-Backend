@@ -106,6 +106,7 @@ def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Excepti
             processObj = interface.getProcessObj(projectID, entry[ProcessDescription.processID])
             missingElements = getMissingElements(interface, processObj)
             entry["processErrors"] = missingElements
+            entry["flatProcessStatus"] = getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client])
 
             # check if costs are there and if they should be shown
             if ProcessDetails.prices in processObj.processDetails:
