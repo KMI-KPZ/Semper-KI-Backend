@@ -26,7 +26,7 @@ from code_SemperKI.states.states import StateMachine, signalDependencyToOtherPro
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.definitions import *
-from code_SemperKI.states.states import getButtonsForProcess, getMissingElements
+from code_SemperKI.states.states import getButtonsForProcess, getMissingElements, getFlatStatus
 from code_SemperKI.connections.content.postgresql import pgProcesses
 import code_SemperKI.utilities.websocket as WebSocketEvents
 
@@ -153,6 +153,10 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
         # add what's missing to continue
         missingElements = getMissingElements(interface, process)
         outDict["processErrors"] = missingElements
+
+        # Add who needs to do what
+        outDict["flatProcessStatus"] = getFlatStatus(process.processStatus, contentManager.getClient() == process.client)
+
 
         # parse for frontend
         if process.serviceType == serviceManager.getNone():
@@ -417,6 +421,9 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
                 raise errorOrNone
             
             # set service specific stuff
+            if oldProcess.serviceType == serviceManager.getNone():
+                continue # no service selected, skip the rest
+
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.serviceType, oldProcess.serviceType, oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone
@@ -445,7 +452,7 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
             newProcess.save()
 
             # set process state through state machine (could be complete or waiting or in conflict and so on)
-            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS), oldProcess.client)
+            errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.DRAFT), oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone
             newProcess = pgProcesses.ProcessManagementBase.getProcessObj(newProjectID, newProcessID)

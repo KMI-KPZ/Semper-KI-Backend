@@ -172,6 +172,7 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     WAITING_CLIENT = enum.auto()
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
+    FAILED = enum.auto()
     COMPLETED = enum.auto()
 
 ####################################################################################

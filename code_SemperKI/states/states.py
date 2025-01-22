@@ -1991,7 +1991,7 @@ class OFFER_REJECTED(State):
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
-        No Buttons only CANCELED
+        No Buttons
 
         """
         outArr = []
@@ -2026,9 +2026,9 @@ class OFFER_REJECTED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.ACTION_REQUIRED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -2045,18 +2045,18 @@ class OFFER_REJECTED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          OFFER_REJECTED | CANCELED:
-        """
-        From: OFFER_REJECTED
-        To: CANCELED
+    # def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    #       OFFER_REJECTED | CANCELED:
+    #     """
+    #     From: OFFER_REJECTED
+    #     To: CANCELED
 
-        """
-        # TODO do stuff to clean up
-        return stateDict[ProcessStatusAsString.CANCELED]
+    #     """
+    #     # TODO do stuff to clean up
+    #     return stateDict[ProcessStatusAsString.CANCELED]
 
     ###################################################
-    updateTransitions = [to_CANCELED]
+    updateTransitions = []#[to_CANCELED]
     buttonTransitions = {}
 
     ###################################################
@@ -2184,7 +2184,7 @@ class CONFIRMATION_REJECTED(State):
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
-        No Buttons only CANCELED
+        No Buttons
 
         """
         outArr = []
@@ -2219,9 +2219,9 @@ class CONFIRMATION_REJECTED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.ACTION_REQUIRED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -2238,18 +2238,18 @@ class CONFIRMATION_REJECTED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONFIRMATION_REJECTED | CANCELED:
-        """
-        From: CONFIRMATION_REJECTED
-        To: CANCELLED
+    # def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    #       CONFIRMATION_REJECTED | CANCELED:
+    #     """
+    #     From: CONFIRMATION_REJECTED
+    #     To: CANCELLED
 
-        """
-        # TODO clean up and stuff
-        return stateDict[ProcessStatusAsString.CANCELED]
+    #     """
+    #     # TODO clean up and stuff
+    #     return stateDict[ProcessStatusAsString.CANCELED]
 
     ###################################################
-    updateTransitions = [to_CANCELED]
+    updateTransitions = []#[to_CANCELED]
     buttonTransitions = {}
 
     ###################################################
@@ -3064,9 +3064,9 @@ class FAILED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
     
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -3150,9 +3150,9 @@ class CANCELED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
