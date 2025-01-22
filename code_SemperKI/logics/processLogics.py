@@ -372,7 +372,9 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
         errorOrNone = pgProcesses.ProcessManagementBase.createProject(newProjectID, oldProject.client)
         if isinstance(errorOrNone, Exception):
             raise errorOrNone
-        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, oldProject.projectDetails)
+        newProjectDetails = oldProject.projectDetails
+        newProjectDetails[ProjectDetails.title] = newProjectDetails[ProjectDetails.title] + "*"
+        pgProcesses.ProcessManagementBase.updateProject(newProjectID, ProjectUpdates.projectDetails, newProjectDetails)
         if isinstance(errorOrNone, Exception):
             raise errorOrNone
         
@@ -388,7 +390,8 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
                 raise errorOrNone
             
             oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
-            del oldProcessDetails[ProcessDetails.provisionalContractor]
+            if ProcessDetails.provisionalContractor in oldProcessDetails:
+                del oldProcessDetails[ProcessDetails.provisionalContractor]
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone

@@ -533,13 +533,13 @@ class SERVICE_IN_PROGRESS(State):
                 "showIn": "process",
             },
             {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_READY,
+                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
                 "icon": IconType.FactoryIcon,
                 "action": {
                     "type": "request",
                     "data": {
                         "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
+                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
                     },
                 },
                 "active": False,
