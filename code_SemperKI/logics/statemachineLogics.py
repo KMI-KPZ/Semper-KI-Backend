@@ -46,9 +46,21 @@ def logicForStatusButtonRequest(request:Request, validatedInput:dict, functionNa
                 raise retVal
             return retVal
         elif "cloneProcess" in buttonData[InterfaceForStateChange.type]:
-            retVal = logicForCloneProcesses(request, projectID, processIDs, "cloneProcesses")
-            return retVal
+            retVal, statusCode = logicForCloneProcesses(request, projectID, processIDs, "cloneProcesses")
+            if isinstance(retVal, Exception):
+                message = f"Error in {functionName}: {str(retVal)}"
+                exception = str(retVal)
+                loggerError.error(message)
+                exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+                if exceptionSerializer.is_valid():
+                    return Response(exceptionSerializer.data, status=statusCode)
+                else:
+                    return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response(retVal, status=statusCode)
         else:
+            if InterfaceForStateChange.targetStatus not in buttonData:
+                raise Exception("Target status not provided")
             nextState = buttonData[InterfaceForStateChange.targetStatus]
 
             contentManager = ManageContent(request.session)

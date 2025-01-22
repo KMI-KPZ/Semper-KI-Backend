@@ -68,6 +68,7 @@ class SResFlatProjectsEntry(serializers.Serializer):
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
     processesCount = serializers.IntegerField()
+    processIDs = serializers.ListField(child=serializers.CharField(), allow_empty=True, required=False)
     owner = serializers.BooleanField(required=False)
     searchableData = serializers.ListField(child=serializers.CharField(), required=False, allow_empty=True)
 

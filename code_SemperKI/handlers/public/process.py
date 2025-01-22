@@ -153,7 +153,7 @@ class SResProcess(serializers.Serializer):
     client = serializers.CharField(max_length=513)
     files = serializers.DictField(required=False, allow_empty=True)#SResFiles()
     messages = serializers.DictField(required=False, allow_empty=True)#SResMessages()
-    contractor = SResContractor(required=False)
+    contractor = SResContractor(required=False, allow_null=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)

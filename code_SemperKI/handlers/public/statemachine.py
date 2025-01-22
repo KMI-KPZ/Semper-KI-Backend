@@ -79,7 +79,7 @@ def getStateMachine(request:Request):
 #######################################################
 class SReqButtonData(serializers.Serializer):
     type = serializers.CharField(max_length=200)
-    targetStatus = serializers.CharField(max_length=200)
+    targetStatus = serializers.CharField(max_length=200, required=False)
 #######################################################
 class SReqStatusButtons(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)

@@ -510,7 +510,9 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
-                allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
+                processes = self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID])
+                allProjects[idx]["processesCount"] = len(processes)
+                allProjects[idx]["processIDs"] = list(processes.keys())
                 # gather searchable data
                 allProjects[idx]["searchableData"] = []
                 # TODO

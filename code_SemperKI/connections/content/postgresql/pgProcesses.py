@@ -1218,7 +1218,9 @@ class ProcessManagementBase(AbstractContentInterface):
                 #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 #         continue
                 currentProject = project.toDict()
-                currentProject["processesCount"] = len(project.processes.all())
+                processes = project.processes.all()
+                currentProject["processesCount"] = len(processes)
+                currentProject["processIDs"] = processes.values_list("processID", flat=True)
                 currentProject["owner"] = True
                 currentProject["searchableData"] = []
                 # TODO: add searchable data
