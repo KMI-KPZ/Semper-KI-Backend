@@ -263,6 +263,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
             return ("", False)
         
         client = contentManager.getClient()
+        trueIDOfCurrentUser = interface.getActualUserID()
         
         for processID in processIDs:
             if not contentManager.checkRightsForProcess(processID):
@@ -297,11 +298,11 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                         raise returnVal
                     if fireEvent:
                         if elem == ProcessUpdates.messages:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage, creatorOfEvent=client)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.newMessage, creatorOfEvent=trueIDOfCurrentUser)
                         elif elem == ProcessUpdates.processStatus:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=client)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=trueIDOfCurrentUser)
                         else:
-                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, creatorOfEvent=client)
+                            WebSocketEvents.fireWebsocketEventsForProcess(projectID, processID, request.session, elem, returnVal, creatorOfEvent=trueIDOfCurrentUser)
                     
             # change state for this process if necessary
             process = interface.getProcessObj(projectID, processID)

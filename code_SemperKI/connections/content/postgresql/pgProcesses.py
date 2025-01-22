@@ -14,7 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementUser, profileManagement
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
@@ -66,6 +66,20 @@ class ProcessManagementBase(AbstractContentInterface):
             return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
         else:
             return GlobalDefaults.anonymous
+    
+    ##############################################
+    def getActualUserID(self) -> str:
+        """
+        Retrieve the user behind the organization
+        
+        :return: UserID
+        :rtype: str
+        """
+        if manualCheckifLoggedIn(self.structuredSessionObj):
+            return ProfileManagementUser.getClientID(self.structuredSessionObj)
+        else:
+            return GlobalDefaults.anonymous
+
     ##############################################
     @staticmethod
     def checkIfUserIsClient(userHashID, projectID="", processID=""):
