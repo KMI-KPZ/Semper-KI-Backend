@@ -159,6 +159,7 @@ class SResProcess(serializers.Serializer):
     accessedWhen = serializers.CharField(max_length=200)
     processStatusButtons = serializers.ListField(child=SResProcessStatusButtons(), allow_empty=True)
     processErrors = serializers.ListField(child=serializers.DictField(allow_empty=True), allow_empty=True)
+    flatProcessStatus = serializers.CharField(max_length=200, allow_blank=True, required=False)
 ########################################################
 # Handler
 @extend_schema(

@@ -120,7 +120,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
             contentForEvent = retVal
         # send out mail & Websocket event 
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
-        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, contentForEvent, NotificationSettingsUserSemperKI.verification, True)  
+        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, contentForEvent, NotificationSettingsUserSemperKI.verification, True, ProfileManagementBase.getUserHashID(session))  
         
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")
