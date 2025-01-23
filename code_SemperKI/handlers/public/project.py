@@ -43,27 +43,24 @@ loggerError = logging.getLogger("errors")
 ########################################################
 # Serializers
 
-########################################################
-class ProjectDetailsSerializer(serializers.Serializer):
-    title = serializers.CharField()
 
 ########################################################
 class SResGetProject(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     projectStatus = serializers.IntegerField()
     client = serializers.CharField(max_length=200)
-    projectDetails = ProjectDetailsSerializer()
+    projectDetails = serializers.DictField(allow_empty=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
-    processes = serializers.ListField()
+    processes = serializers.ListField(allow_empty=True)
 
 #######################################################
 class SResFlatProjectsEntry(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     projectStatus = serializers.IntegerField()
     client = serializers.CharField(max_length=200)
-    projectDetails = ProjectDetailsSerializer()
+    projectDetails = serializers.DictField(allow_empty=True)
     createdWhen = serializers.CharField(max_length=200)
     updatedWhen = serializers.CharField(max_length=200)
     accessedWhen = serializers.CharField(max_length=200)
