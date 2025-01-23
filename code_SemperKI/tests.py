@@ -10,6 +10,7 @@ Contains: Tests for various functions and services
 from django.test import TestCase, Client
 import datetime
 import json, io
+from copy import deepcopy
 
 from code_SemperKI.modelFiles.dataModel import DataDescription
 from code_SemperKI.states.stateDescriptions import ProcessStatusAsString
@@ -23,8 +24,17 @@ from .definitions import ProjectDescription, ProcessDescription, SessionContentS
 #######################################################
 class TestProjects(TestCase):
     testFile = io.BytesIO(b'binary stl file                                                                \x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x00\x80\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00')
-    
+
     # not part of the tests!
+    #######################################################
+    @classmethod
+    def fileFactory(self) -> io.BytesIO:
+        """
+        Return a copy of the testfile
+        
+        """
+        return deepcopy(self.testFile)
+
     #######################################################
     @classmethod
     def createOrganization(self, client:Client):
@@ -177,7 +187,8 @@ class TestProjects(TestCase):
         client = Client()
         
         projectObj, processObj = self.createProjectAndProcess(client)
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": self.testFile, "origin": "my_origin"}
+        localCopyOfTestFile = self.fileFactory()
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": localCopyOfTestFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
         getProcPathSplit = paths["getProcess"][0].split("/")
@@ -191,15 +202,15 @@ class TestProjects(TestCase):
         response = client.get("/"+downloadPath)
         with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
             loaded_response_content = buf_bytes.read()
-            self.testFile.seek(0)
-            contentOfTestFile = self.testFile.read()
+            localCopyOfTestFile.seek(0)
+            contentOfTestFile = localCopyOfTestFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
         
-        self.testFile.seek(0)
+        localCopyOfTestFile.seek(0)
         # saved stuff
         self.createUser(client)
         projectObj, processObj = self.createProjectAndProcess(client)
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile, "origin": "my_origin"}
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": localCopyOfTestFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
         getProcPathSplit = paths["getProcess"][0].split("/")
@@ -212,8 +223,8 @@ class TestProjects(TestCase):
         response = client.get("/"+downloadPath)
         with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
             loaded_response_content = buf_bytes.read()
-            self.testFile.seek(0)
-            contentOfTestFile = self.testFile.read()
+            localCopyOfTestFile.seek(0)
+            contentOfTestFile = localCopyOfTestFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
 
     ##################################################

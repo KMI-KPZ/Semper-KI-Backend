@@ -9,6 +9,7 @@ Contains: Tests for various functions and services
 
 from django.test import TestCase, Client
 import datetime
+from copy import deepcopy
 import json, io
 from .urls import paths
 
@@ -94,7 +95,8 @@ class TestAdditiveManufacturing(TestCase):
         tags = '""'
         filename = '"file2.stl"'
         details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + '}, "fileName": ' + filename + '}]'
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "file2.stl": self.testFile, "origin": "test_origin"} # non-default case
+        localCopyOfFile = deepcopy(self.testFile)
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "file2.stl": localCopyOfFile, "origin": "test_origin"} # non-default case
         #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
@@ -137,7 +139,8 @@ class TestAdditiveManufacturing(TestCase):
         tags = '""'
         filename = '"file2.stl"'
         details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + ', "quantity": 1, "levelOfDetail": 1, "scalingFactor": 100.0' + '}, "fileName": ' + filename + '}]'
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "origin": "test_origin", "file2.stl": self.testFile} # non-default case
+        localCopyOfFile = deepcopy(self.testFile)
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "origin": "test_origin", "file2.stl": localCopyOfFile} # non-default case
         #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
