@@ -21,6 +21,14 @@ class Packaging(Semper.ServiceBase):
         super().__init__()
 
     ###################################################
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+        return {}
+
+    ###################################################
     def updateServiceDetails(self, existingContent, newContent):
         """
         Run service specific update of service details
@@ -39,12 +47,28 @@ class Packaging(Semper.ServiceBase):
         return P_deleteServiceDetails(existingContent, newContent)
     
     ###################################################
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+        return False
+    
+    ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks, if service is completely defined
         
         """
         return P_serviceReady(existingContent)
+    
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        return {}
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:

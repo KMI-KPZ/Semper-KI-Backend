@@ -160,6 +160,42 @@ class Basics():
         
     ##################################################
     @staticmethod
+    def copyGraphForNewOwner(createdBy:str=defaultOwner):
+        """
+        Copy the whole graph for another owner
+        
+        :param createdBy: The new owner
+        :type createdBy: str
+        :return: None
+        :rtype: None | Exception
+        """
+        try:
+            startPC = time.perf_counter_ns()
+            startPT = time.process_time_ns()
+            
+            nodes = Node.objects.all()
+            for node in nodes:
+                newNode = Basics.copyNode(node, createdBy)
+                if isinstance(newNode, Exception):
+                    raise newNode
+                edges = node.edges.all()
+                for edge in edges:
+                    result = Basics.createEdge(newNode.nodeID, edge.nodeID)
+                    if isinstance(result, Exception):
+                        raise result
+            
+            endPC = time.perf_counter_ns()
+            endPT = time.process_time_ns()
+            loggerPerformance.info(f"DB;Copy Graph;{endPC-startPC};{endPT-startPT}")
+            loggerConsole.info(f"Graph copied for new owner: {createdBy}")
+            return None
+
+        except Exception as error:
+            loggerError.error(f"Could not copy graph for new owner: {error}")
+            return error
+        
+    ##################################################
+    @staticmethod
     def createOrganizationNode(orgaID:str):
         """
         Create a node for an organization

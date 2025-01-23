@@ -11,12 +11,12 @@ import logging, copy
 
 from Generic_Backend.code_General.definitions import GlobalDefaults, SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementUser
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.utilities import crypto
 
 from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
-from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
+from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails, ProjectOutput
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...modelFiles.dataModel import DataInterface, DataDescription
@@ -276,10 +276,19 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        if manualCheckifLoggedIn(self.structuredSessionObj.getSession()):
-            return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
-        else:
-            return GlobalDefaults.anonymous
+
+        return GlobalDefaults.anonymous
+        
+    ##############################################
+    def getActualUserID(self) -> str:
+        """
+        Retrieve the user behind the organization
+        
+        :return: UserID
+        :rtype: str
+        """
+
+        return GlobalDefaults.anonymous
         
     ##################################################
     def checkIfUserIsClient(self, userHashID, projectID="", processID=""):
@@ -510,7 +519,13 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
-                allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
+                processes = self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID])
+                allProjects[idx][ProjectOutput.processesCount] = len(processes)
+                allProjects[idx][ProjectOutput.processIDs] = list(processes.keys())
+                # gather searchable data
+                allProjects[idx][ProjectOutput.searchableData] = []
+                # TODO
+                
                 if SessionContentSemperKI.processes in allProjects[idx]:
                     del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
             
@@ -707,6 +722,8 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
+                currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(currentProcess[ProcessDescription.serviceType]).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
+                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
             
             elif updateType == ProcessUpdates.serviceDetails:
@@ -840,7 +857,7 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
+                currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = {}
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:

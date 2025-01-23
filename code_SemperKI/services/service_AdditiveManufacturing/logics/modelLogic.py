@@ -1,3 +1,4 @@
+from __future__ import annotations 
 """
 Part of Semper-KI software
 
@@ -6,23 +7,32 @@ Silvio Weging 2024
 Contains: Logics for model handling
 """
 
-import logging, json, os
+import logging, json, os, requests
+import numpy as np
+from stl import mesh
+from io import BytesIO
+
 from datetime import datetime
 
+from django.conf import settings
 from django.utils import timezone
+
+from rest_framework import status
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections import s3
+from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.basics import testPicture
+from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream
+from code_SemperKI.logics.processLogics import updateProcessFunction
 
 from ..definitions import *
-
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -42,6 +52,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
 
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
+        groupID = validatedInput["groupID"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
         # check if duplicates exist
@@ -79,7 +90,13 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         modelToBeSaved[FileContentsAM.complexity] = validatedInput["complexity"]
         modelToBeSaved[FileContentsAM.scalingFactor] = 1.0
 
-        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.models: {fileID: modelToBeSaved}}}}
+        # calculate values right here
+        calculationResult = calculateBoundaryDataForNonFileModel(modelToBeSaved)
+
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        changesArray[groupID] = {ServiceDetails.models: {fileID: modelToBeSaved}, ServiceDetails.calculations: {fileID: calculationResult}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -106,6 +123,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
         origin = validatedInput["origin"]
+        groupID = validatedInput["groupID"]
 
         content = ManageContent(request.session)
         interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
@@ -134,6 +152,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
             existingFileNames.add(value[FileObjectContent.fileName])
 
         modelsToBeSaved = {}
+        calculationsToBeSaved = {}
         for fileName in modelNames:
             # rename duplicates
             counterForFileName = 1
@@ -180,6 +199,14 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
                 modelsToBeSaved[fileID][FileObjectContent.origin] = origin
                 modelsToBeSaved[fileID][FileContentsAM.scalingFactor] = float(details["scalingFactor"]) if "scalingFactor" in details else 100.0
+                
+                # calculate values right here
+                scalingFactor = modelsToBeSaved[fileID][FileContentsAM.scalingFactor]/100.
+                result = calculateBoundaryData(model, nameOfFile, model.size, scalingFactor)
+                if result["status_code"] != 200:
+                    return (Exception(f"Error while calculating measurements for file {nameOfFile}"), 500)
+                calculationsToBeSaved[fileID] = result
+                
                 if remote:
                     modelsToBeSaved[fileID][FileObjectContent.remote] = True
                     returnVal = s3.manageRemoteS3.uploadFile(filePath, model)
@@ -190,8 +217,11 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     returnVal = s3.manageLocalS3.uploadFile(filePath, model)
                     if returnVal is not True:
                         return (Exception(f"File {fileName} could not be saved to local storage"), 500)
-                
-        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.models: modelsToBeSaved}}}
+
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        changesArray[groupID] = {ServiceDetails.models: modelsToBeSaved, ServiceDetails.calculations: calculationsToBeSaved}
+        changes = {"changes": {ProcessUpdates.files: modelsToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -204,4 +234,258 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         return None, 200
     except Exception as e:
         loggerError.error("Error in logicForUploadModel: %s" % str(e))
+        return (e, 500)
+    
+
+##################################################
+def logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]:
+    """
+    The logic for deleting a model
+
+    :param request: The request object
+    :type request: Request
+    :param projectID: The project ID
+    :type projectID: str
+    :param processID: The process ID
+    :type processID: str
+    :param groupID: The group ID
+    :type groupID: int
+    :param fileID: The file ID
+    :type fileID: str
+    :return: Exception and status code
+    :rtype: tuple[Exception, int]
+    
+    """
+    contentManager = ManageContent(request.session)
+    interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
+    if interface == None:
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+        
+    currentProcess = interface.getProcessObj(projectID, processID)
+    modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.groups][groupID][ServiceDetails.models]
+    if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
+        return (Exception(f"Model not found in {functionName}"), 404)
+
+    if currentProcess.client != contentManager.getClient():
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+
+    exception, statusCode = logicForDeleteFile(request, projectID, processID, fileID, functionName, True)
+    if exception is not None:
+        return (exception, statusCode)
+    
+    changesArray = [{} for i in range(len(currentProcess.serviceDetails[ServiceDetails.groups]))]
+    changesArray[groupID] = {ServiceDetails.models: {fileID: None}}
+    changes = {"changes": {}, "deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+    message, flag = updateProcessFunction(request, changes, projectID, [processID])
+    if flag is False:
+        return (Exception(f"Rights not sufficient in {functionName}"), 401)
+    if isinstance(message, Exception):
+        raise message
+
+    logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},model {fileID}," + str(datetime.now()))        
+    return None, 200
+
+
+#######################################################
+def getBoundaryData(readableObject, fileName:str = "ein-dateiname.stl") -> dict:
+    """
+    Send the model to the Chemnitz service and get the dimensions
+
+    :param readableObject: The model to be sent to the service with a .read() method
+    :type readableObject: BytesIO | EncryptionAdapter
+    :param filename: The file name
+    :type filename: str
+    :return: data obtained by IWU service
+    :rtype: Dict
+
+    """
+
+    result =  {"status_code": 500, "content": {"error": "Fehler"}}
+
+    url = settings.IWS_ENDPOINT + "/properties"
+    headers = {'Content-Type': 'model/stl','content-disposition' : f'filename="{fileName}"'}
+
+    try:
+        response = requests.post(url, data=readableObject, headers=headers, stream=True)
+    except Exception as e:
+        logger.warning(f"Error while sending model to Chemnitz service: {str(e)}")
+        return {"status_code" : 500, "content": {"error": "Fehler"}}
+
+    # Check the response
+    if response.status_code == 200:
+        logger.info(f"Success capturing measurements from Chemnitz service")
+        result = response.json()
+        result["status_code"] = 200
+
+    return result
+
+##################################################
+def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSize:int, scalingFactor:float) -> dict:
+    """
+    Calculate some of the stuff ourselves
+
+    :param readableObject: The model to be sent to the service with a .read() method
+    :type readableObject: BytesIO | EncryptionAdapter
+    :param filename: The file name
+    :type filename: str
+    :param fileSize: The size of the file  
+    :type fileSize: int
+    :return: data obtained by IWU service
+    :rtype: Dict
+    
+    """
+    try:
+        completeFile = readableObject.read(fileSize)
+        fileAsBytesObject = BytesIO(completeFile)
+        your_mesh = mesh.Mesh.from_file(fileName, fh=fileAsBytesObject)
+        volume, _, _ = your_mesh.get_mass_properties()
+    
+        # Calculate the surface area by summing up the area of all triangles
+        surface_area = np.sum(your_mesh.areas)
+        
+        # Calculate the bounding box
+        min_bound = np.min(your_mesh.points.reshape(-1, 3), axis=0)
+        max_bound = np.max(your_mesh.points.reshape(-1, 3), axis=0)
+        bounding_box = max_bound - min_bound
+        volumeBB = bounding_box[0]*bounding_box[1]*bounding_box[2]
+        scalingFactorTimesThree = scalingFactor*scalingFactor*scalingFactor
+
+        result = {
+                "filename": fileName,
+                "measurements": {
+                    "volume": float(volume)*scalingFactorTimesThree,
+                    "surfaceArea": float(surface_area)*scalingFactor*scalingFactor,
+                    "mbbDimensions": {
+                        "_1": float(bounding_box[0])*scalingFactor,
+                        "_2": float(bounding_box[1])*scalingFactor,
+                        "_3": float(bounding_box[2])*scalingFactor,
+                    },
+                    "mbbVolume": float(volumeBB)* scalingFactorTimesThree,
+                },
+                "status_code": 200
+            }
+        return result
+    except Exception as error:
+        loggerError.error(f"Error while calculating measurements: {str(error)}")
+        return {"status_code" : 500, "content": {"error": error}}
+
+#######################################################
+def calculateBoundaryDataForNonFileModel(model:dict) -> dict:
+    """
+    Calculate the same stuff as above but for a model that is not a file
+
+    :param model: The model 
+    :type model: Dict
+    :return: data in IWU format
+    :rtype: Dict
+    
+    """
+    fakeCalculation = {
+            "filename": model[FileObjectContent.fileName],
+            "measurements": {
+                "volume": float(model[FileContentsAM.volume]),
+                "surfaceArea": 0.0,
+                "mbbDimensions": {
+                    "_1": float(model[FileContentsAM.width]),
+                    "_2": float(model[FileContentsAM.length]),
+                    "_3": float(model[FileContentsAM.height]),
+                },
+                "mbbVolume": float(model[FileContentsAM.width]*model[FileContentsAM.length]*model[FileContentsAM.height]),
+            },
+            "status_code": 200
+        }
+    return fakeCalculation
+
+##################################################
+def logicForCheckModel(request, functionName:str, projectID:str, processID:str, fileID:str) -> tuple[dict|Exception, int]:
+    """
+    Calculate model properties like boundary and volume
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param functionName: The name of the function
+    :type functionName: str
+    :param projectID: The project ID
+    :type projectID: str
+    :param processID: The process ID
+    :type processID: str
+    :param fileID: The file ID
+    :type fileID: str
+    :return: dict with calculations or an exception and status code
+    :rtype: Tuple[Dict, int]
+    
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(functionName)
+        if interface == None:
+            return (Exception(f"Rights not sufficient in {functionName}"), 401)
+            
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            return (Exception(f"process not found in {functionName}"), 404)
+            
+        
+        # If calculations are already there, take these, unless they are mocked
+        model = {}
+        groupWhereTheModelLies = 0
+        for idx, group in enumerate(process.serviceDetails[ServiceDetails.groups]):
+            if ServiceDetails.models in group:
+                if fileID in group[ServiceDetails.models]:
+                    model = group[ServiceDetails.models][fileID]
+                    groupWhereTheModelLies = idx
+                    break
+
+        
+        scalingFactor = model[FileContentsAM.scalingFactor]/100. if FileContentsAM.scalingFactor in model else 1.0
+
+        if model[FileObjectContent.isFile] is True:
+            modelName = model[FileObjectContent.fileName]
+
+            mock = {
+                "filename": modelName,
+                "measurements": {
+                    "volume": -1.0,
+                    "surfaceArea": -1.0,
+                    "mbbDimensions": {
+                        "_1": -1.0,
+                        "_2": -1.0,
+                        "_3": -1.0,
+                    },
+                    "mbbVolume": -1.0,
+                },
+                "status_code": 200
+            }
+
+            # if settings.IWS_ENDPOINT is None:
+            #     outputSerializer = SResCheckModel(data=mock)
+            #     if outputSerializer.is_valid():
+            #         return Response(outputSerializer.data, status=status.HTTP_200_OK)
+            #     else:
+            #         raise Exception("Validation failed")
+
+            fileContent, flag = getFileReadableStream(request, projectID, processID, model[FileObjectContent.id])
+            if flag:
+                resultData = calculateBoundaryData(fileContent, modelName, model[FileObjectContent.size], scalingFactor) # getBoundaryData(fileContent, modelName)
+            else:
+                return (Exception(f"Error while accessing file {modelName}"), 500)
+
+            if resultData["status_code"] != 200:
+                return (mock, 200)
+        else:
+            resultData = calculateBoundaryDataForNonFileModel(model)
+        
+        # save results in model file details
+        groupArray = [{} for i in range(len(process.serviceDetails[ServiceDetails.groups]))]
+        groupArray[groupWhereTheModelLies] = {ServiceDetails.calculations: {fileID: resultData}}
+        changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: groupArray}}}
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        if flag is False:
+            return (Exception(f"Rights not sufficient in {functionName} while updating process"), 401)
+        if isinstance(message, Exception):
+            raise message
+        
+        return resultData, 200
+    except Exception as e:
+        loggerError.error(f"Error in {functionName}: {str(e)}")
         return (e, 500)
