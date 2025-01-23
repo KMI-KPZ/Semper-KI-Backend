@@ -35,21 +35,23 @@ newPaths = {
 
     "getMaterials": ('public/service/additive-manufacturing/material/get/',materials.retrieveMaterialsWithFilter),
     "setMaterial": ('public/service/additive-manufacturing/material/set/',materials.setMaterialSelection),
-    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<str:materialID>/',materials.deleteMaterialFromSelection),
+    "deleteMaterial": ('public/service/additive-manufacturing/material/delete/<str:projectID>/<str:processID>/<int:groupID>/',materials.deleteMaterialFromSelection),
 
     "getPostProcessings": ('public/service/additive-manufacturing/post-processing/get/',postProcessings.retrievePostProcessingsWithFilter),
     "setPostProcessing": ('public/service/additive-manufacturing/post-processing/set/',postProcessings.setPostProcessingSelection),
-    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<str:postProcessingID>/',postProcessings.deletePostProcessingFromSelection),
+    "deletePostProcessing": ('public/service/additive-manufacturing/post-processing/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:postProcessingID>/',postProcessings.deletePostProcessingFromSelection),
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
-    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<str:fileID>/",model.deleteModel),
-    "remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
+    "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
+    "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:fileID>/",model.deleteModel),
+    "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
+    #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
     "getModelRepository": ("public/service/additive-manufacturing/model/repository/get/", model.getModelRepository),
 
     #"checkPrintability": ("public/checkPrintability/",checkService.),
     #"checkPrices": ("public/checkPrices/",checkService.checkPrice),
     #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
-    "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", checkService.checkModel),
+    
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
@@ -58,7 +60,9 @@ newPaths = {
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
     "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
+    "onto_getNeighbors": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
     "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
+    "onto_createOrUpdateAndLinkNodes": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create-and-link/", onto.onto_createOrUpdateAndLinkNodes),
     "onto_removeEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
@@ -90,8 +94,8 @@ newPaths = {
     "orga_deleteLinkToOrga": ("public/service/additive-manufacturing/resources/orga/edge/to-orga/delete/<str:entityID>/", orga.orga_removeEdgeToOrga),
     "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
     "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
-    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions)
-
+    "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions),
+    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests)
 }
 
 # add paths

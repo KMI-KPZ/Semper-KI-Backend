@@ -1,124 +1,146 @@
-[
+[  
   {
     "node": {
-      "nodeTempID": 0,
-        "nodeName": "Remove Support",
-        "nodeType": "additionalRequirement",
-        "context": "Removing support structures",
-        "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
-          {"name": "technology", "value": "FDM", "type": "string"}
-        ],
-        "active": true
+		"nodeTempID": 0,
+		"nodeName": "Material Extrusion",
+		"nodeType": "technology",
+		"context": "",
+		"properties": [],
+		"active": true
+	  },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 1,
+      "nodeName": "Vat Photopolymerization",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
     },
     "edges": [
       {
-        "nodeTempID": 1,
-        "nodeName": "PLA",
-        "nodeType": "material",
-        "context": "Polylactic acid",
+        "nodeTempID": 7,
+        "nodeName": "Figure 4® Standalone",
+        "nodeType": "printer",
+        "context": "Resin printer",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
-          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
-          {"name": "heatResistant", "value": "215 °C", "type": "string"},
-          {"name": "flexibility", "value": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "type": "string"},
-          {"name": "smooth", "value": "20 Ra", "type": "string"},
-          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
-          {"name": "poissonRatio", "value": "0.35", "type": "number"}
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "value": "196", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "value": "124.8", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "value": "70.2", "unit": "mm", "type": "number"},
+          {"name": "certificates", "value": "FCC, CE, EMC", "unit": "", "type": "text"}
         ],
         "active": true
       }
-    ]
+    ]	
   },
   {
     "node": {
       "nodeTempID": 2,
-      "nodeName": "Snapmaker Artisan",
-      "nodeType": "printer",
-      "context": "FDM Printer",
-      "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
-        {"name": "buildVolume", "value": "400x400x400", "type": "string"},
-        {"name": "technology", "value": "FDM", "type": "string"}
-      ],
+      "nodeName": "Material Jetting",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
       "active": true
     },
     "edges": [
       {
-        "nodeTempID": 1,
-        "nodeName": "PLA",
-        "nodeType": "material",
-        "context": "Polylactic acid",
+        "nodeTempID": 9,
+        "nodeName": "ProJet MJP 2500W Plus",
+        "nodeType": "printer",
+        "context": "Wax printer",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
-          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
-          {"name": "heatResistant", "value": "215 °C", "type": "string"},
-          {"name": "flexibility", "value": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "type": "string"},
-          {"name": "smooth", "value": "20 Ra", "type": "string"},
-          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
-          {"name": "poissonRatio", "value": "0.35", "type": "number"}
-          ],
-          "active": true
-      }
-    ]
-  },
-  {
-    "node":{
-      "nodeTempID": 1,
-      "nodeName": "PLA",
-      "nodeType": "material",
-      "context": "Polylactic acid",
-      "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
-        {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
-         {"name": "heatResistant", "value": "215 °C", "type": "string"},
-         {"name": "flexibility", "value": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "type": "string"},
-         {"name": "smooth", "value": "20 Ra", "type": "string"},
-          {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
-          {"name": "poissonRatio", "value": "0.35", "type": "number"}
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "value": "144", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "value": "294", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "value": "211", "unit": "mm", "type": "number"},
+          {"name": "possibleLayerHeights", "value": "16, 8", "unit": "µm", "type": "text"},
+          {"name": "buildRate", "value": "147", "unit": "cm³/h", "type": "number"}
         ],
         "active": true
+      }
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 3,
+      "nodeName": "Binder Jetting",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
     },
-    "edges":[
-      {
-        "nodeTempID": 3,
-        "nodeName": "PLA - Black",
-        "nodeType": "color",
-        "context": "The default color",
-        "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
-          {"name": "foodSafe", "value": "", "type": "string"},
-          {"name": "color", "value": "9005RAL;#000000", "type": "string"}
-        ],
-        "active": true
-      }
-    ]
+    "edges": [
+    ]	
   },
   {
-    "node":{
+    "node": {
       "nodeTempID": 4,
-      "nodeName": "Plastics",
-      "nodeType": "materialCategory",
-      "context": "All materials made of polyester and such",
-      "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"}
+      "nodeName": "Powder Bed Fusion",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+      {
+        "nodeTempID": 10,
+        "nodeName": "VX1000",
+        "nodeType": "printer",
+        "context": "Powder printer",
+        "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "value": "500", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "value": "600", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "value": "1000", "unit": "mm", "type": "number"},
+          {"name": "possibleLayerHeights", "value": "300, 150", "unit": "µm", "type": "text"}
         ],
         "active": true
+      }
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 5,
+      "nodeName": "Sheet Lamination",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
     },
-    "edges":[
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 6,
+      "nodeName": "Directed Energy Deposition",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 7
+    },
+    "edges": [
       {
-        "nodeTempID": 1,
-        "nodeName": "PLA",
+        "nodeTempID": 8,
+        "nodeName": "Figure 4® Resin",
         "nodeType": "material",
-        "context": "Polylactic acid",
+        "context": "Resin material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "type": "text"},
-          {"name": "foodSafe", "value": "FDA;10/2011", "type": "string"},
-          {"name": "heatResistant", "value": "215 °C", "type": "string"},
-          {"name": "flexibility", "value": "0.5Z50;0.7Z100;4.8XY50;3.7XY100", "type": "string"},
-          {"name": "smooth", "value": "20 Ra", "type": "string"},
-            {"name": "eModul", "value": "1358Z;2030XY", "type": "string"},
-            {"name": "poissonRatio", "value": "0.35", "type": "number"}
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "value": "1.31", "unit": "g/cm³", "type": "number"},
+          {"name": "printingSpeed", "value": "4.8", "unit": "cm/h", "type": "number"},
+          {"name": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"}
           ],
           "active": true
       }
@@ -126,55 +148,180 @@
   },
   {
     "node": {
-      "nodeTempID": 5,
-      "nodeName": "HP Metal Jet",
-      "nodeType": "printer",
-      "context": "Metal Printer",
-      "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
-        {"name": "buildVolume", "value": "430x320x200", "type": "string"},
-        {"name": "technology", "value": "Binder Jetting", "type": "string"}
-      ],
-      "active": true
+      "nodeTempID": 9
     },
-    "edges": [
+    "edges":[
       {
-        "nodeTempID": 6,
-        "nodeName": "HP Metal Jet SS 316L",
+        "nodeTempID": 11,
+        "nodeName": "VisiJet® M2 CAST",
         "nodeType": "material",
-        "context": "Metal powder",
+        "context": "Wax material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
-          {"name": "heatResistant", "value": "1678 K", "type": "string"},
-          {"name": "eModul", "value": "193Z;193XY", "type": "string"}
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "value": "0.8", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "value": "650", "unit": "€/kg", "type": "number"}
           ],
           "active": true
       }
     ]
   },
   {
-    "node":{
-      "nodeTempID": 7,
-      "nodeName": "Metal",
-      "nodeType": "materialCategory",
-      "context": "All materials made of metal",
+    "node": {
+      "nodeTempID": 10
+    },
+    "edges":[
+      {
+        "nodeTempID": 12,
+        "nodeName": "PMMA",
+        "nodeType": "material",
+        "context": "Plastic material",
+        "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "value": "1.18", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "value": "30", "unit": "€/kg", "type": "number"}
+          ],
+          "active": true
+      },
+      {
+        "nodeTempID": 13,
+        "nodeName": "Sand",
+        "nodeType": "material",
+        "context": "Quarzsand material",
+        "properties": [
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "value": "2.65", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "value": "9", "unit": "€/kg", "type": "number"}
+          ],
+          "active": true
+        }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 14,
+      "nodeName": "Remove Support",
+      "nodeType": "additionalRequirement",
+      "context": "Removing support structures",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"}
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+      ],
+      "active": true
+    },
+    "edges": [
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 15,
+      "nodeName": "Plastics",
+      "nodeType": "materialCategory",
+      "context": "All materials considered plastics",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
     "edges":[
       {
-        "nodeTempID": 6,
-        "nodeName": "HP Metal Jet SS 316L",
-        "nodeType": "material",
-        "context": "Metal powder",
+        "nodeTempID": 12
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 16,
+      "nodeName": "Metals",
+      "nodeType": "materialCategory",
+      "context": "All materials considered metals",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 17,
+      "nodeName": "Photopolymers",
+      "nodeType": "materialCategory",
+      "context": "All materials considered photopolymers",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[
+      {
+        "nodeTempID": 8
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 19,
+      "nodeName": "Composites",
+      "nodeType": "materialCategory",
+      "context": "All materials considered composites",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 19,
+      "nodeName": "Powders",
+      "nodeType": "materialCategory",
+      "context": "All materials considered powders",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[
+      {
+        "nodeTempID": 8
+      },
+      {
+        "nodeTempID": 13
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 20,
+      "nodeName": "Thermoplastics",
+      "nodeType": "materialCategory",
+      "context": "All materials considered thermoplastics",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[
+      {
+        "nodeTempID": 11
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 8
+    },
+    "edges": [
+      {
+        "nodeTempID": 3,
+        "nodeName": "Black",
+        "nodeType": "color",
+        "context": "The default color",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "type": "text"},
-          {"name": "heatResistant", "value": "1678 K", "type": "string"},
-          {"name": "eModul", "value": "193Z;193XY", "type": "string"}
-          ],
-          "active": true
+          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "color", "value": "000000", "unit": "#Hex", "type": "string"}
+        ],
+        "active": true
       }
     ]
   }

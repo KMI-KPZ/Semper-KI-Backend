@@ -5,7 +5,7 @@ Silvio Weging 2023
 
 Contains: Services for database calls
 """
-import enum
+import enum, logging
 
 from datetime import datetime
 from django.utils import timezone
@@ -14,8 +14,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
-from Generic_Backend.code_General.definitions import FileObjectContent, OrganizationDescription, SessionContent, OrganizationDetails, GlobalDefaults, UserDetails
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementUser, profileManagement
+from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
@@ -32,7 +32,6 @@ from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
 
-import logging
 logger = logging.getLogger("errors")
 
 
@@ -67,6 +66,20 @@ class ProcessManagementBase(AbstractContentInterface):
             return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
         else:
             return GlobalDefaults.anonymous
+    
+    ##############################################
+    def getActualUserID(self) -> str:
+        """
+        Retrieve the user behind the organization
+        
+        :return: UserID
+        :rtype: str
+        """
+        if manualCheckifLoggedIn(self.structuredSessionObj):
+            return ProfileManagementUser.getClientID(self.structuredSessionObj)
+        else:
+            return GlobalDefaults.anonymous
+
     ##############################################
     @staticmethod
     def checkIfUserIsClient(userHashID, projectID="", processID=""):
@@ -101,7 +114,7 @@ class ProcessManagementBase(AbstractContentInterface):
     @staticmethod
     def getData(processID, processObject=None):
         """
-        Get all files.
+        Get all data associated with the process (aka history).
 
         :param processID: process ID for a process
         :type processID: str
@@ -244,7 +257,7 @@ class ProcessManagementBase(AbstractContentInterface):
         :rtype: None
         """
         try:
-            affectedEntries = Data.objects.delete(dataID=dataID)
+            affectedEntries = Data.objects.filter(dataID=dataID).delete()
         except (Exception) as error:
             logger.error(f'could not delete data entry: {str(error)}')
         
@@ -420,6 +433,31 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
+    def checkIfCurrentUserIsContractorOfProcess(processID:str, currentUserHashedID:str):
+        """
+        Get info if the current User may see the contractors side of the process
+
+        :param processID: ID of the process
+        :type processID: str
+        :param currentUserHashedID: The ID of the current user
+        :type currentUserHashedID: str
+        :return: True if the user is the contractor, false if not
+        :rtype: Bool
+        
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            if currentProcess.contractor is not None and currentProcess.contractor.hashedID == currentUserHashedID:
+                return True
+            else:
+                return False
+        except (Exception) as error:
+            logger.error(f'could not check if user is contractor: {str(error)}')
+        
+        return False
+    
+    ##############################################
+    @staticmethod
     def getAllUsersOfProject(projectID):
         """
         Get all user IDs that are connected to that project.
@@ -518,10 +556,11 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                if allFiles[entry][FileObjectContent.remote]:
-                    s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                else:
-                    s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                if FileObjectContent.isFile not in allFiles[entry] or allFiles[entry][FileObjectContent.isFile]:
+                    if allFiles[entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -604,7 +643,7 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
-    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy):
+    def updateProcess(projectID, processID, updateType: ProcessUpdates, content, updatedBy) -> tuple[str,dict]|Exception:
         """
         Change details of a process like its status, or save communication. 
 
@@ -616,12 +655,14 @@ class ProcessManagementBase(AbstractContentInterface):
         :type updateType: EnumUpdates
         :param content: changed process, can be many stuff
         :type content: json dict
-        :return: Flag if it worked or not
-        :rtype: Bool
+        :return: The relevant thing that got updated, for event queue
+        :rtype: tuple[str,dict]|Exception
 
         """
         updated = timezone.now()
         try:
+            outContent = ""
+            outAdditionalInformation = {}
             currentProcess = Process.objects.get(processID=processID)
             currentProcess.updatedWhen = updated
             dataID = crypto.generateURLFriendlyRandomString()
@@ -639,16 +680,31 @@ class ProcessManagementBase(AbstractContentInterface):
                     else:
                         currentProcess.messages[MessageInterfaceFromFrontend.messages] = [content]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.MESSAGE, updatedBy)
-                
+                outContent = content[MessageInterfaceFromFrontend.text]
+                outAdditionalInformation[MessageInterfaceFromFrontend.origin] = content[MessageInterfaceFromFrontend.origin]
+                outAdditionalInformation[MessageInterfaceFromFrontend.createdBy] = content[MessageInterfaceFromFrontend.userName]
+
             elif updateType == ProcessUpdates.files:
+                getAdditionalInformation = False
+                if len(content) == 1:
+                    outContent = "file"
+                    getAdditionalInformation = True
+                elif len(content) > 1:
+                    outContent = "files"
+
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
-
+                    if getAdditionalInformation:
+                        outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
+                        outAdditionalInformation[FileObjectContent.origin] = content[entry][FileObjectContent.origin]
+                    dataID = crypto.generateURLFriendlyRandomString()
+                
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.STATUS, updatedBy)
-                
+                outContent = str(content)
+
             elif updateType == ProcessUpdates.processDetails:
                 for entry in content:
                     if entry == ProcessDetails.priorities:
@@ -660,23 +716,38 @@ class ProcessManagementBase(AbstractContentInterface):
                             currentProcess.processDetails[ProcessDetails.priorities] = content[entry] # is set during creation and therefore complete
                     else:
                         currentProcess.processDetails[entry] = content[entry]
+                    outContent += entry + ","
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DETAILS, updatedBy)
+                outContent = outContent.rstrip(",")
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: ""})
-                      
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).initializeServiceDetails(currentProcess.serviceDetails)
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
+                outContent = content
+
             elif updateType == ProcessUpdates.serviceStatus:
                 currentProcess.serviceStatus = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: ""})
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceStatus: content})
+                outContent = str(content)
 
             elif updateType == ProcessUpdates.serviceDetails:
-                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: ""})
+                serviceType = currentProcess.serviceType
+                if serviceType != serviceManager.getNone():
+                    currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).updateServiceDetails(currentProcess.serviceDetails, content)
+                    ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceDetails: content})
+                    for entry in content:
+                        outContent += entry + ","
+                    outContent = outContent.rstrip(",")
+                else:
+                    raise Exception("No Service chosen!")
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
-                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: ""})
+                if OrganizationDescription.hashedID in content and ProcessDetails.prices in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.prices] = {content[OrganizationDescription.hashedID]: currentProcess.processDetails[ProcessDetails.prices][content[OrganizationDescription.hashedID]]} # delete prices of other contractors and reduce to this one
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
+                outContent = content
 
             elif updateType == ProcessUpdates.dependenciesIn:
                 connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
@@ -684,6 +755,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 connectedProcess.dependenciesOut.add(currentProcess)
                 connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesIn: content})
+                outContent = content
 
             elif updateType == ProcessUpdates.dependenciesOut:
                 connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
@@ -691,9 +763,10 @@ class ProcessManagementBase(AbstractContentInterface):
                 connectedProcess.dependenciesIn.add(currentProcess)
                 connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
+                outContent = content
 
             currentProcess.save()
-            return True
+            return (outContent, outAdditionalInformation)
         except (Exception) as error:
             logger.error(f'could not update process: {str(error)}')
             return error
@@ -728,12 +801,14 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if content[entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                    if FileObjectContent.isFile not in content[entry] or content[entry][FileObjectContent.isFile]:
+                        if content[entry][FileObjectContent.remote]:
+                            s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
+                        else:
+                            s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
+                    dataID = crypto.generateURLFriendlyRandomString()
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
@@ -757,7 +832,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
+                currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
@@ -817,7 +892,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, notification:str, clientOnly:bool):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool, creatorOfEvent:str):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -827,6 +902,8 @@ class ProcessManagementBase(AbstractContentInterface):
         :type processID: str
         :param event: the event that happens
         :type event: str
+        :param eventContent: The content that triggered the event
+        :type eventContent: Any
         :param notification: The notification that wants to be send
         :type notification: str
         :return: Dictionary of users with project ID and processes in order for the websocket to fire events
@@ -843,10 +920,34 @@ class ProcessManagementBase(AbstractContentInterface):
             dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
         for userHashID in dictOfUserIDsAndPreference:
-            dictForEventsAsOutput[userHashID] = {"triggerEvent": dictOfUserIDsAndPreference[userHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            if userHashID == creatorOfEvent:
+                continue
+            dictForEventsAsOutput[userHashID] = {
+                EventsDescriptionGeneric.triggerEvent: dictOfUserIDsAndPreference[userHashID],
+                EventsDescriptionGeneric.eventType: "processEvent",
+                EventsDescriptionGeneric.eventData: {
+                    EventsDescriptionGeneric.primaryID: projectID,
+                    EventsDescriptionGeneric.secondaryID: processID,
+                    EventsDescriptionGeneric.reason: event,
+                    EventsDescriptionGeneric.content: eventContent[0],
+                    EventsDescriptionGeneric.additionalInformation: eventContent[1]
+                }
+            }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
-            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {"triggerEvent": dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID], EventsDescription.eventType: EventsDescription.projectEvent, EventsDescription.events: [{ProjectDescription.projectID: projectID, SessionContentSemperKI.processes: [{ProcessDescription.processID: processID, event: 1}] }]}
+            if userThatBelongsToContractorHashID == creatorOfEvent:
+                continue
+            dictForEventsAsOutput[userThatBelongsToContractorHashID] = {
+                EventsDescriptionGeneric.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
+                EventsDescriptionGeneric.eventType: "processEvent",
+                EventsDescriptionGeneric.eventData: {
+                    EventsDescriptionGeneric.primaryID: projectID,
+                    EventsDescriptionGeneric.secondaryID: processID,
+                    EventsDescriptionGeneric.reason: event,
+                    EventsDescriptionGeneric.content: eventContent[0],
+                    EventsDescriptionGeneric.additionalInformation: eventContent[1]
+                }
+            }
     
         return dictForEventsAsOutput
     
@@ -1029,16 +1130,12 @@ class ProcessManagementBase(AbstractContentInterface):
 
                     processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project:projectObj, ProcessDescription.serviceType: serviceType, ProcessDescription.serviceStatus: serviceStatus, ProcessDescription.serviceDetails: serviceDetails, ProcessDescription.processDetails: processDetails, ProcessDescription.processStatus: processStatus, ProcessDescription.client: clientID, ProcessDescription.files: files, ProcessDescription.messages: messages, ProcessDescription.updatedWhen: now})
                     listOfProcessObjects.append( (processObj, dependenciesIn, dependenciesOut) )
-                    ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, clientID)
 
                     # generate entries in data
-                    for elem in process[ProcessDescription.files]:
-                        fileEntry = process[ProcessDescription.files][elem]
-                        if fileEntry[FileObjectContent.createdBy] == GlobalDefaults.anonymous:
-                            fileEntry[FileObjectContent.createdBy] = clientName
-                            fileEntry[FileObjectContent.createdByID] = clientID
-                        dataID = crypto.generateURLFriendlyRandomString()
-                        ProcessManagementBase.createDataEntry(fileEntry, dataID, processID, DataType.FILE, fileEntry[FileObjectContent.createdBy], {}, elem)
+                    dataEntriesInSession = contentOfSession.getData(processID)
+                    for elem in dataEntriesInSession:
+                        ProcessManagementBase.createDataEntry(elem[DataDescription.data],elem[DataDescription.dataID],processID, elem[DataDescription.type], clientID, elem[DataDescription.details], elem[DataDescription.contentID])
+                    contentOfSession.deleteAllDataEntriesOfProcess(processID)
 
                 # link dependencies
                 for processObj, dependenciesListIn, dependenciesListOut in listOfProcessObjects:
@@ -1135,8 +1232,12 @@ class ProcessManagementBase(AbstractContentInterface):
                 #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 #         continue
                 currentProject = project.toDict()
-                currentProject["processesCount"] = len(project.processes.all())
-                currentProject["owner"] = True
+                processes = project.processes.all()
+                currentProject[ProjectOutput.processesCount] = len(processes)
+                currentProject[ProjectOutput.processIDs] = processes.values_list("processID", flat=True)
+                currentProject[ProjectOutput.owner] = True
+                currentProject[ProjectOutput.searchableData] = []
+                # TODO: add searchable data
                     
                 output.append(currentProject)
             
@@ -1236,11 +1337,11 @@ class ProcessManagementBase(AbstractContentInterface):
             if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID])
 
             # Create history entry
             dataID = crypto.generateURLFriendlyRandomString()
-            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID]}, dataID, processObj.processID, DataType.OTHER, userID, {})
             
             # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
             processObj.contractor = contractorObj

@@ -34,7 +34,7 @@ from ...definitions import NodeTypesAM
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-
+# TODO serializers
 #######################################################
 @extend_schema(
     summary="Retrieve the filters used for this service",
@@ -86,7 +86,7 @@ def getFilters(request:Request):
                      "category":"MATERIAL", # TODO define somewhere
                      "type":"SELECTION", # TODO define somewhere
                      "range":None,
-                     "values":[{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner],
+                     "values":[{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner],
                      "units":None
                      },
                 "answer":None

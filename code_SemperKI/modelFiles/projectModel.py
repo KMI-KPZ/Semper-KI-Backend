@@ -48,7 +48,15 @@ class Project(models.Model):
     accessedWhen = models.DateTimeField(auto_now=True)
 
     def toDict(self):
-        return {ProjectDescription.projectID: self.projectID, ProjectDescription.projectStatus: self.projectStatus, ProjectDescription.client: self.client, ProjectDescription.projectDetails: self.projectDetails, ProjectDescription.createdWhen: str(self.createdWhen), ProjectDescription.updatedWhen: str(self.updatedWhen), ProjectDescription.accessedWhen: str(self.accessedWhen) }
+        return {
+            ProjectDescription.projectID: self.projectID,
+            ProjectDescription.projectStatus: self.projectStatus,
+            ProjectDescription.client: self.client,
+            ProjectDescription.projectDetails: self.projectDetails,
+            ProjectDescription.createdWhen: str(self.createdWhen),
+            ProjectDescription.updatedWhen: str(self.updatedWhen),
+            ProjectDescription.accessedWhen: str(self.accessedWhen)
+        }
 
 
 ###################################################

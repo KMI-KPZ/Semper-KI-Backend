@@ -9,6 +9,7 @@ Contains: Tests for various functions and services
 
 from django.test import TestCase, Client
 import datetime
+from copy import deepcopy
 import json, io
 from .urls import paths
 
@@ -58,6 +59,15 @@ class TestAdditiveManufacturing(TestCase):
         processPath = processPathSplit[0]+"/"+processPathSplit[1]+"/"+processPathSplit[2]+"/"+projectObj[ProjectDescription.projectID]+"/"
         processObj = json.loads(client.get("/"+processPath).content)
         return (projectObj, processObj)
+    
+    #######################################################
+    @staticmethod
+    def createKG(client:Client):
+        # test graph for system
+        client.get("/"+paths["loadTestGraph"][0])
+        # one node for materials
+        client.get("/"+paths["orga_cloneTestGraphToOrgaForTests"][0])
+        return None
 
     #######################################################
     @classmethod
@@ -65,8 +75,8 @@ class TestAdditiveManufacturing(TestCase):
         super().setUpClass()
         self.orgaClient = Client()
         self.createOrganization(self.orgaClient)
+        self.createKG(self.orgaClient)
         
-
     # Tests!
     #######################################################
     def test_uploadAndDeleteModel(self):
@@ -85,7 +95,8 @@ class TestAdditiveManufacturing(TestCase):
         tags = '""'
         filename = '"file2.stl"'
         details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + '}, "fileName": ' + filename + '}]'
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "details": details, "file2.stl": self.testFile} # non-default case
+        localCopyOfFile = deepcopy(self.testFile)
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "file2.stl": localCopyOfFile, "origin": "test_origin"} # non-default case
         #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
         response = client.post("/"+paths["uploadModel"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
@@ -94,13 +105,87 @@ class TestAdditiveManufacturing(TestCase):
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
         fileID = list(response[ProcessDescription.files].keys())[0]
-        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.models]) > 0, True)
+        self.assertIs(len(response[ProcessDescription.serviceDetails][ServiceDetails.groups][0][ServiceDetails.models]) > 0, True)
 
         deleteModelPathSplit = paths["deleteModel"][0].split("/")
-        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + deleteModelPathSplit[2] + "/" + deleteModelPathSplit[3] + "/" + deleteModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + fileID + "/"
+        deleteModelPath = deleteModelPathSplit[0] + "/" + deleteModelPathSplit[1] + "/" + deleteModelPathSplit[2] + "/" + deleteModelPathSplit[3] + "/" + deleteModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/" + "0" + "/" + fileID +"/"
         response = client.delete("/" + deleteModelPath)
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         response = json.loads(client.get("/"+getProcPath).content)
-        self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.models] , True)
+        self.assertIs(fileID not in response[ProcessDescription.serviceDetails][ServiceDetails.groups][0][ServiceDetails.models] , True)
 
     # TODO: get, set, delete for Materials and Post-Processing; onto and orga functions
+
+
+    ##################################################
+    def test_getContractors(self):
+        client = Client()
+
+        # Create user, project and process
+        self.createUser(client)
+        projectObj, processObj = self.createProjectAndProcess(client)
+
+        # TODO set stuff so that the service is complete
+
+        # set service type to 1
+        changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
+        response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # upload model
+        date =  f'"{str(datetime.datetime.now())}"'
+        certificates = '""'
+        licenses = '""'
+        tags = '""'
+        filename = '"file2.stl"'
+        details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + ', "quantity": 1, "levelOfDetail": 1, "scalingFactor": 100.0' + '}, "fileName": ' + filename + '}]'
+        localCopyOfFile = deepcopy(self.testFile)
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "origin": "test_origin", "file2.stl": localCopyOfFile} # non-default case
+        #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
+        response = client.post("/"+paths["uploadModel"][0], uploadBody )
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        getProcPathSplit = paths["getProcess"][0].split("/")
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        fileID = list(response[ProcessDescription.files].keys())[0]
+
+        # call checkModel to calculate stuff
+        checkModelPathSplit = paths["checkModel"][0].split("/")
+        checkModelPath = checkModelPathSplit[0] + "/" + checkModelPathSplit[1] + "/" + checkModelPathSplit[2] + "/" + checkModelPathSplit[3] + "/" + checkModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"+ fileID + "/"
+        response = client.get("/"+checkModelPath)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # set material
+        ## get filters
+        response = client.get("/"+paths["getFilters"][0])
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        filters = json.loads(response.content)
+        ## get materials
+        response = client.post("/"+paths["getMaterials"][0], data=json.dumps(filters), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        materials = json.loads(response.content)
+        material = materials["materials"][0]
+        changes = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "material": material}
+        response = client.patch("/"+paths["setMaterial"][0], data=json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # advance state to service finished
+        getProcPathSplit = paths["getProcess"][0].split("/")
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs("processStatusButtons" in response and len(response["processStatusButtons"]) > 0 and "action" in response["processStatusButtons"][2], True, f'{response}')
+        buttonData = response["processStatusButtons"][2]["action"]["data"]
+        button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]]}
+        response = client.post("/"+paths["statusButtonRequest"][0], json.dumps(button), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # call getContractors as get with processID in path
+        contractorsPath = paths["getContractors"][0].split("/")
+        contractorsPath = contractorsPath[0] + "/" + contractorsPath[1] + "/" + contractorsPath[2] + "/" + contractorsPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = client.get("/"+contractorsPath)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        response = json.loads(client.get("/"+contractorsPath).content)
+        # Check return value for length of contractors
+        self.assertIs(len(response)>=1, True, f'{len(response)} < 1')

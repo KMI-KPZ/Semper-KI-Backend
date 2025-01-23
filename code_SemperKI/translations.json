@@ -3,12 +3,12 @@
     {
         "email": {
             "subjects": {
-                "confirmedByClient": "Vom Auftraggeber bestätigt",
-                "confirmedByContractor": "Vom Auftragnehmer bestätigt",
-                "declinedByClient": "Vom Auftraggeber abgelehnt",
-                "declinedByContractor": "Vom Auftragnehmer abgelehnt",
-                "statusUpdate": "Statusänderung in Prozess:",
-                "newProcessForContractor": "Neuer Prozess für Sie!",
+                "confirmedByClient": "Vom Auftraggeber bestätigt: ",
+                "confirmedByContractor": "Vom Auftragnehmer bestätigt: ",
+                "declinedByClient": "Vom Auftraggeber abgelehnt: ",
+                "declinedByContractor": "Vom Auftragnehmer abgelehnt: ",
+                "statusUpdate": "Statusänderung in Prozess: ",
+                "newProcessForContractor": "Neuer Prozess für Sie: ",
                 "processSent": "Der folgende Prozess wurde versendet: ",
                 "questionsFromContractor": "Rückfragen zu Prozess: ",
                 "inProduction": "Produktion hat begonnen von Prozess: ",
@@ -25,7 +25,7 @@
                 "declinedByContractor": "Der Auftragnehmer hat den Prozess abgelehnt",
                 "verificationSuccessful": "Verifikation erfolgreich.",
                 "verificationFailed": "Verifikation fehlgeschlagen.",
-                "newProcessForContractor": "Neuer Prozess für Sie mit Namen: ",
+                "newProcessForContractor": "Neuer Prozess für Sie!",
                 "processSent": "Prozess wurde zum Auftragnehmer gesendet.",
                 "questionsFromContractor": "Der Auftragnehmer benötigt weitere Informationen. Bitte gehen Sie auf die Website der Plattform.",
                 "inProduction": "Der Auftragnehmer hat mit der Produktion begonnen.",
@@ -35,18 +35,34 @@
                 "dispute": "Lieferung wird vom Auftraggeber als problematisch angesehen. Bitte setzen Sie sich mit dem Auftraggeber in Verbindung.",
                 "failed": "Der Prozess wird vom Auftraggeber als gescheitert angesehen. Vielen Dank dennoch!"
             }
-        }   
+        },  
+        "service": {
+            "ADDITIVE_MANUFACTURING": {
+                "powerCosts": "Stromkosten",
+                "margin": "Marge",
+                "personnelCosts": "Personalkosten",
+                "costRatePersonnelEngineering": "Kostenrate Personal Engineering",
+                "repairCosts": "Reparaturkosten",
+                "personnelPreProcessCosts": "Personalkosten Vorprozess",
+                "amortizationRate": "Abschreibungssatz",
+                "additionalFixedCosts": "Zusätzliche Fixkosten",
+                "costRateEquipmentEngineering": "Kostenrate Equipment Engineering",
+                "fixedCostsEquipmentEngineering": "Fixkosten Equipment Engineering",
+                "safetyGasCosts": "Schutzgas Kosten",
+                "roomCosts": "Raumkosten"
+            }
+        } 
     },
     "en-US":
     {
         "email": {
             "subjects": {
-                "confirmedByClient": "Confirmed by client",
-                "confirmedByContractor": "Confirmed by contractor",
-                "declinedByClient": "Declined by client",
-                "declinedByContractor": "Declined by contractor",
-                "statusUpdate": "Change of state in process:",
-                "newProcessForContractor": "New process for you!",
+                "confirmedByClient": "Confirmed by client: ",
+                "confirmedByContractor": "Confirmed by contractor: ",
+                "declinedByClient": "Declined by client: ",
+                "declinedByContractor": "Declined by contractor: ",
+                "statusUpdate": "Change of state in process: ",
+                "newProcessForContractor": "New process for you: ",
                 "processSent": "The following process has been sent: ",
                 "questionsFromContractor": "The contractor has questions about: ",
                 "inProduction": "Production started for process: ",
@@ -63,7 +79,7 @@
                 "declinedByContractor": "The contractor declined the process.",
                 "verificationSuccessful": "Verification successful.",
                 "verificationFailed": "Verification failed.",
-                "newProcessForContractor": "New process for you with the name: ",
+                "newProcessForContractor": "New process for you!",
                 "processSent": "The process has been sent to the contractor.",
                 "questionsFromContractor": "The contractor requires more information. Please visit the platform.",
                 "inProduction": "The contractor started production.",
@@ -73,6 +89,22 @@
                 "dispute": "The delivered product was declared as insufficient. Please contact the client.",
                 "failed": "The process was declared as failed by the client. We thank you anyway!"
             }
-        }   
+        },  
+        "service": {
+            "ADDITIVE_MANUFACTURING": {
+                "powerCosts": "Power costs",
+                "margin": "Margin",
+                "personnelCosts": "Personnel costs",
+                "costRatePersonnelEngineering": "Cost rate personnel engineering",
+                "repairCosts": "Repair costs",
+                "personnelPreProcessCosts": "Personnel costs pre-process",
+                "amortizationRate": "Amortization rate",
+                "additionalFixedCosts": "Additional fixed costs",
+                "costRateEquipmentEngineering": "Cost rate equipment engineering",
+                "fixedCostsEquipmentEngineering": "Fixed costs equipment engineering",
+                "safetyGasCosts": "Safety gas costs",
+                "roomCosts": "Room costs"
+            }
+        } 
     }
 }

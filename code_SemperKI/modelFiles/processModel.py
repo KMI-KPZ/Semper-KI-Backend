@@ -12,7 +12,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from .projectModel import Project, ProjectInterface
 from ..serviceManager import serviceManager
-from Generic_Backend.code_General.modelFiles.organizationModel import Organization
+from Generic_Backend.code_General.modelFiles.organizationModel import Organization, OrganizationDescription
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 ###################################################
@@ -102,9 +102,9 @@ class Process(models.Model):
         return ""
     
     def toDict(self):
-        return {ProcessDescription.processID: self.processID, 
-                ProcessDescription.project: self.project.toDict(), 
-                ProcessDescription.serviceDetails: self.serviceDetails, 
+        return {ProcessDescription.processID: self.processID,
+                ProcessDescription.project: self.project.toDict(),
+                ProcessDescription.serviceDetails: self.serviceDetails,
                 ProcessDescription.processStatus: self.processStatus,
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,
@@ -112,7 +112,7 @@ class Process(models.Model):
                 ProcessDescription.dependenciesIn: [ process.processID for process in self.dependenciesIn.all()],
                 ProcessDescription.dependenciesOut: [ process.processID for process in self.dependenciesOut.all()],
                 ProcessDescription.client: self.client,
-                ProcessDescription.contractor: self.contractor.name if self.contractor is not None else "",
+                ProcessDescription.contractor: {OrganizationDescription.name: self.contractor.name, OrganizationDescription.hashedID: self.contractor.hashedID} if self.contractor is not None else {},
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
@@ -160,6 +160,7 @@ class ProcessInterface():
     :serviceStatus: How everything is going for the service
     :serviceType: Which service it is
     :client: Who started the process
+    :contractor: Who gets to handle it
     :files: Registrar keeping check, which files are currently there, link to Data model
     :messages: same as files but for chat messages
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
@@ -182,6 +183,7 @@ class ProcessInterface():
     dependenciesOut = ManyToManySimulation()
 
     client = ""
+    contractor = None
     
     files = {}
     messages = {}
@@ -194,7 +196,7 @@ class ProcessInterface():
     def __init__(self, project:ProjectInterface, processID:str, currentTime:str, client:str) -> None:
         self.processID = processID
         self.project = project
-        self.processDetails = {"amount": 1}
+        self.processDetails = {}
         self.processStatus = 0
         self.serviceDetails = {}
         self.serviceStatus = 0
@@ -202,6 +204,7 @@ class ProcessInterface():
         self.dependenciesIn = ManyToManySimulation()
         self.dependenciesOut = ManyToManySimulation()
         self.client = client
+        self.contractor = None
         self.files = {}
         self.messages = {}
         self.createdWhen = currentTime
@@ -220,6 +223,7 @@ class ProcessInterface():
         self.serviceStatus = serviceStatus
         self.serviceType = serviceType
         self.client = client
+        self.contractor = None
         self.files = files
         self.messages = messages
         self.dependenciesIn.initialize(dependenciedIn)
@@ -238,6 +242,7 @@ class ProcessInterface():
                 ProcessDescription.dependenciesIn: self.dependenciesIn.all(),
                 ProcessDescription.dependenciesOut: self.dependenciesOut.all(),
                 ProcessDescription.client: self.client,
+                ProcessDescription.contractor: self.contractor,
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}

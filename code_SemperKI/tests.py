@@ -10,6 +10,10 @@ Contains: Tests for various functions and services
 from django.test import TestCase, Client
 import datetime
 import json, io
+from copy import deepcopy
+
+from code_SemperKI.modelFiles.dataModel import DataDescription
+from code_SemperKI.states.stateDescriptions import ProcessStatusAsString
 from .urls import paths
 
 from Generic_Backend.code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
@@ -20,8 +24,17 @@ from .definitions import ProjectDescription, ProcessDescription, SessionContentS
 #######################################################
 class TestProjects(TestCase):
     testFile = io.BytesIO(b'binary stl file                                                                \x00\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x80\x00\x00\x00\x80\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x00\x00\x80\xbf\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\\\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x00\x80\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00 B\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x00\x00\x80?\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\xa0A\x00\x00\x0c\xc2\x00\x00 B\x00\x00\x00\x00\x00\x00\x0c\xc2\x00\x00pB\x00\x00\x00\x00\x00\x00')
-    
+
     # not part of the tests!
+    #######################################################
+    @classmethod
+    def fileFactory(self) -> io.BytesIO:
+        """
+        Return a copy of the testfile
+        
+        """
+        return deepcopy(self.testFile)
+
     #######################################################
     @classmethod
     def createOrganization(self, client:Client):
@@ -97,7 +110,8 @@ class TestProjects(TestCase):
         client = Client()
         projectObj, processObj = self.createProjectAndProcess(client)
         changes = '{ "' + ProjectDescription.projectID + '": "' + projectObj[ProjectDescription.projectID] + '", "changes": { "' + ProjectDescription.projectDetails + '": {"title": "test"} } }'
-        client.patch("/"+paths["updateProject"][0], changes, content_type="application/json")
+        response = client.patch("/"+paths["updateProject"][0], changes, content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
         response = json.loads(client.get("/"+paths["getFlatProjects"][0]).content)
         self.assertIs(response["projects"][0][ProjectDescription.projectDetails]["title"] == "test", True, f'got: {response["projects"][0][ProjectDescription.projectDetails]["title"]}')
@@ -173,7 +187,8 @@ class TestProjects(TestCase):
         client = Client()
         
         projectObj, processObj = self.createProjectAndProcess(client)
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": self.testFile, "origin": "my_origin"}
+        localCopyOfTestFile = self.fileFactory()
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file": localCopyOfTestFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
         getProcPathSplit = paths["getProcess"][0].split("/")
@@ -187,15 +202,15 @@ class TestProjects(TestCase):
         response = client.get("/"+downloadPath)
         with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
             loaded_response_content = buf_bytes.read()
-            self.testFile.seek(0)
-            contentOfTestFile = self.testFile.read()
+            localCopyOfTestFile.seek(0)
+            contentOfTestFile = localCopyOfTestFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
         
-        self.testFile.seek(0)
+        localCopyOfTestFile.seek(0)
         # saved stuff
-        projectObj, processObj = self.createProjectAndProcess(client)
         self.createUser(client)
-        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": self.testFile, "origin": "my_origin"}
+        projectObj, processObj = self.createProjectAndProcess(client)
+        uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "attachment": localCopyOfTestFile, "origin": "my_origin"}
         response = client.post("/"+paths["uploadFiles"][0], uploadBody )
         self.assertIs(response.status_code == 200, True, f'got Statuscode {response.status_code}')
         getProcPathSplit = paths["getProcess"][0].split("/")
@@ -208,11 +223,9 @@ class TestProjects(TestCase):
         response = client.get("/"+downloadPath)
         with io.BytesIO(b"".join(response.streaming_content)) as buf_bytes:
             loaded_response_content = buf_bytes.read()
-            self.testFile.seek(0)
-            contentOfTestFile = self.testFile.read()
+            localCopyOfTestFile.seek(0)
+            contentOfTestFile = localCopyOfTestFile.read()
             self.assertIs(loaded_response_content == contentOfTestFile, True, f'{loaded_response_content} != {contentOfTestFile}')
-
-    # TODO: getProcessHistory, (getContractors), statemachine, (events), (celery stuff?)
 
     ##################################################
     def test_processHistory(self):
@@ -221,10 +234,25 @@ class TestProjects(TestCase):
         # Create user, project and process
         self.createUser(client)
         projectObj, processObj = self.createProjectAndProcess(client)
-        
-        # TODO: call getProcessHistory as get with processID in path
+        # call getProcessHistory as get with processID in path
+        historyPath = paths["getProcessHistory"][0].split("/")
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/"+ historyPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = client.get("/"+historyPath)
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        response = json.loads(response.content)
+        # Check return value for length of history
+        self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
 
-        # TODO: Check return value for creation of process
+        # save stuff
+        self.createUser(client)
+        # call getProcessHistory as get with processID in path
+        historyPath = paths["getProcessHistory"][0].split("/")
+        historyPath = historyPath[0] + "/" + historyPath[1] + "/" + historyPath[2] + "/" + historyPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+historyPath).content)
+        # Check return value for length of history
+        self.assertIs(len(response["history"])>=1, True, f'{len(response["history"])} < 1')
+
+
 
     ##################################################
     def test_stateMachine(self):
@@ -233,12 +261,27 @@ class TestProjects(TestCase):
         # create project and process but no user as it's not necessary
         projectObj, processObj = self.createProjectAndProcess(client)
 
-        # TODO: call updateProcess with selected service 1
+        # call updateProcess with selected service 1
+        changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
+        response = client.patch("/"+paths["updateProcess"][0], json.dumps(changes), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
-        # TODO: call getProcess and get buttons
+        # call getProcess and get buttons
+        getProcPathSplit = paths["getProcess"][0].split("/")
+        getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs(response[ProcessDescription.serviceType] == 1, True, f'{response[ProcessDescription.serviceType]}')
 
-        # TODO: "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
+        self.assertIs("processStatusButtons" in response and len(response["processStatusButtons"]) > 0 and "action" in response["processStatusButtons"][0], True, f'{response}')
+        buttonData = response["processStatusButtons"][0]["action"]["data"]
 
-        # TODO: call getProcess and check if processStatus code is correct (see StateDescription for the integer value)
+        # "press" Button BACK-TO-DRAFT by calling a POST to statusButtonRequest
+        button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]]}
+        response = client.post("/"+paths["statusButtonRequest"][0], json.dumps(button), content_type="application/json")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+
+        # call getProcess and check if processStatus code is correct (see StateDescription for the integer value)
+        response = json.loads(client.get("/"+getProcPath).content)
+        self.assertIs(response[ProcessDescription.processStatus] == 0, True, f'{response[ProcessDescription.processStatus]}')
 
 

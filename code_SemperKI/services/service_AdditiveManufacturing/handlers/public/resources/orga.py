@@ -27,6 +27,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
+from code_SemperKI.services.service_AdditiveManufacturing.logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
 from code_SemperKI.services.service_AdditiveManufacturing.utilities.basics import checkIfOrgaHasAMAsService
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
@@ -72,12 +73,12 @@ def orga_getGraph(request:Request):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getGraph(orgaID)
+        result = pgKnowledgeGraph.Basics.getGraph(orgaID)
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
         for entry in result["nodes"]:
-            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName]}
+            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "type": entry[pgKnowledgeGraph.NodeDescription.nodeType]}
             outDict["Nodes"].append(outEntry)
         for entry in result["edges"]:
             outEntry = {"source": entry[0], "target": entry[1]}
@@ -142,7 +143,7 @@ def orga_getResources(request:Request):
         outDict = {"resources": []}
         #result = sparqlQueries.getServiceProviders.sendQuery({sparqlQueries.SparqlParameters.ID: orgaID})
         # TODO: Parse and serialize output
-        result = pgKnowledgeGraph.getEdgesForNode(orgaID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(orgaID)
         if isinstance(result, Exception):
             raise result
         outDict["resources"].extend(result)
@@ -201,7 +202,7 @@ def orga_getNodes(request:Request, resourceType:str):
         # for elem in materialsRes:
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-        result = pgKnowledgeGraph.getNodesByType(resourceType)
+        result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
         if isinstance(result, Exception):
             raise result
         # remove nodes not belonging to the system or the orga
@@ -258,7 +259,7 @@ def orga_getNodeViaID(request:Request, nodeID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        nodeInfo = pgKnowledgeGraph.getNode(nodeID)
+        nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
         if nodeInfo.createdBy != orgaID and nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
@@ -320,7 +321,7 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getSpecificNeighborsByType(nodeID, resourceType)
+        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
         
@@ -377,7 +378,7 @@ def orga_getNeighbors(request:Request, nodeID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.getEdgesForNode(nodeID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -403,32 +404,32 @@ def orga_getNeighbors(request:Request, nodeID:str):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #######################################################
-class SReqNodeFE(serializers.Serializer):
+class SReqNodeFEOrga(serializers.Serializer):
     nodeID = serializers.CharField(max_length=200, required=False, allow_blank=True)
     nodeName = serializers.CharField(max_length=200, required=False, allow_blank=True)
     context = serializers.CharField(max_length=1000, required=False, allow_blank=True)
-    nodeType = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    nodeType = serializers.CharField(max_length=200)
     properties = serializers.ListField(child=SResProperties(), allow_empty=True, required=False)
     createdBy = serializers.CharField(max_length=200, required=False, allow_blank=True)
     active = serializers.BooleanField(required=False)
 
 #######################################################
-class SReqEdgesFE(serializers.Serializer):
+class SReqEdgesFEOrga(serializers.Serializer):
     create = serializers.ListField(child=serializers.CharField(max_length=200))
     delete = serializers.ListField(child=serializers.CharField(max_length=200))
 
 #######################################################
-class SReqCreateOrUpdateAndLink(serializers.Serializer):
+class SReqCreateOrUpdateAndLinkOrga(serializers.Serializer):
     type = serializers.CharField(max_length=200)
-    node = SReqNodeFE()
-    edges = SReqEdgesFE()
+    node = SReqNodeFEOrga()
+    edges = SReqEdgesFEOrga()
 
 #######################################################
 @extend_schema(
     summary="Combined access for frontend to create and update together with linking",
     description=" ",
     tags=['FE - AM Resources Organization'],
-    request=SReqCreateOrUpdateAndLink,
+    request=SReqCreateOrUpdateAndLinkOrga,
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -452,7 +453,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
 
     """
     try:
-        inSerializer = SReqCreateOrUpdateAndLink(data=request.data)
+        inSerializer = SReqCreateOrUpdateAndLinkOrga(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
@@ -470,58 +471,58 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             # create node for the orga and link it to the orga
             if "nodeID" in validatedInput["node"]:
                 del validatedInput["node"]["nodeID"]
-            resultNode = pgKnowledgeGraph.createNode(validatedInput["node"], orgaID)
+            resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
-            exceptionOrNone = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
+            exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
-                otherNode = pgKnowledgeGraph.getNode(nodeIDFromEdge)
+                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(otherNode, Exception):
                     raise otherNode
 
                 nodeIDToBeConnected = otherNode.nodeID
                 if otherNode.createdBy != orgaID:
-                    copiedNode = pgKnowledgeGraph.copyNode(otherNode, orgaID)
+                    copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
                     if isinstance(copiedNode, Exception):
                         raise copiedNode
                     nodeIDToBeConnected = copiedNode.nodeID
 
                 # create edge to new node
-                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
                 # create edge to orga
-                result = pgKnowledgeGraph.createEdge(nodeIDToBeConnected, orgaID)
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
                 if isinstance(result, Exception):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
 
         elif validatedInput["type"] == "update":
             # update node
-            resultNode = pgKnowledgeGraph.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
+            resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
             if isinstance(resultNode, Exception):
                 raise resultNode
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # create edge to new node
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, resultNode.nodeID) 
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
                 # create edge to orga
-                result = pgKnowledgeGraph.createEdge(nodeIDFromEdge, orgaID)
+                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
                 if isinstance(result, Exception):
                     raise result
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
         else:
@@ -594,10 +595,10 @@ def orga_createNode(request:Request):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
             
         # create node for the orga and link it
-        resultNode = pgKnowledgeGraph.createNode(validatedInput, orgaID)
+        resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput, orgaID)
         if isinstance(resultNode, Exception):
             raise resultNode
-        result = pgKnowledgeGraph.createEdge(orgaID, resultNode.nodeID) 
+        result = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
         if isinstance(result, Exception):
             raise result
         
@@ -626,7 +627,7 @@ def orga_createNode(request:Request):
     tags=['FE - AM Resources Organization'],
     request=SReqUpdateNode,
     responses={
-        200: None,
+        200: SResNode,
         400: ExceptionSerializer,
         401: ExceptionSerializer,
         500: ExceptionSerializer
@@ -674,7 +675,7 @@ def orga_updateNode(request:Request):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         # check if the node is even associated with the organization
-        result = pgKnowledgeGraph.getNode(validatedInput["nodeID"])
+        result = pgKnowledgeGraph.Basics.getNode(validatedInput["nodeID"])
         if isinstance(result, Exception):
             raise result
         if result.createdBy != orgaID:
@@ -688,13 +689,17 @@ def orga_updateNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # update node for the orga
-        result = pgKnowledgeGraph.updateNode(validatedInput["nodeID"], validatedInput)
+        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
         if isinstance(result, Exception):
             raise result
         
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {result.nodeID} of orga {orgaID}," + str(datetime.now()))
 
-        return Response("Success", status=status.HTTP_200_OK)
+        outSerializer = SResNode(data=result.toDict())
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
 
     except (Exception) as error:
         message = f"Error in {orga_updateNode.cls.__name__}: {str(error)}"
@@ -747,7 +752,7 @@ def orga_deleteNode(request:Request, nodeID:str):
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
         
         # check if the node is even associated with the organization
-        result = pgKnowledgeGraph.getNode(nodeID)
+        result = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(result, Exception):
             raise result
         if result.createdBy != orgaID:
@@ -760,7 +765,7 @@ def orga_deleteNode(request:Request, nodeID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-        result = pgKnowledgeGraph.deleteNode(nodeID)
+        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
         if isinstance(result, Exception):
             raise result
         
@@ -780,7 +785,7 @@ def orga_deleteNode(request:Request, nodeID:str):
 # set printer/material for orga (keep in mind: one item at the time for sparql)
 #######################################################
 class SReqOrgaAddEdges(serializers.Serializer):
-    entityIDs = serializers.ListField(child=serializers.CharField(max_length=200))
+    entityIDs = serializers.ListField(child=serializers.CharField(max_length=200),min_length=2)
 
 #######################################################
 @extend_schema(
@@ -838,13 +843,13 @@ def orga_addEdgesToOrga(request:Request):
         # link the node to the orga
         for entry in entityIDs:
             nodeIDToBeLinked = entry
-            nodeOfEntity = pgKnowledgeGraph.getNode(entry)
+            nodeOfEntity = pgKnowledgeGraph.Basics.getNode(entry)
             # check if node belongs to SYSTEM or the orga
             if nodeOfEntity.createdBy != orgaID:
                 # if it doesn't belong to the orga, create a copy for it
-                newNode = pgKnowledgeGraph.copyNode(nodeOfEntity, orgaID)
+                newNode = pgKnowledgeGraph.Basics.copyNode(nodeOfEntity, orgaID)
                 nodeIDToBeLinked = newNode.nodeID
-            result = pgKnowledgeGraph.createEdge(orgaID, nodeIDToBeLinked) 
+            result = pgKnowledgeGraph.Basics.createEdge(orgaID, nodeIDToBeLinked) 
             if isinstance(result, Exception):
                 raise result
         
@@ -863,17 +868,13 @@ def orga_addEdgesToOrga(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-#######################################################
-class SReqOrgaCreateEdge(serializers.Serializer):
-    entity1ID = serializers.CharField(max_length=200)
-    entity2ID = serializers.CharField(max_length=200)
 
 #######################################################
 @extend_schema(
     summary="Links two things for an organization in the knowledge graph",
     description=" ",
     tags=['FE - AM Resources Organization'],
-    request=SReqOrgaCreateEdge,
+    request=SReqOrgaAddEdges,
     responses={
         200: None,
         400: ExceptionSerializer,
@@ -899,7 +900,7 @@ def orga_addEdgeForOrga(request:Request):
     """
     try:
 
-        serializedInput = SReqOrgaCreateEdge(data=request.data)
+        serializedInput = SReqOrgaAddEdges(data=request.data)
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgeForOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
@@ -910,11 +911,11 @@ def orga_addEdgeForOrga(request:Request):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        entity1ID = serializedInput.data["entity1ID"]
-        entity2ID = serializedInput.data["entity2ID"]
+        entity1ID = serializedInput.data["entityIDs"][0]
+        entity2ID = serializedInput.data["entityIDs"][1]
 
         # edge already exists?
-        if pgKnowledgeGraph.getIfEdgeExists(entity1ID, entity2ID):
+        if pgKnowledgeGraph.Basics.getIfEdgeExists(entity1ID, entity2ID):
             return Response("Success", status=status.HTTP_200_OK)
 
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
@@ -926,10 +927,10 @@ def orga_addEdgeForOrga(request:Request):
         #      sparqlQueries.SparqlParameters.Material: materialName, 
         #      sparqlQueries.SparqlParameters.PrinterModel: printerName})
 
-        result1 = pgKnowledgeGraph.getNode(entity1ID)
+        result1 = pgKnowledgeGraph.Basics.getNode(entity1ID)
         if isinstance(result1, Exception):
             raise result1
-        result2 = pgKnowledgeGraph.getNode(entity2ID)
+        result2 = pgKnowledgeGraph.Basics.getNode(entity2ID)
         if isinstance(result2, Exception):
             raise result2
         
@@ -937,16 +938,16 @@ def orga_addEdgeForOrga(request:Request):
         # check if the node belongs to the orga
         if result1.createdBy != orgaID:
             # if it doesn't belong to the orga, create a copy for it
-            newNode = pgKnowledgeGraph.copyNode(result1, orgaID)
+            newNode = pgKnowledgeGraph.Basics.copyNode(result1, orgaID)
             node1IDToBeLinked = newNode.nodeID
         
         node2IDToBeLinked = result2.nodeID
         if result2.createdBy != orgaID:
-            newNode = pgKnowledgeGraph.copyNode(result2, orgaID)
+            newNode = pgKnowledgeGraph.Basics.copyNode(result2, orgaID)
             node2IDToBeLinked = newNode.nodeID
             
         # link the two things
-        result = pgKnowledgeGraph.createEdge(node1IDToBeLinked, node2IDToBeLinked) 
+        result = pgKnowledgeGraph.Basics.createEdge(node1IDToBeLinked, node2IDToBeLinked) 
         if isinstance(result, Exception):
             raise result
         
@@ -1000,7 +1001,7 @@ def orga_removeEdgeToOrga(request:Request, entityID:str):
         #sparqlQueries.deletePrinterOfContractor.sendQuery(
         #    {sparqlQueries.SparqlParameters.ID: orgaID, 
         #     sparqlQueries.SparqlParameters.PrinterModel: printer})
-        result = pgKnowledgeGraph.deleteEdge(orgaID, entityID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(orgaID, entityID)
         if isinstance(result, Exception):
             raise result
         
@@ -1048,10 +1049,10 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result1 = pgKnowledgeGraph.getNode(entity1ID)
+        result1 = pgKnowledgeGraph.Basics.getNode(entity1ID)
         if isinstance(result1, Exception):
             raise result1
-        result2 = pgKnowledgeGraph.getNode(entity2ID)
+        result2 = pgKnowledgeGraph.Basics.getNode(entity2ID)
         if isinstance(result2, Exception):
             raise result2
         
@@ -1065,7 +1066,7 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        result = pgKnowledgeGraph.deleteEdge(entity1ID,entity2ID)
+        result = pgKnowledgeGraph.Basics.deleteEdge(entity1ID,entity2ID)
         if isinstance(result, Exception):
             raise result
         
@@ -1115,11 +1116,11 @@ def orga_removeAll(request:Request):
         
         # sparqlQueries.deleteAllFromContractor.sendQuery(
         #     {sparqlQueries.SparqlParameters.ID: orgaID})
-        result = pgKnowledgeGraph.getEdgesForNode(orgaID)
+        result = pgKnowledgeGraph.Basics.getEdgesForNode(orgaID)
         if isinstance(result, Exception):
             raise result
         for entry in result:
-            retVal = pgKnowledgeGraph.deleteEdge(orgaID, entry[pgKnowledgeGraph.NodeDescription.nodeID])
+            retVal = pgKnowledgeGraph.Basics.deleteEdge(orgaID, entry[pgKnowledgeGraph.NodeDescription.nodeID])
             if isinstance(retVal, Exception):
                 raise retVal
         
@@ -1227,6 +1228,49 @@ def orga_makeRequestForAdditions(request:Request):
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_makeRequestForAdditions.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+
+#######################################################
+@extend_schema(
+    summary="Clone the test graph to the orga for the tests",
+    description=" ",
+    tags=['BE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def cloneTestGraphToOrgaForTests(request:Request):
+    """
+    Clone the test graph to the orga for the tests
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Nothing
+    :rtype: Response
+
+    """
+    try:
+        result = logicForCloneTestGraphToOrgaForTests(request)
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {cloneTestGraphToOrgaForTests.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
