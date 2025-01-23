@@ -28,10 +28,17 @@ class ServiceBase(ABC):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        pass
 
     ##############################################################
     # Connections
+
+    ###################################################
+    @abstractmethod
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
 
     ###################################################
     @abstractmethod
@@ -40,7 +47,6 @@ class ServiceBase(ABC):
         Update a service
 
         """
-        pass
 
     ###################################################
     @abstractmethod
@@ -49,7 +55,22 @@ class ServiceBase(ABC):
         Delete stuff from a service
 
         """
-        pass
+
+    ###################################################
+    @abstractmethod
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+    
+    ###################################################
+    @abstractmethod
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
 
     ###################################################
     @abstractmethod
@@ -58,9 +79,8 @@ class ServiceBase(ABC):
         Check if a service has been defined completely
 
         """
-        pass
 
-    ####################################################################################
+    ###################################################
     @abstractmethod
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
         """
@@ -74,16 +94,30 @@ class ServiceBase(ABC):
         :rtype: dict
         
         """
-        pass
+
+    ##################################################
+    @abstractmethod
+    def calculatePriceForService(self, process, additionalArguments:dict, transferObject:object) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :param transferObject: Object to transfer data
+        :type transferObject: object
+        :return: Dictionary with all pricing details
+        :rtype: dict
+        """
 
     ###################################################
     @abstractmethod
-    def getFilteredContractors(self, processObj) -> list:
+    def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
         """
-        pass
 
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):

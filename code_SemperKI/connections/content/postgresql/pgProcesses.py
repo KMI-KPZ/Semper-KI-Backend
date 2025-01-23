@@ -14,7 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, profileManagement
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementUser, profileManagement
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
@@ -66,6 +66,20 @@ class ProcessManagementBase(AbstractContentInterface):
             return profileManagement[self.structuredSessionObj[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj)
         else:
             return GlobalDefaults.anonymous
+    
+    ##############################################
+    def getActualUserID(self) -> str:
+        """
+        Retrieve the user behind the organization
+        
+        :return: UserID
+        :rtype: str
+        """
+        if manualCheckifLoggedIn(self.structuredSessionObj):
+            return ProfileManagementUser.getClientID(self.structuredSessionObj)
+        else:
+            return GlobalDefaults.anonymous
+
     ##############################################
     @staticmethod
     def checkIfUserIsClient(userHashID, projectID="", processID=""):
@@ -419,6 +433,31 @@ class ProcessManagementBase(AbstractContentInterface):
     
     ##############################################
     @staticmethod
+    def checkIfCurrentUserIsContractorOfProcess(processID:str, currentUserHashedID:str):
+        """
+        Get info if the current User may see the contractors side of the process
+
+        :param processID: ID of the process
+        :type processID: str
+        :param currentUserHashedID: The ID of the current user
+        :type currentUserHashedID: str
+        :return: True if the user is the contractor, false if not
+        :rtype: Bool
+        
+        """
+        try:
+            currentProcess = Process.objects.get(processID=processID)
+            if currentProcess.contractor is not None and currentProcess.contractor.hashedID == currentUserHashedID:
+                return True
+            else:
+                return False
+        except (Exception) as error:
+            logger.error(f'could not check if user is contractor: {str(error)}')
+        
+        return False
+    
+    ##############################################
+    @staticmethod
     def getAllUsersOfProject(projectID):
         """
         Get all user IDs that are connected to that project.
@@ -517,10 +556,11 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                if allFiles[entry][FileObjectContent.remote]:
-                    s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                else:
-                    s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                if FileObjectContent.isFile not in allFiles[entry] or allFiles[entry][FileObjectContent.isFile]:
+                    if allFiles[entry][FileObjectContent.remote]:
+                        s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                    else:
+                        s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -658,6 +698,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     if getAdditionalInformation:
                         outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
                         outAdditionalInformation[FileObjectContent.origin] = content[entry][FileObjectContent.origin]
+                    dataID = crypto.generateURLFriendlyRandomString()
                 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = content
@@ -681,6 +722,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
+                currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).initializeServiceDetails(currentProcess.serviceDetails)
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
 
@@ -702,6 +744,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.provisionalContractor:
                 currentProcess.processDetails[ProcessDetails.provisionalContractor] = content
+                if OrganizationDescription.hashedID in content and ProcessDetails.prices in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.prices] = {content[OrganizationDescription.hashedID]: currentProcess.processDetails[ProcessDetails.prices][content[OrganizationDescription.hashedID]]} # delete prices of other contractors and reduce to this one
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.provisionalContractor: content})
                 outContent = content
 
@@ -757,12 +801,14 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if content[entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                    if FileObjectContent.isFile not in content[entry] or content[entry][FileObjectContent.isFile]:
+                        if content[entry][FileObjectContent.remote]:
+                            s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
+                        else:
+                            s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
+                    dataID = crypto.generateURLFriendlyRandomString()
 
             elif updateType == ProcessUpdates.processStatus:
                 currentProcess.processStatus = StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.DRAFT)
@@ -786,7 +832,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.processDetails[ProcessDetails.provisionalContractor] = ""
+                currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
@@ -846,7 +892,7 @@ class ProcessManagementBase(AbstractContentInterface):
 
     ##############################################
     @staticmethod
-    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool):
+    def getInfoAboutProjectForWebsocket(projectID:str, processID:str, event:str, eventContent, notification:str, clientOnly:bool, creatorOfEvent:str):
         """
         Retrieve information about the users connected to the project from the database. 
 
@@ -874,6 +920,8 @@ class ProcessManagementBase(AbstractContentInterface):
             dictOfUsersThatBelongToContractor = gatherUserHashIDsAndNotificationPreference(processObj.contractor.hashedID, notification, UserNotificationTargets.event)
         
         for userHashID in dictOfUserIDsAndPreference:
+            if userHashID == creatorOfEvent:
+                continue
             dictForEventsAsOutput[userHashID] = {
                 EventsDescriptionGeneric.triggerEvent: dictOfUserIDsAndPreference[userHashID],
                 EventsDescriptionGeneric.eventType: "processEvent",
@@ -887,6 +935,8 @@ class ProcessManagementBase(AbstractContentInterface):
             }
 
         for userThatBelongsToContractorHashID in dictOfUsersThatBelongToContractor:
+            if userThatBelongsToContractorHashID == creatorOfEvent:
+                continue
             dictForEventsAsOutput[userThatBelongsToContractorHashID] = {
                 EventsDescriptionGeneric.triggerEvent: dictOfUsersThatBelongToContractor[userThatBelongsToContractorHashID],
                 EventsDescriptionGeneric.eventType: "processEvent",
@@ -1182,8 +1232,12 @@ class ProcessManagementBase(AbstractContentInterface):
                 #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
                 #         continue
                 currentProject = project.toDict()
-                currentProject["processesCount"] = len(project.processes.all())
-                currentProject["owner"] = True
+                processes = project.processes.all()
+                currentProject[ProjectOutput.processesCount] = len(processes)
+                currentProject[ProjectOutput.processIDs] = processes.values_list("processID", flat=True)
+                currentProject[ProjectOutput.owner] = True
+                currentProject[ProjectOutput.searchableData] = []
+                # TODO: add searchable data
                     
                 output.append(currentProject)
             
@@ -1283,11 +1337,11 @@ class ProcessManagementBase(AbstractContentInterface):
             if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID])
 
             # Create history entry
             dataID = crypto.generateURLFriendlyRandomString()
-            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor]}, dataID, processObj.processID, DataType.OTHER, userID, {})
+            ProcessManagementBase.createDataEntry({"Action": "SendToContractor", "ID": processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID]}, dataID, processObj.processID, DataType.OTHER, userID, {})
             
             # Send process to contractor (cannot be done async because save overwrites changes -> racing condition)
             processObj.contractor = contractorObj

@@ -21,6 +21,14 @@ class Packaging(Semper.ServiceBase):
         super().__init__()
 
     ###################################################
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+        return {}
+
+    ###################################################
     def updateServiceDetails(self, existingContent, newContent):
         """
         Run service specific update of service details
@@ -39,12 +47,28 @@ class Packaging(Semper.ServiceBase):
         return P_deleteServiceDetails(existingContent, newContent)
     
     ###################################################
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+        return False
+    
+    ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks, if service is completely defined
         
         """
         return P_serviceReady(existingContent)
+    
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        return {}
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -68,14 +92,31 @@ class Packaging(Semper.ServiceBase):
         
         """
         return P_cloneServiceDetails(existingContent, newProcess)
+    
+    ##################################################
+    def calculatePriceForService(self, process, additionalArguments:dict, transferObject:object) -> dict:
+        """
+        Calculate the price for all content of the service
+        
+        :param process: The process with all its details
+        :type process: ProcessInterface|Process
+        :param additionalArguments: Various parameters, differs for every service
+        :type additionalArguments: dict
+        :param transferObject: The object that is used to transfer data between services
+        :type transferObject: object
+        :return: Dictionary with all pricing details
+        :rtype: dict
+
+        """
+        return {}
 
     ###################################################
-    def getFilteredContractors(self, processObj) -> list:
+    def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
         """
-        return []
+        return [], {}
 
 SERVICE_NAME = "PACKAGING"
 SERVICE_NUMBER = 5

@@ -35,7 +35,23 @@
                 "dispute": "Lieferung wird vom Auftraggeber als problematisch angesehen. Bitte setzen Sie sich mit dem Auftraggeber in Verbindung.",
                 "failed": "Der Prozess wird vom Auftraggeber als gescheitert angesehen. Vielen Dank dennoch!"
             }
-        }   
+        },  
+        "service": {
+            "ADDITIVE_MANUFACTURING": {
+                "powerCosts": "Stromkosten",
+                "margin": "Marge",
+                "personnelCosts": "Personalkosten",
+                "costRatePersonnelEngineering": "Kostenrate Personal Engineering",
+                "repairCosts": "Reparaturkosten",
+                "personnelPreProcessCosts": "Personalkosten Vorprozess",
+                "amortizationRate": "Abschreibungssatz",
+                "additionalFixedCosts": "Zusätzliche Fixkosten",
+                "costRateEquipmentEngineering": "Kostenrate Equipment Engineering",
+                "fixedCostsEquipmentEngineering": "Fixkosten Equipment Engineering",
+                "safetyGasCosts": "Schutzgas Kosten",
+                "roomCosts": "Raumkosten"
+            }
+        } 
     },
     "en-US":
     {
@@ -73,6 +89,22 @@
                 "dispute": "The delivered product was declared as insufficient. Please contact the client.",
                 "failed": "The process was declared as failed by the client. We thank you anyway!"
             }
-        }   
+        },  
+        "service": {
+            "ADDITIVE_MANUFACTURING": {
+                "powerCosts": "Power costs",
+                "margin": "Margin",
+                "personnelCosts": "Personnel costs",
+                "costRatePersonnelEngineering": "Cost rate personnel engineering",
+                "repairCosts": "Repair costs",
+                "personnelPreProcessCosts": "Personnel costs pre-process",
+                "amortizationRate": "Amortization rate",
+                "additionalFixedCosts": "Additional fixed costs",
+                "costRateEquipmentEngineering": "Cost rate equipment engineering",
+                "fixedCostsEquipmentEngineering": "Fixed costs equipment engineering",
+                "safetyGasCosts": "Safety gas costs",
+                "roomCosts": "Room costs"
+            }
+        } 
     }
 }

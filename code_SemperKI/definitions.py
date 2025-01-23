@@ -106,13 +106,41 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     
     """
     provisionalContractor = enum.auto()
-    amount = enum.auto()
     title = enum.auto()
     clientBillingAddress = enum.auto()
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
+    prices = enum.auto()
 
+####################################################################################
+# Enum for the output of the process
+class ProcessOutput(StrEnumExactlyAsDefined):
+    """
+    What should the output object contain?
+    
+    """
+    processStatusButtons = enum.auto()
+    processErrors = enum.auto()
+    flatProcessStatus = enum.auto()
+
+####################################################################################
+# Enum for the output of the project
+class ProjectOutput(StrEnumExactlyAsDefined):
+    owner = enum.auto()
+    processIDs = enum.auto()
+    searchableData = enum.auto()
+    processesCount = enum.auto()
+
+
+####################################################################################
+# Enum for prices
+class PricesDetails(StrEnumExactlyAsDefined):
+    """
+    What should the prices object contain?
+    
+    """
+    details = enum.auto()
 
 ####################################################################################
 # Enum for messages
@@ -164,6 +192,7 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     WAITING_CLIENT = enum.auto()
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
+    FAILED = enum.auto()
     COMPLETED = enum.auto()
 
 ####################################################################################
@@ -256,3 +285,31 @@ class MapPermissionsToOrgaNotifications():
         PermissionsEnum.resourcesEdit: [],	
     }
 
+##################################################
+# Class that contains the structure of service specific fields for organization details
+class ServiceSpecificFields(StrEnumExactlyAsDefined):
+    """
+    Contains the structure of service specific fields for organization details
+    """
+    key = enum.auto()
+    name = enum.auto()
+    unit = enum.auto()
+    value = enum.auto()
+
+##################################################
+# Class that contains all units used for price calculation
+class UnitsForPriceCalculation(enum.StrEnum):
+    """
+    Contains all units used for price calculation
+    """
+    euroPerkWh = "€/kWh"
+    euroPerHour = "€/h"
+    percent = "%"
+    euroPerKilogram = "€/kg"
+    euro = "€"
+    cubicCentimeterPerHour = "cm³/h"
+    millimeter = "mm"
+    cubicCentimeter = "cm³"
+    grammPerCubicCentimeter = "g/cm³"
+    euroPerHourPerSquareMeter = "€/(h*m²)"
+    

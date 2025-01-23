@@ -6,7 +6,7 @@ Silvio Weging 2024
 Contains: Handlers for AM Materials
 """
 
-import json, logging, copy
+import json, logging, copy, numpy
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -25,9 +25,11 @@ from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
+from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import MaterialDetails, ServiceDetails
@@ -35,7 +37,8 @@ from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from ...definitions import NodeTypesAM, NodePropertiesAM
+from ...definitions import NodeTypesAM, NodePropertiesAMMaterial
+from ...logics.materialsLogic import logicForSetMaterial, logicForRetrieveMaterialWithFilter
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -50,7 +53,8 @@ class SReqMaterialContent(serializers.Serializer):
     id = serializers.CharField(max_length=200)
     title = serializers.CharField(max_length=200)
     propList = serializers.ListField()
-    imgPath = serializers.CharField(max_length=200) 
+    imgPath = serializers.CharField(max_length=200)
+    medianPrice = serializers.FloatField(required=False)
 
 #######################################################
 class SResMaterialsWithFilters(serializers.Serializer):
@@ -94,71 +98,18 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
-        # format:
-        # "filters":[ {"id":0,
-        #          "isChecked":False,
-        #          "isOpen":False,
-        #          "question":{
-        #              "isSelectable":True,
-        #              "title":"materialCategory",
-        #              "category":"MATERIAL",
-        #              "type":"SELECTION",
-        #              "range":None,
-        #              "values":[{"name": <nodeName>, "id": <nodeID>}, ...],
-        #              "units":None
-        #              },
-        #         "answer":None
-        #         },...
-        # ]
-        output = {"materials": []}
-        
-        #filtersForSparql = []
-        #for entry in filters["filters"]:
-        #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
-        #TODO ask via sparql with most general filter and then iteratively filter response
-        #resultsOfQueries = {"materials": []}
-        #materialsRes = sparqlQueries.getAllMaterials.sendQuery()
-        # for elem in materialsRes:
-        #     title = elem["Material"]["value"]
-        #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
+        result, statusCode = logicForRetrieveMaterialWithFilter(filters)
+        if isinstance(result, Exception):
+            message = f"Error in retrieveMaterialsWithFilter: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=statusCode)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # filter by selection of post-processing
- 
-        materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
-        for entry in materialList:
-            # use only entries from system
-            if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner: #and entry[pgKnowledgeGraph.NodeDescription.active] == True:
-                # adhere to the filters:
-                append = True
-                for filter in filters["filters"]:
-                    # see if filter is selected and the value has not been rules out somewhere
-                    if filter["isChecked"] == True and append == True:
-                        # filter for material category
-                        if filter["question"]["title"] == "materialCategory":
-                            appendViaThisFilter = False
-                            if filter["answer"] != None:
-                                categoryID = filter["answer"]["value"] # contains the id of the chosen category node
-                                categoriesOfEntry = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
-                                if isinstance(categoriesOfEntry, Exception):
-                                    raise categoriesOfEntry
-
-                                for category in categoriesOfEntry:
-                                    if categoryID == category[pgKnowledgeGraph.NodeDescription.uniqueID]:
-                                        appendViaThisFilter = True
-                                        break
-                            append = appendViaThisFilter
-
-                if append:
-                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAM.imgPath] if NodePropertiesAM.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
-            
-        
-        # mockup here:
-        #mock = copy.deepcopy(mocks.materialMock)
-        #mock["materials"].extend(resultsOfQueries["materials"])
-        #output.update(mock)
-
-        outSerializer = SResMaterialsWithFilters(data=output)
+        outSerializer = SResMaterialsWithFilters(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -180,7 +131,8 @@ def retrieveMaterialsWithFilter(request:Request):
 class SReqSetMaterial(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
-    materials = serializers.ListField(child=SReqMaterialContent())
+    groupID = serializers.IntegerField()
+    material = SReqMaterialContent()
     
 #######################################################
 @extend_schema(
@@ -212,7 +164,7 @@ def setMaterialSelection(request:Request):
         serializedContent = SReqSetMaterial(data=request.data)
         if not serializedContent.is_valid():
             message = "Validation failed in setMaterialSelection"
-            exception = "Validation failed"
+            exception = f"Validation failed {serializedContent.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
@@ -223,29 +175,20 @@ def setMaterialSelection(request:Request):
         info = serializedContent.data
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
-        materials = info["materials"]
-
-        materialToBeSaved = {}
-        for material in materials:
-            materialToBeSaved[material[MaterialDetails.id]] = material
-
-        changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.materials: materialToBeSaved}}}
-
-        # Save into files field of the process
-        message, flag = updateProcessFunction(request, changes, projectID, [processID])
-        if flag is False: # this should not happen
-            message = "Rights not sufficient for setMaterialSelection"
-            exception = "Unauthorized"
-            logger.error(message)
+        groupID = info["groupID"]
+        material = info["material"]
+        
+        result, statusCode = logicForSetMaterial(request, projectID, processID, groupID, material, setMaterialSelection.cls.__name__)
+        if isinstance(result, Exception):
+            message = f"Error in addMaterialToSelection: {str(result)}"
+            exception = str(result)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
-                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+                return Response(exceptionSerializer.data, status=statusCode)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if isinstance(message, Exception):
-            raise message
-        
-        logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},set,{Logging.Object.OBJECT},material,"+str(datetime.now()))
+            
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -274,7 +217,7 @@ def setMaterialSelection(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,materialID:str):
+def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,groupID:int):
     """
     Remove a prior selected material from selection
 
@@ -284,14 +227,40 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,mate
     :type projectID: str
     :param processID: Process ID
     :type processID: str
-    :param materialID: ID of the selected material
-    :type materialID: str
+    :param groupID: Index of the group
+    :type groupID: int
     :return: Success or Exception
     :rtype: HTTP Response
 
     """
     try:
-        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.materials: {materialID: ""}}}}
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface()
+        if interface == None:
+            message = "Rights not sufficient for deleteMaterialFromSelection"
+            exception = "Unauthorized"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # Get the process
+        process = interface.getProcessObj(projectID, processID)
+        if isinstance(process, Exception):
+            message = "Process not found in deleteMaterialFromSelection"
+            exception = "Not found"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        changesArray = [{} for i in range(len(process.serviceDetails[ServiceDetails.groups]))]
+        changesArray[groupID] = {ServiceDetails.material: {}}
+        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
