@@ -129,6 +129,7 @@ class SResButtonAction(serializers.Serializer):
 class SResProcessStatusButtons(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     icon = serializers.CharField(max_length=200)
+    iconPosition = serializers.CharField(max_length=200)
     action = SResButtonAction()
     active = serializers.BooleanField()
     buttonVariant = serializers.CharField(max_length=200)
