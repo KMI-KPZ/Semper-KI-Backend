@@ -1653,21 +1653,6 @@ class REQUEST_COMPLETED(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
                     "icon": IconType.CancelIcon,
                     "iconPosition": "left",
@@ -1676,6 +1661,21 @@ class REQUEST_COMPLETED(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
                         },
                     },
                     "active": True,
@@ -1905,21 +1905,6 @@ class OFFER_COMPLETED(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
                     "icon": IconType.CancelIcon,
                     "iconPosition": "left",
@@ -1928,6 +1913,21 @@ class OFFER_COMPLETED(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.CONFIRMATION_REJECTED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
                         },
                     },
                     "active": True,
@@ -2329,21 +2329,6 @@ class PRODUCTION_IN_PROGRESS(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "iconPosition": "left",
@@ -2352,6 +2337,21 @@ class PRODUCTION_IN_PROGRESS(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
                         },
                     },
                     "active": True,
@@ -2460,21 +2460,6 @@ class PRODUCTION_COMPLETED(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                    "icon": IconType.LocalShippingIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "iconPosition": "left",
@@ -2483,6 +2468,21 @@ class PRODUCTION_COMPLETED(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
+                    "icon": IconType.LocalShippingIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
                         },
                     },
                     "active": True,
@@ -2697,21 +2697,6 @@ class DELIVERY_COMPLETED(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
                     "icon": IconType.QuestionAnswerIcon,
                     "iconPosition": "left",
@@ -2735,6 +2720,21 @@ class DELIVERY_COMPLETED(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
+                    "icon": IconType.DoneAllIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.COMPLETED,
                         },
                     },
                     "active": True,
@@ -2864,21 +2864,6 @@ class DISPUTE(State):
                     "showIn": "process",
                 },
                 {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
                     "iconPosition": "left",
@@ -2887,6 +2872,21 @@ class DISPUTE(State):
                         "data": {
                             "type": "forwardStatus",
                             "targetStatus": ProcessStatusAsString.FAILED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
+                    "icon": IconType.DoneAllIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.COMPLETED,
                         },
                     },
                     "active": True,
@@ -3081,6 +3081,7 @@ class FAILED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -3091,7 +3092,8 @@ class FAILED(State):
                 },
                 {
                     "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
+                    "icon": IconType.CloneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "cloneProcesses" },
@@ -3167,6 +3169,7 @@ class CANCELED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -3177,7 +3180,8 @@ class CANCELED(State):
                 },
                 {
                     "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
+                    "icon": IconType.CloneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "cloneProcesses" },
