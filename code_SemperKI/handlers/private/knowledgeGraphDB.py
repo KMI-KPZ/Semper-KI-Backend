@@ -921,7 +921,6 @@ def loadTestGraph(request:Request):
     }
 )
 @loginViaAPITokenIfAvailable()
-@require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
 def loadTestGraphViaAPI(request:Request):
@@ -935,7 +934,7 @@ def loadTestGraphViaAPI(request:Request):
 
     """
     try:
-        if manualCheckifAdmin(request):
+        if manualCheckifAdmin(request.session):
             testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
             tGAsDict = json.loads(testGraph)
             result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
