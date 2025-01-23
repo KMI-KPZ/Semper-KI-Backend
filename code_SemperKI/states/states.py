@@ -412,6 +412,7 @@ class DRAFT(State):
         return [{
                 "title": ButtonLabels.DELETE,
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -510,6 +511,7 @@ class SERVICE_IN_PROGRESS(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -524,6 +526,7 @@ class SERVICE_IN_PROGRESS(State):
             {
                 "title": ButtonLabels.DELETE,
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -534,7 +537,8 @@ class SERVICE_IN_PROGRESS(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -659,6 +663,7 @@ class SERVICE_READY(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -673,6 +678,7 @@ class SERVICE_READY(State):
             {
                 "title": ButtonLabels.DELETE,
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -683,7 +689,8 @@ class SERVICE_READY(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                "icon": IconType.FactoryIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -791,7 +798,7 @@ class SERVICE_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
-    fireEvent = False    
+    fireEvent = False
 
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -828,6 +835,7 @@ class SERVICE_COMPLETED(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -842,6 +850,7 @@ class SERVICE_COMPLETED(State):
             {
                 "title": ButtonLabels.DELETE,
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -852,7 +861,8 @@ class SERVICE_COMPLETED(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                "icon": IconType.DoneAllIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -965,6 +975,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -979,6 +990,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
             {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -1121,6 +1133,7 @@ class SERVICE_COMPLICATION(State):
             {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -1131,7 +1144,8 @@ class SERVICE_COMPLICATION(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                "icon": IconType.TroubleshootIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1238,6 +1252,7 @@ class CONTRACTOR_COMPLETED(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1252,6 +1267,7 @@ class CONTRACTOR_COMPLETED(State):
             {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -1262,7 +1278,8 @@ class CONTRACTOR_COMPLETED(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
-                "icon": IconType.TaskIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1359,6 +1376,7 @@ class VERIFYING(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1373,6 +1391,7 @@ class VERIFYING(State):
             {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -1383,7 +1402,8 @@ class VERIFYING(State):
             },
             { # this button shall not do anything
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
-                "icon": IconType.MailIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1479,6 +1499,7 @@ class VERIFICATION_COMPLETED(State):
             {
                 "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                 "icon": IconType.ArrowBackIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1493,6 +1514,7 @@ class VERIFICATION_COMPLETED(State):
             {
                 "title": ButtonLabels.DELETE, # do not change
                 "icon": IconType.DeleteIcon,
+                "iconPosition": "left",
                 "action": {
                     "type": "request",
                     "data": { "type": "deleteProcess" },
@@ -1503,7 +1525,8 @@ class VERIFICATION_COMPLETED(State):
             },
             {
                 "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                "icon": IconType.MailIcon,
+                "icon": IconType.ArrowForwardIcon,
+                "iconPosition": "right",
                 "action": {
                     "type": "request",
                     "data": {
@@ -1604,6 +1627,7 @@ class REQUEST_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -1619,6 +1643,7 @@ class REQUEST_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -1629,7 +1654,8 @@ class REQUEST_COMPLETED(State):
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -1644,6 +1670,7 @@ class REQUEST_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -1760,7 +1787,7 @@ class REQUEST_COMPLETED(State):
 #             outArr.extend([
 #                 {
 #                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-#                     "icon": IconType.DoneAllIcon,
+#                     "icon": IconType.DoneIcon,
 #                     "action": {
 #                         "type": "request",
 #                         "data": {
@@ -1868,6 +1895,7 @@ class OFFER_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -1878,7 +1906,8 @@ class OFFER_COMPLETED(State):
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -1893,6 +1922,7 @@ class OFFER_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2000,6 +2030,7 @@ class OFFER_REJECTED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2089,6 +2120,7 @@ class CONFIRMATION_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2102,7 +2134,8 @@ class CONFIRMATION_COMPLETED(State):
             outArr.extend( [
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                    "icon": IconType.FactoryIcon,
+                    "icon": IconType.ArrowForwardIcon,
+                    "iconPosition": "right",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2193,6 +2226,7 @@ class CONFIRMATION_REJECTED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2285,6 +2319,7 @@ class PRODUCTION_IN_PROGRESS(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2295,7 +2330,8 @@ class PRODUCTION_IN_PROGRESS(State):
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
-                    "icon": IconType.LocalShippingIcon,
+                    "icon": IconType.DoneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2310,6 +2346,7 @@ class PRODUCTION_IN_PROGRESS(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2413,6 +2450,7 @@ class PRODUCTION_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2424,6 +2462,7 @@ class PRODUCTION_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
                     "icon": IconType.LocalShippingIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2438,6 +2477,7 @@ class PRODUCTION_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2542,6 +2582,7 @@ class DELIVERY_IN_PROGRESS(State):
                 {
                     "title": ButtonLabels.DELETE,
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2552,7 +2593,8 @@ class DELIVERY_IN_PROGRESS(State):
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
+                    "icon": IconType.ArrowForwardIcon,
+                    "iconPosition": "right",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2645,6 +2687,7 @@ class DELIVERY_COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE,
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2656,6 +2699,7 @@ class DELIVERY_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
+                    "iconPosition": "right",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2669,7 +2713,8 @@ class DELIVERY_COMPLETED(State):
                 },
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
-                    "icon": IconType.TroubleshootIcon,
+                    "icon": IconType.QuestionAnswerIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2684,6 +2729,7 @@ class DELIVERY_COMPLETED(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2808,6 +2854,7 @@ class DISPUTE(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2819,6 +2866,7 @@ class DISPUTE(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,
+                    "iconPosition": "right",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2833,6 +2881,7 @@ class DISPUTE(State):
                 {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
                     "icon": IconType.CancelIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": {
@@ -2944,6 +2993,7 @@ class COMPLETED(State):
                 {
                     "title": ButtonLabels.DELETE, # do not change
                     "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "deleteProcess" },
@@ -2954,7 +3004,8 @@ class COMPLETED(State):
                 },
                 {
                     "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
+                    "icon": IconType.CloneIcon,
+                    "iconPosition": "left",
                     "action": {
                         "type": "request",
                         "data": { "type": "cloneProcesses" },

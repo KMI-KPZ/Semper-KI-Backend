@@ -23,6 +23,7 @@ from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getFlatStatus, getMissingElements
+from code_SemperKI.logics.processLogics import parseProcessOutputForFrontend
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -60,68 +61,59 @@ def logicForGetFlatProjects(request) -> tuple[dict|Exception, int]:
         return (e, 500)
     
 ##################################################
-def logicForGetProjectForDashboard(request, projectID:str) -> tuple[dict|Exception, int]:
+def logicForGetProjectForDashboard(request, projectID:str, functionName:str) -> tuple[dict|Exception, int]:
     """
     Get the full project
 
+    :param request: The request
+    :type request: WSGIRequest
+    :param projectID: The project ID
+    :type projectID: str
+    :param functionName: The name of the function
+    :type functionName: str
     :return: The project
     :rtype: tuple[dict, int]
     """
-
-    contentManager = ManageContent(request.session)
-    interface = contentManager.getCorrectInterface("getProjectForDashboard")
-    adminOrNot = manualCheckifAdmin(request.session)
-    userID = contentManager.getClient()
-    if interface == None:
-        return (Exception("Rights not sufficient in getProjectForDashboard"), 401)
-    
-    
-    projectAsDict = interface.getProject(projectID)
-    if isinstance(projectAsDict, Exception):
-        return (Exception("Project not found in getProjectForDashboard"), 404)
+    try:    
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(functionName)
+        if interface == None:
+            return (Exception(f"Rights not sufficient in {functionName}"), 401)
         
-    processList = projectAsDict[SessionContentSemperKI.processes]
-    listOfFlatProcesses = []
-    if manualCheckifLoggedIn(request.session):
-        if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
-            currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
-        else:
-            currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
-    else:
-        currentUserID = GlobalDefaults.anonymous
-    
-    for entry in processList:
-        # list only processes that either the user or the receiving organization should see
-
-        if entry[ProcessDescription.client] == currentUserID or \
-            ( ProcessDescription.contractor in entry and \
-            len(entry[ProcessDescription.contractor]) != 0 and \
-                entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
-            # parse for frontend
-            if entry[ProcessDescription.serviceType] == serviceManager.getNone():
-                entry[ProcessDescription.serviceDetails] = {}
+        projectAsDict = interface.getProject(projectID)
+        if isinstance(projectAsDict, Exception):
+            return (Exception(f"Project not found in {functionName}"), 404)
+            
+        processList = projectAsDict[SessionContentSemperKI.processes]
+        listOfFlatProcesses = []
+        if manualCheckifLoggedIn(request.session):
+            if pgProfiles.ProfileManagementBase.checkIfUserIsInOrganization(request.session):
+                currentUserID = pgProfiles.ProfileManagementBase.getOrganizationHashID(request.session)
             else:
-                entry[ProcessDescription.serviceDetails] = serviceManager.getService(entry[ProcessDescription.serviceType]).parseServiceDetails(entry[ProcessDescription.serviceDetails])
+                currentUserID = pgProfiles.ProfileManagementBase.getUserHashID(request.session)
+        else:
+            currentUserID = GlobalDefaults.anonymous
+        
+        for entry in processList:
+            # list only processes that either the user or the receiving organization should see
+
+            if entry[ProcessDescription.client] == currentUserID or \
+                ( ProcessDescription.contractor in entry and \
+                len(entry[ProcessDescription.contractor]) != 0 and \
+                    entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
+
+                processObj = interface.getProcessObj(projectID, entry[ProcessDescription.processID])
+                retVal, statusCode = parseProcessOutputForFrontend(processObj, contentManager, functionName)
+                if statusCode != 200:
+                    return (retVal, statusCode)
             
-            processObj = interface.getProcessObj(projectID, entry[ProcessDescription.processID])
-            missingElements = getMissingElements(interface, processObj)
-            entry["processErrors"] = missingElements
-            entry["flatProcessStatus"] = getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client])
+                listOfFlatProcesses.append(retVal)
 
-            # check if costs are there and if they should be shown
-            if ProcessDetails.prices in processObj.processDetails:
-                for contractorID in processObj.processDetails[ProcessDetails.prices]:
-                    if PricesDetails.details in processObj.processDetails[ProcessDetails.prices][contractorID]:
-                        if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processObj.processID, userID)):
-                            del entry[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details]
-                        else:
-                            entry[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, processObj.processDetails[ProcessDetails.prices][contractorID][PricesDetails.details])
-
-            
-            listOfFlatProcesses.append(entry)
-
-    projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
-    return (projectAsDict, 200)
+        projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
+        return (projectAsDict, 200)
+    except Exception as e:
+        loggerError.error(f"Error in logicForGetProjectForDashboard: {str(e)}")
+        return (e, 500)
 
 ##################################################
 def logicForGetProject(request, projectID:str, functionName:str):
@@ -165,17 +157,12 @@ def logicForGetProject(request, projectID:str, functionName:str):
                 ( ProcessDescription.contractor in entry and \
                  len(entry[ProcessDescription.contractor]) != 0 and \
                     entry[ProcessDescription.contractor][OrganizationDescription.hashedID] == currentUserID):
-
-                flatProcessDict = {
-                    ProcessDetails.title: entry[ProcessDescription.processDetails][ProcessDetails.title] if ProcessDetails.title in entry[ProcessDescription.processDetails] else entry[ProcessDescription.processID],
-                    ProcessDescription.processID: entry[ProcessDescription.processID],
-                    ProcessDescription.serviceType: entry[ProcessDescription.serviceType],
-                    ProcessDescription.updatedWhen: entry[ProcessDescription.updatedWhen],
-                    ProcessDescription.createdWhen: entry[ProcessDescription.createdWhen],
-                    "flatProcessStatus": getFlatStatus(entry[ProcessDescription.processStatus], contentManager.getClient() == entry[ProcessDescription.client]),
-                    ProcessDetails.imagePath: entry[ProcessDescription.processDetails][ProcessDetails.imagePath] if ProcessDetails.imagePath in entry[ProcessDescription.processDetails] else ""
-                }
-                listOfFlatProcesses.append(flatProcessDict)
+                processObj = interface.getProcessObj(projectID, entry[ProcessDescription.processID])
+                retVal, statusCode = parseProcessOutputForFrontend(processObj, contentManager, functionName)
+                if statusCode != 200:
+                    return (retVal, statusCode)
+                
+                listOfFlatProcesses.append(retVal)
 
         projectAsDict[SessionContentSemperKI.processes] = listOfFlatProcesses
 

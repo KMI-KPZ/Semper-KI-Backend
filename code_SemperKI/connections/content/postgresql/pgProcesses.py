@@ -1233,10 +1233,10 @@ class ProcessManagementBase(AbstractContentInterface):
                 #         continue
                 currentProject = project.toDict()
                 processes = project.processes.all()
-                currentProject["processesCount"] = len(processes)
-                currentProject["processIDs"] = processes.values_list("processID", flat=True)
-                currentProject["owner"] = True
-                currentProject["searchableData"] = []
+                currentProject[ProjectOutput.processesCount] = len(processes)
+                currentProject[ProjectOutput.processIDs] = processes.values_list("processID", flat=True)
+                currentProject[ProjectOutput.owner] = True
+                currentProject[ProjectOutput.searchableData] = []
                 # TODO: add searchable data
                     
                 output.append(currentProject)

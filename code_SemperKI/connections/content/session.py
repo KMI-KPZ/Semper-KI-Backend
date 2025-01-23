@@ -16,7 +16,7 @@ from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.utilities import crypto
 
 from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
-from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
+from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails, ProjectOutput
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...modelFiles.dataModel import DataInterface, DataDescription
@@ -520,10 +520,10 @@ class ProcessManagementSession(AbstractContentInterface):
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
                 processes = self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID])
-                allProjects[idx]["processesCount"] = len(processes)
-                allProjects[idx]["processIDs"] = list(processes.keys())
+                allProjects[idx][ProjectOutput.processesCount] = len(processes)
+                allProjects[idx][ProjectOutput.processIDs] = list(processes.keys())
                 # gather searchable data
-                allProjects[idx]["searchableData"] = []
+                allProjects[idx][ProjectOutput.searchableData] = []
                 # TODO
                 
                 if SessionContentSemperKI.processes in allProjects[idx]:

@@ -216,7 +216,7 @@ def getProjectForDashboard(request:Request, projectID):
 
     """
     try:
-        result, statusCode = projectLogics.logicForGetProjectForDashboard(request, projectID)
+        result, statusCode = projectLogics.logicForGetProjectForDashboard(request, projectID, getProjectForDashboard.cls.__name__)
         if isinstance(result, Exception):
             message = f"Error in {getProjectForDashboard.cls.__name__}: {str(result)}"
             exception = str(result)

@@ -30,7 +30,7 @@ from code_SemperKI.states.states import getButtonsForProcess, getMissingElements
 from code_SemperKI.connections.content.postgresql import pgProcesses
 import code_SemperKI.utilities.websocket as WebSocketEvents
 
-from ..modelFiles.processModel import Process
+from ..modelFiles.processModel import Process, ProcessInterface
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -113,6 +113,63 @@ def logicForGetContractors(processObj:Process):
         return (e, 500)
 
 ####################################################################################
+def parseProcessOutputForFrontend(processObj:Process|ProcessInterface, contentManager:ManageContent, functionName:str):
+    """
+    Add stuff to the usual output of the process for the frontend
+
+    :param processObj: The process object
+    :type processObj: Process | ProcessInterface
+    :param contentManager: The content manager
+    :type contentManager: ManageContent
+    :param functionName: The function name that called this
+    :type functionName: str
+    :return: The process and statusCode
+    :rtype: tuple(dict|Exception, int)
+    
+    """
+    try:
+        userID = contentManager.getClient()
+        adminOrNot = manualCheckifAdmin(contentManager.currentSession)
+        interface = contentManager.getCorrectInterface(functionName)
+        if interface == None:
+            return Exception(f"Rights not sufficient in {functionName}"), 401
+        # add buttons
+        contractor = False
+        if processObj.contractor is not None:
+            contractor = processObj.contractor.hashedID == userID
+        buttons = getButtonsForProcess(processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
+        outDict = processObj.toDict()
+        outDict[ProcessOutput.processStatusButtons] = buttons
+
+        # add what's missing to continue
+        missingElements = getMissingElements(interface, processObj)
+        outDict[ProcessOutput.processErrors] = missingElements
+
+        # Add who needs to do what
+        outDict[ProcessOutput.flatProcessStatus] = getFlatStatus(processObj.processStatus, contentManager.getClient() == processObj.client)
+
+
+        # parse for frontend
+        if processObj.serviceType == serviceManager.getNone():
+            outDict[ProcessDescription.serviceDetails] = {}
+        else:
+            outDict[ProcessDescription.serviceDetails] = serviceManager.getService(processObj.serviceType).parseServiceDetails(processObj.serviceDetails)
+    
+        # check if costs are there and if they should be shown
+        if ProcessDetails.prices in processObj.processDetails:
+            for contractorID in processObj.processDetails[ProcessDetails.prices]:
+                if PricesDetails.details in processObj.processDetails[ProcessDetails.prices][contractorID]:
+                    if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processObj.processID, userID)):
+                        del outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details]
+                    else:
+                        outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, processObj.processDetails[ProcessDetails.prices][contractorID][PricesDetails.details])
+        
+        return (outDict, 200)
+    except Exception as e:
+        loggerError.error("Error in parseProcessOutputForFrontend: %s" % e)
+        return (e, 500)
+
+####################################################################################
 def logicForGetProcess(request:Request, projectID:str, processID:str, functionName:str):
     """
     Get the process
@@ -131,48 +188,15 @@ def logicForGetProcess(request:Request, projectID:str, processID:str, functionNa
     """
     try:
         contentManager = ManageContent(request.session)
-        userID = contentManager.getClient()
-        adminOrNot = manualCheckifAdmin(request.session)
         interface = contentManager.getCorrectInterface(functionName)
-        if interface == None:
-            return Exception(f"Rights not sufficient in {functionName}"), 401
-            
-
         process = interface.getProcessObj(projectID, processID)
         if isinstance(process, Exception):
             raise process
-
-        # add buttons
-        contractor = False
-        if process.contractor is not None:
-            contractor = process.contractor.hashedID == userID
-        buttons = getButtonsForProcess(process, process.client == userID, contractor, adminOrNot) # calls current node of the state machine
-        outDict = process.toDict()
-        outDict["processStatusButtons"] = buttons
-
-        # add what's missing to continue
-        missingElements = getMissingElements(interface, process)
-        outDict["processErrors"] = missingElements
-
-        # Add who needs to do what
-        outDict["flatProcessStatus"] = getFlatStatus(process.processStatus, contentManager.getClient() == process.client)
-
-
-        # parse for frontend
-        if process.serviceType == serviceManager.getNone():
-            outDict[ProcessDescription.serviceDetails] = {}
-        else:
-            outDict[ProcessDescription.serviceDetails] = serviceManager.getService(process.serviceType).parseServiceDetails(process.serviceDetails)
-    
-        # check if costs are there and if they should be shown
-        if ProcessDetails.prices in process.processDetails:
-            for contractorID in process.processDetails[ProcessDetails.prices]:
-                if PricesDetails.details in process.processDetails[ProcessDetails.prices][contractorID]:
-                    if not (adminOrNot or pgProcesses.ProcessManagementBase.checkIfCurrentUserIsContractorOfProcess(processID, userID)):
-                        del outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details]
-                    else:
-                        outDict[ProcessDescription.processDetails][ProcessDetails.prices][contractorID][PricesDetails.details] = crypto.decryptObjectWithAES(settings.AES_ENCRYPTION_KEY, process.processDetails[ProcessDetails.prices][contractorID][PricesDetails.details])
-
+        
+        outDict, statusCode = parseProcessOutputForFrontend(process, contentManager, functionName)
+        if statusCode != 200:
+            raise Exception("Error in parseProcessOutputForFrontend")
+        
         return (outDict, 200)
     except Exception as e:
         loggerError.error("Error in logicForGetProcess: %s" % e)
