@@ -273,11 +273,9 @@ class Basics():
                         node.active = information[NodeDescription.active]
                     case NodeDescription.properties:
                         assert isinstance(information[NodeDescription.properties], list), "Wrong type while adding properties to a node"
+                        node.properties = {}
                         for entry in information[NodeDescription.properties]:
-                            if entry[NodePropertyDescription.value] == "":
-                                del node.properties [entry[NodePropertyDescription.name]]
-                            else:
-                                node.properties[entry[NodePropertyDescription.name]] = entry
+                            node.properties[entry[NodePropertyDescription.name]] = entry
                     case _:
                         pass
             node.updatedWhen = timezone.now()
