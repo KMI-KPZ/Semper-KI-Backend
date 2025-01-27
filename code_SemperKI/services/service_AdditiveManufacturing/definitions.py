@@ -22,8 +22,9 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     What does the service consists of 
 
     """
+    groups = enum.auto()
     models = enum.auto()
-    materials = enum.auto()
+    material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
 
@@ -39,6 +40,7 @@ class FileContentsAM(StrEnumExactlyAsDefined):
     length = enum.auto()
     volume = enum.auto()
     complexity = enum.auto()
+    scalingFactor = enum.auto()
 
 ##################################################
 # How do the calculations look like?

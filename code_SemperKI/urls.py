@@ -40,17 +40,19 @@ newPaths= {
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),
-    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
+    "getFlatProjects": ("public/project/dashboard/all/get/", project.getFlatProjects),
     "updateProject": ("public/project/update/" ,project.updateProject),
     "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
     "saveProjects": ("public/project/save/", project.saveProjects),
-    
+    "getProjectForDashboard": ("public/project/dashboard/get/<str:projectID>/", project.getProjectForDashboard),
+
     "getdistance": ("public/distance/get/", miscellaneous.calculateDistanceView),
 
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
     "deleteProcesses": ("public/process/delete/<str:projectID>/", process.deleteProcesses), 
+    "cloneProcesses": ("public/process/clone/", process.cloneProcesses),
     "getProcessHistory": ("public/process/history/get/<str:processID>/", process.getProcessHistory),
     "getContractors": ("public/process/contractors/get/<str:processID>/", process.getContractors),
 
@@ -99,6 +101,8 @@ newPaths= {
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
     "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
+    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
+
 }
 
 # add paths

@@ -26,8 +26,9 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
+from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
-from code_SemperKI.handlers.public.process import updateProcessFunction
+from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import sparqlQueries
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import PostProcessDetails, ServiceDetails
@@ -145,6 +146,7 @@ class SReqSetPostProcessings(serializers.Serializer):
     projectID = serializers.CharField(max_length=200)
     processID = serializers.CharField(max_length=200)
     postProcessings = serializers.ListField(child=SReqPostProcessingsContent())
+    groupID = serializers.IntegerField()
     
 #######################################################
 @extend_schema(
@@ -176,7 +178,7 @@ def setPostProcessingSelection(request:Request):
         serializedContent = SReqSetPostProcessings(data=request.data)
         if not serializedContent.is_valid():
             message = "Validation failed in setPostProcessingSelection"
-            exception = "Validation failed"
+            exception = f"Validation failed {serializedContent.errors}"
             logger.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
@@ -188,12 +190,21 @@ def setPostProcessingSelection(request:Request):
         projectID = info[ProjectDescription.projectID]
         processID = info[ProcessDescription.processID]
         postProcessings = info["postProcessings"]
+        groupID = info["groupID"]
+
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface()
+        if interface == None:
+            return (Exception(f"Rights not sufficient in {setPostProcessingSelection.cls.__name__}"), 401)
 
         postProcessingToBeSaved = {} 
         for postProcessing in postProcessings:
             postProcessingToBeSaved[postProcessing[PostProcessDetails.id]] = postProcessing
 
-        changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.postProcessings: postProcessingToBeSaved}}}
+        existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
+        updateArray = [{} for i in range(len(existingGroups))]
+        updateArray[groupID] = {ServiceDetails.postProcessings: postProcessingToBeSaved}
+        changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -238,7 +249,7 @@ def setPostProcessingSelection(request:Request):
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 @checkVersion(0.3)
-def deletePostProcessingFromSelection(request:Request,projectID:str,processID:str,postProcessingID:str):
+def deletePostProcessingFromSelection(request:Request,projectID:str,processID:str,groupID:int,postProcessingID:str):
     """
     Remove a prior selected postProcessing from selection
 
@@ -250,12 +261,22 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
     :type processID: str
     :param postProcessingID: ID of the selected postProcessing
     :type postProcessingID: str
+    :param groupID: Index of the group
+    :type groupID: str
     :return: Success or Exception
     :rtype: HTTP Response
 
     """
     try:
-        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.postProcessings: {postProcessingID: ""}}}}
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface()
+        if interface == None:
+            return (Exception(f"Rights not sufficient in {deletePostProcessingFromSelection.cls.__name__}"), 401)
+        
+        existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
+        updateArray = [{} for i in range(len(existingGroups))]
+        updateArray[groupID] = {ServiceDetails.postProcessings: {postProcessingID: ""}}
+        changes = {"deletions": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])

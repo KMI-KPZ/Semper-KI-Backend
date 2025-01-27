@@ -81,8 +81,6 @@ def getServices(request:Request):
             if entry[ServicesStructure.name] == "None":
                 continue
             outList.append({"type": entry[ServicesStructure.name], "imgPath": testPicture})
-        # NRU ONLY
-        outList = outList[:1]
         outSerializer = SResServices(data=outList, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)

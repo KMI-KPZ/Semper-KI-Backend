@@ -111,6 +111,36 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
+    prices = enum.auto()
+
+####################################################################################
+# Enum for the output of the process
+class ProcessOutput(StrEnumExactlyAsDefined):
+    """
+    What should the output object contain?
+    
+    """
+    processStatusButtons = enum.auto()
+    processErrors = enum.auto()
+    flatProcessStatus = enum.auto()
+
+####################################################################################
+# Enum for the output of the project
+class ProjectOutput(StrEnumExactlyAsDefined):
+    owner = enum.auto()
+    processIDs = enum.auto()
+    searchableData = enum.auto()
+    processesCount = enum.auto()
+
+
+####################################################################################
+# Enum for prices
+class PricesDetails(StrEnumExactlyAsDefined):
+    """
+    What should the prices object contain?
+    
+    """
+    details = enum.auto()
 
 ####################################################################################
 # Enum for messages
@@ -162,6 +192,7 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     WAITING_CLIENT = enum.auto()
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
+    FAILED = enum.auto()
     COMPLETED = enum.auto()
 
 ####################################################################################

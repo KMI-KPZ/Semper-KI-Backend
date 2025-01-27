@@ -208,6 +208,7 @@ class IconType(StrEnumExactlyAsDefined):
     
     """
     ArrowBackIcon = enum.auto()
+    ArrowForwardIcon = enum.auto()
     DeleteIcon = enum.auto()
     FactoryIcon = enum.auto()
     TroubleshootIcon = enum.auto()
@@ -217,7 +218,9 @@ class IconType(StrEnumExactlyAsDefined):
     DescriptionIcon = enum.auto()
     CancelIcon = enum.auto()
     DoneAllIcon = enum.auto()
+    DoneIcon = enum.auto()
     LocalShippingIcon = enum.auto()
     TaskIcon = enum.auto()
     ReplayIcon = enum.auto()
+    CloneIcon = enum.auto() 
 

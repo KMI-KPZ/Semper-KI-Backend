@@ -255,7 +255,7 @@ class LogicAM(Logic):
 
         for printer in listOfPrinters:
             # filter if printer is active
-            if printer[NodeDescription.active] == False:
+            if printer[NodeDescription.active] is False:
                 continue
             
             chamberHeight = 0

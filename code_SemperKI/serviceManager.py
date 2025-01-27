@@ -34,6 +34,14 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+
+    ###################################################
+    @abstractmethod
     def updateServiceDetails(self, existingContent, newContent):
         """
         Update a service
@@ -45,6 +53,22 @@ class ServiceBase(ABC):
     def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Delete stuff from a service
+
+        """
+
+    ###################################################
+    @abstractmethod
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+    
+    ###################################################
+    @abstractmethod
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
 
         """
 

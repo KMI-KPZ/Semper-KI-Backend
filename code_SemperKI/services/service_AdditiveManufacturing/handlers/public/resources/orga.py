@@ -27,6 +27,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
+from code_SemperKI.services.service_AdditiveManufacturing.logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
 from code_SemperKI.services.service_AdditiveManufacturing.utilities.basics import checkIfOrgaHasAMAsService
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
@@ -476,6 +477,11 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
@@ -498,17 +504,17 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
                 if isinstance(result, Exception):
                     raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
-                if isinstance(result, Exception):
-                    raise result
-
+            
         elif validatedInput["type"] == "update":
             # update node
             resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
             if isinstance(resultNode, Exception):
                 raise resultNode
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # create edge to new node
@@ -517,11 +523,6 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                     raise result
                 # create edge to orga
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
-                if isinstance(result, Exception):
-                    raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
         else:
@@ -1227,6 +1228,49 @@ def orga_makeRequestForAdditions(request:Request):
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_makeRequestForAdditions.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+
+#######################################################
+@extend_schema(
+    summary="Clone the test graph to the orga for the tests",
+    description=" ",
+    tags=['BE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def cloneTestGraphToOrgaForTests(request:Request):
+    """
+    Clone the test graph to the orga for the tests
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Nothing
+    :rtype: Response
+
+    """
+    try:
+        result = logicForCloneTestGraphToOrgaForTests(request)
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {cloneTestGraphToOrgaForTests.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
