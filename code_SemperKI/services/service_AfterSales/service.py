@@ -6,9 +6,14 @@ Silvio Weging 2023
 Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
+from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
 
-from .connections.postgresql.pgService import updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
+from .connections.postgresql.pgService import initializeService as AS_initializeService, updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, isFileRelevantForService as AS_isFileRelevantForService, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
 from .handlers.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
+#from .connections.filterViaSparql import *
+from .definitions import SERVICE_NAME, SERVICE_NUMBER
+#from .logics.costs import Costs
 
 ###################################################
 class AfterSales(Semper.ServiceBase):
@@ -16,17 +21,14 @@ class AfterSales(Semper.ServiceBase):
     All connections of this service that Semper-KI should know about
     
     """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
 
     ###################################################
-    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+    def initializeServiceDetails(self, serviceDetails:dict) -> None:
         """
         Initialize the service
 
         """
-        return {}
+        return AS_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -38,13 +40,13 @@ class AfterSales(Semper.ServiceBase):
         return AS_updateServiceDetails(existingContent, newContent)
     
     ###################################################
-    def deleteServiceDetails(self, existingContent, newContent):
+    def deleteServiceDetails(self, existingContent, deletedContent):
         """
-        Run service specific update of service details
+        Delete stuff from a service
 
         """
 
-        return AS_deleteServiceDetails(existingContent, newContent)
+        return AS_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
     def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
@@ -52,7 +54,17 @@ class AfterSales(Semper.ServiceBase):
         Check if a file is relevant for the service
 
         """
-        return False
+        return AS_isFileRelevantForService(existingContent, fileID)
+    
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        outContent = {}
+
+        return outContent
     
     ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
@@ -63,20 +75,13 @@ class AfterSales(Semper.ServiceBase):
         return AS_serviceReady(existingContent)
     
     ###################################################
-    def parseServiceDetails(self, existingContent) -> dict:
-        """
-        Parse the service details for Frontend
-
-        """
-        return {}
-    
-    ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
         """
         Checks, if the selection of the service is available (material, ...)
         
         """
-        return AS_checkIfSelectionIsAvailable(processObj)
+        completeOrNot, listOfMissingStuff =  AS_checkIfSelectionIsAvailable(processObj)
+        return (completeOrNot, listOfMissingStuff)
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -111,11 +116,23 @@ class AfterSales(Semper.ServiceBase):
         return {}
 
     ###################################################
-    def getFilteredContractors(self, processObj) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
         """
-        Get a list of contractors that can do the job
+        Get a list of contractors that are available for this service
+
+        :param processObj: The process in question
+        :type processObj: ProcessInterface|Process
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
 
         """
+        # filter by choice of material, post-processings, build plate, etc...
+        
+        # filteredContractors = Filter()
+
+        # outList = filteredContractors.getFilteredContractors(processObj)
+        
+        # return outList, filteredContractors
         return [], {}
 
 SERVICE_NAME = "AFTER_SALES"

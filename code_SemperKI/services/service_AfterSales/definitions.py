@@ -12,9 +12,31 @@ import enum
 
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
+##################################################
+# Service specific definitions
+SERVICE_NAME = "AFTER_SALES"
+SERVICE_NUMBER = 7
+
+###################################################
 class ServiceDetails(StrEnumExactlyAsDefined):
     """
     What does the service consists of 
 
     """
-    pass
+
+####################################################
+class NodeTypesAS(StrEnumExactlyAsDefined):
+    """
+    What possible types can a node have in the AM service?
+    
+    """
+    organization = enum.auto() # the orga node
+
+##################################################
+class OrganizationDetailsAS(StrEnumExactlyAsDefined):
+    """
+    What are the details of an organization?
+    
+    """
+
+# TODO: Service Status Codes
