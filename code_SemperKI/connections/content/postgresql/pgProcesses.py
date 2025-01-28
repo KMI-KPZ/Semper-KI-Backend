@@ -840,13 +840,17 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
-                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
-                currentProcess.dependenciesIn.remove(connectedProcess)
+                assert isinstance(content, list), "DependencyIn Content is not a list"
+                for contentProcessID in content:
+                    connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
+                    currentProcess.dependenciesIn.remove(connectedProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesIn})
 
             elif updateType == ProcessUpdates.dependenciesOut:
-                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
-                currentProcess.dependenciesOut.remove(connectedProcess)
+                assert isinstance(content, list), "DependencyOut Content is not a list"
+                for contentProcessID in content:
+                    connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
+                    currentProcess.dependenciesOut.remove(connectedProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
 
             currentProcess.save()
