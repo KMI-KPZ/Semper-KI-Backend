@@ -844,6 +844,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 for contentProcessID in content:
                     connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
                     currentProcess.dependenciesIn.remove(connectedProcess)
+                    connectedProcess.dependenciesOut.remove(currentProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesIn})
 
             elif updateType == ProcessUpdates.dependenciesOut:
@@ -851,6 +852,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 for contentProcessID in content:
                     connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
                     currentProcess.dependenciesOut.remove(connectedProcess)
+                    connectedProcess.dependenciesIn.remove(currentProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
 
             currentProcess.save()
