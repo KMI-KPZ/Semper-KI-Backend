@@ -91,7 +91,7 @@ async def calculateAddInfoForEachContractor(contractor:dict, processObj:Process|
         distance = -1.0
     else:
         #retrieve addresses and calculate distance
-        coordsContractor = (None,None)
+        coordsContractor = (0,0)
         for idKey, entry in contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.addresses].items():
             if Addresses.standard in entry and entry[Addresses.standard]:
                 if AddressesSKI.coordinates in entry:
@@ -107,6 +107,7 @@ async def calculateAddInfoForEachContractor(contractor:dict, processObj:Process|
                             OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
                             OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
                             "distance": distance,
+                            "contractorCoordinates": coordsContractor,
                             ProcessDetails.prices: priceOfContractor}
     endPC = time.perf_counter_ns()
     endPT = time.process_time_ns()
@@ -185,6 +186,7 @@ def logicForGetContractors(processObj:Process):
                 OrganizationDescription.name: contractor[0][OrganizationDescription.name],
                 OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
                 "distance": contractor[0]["distance"],
+                "contractorCoordinates": contractor[0]["contractorCoordinates"],
                 ProcessDetails.prices: contractor[0][ProcessDetails.prices]
             })
         processObj.save()
