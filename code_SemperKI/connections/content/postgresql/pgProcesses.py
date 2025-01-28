@@ -750,18 +750,22 @@ class ProcessManagementBase(AbstractContentInterface):
                 outContent = content
 
             elif updateType == ProcessUpdates.dependenciesIn:
-                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
-                currentProcess.dependenciesIn.add(connectedProcess)
-                connectedProcess.dependenciesOut.add(currentProcess)
-                connectedProcess.save()
+                assert isinstance(content, list), "DependencyIn Content is not a list"
+                for contentProcessID in content:
+                    connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
+                    currentProcess.dependenciesIn.add(connectedProcess)
+                    connectedProcess.dependenciesOut.add(currentProcess)
+                    connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesIn: content})
                 outContent = content
 
             elif updateType == ProcessUpdates.dependenciesOut:
-                connectedProcess = ProcessManagementBase.getProcessObj(projectID, content)
-                currentProcess.dependenciesOut.add(connectedProcess)
-                connectedProcess.dependenciesIn.add(currentProcess)
-                connectedProcess.save()
+                assert isinstance(content, list), "DependencyOut Content is not a list"
+                for contentProcessID in content:
+                    connectedProcess = ProcessManagementBase.getProcessObj(projectID, contentProcessID)
+                    currentProcess.dependenciesOut.add(connectedProcess)
+                    connectedProcess.dependenciesIn.add(currentProcess)
+                    connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
                 outContent = content
 
@@ -1121,7 +1125,7 @@ class ProcessManagementBase(AbstractContentInterface):
                         clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                         for key in clientAddresses:
                             entry = clientAddresses[key]
-                            if entry["standard"]:
+                            if entry[Addresses.standard]:
                                 defaultAddress = entry
                                 break
                     processDetails[ProcessDetails.clientDeliverAddress] = defaultAddress

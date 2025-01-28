@@ -235,7 +235,7 @@ class Filter():
             return list(set(outList))
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")
-            raise e
+            return e
         
     ##################################################
     def getPrintersOfAContractor(self, contractorID:str, groupIdx:int) -> list:

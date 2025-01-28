@@ -1030,7 +1030,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         dependenciesIn, dependenciesOut = interface.getProcessDependencies(process.project.projectID, process.processID)
         for priorProcess in dependenciesIn:
             if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                listOfMissingStuff.append({"key": "Process-Dependency-"+priorProcess.processID})
+                listOfMissingStuff.append({"key": "Process-Dependency", "processID": priorProcess.processID})
         return listOfMissingStuff
         
 

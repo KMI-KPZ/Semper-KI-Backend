@@ -9,7 +9,7 @@ Contains: Signals that can be sent to other apps
 import django.dispatch
 import Generic_Backend.code_General.utilities.signals as GeneralSignals
 from ..handlers.public.project import saveProjects, saveProjectsViaWebsocket
-from ..connections.content.postgresql.pgProfilesSKI import updateOrgaDetailsSemperKI, updateUserDetailsSemperKI
+from ..connections.content.postgresql.pgProfilesSKI import orgaCreatedSemperKI, userCreatedSemperKI, userUpdatedSemperKI, orgaUpdatedSemperKI
 from ..connections.content.postgresql.pgKnowledgeGraph import Basics
 
 ################################################################################################
@@ -69,20 +69,36 @@ class SemperKISignalReceivers():
 
     ###########################################################
     @staticmethod
-    def receiverForUserDetailsUpdate(sender, **kwargs):
+    def receiverForUserCreated(sender, **kwargs):
         """
-        If a user gets initialized or updated, set the SemperKI specific details
+        If a user gets initialized, set the SemperKI specific details
         """
-        updateUserDetailsSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
+        userCreatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
 
     ###########################################################
     @staticmethod
-    def receiverForOrgaDetailsUpdate(sender, **kwargs):
+    def receiverForUserDetailsUpdate(sender, **kwargs):
         """
-        If a user gets initialized or updated, set the SemperKI specific details
+        If a user gets updated, set the SemperKI specific details
         """
-        updateOrgaDetailsSemperKI(orgaHashID=kwargs["orgaID"])
+        userUpdatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
+
+    ###########################################################
+    @staticmethod
+    def receiverForOrgaCreated(sender, **kwargs):
+        """
+        If a user gets initialized, set the SemperKI specific details
+        """
+        orgaCreatedSemperKI(orgaHashID=kwargs["orgaID"])
         Basics.createOrganizationNode(orgaID=kwargs["orgaID"])
+    
+    ###########################################################
+    @staticmethod
+    def receiverForOrgaUpdated(sender, **kwargs):
+        """
+        If am orga gets updated, set the SemperKI specific details
+        """
+        orgaUpdatedSemperKI(orgaHashID=kwargs["orgaID"], session=kwargs["session"])
     
     ###########################################################
     @staticmethod
@@ -111,10 +127,12 @@ class SemperKISignalReceivers():
         GeneralSignals.signalDispatcher.userLoggedOut.connect(self.receiverForLogout, dispatch_uid="2")
         GeneralSignals.signalDispatcher.websocketConnected.connect(self.receiverForWebsocketConnect, dispatch_uid="3")
         GeneralSignals.signalDispatcher.websocketDisconnected.connect(self.receiverForWebsocketDisconnect, dispatch_uid="4")
-        GeneralSignals.signalDispatcher.userUpdated.connect(self.receiverForUserDetailsUpdate, dispatch_uid="5")
-        GeneralSignals.signalDispatcher.orgaUpdated.connect(self.receiverForOrgaDetailsUpdate, dispatch_uid="6")
-        GeneralSignals.signalDispatcher.userDeleted.connect(self.receiverForUserDeleted, dispatch_uid="7")
-        GeneralSignals.signalDispatcher.orgaDeleted.connect(self.receiverForOrgaDeleted, dispatch_uid="8")
+        GeneralSignals.signalDispatcher.userCreated.connect(self.receiverForUserCreated, dispatch_uid="5")
+        GeneralSignals.signalDispatcher.userUpdated.connect(self.receiverForUserDetailsUpdate, dispatch_uid="6")
+        GeneralSignals.signalDispatcher.orgaCreated.connect(self.receiverForOrgaCreated, dispatch_uid="7")
+        GeneralSignals.signalDispatcher.orgaUpdated.connect(self.receiverForOrgaUpdated, dispatch_uid="8")
+        GeneralSignals.signalDispatcher.userDeleted.connect(self.receiverForUserDeleted, dispatch_uid="9")
+        GeneralSignals.signalDispatcher.orgaDeleted.connect(self.receiverForOrgaDeleted, dispatch_uid="10")
 
 semperKISignalReceiver = SemperKISignalReceivers()
     

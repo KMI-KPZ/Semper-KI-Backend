@@ -196,6 +196,14 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     COMPLETED = enum.auto()
 
 ####################################################################################
+# Enum for Addresses for SemperKI
+class AddressesSKI(StrEnumExactlyAsDefined):
+    """
+    What address-specific fields are there for SKI?
+    """
+    coordinates = enum.auto()
+
+####################################################################################
 # Enum for notification settings
 class NotificationSettingsUserSemperKI(StrEnumExactlyAsDefined):
     """

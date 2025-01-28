@@ -509,8 +509,11 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
         if flag == False:
             return Exception(str(fileOfThisProcess.content)), fileOfThisProcess.status_code # Response if something went wrong
 
+        manager = ManageC.ManageContent(request.session)
+        interface = manager.getCorrectInterface("deleteFile")
+
         # check if the file is relevant to the service and if so, dont delete it
-        processObj = pgProcesses.ProcessManagementBase.getProcessObj(projectID, processID)
+        processObj = interface.getProcessObj(projectID, processID)
         serviceType = processObj.serviceType
         if serviceType == serviceManager.getNone():
             return Exception("No Service selected!"), 400

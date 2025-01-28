@@ -7,9 +7,15 @@ Contains: Connector to Generic Backend's profile database (User/Organization)
 """
 
 import copy
+import asyncio
 
-from ....definitions import NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, MapPermissionsToOrgaNotifications
-from Generic_Backend.code_General.definitions import OrganizationDetails, UserDetails, UserNotificationTargets, OrganizationNotificationTargets, SessionContent, ProfileClasses
+from geopy.adapters import AioHTTPAdapter
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+from geopy.exc import GeocoderServiceError
+
+from ....definitions import NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, MapPermissionsToOrgaNotifications, AddressesSKI
+from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 
@@ -17,12 +23,14 @@ from logging import getLogger
 logger = getLogger("errors")
 
 ####################################################################################
-def updateUserDetailsSemperKI(userHashID:str, session):
+def userCreatedSemperKI(userHashID:str, session):
     """
-    Look for user, update details according to Semper-KI specific fields
+    Look for (new) user, update details according to Semper-KI specific fields
 
     :param userHashID: The ID transmitted via signal
     :type userHashID: str
+    :param session: The session object
+    :type session: Session
     :return: Nothing
     :rtype: None
     """
@@ -85,11 +93,66 @@ def updateUserDetailsSemperKI(userHashID:str, session):
 
         user.save()
     except Exception as error:
+        logger.error(f'Could not create user details in SemperKI: {str(error)}')
+        return None
+
+####################################################################################
+async def fetchCoordinates(address):
+    try:
+        # https://nominatim.org/release-docs/develop/api/Search/
+        addressDictForLookup = {
+            "city" : address[Addresses.city],
+            "street" : address[Addresses.street] + " " + str(address[Addresses.houseNumber]),
+            "country" : address[Addresses.country],
+            "postalcode" : address[Addresses.zipcode]
+        }
+        async with Nominatim(user_agent="geo_distance_calculator", adapter_factory=AioHTTPAdapter) as geolocator:
+            for attempt in range(3):  # Retry up to 3 times
+                try:
+                    location = await geolocator.geocode(addressDictForLookup, exactly_one=True, timeout=10)
+                    if location is None:
+                        raise ValueError("Location not found.")
+                    return (location.latitude, location.longitude)
+                except GeocoderServiceError:
+                    if attempt == 2:  # Last attempt
+                        return None
+                except Exception:
+                    return None
+            return None
+    except Exception as e:
+        return e
+
+####################################################################################
+def userUpdatedSemperKI(userHashID:str, session):
+    """
+    Update user details according to Semper-KI specific fields
+    
+    :param userHashID: The ID transmitted via signal
+    :type userHashID: str
+    :param session: The session object
+    :type session: Session
+    :return: Nothing
+    :rtype: None
+
+    """
+    try:
+        user, _ = ProfileManagementBase.getUserViaHash(userHashID)
+        existingDetails = copy.deepcopy(user.details)
+        for entry in existingDetails:
+            if entry == UserDetails.addresses:
+                for addressID, address in existingDetails[entry].items():
+                    coordsOfAddress = asyncio.run(fetchCoordinates(address))
+                    if coordsOfAddress is not None:
+                        user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
+        
+        user.save()
+        return None
+    except Exception as error:
         logger.error(f'Could not update user details in SemperKI: {str(error)}')
         return None
 
 ####################################################################################
-def updateOrgaDetailsSemperKI(orgaHashID:str):
+def orgaCreatedSemperKI(orgaHashID:str):
     """
     Look for orga, update details according to Semper-KI specific fields
 
@@ -140,6 +203,37 @@ def updateOrgaDetailsSemperKI(orgaHashID:str):
                 orga.details[OrganizationDetails.priorities][setting] = {PriorityTargetsSemperKI.value: 4}
 
         orga.save()
+    except Exception as error:
+        logger.error(f'Could not update orga details in SemperKI: {str(error)}')
+        return None
+    
+####################################################################################
+def orgaUpdatedSemperKI(orgaHashID:str, session):
+    """
+    Update orga details according to Semper-KI specific fields
+    
+    :param userHashID: The ID transmitted via signal
+    :type userHashID: str
+    :param session: The session object
+    :type session: Session
+    :return: Nothing
+    :rtype: None
+
+    """
+    try:
+        orga = ProfileManagementBase.getOrganizationObject(hashID=orgaHashID)
+        if isinstance(orga, Exception):
+            raise orga
+        existingDetails = copy.deepcopy(orga.details)
+        for entry in existingDetails:
+            if entry == OrganizationDetails.addresses:
+                for addressID, address in existingDetails[entry].items():
+                    coordsOfAddress = asyncio.run(fetchCoordinates(address))
+                    if coordsOfAddress is not None:
+                        orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
+        
+        orga.save()
+        return None
     except Exception as error:
         logger.error(f'Could not update orga details in SemperKI: {str(error)}')
         return None
