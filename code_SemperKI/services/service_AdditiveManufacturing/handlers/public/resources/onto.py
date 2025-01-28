@@ -479,7 +479,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         else:
             return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
 
-        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga {orgaID}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges," + str(datetime.now()))
 
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:

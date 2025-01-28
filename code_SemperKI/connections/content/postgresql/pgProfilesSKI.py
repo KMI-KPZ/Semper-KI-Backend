@@ -144,7 +144,8 @@ def userUpdatedSemperKI(userHashID:str, session):
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
                     if coordsOfAddress is not None:
                         user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
-        
+                    else:
+                        user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = (0,0)
         user.save()
         return None
     except Exception as error:
@@ -231,7 +232,8 @@ def orgaUpdatedSemperKI(orgaHashID:str, session):
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
                     if coordsOfAddress is not None:
                         orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
-        
+                    else:
+                        orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = (0,0)
         orga.save()
         return None
     except Exception as error:

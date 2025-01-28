@@ -56,7 +56,7 @@ async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple
 
         """
         try:
-            if None not in userCoords and None not in orgaCoords:
+            if None not in userCoords and None not in orgaCoords and userCoords != (0,0) and orgaCoords != (0,0):
                 distance = geodesic(userCoords, orgaCoords).kilometers
                 return round(distance, 2)
             else:
