@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2023
 
-Contains: Services using the sparql endpoint regarding 3D Printer Data
+Contains: Services using the sparql endpoint regarding After Sales
 """
 
 import enum

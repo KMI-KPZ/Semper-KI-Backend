@@ -436,6 +436,8 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
             
         validatedInput = inSerializer.data
         
+        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session) # not sure if this is correct
+
         if validatedInput["type"] == "create":
             # create node for the system
             if "nodeID" in validatedInput["node"]:

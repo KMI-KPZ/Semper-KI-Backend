@@ -7,11 +7,11 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
-from code_SemperKI.definitions import PricesDetails
 
 from .connections.postgresql.pgService import initializeService as AS_initializeService, updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, isFileRelevantForService as AS_isFileRelevantForService, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
-#from .connections.filterViaSparql import *
+#from .handlers.public.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
+from  .logics.checkServiceLogic import checkifSelectionIsAvailable as AS_checkIfSelectionIsAvailable
+from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
 #from .logics.costs import Costs
 
@@ -128,14 +128,11 @@ class AfterSales(Semper.ServiceBase):
         """
         # filter by choice of material, post-processings, build plate, etc...
         
-        # filteredContractors = Filter()
+        filteredContractors = Filter()
 
-        # outList = filteredContractors.getFilteredContractors(processObj)
+        outList = filteredContractors.getFilteredContractors(processObj)
         
         # return outList, filteredContractors
         return [], {}
-
-SERVICE_NAME = "AFTER_SALES"
-SERVICE_NUMBER = 7
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AfterSales())

@@ -43,25 +43,8 @@ class Filter():
         
         """
         try:
-            # self.resultGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
-            # self.printerGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
-            # for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
-            #     retVal = self.filterByMaterial(processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.material], groupIdx)
-            #     if isinstance(retVal, Exception):
-            #         raise retVal
-            #     chosenPostProcessings = processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]
-            #     if chosenPostProcessings != {}:
-            #         retVal = self.filterByPostProcessings(chosenPostProcessings, groupIdx)
-            #         if isinstance(retVal, Exception):
-            #             raise retVal
-            #     calculations = processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]
-            #     retVal = self.filterByPrinter(calculations, groupIdx)
-            #     if isinstance(retVal, Exception):
-            #         raise retVal
-            # # TODO: do something with the information, that is inside every group. For now, just return the whole thing
+            ###
             outList = []
-            # for group in self.resultGroups:
-            #     outList.extend(group.values())
             return list(set(outList))
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")

@@ -27,7 +27,7 @@ class ServiceDetails(StrEnumExactlyAsDefined):
 ####################################################
 class NodeTypesAS(StrEnumExactlyAsDefined):
     """
-    What possible types can a node have in the AM service?
+    What possible types can a node have in the AS service?
     
     """
     organization = enum.auto() # the orga node
@@ -39,4 +39,4 @@ class OrganizationDetailsAS(StrEnumExactlyAsDefined):
     
     """
 
-# TODO: Service Status Codes
+##################################################
