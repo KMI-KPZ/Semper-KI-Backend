@@ -479,7 +479,7 @@ class DRAFT(State):
         return self # either all prior processes have been completed or there are none
 
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
+    updateTransitions = [to_WAITING_FOR_OTHER_PROCESS, to_SERVICE_IN_PROGRESS]
     buttonTransitions = {}
 
     ###################################################
