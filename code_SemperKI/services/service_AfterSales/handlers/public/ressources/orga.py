@@ -1265,7 +1265,7 @@ def cloneTestGraphToOrgaForTests(request:Request):
 
     """
     try:
-        result = logicForCloneTestGraphToOrgaForTests(request)
+        result = {} #logicForCloneTestGraphToOrgaForTests(request)
         if isinstance(result, Exception):
             raise result
         return Response("Success", status=status.HTTP_200_OK)
