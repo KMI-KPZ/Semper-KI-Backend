@@ -25,10 +25,11 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -100,7 +101,6 @@ newPaths= {
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
-    "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
     "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
 
 }
