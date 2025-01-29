@@ -477,6 +477,11 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
@@ -499,17 +504,17 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
                 if isinstance(result, Exception):
                     raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
-                if isinstance(result, Exception):
-                    raise result
-
+            
         elif validatedInput["type"] == "update":
             # update node
             resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
             if isinstance(resultNode, Exception):
                 raise resultNode
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # create edge to new node
@@ -518,11 +523,6 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                     raise result
                 # create edge to orga
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
-                if isinstance(result, Exception):
-                    raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
         else:

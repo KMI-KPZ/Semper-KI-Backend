@@ -1,11 +1,12 @@
 """
 Part of Semper-KI software
 
-Silvio Weging 2024
+Silvio Weging 2024,
+Akshay NS 2024
 
 Contains: Logic for the processes
 """
-import logging, numpy, copy
+import logging, numpy, copy, time
 
 from datetime import datetime
 
@@ -16,6 +17,13 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.conf import settings
 
+from geopy.adapters import AioHTTPAdapter
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+from geopy.exc import GeocoderServiceError
+import asyncio
+from asgiref.sync import sync_to_async
+
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, manualCheckIfRightsAreSufficientForSpecificOperation, manualCheckifAdmin, manualCheckifLoggedIn
@@ -24,7 +32,7 @@ from Generic_Backend.code_General.connections import s3
 
 from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.serviceManager import serviceManager
+from code_SemperKI.serviceManager import serviceManager, ServiceBase
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getButtonsForProcess, getMissingElements, getFlatStatus
 from code_SemperKI.connections.content.postgresql import pgProcesses
@@ -34,6 +42,86 @@ from ..modelFiles.processModel import Process, ProcessInterface
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
+####################################################################################
+async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple:
+        """
+        Calculate the geodesic distance between two addresses
+
+        :param userCoords: The first address' coordinates
+        :type userCoords: tuple
+        :param orgaCoords: The second address' coordinates
+        :type orgaCoords: tuple
+        :return: The distance between the two coordinates
+        :rtype: float | exception
+
+        """
+        try:
+            if None not in userCoords and None not in orgaCoords and userCoords != (0,0) and orgaCoords != (0,0):
+                distance = geodesic(userCoords, orgaCoords).kilometers
+                return round(distance, 2)
+            else:
+                return -1.0
+
+        except Exception as e:
+            loggerError.error("Error in calculateGeodesicDistance: %s" % e)
+            return -1.0
+        
+####################################################################################
+async def calculateAddInfoForEachContractor(contractor:dict, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
+    """
+    Parallelized for loop over every contractor
+
+    """
+    startPC = time.perf_counter_ns()
+    startPT = time.process_time_ns()
+    idOfContractor = ""
+    if "ID" in contractor:
+        idOfContractor = contractor["ID"]["value"]
+    else:
+        idOfContractor = contractor
+
+    # calculate price for service
+    # await sync_to_async(
+    priceOfContractor = await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": idOfContractor}, transferObject)
+    contractorContentFromDB = await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=idOfContractor)
+    if isinstance(contractorContentFromDB, Exception):
+        return {"error": contractorContentFromDB}
+    
+    if savedCoords == (0,0):
+        distance = -1.0
+    else:
+        #retrieve addresses and calculate distance
+        coordsContractor = (0,0)
+        for idKey, entry in contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.addresses].items():
+            if Addresses.standard in entry and entry[Addresses.standard]:
+                if AddressesSKI.coordinates in entry:
+                    coordsContractor = entry[AddressesSKI.coordinates]
+                    break
+            else:
+                if AddressesSKI.coordinates in entry:
+                    coordsContractor = entry[AddressesSKI.coordinates]
+
+        distance = await calculateGeodesicDistance(savedCoords, coordsContractor)
+
+    contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                            OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                            OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
+                            "distance": distance,
+                            "contractorCoordinates": coordsContractor,
+                            ProcessDetails.prices: priceOfContractor}
+    endPC = time.perf_counter_ns()
+    endPT = time.process_time_ns()
+    print(f"Time taken for contractor {idx}: {(endPC-startPC)/1000000000.0} s, {(endPT-startPT)/1000000000.0} s")
+    return contractorToBeAdded
+
+####################################################################################
+async def parallelLoop(listOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
+    """
+    The main loop
+    
+    """
+    return await asyncio.gather(*[calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))])
+
 ####################################################################################
 def logicForGetContractors(processObj:Process):
     """
@@ -49,26 +137,18 @@ def logicForGetContractors(processObj:Process):
         
         service = serviceManager.getService(serviceType)
 
-        listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
+        coordsOfUser = (0,0)
+        if ProcessDetails.clientDeliverAddress in processObj.processDetails:
+            address1 = processObj.processDetails[ProcessDetails.clientDeliverAddress]
+            if AddressesSKI.coordinates in address1:
+                coordsOfUser = address1[AddressesSKI.coordinates]
         
-        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
-        # Therefore parse it
-        listOfResultingContractors = []
-        for contractor in listOfFilteredContractors:
-            idOfContractor = ""
-            if "ID" in contractor:
-                idOfContractor = contractor["ID"]["value"]
-            else:
-                idOfContractor = contractor
-            priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": idOfContractor}, transferObject)
-            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
-            if isinstance(contractorContentFromDB, Exception):
-                raise contractorContentFromDB
-            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
-                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
-                                   ProcessDetails.prices: priceOfContractor}
-            listOfResultingContractors.append(contractorToBeAdded)
+        listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
+        if len(listOfFilteredContractors) == 0:
+            return [], 200
+
+        # Loop is parallelized
+        listOfResultingContractors = asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
         
         #if settings.DEBUG:
         #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
@@ -82,6 +162,8 @@ def logicForGetContractors(processObj:Process):
             userPrioritiesVector = [4 for i in range(numberOfPriorities)]
         listOfContractorsWithPriorities = []
         for entry in listOfResultingContractors:
+            if "error" in entry:
+                raise entry["error"]
             if OrganizationDetails.priorities in entry[OrganizationDescription.details]:
                 prioList = []
                 for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
@@ -103,6 +185,8 @@ def logicForGetContractors(processObj:Process):
                 OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
                 OrganizationDescription.name: contractor[0][OrganizationDescription.name],
                 OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
+                "distance": contractor[0]["distance"],
+                "contractorCoordinates": contractor[0]["contractorCoordinates"],
                 ProcessDetails.prices: contractor[0][ProcessDetails.prices]
             })
         processObj.save()
@@ -237,7 +321,7 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
                 clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                 for key in clientAddresses:
                     entry = clientAddresses[key]
-                    if entry["standard"]:
+                    if entry[Addresses.standard]:
                         defaultAddress = entry
                         break
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}

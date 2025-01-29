@@ -438,6 +438,8 @@ class SResContractors(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     branding = serializers.DictField()
     prices = serializers.DictField()
+    distance = serializers.FloatField()
+    contractorCoordinates = serializers.ListField(child=serializers.FloatField(), required=False)
 
 
 #########################################################################

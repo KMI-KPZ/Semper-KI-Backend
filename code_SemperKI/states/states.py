@@ -479,7 +479,7 @@ class DRAFT(State):
         return self # either all prior processes have been completed or there are none
 
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
+    updateTransitions = [to_WAITING_FOR_OTHER_PROCESS, to_SERVICE_IN_PROGRESS]
     buttonTransitions = {}
 
     ###################################################
@@ -1030,7 +1030,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         dependenciesIn, dependenciesOut = interface.getProcessDependencies(process.project.projectID, process.processID)
         for priorProcess in dependenciesIn:
             if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                listOfMissingStuff.append({"key": "Process-Dependency-"+priorProcess.processID})
+                listOfMissingStuff.append({"key": "Process-Dependency", "processID": priorProcess.processID})
         return listOfMissingStuff
         
 

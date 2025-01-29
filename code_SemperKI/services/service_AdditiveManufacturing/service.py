@@ -154,6 +154,8 @@ class AdditiveManufacturing(Semper.ServiceBase):
         filteredContractors = Filter()
 
         outList = filteredContractors.getFilteredContractors(processObj)
+        if isinstance(outList, Exception):
+            outList = []
         
         return outList, filteredContractors
 

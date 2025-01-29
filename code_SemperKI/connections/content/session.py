@@ -772,13 +772,14 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
                 oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                assert isinstance(content, list), "DependencyIn Content is not a list"
+                for contentProcessID in content:
+                    if contentProcessID not in currentProcess.setdefault(dependencyKey, []):
+                        currentProcess[dependencyKey].append(contentProcessID)
                 
-                if content not in currentProcess.setdefault(dependencyKey, []):
-                    currentProcess[dependencyKey].append(content)
-                
-                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
-                if processID not in dependentProcess.setdefault(oppositeKey, []):
-                    dependentProcess[oppositeKey].append(processID)
+                    dependentProcess = self.structuredSessionObj.getProcess(projectID, contentProcessID)
+                    if processID not in dependentProcess.setdefault(oppositeKey, []):
+                        dependentProcess[oppositeKey].append(processID)
                 self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
                 outContent = content
             else:
@@ -862,8 +863,14 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
-                if content in currentProcess.get(dependencyKey, []):
-                    currentProcess[dependencyKey].remove(content)
+                oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                assert isinstance(content, list), "DependencyOut Content is not a list"
+                for contentProcessID in content:
+                    if contentProcessID in currentProcess.get(dependencyKey, []):
+                        currentProcess[dependencyKey].remove(contentProcessID)
+                    dependentProcess = self.structuredSessionObj.getProcess(projectID, contentProcessID)
+                    if contentProcessID in dependentProcess.get(oppositeKey, []):
+                        dependentProcess[oppositeKey].remove(processID)
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
 
             else:
