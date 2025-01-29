@@ -185,7 +185,7 @@ class TestAdditiveManufacturing(TestCase):
         contractorsPath = paths["getContractors"][0].split("/")
         contractorsPath = contractorsPath[0] + "/" + contractorsPath[1] + "/" + contractorsPath[2] + "/" + contractorsPath[3] + "/" + processObj[ProcessDescription.processID] + "/"
         response = client.get("/"+contractorsPath)
-        self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
+        self.assertIs(response.status_code == 200, True, f"got: {response.status_code} with response: {json.loads(response.content)}")
         response = json.loads(client.get("/"+contractorsPath).content)
         # Check return value for length of contractors
         self.assertIs(len(response)>=1, True, f'{len(response)} < 1')

@@ -1,17 +1,16 @@
-"""
-Part of Semper-KI software
-
-Silvio Weging, Mahdi Hedayat Mahmoudi 2024
-
-Contains: Definitions to how the chat model should extract data
-"""
+#models.py
 
 from enum import Enum
 from pydantic import BaseModel, Field
 from typing import List, Optional, Union, Literal
 
+
+
 # Enumeration of 3D printer types
 class PrinterType(str, Enum):
+    """
+    Enumeration for the different types of 3D printing technologies.
+    """
     binder_jetting = "Binder Jetting"
     directed_energy_deposition = "Directed Energy Deposition"
     material_extrusion = "Material Extrusion"
@@ -21,47 +20,245 @@ class PrinterType(str, Enum):
     vat_photopolymerization = "Vat Photopolymerization"
     not_reported = "Not reported"
 
+
 # Enumeration of organization types
 class OrganizationType(str, Enum):
+    """
+    Enumeration for the type of organization associated with the printer.
+    It could be a manufacturer, distributor, service provider, etc.
+    """
     manufacturer = "manufacturer"
     distributor = "distributor"
     service_provider = "service_provider"
     research_institution = "research_institution"
     other = "other"
 
+
 # Model representing an organization
 class Organization(BaseModel):
+    """
+    Represents an organization involved with the 3D printer.
+    This could be a manufacturer, distributor, or service provider.
+    """
     type: OrganizationType
-    name: str
+    organization_name: str
 
-class PrinterModel(BaseModel):
-    name: str
 
+# Model for dimensions and physical properties
 class Dimension(BaseModel):
+    """
+    Represents a dimension with a value and a unit.
+    Used for defining dimensions like width, length, or height.
+    """
     value: float
     unit: str
 
 
+
+class PrinterDimensions(BaseModel):
+    """
+    Represents the physical dimensions of the printer.
+    This includes width, length, and height dimensions.
+    """
+    width: Dimension
+    length: Dimension
+    height: Dimension
+
+
+class MachineSurfaceArea(BaseModel):
+    """
+    Represents the surface area of the machine with a unit (e.g., m², ft²).
+    """
+    value: float  # The surface area value
+    unit: str  # Unit of surface area, e.g., m², ft²
+
+    def __init__(self, **data):
+        data['unit'] = data.get('unit', "m²")  # Set default unit to m² if not provided
+        super().__init__(**data)
+
+
+class PhysicalProperties(BaseModel):
+    """
+    Represents the weight of the printer along with its dimensions.
+    """
+    weight: Dimension  # The weight of the printer
+    dimensions: PrinterDimensions  # The physical dimensions of the printer
+    #machine_surface_area: Optional[MachineSurfaceArea]
+
+# Build volume and layer thickness models
 class BuildVolume(BaseModel):
     width: Dimension
     length: Dimension
     height: Dimension
 
-# Model representing printer specifications
-class PrinterSpecification(BaseModel):
+
+class LayerThickness(BaseModel):
+    """
+    Represents the layer thickness specifications for 3D printing.
+    """
+    min_thickness: Dimension  # Minimum layer thickness
+    max_thickness: Dimension  # Maximum layer thickness
+
+
+# New features: Chamber build dimensions, batch distance, and build rate
+class ChamberBuild(BaseModel):
+    """
+    Represents the dimensions of the build chamber and batch settings.
+    """
+    width: Dimension  # Width of the build chamber
+    length: Dimension  # Length of the build chamber
+    height: Dimension  # Height of the build chamber
+
+class PrintingSpeed(BaseModel):
+    """
+    Represents the physical properties of the material.
+    """
+    printing_speed: Dimension
+
+
+class BuildRate(BaseModel):
+    """
+    Represents the build rate of the printer.
+    """
+    value: float  # The build rate value
+    unit: str  # Unit of build rate, e.g., cm³/h
+
+    def __init__(self, **data):
+        data['unit'] = data.get('unit', "cm³/h")  # Set default if not provided
+        super().__init__(**data)
+
+
+# Model for representing power consumption
+class PowerConsumption(BaseModel):
+    """
+    Represents the average power consumption of the printer.
+    """
+    value: float  # Average power consumption value
+    unit: str  # Unit for power consumption, defaulting to €/kWh
+
+    def __init__(self, **data):
+        data['unit'] = data.get('unit', "€/kWh")  # Default to €/kWh if not provided
+        super().__init__(**data)
+
+
+# Enumeration for various certifications
+class Certification(str, Enum):
+    """
+    Enumeration for different certifications that a 3D printer might have.
+    """
+    CE = "CE"
+    FDA = "FDA"
+    EMC = "EMC"
+    ISO = "ISO"
+    UL = "UL"
+    RoHS = "RoHS"
+    other = "Other"
+
+
+
+# Enumeration for various file formats
+class FileFormat(str, Enum):
+    """
+    Enumeration for common input file formats supported by 3D printers.
+    """
+    STL = "STL"  # Stereolithography
+    OBJ = "OBJ"  # Wavefront Object
+    AMF = "AMF"  # Additive Manufacturing File Format
+    _3MF = "3MF"  # 3D Manufacturing Format
+    PLY = "PLY"  # Polygon File Format
+    GCODE = "GCODE"  # G-code, widely used for 3D printing
+    STEP = "STEP"  # Standard for the Exchange of Product Model Data
+    IGES = "IGES"  # Initial Graphics Exchange Specification
+    X3D = "X3D"  # Extensible 3D
+    VRML = "VRML"  # Virtual Reality Modeling Language
+    other = "Other"  # For custom or unsupported formats
+
+
+# Printer specifications model
+class PrinterSpecifications(BaseModel):
+    """
+    Core specifications of the printer.
+    """
     printing_technology: PrinterType
     build_volume: BuildVolume
-    compatible_material: Optional[List[str]] = Field(default_factory=list)  # Default to empty list if missing
-    support_material: Optional[List[str]] = Field(default_factory=list)  # Default to empty list if missing
+    layer_thickness: LayerThickness
+    possible_layer_heights: Optional[List[float]] = Field(default_factory=list)  
+    nozzle_diameter: Optional[Dimension]
+    chamber_build: Optional[ChamberBuild]  
+    machine_batch_distance: Optional[Dimension]  
+    build_rate: Optional[BuildRate] 
+    max_printing_speed: Optional[Dimension]
+    scan_speed: Optional[Dimension] 
+    coating_time: Optional[float] 
+    printing_speed: Optional[PrintingSpeed] 
+    certificates: Optional[List[str]] = Field(default_factory=list)  # Added certificates field
+    supported_input_file_formats: Optional[List[str]] = Field(default_factory=list)  # New field for supported file formats
+    compatible_materials: Optional[List[str]] = Field(default_factory=list)
+    support_materials: Optional[List[str]] = Field(default_factory=list)
+    #loss_of_material: Optional[Dimension]
+    #average_power_consumption: Optional[PowerConsumption]  
+
+
+
+
+# Enumeration for printer module types
+class ModuleType(str, Enum):
+    """
+    Enumeration for different module types in the 3D printing system.
+    """
+    printing = "Printing Module"  # Handles additive manufacturing
+    post_curing = "Post-Curing Module"  # Used for curing materials post-printing
+    mixing = "Mixing Module"  # For combining materials or technologies
+    default = "Default Module"  # Fallback or unspecified module type
+    curing = "Curing Module"  # Dedicated to curing prints
+    inspection = "Inspection Module"  # Performs measurements or quality checks
+    support_removal = "Support Material Removal Module"  # Removes supports from prints
+    hybrid = "Hybrid Module"  # Combines multiple functionalities
+
+# Enumeration for printer module types
+class ConfigurationType(str, Enum):
+    """
+    Enumeration for different module types in the 3D printing system.
+    """
+    printing = "Printing Module"
+    post_curing = "Post-Curing Module"
+    mixing = "Mixing Module"
+    default = "Default Module"
+
+
+
+
+# Model for representing each printer module
+class PrinterConfiguration(BaseModel):
+    """Represents a printer module or the printer itself if standalone."""
+    configuration_name: str # Name of the module or printer
+    configuration_type: ConfigurationType
+    physical_properties: PhysicalProperties = Field(default_factory=PhysicalProperties)  # Physical properties of the module
+    specifications: PrinterSpecifications = Field(default_factory=PrinterSpecifications)  # Specifications of the module
+
+
+# Updated PrinterModel to handle cases with or without modules
+class PrinterModel(BaseModel):
+    """Represents a collection of printer modules or standalone printer details."""
+    printer_names: Optional[List[str]] = Field(default_factory=list)  # Main name of the printer
+    #configuration_names: Optional[List[str]] = Field(default_factory=list)  
+    configurations: Optional[List[PrinterConfiguration]] = Field(default_factory=list)  
+
+
+    def is_standalone(self) -> bool:
+        """Helper method to check if the printer is standalone (without modules)."""
+        return len(self.configurations) == 0
+
 
 
 # Aggregated response model for a 3D printer specification analysis
 class PrinterResponse(BaseModel):
+    """
+    Aggregated response model for 3D printer data extraction.
+    """
     organization: Organization
     printer_model: PrinterModel
-    printer_specifications: PrinterSpecification
     summary: str
-
 
 
 
@@ -184,7 +381,7 @@ class MetalMaterialTypeEnum(str, Enum):
     magnesium = "Magnesium"
     nickel = "Nickel"
     niobium = "Niobium"
-    pa = "PA"  # Clarify the full form of "PA" if necessary.
+    pa = "PA"  
     platinum = "Platinum"
     refractory_metal = "Refractory Metal"
     refractory_metal_bronze = "Refractory Metal, Bronze"
@@ -279,7 +476,9 @@ class MaterialInformation(BaseModel):
     """
     material_supplier: str 
     material_name: str
-    material_description: Optional[str]  
+    compatible_printers: Optional[List[str]] = Field(default_factory=list)  # Added certificates field
+
+    #material_description: Optional[str]  
 
     
 
@@ -296,7 +495,6 @@ class AdditiveManufacturingProcessEnum(str, Enum):
     sheet_lamination = "Sheet Lamination"
     vat_photopolymerization = "Vat Photopolymerization"
     not_reported = "Not reported"
-
 
 
 class Range(BaseModel):
@@ -324,16 +522,22 @@ class FlexuralModulus(BaseModel):
     min: Range
     max: Range 
 
+class ElongationModulus(BaseModel):
+    min: Range
+    max: Range
+
+
 
 class MechanicalProperties(BaseModel):
     """
     Represents the mechanical properties of the material.
     """
-    ultimate_tensile_strength: UltimateTensileStrength
-    tensile_modulus: TensileModulus
-    elongation_at_break: ElongationAtBreak
-    flexural_strength: FlexuralStrengthk
-    flexural_modulus: FlexuralModulus
+    ultimate_tensile_strength: Optional[UltimateTensileStrength]  
+    tensile_modulus: Optional[TensileModulus]  
+    elongation_modulus: Optional[ElongationModulus]  
+    elongation_at_break: Optional[ElongationAtBreak]  
+    flexural_strength: Optional[FlexuralStrengthk]  
+    flexural_modulus: Optional[FlexuralModulus]  
 
 class Hardness(BaseModel):
     """
@@ -348,7 +552,6 @@ class HeatDeflectionTemperature(BaseModel):
 
 
 
-
 class ThermalProperties(BaseModel):
     """
     Represents the thermal properties of the material.
@@ -356,19 +559,27 @@ class ThermalProperties(BaseModel):
     heat_deflection_temperature: HeatDeflectionTemperature
     glass_transition_temperature: Range
 
-class PhysicalProperties(BaseModel):
+class PhysicalPropertiesMaterial(BaseModel):
     """
     Represents the physical properties of the material.
     """
-    min_part_density: Range
+    density: Optional[Range] 
+
+class PrintingSettings(BaseModel):
+    """
+    Represents the physical properties of the material.
+    """
+    printing_speed: Optional[Range] 
+
 
 class MaterialResponse(BaseModel):
     """
     Aggregates all material specification sections.
     """
     material_information: MaterialInformation
-    am_process: AdditiveManufacturingProcessEnum
-    material_type: str
+    am_process: Optional[AdditiveManufacturingProcessEnum] 
+    certificates: Optional[List[str]] = Field(default_factory=list)  # Added certificates field
+    material_type: Optional[str] 
     material_type: Union[
         SpecificPolymerMaterialType,
         SpecificCeramicMaterialType,
@@ -380,5 +591,6 @@ class MaterialResponse(BaseModel):
     mechanical_properties: MechanicalProperties
     #hardness: Hardness
     #thermal_properties: ThermalProperties
-    physical_properties: PhysicalProperties
+    physical_properties: PhysicalPropertiesMaterial
+    printing_settings: PrintingSettings 
     summary: str

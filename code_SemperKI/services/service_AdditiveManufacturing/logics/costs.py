@@ -50,7 +50,7 @@ class Costs():
 
         # From Organization (do only once)
         organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["orgaID"])
-        if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME) == True:
+        if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME):
             orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
 
             for entry in orgaParameters:
