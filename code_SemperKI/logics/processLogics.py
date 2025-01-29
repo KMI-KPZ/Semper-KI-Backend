@@ -22,7 +22,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from geopy.exc import GeocoderServiceError
 import asyncio
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
@@ -67,61 +67,57 @@ async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple
             return -1.0
         
 ####################################################################################
-async def calculateAddInfoForEachContractor(contractor:dict, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
+def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
     """
     Parallelized for loop over every contractor
 
     """
-    startPC = time.perf_counter_ns()
-    startPT = time.process_time_ns()
-    idOfContractor = ""
-    if "ID" in contractor:
-        idOfContractor = contractor["ID"]["value"]
-    else:
-        idOfContractor = contractor
-
-    # calculate price for service
-    # await sync_to_async(
-    priceOfContractor = await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": idOfContractor}, transferObject)
-    contractorContentFromDB = await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=idOfContractor)
-    if isinstance(contractorContentFromDB, Exception):
-        return {"error": contractorContentFromDB}
-    
-    if savedCoords == (0,0):
-        distance = -1.0
-    else:
-        #retrieve addresses and calculate distance
+    try:
+        # calculate price for service
+        # await sync_to_async(
+        priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": contractorID}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
+        contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=contractorID) #await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=contractorID)
+        if isinstance(contractorContentFromDB, Exception):
+            return {"error": contractorContentFromDB}
+        
         coordsContractor = (0,0)
-        for idKey, entry in contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.addresses].items():
-            if Addresses.standard in entry and entry[Addresses.standard]:
-                if AddressesSKI.coordinates in entry:
-                    coordsContractor = entry[AddressesSKI.coordinates]
-                    break
-            else:
-                if AddressesSKI.coordinates in entry:
-                    coordsContractor = entry[AddressesSKI.coordinates]
+        if savedCoords == (0,0):
+            distance = -1.0
+        else:
+            #retrieve addresses and calculate distance
+            for idKey, entry in contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.addresses].items():
+                if Addresses.standard in entry and entry[Addresses.standard]:
+                    if AddressesSKI.coordinates in entry:
+                        coordsContractor = entry[AddressesSKI.coordinates]
+                        break
+                else:
+                    if AddressesSKI.coordinates in entry:
+                        coordsContractor = entry[AddressesSKI.coordinates]
 
-        distance = await calculateGeodesicDistance(savedCoords, coordsContractor)
+            distance = async_to_sync(calculateGeodesicDistance)(savedCoords, coordsContractor) #await calculateGeodesicDistance(savedCoords, coordsContractor)
 
-    contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                            OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
-                            OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
-                            "distance": distance,
-                            "contractorCoordinates": coordsContractor,
-                            ProcessDetails.prices: priceOfContractor}
-    endPC = time.perf_counter_ns()
-    endPT = time.process_time_ns()
-    print(f"Time taken for contractor {idx}: {(endPC-startPC)/1000000000.0} s, {(endPT-startPT)/1000000000.0} s")
-    return contractorToBeAdded
+        contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                                OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                                OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
+                                "distance": distance,
+                                "contractorCoordinates": coordsContractor,
+                                ProcessDetails.prices: priceOfContractor}
+        return contractorToBeAdded
+    except Exception as e: 
+        return {"error": e}
 
 ####################################################################################
-async def parallelLoop(listOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
+def parallelLoop(listOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
     """
     The main loop
     
     """
-    return await asyncio.gather(*[calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))])
-
+    try:
+        #return await asyncio.gather(*[calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))])
+        return [calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))]
+    except Exception as e:
+        loggerError.error("Error in parallelLoop: %s" % e)
+        return []
 ####################################################################################
 def logicForGetContractors(processObj:Process):
     """
@@ -147,8 +143,9 @@ def logicForGetContractors(processObj:Process):
         if len(listOfFilteredContractors) == 0:
             return [], 200
 
-        # Loop is parallelized
-        listOfResultingContractors = asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
+        # Loop could be parallelized but tests fail if it is
+        # This is due to django not closing the database calls correctly. If there is some other solution to to_thread above then by all means...
+        listOfResultingContractors = parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject) #asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
         
         #if settings.DEBUG:
         #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
