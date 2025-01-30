@@ -14,7 +14,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from geopy.exc import GeocoderServiceError
 
-from ....definitions import NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI, PrioritiesForOrganizationSemperKI, PriorityTargetsSemperKI, MapPermissionsToOrgaNotifications, AddressesSKI
+from ....definitions import *
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
@@ -123,7 +123,7 @@ async def fetchCoordinates(address):
         return e
 
 ####################################################################################
-def userUpdatedSemperKI(userHashID:str, session):
+def userUpdatedSemperKI(userHashID:str, session, updates):
     """
     Update user details according to Semper-KI specific fields
     
@@ -138,9 +138,10 @@ def userUpdatedSemperKI(userHashID:str, session):
     try:
         user, _ = ProfileManagementBase.getUserViaHash(userHashID)
         existingDetails = copy.deepcopy(user.details)
-        for entry in existingDetails:
-            if entry == UserDetails.addresses:
-                for addressID, address in existingDetails[entry].items():
+
+        if UserDetails.addresses in updates:
+            if UserDetails.addresses in existingDetails:
+                for addressID, address in existingDetails[UserDetails.addresses].items():
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
                     if coordsOfAddress is not None:
                         user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
@@ -203,13 +204,23 @@ def orgaCreatedSemperKI(orgaHashID:str):
             else:
                 orga.details[OrganizationDetails.priorities][setting] = {PriorityTargetsSemperKI.value: 4}
 
+        if OrganizationDetailsSKI.maturityLevel not in existingDetails:
+            orga.details[OrganizationDetailsSKI.maturityLevel] = 0
+        else:
+            orga.details[OrganizationDetailsSKI.maturityLevel] = existingDetails[OrganizationDetailsSKI.maturityLevel]
+        
+        if OrganizationDetailsSKI.resilienceScore not in existingDetails:
+            orga.details[OrganizationDetailsSKI.resilienceScore] = 0
+        else:
+            orga.details[OrganizationDetailsSKI.resilienceScore] = existingDetails[OrganizationDetailsSKI.resilienceScore]
+
         orga.save()
     except Exception as error:
         logger.error(f'Could not update orga details in SemperKI: {str(error)}')
         return None
     
 ####################################################################################
-def orgaUpdatedSemperKI(orgaHashID:str, session):
+def orgaUpdatedSemperKI(orgaHashID:str, session, updates):
     """
     Update orga details according to Semper-KI specific fields
     
@@ -226,14 +237,15 @@ def orgaUpdatedSemperKI(orgaHashID:str, session):
         if isinstance(orga, Exception):
             raise orga
         existingDetails = copy.deepcopy(orga.details)
-        for entry in existingDetails:
-            if entry == OrganizationDetails.addresses:
-                for addressID, address in existingDetails[entry].items():
+        if OrganizationDetails.addresses in updates:
+            if OrganizationDetails.addresses in existingDetails:
+                for addressID, address in existingDetails[OrganizationDetails.addresses].items():
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
                     if coordsOfAddress is not None:
                         orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
                     else:
                         orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = (0,0)
+        
         orga.save()
         return None
     except Exception as error:

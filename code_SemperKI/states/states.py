@@ -15,7 +15,7 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets
+from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets, FileObjectContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
 from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription 
@@ -275,6 +275,22 @@ class State(ABC):
 
     ###################################################
     @abstractmethod
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    @abstractmethod
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
         Which buttons should be shown in this state
@@ -336,6 +352,8 @@ class State(ABC):
                         raise retVal
                     if returnState.fireEvent:
                         WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
+                    returnState.entryCalls(interface, process) # call functions that should be called when entering this state
+
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -369,6 +387,7 @@ class State(ABC):
                         raise retVal
                     if returnState.fireEvent:
                         WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
+                    returnState.entryCalls(interface, process) # call functions that should be called when entering this state
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -403,6 +422,21 @@ class DRAFT(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.DRAFT)
     name = ProcessStatusAsString.DRAFT
     fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -500,6 +534,21 @@ class SERVICE_IN_PROGRESS(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
     
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -653,6 +702,21 @@ class SERVICE_READY(State):
     name = ProcessStatusAsString.SERVICE_READY
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -799,6 +863,21 @@ class SERVICE_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
     fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -965,6 +1044,21 @@ class WAITING_FOR_OTHER_PROCESS(State):
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -1123,6 +1217,21 @@ class SERVICE_COMPLICATION(State):
     name = ProcessStatusAsString.SERVICE_COMPLICATION
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -1241,6 +1350,21 @@ class CONTRACTOR_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.CONTRACTOR_COMPLETED)
     name = ProcessStatusAsString.CONTRACTOR_COMPLETED
     fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -1366,6 +1490,21 @@ class VERIFYING(State):
     name = ProcessStatusAsString.VERIFYING
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -1488,6 +1627,21 @@ class VERIFICATION_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED)
     name = ProcessStatusAsString.VERIFICATION_COMPLETED
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -1615,6 +1769,21 @@ class REQUEST_COMPLETED(State):
     name = ProcessStatusAsString.REQUEST_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -1710,7 +1879,11 @@ class REQUEST_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return []
+        # Scan for file with origin "ContractFiles"
+        for fileID, file in process.files.items():
+            if file[FileObjectContent.origin] == "ContractFiles":
+                return []
+        return [{"key": "Process-ContractFiles"}]
 
     ###################################################
     # Transitions
@@ -1883,6 +2056,21 @@ class OFFER_COMPLETED(State):
     name = ProcessStatusAsString.OFFER_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -2018,6 +2206,21 @@ class OFFER_REJECTED(State):
     name = ProcessStatusAsString.OFFER_REJECTED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -2107,6 +2310,21 @@ class CONFIRMATION_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.CONFIRMATION_COMPLETED)
     name = ProcessStatusAsString.CONFIRMATION_COMPLETED
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -2214,6 +2432,21 @@ class CONFIRMATION_REJECTED(State):
     name = ProcessStatusAsString.CONFIRMATION_REJECTED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -2303,6 +2536,21 @@ class PRODUCTION_IN_PROGRESS(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.PRODUCTION_IN_PROGRESS)
     name = ProcessStatusAsString.PRODUCTION_IN_PROGRESS
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -2435,6 +2683,21 @@ class PRODUCTION_COMPLETED(State):
     name = ProcessStatusAsString.PRODUCTION_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -2517,7 +2780,11 @@ class PRODUCTION_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return []
+        # Scan for file with origin "PaymentFiles"
+        for fileID, file in process.files.items():
+            if file[FileObjectContent.origin] == "PaymentFiles":
+                return []
+        return [{"key": "Process-Payment"}]
 
     ###################################################
     # Transitions
@@ -2569,6 +2836,21 @@ class DELIVERY_IN_PROGRESS(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_IN_PROGRESS)
     name = ProcessStatusAsString.DELIVERY_IN_PROGRESS
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -2674,6 +2956,21 @@ class DELIVERY_COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.DELIVERY_COMPLETED)
     name = ProcessStatusAsString.DELIVERY_COMPLETED
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -2786,12 +3083,6 @@ class DELIVERY_COMPLETED(State):
 
         """
         
-        # signal to dependent processes, that this one is finished
-        signalCompleteToDependentProcesses(interface, process)
-
-        subject = ["email","subjects","processFinished"]
-        message = ["email","content","processFinished"]
-        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2841,6 +3132,21 @@ class DISPUTE(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.DISPUTE)
     name = ProcessStatusAsString.DISPUTE
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -2938,12 +3244,6 @@ class DISPUTE(State):
         To: COMPLETED
 
         """
-        # signal to dependent processes, that this one is finished
-        signalCompleteToDependentProcesses(interface, process)
-
-        subject = ["email","subjects","processFinished"]
-        message = ["email","content","processFinished"]
-        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2981,6 +3281,27 @@ class COMPLETED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.COMPLETED)
     name = ProcessStatusAsString.COMPLETED
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        # signal to dependent processes, that this one is finished
+        signalCompleteToDependentProcesses(interface, process)
+
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
+
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
@@ -3070,6 +3391,21 @@ class FAILED(State):
     name = ProcessStatusAsString.FAILED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:
         """
@@ -3157,6 +3493,21 @@ class CANCELED(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.CANCELED)
     name = ProcessStatusAsString.CANCELED
     fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ###################################################
     def buttons(self, process, client=True, contractor=False, admin=False) -> list:

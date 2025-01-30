@@ -18,15 +18,10 @@ from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
 from rest_framework.exceptions import ValidationError
 
-from geopy.adapters import AioHTTPAdapter
-from geopy.geocoders import Nominatim
-from geopy.distance import geodesic
-from geopy.exc import GeocoderServiceError
-import asyncio
-
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, checkVersion
 from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -171,6 +166,7 @@ def retrieveResultsFromQuestionnaire(request:Request):
 
     """
     try:
+        # TODO: Parse the request and do the necessary
         return HttpResponseRedirect(settings.FORWARD_URL)
     except (Exception) as error:
         message = f"Error in {retrieveResultsFromQuestionnaire.cls.__name__}: {str(error)}"
@@ -181,115 +177,88 @@ def retrieveResultsFromQuestionnaire(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-#################################################################################
-class DistanceRequestSerializer(serializers.Serializer):
-    address1 = serializers.CharField(max_length=255, trim_whitespace=True)
-    address2 = serializers.CharField(max_length=255, trim_whitespace=True)
 
-class DistanceResponseSerializer(serializers.Serializer):
-    address1 = serializers.CharField(max_length=255)
-    coordinates1 = serializers.CharField()
-    address2 = serializers.CharField(max_length=255)
-    coordinates2 = serializers.CharField()
-    distanceKm = serializers.FloatField()
-
+#######################################################
 @extend_schema(
-    summary="Calculate the geodesic distance between two addresses",
+    summary="Return the maturity level of the project",
     description=" ",
-    request=DistanceRequestSerializer,
-    tags=['FE - Miscellaneous'],
+    tags=['FE - Questionnaire'],
+    request=None,
     responses={
-        200: DistanceResponseSerializer,
-        400: ExceptionSerializer,
+        200: None,
+        401: ExceptionSerializer,
         500: ExceptionSerializer
     }
 )
-@api_view(["POST"])
-def calculateDistanceView(request: Request):
+@require_http_methods(["GET"])
+@api_view(["GET"])
+def maturityLevel(request:Request):
     """
-    Calculate the geodesic distance between two addresses.
+    Return the maturity level of the project
 
-    :param request: The request object
-    :type request: Dict
-    :return: The distance between the addresses and their coordinates
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response
     :rtype: JSONResponse
+
     """
-    
-    inSerializer = DistanceRequestSerializer(data=request.data)
-    if inSerializer.is_valid():
-        address1 = inSerializer.data["address1"]
-        address2 = inSerializer.data["address2"]
-    else:
-        return Response({"error": "Both 'address1' and 'address2' must be provided."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    async def calculateGeodesicDistance(address1, address2):
-        async with Nominatim(user_agent="geo_distance_calculator", adapter_factory=AioHTTPAdapter) as geolocator:
-            async def fetchCoordinates(address):
-                for attempt in range(3):  # Retry up to 3 times
-                    try:
-                        location = await geolocator.geocode(address, exactly_one=True, timeout=10)
-                        if location is None:
-                            raise ValueError("Location not found.")
-                        return (location.latitude, location.longitude)
-                    except GeocoderServiceError:
-                        if attempt == 2:  # Last attempt
-                            return None
-                    except Exception:
-                        return None
-
-            coords1 = await fetchCoordinates(address1)
-            coords2 = await fetchCoordinates(address2)
-
-            if coords1 and coords2:
-                distance = geodesic(coords1, coords2).kilometers
-                return {
-                    "address1": {
-                        "address": address1,
-                        "coordinates": coords1
-                    },
-                    "address2": {
-                        "address": address2,
-                        "coordinates": coords2
-                    },
-                    "distanceKm": round(distance, 2)
-                }
-            else:
-                return {"error": "Could not calculate distance due to missing or invalid address data."}
-
     try:
+        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
+        if isinstance(orgaAsDict, Exception):
+            raise ValidationError("No organization found")
+        if OrganizationDetailsSKI.maturityLevel in orgaAsDict[OrganizationDescription.details]:
+            return JsonResponse({"maturityLevel": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.maturityLevel]})
+        else:
+            return JsonResponse({"maturityLevel": 0}, status=status.HTTP_404_NOT_FOUND)
         
-        async def calculateAndRespond():
-            result = await calculateGeodesicDistance(address1, address2)
-
-            if "error" in result:
-                raise Exception(result["error"])
-            
-            responseSerializer = DistanceResponseSerializer(data={
-                "address1": result["address1"]["address"],
-                "coordinates1": str(result["address1"]["coordinates"]),
-                "address2": result["address2"]["address"],
-                "coordinates2": str(result["address2"]["coordinates"]),
-                "distanceKm": result["distanceKm"]
-            })
-
-            if not responseSerializer.is_valid():
-                raise ValidationError(responseSerializer.errors)
-            
-            return Response(responseSerializer.data, status=status.HTTP_200_OK)
-
-        return asyncio.run(calculateAndRespond())
-
-    except ValidationError as e:
-        errorMessage = {"message": "Validation Error", "exception": str(e)}
-        exceptionSerializer = ExceptionSerializer(data=errorMessage)
-        if exceptionSerializer.is_valid():
-            return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
-        return Response(errorMessage, status=status.HTTP_400_BAD_REQUEST)
-
-    except Exception as e:
-        errorMessage = {"message": "Error in calculateDistanceView", "exception": str(e)}
-        exceptionSerializer = ExceptionSerializer(data=errorMessage)
+    except (Exception) as error:
+        message = f"Error in {maturityLevel.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
         if exceptionSerializer.is_valid():
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return Response(errorMessage, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
+    summary="Return the resilience score of the project",
+    description=" ",
+    tags=['FE - Questionnaire'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+def resilienceScore(request:Request):
+    """
+    Return the resilience score of the project
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response
+    :rtype: JSONResponse
+
+    """
+    try:
+        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
+        if isinstance(orgaAsDict, Exception):
+            raise ValidationError("No organization found")
+        if OrganizationDetailsSKI.resilienceScore in orgaAsDict[OrganizationDescription.details]:
+            return JsonResponse({"resilienceScore": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.resilienceScore]})
+        else:
+            return JsonResponse({"resilienceScore": 0}, status=status.HTTP_404_NOT_FOUND)
+    except (Exception) as error:
+        message = f"Error in {resilienceScore.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

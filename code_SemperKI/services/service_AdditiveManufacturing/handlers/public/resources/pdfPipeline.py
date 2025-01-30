@@ -25,7 +25,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsAdmin
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
@@ -63,6 +63,7 @@ class SReqPDFExtraction(serializers.Serializer):
 
 @require_http_methods(["POST"])
 @loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin(json=True)
 @api_view(["POST"])
 @checkVersion(0.3)
 def extractFromPDF(request:Request):
@@ -128,6 +129,7 @@ class ReqExtractFromJSON(serializers.Serializer):
 
 @require_http_methods(["POST"])
 @loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin(json=True)
 @api_view(["POST"])
 @checkVersion(0.3)
 def extractFromJSON(request: Request):

@@ -47,8 +47,6 @@ newPaths= {
     "saveProjects": ("public/project/save/", project.saveProjects),
     "getProjectForDashboard": ("public/project/dashboard/get/<str:projectID>/", project.getProjectForDashboard),
 
-    "getdistance": ("public/distance/get/", miscellaneous.calculateDistanceView),
-
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
@@ -62,6 +60,8 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
+    "maturityLevel": ("public/questionnaire/maturityLevel/", miscellaneous.maturityLevel),
+    "resilienceScore": ("public/questionnaire/resilienceScore/", miscellaneous.resilienceScore),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),

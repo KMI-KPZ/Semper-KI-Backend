@@ -502,29 +502,29 @@ class Range(BaseModel):
     unit: str
 
 class UltimateTensileStrength(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 class TensileModulus(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 class ElongationAtBreak(BaseModel):
-    min: Range
-    max: Range 
+    value: float
+    unit: str 
 
 
-class FlexuralStrengthk(BaseModel):
-    min: Range
-    max: Range 
+class FlexuralStrength(BaseModel):
+    value: float
+    unit: str
 
 class FlexuralModulus(BaseModel):
-    min: Range
-    max: Range 
+    value: float
+    unit: str 
 
 class ElongationModulus(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 
 
@@ -536,7 +536,7 @@ class MechanicalProperties(BaseModel):
     tensile_modulus: Optional[TensileModulus]  
     elongation_modulus: Optional[ElongationModulus]  
     elongation_at_break: Optional[ElongationAtBreak]  
-    flexural_strength: Optional[FlexuralStrengthk]  
+    flexural_strength: Optional[FlexuralStrength]  
     flexural_modulus: Optional[FlexuralModulus]  
 
 class Hardness(BaseModel):

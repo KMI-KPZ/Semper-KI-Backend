@@ -159,6 +159,9 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     density = enum.auto() # 1.2 g/cm³
     printingSpeed = enum.auto() # 100 cm/h
     acquisitionCosts = enum.auto() # €/kg
+    ultimateTensileStrength = enum.auto() # MPa
+    tensileModulus = enum.auto() # GPa
+    elongationAtBreak = enum.auto() # %
 
 ##################################################
 class NodePropertiesAMAdditionalRequirement(StrEnumExactlyAsDefined):

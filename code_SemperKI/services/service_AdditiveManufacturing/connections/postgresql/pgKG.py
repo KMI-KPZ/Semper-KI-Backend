@@ -163,7 +163,8 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/kg",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            
+            outList.append()
+
         case NodeTypesAM.additionalRequirement:
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.imgPath,
                             NodePropertyDescription.value: "",
