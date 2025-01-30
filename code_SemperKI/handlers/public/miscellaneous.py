@@ -209,7 +209,7 @@ def maturityLevel(request:Request):
         if OrganizationDetailsSKI.maturityLevel in orgaAsDict[OrganizationDescription.details]:
             return JsonResponse({"maturityLevel": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.maturityLevel]})
         else:
-            return JsonResponse({"maturityLevel": 0}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({"maturityLevel": -1}) # -1 means not set
         
     except (Exception) as error:
         message = f"Error in {maturityLevel.cls.__name__}: {str(error)}"
@@ -252,7 +252,7 @@ def resilienceScore(request:Request):
         if OrganizationDetailsSKI.resilienceScore in orgaAsDict[OrganizationDescription.details]:
             return JsonResponse({"resilienceScore": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.resilienceScore]})
         else:
-            return JsonResponse({"resilienceScore": 0}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({"resilienceScore": -1}) # -1 means not set
     except (Exception) as error:
         message = f"Error in {resilienceScore.cls.__name__}: {str(error)}"
         exception = str(error)
