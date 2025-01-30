@@ -47,7 +47,21 @@ class Costs():
         self.additionalArguments = additionalArguments
         self.filterObject = filterObject
         self.detailedCalculations = {} # contains all information about every calculation here, will be encrypted and saved in the process
+        ###
 
+    ####################################################################################################
+    def calculateCosts(self) -> list[tuple[float,float]]|Exception:
+        """
+        Calculate all costs
+        
+        """
+        try:
+            costsPerGroup = [0,0]
+                
+            return costsPerGroup
+        except Exception as e:
+            loggerError.error("Error in calculateCosts: " + str(e))
+            return e
         
 
     ####################################################################################################

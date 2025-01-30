@@ -435,8 +435,6 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
         validatedInput = inSerializer.data
-        
-        orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session) # not sure if this is correct
 
         if validatedInput["type"] == "create":
             # create node for the system
@@ -481,7 +479,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         else:
             return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
 
-        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga {orgaID}," + str(datetime.now()))
+        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga," + str(datetime.now()))
 
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:

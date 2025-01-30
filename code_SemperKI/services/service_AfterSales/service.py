@@ -7,13 +7,14 @@ Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
 
 from .connections.postgresql.pgService import initializeService as AS_initializeService, updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, isFileRelevantForService as AS_isFileRelevantForService, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
 #from .handlers.public.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
-from  .logics.checkServiceLogic import checkifSelectionIsAvailable as AS_checkIfSelectionIsAvailable
+from  .logics.checkServiceLogic import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
-#from .logics.costs import Costs
+from .logics.costs import Costs
 
 ###################################################
 class AfterSales(Semper.ServiceBase):
@@ -107,13 +108,22 @@ class AfterSales(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :param transferObject: Object to transfer data between services
+        :param transferObject: Transfer object with additional information
         :type transferObject: object
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return {}
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts() 
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+            
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
+        
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
@@ -127,12 +137,11 @@ class AfterSales(Semper.ServiceBase):
 
         """
         # filter by choice of material, post-processings, build plate, etc...
-        
+        print ("AFTER SALES: getFilteredContractors")
         filteredContractors = Filter()
 
         outList = filteredContractors.getFilteredContractors(processObj)
         
-        # return outList, filteredContractors
-        return [], {}
+        return outList, filteredContractors
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AfterSales())
