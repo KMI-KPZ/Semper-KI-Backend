@@ -21,7 +21,7 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline
+from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification
 from .handlers.public import materials, checkService, filter, model, postProcessings
 
 from code_SemperKI.urls import paths, urlpatterns
@@ -53,6 +53,11 @@ newPaths = {
     #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
     
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
+    "getVerificationForOrganization": ("public/service/additive-manufacturing/verification/get/", verification.getVerificationForOrganization),
+    "createVerificationForOrganization": ("public/service/additive-manufacturing/verification/create/", verification.createVerificationForOrganization),
+    "updateVerificationForOrganization": ("public/service/additive-manufacturing/verification/update/", verification.updateVerificationForOrganization),
+    "deleteVerificationForOrganization": ("public/service/additive-manufacturing/verification/delete/<str:printerID>/<str:materialID>/", verification.deleteVerificationForOrganization),
+
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
     

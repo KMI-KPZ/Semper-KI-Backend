@@ -115,7 +115,7 @@ def statusButtonRequest(request:Request):
         if not inSerializer.is_valid():
             message = "Verification failed in statusButtonRequest"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

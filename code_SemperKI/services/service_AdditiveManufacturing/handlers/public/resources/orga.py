@@ -265,7 +265,7 @@ def orga_getNodeViaID(request:Request, nodeID:str):
         if nodeInfo.createdBy != orgaID and nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
             message = f"Rights not sufficient in {orga_getNodeViaID.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -457,7 +457,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -576,7 +576,7 @@ def orga_createNode(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_createNode.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -655,7 +655,7 @@ def orga_updateNode(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_updateNode.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -681,7 +681,7 @@ def orga_updateNode(request:Request):
         if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_updateNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -758,7 +758,7 @@ def orga_deleteNode(request:Request, nodeID:str):
         if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -822,7 +822,7 @@ def orga_addEdgesToOrga(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgesToOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -904,7 +904,7 @@ def orga_addEdgeForOrga(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgeForOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -1059,7 +1059,7 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         if result1.createdBy != orgaID and result2.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -1216,7 +1216,7 @@ def orga_makeRequestForAdditions(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_makeRequestForAdditions.cls.__name__   }"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

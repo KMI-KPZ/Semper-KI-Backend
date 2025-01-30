@@ -144,7 +144,7 @@ def createNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -254,7 +254,7 @@ def updateNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -610,7 +610,7 @@ def createEdge(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createEdge.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -841,7 +841,7 @@ def createGraph(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createGraph.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

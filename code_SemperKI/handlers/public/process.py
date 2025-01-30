@@ -255,7 +255,7 @@ def updateProcess(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateProcess.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -390,7 +390,7 @@ def getProcessHistory(request:Request, processID):
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(getProcessHistory.cls.__name__)
         if interface is None:
-            logger.error("Rights not sufficient in getProcessHistory")
+            loggerError.error("Rights not sufficient in getProcessHistory")
             return Response("Insufficient rights", status=status.HTTP_401_UNAUTHORIZED)
 
         processObj = interface.getProcessObj("", processID)
@@ -547,7 +547,7 @@ def cloneProcesses(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {cloneProcesses.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

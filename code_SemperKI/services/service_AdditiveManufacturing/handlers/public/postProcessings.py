@@ -90,7 +90,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {retrievePostProcessingsWithFilter.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -179,7 +179,7 @@ def setPostProcessingSelection(request:Request):
         if not serializedContent.is_valid():
             message = "Validation failed in setPostProcessingSelection"
             exception = f"Validation failed {serializedContent.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -211,7 +211,7 @@ def setPostProcessingSelection(request:Request):
         if flag is False: # this should not happen
             message = f"Rights not sufficient for {setPostProcessingSelection.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -283,7 +283,7 @@ def deletePostProcessingFromSelection(request:Request,projectID:str,processID:st
         if flag is False: # this should not happen
             message = f"Rights not sufficient for {deletePostProcessingFromSelection.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)

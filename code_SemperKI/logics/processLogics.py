@@ -364,7 +364,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface("updateProcess")
         if interface == None:
-            logger.error("Rights not sufficient in updateProcess")
+            loggerError.error("Rights not sufficient in updateProcess")
             return ("", False)
         
         client = contentManager.getClient()
@@ -372,7 +372,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         
         for processID in processIDs:
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in updateProcess")
+                loggerError.error("Rights not sufficient in updateProcess")
                 return ("", False)
 
             if "deletions" in changes:
@@ -380,7 +380,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
                         if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
+                            loggerError.error("Rights not sufficient in updateProcess")
                             return ("", False)
                         
                     returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
@@ -392,7 +392,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                 for elem in changes["changes"]:
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                        logger.error("Rights not sufficient in updateProcess")
+                        loggerError.error("Rights not sufficient in updateProcess")
                         return ("", False)
                     fireEvent = False
                     # for websocket events
@@ -439,12 +439,12 @@ def deleteProcessFunction(session, processIDs:list[str]):
         contentManager = ManageContent(session)
         interface = contentManager.getCorrectInterface("deleteProcesses")
         if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
+            loggerError.error("Rights not sufficient in deleteProcesses")
             return HttpResponse("Insufficient rights!", status=401)
 
         for processID in processIDs:
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
+                loggerError.error("Rights not sufficient in deleteProcesses")
                 return HttpResponse("Insufficient rights!", status=401)
             result = interface.deleteProcess(processID)
             if result is False:

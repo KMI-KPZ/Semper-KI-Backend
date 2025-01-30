@@ -239,7 +239,7 @@ class Basics():
             if isinstance(result, Exception):
                 raise result
         except Exception as error:
-            logger.error(f"Could not delete nodes of orga: {error}")
+            loggerError.error(f"Could not delete nodes of orga: {error}")
             
     ##################################################
     @staticmethod
