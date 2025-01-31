@@ -270,6 +270,7 @@ class GeneralMaterialTypeEnum(str, Enum):
     Enumeration for general material types.
     """
     polymer = "Polymer"
+    photopolymer = "Photopolymer"
     metal = "Metal"
     ceramic = "Ceramic"
     composite = "Composite"
@@ -278,7 +279,18 @@ class GeneralMaterialTypeEnum(str, Enum):
     other = "Other"
 
 
-
+class PhotopolymerMaterialTypeEnum(str, Enum):
+    """
+    Enumeration for photopolymer material types.
+    """
+    acrylic = "Acrylic"
+    acrylic_like = "Acrylic-like"
+    epoxy = "Epoxy"
+    oxycetane_resin = "Oxycetane Resin"
+    polyurethane = "Polyurethane"
+    resin = "Resin"
+    silicon_like = "Silicon-like"
+    other = "Other"
 
 class PolymerMaterialTypeEnum(str, Enum):
     """Enumeration for polymer material types."""
@@ -288,18 +300,14 @@ class PolymerMaterialTypeEnum(str, Enum):
     abs_pp = "ABS/PP"
     abs_pp_like = "ABS/PP-like"
     abs_like = "ABS-like"
-    acrylic = "Acrylic"
-    acrylic_like = "Acrylic-like"
     alumina_like = "Alumina-like"
     asa = "ASA"
     bvoh = "BVOH"
     ce_like = "CE-like"
     cpe = "CPE"
-    epoxy = "Epoxy"
     gypsum = "Gypsum"
     hdpe_like = "HDPE-like"
     hips = "HIPS"
-    oxycetane_resin = "Oxycetane Resin"
     pa = "PA"
     pa_tpe = "PA/TPE"
     paek = "PAEK"
@@ -339,9 +347,7 @@ class PolymerMaterialTypeEnum(str, Enum):
     pva = "PVA"
     pvc = "PVC"
     pvdf = "PVDF"
-    resin = "Resin"
     rubber_like = "Rubber-like"
-    silicon_like = "Silicon-like"
     tpc = "TPC"
     tpe = "TPE"
     tpe_like = "TPE-like"
@@ -432,6 +438,10 @@ class SpecificMaterialTypeBase(BaseModel):
 class SpecificPolymerMaterialType(SpecificMaterialTypeBase):
     general_material_type: Literal["Polymer"]
     specific_material_type: PolymerMaterialTypeEnum
+
+class SpecificPhotopolymerMaterialType(SpecificMaterialTypeBase):
+    general_material_type: Literal["Photopolymer"]
+    specific_material_type: PhotopolymerMaterialTypeEnum
 
 class SpecificCeramicMaterialType(SpecificMaterialTypeBase):
     general_material_type: Literal["Ceramic"]
@@ -582,6 +592,7 @@ class MaterialResponse(BaseModel):
     material_type: Union[
         SpecificPolymerMaterialType,
         SpecificCeramicMaterialType,
+        SpecificPhotopolymerMaterialType,
         SpecificMetalMaterialType,
         SpecificCompositeMaterialType,
         SpecificSandMaterialType,

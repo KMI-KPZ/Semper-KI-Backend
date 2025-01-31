@@ -223,7 +223,7 @@ def parseJSONToDBKGFormat(jsonData:dict, category:str) -> dict|Exception:
                 elif key == "material_type" and len(value) > 0:
                     if "general_material_type" in value and value["general_material_type"] is not None and value["general_material_type"] != "Other":
                         outDict["materialType"] = value["general_material_type"]
-                    if "specific_material_type" in value and value["specific_material_type"] is not None and value["specific_material_type"] != "":
+                    if "specific_material_type" in value and value["specific_material_type"] is not None and value["specific_material_type"] != "Other":
                         outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: value.get("specific_material_type", ""), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
 
         else:

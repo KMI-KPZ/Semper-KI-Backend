@@ -78,10 +78,10 @@
   },
   {
     "node": {
-      "nodeTempID": 15,
-      "nodeName": "Plastics",
-      "nodeType": "materialCategory",
-      "context": "All materials considered plastics",
+      "nodeTempID": 7,
+      "nodeName": "Irrelevant",
+      "nodeType": "material",
+      "context": "Material is not important. Connect to this material if you can handle almost anything.",
       "properties": [
         {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
@@ -91,8 +91,21 @@
   },
   {
     "node": {
-      "nodeTempID": 16,
-      "nodeName": "Metals",
+      "nodeTempID": 8,
+      "nodeName": "Polymer",
+      "nodeType": "materialCategory",
+      "context": "All materials consisting of macromolecules",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 9,
+      "nodeName": "Metal",
       "nodeType": "materialCategory",
       "context": "All materials considered metals",
       "properties": [
@@ -104,8 +117,8 @@
   },
   {
     "node": {
-      "nodeTempID": 17,
-      "nodeName": "Photopolymers",
+      "nodeTempID": 10,
+      "nodeName": "Photopolymer",
       "nodeType": "materialCategory",
       "context": "All materials considered photopolymers",
       "properties": [
@@ -117,8 +130,8 @@
   },
   {
     "node": {
-      "nodeTempID": 19,
-      "nodeName": "Composites",
+      "nodeTempID": 11,
+      "nodeName": "Composite",
       "nodeType": "materialCategory",
       "context": "All materials considered composites",
       "properties": [
@@ -130,10 +143,10 @@
   },
   {
     "node": {
-      "nodeTempID": 19,
-      "nodeName": "Powders",
+      "nodeTempID": 12,
+      "nodeName": "Sand",
       "nodeType": "materialCategory",
-      "context": "All materials considered powders",
+      "context": "All materials considered sand",
       "properties": [
         {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
@@ -143,10 +156,10 @@
   },
   {
     "node": {
-      "nodeTempID": 20,
-      "nodeName": "Thermoplastics",
+      "nodeTempID": 13,
+      "nodeName": "Wax",
       "nodeType": "materialCategory",
-      "context": "All materials considered thermoplastics",
+      "context": "All materials considered wax",
       "properties": [
         {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
