@@ -210,6 +210,8 @@ def parseJSONToDBKGFormat(jsonData:dict, category:str) -> dict|Exception:
                             outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                         elif subKey == "elongation_at_break" and subValue is not None and subValue != "":
                             outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "%", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                        elif subKey == "flexural_strength" and subValue is not None and subValue != "":
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                 elif key == "physical_properties":
                     if "density" in value:
                         if value["density"] is not None and value["density"] != "":
@@ -218,12 +220,60 @@ def parseJSONToDBKGFormat(jsonData:dict, category:str) -> dict|Exception:
                     if "printing_speed" in value:
                         if value["printing_speed"] is not None and value["printing_speed"] != "":
                             outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: value.get("printing_speed", 0), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                elif key == "material_type" and len(value) > 0:
+                    if "general_material_type" in value and value["general_material_type"] is not None and value["general_material_type"] != "Other":
+                        outDict["materialType"] = value["general_material_type"]
+                    if "specific_material_type" in value and value["specific_material_type"] is not None and value["specific_material_type"] != "":
+                        outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: value.get("specific_material_type", ""), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
+
         else:
             return {}
         return outDict
     except Exception as e:
         loggerError.error(f"Error in parseJSONToDBKGFormat: {e}")
         return e
+    
+#######################################################
+def insertIntoKG(dataDict:dict, category:str) -> None|Exception:
+    """
+    Insert extracted data into KG
+    
+    """
+    try:
+        if category == "printer":
+            # connect to existing technology node
+            techID = ""
+            if "technology" in dataDict:
+                techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
+                for tNode in techNodes:
+                    if SequenceMatcher(tNode[NodeDescription.nodeName], dataDict["technology"]).quick_ratio() > 0.8:
+                        techID = tNode[NodeDescription.nodeID]
+                        break
+                del dataDict["technology"]
+            createdPrinter = Basics.createNode(dataDict)
+            if isinstance(createdPrinter, Exception):
+                raise createdPrinter
+            if techID != "":
+                Basics.createEdge(createdPrinter[NodeDescription.nodeID], techID)
+        elif category == "material":
+            typeID = ""
+            if "materialType" in dataDict:
+                typeNodes = Basics.getNodesByType(NodeTypesAM.materialType.value)
+                for tNode in typeNodes:
+                    if SequenceMatcher(tNode[NodeDescription.nodeName], dataDict["materialType"]).quick_ratio() > 0.8:
+                        typeID = tNode[NodeDescription.nodeID]
+                        break
+                del dataDict["materialType"]
+                
+            createdMaterial = Basics.createNode(dataDict)
+            if isinstance(createdMaterial, Exception):
+                raise createdMaterial
+            if typeID != "":
+                Basics.createEdge(createdMaterial[NodeDescription.nodeID], typeID)
+    except Exception as e:
+        loggerError.error(f"Error in insertIntoKG: {e}")
+        return e
+
 
 #######################################################
 def logicForPDFPipeline(validatedInput, files):
@@ -271,25 +321,9 @@ def logicForPDFPipeline(validatedInput, files):
                 resultDict = parseJSONToDBKGFormat(jsonData, category)
                 if isinstance(resultDict, Exception):
                     raise resultDict
-                if category == "printer":
-                    # connect to existing technology node
-                    techID = ""
-                    if "technology" in resultDict:
-                        techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
-                        for tNode in techNodes:
-                            if SequenceMatcher(tNode[NodeDescription.nodeName], resultDict["technology"]).quick_ratio() > 0.8:
-                                techID = tNode[NodeDescription.nodeID]
-                                break
-                        del resultDict["technology"]
-                    createdPrinter = Basics.createNode(resultDict)
-                    if isinstance(createdPrinter, Exception):
-                        raise createdPrinter
-                    if techID != "":
-                        Basics.createEdge(createdPrinter[NodeDescription.nodeID], techID)
-                elif category == "material":
-                    createdMaterial = Basics.createNode(resultDict)
-                    if isinstance(createdMaterial, Exception):
-                        raise createdMaterial
+                result = insertIntoKG(resultDict, category)
+                if isinstance(result, Exception):
+                    raise result
 
                 listOfJSONs.append(jsonData)
 
@@ -314,25 +348,10 @@ def logicForExtractFromJSON(validatedInput):
             resultDict = parseJSONToDBKGFormat(entry, category)
             if isinstance(resultDict, Exception):
                 raise resultDict
-            if category == "printer":
-                # connect to existing technology node
-                techID = ""
-                if "technology" in resultDict:
-                    techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
-                    for tNode in techNodes:
-                        if SequenceMatcher(tNode[NodeDescription.nodeName], resultDict["technology"]).quick_ratio() > 0.8:
-                            techID = tNode[NodeDescription.nodeID]
-                            break
-                    del resultDict["technology"]
-                createdPrinter = Basics.createNode(resultDict)
-                if isinstance(createdPrinter, Exception):
-                    raise createdPrinter
-                if techID != "":
-                    Basics.createEdge(createdPrinter[NodeDescription.nodeID], techID)
-            elif category == "material":
-                createdMaterial = Basics.createNode(resultDict)
-                if isinstance(createdMaterial, Exception):
-                    raise createdMaterial
+            result = insertIntoKG(resultDict, category)
+            if isinstance(result, Exception):
+                raise result
+
         
         return "Success", 200
     except Exception as e:

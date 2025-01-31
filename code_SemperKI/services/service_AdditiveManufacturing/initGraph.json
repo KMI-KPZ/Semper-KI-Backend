@@ -1,0 +1,157 @@
+[  
+  {
+    "node": {
+		"nodeTempID": 0,
+		"nodeName": "Material Extrusion",
+		"nodeType": "technology",
+		"context": "",
+		"properties": [],
+		"active": true
+	  },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 1,
+      "nodeName": "Vat Photopolymerization",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 2,
+      "nodeName": "Material Jetting",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 3,
+      "nodeName": "Binder Jetting",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 4,
+      "nodeName": "Powder Bed Fusion",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 5,
+      "nodeName": "Sheet Lamination",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 6,
+      "nodeName": "Directed Energy Deposition",
+      "nodeType": "technology",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": []	
+  },
+  {
+    "node": {
+      "nodeTempID": 15,
+      "nodeName": "Plastics",
+      "nodeType": "materialCategory",
+      "context": "All materials considered plastics",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 16,
+      "nodeName": "Metals",
+      "nodeType": "materialCategory",
+      "context": "All materials considered metals",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 17,
+      "nodeName": "Photopolymers",
+      "nodeType": "materialCategory",
+      "context": "All materials considered photopolymers",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 19,
+      "nodeName": "Composites",
+      "nodeType": "materialCategory",
+      "context": "All materials considered composites",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 19,
+      "nodeName": "Powders",
+      "nodeType": "materialCategory",
+      "context": "All materials considered powders",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 20,
+      "nodeName": "Thermoplastics",
+      "nodeType": "materialCategory",
+      "context": "All materials considered thermoplastics",
+      "properties": [
+        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  }
+]

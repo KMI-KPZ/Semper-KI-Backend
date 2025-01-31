@@ -579,7 +579,6 @@ class MaterialResponse(BaseModel):
     material_information: MaterialInformation
     am_process: Optional[AdditiveManufacturingProcessEnum] 
     certificates: Optional[List[str]] = Field(default_factory=list)  # Added certificates field
-    material_type: Optional[str] 
     material_type: Union[
         SpecificPolymerMaterialType,
         SpecificCeramicMaterialType,

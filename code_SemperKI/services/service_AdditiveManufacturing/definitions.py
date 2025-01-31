@@ -27,6 +27,7 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
+    context = enum.auto()
 
 ##################################################
 # Additional FileContents
@@ -162,6 +163,8 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     ultimateTensileStrength = enum.auto() # MPa
     tensileModulus = enum.auto() # GPa
     elongationAtBreak = enum.auto() # %
+    flexuralStrength = enum.auto() # MPa
+    specificMaterialType = enum.auto() # PLA, ABS, ...
 
 ##################################################
 class NodePropertiesAMAdditionalRequirement(StrEnumExactlyAsDefined):

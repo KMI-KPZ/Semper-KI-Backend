@@ -45,7 +45,14 @@ def createVerificationForOrganizationLogic(request:Request, verifiedInput) -> tu
     orgaID = ProfileManagementBase.getOrganizationHashID(request.session)
     if orgaID == "":
         return Exception("Organization not found"), 404
-    result = createVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], verifiedInput["status"], verifiedInput["details"])
+    status = 1
+    if "status" in verifiedInput:
+        status = verifiedInput["status"]
+    details = {}
+    if "details" in verifiedInput:
+        details = verifiedInput["details"]
+
+    result = createVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], status, details)
     if isinstance(result, Exception):
         return result, 500
     return result.toDict(), 200
@@ -59,7 +66,14 @@ def updateVerificationForOrganizationLogic(request:Request, verifiedInput) -> tu
     orgaID = ProfileManagementBase.getOrganizationHashID(request.session)
     if orgaID == "":
         return Exception("Organization not found"), 404
-    result = updateVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], verifiedInput["status"], verifiedInput["details"])
+    if "status" in verifiedInput and "details" in verifiedInput:
+        result = updateVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], verifiedInput["status"], verifiedInput["details"])
+    elif "status" in verifiedInput:
+        result = updateVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], verifiedInput["status"])
+    elif "details" in verifiedInput:
+        result = updateVerification(orgaID, verifiedInput["printerID"], verifiedInput["materialID"], details=verifiedInput["details"])
+    else:
+        return Exception("No valid input"), 400
     if isinstance(result, Exception):
         return result, 500
     return None, 200

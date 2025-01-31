@@ -9,7 +9,7 @@ import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
 
-from .connections.postgresql.pgService import initializeService as AM_initializeService, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
+from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
@@ -61,21 +61,9 @@ class AdditiveManufacturing(Semper.ServiceBase):
         Parse the service details for Frontend
 
         """
-        outContent = {ServiceDetails.groups: []}
-        if ServiceDetails.groups in existingContent:
-            for groupIdx, group in enumerate(existingContent[ServiceDetails.groups]):
-                outEntry = {}
-                for serviceDetailType in group:
-                    match serviceDetailType:
-                        case ServiceDetails.material:
-                            outEntry[ServiceDetails.material] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.material] # take material object as given
-                        case ServiceDetails.postProcessings:
-                            outEntry[ServiceDetails.postProcessings] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]] # convert postprocessings to list
-                        case ServiceDetails.models:
-                            outEntry[ServiceDetails.models] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models]] # convert models to list
-                        case ServiceDetails.calculations:
-                            outEntry[ServiceDetails.calculations] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]] # convert calculations to list
-                outContent[ServiceDetails.groups].append(outEntry)
+        outContent = AM_parseServiceDetails(existingContent)
+        if isinstance(outContent, Exception):
+            return {}
         return outContent
     
     ###################################################

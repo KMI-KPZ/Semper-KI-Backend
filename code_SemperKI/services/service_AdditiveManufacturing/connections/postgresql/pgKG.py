@@ -163,7 +163,26 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/kg",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append()
+            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.ultimateTensileStrength,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.tensileModulus,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "GPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.elongationAtBreak,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "%",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType,
+                            NodePropertyDescription.value: "PLA, ABS, ...",
+                            NodePropertyDescription.unit: "",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
 
         case NodeTypesAM.additionalRequirement:
             outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.imgPath,

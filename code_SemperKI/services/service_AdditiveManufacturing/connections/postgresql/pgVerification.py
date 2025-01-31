@@ -26,7 +26,7 @@ def getVerificationObject(orgaHashID:str, printerID:str, materialID:str) -> Veri
     try:
         result = Verification.objects.get(organizationID=orgaHashID, printerID=printerID, materialID=materialID)
         return result
-    except Verification.DoesNotExist:
+    except Verification.DoesNotExist as e:
         loggerError.error("Verification for organization not found")
         return e
     except Exception as e:
@@ -42,7 +42,7 @@ def getVerification(orgaHashID:str) -> list[dict]|Exception:
     try:
         result = Verification.objects.filter(organizationID=orgaHashID)
         return [veri.toDict() for veri in result]
-    except Verification.DoesNotExist:
+    except Verification.DoesNotExist as e:
         loggerError.error("Verification for organization not found")
         return e
 

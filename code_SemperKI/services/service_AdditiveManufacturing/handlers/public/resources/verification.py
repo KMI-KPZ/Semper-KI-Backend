@@ -72,9 +72,9 @@ def getVerificationForOrganization(request:Request):
 
     """
     try:
-        result = getVerificationForOrganizationLogic(request)
+        result, statusCode = getVerificationForOrganizationLogic(request)
         if isinstance(result, Exception):
-            return Response({"message": str(result)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"message": str(result)}, status=statusCode)
         
         serializer = SResVerification(data=result, many=True)
         if serializer.is_valid():
@@ -141,9 +141,9 @@ def createVerificationForOrganization(request:Request):
         
         validatedInput = inSerializer.data
 
-        result = createVerificationForOrganizationLogic(request, validatedInput)
+        result, statusCode = createVerificationForOrganizationLogic(request, validatedInput)
         if isinstance(result, Exception):
-            return Response(str(result), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(result), status=statusCode)
         
         return Response("Success", status=status.HTTP_200_OK)
         
@@ -200,9 +200,9 @@ def updateVerificationForOrganization(request:Request):
         
         validatedInput = inSerializer.data
 
-        result = updateVerificationForOrganizationLogic(request, validatedInput)
+        result, statusCode = updateVerificationForOrganizationLogic(request, validatedInput)
         if isinstance(result, Exception):
-            return Response(str(result), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(result), status=statusCode)
         
         return Response("Success", status=status.HTTP_200_OK)
         
@@ -249,9 +249,9 @@ def deleteVerificationForOrganization(request:Request, printerID:str, materialID
 
     """
     try:
-        result = deleteVerificationForOrganizationLogic(request, printerID, materialID)
+        result, statusCode = deleteVerificationForOrganizationLogic(request, printerID, materialID)
         if isinstance(result, Exception):
-            return Response(str(result), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(result), status=statusCode)
         
         return Response("Success", status=status.HTTP_200_OK)
         
