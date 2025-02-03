@@ -94,9 +94,9 @@ def getFilters(request:Request):
                     propValues = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
                     setOfCertificates.update(propValues)
         
-        tensileStrengthRange = [minTensileStrengthRange, maxTensileStrengthRange]
-        densityRange = [minDensityRange, maxDensityRange]
-        elongationAtBreakRange = [minElongationAtBreak, maxElongationAtBreak]
+        tensileStrengthRange = [minTensileStrengthRange, maxTensileStrengthRange] if minTensileStrengthRange != 9999 and maxTensileStrengthRange != 0 else [0, 0]
+        densityRange = [minDensityRange, maxDensityRange] if minDensityRange != 9999 and maxDensityRange != 0 else [0, 0]
+        elongationAtBreakRange = [minElongationAtBreak, maxElongationAtBreak] if minElongationAtBreak != 100 and maxElongationAtBreak != 0 else [0, 0]
         certificateList = list(setOfCertificates)
         filters = {
             "filters": [

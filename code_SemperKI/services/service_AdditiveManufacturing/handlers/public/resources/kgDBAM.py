@@ -22,10 +22,12 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsAdmin
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SResProperties
+from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
@@ -69,6 +71,49 @@ def getPropertyDefinitionFrontend(request:Request, nodeType:str):
             raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {getPropertyDefinitionFrontend.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Loads the initial graph from the file",
+    description=" ",
+    tags=['BE - Graph'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
+@api_view(["GET"])
+@checkVersion(0.3)
+def loadInitGraphViaAPI(request:Request):
+    """
+    Loads the initial graph from the file
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+
+        testGraph = open(str(settings.BASE_DIR)+'/code_SemperKI/services/service_AdditiveManufacturing/initGraph.json').read()
+        tGAsDict = json.loads(testGraph)
+        result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {loadInitGraphViaAPI.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

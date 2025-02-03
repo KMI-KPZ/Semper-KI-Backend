@@ -409,7 +409,7 @@ def getNodesByTypeAndProperty(request:Request, nodeType:str, nodeProperty:str, v
 
     """
     try:
-        result = pgKnowledgeGraph.Basics.getNodesByTypeAndProperty(nodeType, nodeProperty, value)
+        result = pgKnowledgeGraph.Basics.getNodesByTypeAndPropertyAndValue(nodeType, nodeProperty, value)
         if isinstance(result, Exception):
             raise result
 

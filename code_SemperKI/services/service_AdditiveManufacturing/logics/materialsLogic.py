@@ -85,7 +85,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                         # filter for material category
                         if filter["question"]["title"] == "materialCategory":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 categoryID = filter["answer"]["value"] # contains the id of the chosen category node
                                 categoriesOfEntry = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
                                 if isinstance(categoriesOfEntry, Exception):
@@ -100,7 +100,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                         # filter for material tensile strenght
                         if filter["question"]["title"] == "tensileStrength":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
@@ -114,7 +114,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                         # filter for material density
                         if filter["question"]["title"] == "density":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
@@ -128,7 +128,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                         # filter for material elongation at break
                         if filter["question"]["title"] == "elongationAtBreak":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
@@ -142,7 +142,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                         # filter for material certificates
                         if filter["question"]["title"] == "certificates":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 certificates = filter["answer"]["value"]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
@@ -162,6 +162,9 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                 if append:
                     imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMMaterial.imgPath] if NodePropertiesAMMaterial.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
                     output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+
+        # sort by price
+        output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
 
         # mockup here:
         #mock = copy.deepcopy(mocks.materialMock)

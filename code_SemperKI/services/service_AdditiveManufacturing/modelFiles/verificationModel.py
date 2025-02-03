@@ -35,6 +35,17 @@ class VerificationDetails(StrEnumExactlyAsDefined):
     pass
 
 ##################################################
+class VerificationStatus(enum.IntEnum):
+    """
+    Status of the verification
+    
+    """
+    notInitialized = 0
+    initialized = 1
+    sent = 2
+    verified = 3
+
+##################################################
 class Verification(models.Model):
     """
     The verification model

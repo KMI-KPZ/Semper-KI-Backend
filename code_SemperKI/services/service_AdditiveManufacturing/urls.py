@@ -105,6 +105,7 @@ newPaths = {
     ########################
     "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
     "apiExtractPDFsTest": ("public/api/extractFromJSON/", pdfPipeline.extractFromJSON),
+    "loadInitGraphViaAPI": ("public/api/graph/loadInitGraph/", kgDBAM.loadInitGraphViaAPI),
 }
 
 # add paths

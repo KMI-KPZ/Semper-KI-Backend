@@ -230,3 +230,12 @@ class OrganizationDetailsAM(StrEnumExactlyAsDefined):
     roomCosts = enum.auto()
 
 # TODO: Service Status Codes
+
+##################################################
+class ServiceSpecificDetailsForContractors(StrEnumExactlyAsDefined):
+    """
+    What are the details of a service for contractors?
+        
+    """
+    verified = enum.auto()
+    groups = enum.auto()

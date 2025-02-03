@@ -27,7 +27,7 @@ def getVerificationObject(orgaHashID:str, printerID:str, materialID:str) -> Veri
         result = Verification.objects.get(organizationID=orgaHashID, printerID=printerID, materialID=materialID)
         return result
     except Verification.DoesNotExist as e:
-        loggerError.error("Verification for organization not found")
+        #loggerError.error("Verification for organization not found") # expected exception, doesn't need to be logged
         return e
     except Exception as e:
         loggerError.error(f"Error in getVerificationObject: {str(e)}")

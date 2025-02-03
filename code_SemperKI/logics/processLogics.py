@@ -67,7 +67,7 @@ async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple
             return -1.0
         
 ####################################################################################
-def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
+def calculateAddInfoForEachContractor(contractor, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
     """
     Parallelized for loop over every contractor
 
@@ -75,7 +75,12 @@ def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|Proce
     try:
         # calculate price for service
         # await sync_to_async(
-        priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": contractorID}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
+        if isinstance(contractor, tuple):
+            contractorID = contractor[0] # contractor 0 contains the id, 1 contains if the contractor is verified and 2 contains a list of all groups that contractor can serve
+        else:
+            contractorID = contractor
+
+        priceOfContractor = service.calculatePriceForService(processObj, {"contractor": contractor}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
         contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=contractorID) #await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=contractorID)
         if isinstance(contractorContentFromDB, Exception):
             return {"error": contractorContentFromDB}
@@ -102,6 +107,8 @@ def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|Proce
                                 "distance": distance,
                                 "contractorCoordinates": coordsContractor,
                                 ProcessDetails.prices: priceOfContractor}
+        # add service specific details
+        contractorToBeAdded = serviceManager.getService(processObj.serviceType).getServiceSpecificContractorDetails(contractorToBeAdded, contractor)
         return contractorToBeAdded
     except Exception as e: 
         return {"error": e}
@@ -178,14 +185,9 @@ def logicForGetContractors(processObj:Process):
             processObj.processDetails[ProcessDetails.prices][contractor[0][OrganizationDescription.hashedID]] = copy.deepcopy(contractor[0][ProcessDetails.prices])
             # but parse away the details for the frontend
             del contractor[0][ProcessDetails.prices][PricesDetails.details]
-            listOfResultingContractors.append({
-                OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
-                OrganizationDescription.name: contractor[0][OrganizationDescription.name],
-                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
-                "distance": contractor[0]["distance"],
-                "contractorCoordinates": contractor[0]["contractorCoordinates"],
-                ProcessDetails.prices: contractor[0][ProcessDetails.prices]
-            })
+            contractor[0][OrganizationDetails.branding] = contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {}
+            del contractor[0][OrganizationDescription.details]
+            listOfResultingContractors.append(contractor[0])
         processObj.save()
         return (listOfResultingContractors, 200)
 

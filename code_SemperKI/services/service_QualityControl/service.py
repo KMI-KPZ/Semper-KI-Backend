@@ -117,6 +117,14 @@ class QualityControl(Semper.ServiceBase):
 
         """
         return [], {}
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+        return existingDetails
 
 SERVICE_NAME = "QUALITY_CONTROL"
 SERVICE_NUMBER = 6

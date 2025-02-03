@@ -440,6 +440,8 @@ class SResContractors(serializers.Serializer):
     prices = serializers.DictField()
     distance = serializers.FloatField()
     contractorCoordinates = serializers.ListField(child=serializers.FloatField(), required=False)
+    verified = serializers.BooleanField(required=False) # AM service only
+    groups = serializers.ListField(child=serializers.IntegerField(), required=False) # AM service only
 
 
 #########################################################################

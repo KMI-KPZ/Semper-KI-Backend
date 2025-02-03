@@ -49,7 +49,7 @@ class Costs():
         self.detailedCalculations = {} # contains all information about every calculation here, will be encrypted and saved in the process
 
         # From Organization (do only once)
-        organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["orgaID"])
+        organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["contractor"][0])
         if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME):
             orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
 
@@ -177,7 +177,7 @@ class Costs():
             self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From Printer
-            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["orgaID"], groupID)
+            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["contractor"][0], groupID)
             self.listOfValuesForEveryPrinter = []
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["printerParameters"] = []
             for printer in viablePrintersOfTheManufacturer:
@@ -684,6 +684,9 @@ class Costs():
         try: 
             costsPerGroup = []
             for groupIdx, group in enumerate(self.processObj.serviceDetails[ServiceDetails.groups]):
+                if groupIdx not in self.additionalArguments["contractor"][2]:
+                    costsPerGroup.append((0., 0.))
+                    continue
                 self.detailedCalculations[ServiceDetails.groups.value] = [{} for _ in range(len(self.processObj.serviceDetails[ServiceDetails.groups.value]))]
                 retVal = self.fetchInformation(groupIdx, group)
                 if retVal is not None:

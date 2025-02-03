@@ -139,7 +139,7 @@ def userUpdatedSemperKI(userHashID:str, session, updates):
         user, _ = ProfileManagementBase.getUserViaHash(userHashID)
         existingDetails = copy.deepcopy(user.details)
 
-        if UserDetails.addresses in updates:
+        if UserUpdateType.address in updates:
             if UserDetails.addresses in existingDetails:
                 for addressID, address in existingDetails[UserDetails.addresses].items():
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
@@ -237,7 +237,7 @@ def orgaUpdatedSemperKI(orgaHashID:str, session, updates):
         if isinstance(orga, Exception):
             raise orga
         existingDetails = copy.deepcopy(orga.details)
-        if OrganizationDetails.addresses in updates:
+        if OrganizationUpdateType.address in updates:
             if OrganizationDetails.addresses in existingDetails:
                 for addressID, address in existingDetails[OrganizationDetails.addresses].items():
                     coordsOfAddress = asyncio.run(fetchCoordinates(address))
