@@ -38,7 +38,7 @@ class Costs():
     """
 
     ##################################################
-    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:Filter) -> None:
+    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:Filter, apiGivenContent:dict={}) -> None:
         """
         Gather input variables
 
@@ -49,7 +49,11 @@ class Costs():
         self.detailedCalculations = {} # contains all information about every calculation here, will be encrypted and saved in the process
 
         # From Organization (do only once)
-        organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["contractor"][0])
+        organization = {}
+        if apiGivenContent == {}:
+            organization = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=self.additionalArguments["contractor"][0])
+        else:
+            organization = apiGivenContent["organization"]
         if checkIfNestedKeyExists(organization, OrganizationDescription.details, OrganizationDetails.services, SERVICE_NAME):
             orgaParameters = organization[OrganizationDescription.details][OrganizationDetails.services][SERVICE_NAME]
 
@@ -158,7 +162,7 @@ class Costs():
         treatmentCostsPostProcessing = enum.auto()
 
     ##################################################
-    def fetchInformation(self, groupID, group) -> None|Exception:
+    def fetchInformation(self, groupID, group, apiGivenContent:dict={}) -> None|Exception:
         """
         Fetch information about everything
         
@@ -177,14 +181,22 @@ class Costs():
             self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
             # From Printer
-            viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["contractor"][0], groupID)
+            if apiGivenContent == {}:
+                viablePrintersOfTheManufacturer = self.filterObject.getPrintersOfAContractor(self.additionalArguments["contractor"][0], groupID)
+            else:
+                viablePrintersOfTheManufacturer = apiGivenContent["printers"]
             self.listOfValuesForEveryPrinter = []
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["printerParameters"] = []
             for printer in viablePrintersOfTheManufacturer:
                 valuesForThisPrinter = {}
                 # get technology
-                technologies = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)
-                technology = technologies[0][pgKG.NodeDescription.nodeName] if len(technologies) > 0 else "Material Extrusion"
+                technology = "Material Extrusion"
+                if apiGivenContent == {}:
+                    technologies = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)
+                    technology = technologies[0][pgKG.NodeDescription.nodeName] if len(technologies) > 0 else "Material Extrusion"
+                else:
+                    technology = printer["technology"]
+                
                 valuesForThisPrinter[self.PrinterValues.technology.value] = technology
                 propertiesOfPrinter = printer[pgKG.NodeDescription.properties]
                 for entry in propertiesOfPrinter:
@@ -203,7 +215,7 @@ class Costs():
                         case NodePropertiesAMPrinter.machineBatchDistance:
                             valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = float(value)
                         case NodePropertiesAMPrinter.possibleLayerHeights:
-                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = float(value.split(",")[0])
+                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [float(x) for x in value.split(",")].sort(reverse=True)
                         case NodePropertiesAMPrinter.machineSurfaceArea:
                             valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = float(value)
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
@@ -242,7 +254,7 @@ class Costs():
                 if NodePropertiesAMPrinter.machineBatchDistance not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = 10
                 if NodePropertiesAMPrinter.possibleLayerHeights not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.layerThickness.value] = 75
+                    valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [75.]
                 if NodePropertiesAMPrinter.machineSurfaceArea not in propertiesOfPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = 1.8
                 if NodePropertiesAMPrinter.simpleMachineSetUp not in propertiesOfPrinter:
@@ -284,7 +296,7 @@ class Costs():
 
 
     ##################################################
-    def calculateCostsForBatches(self, groupID, modelID, printerIdx, printer:dict, exposureTime:float, partLength:float, partHeight:float, partWidth:float, partQuantity:int) -> tuple:
+    def calculateCostsForBatches(self, groupID, modelID, printerIdx, printer:dict, exposureTime:float, partLength:float, partHeight:float, partWidth:float, partQuantity:int, layerThickness:float) -> tuple:
         """
         Calculate the costs for the batches
         
@@ -358,14 +370,14 @@ class Costs():
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["belichtungszeit_batch"] = belichtungszeit_batch
 
             # C105 - Beschichtungszeit Batch ==(AUFRUNDEN(((C2*1000)/C77);0)*C94)/3600
-            beschichtungszeit_batch = (math.ceil((printer[self.PrinterValues.buildChamberHeight] * 1000.) / printer[self.PrinterValues.layerThickness]) * printer[self.PrinterValues.coatingTime]) / 3600.
+            beschichtungszeit_batch = (math.ceil((printer[self.PrinterValues.buildChamberHeight] * 1000.) / layerThickness) * printer[self.PrinterValues.coatingTime]) / 3600.
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["beschichtungszeit_batch"] = beschichtungszeit_batch
 
             # C106 - Beschichtungszeit Quantity =((AUFRUNDEN((((((C2-C30)*(C22-1))+(C2-C31))*1000)/C77);0)*C94)/3600)
             beschichtungszeit_quantity = ((math.ceil((((((
                                         printer[self.PrinterValues.buildChamberHeight] - height_offset_first_batch_n_1) * (
                                         min_batch_quantity - 1)) + (
-                                        printer[self.PrinterValues.buildChamberHeight] - height_offset_last_batch_n)) * 1000.) / printer[self.PrinterValues.layerThickness])) * printer[self.PrinterValues.coatingTime]) / 3600.)
+                                        printer[self.PrinterValues.buildChamberHeight] - height_offset_last_batch_n)) * 1000.) / layerThickness)) * printer[self.PrinterValues.coatingTime]) / 3600.)
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["beschichtungszeit_quantity"] = beschichtungszeit_quantity
 
             # C79 - Druckdauer Batch =C105+C108
@@ -519,6 +531,20 @@ class Costs():
                 totalCostsForEveryPrinter = []
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"] = [{} for _ in range(len(self.listOfValuesForEveryPrinter))]
                 for printerIdx, printer in enumerate(self.listOfValuesForEveryPrinter):
+                    
+                    # calculate layer thickness corresponding to the levelOfDetail
+                    layerThicknessArrayLength = len(printer[self.PrinterValues.layerThickness])
+                    layerThickness = 75. # default value
+                    match levelOfDetail:
+                        case 0:
+                            layerThickness = printer[self.PrinterValues.layerThickness][0]
+                        case 1:
+                            layerThickness = printer[self.PrinterValues.layerThickness][int(math.ceil(layerThicknessArrayLength / 2)) - 1]
+                        case 2:
+                            layerThickness = printer[self.PrinterValues.layerThickness][layerThicknessArrayLength - 1]
+                            
+                    
+                        
 
                     printingSpeedForMaterialAndPrinter = self.minimalPrintingSpeed
                     # if extrusion printer and build rate is not set, calculate it
@@ -529,13 +555,13 @@ class Costs():
                     buildRateForThisPrinter = 0
                     if printer[self.PrinterValues.technology] == "Material Extrusion":
                         if self.PrinterValues.buildRate not in printer:
-                            buildRateForThisPrinter = (printer[self.PrinterValues.nozzleDiameter] / 10. )* (printer[self.PrinterValues.layerThickness] / 10000.) * printingSpeedForMaterialAndPrinter # converted values to cm so that unit is cm^3/h
+                            buildRateForThisPrinter = (printer[self.PrinterValues.nozzleDiameter] / 10. )* (layerThickness / 10000.) * printingSpeedForMaterialAndPrinter # converted values to cm so that unit is cm^3/h
                         else:
                             buildRateForThisPrinter = printer[self.PrinterValues.buildRate]
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["buildRateForThisPrinter"] = buildRateForThisPrinter
 
                     # C81 - schichten_part =AUFRUNDEN((C15*1000)/C77;0)
-                    schichten_part =  math.ceil((partHeight * 1000) / printer[self.PrinterValues.layerThickness])
+                    schichten_part =  math.ceil((partHeight * 1000) / layerThickness)
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["schichten_part"] = schichten_part
 
                     # C89 - Flächennutzung der Maschine =AUFRUNDEN(C88*1,25;0) - Flächenfaktormethode nach Rockstroh ca. +25%
@@ -586,7 +612,7 @@ class Costs():
                     belichtungszeit_ein_teil = (printer[self.PrinterValues.coatingTime]  * schichten_part) / 3600.
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["belichtungszeit_ein_teil"] = belichtungszeit_ein_teil
 
-                    print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(groupID, modelID, printerIdx, printer, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity)
+                    print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(groupID, modelID, printerIdx, printer, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity, layerThickness)
 
                     listOfCostsForMaterial = self.calculateCostsForMaterial(groupID, modelID, printerIdx, printer, theo_max_parts_per_batch, partVolume, partQuantity, productComplexity)
 
@@ -676,19 +702,20 @@ class Costs():
             return e
     
     ####################################################################################################
-    def calculateCosts(self) -> list[tuple[float,float]]|Exception:
+    def calculateCosts(self, apiGivenValues:dict={}) -> list[tuple[float,float]]|Exception:
         """
         Calculate all costs
         
         """
         try: 
             costsPerGroup = []
-            for groupIdx, group in enumerate(self.processObj.serviceDetails[ServiceDetails.groups]):
-                if groupIdx not in self.additionalArguments["contractor"][2]:
+            content = self.processObj.serviceDetails[ServiceDetails.groups.value] if apiGivenValues == {} else apiGivenValues[ServiceDetails.groups.value] 
+            self.detailedCalculations[ServiceDetails.groups.value] = [{} for _ in range(len(content))]
+            for groupIdx, group in enumerate(content):
+                if apiGivenValues == {} and "contractor" in self.additionalArguments and groupIdx not in self.additionalArguments["contractor"][2]:
                     costsPerGroup.append((0., 0.))
                     continue
-                self.detailedCalculations[ServiceDetails.groups.value] = [{} for _ in range(len(self.processObj.serviceDetails[ServiceDetails.groups.value]))]
-                retVal = self.fetchInformation(groupIdx, group)
+                retVal = self.fetchInformation(groupIdx, group, apiGivenContent=apiGivenValues)
                 if retVal is not None:
                     raise retVal
                 printerCostDict = self.calculateCostsForPrinter(groupIdx, group)
@@ -700,7 +727,10 @@ class Costs():
                 
                 postProcessingsCosts = numpy.sum(postProcessingCostList)
                 marginOrganization = 1. + self.organizationMargin/100.
+                self.detailedCalculations[ServiceDetails.groups.value][groupIdx]["marginOrganization"] = marginOrganization
+                
                 marginPlattform = 1. + PLATFORM_MARGIN/100.
+                self.detailedCalculations[ServiceDetails.groups.value][groupIdx]["marginPlattform"] = marginPlattform
 
                 maximumCosts = [0., 0., 0.] # part, quantity, batch
                 minimumCosts = [sys.float_info.max, sys.float_info.max, sys.float_info.max]
@@ -734,6 +764,10 @@ class Costs():
                             maximumCosts[i] = maximumCostsThisFile[i]
                         if minimumCostsThisFile[i] < minimumCosts[i]:
                             minimumCosts[i] = minimumCostsThisFile[i]
+
+                    self.detailedCalculations[ServiceDetails.groups.value][groupIdx][fileID] = {}
+                    self.detailedCalculations[ServiceDetails.groups.value][groupIdx][fileID]["maximumCostsThisFile"] = maximumCostsThisFile
+                    self.detailedCalculations[ServiceDetails.groups.value][groupIdx][fileID]["minimumCostsThisFile"] = minimumCostsThisFile
                     
 
                 totalCosts = [(minimumCosts[0]*marginOrganization*marginPlattform, maximumCosts[0]*marginOrganization*marginPlattform), (minimumCosts[1]*marginOrganization*marginPlattform, maximumCosts[1]*marginOrganization*marginPlattform), (minimumCosts[2]*marginOrganization*marginPlattform, maximumCosts[2]*marginOrganization*marginPlattform)]
@@ -744,6 +778,7 @@ class Costs():
                     if numpy.isnan(right) or not numpy.isfinite(right):
                         right = -1.
                     totalCosts[i] = (left, right)
+                self.detailedCalculations[ServiceDetails.groups.value][groupIdx]["totalCosts"] = totalCosts
                 costsPerGroup.append(totalCosts[1]) # return the costs for quantity
                 
             return costsPerGroup
@@ -760,3 +795,26 @@ class Costs():
         :rtype: str
         """
         return encryptObjectWithAES(settings.AES_ENCRYPTION_KEY,self.detailedCalculations)
+    
+
+##################################################
+def logicForCosts(apiGivenValues:dict={}) -> dict|Exception:
+    """
+    Logic for the costs
+
+    :param apiGivenValues: the values given by the api
+    :type apiGivenValues: dict
+    :return: the costs
+    :rtype: list[tuple[float,float]]
+    """
+    try:
+        costsObj = Costs({}, {}, {}, apiGivenValues)
+        costs = costsObj.calculateCosts(apiGivenValues)
+        if isinstance(costs, Exception):
+            raise costs
+        detailedCalculations = costsObj.detailedCalculations
+        outDict = {"costs": costs, "detailedCalculations": detailedCalculations}
+        return outDict, 200
+    except Exception as e:
+        loggerError.error("Error in logicForCosts: " + str(e))
+        return e, 500

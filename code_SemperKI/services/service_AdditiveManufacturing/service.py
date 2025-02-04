@@ -13,7 +13,7 @@ from .connections.postgresql.pgService import initializeService as AM_initialize
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER, ServiceSpecificDetailsForContractors
-from .logics.costs import Costs
+from .logics.costsLogic import Costs
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):

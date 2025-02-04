@@ -22,7 +22,7 @@ Including another URLconf
 from django.urls import path
 
 from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification
-from .handlers.public import materials, checkService, filter, model, postProcessings
+from .handlers.public import materials, checkService, filter, model, postProcessings, costs
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -43,6 +43,7 @@ newPaths = {
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
     "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
+    "updateModel": ("public/service/additive-manufacturing/model/update/", model.updateModel),
     "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:fileID>/",model.deleteModel),
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
     #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
@@ -106,6 +107,7 @@ newPaths = {
     "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
     "apiExtractPDFsTest": ("public/api/extractFromJSON/", pdfPipeline.extractFromJSON),
     "loadInitGraphViaAPI": ("public/api/graph/loadInitGraph/", kgDBAM.loadInitGraphViaAPI),
+    "apiCalculateCosts": ("public/api/calculateCosts/", costs.apiCalculateCosts),
 }
 
 # add paths

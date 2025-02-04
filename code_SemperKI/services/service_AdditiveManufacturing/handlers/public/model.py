@@ -253,6 +253,84 @@ def uploadModelWithoutFile(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
+class SReqUpdateModel(serializers.Serializer):
+    projectID = serializers.CharField(max_length=513)
+    processID = serializers.CharField(max_length=513)
+    groupID = serializers.IntegerField()
+    fileID = serializers.CharField(max_length=513)
+    levelOfDetail = serializers.FloatField()
+    quantity = serializers.IntegerField()
+    isFile = serializers.BooleanField()
+    tags = serializers.ListField(child=serializers.CharField(allow_blank=True, required=False), required=False, allow_empty=True)
+    licenses = serializers.ListField(child=serializers.CharField(allow_blank=True, required=False), required=False, allow_empty=True)
+    certificates = serializers.ListField(child=serializers.CharField(allow_blank=True, required=False), required=False, allow_empty=True)
+    fileName = serializers.CharField(max_length=200, required=False)
+    complexity = serializers.IntegerField(required=False)
+    width = serializers.FloatField(required=False)
+    height = serializers.FloatField(required=False)
+    length = serializers.FloatField(required=False)
+    volume = serializers.FloatField(required=False)
+    scalingFactor = serializers.FloatField(required=False)
+#######################################################
+@extend_schema(
+    summary="Update a model",
+    description=" ",
+    tags=['FE - AM Models'],
+    request=SReqUpdateModel,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["PATCH"])
+@api_view(["PATCH"])
+@checkVersion(0.3)
+def updateModel(request:Request):
+    """
+    Update a model
+
+    :param request: PATCH Request
+    :type request: HTTP PATCH
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        inSerializer = SReqUpdateModel(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {updateModel.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        retVal, value = logicForUpdateModel(request, validatedInput)
+        if retVal is not None:
+            message = str(retVal)
+            loggerError.error(retVal)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": retVal})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=value)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {updateModel.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
 @extend_schema(
     summary="Delete the model and the file with it, if not done already",
     description=" ",
