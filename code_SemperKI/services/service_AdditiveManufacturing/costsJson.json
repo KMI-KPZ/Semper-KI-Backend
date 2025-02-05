@@ -1,74 +1,62 @@
 {
 	"organization": {
-		"details":
-		{
-			"services": {
-				"ADDITIVE_MANUFACTURING":
-				[
-					{"key":"powerCosts", "value": 0.17, "unit": "€/kWh"},
-					{"key":"margin", "value": 10, "unit": "%"},
-					{"key":"personnelCosts", "value": 0, "unit": "€/h"},
-					{"key":"costRatePersonnelEngineering", "value": 35, "unit": "€/h" },
-					{"key":"repairCosts", "value": 0.025, "unit": "%" },
-					{"key":"additionalFixedCosts", "value": 0, "unit": "€" },
-					{"key":"costRateEquipmentEngineering", "value": 2, "unit": "€/h" },
-					{"key":"fixedCostsEquipmentEngineering", "value": 2, "unit": "€/kWh" },
-					{"key":"safetyGasCosts", "value": 20, "unit": "€/h" },
-					{"key":"roomCosts", "value": 14.5, "unit": "€/m²" }
-				]
-			}
-		}
+	  "powerCosts": "0.17 €/kWh",
+	  "margin": "10 %",
+	  "personnelCosts": "0 €/h",
+	  "costRatePersonnelEngineering": "35 €/h",
+	  "repairCosts": "0.025 %",
+	  "additionalFixedCosts": "0 €",
+	  "costRateEquipmentEngineering": "2 €/h",
+	  "fixedCostsEquipmentEngineering": "2 €/kWh",
+	  "safetyGasCosts": "20 €/h",
+	  "roomCosts": "14.5 €/m²"
 	},
-	"groups": [
-		{
-			"material": {
-				"density": 4.43,
-				"printingSpeed": 60,
-				"acquisitionCosts": 400
-			},
-			"postProcessings": {
-					"dummyPostProcessing_1": {
-						"fixedCostsPostProcessing": 0,
-						"treatmentCostsPostProcessing": 0
-					}
-			},
-			"models": {
-				"dummyModel_1": {
-					"levelOfDetail": 2,
-					"isFile": false,
-					"quantity": 1,
-					"complexity": 1,
-					"height": 100,
-					"length": 100,
-					"width": 100,
-					"volume": 1000000,
-					"id": "dummyModel_1"
-				}
-			}
-		}
-	],
+	"material": {
+	  "density": "4.43 g/cm³",
+	  "printingSpeed": "60 cm/h",
+	  "acquisitionCosts": "400 €"
+	},
+	"postProcessings": {
+	  "cleaning": {
+		"fixedCostsPostProcessing": "0 €",
+		"treatmentCostsPostProcessing": "0 €"
+	  }
+	},
+	"models": {
+	  "testModel_1": {
+		"levelOfDetail": 1,
+		"quantity": 1,
+		"complexity": 1,
+		"height": "100 mm",
+		"length": "100 mm",
+		"width": "100 mm",
+		"volume": "1000000 mm³",
+		"id": "testModel_1"
+	  }
+	},
 	"printers": [
-		{
-			"technology": "Powder Bed Fusion",
-			"properties": [
-				{"name": "costRatePersonalMachine", "value": "26"},
-				{"name": "chamberBuildHeight", "value": "500"},
-				{"name": "chamberBuildWidth", "value": "500"},
-				{"name": "chamberBuildLength", "value": "500"},
-				{"name": "lossOfMaterial", "value": "30"},
-				{"name": "machineBatchDistance", "value": "10"},
-				{"name": "possibleLayerHeights", "value": "75, 30, 15"},
-				{"name": "machineSurfaceArea", "value": "1.8"},
-				{"name": "simpleMachineSetUp", "value": "1"},
-				{"name": "complexMachineSetUp", "value": "2"},
-				{"name": "averagePowerConsumption", "value": "5"},
-				{"name": "machineUsageCosts", "value": "51.8"},
-				{"name": "coatingTime", "value": "9"},
-				{"name": "buildRate", "value": "50"},
-				{"name": "fillRate", "value": "100"},
-				{"name": "nozzleDiameter", "value": "0.4"},
-				{"name": "maxPrintingSpeed", "value": "60"}
-			]
-		}
+	  {
+		"technology": "Powder Bed Fusion",
+		"properties": 
+		  {
+			"costRatePersonalMachine": "26 €/h",
+			"chamberBuildHeight": "500 mm",
+			"chamberBuildWidth": "500 mm",
+			"chamberBuildLength": "500 mm",
+			"lossOfMaterial": "30 %",
+			"machineBatchDistance": "10 mm",
+			"possibleLayerHeights": "75, 30, 15",
+			"machineSurfaceArea": "1.8 m²",
+			"machineSetUpSimple": "1",
+			"machineSetUpComplex": "2",
+			"averagePowerConsumption": "5 €/kWh",
+			"machineUsageCosts": "51.8 €/h",
+			"coatingTime": "9 h",
+			"buildRate": "50 cm³/h",
+			"fillRate": "100 %",
+			"nozzleDiameter": "0.4 mm",
+			"maxPrintingSpeed": "60 cm/h"
+		  }
+	  }
 	]
 }

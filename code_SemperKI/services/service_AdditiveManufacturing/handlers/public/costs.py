@@ -33,96 +33,71 @@ from ...logics.costsLogic import logicForCosts
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 #######################################################
-#######################################################
-class SReqCostsAddManValues(serializers.Serializer):
-    key = serializers.CharField(max_length=200)
-    value = serializers.FloatField()
-    unit = serializers.CharField(max_length=200)
-
-# #######################################################
-# class SReqAddManValues(serializers.Serializer):
-#     powerCosts = serializers.FloatField()
-#     margin = serializers.FloatField()
-#     personnelCosts = serializers.FloatField()
-#     costRatePersonnelEngineering = serializers.FloatField()
-#     repairCosts = serializers.FloatField()
-#     additionalFixedCosts = serializers.FloatField()
-#     costRateEquipmentEngineering = serializers.FloatField()
-#     fixedCostsEquipmentEngineering = serializers.FloatField()
-#     safetyGasCosts = serializers.FloatField()
-#     roomCosts = serializers.FloatField()
-#######################################################
-class SReqCostsAdditiveManufacturing(serializers.Serializer):
-    ADDITIVE_MANUFACTURING = serializers.ListField(child=SReqCostsAddManValues())
-#######################################################
-class SReqCostsServices(serializers.Serializer):
-    services = SReqCostsAdditiveManufacturing()
-#######################################################
 class SReqCostsOrgaDetails(serializers.Serializer):
-    details = SReqCostsServices()
+    powerCosts = serializers.CharField(max_length=200, default="0.17 €/kWh")
+    margin = serializers.CharField(max_length=200, default="10 %")
+    personnelCosts = serializers.CharField(max_length=200, default="0 €/h")
+    costRatePersonnelEngineering = serializers.CharField(max_length=200, default="35 €/h")
+    repairCosts = serializers.CharField(max_length=200, default="0.025 %")
+    additionalFixedCosts = serializers.CharField(max_length=200, default="0 €")
+    costRateEquipmentEngineering = serializers.CharField(max_length=200, default="2 €/h")
+    fixedCostsEquipmentEngineering = serializers.CharField(max_length=200, default="2 €/kWh")
+    safetyGasCosts = serializers.CharField(max_length=200, default="20 €/h")
+    roomCosts = serializers.CharField(max_length=200, default="14.5 €/m²")
 
 #######################################################
 class SReqCostsMaterial(serializers.Serializer):
-    density = serializers.FloatField()
-    printingSpeed = serializers.FloatField()
-    acquisitionCosts = serializers.FloatField()
+    density = serializers.CharField(max_length=200, default="4.43 g/cm³")
+    printingSpeed = serializers.CharField(max_length=200, default="60 cm/h")
+    acquisitionCosts = serializers.CharField(max_length=200, default="400 €")
 
 #######################################################
 class SReqCostsPostProcessings(serializers.Serializer):
-    fixedCostsPostProcessing = serializers.FloatField()
-    treatmentCostsPostProcessing = serializers.FloatField()
+    fixedCostsPostProcessing = serializers.CharField(max_length=200, default="0 €")
+    treatmentCostsPostProcessing = serializers.CharField(max_length=200, default="0 €")
 
 #######################################################
 class SReqCostsModels(serializers.Serializer):
-    levelOfDetail = serializers.FloatField()
-    isFile = serializers.FloatField()
-    quantity = serializers.FloatField()
-    complexity = serializers.FloatField()
-    height = serializers.FloatField()
-    length = serializers.FloatField()
-    width = serializers.FloatField()
-    volume = serializers.FloatField()
-    id = serializers.CharField(max_length=200)
+    levelOfDetail = serializers.IntegerField(default=1)
+    quantity = serializers.IntegerField(default=1)
+    complexity = serializers.IntegerField(default=1)
+    height = serializers.CharField(max_length=200, default="100 mm")
+    length = serializers.CharField(max_length=200, default="100 mm")
+    width = serializers.CharField(max_length=200, default="100 mm")
+    volume = serializers.CharField(max_length=200, default="1000000 mm³")
+    id = serializers.CharField(max_length=200, default="testModel_1")
 
 #######################################################
-class SReqCostsGroups(serializers.Serializer):
-    material = SReqCostsMaterial()
-    postProcessings = serializers.DictField(child=SReqCostsPostProcessings())
-    models = serializers.DictField(child=SReqCostsModels())
-
-#######################################################
-class SReqCostsPrinterProperties(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    value = serializers.CharField(max_length=200)
-# #######################################################
-# class SReqCostsProperties(serializers.Serializer):
-#     costRatePersonalMachine = serializers.FloatField()
-#     buildChamberHeight = serializers.FloatField()
-#     buildChamberLength = serializers.FloatField()
-#     buildChamberWidth = serializers.FloatField()
-#     machineMaterialLoss = serializers.FloatField()
-#     machineBatchDistance = serializers.FloatField()
-#     layerThickness = serializers.CharField(max_length=200)
-#     machineSurfaceArea = serializers.FloatField()
-#     machineSetUpSimple = serializers.FloatField()
-#     machineSetUpComplex = serializers.FloatField()
-#     averagePowerConsumption = serializers.FloatField()
-#     machineHourlyRate = serializers.FloatField()
-#     coatingTime = serializers.FloatField()
-#     buildRate = serializers.FloatField()
-#     fillRate = serializers.FloatField()
-#     nozzleDiameter = serializers.FloatField()
-#     maxPrintingSpeed = serializers.FloatField()
+class SReqCostsProperties(serializers.Serializer):
+    costRatePersonalMachine = serializers.CharField(max_length=200, default="26 €/h")
+    chamberBuildHeight = serializers.CharField(max_length=200, default="500 mm")
+    chamberBuildWidth = serializers.CharField(max_length=200, default="500 mm")
+    chamberBuildLength = serializers.CharField(max_length=200, default="500 mm")
+    lossOfMaterial = serializers.CharField(max_length=200, default="30 %")
+    machineBatchDistance = serializers.CharField(max_length=200, default="10 mm")
+    possibleLayerHeights = serializers.CharField(max_length=200, default="75, 30, 15")
+    machineSurfaceArea = serializers.CharField(max_length=200, default="1.8 m²")
+    machineSetUpSimple = serializers.CharField(max_length=200, default="1")
+    machineSetUpComplex = serializers.CharField(max_length=200, default="2")
+    averagePowerConsumption = serializers.CharField(max_length=200, default="5 €/kWh")
+    machineUsageCosts = serializers.CharField(max_length=200, default="51.8 €/h")
+    coatingTime = serializers.CharField(max_length=200, default="9 h")
+    buildRate = serializers.CharField(max_length=200, default="50 cm³/h")
+    fillRate = serializers.CharField(max_length=200, default="100 %")
+    nozzleDiameter = serializers.CharField(max_length=200, default="0.4 mm")
+    maxPrintingSpeed = serializers.CharField(max_length=200, default="60 cm/h")
 
 #######################################################
 class SReqCostsPrinters(serializers.Serializer):
-    technology = serializers.CharField(max_length=200)
-    properties = serializers.ListField(child=SReqCostsPrinterProperties())
+    technology = serializers.CharField(max_length=200, default="Powder Bed Fusion")
+    properties = SReqCostsProperties()
 
 #######################################################
 class SReqCosts(serializers.Serializer):
     organization = SReqCostsOrgaDetails()
-    groups = serializers.ListField(child=SReqCostsGroups())
+    material = SReqCostsMaterial()
+    postProcessings = serializers.DictField(child=SReqCostsPostProcessings())#, default={"testPostProcessing_1": SReqCostsPostProcessings()})
+    models = serializers.DictField(child=SReqCostsModels())#, default={"testModel_1": SReqCostsModels()})
     printers = serializers.ListField(child=SReqCostsPrinters())
 
 #######################################################

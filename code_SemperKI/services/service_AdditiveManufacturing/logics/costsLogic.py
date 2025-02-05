@@ -303,97 +303,97 @@ class Costs():
         """
         try:
             # C09 - Calculation of max. printed parts in z-dimension, batch distance is only between the parts, first layer and last layer of the chamber is fully used
-            theo_max_Batch_size_height = math.floor((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) // (partHeight + printer[self.PrinterValues.machineBatchDistance]))
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theo_max_Batch_size_height"] = theo_max_Batch_size_height
+            theoMaxBatchSizeHeight = math.floor((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) // (partHeight + printer[self.PrinterValues.machineBatchDistance]))
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeHeight"] = theoMaxBatchSizeHeight
 
             # C10 - Calculation of max. printed parts in x-dimension, batch distance is  between everything, first layer and last layer of the chamber isnt fully used
-            theo_max_Batch_size_length = math.floor((printer[self.PrinterValues.buildChamberLength] ) // (partLength + printer[self.PrinterValues.machineBatchDistance]))
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theo_max_Batch_size_length"] = theo_max_Batch_size_length
+            theoMaxBatchSizeLength = math.floor((printer[self.PrinterValues.buildChamberLength] ) // (partLength + printer[self.PrinterValues.machineBatchDistance]))
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeLength"] = theoMaxBatchSizeLength
 
             # C11 - Calculation of max. printed parts in y-dimension, batch distance is  between everything, first layer and last layer of the chamber isnt fully used
-            theo_max_Batch_size_width = math.floor((printer[self.PrinterValues.buildChamberWidth] ) // (partWidth + printer[self.PrinterValues.machineBatchDistance]))
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theo_max_Batch_size_width"] = theo_max_Batch_size_width
+            theoMaxBatchSizeWidth = math.floor((printer[self.PrinterValues.buildChamberWidth] ) // (partWidth + printer[self.PrinterValues.machineBatchDistance]))
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeWidth"] = theoMaxBatchSizeWidth
 
             # C12 - Calculation of max. printed parts in xy-plain
-            theo_max_batch_size_xy = theo_max_Batch_size_length * theo_max_Batch_size_width
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theo_max_batch_size_xy"] = theo_max_batch_size_xy
+            theoMaxBatchSizeXY = theoMaxBatchSizeLength * theoMaxBatchSizeWidth
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizexy"] = theoMaxBatchSizeXY
 
             # C13 - Calculation of max. printed parts in chamber
-            theo_max_parts_per_batch = theo_max_batch_size_xy * theo_max_Batch_size_height
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theo_max_parts_per_batch"] = theo_max_parts_per_batch
+            theoMaxPartsPerBatch = theoMaxBatchSizeXY * theoMaxBatchSizeHeight
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxPartsPerBatch"] = theoMaxPartsPerBatch
 
             # C18 - Resulting Bounding-Box volume of x,y,z with batch distance in each dimension
             #volume_bounding_box = (self.partHeight + machineBatchDistance) * (partLength + machineBatchDistance) * (partWidth + machineBatchDistance)
 
             # C22 - How many batches you need at least to print the quanitity
-            min_batch_quantity = math.ceil(partQuantity / theo_max_parts_per_batch)
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["min_batch_quantity"] = min_batch_quantity
+            minBatchQuantity = math.ceil(partQuantity / theoMaxPartsPerBatch)
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["minBatchQuantity"] = minBatchQuantity
 
             # C23 - Shows how many parts could be printed in the last batch
-            all_unused_batch = min_batch_quantity * theo_max_parts_per_batch - partQuantity
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["all_unused_batch"] = all_unused_batch
+            allUnusedBatch = minBatchQuantity * theoMaxPartsPerBatch - partQuantity
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["allUnusedBatch"] = allUnusedBatch
 
             # C24 - Shows how many bounding boxes in z-dimension is unused
-            unused_batch_size_height = all_unused_batch // theo_max_batch_size_xy
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["unused_batch_size_height"] = unused_batch_size_height
+            unusedBatchSizeHeight = allUnusedBatch // theoMaxBatchSizeXY
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["unusedBatchSizeHeight"] = unusedBatchSizeHeight
 
             # C25 - Shows how many bounding boxes in z-dimension is used
-            used_batch_size_height = theo_max_Batch_size_height - unused_batch_size_height
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["used_batch_size_height"] = used_batch_size_height
+            usedBatchSizeHeight = theoMaxBatchSizeHeight - unusedBatchSizeHeight
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["usedBatchSizeHeight"] = usedBatchSizeHeight
 
             # C27 - Shows how many bounding boxes in the xy-plain is used
-            used_batch_size_xz = (theo_max_Batch_size_length * theo_max_Batch_size_width) if partQuantity % theo_max_batch_size_xy == 0 else partQuantity % theo_max_batch_size_xy
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["used_batch_size_xz"] = used_batch_size_xz
+            usedBatchSizeXZ = (theoMaxBatchSizeLength * theoMaxBatchSizeWidth) if partQuantity % theoMaxBatchSizeXY == 0 else partQuantity % theoMaxBatchSizeXY
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["usedBatchSizeXZ"] = usedBatchSizeXZ
 
             # C26 - Shows how many bounding boxes in the xy-plain is unused
-            unused_batch_size_xz = theo_max_batch_size_xy - used_batch_size_xz
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["unused_batch_size_xz"] = unused_batch_size_xz
+            unusedBatchSizeXZ = theoMaxBatchSizeXY - usedBatchSizeXZ
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["unusedBatchSizeXZ"] = unusedBatchSizeXZ
 
             # C28 - Checks if used bounding boxes are the same as the part quantity
-            quantity_check = partQuantity == min_batch_quantity * theo_max_Batch_size_height * theo_max_batch_size_xy - unused_batch_size_height * theo_max_batch_size_xy - unused_batch_size_xz
-            if quantity_check == False:
+            quantityCheck = partQuantity == minBatchQuantity * theoMaxBatchSizeHeight * theoMaxBatchSizeXY - unusedBatchSizeHeight * theoMaxBatchSizeXY - unusedBatchSizeXZ
+            if quantityCheck is False:
                 raise ValueError("Quantity check failed")
 
             # C30 - Calculates the summ of all unused heigth of the chamber in mm for all batches excluding batch n
-            height_offset_first_batch_n_1 = ((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * theo_max_Batch_size_height) * (min_batch_quantity - 1)
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["height_offset_first_batch_n_1"] = height_offset_first_batch_n_1
+            heightOffsetFirstBatchN1 = ((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * theoMaxBatchSizeHeight) * (minBatchQuantity - 1)
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["heightOffsetFirstBatchN1"] = heightOffsetFirstBatchN1
 
             # C31 - Calculates unused heigth of the chamber in mm for  batch n
-            height_offset_last_batch_n = (printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * used_batch_size_height
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["height_offset_last_batch_n"] = height_offset_last_batch_n
+            heightOffsetLastBatchN = (printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * usedBatchSizeHeight
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["heightOffsetLastBatchN"] = heightOffsetLastBatchN
 
             # C32 - Ratio between used chamber height and unused chamber height over all batches
-            #chamber_height_fillgrade = 1 - ( (height_offset_first_batch_n_1 + height_offset_last_batch_n) / (min_batch_quantity * printer[self.PrinterValues.buildChamberHeight]))
+            #chamberHeightFillgrade = 1 - ( (heightOffsetFirstBatchN1 + heightOffsetLastBatchN) / (minBatchQuantity * printer[self.PrinterValues.buildChamberHeight]))
 
             # C108 - Belichtungszeit Batch =C107*C13
-            belichtungszeit_batch = exposureTime * theo_max_parts_per_batch
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["belichtungszeit_batch"] = belichtungszeit_batch
+            exposureTimeBatch = exposureTime * theoMaxPartsPerBatch
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["exposureTimeBatch"] = exposureTimeBatch
 
             # C105 - Beschichtungszeit Batch ==(AUFRUNDEN(((C2*1000)/C77);0)*C94)/3600
-            beschichtungszeit_batch = (math.ceil((printer[self.PrinterValues.buildChamberHeight] * 1000.) / layerThickness) * printer[self.PrinterValues.coatingTime]) / 3600.
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["beschichtungszeit_batch"] = beschichtungszeit_batch
+            coatingTimeBatch = (math.ceil((printer[self.PrinterValues.buildChamberHeight] * 1000.) / layerThickness) * printer[self.PrinterValues.coatingTime]) / 3600.
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["coatingTimeBatch"] = coatingTimeBatch
 
             # C106 - Beschichtungszeit Quantity =((AUFRUNDEN((((((C2-C30)*(C22-1))+(C2-C31))*1000)/C77);0)*C94)/3600)
-            beschichtungszeit_quantity = ((math.ceil((((((
-                                        printer[self.PrinterValues.buildChamberHeight] - height_offset_first_batch_n_1) * (
-                                        min_batch_quantity - 1)) + (
-                                        printer[self.PrinterValues.buildChamberHeight] - height_offset_last_batch_n)) * 1000.) / layerThickness)) * printer[self.PrinterValues.coatingTime]) / 3600.)
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["beschichtungszeit_quantity"] = beschichtungszeit_quantity
+            coatingTimeQuantity = ((math.ceil((((((
+                                        printer[self.PrinterValues.buildChamberHeight] - heightOffsetFirstBatchN1) * (
+                                        minBatchQuantity - 1)) + (
+                                        printer[self.PrinterValues.buildChamberHeight] - heightOffsetLastBatchN)) * 1000.) / layerThickness)) * printer[self.PrinterValues.coatingTime]) / 3600.)
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["coatingTimeQuantity"] = coatingTimeQuantity
 
             # C79 - Druckdauer Batch =C105+C108
-            print_duration_batch = beschichtungszeit_batch + belichtungszeit_batch
-            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["print_duration_batch"] = print_duration_batch
+            printDurationBatch = coatingTimeBatch + exposureTimeBatch
+            self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["printDurationBatch"] = printDurationBatch
 
             # C103 - Anzahl an Batches C22
-            #anzahl_an_batches = min_batch_quantity
+            #anzahlAnBatches = minBatchQuantity
 
-            return print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch
+            return printDurationBatch, coatingTimeQuantity, minBatchQuantity, theoMaxPartsPerBatch
         except Exception as e:
             loggerError.error("Error in calculateCostsForBatches: " + str(e))
             return e, e, e, e
 
     ##################################################
-    def calculateCostsForMaterial(self, groupID, modelID, printerIdx, printer:dict, theo_max_parts_per_batch:int, partVolume:float, partQuantity:int, productComplexity) -> list:
+    def calculateCostsForMaterial(self, groupID, modelID, printerIdx, printer:dict, theoMaxPartsPerBatch:int, partVolume:float, partQuantity:int, productComplexity) -> list:
         """
         Calculate the costs for every material
 
@@ -406,57 +406,56 @@ class Costs():
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["amountOfMaterial"] = amountOfMaterial
 
                 # C41 - material printing cost for the part
-                material_cost_printing_part = amountOfMaterial * material[self.MaterialValues.priceOfSpecificMaterial]
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["material_cost_printing_part"] = material_cost_printing_part
-
+                materialCostPrintingPart = amountOfMaterial * material[self.MaterialValues.priceOfSpecificMaterial]
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["materialCostPrintingPart"] = materialCostPrintingPart
 
                 # C43 - material printing cost for the quantity
-                material_cost_printing_quantity = material_cost_printing_part * partQuantity
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["material_cost_printing_quantity"] = material_cost_printing_quantity
+                materialCostPrintingQuantity = materialCostPrintingPart * partQuantity
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["materialCostPrintingQuantity"] = materialCostPrintingQuantity
 
                 # C44 - machine material loss for the part
-                cost_machine_material_loss_part = material_cost_printing_part * (printer[self.PrinterValues.machineMaterialLoss] / 100)
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_machine_material_loss_part"] = cost_machine_material_loss_part
+                costMachineMaterialLossPart = materialCostPrintingPart * (printer[self.PrinterValues.machineMaterialLoss] / 100)
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costMachineMaterialLossPart"] = costMachineMaterialLossPart
 
                 # C46 - cost for material loss per quantity
-                cost_machine_material_loss_quantity = cost_machine_material_loss_part * partQuantity
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_machine_material_loss_quantity"] = cost_machine_material_loss_quantity
+                costMachineMaterialLossQuantity = costMachineMaterialLossPart * partQuantity
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costMachineMaterialLossQuantity"] = costMachineMaterialLossQuantity
 
                 # C59 - support structures part rate
                 supportStructuresPartRate = productComplexity*10.
 
                 # C48 - depending on complexity 0 = 0 ; 1 = 10; 2 = 20; 3 = 30
-                cost_support_structures_part = material_cost_printing_part * supportStructuresPartRate/100.
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_support_structures_part"] = cost_support_structures_part
+                costSupportStructuresPart = materialCostPrintingPart * supportStructuresPartRate/100.
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costSupportStructuresPart"] = costSupportStructuresPart
 
                 # C50 - cost for support structures per quantity
-                cost_support_structures_quantity = cost_support_structures_part * partQuantity
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_support_structures_quantity"] = cost_support_structures_quantity
+                costSupportStructuresQuantity = costSupportStructuresPart * partQuantity
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costSupportStructuresQuantity"] = costSupportStructuresQuantity
 
                 # C49 - cost for support structures per batch
-                cost_support_structures_batch = cost_support_structures_part * theo_max_parts_per_batch
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_support_structures_batch"] = cost_support_structures_batch
+                costSupportStructuresBatch = costSupportStructuresPart * theoMaxPartsPerBatch
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costSupportStructuresBatch"] = costSupportStructuresBatch
 
                 # C42 - material printing cost for one batch
-                material_cost_printing_batch = material_cost_printing_part * theo_max_parts_per_batch
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["material_cost_printing_batch"] = material_cost_printing_batch
+                materialCostPrintingBatch = materialCostPrintingPart * theoMaxPartsPerBatch
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["materialCostPrintingBatch"] = materialCostPrintingBatch
 
                 # C45 - cost for material loss per batch
-                cost_machine_material_loss_batch = cost_machine_material_loss_part * theo_max_parts_per_batch
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_machine_material_loss_batch"] = cost_machine_material_loss_batch
+                costMachineMaterialLossBatch = costMachineMaterialLossPart * theoMaxPartsPerBatch
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costMachineMaterialLossBatch"] = costMachineMaterialLossBatch
 
                 # C53 - total material cost for the batch
-                total_material_cost_batch = material_cost_printing_batch + cost_machine_material_loss_batch + cost_support_structures_batch
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["total_material_cost_batch"] = total_material_cost_batch
+                totalMaterialCostBatch = materialCostPrintingBatch + costMachineMaterialLossBatch + costSupportStructuresBatch
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["totalMaterialCostBatch"] = totalMaterialCostBatch
 
                 # C52 - total material cost for the part
-                total_material_cost_part = material_cost_printing_part + cost_machine_material_loss_part + cost_support_structures_part
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["total_material_cost_part"] = total_material_cost_part
+                totalMaterialCostPart = materialCostPrintingPart + costMachineMaterialLossPart + costSupportStructuresPart
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["totalMaterialCostPart"] = totalMaterialCostPart
 
-                total_material_cost_quantity = material_cost_printing_quantity + cost_machine_material_loss_quantity + cost_support_structures_quantity
-                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["total_material_cost_quantity"] = total_material_cost_quantity
+                totalMaterialCostQuantity = materialCostPrintingQuantity + costMachineMaterialLossQuantity + costSupportStructuresQuantity
+                self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["totalMaterialCostQuantity"] = totalMaterialCostQuantity
 
-                totalCostsForEveryMaterial.append( (total_material_cost_part, total_material_cost_quantity, total_material_cost_batch) )
+                totalCostsForEveryMaterial.append( (totalMaterialCostPart, totalMaterialCostQuantity, totalMaterialCostBatch) )
             
             return totalCostsForEveryMaterial
         except Exception as e:
@@ -476,12 +475,12 @@ class Costs():
             for modelID, model in group[ServiceDetails.models].items():
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID] = {}
                 levelOfDetail = model.get(FileObjectContent.levelOfDetail, 1)
-                if FileObjectContent.isFile in model and model[FileObjectContent.isFile] == False:
-                    partQuantity = model[FileObjectContent.quantity]
-                    productComplexity = model[FileContentsAM.complexity]
-                    partHeight = model[FileContentsAM.height]
-                    partLength = model[FileContentsAM.length]
-                    partWidth = model[FileContentsAM.width]
+                if FileObjectContent.isFile in model and model[FileObjectContent.isFile] is False:
+                    partQuantity = model[FileObjectContent.quantity] if model[FileObjectContent.quantity] >= 1 else 1
+                    productComplexity = model[FileContentsAM.complexity] if model[FileContentsAM.complexity] >= 0 else 0
+                    partHeight = model[FileContentsAM.height] if model[FileContentsAM.height] >= 0 else 0
+                    partLength = model[FileContentsAM.length] if model[FileContentsAM.length] >= 0 else 0
+                    partWidth = model[FileContentsAM.width] if model[FileContentsAM.width] >= 0 else 0
                     if FileContentsAM.volume not in model or model[FileContentsAM.volume] == 0:
                         partVolume = partHeight * partLength * partWidth / 1000. # to cm³
                     else:
@@ -561,35 +560,35 @@ class Costs():
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["buildRateForThisPrinter"] = buildRateForThisPrinter
 
                     # C81 - schichten_part =AUFRUNDEN((C15*1000)/C77;0)
-                    schichten_part =  math.ceil((partHeight * 1000) / layerThickness)
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["schichten_part"] = schichten_part
+                    layersPart =  math.ceil((partHeight * 1000) / layerThickness)
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["layersPart"] = layersPart
 
                     # C89 - Flächennutzung der Maschine =AUFRUNDEN(C88*1,25;0) - Flächenfaktormethode nach Rockstroh ca. +25%
-                    flaechennutzung_der_maschine = math.ceil(printer[self.PrinterValues.machineSurfaceArea] * 1.25)
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["flaechennutzung_der_maschine"] = flaechennutzung_der_maschine
+                    machineAreaUsage = math.ceil(printer[self.PrinterValues.machineSurfaceArea] * 1.25)
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machineAreaUsage"] = machineAreaUsage
 
                     # C91 - Flächennutzungskosten =C89*C90
-                    flaechennutzungskosten = flaechennutzung_der_maschine * self.roomCosts
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["flaechennutzungskosten"] = flaechennutzungskosten
+                    areaUsageCosts = machineAreaUsage * self.roomCosts
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["areaUsageCosts"] = areaUsageCosts
 
                     # 92 - Stundensatz für Flächennutzung - Berechnung des Stundensatzes für die Fläche =(C91/30)/24 #TODO (wieso /30 nicht 60)??
-                    stundensatz_fuer_flaechennutzung = (flaechennutzungskosten / 30.) / 24.
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["stundensatz_fuer_flaechennutzung"] = stundensatz_fuer_flaechennutzung
+                    hourlyRateForAreaUsage = (areaUsageCosts / 30.) / 24.
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["hourlyRateForAreaUsage"] = hourlyRateForAreaUsage
 
                     # C96 - Kosten Strom pro Stunde =C83*C82
-                    kosten_strom_pro_stunde = printer[self.PrinterValues.averagePowerConsumption] * self.powerCosts
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["kosten_strom_pro_stunde"] = kosten_strom_pro_stunde
+                    electricityCostPerHour = printer[self.PrinterValues.averagePowerConsumption] * self.powerCosts
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["electricityCostPerHour"] = electricityCostPerHour
 
                     # C68 - cost for personal machine
-                    cost_personal_machine = printer[self.PrinterValues.costRatePersonalMachine] * (printer[self.PrinterValues.machineSetUpSimple] + printer[self.PrinterValues.machineSetUpComplex])
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_personal_machine"] = cost_personal_machine
+                    costPersonalMachine = printer[self.PrinterValues.costRatePersonalMachine] * (printer[self.PrinterValues.machineSetUpSimple] + printer[self.PrinterValues.machineSetUpComplex])
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costPersonalMachine"] = costPersonalMachine
 
                     # C70 - cost personal pre process
-                    cost_personal_pre_process = costPersonalEngineering + cost_personal_machine
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["cost_personal_pre_process"] = cost_personal_pre_process
+                    costPersonalPreProcess = costPersonalEngineering + costPersonalMachine
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costPersonalPreProcess"] = costPersonalPreProcess
 
                     # C72 - cost pre process
-                    costPreProcessTotal = cost_personal_pre_process + costEquipment
+                    costPreProcessTotal = costPersonalPreProcess + costEquipment
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costPreProcessTotal"] = costPreProcessTotal
 
                     # C97 - Allgemeiner Abschreibungssatz =C76
@@ -597,83 +596,82 @@ class Costs():
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["amortizationRate"] = amortizationRate
 
                     # C98 - Reparatur =C97*C84
-                    reparatur = amortizationRate * self.repairCosts
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["reparatur"] = reparatur
+                    repair = amortizationRate * self.repairCosts
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["repair"] = repair
 
                     # C100 - Fläche =C92
-                    flaeche = stundensatz_fuer_flaechennutzung
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["flaeche"] = flaeche
+                    area = hourlyRateForAreaUsage
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["area"] = area
 
                     # C104 - Beschichtungszeit Part =(C81*C94)/3600
-                    beschichtungszeit_part = (schichten_part * printer[self.PrinterValues.coatingTime]) / 3600.
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["beschichtungszeit_part"] = beschichtungszeit_part
+                    coatingDurationPart = (layersPart * printer[self.PrinterValues.coatingTime]) / 3600.
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["coatingDurationPart"] = coatingDurationPart
 
                     # C107 - Belichtungszeit ein Teil =((C94*C81)/3600)
-                    belichtungszeit_ein_teil = (printer[self.PrinterValues.coatingTime]  * schichten_part) / 3600.
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["belichtungszeit_ein_teil"] = belichtungszeit_ein_teil
+                    exposureTimeSinglePart = (printer[self.PrinterValues.coatingTime]  * layersPart) / 3600.
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["exposureTimeSinglePart"] = exposureTimeSinglePart
 
-                    print_duration_batch, beschichtungszeit_quantity, min_batch_quantity, theo_max_parts_per_batch = self.calculateCostsForBatches(groupID, modelID, printerIdx, printer, belichtungszeit_ein_teil, partLength, partHeight, partWidth, partQuantity, layerThickness)
+                    printDurationBatch, coatingTimeQuantity, minBatchQuantity, theoMaxPartsPerBatch = self.calculateCostsForBatches(groupID, modelID, printerIdx, printer, exposureTimeSinglePart, partLength, partHeight, partWidth, partQuantity, layerThickness)
 
-                    listOfCostsForMaterial = self.calculateCostsForMaterial(groupID, modelID, printerIdx, printer, theo_max_parts_per_batch, partVolume, partQuantity, productComplexity)
+                    listOfCostsForMaterial = self.calculateCostsForMaterial(groupID, modelID, printerIdx, printer, theoMaxPartsPerBatch, partVolume, partQuantity, productComplexity)
 
                     # C109 - Belichtungszeit Quantity =((C94*C81)/3600)*C21
-                    belichtungszeit_quantity = ((printer[self.PrinterValues.coatingTime] * schichten_part) / 3600.) * partQuantity
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["belichtungszeit_quantity"] = belichtungszeit_quantity
+                    exposureTimeQuantity = ((printer[self.PrinterValues.coatingTime] * layersPart) / 3600.) * partQuantity
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["exposureTimeQuantity"] = exposureTimeQuantity
 
-                    print_duration_part = beschichtungszeit_part + belichtungszeit_ein_teil
-                    print_duration_quantity = beschichtungszeit_quantity + belichtungszeit_quantity
+                    printDurationPart = coatingDurationPart + exposureTimeSinglePart
+                    printDurationQuantity = coatingTimeQuantity + exposureTimeQuantity
                     if printer[self.PrinterValues.technology] == "Powder Bed Fusion":
                         # C78 - Druckdauer Part =C104+C107
-                        print_duration_part = beschichtungszeit_part + belichtungszeit_ein_teil
-                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["print_duration_part"] = print_duration_part
+                        printDurationPart = coatingDurationPart + exposureTimeSinglePart
+                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["printDurationPart"] = printDurationPart
 
                         # C80 - Druckdauer Quantity =C106+C109
-                        print_duration_quantity = beschichtungszeit_quantity + belichtungszeit_quantity
-                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["print_duration_quantity"] = print_duration_quantity
+                        printDurationQuantity = coatingTimeQuantity + exposureTimeQuantity
+                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["printDurationQuantity"] = printDurationQuantity
                     if printer[self.PrinterValues.technology] == "Material Extrusion":
                         # C78 - Druckdauer Part =C104+C107
-                        print_duration_part = 2.5 * partVolume * printer[self.PrinterValues.fillRate] / buildRateForThisPrinter # the 2.5 is an empirical value
-                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["print_duration_part"] = print_duration_part
+                        printDurationPart = 2.5 * partVolume * printer[self.PrinterValues.fillRate] / buildRateForThisPrinter # the 2.5 is an empirical value
+                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["printDurationPart"] = printDurationPart
 
                         # C80 - Druckdauer Quantity =C106+C109
-                        print_duration_quantity = print_duration_part * partQuantity
-                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["print_duration_quantity"] = print_duration_quantity
+                        printDurationQuantity = printDurationPart * partQuantity
+                        self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["printDurationQuantity"] = printDurationQuantity
 
                     # C99 - Schutzgas =C87
                     safetyGas = self.safetyGasPerHour
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["safetyGas"] = safetyGas
 
                     # C102 =SUMME(C96:C100)
-                    gesamter_maschinenstundensatz = kosten_strom_pro_stunde + amortizationRate + reparatur + safetyGas + flaeche
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["gesamter_maschinenstundensatz"] = gesamter_maschinenstundensatz
+                    totalMachineHourlyRate = electricityCostPerHour + amortizationRate + repair + safetyGas + area
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["totalMachineHourlyRate"] = totalMachineHourlyRate
 
                     # C112 - Maschinenkosten Druckprozess Batch =C79*C102
-                    machine_costs_print_process_batch = print_duration_batch * gesamter_maschinenstundensatz
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machine_costs_print_process_batch"] = machine_costs_print_process_batch
+                    machineCostsPrintProcessBatch = printDurationBatch * totalMachineHourlyRate
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machineCostsPrintProcessBatch"] = machineCostsPrintProcessBatch
 
                     # C111 - Maschinenkosten Druckprozess Part =C78*C102
-                    machine_costs_print_process_part = print_duration_part * gesamter_maschinenstundensatz
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machine_costs_print_process_part"] = machine_costs_print_process_part
+                    machineCostsPrintProcessPart = printDurationPart * totalMachineHourlyRate
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machineCostsPrintProcessPart"] = machineCostsPrintProcessPart
 
                     # C113 - Maschinenkosten Druckprozess Quantity =C80*C102
-                    machine_costs_print_process_quantity = print_duration_quantity * gesamter_maschinenstundensatz
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machine_costs_print_process_quantity"] = machine_costs_print_process_quantity
+                    machineCostsPrintProcessQuantity = printDurationQuantity * totalMachineHourlyRate
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["machineCostsPrintProcessQuantity"] = machineCostsPrintProcessQuantity
 
                     # C114 - Personalkosten Druckprozess =(C22-1)*C68
-                    personalkosten_print_process = (min_batch_quantity - 1) * cost_personal_machine + self.personnelCosts
-                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["personalkosten_print_process"] = personalkosten_print_process
+                    personalkostenPrintProcess = (minBatchQuantity - 1) * costPersonalMachine + self.personnelCosts
+                    self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["personalkostenPrintProcess"] = personalkostenPrintProcess
 
-                    costsTotalForPrinterPart = machine_costs_print_process_part + personalkosten_print_process + costPreProcessTotal + self.additionalFixedCosts
+                    costsTotalForPrinterPart = machineCostsPrintProcessPart + personalkostenPrintProcess + costPreProcessTotal + self.additionalFixedCosts
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costsTotalForPrinterPart"] = costsTotalForPrinterPart
-                    costsTotalForPrinterQuantity = machine_costs_print_process_quantity + personalkosten_print_process + costPreProcessTotal + self.additionalFixedCosts
+                    costsTotalForPrinterQuantity = machineCostsPrintProcessQuantity + personalkostenPrintProcess + costPreProcessTotal + self.additionalFixedCosts
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costsTotalForPrinterQuantity"] = costsTotalForPrinterQuantity
-                    costsTotalForPrinterBatch = machine_costs_print_process_batch + personalkosten_print_process + costPreProcessTotal + self.additionalFixedCosts
+                    costsTotalForPrinterBatch = machineCostsPrintProcessBatch + personalkostenPrintProcess + costPreProcessTotal + self.additionalFixedCosts
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costsTotalForPrinterBatch"] = costsTotalForPrinterBatch
                     # TODO save results in a useful datastructure
                     totalCostsForEveryPrinter.append((costsTotalForPrinterPart, costsTotalForPrinterQuantity, costsTotalForPrinterBatch, listOfCostsForMaterial))
                 
                 printerCostsPerModel[model[FileObjectContent.id]] = totalCostsForEveryPrinter
-            
             return printerCostsPerModel
         except Exception as e:
             loggerError.error("Error in calculateCostsForPrinter: " + str(e))
@@ -808,8 +806,74 @@ def logicForCosts(apiGivenValues:dict={}) -> dict|Exception:
     :rtype: list[tuple[float,float]]
     """
     try:
-        costsObj = Costs({}, {}, {}, apiGivenValues)
-        costs = costsObj.calculateCosts(apiGivenValues)
+        postProcessingObjects = {}
+        for postProcessingID, values in apiGivenValues["postProcessings"].items():
+            postProcessingObjects[postProcessingID] = {}
+            for key, value in values.items():
+                postProcessingObjects[postProcessingID][key] = float(value.split(" ")[0])
+        
+        modelObjects = {}
+        for modelID, values in apiGivenValues["models"].items():
+            modelObjects[modelID] = {}
+            modelObjects[modelID]["isFile"] = False
+            for key, value in values.items():
+                if key == "id":
+                    modelObjects[modelID][key] = value
+                else:
+                    if isinstance(value, int):
+                        modelObjects[modelID][key] = value
+                    else:
+                        modelObjects[modelID][key] = float(value.split(" ")[0])
+
+        printersArray = []
+        for printer in apiGivenValues["printers"]:
+            printerObject = {}
+            printerObject["technology"] = printer["technology"]
+            printerObject["properties"] = []
+            for key, value in printer["properties"].items():
+                if key == "possibleLayerHeights":
+                    printerObject["properties"].append({"name": key, "value": value})
+                    continue
+                printerObject["properties"].append({"name": key, "value": float(value.split(" ")[0])})
+            printersArray.append(printerObject)
+
+        inputDict = {
+            "organization": {
+                "details":
+                {
+                    "services": {
+                        "ADDITIVE_MANUFACTURING":
+                        [
+                            {"key":"powerCosts", "value": float(apiGivenValues["organization"]["powerCosts"].split(" ")[0]), "unit": "€/kWh"},
+                            {"key":"margin", "value": float(apiGivenValues["organization"]["margin"].split(" ")[0]), "unit": "%"},
+                            {"key":"personnelCosts", "value": float(apiGivenValues["organization"]["personnelCosts"].split(" ")[0]), "unit": "€/h"},
+                            {"key":"costRatePersonnelEngineering", "value": float(apiGivenValues["organization"]["costRatePersonnelEngineering"].split(" ")[0]), "unit": "€/h" },
+                            {"key":"repairCosts", "value": float(apiGivenValues["organization"]["repairCosts"].split(" ")[0]), "unit": "%" },
+                            {"key":"additionalFixedCosts", "value": float(apiGivenValues["organization"]["additionalFixedCosts"].split(" ")[0]), "unit": "€" },
+                            {"key":"costRateEquipmentEngineering", "value": float(apiGivenValues["organization"]["costRateEquipmentEngineering"].split(" ")[0]), "unit": "€/h" },
+                            {"key":"fixedCostsEquipmentEngineering", "value": float(apiGivenValues["organization"]["fixedCostsEquipmentEngineering"].split(" ")[0]), "unit": "€/kWh" },
+                            {"key":"safetyGasCosts", "value": float(apiGivenValues["organization"]["safetyGasCosts"].split(" ")[0]), "unit": "€/h" },
+                            {"key":"roomCosts", "value": float(apiGivenValues["organization"]["roomCosts"].split(" ")[0]), "unit": "€/m²" }
+                        ]
+                    }
+                }
+            },
+            "groups": [
+                {
+                    "material": {
+                        "density": float(apiGivenValues["material"]["density"].split(" ")[0]),
+                        "printingSpeed": float(apiGivenValues["material"]["printingSpeed"].split(" ")[0]),
+                        "acquisitionCosts": float(apiGivenValues["material"]["acquisitionCosts"].split(" ")[0])
+                    },
+                    "postProcessings": postProcessingObjects,
+                    "models": modelObjects
+                }
+            ],
+            "printers": printersArray
+        }
+
+        costsObj = Costs({}, {}, {}, inputDict)
+        costs = costsObj.calculateCosts(inputDict)
         if isinstance(costs, Exception):
             raise costs
         detailedCalculations = costsObj.detailedCalculations
