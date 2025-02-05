@@ -10,7 +10,6 @@ from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
 
 from .connections.postgresql.pgService import initializeService as AS_initializeService, updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, isFileRelevantForService as AS_isFileRelevantForService, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
-#from .handlers.public.checkService import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
 from  .logics.checkServiceLogic import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER
@@ -136,8 +135,6 @@ class AfterSales(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        # filter by choice of material, post-processings, build plate, etc...
-        print ("AFTER SALES: getFilteredContractors")
         filteredContractors = Filter()
 
         outList = filteredContractors.getFilteredContractors(processObj)

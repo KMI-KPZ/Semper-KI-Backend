@@ -1320,7 +1320,7 @@ class ProcessManagementBase(AbstractContentInterface):
             if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
                 raise Exception("Not verified yet!")
             
-            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor])
+            contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID])
 
             # Create history entry
             dataID = crypto.generateURLFriendlyRandomString()
