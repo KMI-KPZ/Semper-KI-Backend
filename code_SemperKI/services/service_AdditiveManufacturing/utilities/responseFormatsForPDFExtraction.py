@@ -545,7 +545,8 @@ class MechanicalProperties(BaseModel):
     ultimate_tensile_strength: Optional[UltimateTensileStrength]  
     tensile_modulus: Optional[TensileModulus]  
     elongation_modulus: Optional[ElongationModulus]  
-    elongation_at_break: Optional[ElongationAtBreak]  
+    elongation_at_break: Optional[ElongationAtBreak] 
+    elastic_modulus: Optional[TensileModulus] 
     flexural_strength: Optional[FlexuralStrength]  
     flexural_modulus: Optional[FlexuralModulus]  
 

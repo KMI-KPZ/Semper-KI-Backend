@@ -55,6 +55,7 @@ class NodePropertyDescription(StrEnumExactlyAsDefined):
     
     """
     name = enum.auto()
+    key = enum.auto()
     value = enum.auto()
     unit = enum.auto()
     type = enum.auto()

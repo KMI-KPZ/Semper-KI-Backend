@@ -306,10 +306,16 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
         
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(functionName)
-        if interface == None:
+        if interface is None:
             return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
             
         client = contentManager.getClient()
+        projectObj = interface.getProjectObj(projectID)
+        if projectObj is None:
+            return Exception("Project not found!"), 404
+        if client != projectObj.client:
+            return Exception("Not allowed to create process in this project!"), 401
+        
         interface.createProcess(projectID, processID, client)
 
         # set default addresses here
@@ -425,7 +431,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
     
 #######################################################
 #deleteProcessFunction
-def deleteProcessFunction(session, processIDs:list[str]):
+def deleteProcessFunction(session, processIDs:list[str], projectID:str):
     """
     Delete the processes
 
@@ -440,14 +446,24 @@ def deleteProcessFunction(session, processIDs:list[str]):
     try:
         contentManager = ManageContent(session)
         interface = contentManager.getCorrectInterface("deleteProcesses")
-        if interface == None:
+        if interface is None:
             loggerError.error("Rights not sufficient in deleteProcesses")
             return HttpResponse("Insufficient rights!", status=401)
 
         for processID in processIDs:
+            # check visibility
             if not contentManager.checkRightsForProcess(processID):
                 loggerError.error("Rights not sufficient in deleteProcesses")
                 return HttpResponse("Insufficient rights!", status=401)
+            # check accessability
+            processClient = interface.getProcessObj(projectID, processID)
+            if isinstance(processClient, Exception):
+                raise processClient
+            processClient = processClient.client
+            if processClient != contentManager.getClient():
+                loggerError.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            
             result = interface.deleteProcess(processID)
             if result is False:
                 raise Exception("Error in deleteProcessFunction")

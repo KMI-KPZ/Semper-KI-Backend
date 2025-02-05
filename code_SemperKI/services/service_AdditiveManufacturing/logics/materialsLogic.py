@@ -59,7 +59,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
             for materialNode in listOfAllMaterialNodes:
                 if materialNode[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
                     for propertyValue in materialNode[pgKnowledgeGraph.NodeDescription.properties]:
-                        if NodePropertiesAMMaterial.acquisitionCosts == propertyValue[pgKnowledgeGraph.NodePropertyDescription.name]:
+                        if NodePropertiesAMMaterial.acquisitionCosts == propertyValue[pgKnowledgeGraph.NodePropertyDescription.key]:
                             if materialNode[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices:
                                 materialPrices[materialNode[pgKnowledgeGraph.NodeDescription.uniqueID]].append(float(propertyValue[pgKnowledgeGraph.NodePropertyDescription.value]))
                             else:
@@ -104,7 +104,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.ultimateTensileStrength:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
                                         if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
                                             appendViaThisFilter = True
                                             break
@@ -118,7 +118,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.density:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
                                         if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
                                             appendViaThisFilter = True
                                             break
@@ -132,7 +132,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                                 answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.elongationAtBreak:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
                                         if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
                                             appendViaThisFilter = True
                                             break
@@ -146,7 +146,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                                 certificates = filter["answer"]["value"]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.certificates:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.certificates:
                                         propValues = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
                                         for cert in certificates:
                                             if cert in propValues:

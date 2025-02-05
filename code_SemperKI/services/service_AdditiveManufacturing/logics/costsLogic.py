@@ -201,7 +201,7 @@ class Costs():
                 propertiesOfPrinter = printer[pgKG.NodeDescription.properties]
                 for entry in propertiesOfPrinter:
                     value = entry[pgKG.NodePropertyDescription.value]
-                    match entry[pgKG.NodePropertyDescription.name]:
+                    match entry[pgKG.NodePropertyDescription.key]:
                         case NodePropertiesAMPrinter.costRatePersonalMachine:
                             valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine.value] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildHeight:

@@ -72,25 +72,25 @@ def getFilters(request:Request):
         setOfCertificates = set()
         for material in allMaterials:
             for prop in material[pgKnowledgeGraph.NodeDescription.properties]:
-                if prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.ultimateTensileStrength:
+                if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
                     propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
                     if minTensileStrengthRange > propValue:
                         minTensileStrengthRange = propValue
                     if maxTensileStrengthRange < propValue:
                         maxTensileStrengthRange = propValue
-                elif prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.density:
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
                     propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
                     if minDensityRange > propValue:
                         minDensityRange = propValue
                     if maxDensityRange < propValue:
                         maxDensityRange = propValue
-                elif prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.elongationAtBreak:
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
                     propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
                     if minElongationAtBreak > propValue:
                         minElongationAtBreak = propValue
                     if maxElongationAtBreak < propValue:
                         maxElongationAtBreak = propValue
-                elif prop[pgKnowledgeGraph.NodePropertyDescription.name] == NodePropertiesAMMaterial.certificates:
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.certificates:
                     propValues = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
                     setOfCertificates.update(propValues)
         

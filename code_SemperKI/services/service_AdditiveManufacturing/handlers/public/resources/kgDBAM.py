@@ -22,8 +22,9 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsAdmin
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsAdmin, checkIfUserIsLoggedIn
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SResProperties
@@ -50,6 +51,7 @@ loggerError = logging.getLogger("errors")
     }
 )
 @require_http_methods(["GET"])
+@checkIfUserIsLoggedIn()
 @api_view(["GET"])
 @checkVersion(0.3)
 def getPropertyDefinitionFrontend(request:Request, nodeType:str):
@@ -63,7 +65,10 @@ def getPropertyDefinitionFrontend(request:Request, nodeType:str):
 
     """
     try:
-        propertyDefinitions = pgKG.getPropertyDefinitionForNodeType(nodeType)
+        # get locale of current user
+        userLocale = ProfileManagementBase.getUserLocale(request.session)
+        
+        propertyDefinitions = pgKG.getPropertyDefinitionForNodeType(nodeType, userLocale)
         outSerializer = SResProperties(data=propertyDefinitions, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)

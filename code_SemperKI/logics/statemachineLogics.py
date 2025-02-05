@@ -41,7 +41,7 @@ def logicForStatusButtonRequest(request:Request, validatedInput:dict, functionNa
         processIDs = validatedInput[InterfaceForStateChange.processIDs]
         buttonData = validatedInput[InterfaceForStateChange.buttonData]
         if "deleteProcess" in buttonData[InterfaceForStateChange.type]:
-            retVal = deleteProcessFunction(request.session, processIDs)
+            retVal = deleteProcessFunction(request.session, processIDs, projectID)
             if isinstance(retVal, Exception):
                 raise retVal
             return retVal
