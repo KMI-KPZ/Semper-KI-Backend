@@ -258,7 +258,7 @@ def logicForUpdateModel(request, validatedInput):
         projectID = validatedInput[ProjectDescription.projectID]
         processID = validatedInput[ProcessDescription.processID]
         groupID = validatedInput["groupID"]
-        fileID = validatedInput["fileID"]
+        fileID = validatedInput["id"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         
         currentProcess = interface.getProcessObj(projectID, processID)

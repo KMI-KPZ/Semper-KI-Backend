@@ -257,7 +257,7 @@ class SReqUpdateModel(serializers.Serializer):
     projectID = serializers.CharField(max_length=513)
     processID = serializers.CharField(max_length=513)
     groupID = serializers.IntegerField()
-    fileID = serializers.CharField(max_length=513)
+    id = serializers.CharField(max_length=513)
     levelOfDetail = serializers.FloatField()
     quantity = serializers.IntegerField()
     isFile = serializers.BooleanField()
