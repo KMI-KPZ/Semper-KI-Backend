@@ -832,9 +832,9 @@ def logicForCosts(apiGivenValues:dict={}) -> dict|Exception:
             printerObject["properties"] = []
             for key, value in printer["properties"].items():
                 if key == "possibleLayerHeights":
-                    printerObject["properties"].append({"name": key, "value": value})
+                    printerObject["properties"].append({"name": key, "key": key, "value": value})
                     continue
-                printerObject["properties"].append({"name": key, "value": float(value.split(" ")[0])})
+                printerObject["properties"].append({"name": key, "key": key, "value": float(value.split(" ")[0])})
             printersArray.append(printerObject)
 
         inputDict = {
