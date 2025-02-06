@@ -101,7 +101,7 @@ newPaths= {
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
-    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
+    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
     "apiDeleteGraph": ("public/api/graph/delete/", knowledgeGraphDB.deleteGraph),
     "apiCreateGraph": ("public/api/graph/create/", knowledgeGraphDB.createGraph),
     

@@ -883,11 +883,53 @@ def createGraph(request:Request):
     }
 )
 @require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def loadTestGraph(request:Request):
+    """
+    Loads the test graph from the file.
+    KEEP THIS, IT'S USED FOR TESTS
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
+        tGAsDict = json.loads(testGraph)
+        result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
+        return Response("Success", status=status.HTTP_200_OK)
+
+    except (Exception) as error:
+        message = f"Error in {loadTestGraph.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Loads the test graph from the file",
+    description=" ",
+    tags=['BE - Graph'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
 @loginViaAPITokenIfAvailable()
 @checkIfUserIsAdmin()
 @api_view(["GET"])
 @checkVersion(0.3)
-def loadTestGraph(request:Request):
+def loadTestGraphViaAPI(request:Request):
     """
     Loads the test graph from the file
 

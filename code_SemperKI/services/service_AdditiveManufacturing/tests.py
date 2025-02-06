@@ -161,6 +161,7 @@ class TestAdditiveManufacturing(TestCase):
         response = client.get("/"+paths["getFilters"][0])
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
         filters = json.loads(response.content)
+
         ## get materials
         response = client.post("/"+paths["getMaterials"][0], data=json.dumps(filters), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
