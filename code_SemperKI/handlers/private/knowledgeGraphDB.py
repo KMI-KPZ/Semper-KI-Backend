@@ -24,7 +24,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, manualCheckifAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfUserIsAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
 from code_SemperKI.modelFiles.nodesModel import NodeDescription
@@ -825,6 +825,8 @@ class SReqGraph(serializers.Serializer):
 )
 
 @require_http_methods(["POST"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["POST"])
 @checkVersion(0.3)
 def createGraph(request:Request):
@@ -881,6 +883,8 @@ def createGraph(request:Request):
     }
 )
 @require_http_methods(["GET"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["GET"])
 @checkVersion(0.3)
 def loadTestGraph(request:Request):
@@ -911,50 +915,6 @@ def loadTestGraph(request:Request):
 
 #######################################################
 @extend_schema(
-    summary="Loads the test graph from the file",
-    description=" ",
-    tags=['BE - Graph'],
-    request=None,
-    responses={
-        200: None,
-        401: ExceptionSerializer,
-        500: ExceptionSerializer
-    }
-)
-@loginViaAPITokenIfAvailable()
-@api_view(["GET"])
-@checkVersion(0.3)
-def loadTestGraphViaAPI(request:Request):
-    """
-    Loads the test graph from the file
-
-    :param request: GET Request
-    :type request: HTTP GET
-    :return: Success or not
-    :rtype: Response
-
-    """
-    try:
-        if manualCheckifAdmin(request.session):
-            testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
-            tGAsDict = json.loads(testGraph)
-            result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
-            return Response("Success", status=status.HTTP_200_OK)
-        else:
-            return Response("Not authorized", status=status.HTTP_401_UNAUTHORIZED)
-
-    except (Exception) as error:
-        message = f"Error in {loadTestGraphViaAPI.cls.__name__}: {str(error)}"
-        exception = str(error)
-        loggerError.error(message)
-        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
-        if exceptionSerializer.is_valid():
-            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-#######################################################
-@extend_schema(
     summary="Deletes the whole graph",
     description=" ",
     tags=['BE - Graph'],
@@ -967,6 +927,8 @@ def loadTestGraphViaAPI(request:Request):
 )
 
 @require_http_methods(["DELETE"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["DELETE"])
 @checkVersion(0.3)
 def deleteGraph(request:Request):
