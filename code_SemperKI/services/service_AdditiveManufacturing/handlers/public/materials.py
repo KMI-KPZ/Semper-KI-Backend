@@ -98,7 +98,9 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
-        result, statusCode = logicForRetrieveMaterialWithFilter(filters)
+        # get language settings from session
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
+        result, statusCode = logicForRetrieveMaterialWithFilter(filters, locale)
         if isinstance(result, Exception):
             message = f"Error in retrieveMaterialsWithFilter: {str(result)}"
             exception = str(result)

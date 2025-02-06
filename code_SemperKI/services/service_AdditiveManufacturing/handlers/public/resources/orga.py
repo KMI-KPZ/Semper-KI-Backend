@@ -30,12 +30,13 @@ from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReq
 from code_SemperKI.services.service_AdditiveManufacturing.logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
 from code_SemperKI.services.service_AdditiveManufacturing.utilities.basics import checkIfOrgaHasAMAsService
 from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.locales import manageTranslations
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 
 from ....utilities import sparqlQueries
-from ....service import SERVICE_NUMBER
+from ....service import SERVICE_NUMBER, SERVICE_NAME
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -207,7 +208,12 @@ def orga_getNodes(request:Request, resourceType:str):
             raise result
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-                
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)
@@ -272,9 +278,14 @@ def orga_getNodeViaID(request:Request, nodeID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        nodeDict = nodeInfo.toDict()
+        for propIdx, prop in enumerate(nodeDict[pgKnowledgeGraph.NodeDescription.properties]):
+            nodeDict[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
-        outSerializer = SResNode(data=nodeInfo.toDict())
+        outSerializer = SResNode(data=nodeDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -327,7 +338,12 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-                
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},connected nodes of type {resourceType} from node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)
@@ -384,7 +400,12 @@ def orga_getNeighbors(request:Request, nodeID:str):
         
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-        
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)

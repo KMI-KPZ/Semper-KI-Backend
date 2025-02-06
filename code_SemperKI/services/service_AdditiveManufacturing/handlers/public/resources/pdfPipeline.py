@@ -41,6 +41,7 @@ loggerError = logging.getLogger("errors")
 class SReqPDFExtraction(serializers.Serializer):
     file = serializers.ListField(child=serializers.FileField())
     category = serializers.CharField(max_length=200)
+    insertIntoKG = serializers.BooleanField()
     gptModel = serializers.CharField(max_length=200, required=False, allow_blank=True)
 
 #######################################################

@@ -61,6 +61,7 @@ def getFilters(request:Request):
 
     """
     try:
+        # TODO use translation here for nodeName
         allMaterialCategories = [{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
         allMaterials = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         minTensileStrengthRange = 9999

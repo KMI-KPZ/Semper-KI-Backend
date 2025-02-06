@@ -119,7 +119,7 @@ def retrievePostProcessingsWithFilter(request:Request):
         for entry in filteredOutput:
             imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMAdditionalRequirement.imgPath] if NodePropertiesAMAdditionalRequirement.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
             output["postProcessings"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "checked": False, "selectedValue": "", "type": "text", "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath})
-
+            # TODO use translation here for nodeName
         # mockup here:
         #mock = copy.deepcopy(mocks.postProcessingMock)
         #output.update(mock)

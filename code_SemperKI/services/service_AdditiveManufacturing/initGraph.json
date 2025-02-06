@@ -81,9 +81,9 @@
       "nodeTempID": 7,
       "nodeName": "Irrelevant",
       "nodeType": "material",
-      "context": "Material is not important. Connect to this material if you can handle almost anything.",
+      "context": "Material is not important.",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "Bildpfad", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -96,7 +96,7 @@
       "nodeType": "materialCategory",
       "context": "All materials consisting of macromolecules",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -109,7 +109,7 @@
       "nodeType": "materialCategory",
       "context": "All materials considered metals",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -122,7 +122,7 @@
       "nodeType": "materialCategory",
       "context": "All materials considered photopolymers",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -135,7 +135,7 @@
       "nodeType": "materialCategory",
       "context": "All materials considered composites",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -148,7 +148,7 @@
       "nodeType": "materialCategory",
       "context": "All materials considered sand",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -161,7 +161,7 @@
       "nodeType": "materialCategory",
       "context": "All materials considered wax",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },

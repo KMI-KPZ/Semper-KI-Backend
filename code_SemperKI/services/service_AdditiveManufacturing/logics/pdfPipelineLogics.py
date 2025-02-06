@@ -161,15 +161,19 @@ def parseJSONToDBKGFormat(jsonData:dict, category:str) -> dict|Exception:
                                         if specKey == "printing_technology" and specValue is not None and specValue != "":
                                             outDict["technology"] = specValue
                                         elif specKey == "build_volume":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.value: specValue.get("width", {}).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.value: specValue.get("length", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.value: specValue.get("height", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                        elif specKey == "possible_layer_heights" and len(specValue) > 0:
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.value: ",".join(map(str, specValue)), NodePropertyDescription.unit: "µm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.value: specValue.get("width", {}).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.value: specValue.get("length", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.value: specValue.get("height", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        elif (specKey == "possible_layer_heights" or specKey == "layer_thickness") and specValue is not None and len(specValue) > 0:
+                                            if specKey == "layer_thickness":
+                                                if "max_thickness" in specValue and "min_thickness" in specValue and specValue["max_thickness"]["value"] is not None and specValue["max_thickness"]["unit"] == "µm" and specValue["min_thickness"]["value"] is not None and specValue["min_thickness"]["unit"] == "µm":
+                                                    outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.key: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.value: f'{str(specValue["max_thickness"]["value"])}, {str(specValue["min_thickness"]["value"])}', NodePropertyDescription.unit: "µm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            else:
+                                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.key: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.value: ",".join(map(str, specValue)), NodePropertyDescription.unit: "µm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "nozzle_diameter" and specValue is not None and specValue != "":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.key: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "machine_batch_distance" and specValue is not None and specValue != "":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.key: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "build_rate" and specValue is not None and specValue != "" and isinstance(specValue, dict):
                                             buildRate = None
                                             if "unit" in specValue:
@@ -183,50 +187,51 @@ def parseJSONToDBKGFormat(jsonData:dict, category:str) -> dict|Exception:
                                                     buildRate = specValue["value"] / 1000.
                                                 elif specValue["unit"] == "mm/s":
                                                     buildRate = specValue["value"] * 3600. / 1000.
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.value: buildRate, NodePropertyDescription.unit: "cm³/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            if buildRate is not None:
+                                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.key: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.value: buildRate, NodePropertyDescription.unit: "cm³/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "average_power_consumption" and specValue is not None and specValue != "":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "€/kWh", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.key: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "€/kWh", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif (specKey == "printing_speed" or specValue == "max_printing_speed") and specValue is not None and specValue != "":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "cm/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.key: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "cm/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "certificates" and len(specValue) > 0:
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.certificates, NodePropertyDescription.value: ",".join(specValue), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.certificates, NodePropertyDescription.key: NodePropertiesAMPrinter.certificates, NodePropertyDescription.value: ",".join(specValue), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
                                         elif specKey == "physical_properties":
                                             if "dimensions" in specValue:
                                                 surfaceArea = specValue.get("dimensions", {}).get("width", {}).get("value", 0) * specValue.get("dimensions", {}).get("length", {}).get("value", 0) / 10000.0
-                                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.value: surfaceArea, NodePropertyDescription.unit: "m²", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.key: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.value: surfaceArea, NodePropertyDescription.unit: "m²", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                         elif specKey == "coating_time" and specValue is not None and specValue != "":
-                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.key: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                     break # only one configuration as of now
         elif category == 'material':
             outDict[NodeDescription.nodeName] = jsonData.get("material_information", {}).get("material_supplier", "") + " " + jsonData.get("material_information", {}).get("material_name", "")
             for key, value in jsonData.items():
                 if key == "certificates" and len (value) > 0:
-                    outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.certificates, NodePropertyDescription.value: ",".join(value), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
+                    outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.certificates, NodePropertyDescription.key: NodePropertiesAMMaterial.certificates, NodePropertyDescription.value: ",".join(value), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
                 elif key == "mechanical_properties":
                     for subKey, subValue in value.items():
                         if subKey == "ultimate_tensile_strength" and subValue is not None and subValue != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                         elif subKey == "tensile_modulus" and subValue is not None and subValue != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.key: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                         elif subKey == "elongation_at_break" and subValue is not None and subValue != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "%", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.key: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "%", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                         elif subKey == "flexural_strength" and subValue is not None and subValue != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                         elif subKey == "elastic_modulus" and subValue is not None and subValue != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.eModul, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul, NodePropertyDescription.key: NodePropertiesAMMaterial.eModul, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                 elif key == "physical_properties":
                     if "density" in value:
                         if value["density"] is not None and value["density"] != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.density, NodePropertyDescription.value: value.get("density", 0), NodePropertyDescription.unit: "g/cm³", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.density, NodePropertyDescription.key: NodePropertiesAMMaterial.density, NodePropertyDescription.value: value.get("density", 0), NodePropertyDescription.unit: "g/cm³", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                 elif key == "printing_settings":
                     if "printing_speed" in value:
                         if value["printing_speed"] is not None and value["printing_speed"] != "":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: value.get("printing_speed", 0), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: value.get("printing_speed", 0), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                 elif key == "material_type" and len(value) > 0:
                     if "general_material_type" in value and value["general_material_type"] is not None and value["general_material_type"] != "Other":
                         outDict["materialType"] = value["general_material_type"]
                     if "specific_material_type" in value and value["specific_material_type"] is not None and value["specific_material_type"] != "Other":
-                        outDict[NodeDescription.properties].append({NodePropertyDescription.name: "", NodePropertyDescription.key: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: value.get("specific_material_type", ""), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
+                        outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.key: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: value.get("specific_material_type", ""), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
 
         else:
             return {}
@@ -248,7 +253,8 @@ def insertIntoKG(dataDict:dict, category:str) -> None|Exception:
             if "technology" in dataDict:
                 techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
                 for tNode in techNodes:
-                    if SequenceMatcher(tNode[NodeDescription.nodeName], dataDict["technology"]).quick_ratio() > 0.8:
+                    similarity = SequenceMatcher(a=tNode[NodeDescription.nodeName], b=dataDict["technology"]).quick_ratio()
+                    if  similarity >= 0.8:
                         techID = tNode[NodeDescription.nodeID]
                         break
                 del dataDict["technology"]
@@ -256,13 +262,13 @@ def insertIntoKG(dataDict:dict, category:str) -> None|Exception:
             if isinstance(createdPrinter, Exception):
                 raise createdPrinter
             if techID != "":
-                Basics.createEdge(createdPrinter[NodeDescription.nodeID], techID)
+                Basics.createEdge(createdPrinter.nodeID, techID)
         elif category == "material":
             typeID = ""
             if "materialType" in dataDict:
-                typeNodes = Basics.getNodesByType(NodeTypesAM.materialType.value)
+                typeNodes = Basics.getNodesByType(NodeTypesAM.materialCategory.value)
                 for tNode in typeNodes:
-                    if SequenceMatcher(tNode[NodeDescription.nodeName], dataDict["materialType"]).quick_ratio() > 0.8:
+                    if SequenceMatcher(a=tNode[NodeDescription.nodeName], b=dataDict["materialType"]).quick_ratio() > 0.8:
                         typeID = tNode[NodeDescription.nodeID]
                         break
                 del dataDict["materialType"]
@@ -271,7 +277,7 @@ def insertIntoKG(dataDict:dict, category:str) -> None|Exception:
             if isinstance(createdMaterial, Exception):
                 raise createdMaterial
             if typeID != "":
-                Basics.createEdge(createdMaterial[NodeDescription.nodeID], typeID)
+                Basics.createEdge(createdMaterial.nodeID, typeID)
     except Exception as e:
         loggerError.error(f"Error in insertIntoKG: {e}")
         return e
@@ -320,12 +326,13 @@ def logicForPDFPipeline(validatedInput, files):
                 
                 ####
                 # Insert into KG
-                resultDict = parseJSONToDBKGFormat(jsonData, category)
-                if isinstance(resultDict, Exception):
-                    raise resultDict
-                result = insertIntoKG(resultDict, category)
-                if isinstance(result, Exception):
-                    raise result
+                if validatedInput["insertIntoKG"]:
+                    resultDict = parseJSONToDBKGFormat(jsonData, category)
+                    if isinstance(resultDict, Exception):
+                        raise resultDict
+                    result = insertIntoKG(resultDict, category)
+                    if isinstance(result, Exception):
+                        raise result
 
                 listOfJSONs.append(jsonData)
 

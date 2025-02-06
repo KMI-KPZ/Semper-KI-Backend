@@ -20,15 +20,16 @@ from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails, MaterialDetails
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
+from code_SemperKI.utilities.locales import manageTranslations
 
-from ..definitions import NodeTypesAM, NodePropertiesAMMaterial
+from ..definitions import SERVICE_NAME, NodeTypesAM, NodePropertiesAMMaterial
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 ####################################################################################
 
 ##################################################
-def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
+def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Exception, int]:
 
     try:
         # format:
@@ -160,9 +161,18 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
 
 
                 if append:
-                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMMaterial.imgPath] if NodePropertiesAMMaterial.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
-                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+                    imgPath = mocks.testPicture
+                    for propIdx, prop in enumerate(entry[pgKnowledgeGraph.NodeDescription.properties]):
+                        if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.imgPath:
+                            imgPath = prop[pgKnowledgeGraph.NodePropertyDescription.value]
+                            del entry[pgKnowledgeGraph.NodeDescription.properties][propIdx]
+                            break
+                        else:
+                            # translate properties
+                            entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
 
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+                    # TODO use translation here for nodeName
         # sort by price
         output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
 
