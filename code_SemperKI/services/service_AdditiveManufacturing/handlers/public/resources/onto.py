@@ -22,7 +22,8 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfUserIsAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfUserIsAdmin
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
@@ -53,6 +54,7 @@ loggerError = logging.getLogger("errors")
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -109,6 +111,7 @@ def onto_getGraph(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -164,6 +167,7 @@ def onto_getResources(request:Request, resourceType:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -213,6 +217,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -268,6 +273,7 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -323,6 +329,7 @@ def onto_getNeighbors(request:Request, nodeID:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["POST"])
@@ -409,6 +416,7 @@ class SReqCreateOrUpdateAndLinkAdmin(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfUserIsAdmin()
@@ -507,6 +515,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["PATCH"])
@@ -569,6 +578,7 @@ def onto_updateNode(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["DELETE"])
@@ -622,6 +632,7 @@ class SReqOntoCreateEdge(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["POST"])
@@ -685,6 +696,7 @@ def onto_addEdge(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["DELETE"])

@@ -108,6 +108,18 @@ newPaths = {
     "apiExtractPDFsTest": ("public/api/extractFromJSON/", pdfPipeline.extractFromJSON),
     "loadInitGraphViaAPI": ("public/api/graph/loadInitGraph/", kgDBAM.loadInitGraphViaAPI),
     "apiCalculateCosts": ("public/api/calculateCosts/", costs.apiCalculateCosts),
+    "apiOnto_getGraph": ("public/api/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
+    "apiOnto_getResources": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
+    "apiOnto_getNodeViaID": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
+    "apiOnto_getAssociatedResources": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
+    "apiOnto_getNeighbors": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
+    "apiOnto_addEdge": ("public/api/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
+    "apiOnto_createOrUpdateAndLinkNodes": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/create-and-link/", onto.onto_createOrUpdateAndLinkNodes),
+    "apiOnto_removeEdge": ("public/api/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
+    "apiOnto_addNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
+    "apiOnto_updateNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
+    "apiOnto_deleteNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    
 }
 
 # add paths
