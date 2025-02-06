@@ -15,7 +15,7 @@ from .urls import paths
 
 from Generic_Backend.code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses, FileObjectContent
 from code_SemperKI.definitions import ProjectDescription, ProcessDescription, SessionContentSemperKI, ProcessUpdates
-from .definitions import ServiceDetails
+from .definitions import *
 
 # Create your tests here.
 
@@ -164,9 +164,14 @@ class TestAdditiveManufacturing(TestCase):
         ## get materials
         response = client.post("/"+paths["getMaterials"][0], data=json.dumps(filters), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-
+        
         materials = json.loads(response.content)
-        material = materials["materials"][0]
+        idx = 0
+        for matIdx, mat in enumerate(materials["materials"]):
+            if mat["title"] == "PMMA":
+                idx = matIdx
+                break
+        material = materials["materials"][idx]
         changes = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "material": material}
         response = client.patch("/"+paths["setMaterial"][0], data=json.dumps(changes), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
@@ -188,4 +193,4 @@ class TestAdditiveManufacturing(TestCase):
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code} with response: {json.loads(response.content)}")
         response = json.loads(client.get("/"+contractorsPath).content)
         # Check return value for length of contractors
-        self.assertIs(len(response)>=1, True, f'{len(response)} < 1')
+        self.assertIs(len(response)>=1, True, f'{response}')
