@@ -270,6 +270,7 @@ class GeneralMaterialTypeEnum(str, Enum):
     Enumeration for general material types.
     """
     polymer = "Polymer"
+    photopolymer = "Photopolymer"
     metal = "Metal"
     ceramic = "Ceramic"
     composite = "Composite"
@@ -278,7 +279,18 @@ class GeneralMaterialTypeEnum(str, Enum):
     other = "Other"
 
 
-
+class PhotopolymerMaterialTypeEnum(str, Enum):
+    """
+    Enumeration for photopolymer material types.
+    """
+    acrylic = "Acrylic"
+    acrylic_like = "Acrylic-like"
+    epoxy = "Epoxy"
+    oxycetane_resin = "Oxycetane Resin"
+    polyurethane = "Polyurethane"
+    resin = "Resin"
+    silicon_like = "Silicon-like"
+    other = "Other"
 
 class PolymerMaterialTypeEnum(str, Enum):
     """Enumeration for polymer material types."""
@@ -288,18 +300,14 @@ class PolymerMaterialTypeEnum(str, Enum):
     abs_pp = "ABS/PP"
     abs_pp_like = "ABS/PP-like"
     abs_like = "ABS-like"
-    acrylic = "Acrylic"
-    acrylic_like = "Acrylic-like"
     alumina_like = "Alumina-like"
     asa = "ASA"
     bvoh = "BVOH"
     ce_like = "CE-like"
     cpe = "CPE"
-    epoxy = "Epoxy"
     gypsum = "Gypsum"
     hdpe_like = "HDPE-like"
     hips = "HIPS"
-    oxycetane_resin = "Oxycetane Resin"
     pa = "PA"
     pa_tpe = "PA/TPE"
     paek = "PAEK"
@@ -339,9 +347,7 @@ class PolymerMaterialTypeEnum(str, Enum):
     pva = "PVA"
     pvc = "PVC"
     pvdf = "PVDF"
-    resin = "Resin"
     rubber_like = "Rubber-like"
-    silicon_like = "Silicon-like"
     tpc = "TPC"
     tpe = "TPE"
     tpe_like = "TPE-like"
@@ -433,6 +439,10 @@ class SpecificPolymerMaterialType(SpecificMaterialTypeBase):
     general_material_type: Literal["Polymer"]
     specific_material_type: PolymerMaterialTypeEnum
 
+class SpecificPhotopolymerMaterialType(SpecificMaterialTypeBase):
+    general_material_type: Literal["Photopolymer"]
+    specific_material_type: PhotopolymerMaterialTypeEnum
+
 class SpecificCeramicMaterialType(SpecificMaterialTypeBase):
     general_material_type: Literal["Ceramic"]
     specific_material_type: CeramicMaterialTypeEnum
@@ -502,29 +512,29 @@ class Range(BaseModel):
     unit: str
 
 class UltimateTensileStrength(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 class TensileModulus(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 class ElongationAtBreak(BaseModel):
-    min: Range
-    max: Range 
+    value: float
+    unit: str 
 
 
-class FlexuralStrengthk(BaseModel):
-    min: Range
-    max: Range 
+class FlexuralStrength(BaseModel):
+    value: float
+    unit: str
 
 class FlexuralModulus(BaseModel):
-    min: Range
-    max: Range 
+    value: float
+    unit: str 
 
 class ElongationModulus(BaseModel):
-    min: Range
-    max: Range
+    value: float
+    unit: str
 
 
 
@@ -535,8 +545,9 @@ class MechanicalProperties(BaseModel):
     ultimate_tensile_strength: Optional[UltimateTensileStrength]  
     tensile_modulus: Optional[TensileModulus]  
     elongation_modulus: Optional[ElongationModulus]  
-    elongation_at_break: Optional[ElongationAtBreak]  
-    flexural_strength: Optional[FlexuralStrengthk]  
+    elongation_at_break: Optional[ElongationAtBreak] 
+    elastic_modulus: Optional[TensileModulus] 
+    flexural_strength: Optional[FlexuralStrength]  
     flexural_modulus: Optional[FlexuralModulus]  
 
 class Hardness(BaseModel):
@@ -579,10 +590,10 @@ class MaterialResponse(BaseModel):
     material_information: MaterialInformation
     am_process: Optional[AdditiveManufacturingProcessEnum] 
     certificates: Optional[List[str]] = Field(default_factory=list)  # Added certificates field
-    material_type: Optional[str] 
     material_type: Union[
         SpecificPolymerMaterialType,
         SpecificCeramicMaterialType,
+        SpecificPhotopolymerMaterialType,
         SpecificMetalMaterialType,
         SpecificCompositeMaterialType,
         SpecificSandMaterialType,

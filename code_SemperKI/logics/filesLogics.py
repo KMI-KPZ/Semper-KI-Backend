@@ -151,7 +151,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},files,"+str(datetime.now()))
         return None, status.HTTP_200_OK
     except Exception as e:
-        logger.error(f"Error in {functionName}: {str(e)}")
+        loggerError.error(f"Error in {functionName}: {str(e)}")
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR
     
 #######################################################
@@ -409,7 +409,7 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
         return createFileResponse(zipFile, filename=processID+".zip")
     except Exception as e:
-        logger.error(f"Error in {functionName}: {str(e)}")
+        loggerError.error(f"Error in {functionName}: {str(e)}")
         return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
@@ -481,7 +481,7 @@ def logicForDownloadProcessHistory(request:Request, processID:str, functionName:
         # return file
         return createFileResponse(outPDFBuffer, filename=processID+".pdf")
     except Exception as e:
-        logger.error(f"Error in {functionName}: {str(e)}")
+        loggerError.error(f"Error in {functionName}: {str(e)}")
         return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 #######################################################
@@ -534,5 +534,5 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},file {fileID}," + str(datetime.now()))        
         return None, status.HTTP_200_OK
     except Exception as e:
-        logger.error(f"Error in {logicForDeleteFile.__name__}: {str(e)}")
+        loggerError.error(f"Error in {logicForDeleteFile.__name__}: {str(e)}")
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR

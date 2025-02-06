@@ -21,10 +21,44 @@ def initializeService(serviceDetails:dict) -> dict:
     """
     try:
         if ServiceDetails.groups not in serviceDetails:
-            serviceDetails[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}}]
+            serviceDetails[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}, ServiceDetails.context: ""}]
         return serviceDetails
     except (Exception) as error:
         logger.error(f'Generic error in initializeService(3D Print): {str(error)}')
+
+####################################################################################
+def parseServiceDetails(existingContent:dict) -> dict|Exception:
+    """
+    Display the service content for the Frontend
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: Dict
+    :return: The service content for the frontend
+    :rtype: Dict
+    
+    """
+    try:
+        outContent = {ServiceDetails.groups: []}
+        if ServiceDetails.groups in existingContent:
+            for groupIdx, group in enumerate(existingContent[ServiceDetails.groups]):
+                outEntry = {}
+                for serviceDetailType in group:
+                    match serviceDetailType:
+                        case ServiceDetails.material:
+                            outEntry[ServiceDetails.material] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.material] # take material object as given
+                        case ServiceDetails.postProcessings:
+                            outEntry[ServiceDetails.postProcessings] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]] # convert postprocessings to list
+                        case ServiceDetails.models:
+                            outEntry[ServiceDetails.models] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models]] # convert models to list
+                        case ServiceDetails.calculations:
+                            outEntry[ServiceDetails.calculations] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]] # convert calculations to list
+                        case ServiceDetails.context:
+                            outEntry[ServiceDetails.context] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.context]
+                outContent[ServiceDetails.groups].append(outEntry)
+        return outContent
+    except (Exception) as error:
+        logger.error(f'Generic error in parseServiceDetails(3D Print): {str(error)}')
+        return error
 
 ####################################################################################
 def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
@@ -64,6 +98,9 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
                         existingGroup[ServiceDetails.calculations] = {}
                     for fileID in newContentGroup[ServiceDetails.calculations]:
                         existingGroup[ServiceDetails.calculations][fileID] = newContentGroup[entry][fileID]
+                elif entry == ServiceDetails.context:
+                    existingGroup[ServiceDetails.context] = newContentGroup[entry]
+                    
                 else:
                     raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -113,6 +150,8 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                     case ServiceDetails.calculations:
                         for fileID in deletedContentGroup[ServiceDetails.calculations]:
                             del existingGroup[ServiceDetails.calculations][fileID]
+                    case ServiceDetails.context:
+                        existingGroup[ServiceDetails.context] = ""
                     case _:
                         raise NotImplementedError("This service detail does not exist (yet).")
             groupIdxForExistingContent += 1
@@ -220,6 +259,8 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
                 tempDict[ServiceDetails.material] = group[ServiceDetails.material]
             if ServiceDetails.postProcessings in group:
                 tempDict[ServiceDetails.postProcessings] = group[ServiceDetails.postProcessings]
+            if ServiceDetails.context in group:
+                tempDict[ServiceDetails.context] = group[ServiceDetails.context]
             outDict[ServiceDetails.groups].append(tempDict)
     
     except Exception as error:

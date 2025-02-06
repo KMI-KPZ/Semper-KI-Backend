@@ -196,6 +196,12 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     COMPLETED = enum.auto()
 
 ####################################################################################
+# Enum for organization details for SemperKI
+class OrganizationDetailsSKI(StrEnumExactlyAsDefined):
+    maturityLevel = enum.auto()
+    resilienceScore = enum.auto()
+
+####################################################################################
 # Enum for Addresses for SemperKI
 class AddressesSKI(StrEnumExactlyAsDefined):
     """

@@ -67,7 +67,7 @@ async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple
             return -1.0
         
 ####################################################################################
-def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
+def calculateAddInfoForEachContractor(contractor, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
     """
     Parallelized for loop over every contractor
 
@@ -75,7 +75,12 @@ def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|Proce
     try:
         # calculate price for service
         # await sync_to_async(
-        priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": contractorID}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
+        if isinstance(contractor, tuple):
+            contractorID = contractor[0] # contractor 0 contains the id, 1 contains if the contractor is verified and 2 contains a list of all groups that contractor can serve
+        else:
+            contractorID = contractor
+
+        priceOfContractor = service.calculatePriceForService(processObj, {"contractor": contractor}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
         contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=contractorID) #await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=contractorID)
         if isinstance(contractorContentFromDB, Exception):
             return {"error": contractorContentFromDB}
@@ -102,6 +107,8 @@ def calculateAddInfoForEachContractor(contractorID:str, processObj:Process|Proce
                                 "distance": distance,
                                 "contractorCoordinates": coordsContractor,
                                 ProcessDetails.prices: priceOfContractor}
+        # add service specific details
+        contractorToBeAdded = serviceManager.getService(processObj.serviceType).getServiceSpecificContractorDetails(contractorToBeAdded, contractor)
         return contractorToBeAdded
     except Exception as e: 
         return {"error": e}
@@ -178,14 +185,9 @@ def logicForGetContractors(processObj:Process):
             processObj.processDetails[ProcessDetails.prices][contractor[0][OrganizationDescription.hashedID]] = copy.deepcopy(contractor[0][ProcessDetails.prices])
             # but parse away the details for the frontend
             del contractor[0][ProcessDetails.prices][PricesDetails.details]
-            listOfResultingContractors.append({
-                OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
-                OrganizationDescription.name: contractor[0][OrganizationDescription.name],
-                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
-                "distance": contractor[0]["distance"],
-                "contractorCoordinates": contractor[0]["contractorCoordinates"],
-                ProcessDetails.prices: contractor[0][ProcessDetails.prices]
-            })
+            contractor[0][OrganizationDetails.branding] = contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {}
+            del contractor[0][OrganizationDescription.details]
+            listOfResultingContractors.append(contractor[0])
         processObj.save()
         return (listOfResultingContractors, 200)
 
@@ -304,10 +306,16 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
         
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(functionName)
-        if interface == None:
+        if interface is None:
             return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
             
         client = contentManager.getClient()
+        projectObj = interface.getProjectObj(projectID)
+        if projectObj is None:
+            return Exception("Project not found!"), 404
+        if client != projectObj.client:
+            return Exception("Not allowed to create process in this project!"), 401
+        
         interface.createProcess(projectID, processID, client)
 
         # set default addresses here
@@ -364,7 +372,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface("updateProcess")
         if interface == None:
-            logger.error("Rights not sufficient in updateProcess")
+            loggerError.error("Rights not sufficient in updateProcess")
             return ("", False)
         
         client = contentManager.getClient()
@@ -372,7 +380,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         
         for processID in processIDs:
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in updateProcess")
+                loggerError.error("Rights not sufficient in updateProcess")
                 return ("", False)
 
             if "deletions" in changes:
@@ -380,7 +388,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
                         if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
+                            loggerError.error("Rights not sufficient in updateProcess")
                             return ("", False)
                         
                     returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
@@ -392,7 +400,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                 for elem in changes["changes"]:
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                        logger.error("Rights not sufficient in updateProcess")
+                        loggerError.error("Rights not sufficient in updateProcess")
                         return ("", False)
                     fireEvent = False
                     # for websocket events
@@ -423,7 +431,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
     
 #######################################################
 #deleteProcessFunction
-def deleteProcessFunction(session, processIDs:list[str]):
+def deleteProcessFunction(session, processIDs:list[str], projectID:str):
     """
     Delete the processes
 
@@ -438,14 +446,24 @@ def deleteProcessFunction(session, processIDs:list[str]):
     try:
         contentManager = ManageContent(session)
         interface = contentManager.getCorrectInterface("deleteProcesses")
-        if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
+        if interface is None:
+            loggerError.error("Rights not sufficient in deleteProcesses")
             return HttpResponse("Insufficient rights!", status=401)
 
         for processID in processIDs:
+            # check visibility
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
+                loggerError.error("Rights not sufficient in deleteProcesses")
                 return HttpResponse("Insufficient rights!", status=401)
+            # check accessability
+            processClient = interface.getProcessObj(projectID, processID)
+            if isinstance(processClient, Exception):
+                raise processClient
+            processClient = processClient.client
+            if processClient != contentManager.getClient():
+                loggerError.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            
             result = interface.deleteProcess(processID)
             if result is False:
                 raise Exception("Error in deleteProcessFunction")

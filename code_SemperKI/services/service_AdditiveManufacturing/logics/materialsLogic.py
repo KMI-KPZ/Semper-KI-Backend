@@ -20,15 +20,16 @@ from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails, MaterialDetails
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
+from code_SemperKI.utilities.locales import manageTranslations
 
-from ..definitions import NodeTypesAM, NodePropertiesAMMaterial
+from ..definitions import SERVICE_NAME, NodeTypesAM, NodePropertiesAMMaterial
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 ####################################################################################
 
 ##################################################
-def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
+def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Exception, int]:
 
     try:
         # format:
@@ -49,16 +50,6 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
         # ]
         output = {"materials": []}
         
-        #filtersForSparql = []
-        #for entry in filters["filters"]:
-        #    filtersForSparql.append([entry["question"]["title"], entry["answer"]])
-        #TODO ask via sparql with most general filter and then iteratively filter response
-        #resultsOfQueries = {"materials": []}
-        #materialsRes = sparqlQueries.getAllMaterials.sendQuery()
-        # for elem in materialsRes:
-        #     title = elem["Material"]["value"]
-        #     resultsOfQueries["materials"].append({"id": crypto.generateMD5(title), "title": title, "propList": [], "imgPath": mocks.testPicture})
-
         # TODO filter by selection of post-processing
 
         # calculate median price if not found in redis or date is too old
@@ -69,7 +60,7 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
             for materialNode in listOfAllMaterialNodes:
                 if materialNode[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
                     for propertyValue in materialNode[pgKnowledgeGraph.NodeDescription.properties]:
-                        if NodePropertiesAMMaterial.acquisitionCosts == propertyValue[pgKnowledgeGraph.NodePropertyDescription.name]:
+                        if NodePropertiesAMMaterial.acquisitionCosts == propertyValue[pgKnowledgeGraph.NodePropertyDescription.key]:
                             if materialNode[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices:
                                 materialPrices[materialNode[pgKnowledgeGraph.NodeDescription.uniqueID]].append(float(propertyValue[pgKnowledgeGraph.NodePropertyDescription.value]))
                             else:
@@ -91,11 +82,11 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                 append = True
                 for filter in filters["filters"]:
                     # see if filter is selected and the value has not been rules out somewhere
-                    if filter["isChecked"] == True and append == True:
+                    if filter["isChecked"] is True and append is True:
                         # filter for material category
                         if filter["question"]["title"] == "materialCategory":
                             appendViaThisFilter = False
-                            if filter["answer"] != None:
+                            if filter["answer"] is not None:
                                 categoryID = filter["answer"]["value"] # contains the id of the chosen category node
                                 categoriesOfEntry = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
                                 if isinstance(categoriesOfEntry, Exception):
@@ -105,11 +96,85 @@ def logicForRetrieveMaterialWithFilter(filters) -> tuple[dict|Exception, int]:
                                     if categoryID == category[pgKnowledgeGraph.NodeDescription.uniqueID]:
                                         appendViaThisFilter = True
                                         break
-                            append = appendViaThisFilter
+                                append = appendViaThisFilter
+
+                        # filter for material tensile strenght
+                        if filter["question"]["title"] == "tensileStrength":
+                            appendViaThisFilter = False
+                            if filter["answer"] is not None:
+                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
+                                for prop in propertiesOfEntry:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
+                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
+                                            appendViaThisFilter = True
+                                            break
+
+                                append = appendViaThisFilter
+                        
+                        # filter for material density
+                        if filter["question"]["title"] == "density":
+                            appendViaThisFilter = False
+                            if filter["answer"] is not None:
+                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
+                                for prop in propertiesOfEntry:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
+                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
+                                            appendViaThisFilter = True
+                                            break
+
+                                append = appendViaThisFilter
+                        
+                        # filter for material elongation at break
+                        if filter["question"]["title"] == "elongationAtBreak":
+                            appendViaThisFilter = False
+                            if filter["answer"] is not None:
+                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
+                                for prop in propertiesOfEntry:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
+                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
+                                            appendViaThisFilter = True
+                                            break
+
+                                append = appendViaThisFilter
+                        
+                        # filter for material certificates
+                        if filter["question"]["title"] == "certificates":
+                            appendViaThisFilter = False
+                            if filter["answer"] is not None:
+                                certificates = filter["answer"]["value"]
+                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
+                                for prop in propertiesOfEntry:
+                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.certificates:
+                                        propValues = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
+                                        for cert in certificates:
+                                            if cert in propValues:
+                                                appendViaThisFilter = True
+                                            else:
+                                                appendViaThisFilter = False
+                                                break
+                                        break
+
+                                append = appendViaThisFilter
+
 
                 if append:
-                    imgPath = entry[pgKnowledgeGraph.NodeDescription.properties][NodePropertiesAMMaterial.imgPath] if NodePropertiesAMMaterial.imgPath in entry[pgKnowledgeGraph.NodeDescription.properties] else mocks.testPicture
+                    imgPath = mocks.testPicture
+                    for propIdx, prop in enumerate(entry[pgKnowledgeGraph.NodeDescription.properties]):
+                        if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.imgPath:
+                            imgPath = prop[pgKnowledgeGraph.NodePropertyDescription.value]
+                            del entry[pgKnowledgeGraph.NodeDescription.properties][propIdx]
+                            break
+                        else:
+                            # translate properties
+                            entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
+
                     output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+                    # TODO use translation here for nodeName
+        # sort by price
+        output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
 
         # mockup here:
         #mock = copy.deepcopy(mocks.materialMock)

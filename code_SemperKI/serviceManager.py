@@ -119,6 +119,14 @@ class ServiceBase(ABC):
 
         """
 
+    ###################################################
+    @abstractmethod
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):
     """

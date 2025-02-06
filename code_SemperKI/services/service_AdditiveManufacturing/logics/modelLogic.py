@@ -235,7 +235,117 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
     except Exception as e:
         loggerError.error("Error in logicForUploadModel: %s" % str(e))
         return (e, 500)
-    
+
+##################################################
+def logicForUpdateModel(request, validatedInput):
+    """
+    Update an existing model
+
+    :param request: The request object
+    :type request: Request
+    :param validatedInput: The validated input
+    :type validatedInput: Dict
+    :return: Exception and status code
+    :rtype: Tuple[Exception, int]
+
+    """
+    try:
+        contentManager = ManageContent(request.session)
+        interface = contentManager.getCorrectInterface(updateProcessFunction.__name__)
+        if interface == None:
+            return (Exception("Rights not sufficient in updateModel"), 401)
+        
+        projectID = validatedInput[ProjectDescription.projectID]
+        processID = validatedInput[ProcessDescription.processID]
+        groupID = validatedInput["groupID"]
+        fileID = validatedInput["id"]
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        
+        currentProcess = interface.getProcessObj(projectID, processID)
+        modelsOfThisProcess = currentProcess.serviceDetails[ServiceDetails.groups][groupID][ServiceDetails.models]
+        if fileID not in modelsOfThisProcess or fileID not in currentProcess.files:
+            return (Exception("Model not found in updateModel"), 404)
+
+        if currentProcess.client != contentManager.getClient():
+            return (Exception("Rights not sufficient in updateModel"), 401)
+
+        model = modelsOfThisProcess[fileID]
+
+        # check if duplicates exist
+        existingFileNames = set()
+        processContent = interface.getProcess(projectID, processID)
+        if isinstance(processContent, Exception):
+            return (Exception(f"Process not found in {logicForUpdateModel.__name__}"), 404)
+        for key in processContent[ProcessDescription.files]:
+            value = processContent[ProcessDescription.files][key]
+            if value[FileObjectContent.fileName] != model[FileObjectContent.fileName]:
+                existingFileNames.add(value[FileObjectContent.fileName])
+        
+        # rename duplicates
+        counterForFileName = 1
+        nameOfFile = validatedInput["fileName"]
+        while nameOfFile in existingFileNames:
+            fileNameRoot, extension= os.path.splitext(nameOfFile)
+            if counterForFileName > 100000:
+                return (Exception("Too many files with the same name uploaded!"), 400)
+            
+            if "_" in fileNameRoot:
+                fileNameRootSplit = fileNameRoot.split("_")
+                try:
+                    counterForFileName = int(fileNameRootSplit[-1])
+                    fileNameRoot = "_".join(fileNameRootSplit[:-1])
+                    counterForFileName += 1
+                except:
+                    pass
+            nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
+            counterForFileName += 1
+        
+        
+        model[FileObjectContent.fileName] = nameOfFile
+        model[FileObjectContent.tags] = validatedInput["tags"] if "tags" in validatedInput else []
+        model[FileObjectContent.licenses] = validatedInput["licenses"] if "licenses" in validatedInput else []
+        model[FileObjectContent.certificates] = validatedInput["certificates"] if "certificates" in validatedInput else []
+        model[FileObjectContent.quantity] = validatedInput["quantity"]
+        model[FileObjectContent.levelOfDetail] = validatedInput["levelOfDetail"]
+        model[FileObjectContent.isFile] = validatedInput["isFile"]
+        if "width" in validatedInput:
+            model[FileContentsAM.width] = validatedInput["width"]
+        if "height" in validatedInput:
+            model[FileContentsAM.height] = validatedInput["height"]
+        if "length" in validatedInput:
+            model[FileContentsAM.length] = validatedInput["length"]
+        if "volume" in validatedInput:
+            model[FileContentsAM.volume] = validatedInput["volume"]
+        if "complexity" in validatedInput:
+            model[FileContentsAM.complexity] = validatedInput["complexity"]
+        if "scalingFactor" in validatedInput:
+            model[FileContentsAM.scalingFactor] = validatedInput["scalingFactor"]
+        
+
+        # calculate values right here
+        if model[FileObjectContent.isFile] is False:
+            calculationResult = calculateBoundaryDataForNonFileModel(model)
+
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        if model[FileObjectContent.isFile] is False:
+            changesArray[groupID] = {ServiceDetails.models: {fileID: model}, ServiceDetails.calculations: {fileID: calculationResult}}
+        else:
+            changesArray[groupID] = {ServiceDetails.models: {fileID: model}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: model}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+
+        # Save into files field of the process
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        if flag is False: # this should not happen
+            return (Exception("Rights not sufficient for updateModel"), 401)
+        if isinstance(message, Exception):
+            return (message, 500)
+        
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},model {fileID},"+str(datetime.now()))
+        return None, 200
+    except Exception as e:
+        loggerError.error("Error in logicForUpdateModel: %s" % str(e))
+        return (e, 500)
 
 ##################################################
 def logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]:

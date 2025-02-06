@@ -27,6 +27,7 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
+    context = enum.auto()
 
 ##################################################
 # Additional FileContents
@@ -159,6 +160,11 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     density = enum.auto() # 1.2 g/cm³
     printingSpeed = enum.auto() # 100 cm/h
     acquisitionCosts = enum.auto() # €/kg
+    ultimateTensileStrength = enum.auto() # MPa
+    tensileModulus = enum.auto() # GPa
+    elongationAtBreak = enum.auto() # %
+    flexuralStrength = enum.auto() # MPa
+    specificMaterialType = enum.auto() # PLA, ABS, ...
 
 ##################################################
 class NodePropertiesAMAdditionalRequirement(StrEnumExactlyAsDefined):
@@ -224,3 +230,12 @@ class OrganizationDetailsAM(StrEnumExactlyAsDefined):
     roomCosts = enum.auto()
 
 # TODO: Service Status Codes
+
+##################################################
+class ServiceSpecificDetailsForContractors(StrEnumExactlyAsDefined):
+    """
+    What are the details of a service for contractors?
+        
+    """
+    verified = enum.auto()
+    groups = enum.auto()

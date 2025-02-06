@@ -81,7 +81,7 @@ class SemperKISignalReceivers():
         """
         If a user gets updated, set the SemperKI specific details
         """
-        userUpdatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
+        userUpdatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"], updates=kwargs["updates"])
 
     ###########################################################
     @staticmethod
@@ -98,7 +98,7 @@ class SemperKISignalReceivers():
         """
         If am orga gets updated, set the SemperKI specific details
         """
-        orgaUpdatedSemperKI(orgaHashID=kwargs["orgaID"], session=kwargs["session"])
+        orgaUpdatedSemperKI(orgaHashID=kwargs["orgaID"], session=kwargs["session"], updates=kwargs["updates"])
     
     ###########################################################
     @staticmethod

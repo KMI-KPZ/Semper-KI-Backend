@@ -11,7 +11,7 @@ from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 from code_SemperKI.modelFiles.processModel import Process, ProcessInterface
 
-from ..connections.postgresql import pgKG
+from ..connections.postgresql import pgKG, pgVerification
 from ..definitions import *
 from ..utilities.sparqlQueries import *
 
@@ -57,19 +57,34 @@ class Filter():
             listOfSetsForManufacturers:list[set] = []
 
             setOfManufacturerIDs = set()
+            setOfVerifiedManufacturerIDs = set()
             material = pgKnowledgeGraph.Basics.getNode(chosenMaterial[MaterialDetails.id])
             nodesWithTheSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(material.uniqueID)
             # filter for those of orgas and retrieve the orgaID
             for entry in nodesWithTheSameUID:
                 if NodeDescription.active in entry and entry[NodeDescription.active]:
                     if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+                        
                         setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+
                         # Save found printers that can print the selected material
                         printersThatSupportThisMaterial = pgKG.Basics.getSpecificNeighborsByType(entry[NodeDescription.nodeID], NodeTypesAM.printer)
                         if entry[NodeDescription.createdBy] in self.printerGroups[groupIdx]:
                             self.printerGroups[groupIdx][entry[NodeDescription.createdBy]].extend(printersThatSupportThisMaterial)
                         else:
                             self.printerGroups[groupIdx][entry[NodeDescription.createdBy]] = printersThatSupportThisMaterial
+                        
+                        # check if the printer and the material are verified for this organization
+                        for printer in printersThatSupportThisMaterial:
+                            verification = pgVerification.getVerificationObject(entry[NodeDescription.createdBy], printer[NodeDescription.nodeID], chosenMaterial[MaterialDetails.id])
+                            if not isinstance(verification, Exception):
+                                if verification.status == pgVerification.VerificationStatus.verified:
+                                    setOfVerifiedManufacturerIDs.add(entry[NodeDescription.createdBy])
+                                    break
+
+                        
+
+
                         
                 
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
@@ -87,7 +102,10 @@ class Filter():
                         self.resultGroups[groupIdx].update(copiedDict)
                     else:
                         for manufacturer in manufacturersWhoCanDoItAll:
-                            self.resultGroups[groupIdx][manufacturer] = manufacturer
+                            if manufacturer in setOfVerifiedManufacturerIDs:
+                                self.resultGroups[groupIdx][manufacturer] = (manufacturer, True)
+                            else:
+                                self.resultGroups[groupIdx][manufacturer] = (manufacturer, False)
             elif len(chosenMaterial) > 0:
                 self.resultGroups[groupIdx].clear()
         except Exception as e:
@@ -134,7 +152,7 @@ class Filter():
                                 copiedDict.pop(alreadyFilteredManufacturer)
                                 # also remove contractors and their printers
                                 if alreadyFilteredManufacturer in self.printerGroups[groupIdx]:
-                                    self.printerGroups[groupIdx].pop(alreadyFilteredManufacturer)
+                                    self.printerGroups[groupIdx].pop(alreadyFilteredManufacturer[0])
                         self.resultGroups[groupIdx].clear()
                         self.resultGroups[groupIdx].update(copiedDict)
                     else:
@@ -228,11 +246,21 @@ class Filter():
                 retVal = self.filterByPrinter(calculations, groupIdx)
                 if isinstance(retVal, Exception):
                     raise retVal
-            # TODO: do something with the information, that is inside every group. For now, just return the whole thing
-            outList = []
-            for group in self.resultGroups:
-                outList.extend(group.values())
-            return list(set(outList))
+
+            outDict = {}
+            for groupIdx, group in enumerate(self.resultGroups):
+                for contractorID, contractorTuple in group.items():
+                    if contractorID in outDict:
+                        if outDict[contractorID][1] is True and contractorTuple[1] is True: # stays verified
+                            outDict[contractorID] = (contractorTuple[0], True, outDict[contractorID][2].append(groupIdx))
+                        elif outDict[contractorID][1] is True and contractorTuple[1] is False: #not verified anymore
+                            outDict[contractorID] = (contractorTuple[0], False, outDict[contractorID][2].append(groupIdx))
+                        else:
+                            outDict[contractorID][2].append(groupIdx) # was not verified before, stays not verified
+                    else:
+                        outDict[contractorID] = (contractorTuple[0], contractorTuple[1], [groupIdx])
+
+            return list(outDict.values())
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")
             return e

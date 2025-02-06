@@ -90,7 +90,7 @@ def retrieveMaterialsWithFilter(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {retrieveMaterialsWithFilter.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -98,7 +98,9 @@ def retrieveMaterialsWithFilter(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         filters = inSerializer.data
-        result, statusCode = logicForRetrieveMaterialWithFilter(filters)
+        # get language settings from session
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
+        result, statusCode = logicForRetrieveMaterialWithFilter(filters, locale)
         if isinstance(result, Exception):
             message = f"Error in retrieveMaterialsWithFilter: {str(result)}"
             exception = str(result)
@@ -165,7 +167,7 @@ def setMaterialSelection(request:Request):
         if not serializedContent.is_valid():
             message = "Validation failed in setMaterialSelection"
             exception = f"Validation failed {serializedContent.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -239,7 +241,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
         if interface == None:
             message = "Rights not sufficient for deleteMaterialFromSelection"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -251,7 +253,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
         if isinstance(process, Exception):
             message = "Process not found in deleteMaterialFromSelection"
             exception = "Not found"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_404_NOT_FOUND)
@@ -267,7 +269,7 @@ def deleteMaterialFromSelection(request:Request,projectID:str,processID:str,grou
         if flag is False: # this should not happen
             message = "Rights not sufficient for deleteMaterialFromSelection"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)

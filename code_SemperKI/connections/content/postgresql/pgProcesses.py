@@ -1243,7 +1243,11 @@ class ProcessManagementBase(AbstractContentInterface):
                 #         continue
                 currentProject = project.toDict()
                 processes = project.processes.all()
-                currentProject[ProjectOutput.processesCount] = len(processes)
+                processCount = 0
+                for entry in processes:
+                    if entry.client == currentClient:
+                        processCount += 1
+                currentProject[ProjectOutput.processesCount] = processCount
                 currentProject[ProjectOutput.processIDs] = processes.values_list("processID", flat=True)
                 currentProject[ProjectOutput.owner] = True
                 currentProject[ProjectOutput.searchableData] = []

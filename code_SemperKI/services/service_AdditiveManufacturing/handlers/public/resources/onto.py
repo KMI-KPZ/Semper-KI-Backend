@@ -31,8 +31,10 @@ from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
+from code_SemperKI.utilities.locales import manageTranslations
 
 from ....utilities import sparqlQueries
+from ....definitions import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -181,10 +183,10 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
-        
+        nodeDict = nodeInfo.toDict()
         logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
 
-        outSerializer = SResNode(data=nodeInfo.toDict())
+        outSerializer = SResNode(data=nodeDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -341,7 +343,7 @@ def onto_addNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_addNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -427,7 +429,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -525,7 +527,7 @@ def onto_updateNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_updateNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -641,7 +643,7 @@ def onto_addEdge(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {onto_addEdge.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

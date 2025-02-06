@@ -21,8 +21,8 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers.public.resources import orga, onto, kgDBAM
-from .handlers.public import materials, checkService, filter, model, postProcessings
+from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification
+from .handlers.public import materials, checkService, filter, model, postProcessings, costs
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -43,6 +43,7 @@ newPaths = {
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
     "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
+    "updateModel": ("public/service/additive-manufacturing/model/update/", model.updateModel),
     "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:fileID>/",model.deleteModel),
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
     #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
@@ -53,6 +54,11 @@ newPaths = {
     #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
     
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
+    "getVerificationForOrganization": ("public/service/additive-manufacturing/verification/get/", verification.getVerificationForOrganization),
+    "createVerificationForOrganization": ("public/service/additive-manufacturing/verification/create/", verification.createVerificationForOrganization),
+    "updateVerificationForOrganization": ("public/service/additive-manufacturing/verification/update/", verification.updateVerificationForOrganization),
+    "deleteVerificationForOrganization": ("public/service/additive-manufacturing/verification/delete/<str:printerID>/<str:materialID>/", verification.deleteVerificationForOrganization),
+
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
     
@@ -95,7 +101,13 @@ newPaths = {
     "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
     "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
     "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions),
-    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests)
+    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests),
+
+    ########################
+    "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
+    "apiExtractPDFsTest": ("public/api/extractFromJSON/", pdfPipeline.extractFromJSON),
+    "loadInitGraphViaAPI": ("public/api/graph/loadInitGraph/", kgDBAM.loadInitGraphViaAPI),
+    "apiCalculateCosts": ("public/api/calculateCosts/", costs.apiCalculateCosts),
 }
 
 # add paths

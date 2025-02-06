@@ -117,6 +117,14 @@ class AfterSales(Semper.ServiceBase):
 
         """
         return [], {}
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+        return existingDetails
 
 SERVICE_NAME = "AFTER_SALES"
 SERVICE_NUMBER = 7

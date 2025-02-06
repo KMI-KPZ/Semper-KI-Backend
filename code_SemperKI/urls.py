@@ -25,10 +25,11 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -46,8 +47,6 @@ newPaths= {
     "saveProjects": ("public/project/save/", project.saveProjects),
     "getProjectForDashboard": ("public/project/dashboard/get/<str:projectID>/", project.getProjectForDashboard),
 
-    "getdistance": ("public/distance/get/", miscellaneous.calculateDistanceView),
-
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
@@ -61,6 +60,8 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
+    "maturityLevel": ("public/questionnaire/maturityLevel/", miscellaneous.maturityLevel),
+    "resilienceScore": ("public/questionnaire/resilienceScore/", miscellaneous.resilienceScore),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
@@ -100,7 +101,6 @@ newPaths= {
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
-    "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
     "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
 
 }
