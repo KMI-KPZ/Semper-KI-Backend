@@ -6,7 +6,7 @@ Silvio Weging, Mahdi Hedayat Mahmoudi 2024
 Contains: Handler for processing pdfs to json
 """
 
-import json, logging, copy
+import json, logging, copy, zipfile
 from io import BytesIO
 from difflib import SequenceMatcher
 from datetime import datetime
@@ -282,6 +282,37 @@ def insertIntoKG(dataDict:dict, category:str) -> None|Exception:
         loggerError.error(f"Error in insertIntoKG: {e}")
         return e
 
+#######################################################
+def convertAndInsertIntoKG(textContent:str, category:str, gptModel:str, insertIntoKG:bool, listOfJSONs:list) -> None|Exception:
+    """
+    Do the rest
+    
+    """
+    try:
+        # Convert text to JSON
+        if category == 'printer':
+            jsonData = callChatInterface(gptModel, textContent, printerRole(), PrinterResponse)
+        elif category == 'material':
+            jsonData = callChatInterface(gptModel, textContent, "You are a helpful assistant and expert in additive manufacturing. Categorize & extract AM material specifications key info from a factsheet:", MaterialResponse)
+        else:
+            jsonData = {}
+        if isinstance(jsonData, Exception):
+            raise jsonData
+        
+        ####
+        # Insert into KG
+        if insertIntoKG:
+            resultDict = parseJSONToDBKGFormat(jsonData, category)
+            if isinstance(resultDict, Exception):
+                raise resultDict
+            result = insertIntoKG(resultDict, category)
+            if isinstance(result, Exception):
+                raise result
+
+        listOfJSONs.append(jsonData)
+    except Exception as error:
+        loggerError.error(f"Error in convertAndInsertIntoKG: {error}")
+        return error
 
 #######################################################
 def logicForPDFPipeline(validatedInput, files):
@@ -298,6 +329,8 @@ def logicForPDFPipeline(validatedInput, files):
             gptModel = validatedInput["gptModel"]
         else:
             gptModel = "gpt-4o-mini"
+
+        insertIntoKG = validatedInput["insertIntoKG"]
         
         # gather uploaded file(s)
         listOfJSONs = []
@@ -308,33 +341,52 @@ def logicForPDFPipeline(validatedInput, files):
 
                 # read file and extract text
                 fileInBytes = BytesIO(file.read())
-                textContent = extractTextWithPdfplumber(fileInBytes) #extractTextWithLlamaparse(fileInBytes, fileName)
-                
-                if textContent is None:
-                    raise Exception("No text extracted from the PDF. Exiting.")
 
-                # Convert text to JSON
-                
-                if category == 'printer':
-                    jsonData = callChatInterface(gptModel, textContent, printerRole(), PrinterResponse)
-                elif category == 'material':
-                    jsonData = callChatInterface(gptModel, textContent, "You are a helpful assistant and expert in additive manufacturing. Categorize & extract AM material specifications key info from a factsheet:", MaterialResponse)
+                # determine the file type
+                if zipfile.is_zipfile(fileInBytes):
+                    with zipfile.ZipFile(fileInBytes) as z:
+                        for zFile in z.namelist():
+                            if zFile.lower().endswith(".pdf"):
+                                with z.open(zFile) as zF:
+                                    textContent = extractTextWithPdfplumber(zF)
+                                    if textContent is None:
+                                        loggerError.error(f"Error extracting text from {zFile}")
+                                        continue
+                                    exception = convertAndInsertIntoKG(textContent, category, gptModel, insertIntoKG, listOfJSONs)
+                                    if isinstance(exception, Exception):
+                                        loggerError.error(f"Error in convertAndInsertIntoKG: {exception}")
+                                        continue
+                            elif zFile.lower().endswith(".txt"):
+                                with z.open(zFile) as zF:
+                                    textContent = zF.read().decode("utf-8")
+                                    if textContent is None:
+                                        loggerError.error(f"Error extracting text from {zFile}")
+                                        continue
+                                    exception = convertAndInsertIntoKG(textContent, category, gptModel, insertIntoKG, listOfJSONs)
+                                    if isinstance(exception, Exception):
+                                        loggerError.error(f"Error in convertAndInsertIntoKG: {exception}")
+                                        continue
+                elif file.name.lower().endswith(".pdf"):
+                    textContent = extractTextWithPdfplumber(fileInBytes) #extractTextWithLlamaparse(fileInBytes, fileName)
+                    if textContent is None:
+                        loggerError.error(f"Error extracting text from {fileName}")
+                        continue
+                    exception = convertAndInsertIntoKG(textContent, category, gptModel, insertIntoKG, listOfJSONs)
+                    if isinstance(exception, Exception):
+                        loggerError.error(f"Error in convertAndInsertIntoKG: {exception}")
+                        continue
+                elif file.name.lower().endswith(".txt"):
+                    file.seek(0)
+                    textContent = file.read().decode("utf-8")
+                    if textContent is None:
+                        loggerError.error(f"Error extracting text from {fileName}")
+                        continue
+                    exception = convertAndInsertIntoKG(textContent, category, gptModel, insertIntoKG, listOfJSONs)
+                    if isinstance(exception, Exception):
+                        loggerError.error(f"Error in convertAndInsertIntoKG: {exception}")
+                        continue
                 else:
-                    jsonData = {}
-                if isinstance(jsonData, Exception):
-                    raise jsonData
-                
-                ####
-                # Insert into KG
-                if validatedInput["insertIntoKG"]:
-                    resultDict = parseJSONToDBKGFormat(jsonData, category)
-                    if isinstance(resultDict, Exception):
-                        raise resultDict
-                    result = insertIntoKG(resultDict, category)
-                    if isinstance(result, Exception):
-                        raise result
-
-                listOfJSONs.append(jsonData)
+                    loggerError.error(f"Unsupported file type: {fileName}")
 
         return listOfJSONs, 200
     except Exception as e:
