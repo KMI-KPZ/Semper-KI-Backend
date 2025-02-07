@@ -7,7 +7,7 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 
 ##################################################
-# What makes up the 3D print service
+# What makes up the After Sales service
 import enum
 
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined

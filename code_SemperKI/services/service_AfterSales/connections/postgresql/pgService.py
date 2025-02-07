@@ -57,7 +57,7 @@ def updateServiceDetails(existingContent, newContent) -> dict:
         #             raise NotImplementedError("This service detail does not exist (yet).")
 
     except (Exception) as error:
-        logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
+        logger.error(f'Generic error in updateServiceDetails(After Sales): {str(error)}')
 
     return existingContent
 

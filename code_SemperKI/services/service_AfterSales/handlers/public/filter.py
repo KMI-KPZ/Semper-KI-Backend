@@ -39,7 +39,7 @@ loggerError = logging.getLogger("errors")
 @extend_schema(
     summary="Retrieve the filters used for this service",
     description=" ",
-    tags=['FE - AM Filter'],
+    tags=['FE - AS Filter'],
     request=None,
     responses={
         200: None,
