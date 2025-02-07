@@ -128,15 +128,15 @@ def onto_getResources(request:Request, resourceType:str):
 
     """
     try:
-        resultsOfQueries = {"resources": []}
-        # materialsRes = sparqlQueries.getAllMaterials.sendQuery()
-        # for elem in materialsRes:
-        #     title = elem["Material"]["value"]
-        #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
         result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
         if isinstance(result, Exception):
             raise result
         
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(result):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                result[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
         logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType}," + str(datetime.now()))
 
         outSerializer = SResNode(data=result, many=True)
@@ -187,7 +187,13 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
         if isinstance(nodeInfo, Exception):
             raise nodeInfo
+
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
         nodeDict = nodeInfo.toDict()
+        for propIdx, prop in enumerate(nodeDict[pgKnowledgeGraph.NodeDescription.properties]):
+            nodeDict[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=nodeDict)
@@ -243,6 +249,12 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         if isinstance(result, Exception):
             raise result
         
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(result):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                result[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+        
         logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighbor nodes of {nodeID} of type {resourceType}," + str(datetime.now()))
 
         outSerializer = SResNode(data=result, many=True)
@@ -296,6 +308,11 @@ def onto_getNeighbors(request:Request, nodeID:str):
         
         # remove nodes not belonging to the system
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
         
         logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID}," + str(datetime.now()))
 
