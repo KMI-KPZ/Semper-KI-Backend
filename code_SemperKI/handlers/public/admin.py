@@ -110,8 +110,11 @@ def getSpecificProjectAsAdmin(request:Request, projectID):
     :return: JSON response
     :rtype: JSONResponse
     """
+    project = pgProcesses.ProcessManagementBase.getProject(projectID)
+    if isinstance(project, Exception):
+        return Response({"error": str(project)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
-    return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+    return JsonResponse(project)
 
     
