@@ -325,13 +325,15 @@ def logicForUpdateModel(request, validatedInput):
         # calculate values right here
         if model[FileObjectContent.isFile] is False:
             calculationResult = calculateBoundaryDataForNonFileModel(model)
+        else:
+            uploadedModel, flag = getFileReadableStream(request, projectID, processID, fileID)
+            if flag is False:
+                return (Exception(f"Error while accessing file {model[FileObjectContent.fileName]}"), 500)
+            calculationResult = calculateBoundaryData(uploadedModel, nameOfFile, model[FileObjectContent.size], model[FileContentsAM.scalingFactor]/100.)
 
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        if model[FileObjectContent.isFile] is False:
-            changesArray[groupID] = {ServiceDetails.models: {fileID: model}, ServiceDetails.calculations: {fileID: calculationResult}}
-        else:
-            changesArray[groupID] = {ServiceDetails.models: {fileID: model}}
+        changesArray[groupID] = {ServiceDetails.models: {fileID: model}, ServiceDetails.calculations: {fileID: calculationResult}}
         changes = {"changes": {ProcessUpdates.files: {fileID: model}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process

@@ -576,7 +576,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def getSpecificNeighborsByType(nodeID:str, neighborNodeType:str):
+    def getSpecificNeighborsByType(nodeID:str, neighborNodeType:str) -> list[dict]|Exception:
         """
         Return all neighbors that have the specified neighborNodeType
 
@@ -669,7 +669,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def getGraph(createdBy=""):
+    def getGraph(createdBy="", allowedNodeTypes:list[str]=[]):
         """
         Return the whole graph
 
@@ -683,11 +683,11 @@ class Basics():
             allNodes = Node.objects.all()
             outDict = {"nodes": [], "edges": []}
             for entry in allNodes:
-                if createdBy != "" and entry.createdBy != createdBy:
+                if createdBy != "" and entry.createdBy != createdBy and entry.nodeType not in allowedNodeTypes:
                     continue
                 outDict["nodes"].append(entry.toDict())
                 for neighbor in entry.edges.all():
-                    if createdBy != "" and neighbor.createdBy != createdBy:
+                    if createdBy != "" and neighbor.createdBy != createdBy and neighbor.nodeType not in allowedNodeTypes:
                         continue
                     outDict["edges"].append([entry.nodeID,neighbor.nodeID])
             
