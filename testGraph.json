@@ -128,7 +128,7 @@
   },
   {
     "node": {
-      "nodeTempID": 20,
+      "nodeTempID": 21,
       "nodeName": "Irrelevant",
       "nodeType": "material",
       "context": "Material is not important.",
@@ -323,7 +323,7 @@
     },
     "edges": [
       {
-        "nodeTempID": 3,
+        "nodeTempID": 22,
         "nodeName": "Black",
         "nodeType": "color",
         "context": "The default color",

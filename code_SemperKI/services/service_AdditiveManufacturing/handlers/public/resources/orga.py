@@ -535,9 +535,6 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                                     if isinstance(newResult, Exception):
                                         raise newResult
                                     break     
-                            
-
-
                     # create edge to new node
                     result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
                     if isinstance(result, Exception):
