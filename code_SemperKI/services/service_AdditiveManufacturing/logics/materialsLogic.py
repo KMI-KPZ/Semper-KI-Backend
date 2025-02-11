@@ -54,7 +54,9 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
 
         # calculate median price if not found in redis or date is too old
         redisConn = RedisConnection()
-        if redisConn.retrieveContentJSON("medianMaterialPrices")[1] == False or redisConn.retrieveContent("medianMaterialPricesDate")[1] == False or (timezone.now() - datetime.fromisoformat(redisConn.retrieveContent("medianMaterialPricesDate")[0])).days > 1:
+        redisContentMedianMaterialPrices = redisConn.retrieveContentJSON("medianMaterialPrices")
+        redisContentMedianMaterialPricesDate = redisConn.retrieveContent("medianMaterialPricesDate")
+        if redisContentMedianMaterialPrices[1] is False or redisContentMedianMaterialPricesDate[1] is False or (timezone.now() - datetime.fromisoformat(redisContentMedianMaterialPricesDate[0])).days > 1:
             materialPrices = {}
             listOfAllMaterialNodes = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
             for materialNode in listOfAllMaterialNodes:
@@ -72,7 +74,7 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
             redisConn.addContent("medianMaterialPricesDate", timezone.now().isoformat())
         # else: take value from redis
         else:
-            materialPrices = redisConn.retrieveContentJSON("medianMaterialPrices")[0]
+            materialPrices = redisContentMedianMaterialPrices[0]
 
         materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
