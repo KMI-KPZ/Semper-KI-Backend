@@ -159,17 +159,18 @@ def parsePrinterJSONToDBKGFormat(jsonData:dict) -> list[dict]|Exception:
                             currentDict[NodeDescription.nodeName] = jsonData.get("organization", {}).get("organization_name", "") + " " + jsonData.get("printer_model", {}).get("printer_names", [""])[0] + " " + config.get("configuration_name", "")
                             if "physical_properties" in config:
                                 if "dimensions" in config["physical_properties"]:
-                                    surfaceArea = config["physical_properties"]["dimensions"].get("dimensions", {}).get("width", {}).get("value", 0) * config["physical_properties"]["dimensions"].get("dimensions", {}).get("length", {}).get("value", 0) / 10000.0
-                                    currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.key: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.value: surfaceArea, NodePropertyDescription.unit: "m²", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                    surfaceArea = config["physical_properties"].get("dimensions", {}).get("width", {}).get("value", 0) * config["physical_properties"].get("dimensions", {}).get("length", {}).get("value", 0) / 10000.0
+                                    if surfaceArea > 0:
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.key: NodePropertiesAMPrinter.machineSurfaceArea, NodePropertyDescription.value: str(surfaceArea), NodePropertyDescription.unit: "m²", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                             if "specifications" in config:
                                 itemsOfSpecifications = config["specifications"].items()
                                 for specKey, specValue in itemsOfSpecifications:
                                     if specKey == "printing_technology" and specValue is not None and specValue != "":
                                         currentDict["technology"] = specValue
                                     elif specKey == "build_volume":
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.value: specValue.get("width", {}).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.value: specValue.get("length", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.value: specValue.get("height", 0).get("value", 0), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildWidth, NodePropertyDescription.value: str(specValue.get("width", {}).get("value", 0)), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildLength, NodePropertyDescription.value: str(specValue.get("length", 0).get("value", 0)), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildHeight, NodePropertyDescription.value: str(specValue.get("height", 0).get("value", 0)), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                     elif (specKey == "possible_layer_heights" or specKey == "layer_thickness") and specValue is not None and len(specValue) > 0:
                                         if specKey == "layer_thickness":
                                             if "possible_layer_heights" in itemsOfSpecifications and config["specifications"]["possible_layer_heights"] is not None and len(config["specifications"]["possible_layer_heights"]) > 0:
@@ -179,9 +180,9 @@ def parsePrinterJSONToDBKGFormat(jsonData:dict) -> list[dict]|Exception:
                                         else:
                                             currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.key: NodePropertiesAMPrinter.possibleLayerHeights, NodePropertyDescription.value: ",".join(map(str, specValue)), NodePropertyDescription.unit: "µm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
                                     elif specKey == "nozzle_diameter" and specValue is not None and specValue != "":
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.key: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.key: NodePropertiesAMPrinter.nozzleDiameter, NodePropertyDescription.value: str(specValue.get("value", 0)), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                     elif specKey == "machine_batch_distance" and specValue is not None and specValue != "":
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.key: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.key: NodePropertiesAMPrinter.machineBatchDistance, NodePropertyDescription.value: str(specValue.get("value", 0)), NodePropertyDescription.unit: "mm", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                     elif specKey == "build_rate" and specValue is not None and specValue != "" and isinstance(specValue, dict):
                                         buildRate = None
                                         if "unit" in specValue:
@@ -196,9 +197,9 @@ def parsePrinterJSONToDBKGFormat(jsonData:dict) -> list[dict]|Exception:
                                             elif specValue["unit"] == "mm/s":
                                                 buildRate = specValue["value"] * 3600. / 1000.
                                         if buildRate is not None:
-                                            currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.key: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.value: buildRate, NodePropertyDescription.unit: "cm³/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                    elif specKey == "average_power_consumption" and specValue is not None and specValue != "":
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.key: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "€/kWh", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                            currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.key: NodePropertiesAMPrinter.buildRate, NodePropertyDescription.value: str(buildRate), NodePropertyDescription.unit: "cm³/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                    #elif specKey == "average_power_consumption" and specValue is not None and specValue != "":
+                                    #    currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.key: NodePropertiesAMPrinter.averagePowerConsumption, NodePropertyDescription.value: str(specValue), NodePropertyDescription.unit: "€/kWh", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                                     elif (specKey == "printing_speed" or specValue == "max_printing_speed") and specValue is not None and specValue != "":
                                         printingSpeed = None
                                         if "unit" in specValue:
@@ -209,12 +210,12 @@ def parsePrinterJSONToDBKGFormat(jsonData:dict) -> list[dict]|Exception:
                                             elif specValue["unit"] == "mm/s":
                                                 printingSpeed = specValue["value"] * 360.
                                         if printingSpeed is not None:
-                                            currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.key: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "cm/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                                    elif specKey == "certificates" and len(specValue) > 0:
+                                            currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.key: NodePropertiesAMPrinter.maxPrintingSpeed, NodePropertyDescription.value: str(specValue), NodePropertyDescription.unit: "cm/h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                    elif specKey == "certificates" and specValue is not None and len(specValue) > 0:
                                         currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.certificates, NodePropertyDescription.key: NodePropertiesAMPrinter.certificates, NodePropertyDescription.value: ",".join(specValue), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
                                     elif specKey == "coating_time" and specValue is not None and specValue != "":
-                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.key: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.value: specValue, NodePropertyDescription.unit: "h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                        outArray.append(currentDict)
+                                        currentDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.key: NodePropertiesAMPrinter.coatingTime, NodePropertyDescription.value: str(specValue), NodePropertyDescription.unit: "h", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outArray.append(currentDict)
         return outArray
     except Exception as e:
         loggerError.error(f"Error in parsePrinterJSONToDBKGFormat: {e}")
@@ -242,7 +243,7 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
         
         outDict[NodeDescription.nodeName] = jsonData.get("material_information", {}).get("material_supplier", "") + " " + jsonData.get("material_information", {}).get("material_name", "")
         for key, value in jsonData.items():
-            if key == "certificates" and len (value) > 0:
+            if key == "certificates" and value is not None and len (value) > 0:
                 outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.certificates, NodePropertyDescription.key: NodePropertiesAMMaterial.certificates, NodePropertyDescription.value: ",".join(value), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
             elif key == "mechanical_properties":
                 for subKey, subValue in value.items():
@@ -256,7 +257,7 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                             else:
                                 val = 0
                         if val != 0:
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.value: val, NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                     elif subKey == "tensile_modulus" and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "GPa":
@@ -267,13 +268,13 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                             else:
                                 val = 0
                         if val != 0:
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.key: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.value: val, NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.key: NodePropertiesAMMaterial.tensileModulus, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                     elif subKey == "elongation_at_break" and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "%":
                             val = 0
                         if val != 0:
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.key: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.value: val, NodePropertyDescription.unit: "%", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.key: NodePropertiesAMMaterial.elongationAtBreak, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "%", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                     elif subKey == "flexural_strength" and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "MPa":
@@ -284,7 +285,7 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                             else:
                                 val = 0
                         if val != 0:
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: val, NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                     elif subKey == "elastic_modulus" and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "GPa":
@@ -295,22 +296,22 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                             else:
                                 val = 0
                         if val != 0:
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul, NodePropertyDescription.key: NodePropertiesAMMaterial.eModul, NodePropertyDescription.value: val, NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul, NodePropertyDescription.key: NodePropertiesAMMaterial.eModul, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "GPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
             elif key == "physical_properties":
                 for subKey, subValue in value.items():
                     if subKey == "density" and subValue is not None and subValue != "":
                         if subValue.get("unit", "") == "g/cm³":
-                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.density, NodePropertyDescription.key: NodePropertiesAMMaterial.density, NodePropertyDescription.value: subValue.get("value", 0), NodePropertyDescription.unit: "g/cm³", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                            outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.density, NodePropertyDescription.key: NodePropertiesAMMaterial.density, NodePropertyDescription.value: str(subValue.get("value", 0)), NodePropertyDescription.unit: "g/cm³", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
             elif key == "printing_settings":
                 for subKey, subValue in value.items():
                     if subKey == "printing_speed" and subValue is not None and subValue != "":
                             if subValue.get("unit", "") == "mm/s":
-                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: value.get("printing_speed", 0), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-            elif key == "material_type" and len(value) > 0:
+                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: str(value.get("printing_speed", 0)), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+            elif key == "material_type" and value is not None and len(value) > 0:
                 if "general_material_type" in value and value["general_material_type"] is not None and value["general_material_type"] != "Other":
                     outDict["materialType"] = value["general_material_type"]
                 if "specific_material_type" in value and value["specific_material_type"] is not None and value["specific_material_type"] != "Other":
-                    outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.key: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: value.get("specific_material_type", ""), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
+                    outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.key: NodePropertiesAMMaterial.specificMaterialType, NodePropertyDescription.value: str(value.get("specific_material_type", "")), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.text.value})
 
         return outDict
     except Exception as e:
@@ -325,12 +326,12 @@ def insertIntoKG(dataDict:dict|list, category:str) -> None|Exception:
     """
     try:
         if category == "printer":
+            techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
             # go through all configurations
             for config in dataDict:
                 # connect to existing technology node
                 techID = ""
                 if "technology" in config:
-                    techNodes = Basics.getNodesByType(NodeTypesAM.technology.value)
                     for tNode in techNodes:
                         similarity = SequenceMatcher(a=tNode[NodeDescription.nodeName], b=config["technology"]).quick_ratio()
                         if  similarity >= 0.8:
