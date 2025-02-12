@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2024
 
-Contains: Signals send by the other apps which relate to the Additive Manufacturing service
+Contains: Signals send by the other apps which relate to the Assembly service
 """
 
 import Generic_Backend.code_General.utilities.signals as GeneralSignals

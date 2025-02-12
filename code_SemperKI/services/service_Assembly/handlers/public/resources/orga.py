@@ -27,8 +27,8 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
-from code_SemperKI.services.service_Assembly.logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
-from code_SemperKI.services.service_Assembly.utilities.basics import checkIfOrgaHasAAsService
+from ....logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
+from ....utilities.basics import checkIfOrgaHasAAsService
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer

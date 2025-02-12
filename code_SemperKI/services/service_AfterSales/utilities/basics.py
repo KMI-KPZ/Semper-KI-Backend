@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2024
 
-Contains: Basic implementations regarding the AM service
+Contains: Basic implementations regarding the AS service
 """
 
 from functools import wraps
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from ....services.service_AfterSales.service import SERVICE_NUMBER
+from ..service import SERVICE_NUMBER
 
 #################### DECORATOR ###################################
 def checkIfOrgaHasASAsService():
@@ -29,7 +29,7 @@ def checkIfOrgaHasASAsService():
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
-            #Check that this orga provides AM as service
+            #Check that this orga provides AS as service
             orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
             functionName = func.cls.__name__ if func.__name__ == "view" else func.__name__
             if SERVICE_NUMBER not in ProfileManagementOrganization.getSupportedServices(orgaID):
