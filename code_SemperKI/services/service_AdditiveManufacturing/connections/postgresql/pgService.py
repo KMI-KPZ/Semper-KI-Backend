@@ -21,7 +21,7 @@ def initializeService(serviceDetails:dict) -> dict:
     """
     try:
         if ServiceDetails.groups not in serviceDetails:
-            serviceDetails[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}, ServiceDetails.context: ""}]
+            serviceDetails[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}, ServiceDetails.color: {}, ServiceDetails.context: ""}]
         return serviceDetails
     except (Exception) as error:
         logger.error(f'Generic error in initializeService(3D Print): {str(error)}')
@@ -52,6 +52,8 @@ def parseServiceDetails(existingContent:dict) -> dict|Exception:
                             outEntry[ServiceDetails.models] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.models]] # convert models to list
                         case ServiceDetails.calculations:
                             outEntry[ServiceDetails.calculations] = [existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations][content] for content in existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]] # convert calculations to list
+                        case ServiceDetails.color:
+                            outEntry[ServiceDetails.color] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.color]
                         case ServiceDetails.context:
                             outEntry[ServiceDetails.context] = existingContent[ServiceDetails.groups][groupIdx][ServiceDetails.context]
                 outContent[ServiceDetails.groups].append(outEntry)
@@ -75,10 +77,10 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
 
     try:
         if ServiceDetails.groups not in existingContent:
-            existingContent[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}}]
+            existingContent[ServiceDetails.groups] = [{ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}, ServiceDetails.color: {}, ServiceDetails.context: ""}]
         for idx, newContentGroup in enumerate(newContent[ServiceDetails.groups]):
             if idx >= len(existingContent[ServiceDetails.groups]):
-                existingContent[ServiceDetails.groups].append({ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}})
+                existingContent[ServiceDetails.groups].append({ServiceDetails.models: {}, ServiceDetails.material: {}, ServiceDetails.postProcessings: {}, ServiceDetails.color: {}, ServiceDetails.context: ""})
             existingGroup = existingContent[ServiceDetails.groups][idx]
 
             for entry in newContentGroup:
@@ -100,7 +102,8 @@ def updateServiceDetails(existingContent:dict, newContent:dict) -> dict:
                         existingGroup[ServiceDetails.calculations][fileID] = newContentGroup[entry][fileID]
                 elif entry == ServiceDetails.context:
                     existingGroup[ServiceDetails.context] = newContentGroup[entry]
-                    
+                elif entry == ServiceDetails.color:
+                    existingGroup[ServiceDetails.color] = newContentGroup[entry]
                 else:
                     raise NotImplementedError("This service detail does not exist (yet).")
 
@@ -152,6 +155,8 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
                             del existingGroup[ServiceDetails.calculations][fileID]
                     case ServiceDetails.context:
                         existingGroup[ServiceDetails.context] = ""
+                    case ServiceDetails.color:
+                        existingGroup[ServiceDetails.color] = {}
                     case _:
                         raise NotImplementedError("This service detail does not exist (yet).")
             groupIdxForExistingContent += 1
@@ -261,6 +266,8 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
                 tempDict[ServiceDetails.postProcessings] = group[ServiceDetails.postProcessings]
             if ServiceDetails.context in group:
                 tempDict[ServiceDetails.context] = group[ServiceDetails.context]
+            if ServiceDetails.color in group:
+                tempDict[ServiceDetails.color] = group[ServiceDetails.color]
             outDict[ServiceDetails.groups].append(tempDict)
     
     except Exception as error:

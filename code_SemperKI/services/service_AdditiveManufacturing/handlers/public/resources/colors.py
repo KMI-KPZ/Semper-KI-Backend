@@ -28,7 +28,7 @@ from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
-from ....logics.colorsLogic import logicForGetRALList
+from ....logics.colorsLogic import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -62,8 +62,8 @@ def getRALList(request:Request):
     
     :param request: GET Request
     :type request: HTTP GET
-    :return: 
-    :rtype: Response
+    :return: JSON Array with RAL table
+    :rtype: JSONResponse
 
     """
     try:
@@ -75,6 +75,70 @@ def getRALList(request:Request):
             raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {getRALList.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+#######################################################
+class SReqColor(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+
+#######################################################
+class SReqSetColor(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processID = serializers.CharField(max_length=200)
+    groupID = serializers.IntegerField()
+    color = serializers.DictField()
+
+#######################################################
+@extend_schema(
+    summary="Set the color",
+    description=" ",
+    tags=['FE - Color'],
+    request=SReqSetColor,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["POST"])
+@api_view(["POST"])
+@checkVersion(0.3)
+def setColor(request:Request):
+    """
+    Set the color
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        inSerializer = SReqSetColor(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {setColor.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+        result, statusCode = logicForSetColor(request, validatedInput, setColor.cls.__name__)
+        if statusCode != 200:
+            raise Exception(result)
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {setColor.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

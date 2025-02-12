@@ -259,16 +259,16 @@ def getPropertyDefinitionForNodeType(nodeType:str, userLocale:str) -> list[dict]
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.foodSafe]),
-                            NodePropertyDescription.key: NodePropertiesAMColor.foodSafe,
-                            NodePropertyDescription.value: "License;License;...",
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorHEX]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.colorHEX,
+                            NodePropertyDescription.value: "[#000000, #FFFFFF]",
                             NodePropertyDescription.unit: "",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.color]),
-                            NodePropertyDescription.key: NodePropertiesAMColor.color,
-                            NodePropertyDescription.value: "000000",
-                            NodePropertyDescription.unit: "#Hex",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.color})
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.array})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorRAL]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.colorRAL,
+                            NodePropertyDescription.value: "RAL 1000",
+                            NodePropertyDescription.unit: "",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.certificates]),
                             NodePropertyDescription.key: NodePropertiesAMColor.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",

@@ -27,6 +27,7 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
+    color = enum.auto()
     context = enum.auto()
 
 ##################################################
@@ -185,9 +186,8 @@ class NodePropertiesAMColor(StrEnumExactlyAsDefined):
     What are the properties, a color node can have?
     """
     imgPath = enum.auto() # mocks.testPicture
-    foodSafe = enum.auto() #"FDA;10/2011"
-    heatResistant = enum.auto() #250 
-    color = enum.auto()  # 9005RAL;Black
+    colorRAL = enum.auto()  # RAL 9005
+    colorHEX = enum.auto()  # #000000;#FFFFFF
     certificates = enum.auto() # CE, MD, ...
 
 ##################################################

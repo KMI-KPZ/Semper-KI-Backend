@@ -70,6 +70,7 @@ class NodePropertiesTypesOfEntries(StrEnumExactlyAsDefined):
     text = enum.auto()
     string = enum.auto()
     color = enum.auto()
+    array = enum.auto()
 
 ##################################################
 defaultOwner = "SYSTEM"
