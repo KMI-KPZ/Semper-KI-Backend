@@ -21,7 +21,7 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification
+from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification, colors
 from .handlers.public import materials, checkService, filter, model, postProcessings, costs
 
 from code_SemperKI.urls import paths, urlpatterns
@@ -61,7 +61,8 @@ newPaths = {
 
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
-    
+    "getRALList": ("public/service/additive-manufacturing/resources/colors/getRALList/", colors.getRALList),
+
     "onto_getGraph": ("public/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
     "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
