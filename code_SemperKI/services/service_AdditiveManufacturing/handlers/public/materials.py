@@ -55,6 +55,7 @@ class SReqMaterialContent(serializers.Serializer):
     propList = serializers.ListField()
     imgPath = serializers.CharField(max_length=200)
     medianPrice = serializers.FloatField(required=False)
+    colors = serializers.ListField(child=serializers.DictField(), required=False, allow_empty=True)
 
 #######################################################
 class SResMaterialsWithFilters(serializers.Serializer):
@@ -135,6 +136,7 @@ class SReqSetMaterial(serializers.Serializer):
     processID = serializers.CharField(max_length=200)
     groupID = serializers.IntegerField()
     material = SReqMaterialContent()
+    color = serializers.DictField(required=False)
     
 #######################################################
 @extend_schema(
@@ -175,12 +177,8 @@ def setMaterialSelection(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         info = serializedContent.data
-        projectID = info[ProjectDescription.projectID]
-        processID = info[ProcessDescription.processID]
-        groupID = info["groupID"]
-        material = info["material"]
         
-        result, statusCode = logicForSetMaterial(request, projectID, processID, groupID, material, setMaterialSelection.cls.__name__)
+        result, statusCode = logicForSetMaterial(request, info, setMaterialSelection.cls.__name__)
         if isinstance(result, Exception):
             message = f"Error in addMaterialToSelection: {str(result)}"
             exception = str(result)

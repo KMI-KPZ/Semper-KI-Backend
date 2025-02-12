@@ -261,7 +261,7 @@ def getPropertyDefinitionForNodeType(nodeType:str, userLocale:str) -> list[dict]
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
             outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorHEX]),
                             NodePropertyDescription.key: NodePropertiesAMColor.colorHEX,
-                            NodePropertyDescription.value: "[#000000, #FFFFFF]",
+                            NodePropertyDescription.value: "#000000, #FFFFFF",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.array})
             outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorRAL]),

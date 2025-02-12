@@ -17,6 +17,8 @@ from Generic_Backend.code_General.connections.redis import RedisConnection
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import ProcessUpdates
 from code_SemperKI.logics.processLogics import updateProcessFunction
+from code_SemperKI.modelFiles.processModel import ProcessDescription
+from code_SemperKI.modelFiles.projectModel import ProjectDescription
 from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails, MaterialDetails
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
@@ -78,18 +80,18 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
 
         materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
-            # use only entries from system
-            if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner: #and entry[pgKnowledgeGraph.NodeDescription.active] == True:
+            # use only entries from orgas
+            if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] is True:
                 # adhere to the filters:
                 append = True
-                for filter in filters["filters"]:
+                for filterEntry in filters["filters"]:
                     # see if filter is selected and the value has not been rules out somewhere
-                    if filter["isChecked"] is True and append is True:
+                    if filterEntry["isChecked"] is True and append is True:
                         # filter for material category
-                        if filter["question"]["title"] == "materialCategory":
+                        if filterEntry["question"]["title"] == "materialCategory":
                             appendViaThisFilter = False
-                            if filter["answer"] is not None:
-                                categoryID = filter["answer"]["value"] # contains the id of the chosen category node
+                            if filterEntry["answer"] is not None:
+                                categoryID = filterEntry["answer"]["value"] # contains the id of the chosen category node
                                 categoriesOfEntry = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.uniqueID], NodeTypesAM.materialCategory)
                                 if isinstance(categoriesOfEntry, Exception):
                                     raise categoriesOfEntry
@@ -101,10 +103,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                                 append = appendViaThisFilter
 
                         # filter for material tensile strenght
-                        if filter["question"]["title"] == "tensileStrength":
+                        if filterEntry["question"]["title"] == "tensileStrength":
                             appendViaThisFilter = False
-                            if filter["answer"] is not None:
-                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                            if filterEntry["answer"] is not None:
+                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
                                     if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
@@ -115,10 +117,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                                 append = appendViaThisFilter
                         
                         # filter for material density
-                        if filter["question"]["title"] == "density":
+                        if filterEntry["question"]["title"] == "density":
                             appendViaThisFilter = False
-                            if filter["answer"] is not None:
-                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                            if filterEntry["answer"] is not None:
+                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
                                     if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
@@ -129,10 +131,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                                 append = appendViaThisFilter
                         
                         # filter for material elongation at break
-                        if filter["question"]["title"] == "elongationAtBreak":
+                        if filterEntry["question"]["title"] == "elongationAtBreak":
                             appendViaThisFilter = False
-                            if filter["answer"] is not None:
-                                answerRange = [filter["answer"]["value"]["min"], filter["answer"]["value"]["max"]]
+                            if filterEntry["answer"] is not None:
+                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
                                     if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
@@ -143,10 +145,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                                 append = appendViaThisFilter
                         
                         # filter for material certificates
-                        if filter["question"]["title"] == "certificates":
+                        if filterEntry["question"]["title"] == "certificates":
                             appendViaThisFilter = False
-                            if filter["answer"] is not None:
-                                certificates = filter["answer"]["value"]
+                            if filterEntry["answer"] is not None:
+                                certificates = filterEntry["answer"]["value"]
                                 propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
                                 for prop in propertiesOfEntry:
                                     if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.certificates:
@@ -163,17 +165,27 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
 
 
                 if append:
+                    # prepare properties
                     imgPath = mocks.testPicture
                     for propIdx, prop in enumerate(entry[pgKnowledgeGraph.NodeDescription.properties]):
                         if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.imgPath:
                             imgPath = prop[pgKnowledgeGraph.NodePropertyDescription.value]
                             del entry[pgKnowledgeGraph.NodeDescription.properties][propIdx]
-                            break
+                        elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.acquisitionCosts:
+                            del entry[pgKnowledgeGraph.NodeDescription.properties][propIdx] # info that the user doesn't need to know
+                        elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.printingSpeed:
+                            del entry[pgKnowledgeGraph.NodeDescription.properties][propIdx]
                         else:
                             # translate properties
                             entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,entry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
 
-                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0.})
+                    # fetch colors of that material
+                    colorsOfMaterial = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
+                    # maybe parse the content of the colorNodeArray
+                    # sort out all inactive nodes
+                    colorsOfMaterial = [color for color in colorsOfMaterial if color[pgKnowledgeGraph.NodeDescription.active] is True]
+
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., "colors": colorsOfMaterial})
                     # TODO use translation here for nodeName
         # sort by price
         output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
@@ -187,7 +199,7 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
         return (e, 500)
 
 ##################################################
-def logicForSetMaterial(request, projectID, processID, groupID, material, functionName) -> tuple[dict|Exception, int]:
+def logicForSetMaterial(request, validatedInput, functionName) -> tuple[dict|Exception, int]:
     """
     Set a material
 
@@ -199,12 +211,20 @@ def logicForSetMaterial(request, projectID, processID, groupID, material, functi
     try:
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface()
-        if interface == None:
+        if interface is None:
             return (Exception(f"Rights not sufficient in {functionName}"), 401)
+
+        projectID = validatedInput[ProjectDescription.projectID]
+        processID = validatedInput[ProcessDescription.processID]
+        groupID = validatedInput["groupID"]
+        material = validatedInput["material"]
+        color = validatedInput["color"] if "color" in validatedInput else None
 
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
         updateArray[groupID] = {ServiceDetails.material: material}
+        if color is not None:
+            updateArray[groupID][ServiceDetails.color] = color
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process
