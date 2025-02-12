@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2024
 
-Contains: Handlers of frontend filters for AM service details
+Contains: Handlers of frontend filters for A service details
 """
 
 import json, logging, copy
