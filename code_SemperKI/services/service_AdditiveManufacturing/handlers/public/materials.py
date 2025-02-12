@@ -136,7 +136,7 @@ class SReqSetMaterial(serializers.Serializer):
     processID = serializers.CharField(max_length=200)
     groupID = serializers.IntegerField()
     material = SReqMaterialContent()
-    color = serializers.DictField(required=False)
+    color = serializers.DictField(required=False, allow_empty=True)
     
 #######################################################
 @extend_schema(
