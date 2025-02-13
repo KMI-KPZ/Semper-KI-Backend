@@ -63,7 +63,7 @@ newPaths = {
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
     
     "getRALList": ("public/service/additive-manufacturing/resources/colors/getRALList/", colors.getRALList),
-    "setColor": ("public/service/additive-manufacturing/resources/colors/set/", colors.setColor),
+    #"setColor": ("public/service/additive-manufacturing/resources/colors/set/", colors.setColor),
 
     "onto_getGraph": ("public/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),

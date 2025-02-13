@@ -183,9 +183,14 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                     colorsOfMaterial = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(entry[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
                     # maybe parse the content of the colorNodeArray
                     # sort out all inactive nodes
-                    colorsOfMaterial = [color for color in colorsOfMaterial if color[pgKnowledgeGraph.NodeDescription.active] is True]
+                    colors = []
+                    for color in colorsOfMaterial:
+                        if color[pgKnowledgeGraph.NodeDescription.active] is True:
+                            for propIdx, prop in enumerate(color[pgKnowledgeGraph.NodeDescription.properties]):
+                                color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
+                            colors.append(color)
 
-                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., "colors": colorsOfMaterial})
+                    output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., "colors": colors})
                     # TODO use translation here for nodeName
         # sort by price
         output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
