@@ -223,13 +223,12 @@ def logicForSetMaterial(request, validatedInput, functionName) -> tuple[dict|Exc
         processID = validatedInput[ProcessDescription.processID]
         groupID = validatedInput["groupID"]
         material = validatedInput["material"]
-        color = validatedInput["color"] if "color" in validatedInput else None
+        color = validatedInput["color"] if "color" in validatedInput else {}
 
         existingGroups = interface.getProcessObj(projectID, processID).serviceDetails[ServiceDetails.groups]
         updateArray = [{} for i in range(len(existingGroups))]
         updateArray[groupID] = {ServiceDetails.material: material}
-        if color is not None:
-            updateArray[groupID][ServiceDetails.color] = color
+        updateArray[groupID][ServiceDetails.color] = color
         changes = {"changes": {ProcessUpdates.serviceDetails: {ServiceDetails.groups: updateArray}}}
 
         # Save into files field of the process

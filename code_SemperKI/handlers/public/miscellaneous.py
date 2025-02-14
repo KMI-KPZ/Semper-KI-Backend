@@ -233,14 +233,14 @@ def maturityLevel(request:Request):
         500: ExceptionSerializer
     }
 )
-@require_http_methods(["GET"])
-@api_view(["GET"])
+@require_http_methods(["POST"])
+@api_view(["POST"])
 def resilienceScore(request:Request):
     """
     Return the resilience score of the project
 
-    :param request: GET Request
-    :type request: HTTP GET
+    :param request: POST Request
+    :type request: HTTP POST
     :return: JSON Response
     :rtype: JSONResponse
 
