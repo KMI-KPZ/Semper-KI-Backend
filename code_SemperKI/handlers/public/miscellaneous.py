@@ -222,6 +222,7 @@ def maturityLevel(request:Request):
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 #######################################################
+
 @extend_schema(
     summary="Return the resilience score of the project",
     description=" ",
@@ -246,13 +247,11 @@ def resilienceScore(request:Request):
 
     """
     try:
-        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
-        if isinstance(orgaAsDict, Exception):
-            raise ValidationError("No organization found")
-        if OrganizationDetailsSKI.resilienceScore in orgaAsDict[OrganizationDescription.details]:
-            return JsonResponse({"resilienceScore": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.resilienceScore]})
-        else:
-            return JsonResponse({"resilienceScore": -1}) # -1 means not set
+        orgID = request.data["orgID"] if "orgID" in request.data else ""
+        assessmentType = request.data["assessmentType"] if "assessmentType" in request.data else ""
+        data = request.data["data"] if "data" in request.data else []
+        # TODO save shit to db
+        return Response()
     except (Exception) as error:
         message = f"Error in {resilienceScore.cls.__name__}: {str(error)}"
         exception = str(error)

@@ -79,6 +79,7 @@ newPaths= {
     "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
     "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
     "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
+    "getNodesByUniqueID": ("private/nodes/get/by-uniqueID/<str:nodeID>/", knowledgeGraphDB.getNodesByUniqueID),
     "getSpecificNeighborsByType": ("private/edges/get/by-type/<str:nodeID>/<str:nodeType>/", knowledgeGraphDB.getSpecificNeighborsByType),
     "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
     "getNodesByTypeAndProperty": ("private/edges/get/by-property-and-type/<str:nodeType>/<str:nodeProperty>/<str:value>/", knowledgeGraphDB.getNodesByTypeAndProperty),

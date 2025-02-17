@@ -332,6 +332,57 @@ def getNodesByType(request:Request, nodeType:str):
         
 #######################################################
 @extend_schema(
+    summary="Get all nodes that share that nodes unique ID",
+    description=" ",
+    tags=['BE - Graph'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def getNodesByUniqueID(request:Request, nodeID:str):
+    """
+    Get all nodes with a certain type
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param nodeType: The type of the nodes
+    :type nodeType: str
+    :return: list of nodes
+    :rtype: Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.Basics.getNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        result = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(result.uniqueID)
+        if isinstance(result, Exception):
+            raise result
+
+        outSerializer = SResNode(data=result, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {getNodesByUniqueID.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
     summary="Get all nodes with a certain property",
     description=" ",
     tags=['BE - Graph'],
