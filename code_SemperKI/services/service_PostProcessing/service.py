@@ -6,9 +6,14 @@ Silvio Weging 2023
 Contains: Class which describes the service in particular
 """
 import code_SemperKI.serviceManager as Semper
+from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
 
-from .connections.postgresql.pgService import updateServiceDetails as PP_updateServiceDetails, deleteServiceDetails as PP_deleteServiceDetails, serviceReady as PP_serviceReady, cloneServiceDetails as PP_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as PP_checkIfSelectionIsAvailable
+from .connections.postgresql.pgService import initializeService as PP_initializeService, updateServiceDetails as PP_updateServiceDetails, deleteServiceDetails as PP_deleteServiceDetails, isFileRelevantForService as PP_isFileRelevantForService, serviceReady as PP_serviceReady, cloneServiceDetails as PP_cloneServiceDetails
+from .logics.checkServiceLogic import checkIfSelectionIsAvailable as PP_checkIfSelectionIsAvailable
+from .connections.filterViaSparql import *
+from .definitions import SERVICE_NAME, SERVICE_NUMBER
+from .logics.costs import Costs
 
 ###################################################
 class PostProcessing(Semper.ServiceBase):
@@ -16,17 +21,14 @@ class PostProcessing(Semper.ServiceBase):
     All connections of this service that Semper-KI should know about
     
     """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
 
     ###################################################
-    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+    def initializeServiceDetails(self, serviceDetails:dict) -> None:
         """
         Initialize the service
 
         """
-        return {}
+        return PP_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -38,13 +40,13 @@ class PostProcessing(Semper.ServiceBase):
         return PP_updateServiceDetails(existingContent, newContent)
     
     ###################################################
-    def deleteServiceDetails(self, existingContent, newContent):
+    def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Run service specific update of service details
 
         """
 
-        return PP_deleteServiceDetails(existingContent, newContent)
+        return PP_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
     def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
@@ -52,7 +54,17 @@ class PostProcessing(Semper.ServiceBase):
         Check if a file is relevant for the service
 
         """
-        return False
+        return PP_isFileRelevantForService(existingContent, fileID)
+
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        outContent = {}
+
+        return outContent
     
     ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
@@ -63,20 +75,13 @@ class PostProcessing(Semper.ServiceBase):
         return PP_serviceReady(existingContent)
     
     ###################################################
-    def parseServiceDetails(self, existingContent) -> dict:
-        """
-        Parse the service details for Frontend
-
-        """
-        return {}
-    
-    ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
         """
         Checks, if the selection of the service is available (material, ...)
         
         """
-        return PP_checkIfSelectionIsAvailable(processObj)
+        completeOrNot, listOfMissingStuff = PP_checkIfSelectionIsAvailable(processObj)
+        return (completeOrNot, listOfMissingStuff)
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -102,31 +107,38 @@ class PostProcessing(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :param transferObject: Object to transfer data between services
+        :param transferObject: Transfer object with additional information
         :type transferObject: object
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return {}
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts() 
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+            
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
+        
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
-        """
-        return [], {}
-
-    ###################################################
-    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
-        """
-        Get the service specific details for a contractor
+        :param processObj: The process in question
+        :type processObj: ProcessInterface|Process
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
 
         """
-        return existingDetails
+        filteredContractors = Filter()
 
-SERVICE_NAME = "POST_PROCESSING"
-SERVICE_NUMBER = 4
+        outList = filteredContractors.getFilteredContractors(processObj)
+        
+        return outList, filteredContractors
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, PostProcessing())
