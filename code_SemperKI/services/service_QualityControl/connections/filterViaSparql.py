@@ -46,13 +46,9 @@ class Filter():
         :rtype: List
         """
         try:
-            listOfContractors = []
             serviceType = processObj.serviceType
-            userlist , orgalist = pgProfiles.ProfileManagementBase.getAll()
-            for orga in orgalist:
-                if serviceType in orga[OrganizationDescription.supportedServices]:
-                    listOfContractors.append(orga[OrganizationDescription.hashedID])
-
+            orgalist = pgProfiles.ProfileManagementBase.getOrganisationWithSupportedService(serviceType)
+            listOfContractors = [orga.hashedID for orga in orgalist]
             return listOfContractors
         except Exception as e:
             loggerError.error(f"Error in filterQCContractors: {e}")

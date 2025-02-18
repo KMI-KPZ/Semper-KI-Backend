@@ -72,7 +72,8 @@ class QualityControl(Semper.ServiceBase):
         Checks, if service is completely defined
         
         """
-        return QC_serviceReady(existingContent)
+        completeOrNot, listOfMissingStuff = QC_serviceReady(existingContent)
+        return (completeOrNot, listOfMissingStuff)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -80,8 +81,8 @@ class QualityControl(Semper.ServiceBase):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        completeOrNot, listOfMissingStuff = QC_checkIfSelectionIsAvailable(processObj)
-        return (completeOrNot, listOfMissingStuff)
+        return QC_checkIfSelectionIsAvailable(processObj)
+
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -140,5 +141,13 @@ class QualityControl(Semper.ServiceBase):
         outList = filteredContractors.getFilteredContractors(processObj)
         
         return outList, filteredContractors
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+        return existingDetails
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl())

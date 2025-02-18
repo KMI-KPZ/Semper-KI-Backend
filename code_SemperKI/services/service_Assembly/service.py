@@ -73,7 +73,8 @@ class Assembly(Semper.ServiceBase):
         Checks, if service is completely defined
         
         """
-        return A_serviceReady(existingContent)
+        completeOrNot, listOfMissingStuff =  A_serviceReady(existingContent)
+        return (completeOrNot, listOfMissingStuff)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -81,8 +82,7 @@ class Assembly(Semper.ServiceBase):
         Checks, if the selection of the service is available (material, ...)
         
         """
-        completeOrNot, listOfMissingStuff =  A_checkIfSelectionIsAvailable(processObj)
-        return (completeOrNot, listOfMissingStuff)
+        return A_checkIfSelectionIsAvailable(processObj)
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -141,5 +141,13 @@ class Assembly(Semper.ServiceBase):
         outList = filteredContractors.getFilteredContractors(processObj)
         
         return outList, filteredContractors
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+        return existingDetails
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Assembly())

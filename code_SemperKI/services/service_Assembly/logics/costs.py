@@ -56,7 +56,7 @@ class Costs():
         
         """
         try:
-            costsPerGroup = [0,0]
+            costsPerGroup = [(0.,0.)]
                 
             return costsPerGroup
         except Exception as e:
