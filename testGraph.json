@@ -141,6 +141,54 @@
   },
   {
     "node": {
+      "nodeTempID": 23,
+      "nodeName": "Resin",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 24,
+      "nodeName": "Wax",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 25,
+      "nodeName": "Acrylic",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 26,
+      "nodeName": "Quarz",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
       "nodeTempID": 7
     },
     "edges": [
@@ -333,6 +381,39 @@
           {"name": "certificates", "key": "certificates", "value": "FCC, CE, EMC", "unit": "", "type": "text"}
         ],
         "active": true
+      },
+      {
+        "nodeTempID": 23
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 11
+    },
+    "edges": [
+      {
+        "nodeTempID": 24
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 12
+    },
+    "edges": [
+      {
+        "nodeTempID": 25
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 13
+    },
+    "edges": [
+      {
+        "nodeTempID": 26
       }
     ]
   }

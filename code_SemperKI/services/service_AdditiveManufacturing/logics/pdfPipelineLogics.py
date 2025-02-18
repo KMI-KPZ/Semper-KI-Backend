@@ -358,6 +358,21 @@ def insertIntoKG(dataDict:dict|list, category:str) -> None|Exception:
                 raise createdMaterial
             if typeID != "":
                 Basics.createEdge(createdMaterial.nodeID, typeID)
+            # Create a specific material type node if it doesn't exist and connect it to the material node
+            for prop in dataDict[NodeDescription.properties]:
+                if prop[NodePropertyDescription.key] == NodePropertiesAMMaterial.specificMaterialType:
+                    specificTypeNodes = Basics.getNodesByType(NodeTypesAM.materialType.value)
+                    specificTypeNodeID = ""
+                    for sNode in specificTypeNodes:
+                        if SequenceMatcher(a=sNode[NodeDescription.nodeName], b=prop[NodePropertyDescription.value]).quick_ratio() > 0.8:
+                            specificTypeNodeID = sNode[NodeDescription.nodeID]
+                            break
+                    if specificTypeNodeID == "":
+                        specificTypeNode = Basics.createNode({NodeDescription.nodeType: NodeTypesAM.materialType.value, NodeDescription.nodeName: prop[NodePropertyDescription.value]})
+                        if isinstance(specificTypeNode, Exception):
+                            raise specificTypeNode
+                        specificTypeNodeID = specificTypeNode.nodeID
+                    Basics.createEdge(createdMaterial.nodeID, specificTypeNodeID)
     except Exception as e:
         loggerError.error(f"Error in insertIntoKG: {e}")
         return e

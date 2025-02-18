@@ -700,3 +700,45 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+#######################################################
+@extend_schema(
+    summary="Create material type nodes from existing materials",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_createMaterialTypeNodes(request:Request):
+    """
+    Create material type nodes from existing materials
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        result, statusCode = logicForCreateMaterialTypeNodes()
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success")
+    except (Exception) as error:
+        message = f"Error in {onto_createMaterialTypeNodes.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

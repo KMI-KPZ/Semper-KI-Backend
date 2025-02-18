@@ -154,7 +154,7 @@ def userUpdatedSemperKI(userHashID:str, session, updates):
         return None
 
 ####################################################################################
-def orgaCreatedSemperKI(orgaHashID:str):
+def orgaCreatedSemperKI(orgaHashID:str, oldDetails:dict):
     """
     Look for orga, update details according to Semper-KI specific fields
 
@@ -204,15 +204,16 @@ def orgaCreatedSemperKI(orgaHashID:str):
             else:
                 orga.details[OrganizationDetails.priorities][setting] = {PriorityTargetsSemperKI.value: 4}
 
-        if OrganizationDetailsSKI.maturityLevel not in existingDetails:
-            orga.details[OrganizationDetailsSKI.maturityLevel] = 0
+        # Semper KI specific stuff
+        if OrganizationDetailsSKI.maturityLevel not in oldDetails:
+            orga.details[OrganizationDetailsSKI.maturityLevel] = []
         else:
-            orga.details[OrganizationDetailsSKI.maturityLevel] = existingDetails[OrganizationDetailsSKI.maturityLevel]
+            orga.details[OrganizationDetailsSKI.maturityLevel] = oldDetails[OrganizationDetailsSKI.maturityLevel]
         
-        if OrganizationDetailsSKI.resilienceScore not in existingDetails:
-            orga.details[OrganizationDetailsSKI.resilienceScore] = 0
+        if OrganizationDetailsSKI.resilienceScore not in oldDetails:
+            orga.details[OrganizationDetailsSKI.resilienceScore] = []
         else:
-            orga.details[OrganizationDetailsSKI.resilienceScore] = existingDetails[OrganizationDetailsSKI.resilienceScore]
+            orga.details[OrganizationDetailsSKI.resilienceScore] = oldDetails[OrganizationDetailsSKI.resilienceScore]
 
         orga.save()
     except Exception as error:

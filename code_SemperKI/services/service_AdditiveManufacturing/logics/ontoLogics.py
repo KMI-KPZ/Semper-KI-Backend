@@ -6,6 +6,7 @@ Silvio Weging 2025
 Contains: Logic functions for service specific organization KG stuff
 """
 
+from difflib import SequenceMatcher
 import json, logging, copy
 from datetime import datetime
 from django.conf import settings
@@ -310,4 +311,33 @@ def logicForDeleteEdge(request:Request, nodeID1:str, nodeID2:str) -> tuple[None|
         return None, 200
     except Exception as e:
         loggerError.error("Error in logicForDeleteEdge: " + str(e))
+        return e, 500
+    
+##################################################
+def logicForCreateMaterialTypeNodes() -> tuple[None|Exception, int]:
+    """
+    Create nodeType nodes from existing material nodes
+    
+    """
+    try:
+        materialNodes = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material.value)
+        for materialNode in materialNodes:
+            for prop in materialNode[pgKnowledgeGraph.NodeDescription.properties]:
+                if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.specificMaterialType:
+                    specificTypeNodes = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialType.value)
+                    specificTypeNodeID = ""
+                    for sNode in specificTypeNodes:
+                        if SequenceMatcher(a=sNode[pgKnowledgeGraph.NodeDescription.nodeName], b=prop[pgKnowledgeGraph.NodePropertyDescription.value]).quick_ratio() > 0.8:
+                            specificTypeNodeID = sNode[pgKnowledgeGraph.NodeDescription.nodeID]
+                            break
+                    if specificTypeNodeID == "":
+                        specificTypeNode = pgKnowledgeGraph.Basics.createNode({pgKnowledgeGraph.NodeDescription.nodeType: NodeTypesAM.materialType.value, pgKnowledgeGraph.NodeDescription.nodeName: prop[pgKnowledgeGraph.NodePropertyDescription.value]})
+                        if isinstance(specificTypeNode, Exception):
+                            raise specificTypeNode
+                        specificTypeNodeID = specificTypeNode.nodeID
+                    pgKnowledgeGraph.Basics.createEdge(materialNode[pgKnowledgeGraph.NodeDescription.nodeID], specificTypeNodeID)
+
+        return None, 200
+    except Exception as e:
+        loggerError.error("Error in logicForCreateMaterialTypeNodes: " + str(e))
         return e, 500

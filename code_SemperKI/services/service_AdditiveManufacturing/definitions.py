@@ -239,3 +239,16 @@ class ServiceSpecificDetailsForContractors(StrEnumExactlyAsDefined):
     """
     verified = enum.auto()
     groups = enum.auto()
+
+##################################################
+class FilterCategories(StrEnumExactlyAsDefined):
+    """
+    What filters can be applied?
+
+    """
+    materialCategory = enum.auto()
+    materialType = enum.auto()
+    tensileStrength = enum.auto()
+    density = enum.auto()
+    elongationAtBreak = enum.auto()
+    certificates = enum.auto()

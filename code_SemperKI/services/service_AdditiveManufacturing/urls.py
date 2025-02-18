@@ -77,6 +77,7 @@ newPaths = {
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
     "onto_deleteNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    "onto_createMaterialTypeNodes": ("public/service/additive-manufacturing/resources/onto/admin/nodes/createMaterialTypeNodes/", onto.onto_createMaterialTypeNodes),
     
     #"orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
     #"orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
@@ -123,6 +124,7 @@ newPaths = {
     "apiOnto_addNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "apiOnto_updateNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
     "apiOnto_deleteNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    "apiOnto_createMaterialTypeNodes": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/createMaterialTypeNodes/", onto.onto_createMaterialTypeNodes),
     
 }
 
