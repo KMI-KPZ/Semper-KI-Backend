@@ -35,7 +35,7 @@ class Filter():
         self.printerGroups = []
 
     ##################################################
-    def filterByMaterial(self, chosenMaterial:dict, groupIdx:int) -> None|Exception:
+    def filterByMaterialAndColor(self, chosenMaterial:dict, chosenColor:dict, groupIdx:int) -> None|Exception:
         """
         Filter by material choice
 
@@ -48,10 +48,6 @@ class Filter():
         
         """
         try:
-            #manufacturers = getManufacturersByMaterial.sendQuery()
-            # for entry in manufacturers:
-            #     if entry["ID"]["value"] not in resultDict:
-            #         resultDict[entry["ID"]["value"]] = entry
 
             # they must have all selected materials
             listOfSetsForManufacturers:list[set] = []
@@ -64,28 +60,33 @@ class Filter():
             for entry in nodesWithTheSameUID:
                 if NodeDescription.active in entry and entry[NodeDescription.active]:
                     if entry[NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
-                        
-                        setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
-
-                        # Save found printers that can print the selected material
-                        printersThatSupportThisMaterial = pgKG.Basics.getSpecificNeighborsByType(entry[NodeDescription.nodeID], NodeTypesAM.printer)
-                        if entry[NodeDescription.createdBy] in self.printerGroups[groupIdx]:
-                            self.printerGroups[groupIdx][entry[NodeDescription.createdBy]].extend(printersThatSupportThisMaterial)
+                        addPrinter = False
+                        # filter for color
+                        if chosenColor != {}:
+                            nodesWithTheSameUIDColor = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(chosenColor[NodeDescription.uniqueID])
+                            for entryColor in nodesWithTheSameUIDColor:
+                                if entryColor[NodeDescription.active] and entryColor[NodeDescription.createdBy] == entry[NodeDescription.createdBy] and pgKnowledgeGraph.Basics.getIfEdgeExists(entry[NodeDescription.nodeID], entryColor[NodeDescription.nodeID]):
+                                    setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+                                    addPrinter = True
                         else:
-                            self.printerGroups[groupIdx][entry[NodeDescription.createdBy]] = printersThatSupportThisMaterial
-                        
-                        # check if the printer and the material are verified for this organization
-                        for printer in printersThatSupportThisMaterial:
-                            verification = pgVerification.getVerificationObject(entry[NodeDescription.createdBy], printer[NodeDescription.nodeID], chosenMaterial[MaterialDetails.id])
-                            if not isinstance(verification, Exception):
-                                if verification.status == pgVerification.VerificationStatus.verified:
-                                    setOfVerifiedManufacturerIDs.add(entry[NodeDescription.createdBy])
-                                    break
+                            setOfManufacturerIDs.add(entry[NodeDescription.createdBy])
+                            addPrinter = True
 
-                        
-
-
-                        
+                        if addPrinter:
+                            # Save found printers that can print the selected material
+                            printersThatSupportThisMaterial = pgKG.Basics.getSpecificNeighborsByType(entry[NodeDescription.nodeID], NodeTypesAM.printer)
+                            if entry[NodeDescription.createdBy] in self.printerGroups[groupIdx]:
+                                self.printerGroups[groupIdx][entry[NodeDescription.createdBy]].extend(printersThatSupportThisMaterial)
+                            else:
+                                self.printerGroups[groupIdx][entry[NodeDescription.createdBy]] = printersThatSupportThisMaterial
+                            
+                            # check if the printer and the material are verified for this organization
+                            for printer in printersThatSupportThisMaterial:
+                                verification = pgVerification.getVerificationObject(entry[NodeDescription.createdBy], printer[NodeDescription.nodeID], chosenMaterial[MaterialDetails.id])
+                                if not isinstance(verification, Exception):
+                                    if verification.status == pgVerification.VerificationStatus.verified:
+                                        setOfVerifiedManufacturerIDs.add(entry[NodeDescription.createdBy])
+                                        break
                 
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
             
@@ -234,7 +235,7 @@ class Filter():
             self.resultGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
             self.printerGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
             for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
-                retVal = self.filterByMaterial(processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.material], groupIdx)
+                retVal = self.filterByMaterialAndColor(processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.material], processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.color], groupIdx)
                 if isinstance(retVal, Exception):
                     raise retVal
                 chosenPostProcessings = processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]

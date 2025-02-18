@@ -90,7 +90,7 @@ class Basics():
             for content in information:
                 match content:
                     case NodeDescription.nodeID:
-                        nodeID = information[NodeDescription.nodeID]
+                        uniqueID = information[NodeDescription.nodeID] # it's a clone
                     case "nodeTempID": # for testGraph
                         pass
                     case NodeDescription.nodeName:

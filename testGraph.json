@@ -330,7 +330,6 @@
         "properties": [
           {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
           {"name": "colorRAL", "key": "colorRAL", "value": "RAL 9004", "unit": "", "type": "text"},
-          {"name": "colorHEX", "key": "colorHEX", "value": "#2B2B2C,#0E0E10", "unit": "", "type": "array"},
           {"name": "certificates", "key": "certificates", "value": "FCC, CE, EMC", "unit": "", "type": "text"}
         ],
         "active": true

@@ -80,8 +80,8 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
 
         materialList = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         for entry in materialList:
-            # use only entries from orgas
-            if entry[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] is True:
+            # use only entries from system
+            if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] is True:
                 # adhere to the filters:
                 append = True
                 for filterEntry in filters["filters"]:
@@ -187,7 +187,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                     for color in colorsOfMaterial:
                         if color[pgKnowledgeGraph.NodeDescription.active] is True:
                             for propIdx, prop in enumerate(color[pgKnowledgeGraph.NodeDescription.properties]):
-                                color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
+                                if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.imgPath:
+                                    del color[pgKnowledgeGraph.NodeDescription.properties][propIdx]
+                                else:
+                                    color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
                             colors.append(color)
 
                     output["materials"].append({"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "title": entry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": entry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[entry[pgKnowledgeGraph.NodeDescription.uniqueID]] if entry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., "colors": colors})

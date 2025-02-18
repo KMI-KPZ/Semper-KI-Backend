@@ -7,6 +7,7 @@ Contains: Metaclass that handles the services
 """
 import enum, copy
 
+
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 from abc import ABC, abstractmethod
@@ -136,6 +137,7 @@ class ServicesStructure(StrEnumExactlyAsDefined):
     object = enum.auto()
     name = enum.auto()
     identifier = enum.auto()
+    imgPath = enum.auto()
 
 ######################################################
 class _ServicesManager():
@@ -150,10 +152,11 @@ class _ServicesManager():
         self._defaultName = "None"
         self._defaultIdx = 0
         self._services = {}
-        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx} 
+        self._imgPath = ""
+        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx, ServicesStructure.imgPath: self._imgPath} 
 
     ###################################################
-    def register(self, name:str, identifier:int, serviceClassObject):
+    def register(self, name:str, identifier:int, serviceClassObject, imgPath:str) -> None:
         """
         Registers a new service class
         
@@ -165,7 +168,7 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier}
+        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier, ServicesStructure.imgPath: imgPath}
 
     ###################################################
     def getNone(self) -> int:

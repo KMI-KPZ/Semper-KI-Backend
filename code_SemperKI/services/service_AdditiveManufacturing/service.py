@@ -5,6 +5,8 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
+from django.conf import settings
+
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
@@ -158,4 +160,4 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return existingDetails
 
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing(), settings.STATIC_URL+"media/AM.png")

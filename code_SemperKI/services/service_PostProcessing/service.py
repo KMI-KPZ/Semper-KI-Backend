@@ -5,6 +5,8 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
+from django.conf import settings
+
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
@@ -149,4 +151,4 @@ class PostProcessing(Semper.ServiceBase):
         """
         return existingDetails
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, PostProcessing())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, PostProcessing(), settings.STATIC_URL+"media/PP.png")

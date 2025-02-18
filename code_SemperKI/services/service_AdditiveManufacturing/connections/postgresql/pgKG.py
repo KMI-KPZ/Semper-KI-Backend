@@ -329,11 +329,11 @@ class LogicAM(Logic):
             chamberLength = 0
             for printerProperty in printer[NodeDescription.properties]:
                 # filter via build volume
-                if printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildHeight:
+                if printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildHeight:
                     chamberHeight = float(printerProperty[NodePropertyDescription.value])
-                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildWidth:
+                elif printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildWidth:
                     chamberWidth = float(printerProperty[NodePropertyDescription.value])
-                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildLength:
+                elif printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildLength:
                     chamberLength = float(printerProperty[NodePropertyDescription.value])
 
             if (calculatedValues[0] <= float(chamberLength) and \

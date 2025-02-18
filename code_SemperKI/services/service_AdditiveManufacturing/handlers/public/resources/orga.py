@@ -491,8 +491,8 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
         
         if validatedInput["type"] == "create":
-            if "nodeID" in validatedInput["node"]:
-                del validatedInput["node"]["nodeID"]
+            #if "nodeID" in validatedInput["node"]:
+            #    del validatedInput["node"]["nodeID"]
             resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
