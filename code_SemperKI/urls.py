@@ -60,8 +60,8 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
-    "maturityLevel": ("public/questionnaire/maturityLevel/", miscellaneous.maturityLevel),
-    "resilienceScore": ("public/questionnaire/resilienceScore/", miscellaneous.resilienceScore),
+    "maturityLevel": ("public/questionnaire/maturityLevel/get/", miscellaneous.maturityLevel),
+    "resilienceScore": ("public/questionnaire/resilienceScore/get/", miscellaneous.resilienceScore),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),

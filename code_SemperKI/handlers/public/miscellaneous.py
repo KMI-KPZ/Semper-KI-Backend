@@ -166,8 +166,23 @@ def retrieveResultsFromQuestionnaire(request:Request):
 
     """
     try:
-        # TODO: Parse the request and do the necessary
-        return HttpResponseRedirect(settings.FORWARD_URL)
+        orgID = request.data["orgID"] if "orgID" in request.data else ""
+        assessmentType = request.data["assessmentType"] if "assessmentType" in request.data else ""
+        data = request.data["data"] if "data" in request.data else []
+
+        if orgID != "":
+            orgaObj = ProfileManagementBase.getOrganizationObject(hashID=orgID)
+            if isinstance(orgaObj, Exception):
+                raise ValidationError("No organization found")
+            if "maturity" in assessmentType.lower():
+                orgaObj.details[OrganizationDetailsSKI.maturityLevel] = data
+            elif "resilience" in assessmentType.lower():
+                orgaObj.details[OrganizationDetailsSKI.resilienceScore] = data
+            else:
+                raise Exception("Unknown assessment type")
+            orgaObj.save()
+        
+        return Response()
     except (Exception) as error:
         message = f"Error in {retrieveResultsFromQuestionnaire.cls.__name__}: {str(error)}"
         exception = str(error)
@@ -207,9 +222,9 @@ def maturityLevel(request:Request):
         if isinstance(orgaAsDict, Exception):
             raise ValidationError("No organization found")
         if OrganizationDetailsSKI.maturityLevel in orgaAsDict[OrganizationDescription.details]:
-            return JsonResponse({"maturityLevel": orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.maturityLevel]})
+            return Response({OrganizationDetailsSKI.maturityLevel.value: orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.maturityLevel]})
         else:
-            return JsonResponse({"maturityLevel": -1}) # -1 means not set
+            return Response({OrganizationDetailsSKI.maturityLevel.value: []})
         
     except (Exception) as error:
         message = f"Error in {maturityLevel.cls.__name__}: {str(error)}"
@@ -234,24 +249,26 @@ def maturityLevel(request:Request):
         500: ExceptionSerializer
     }
 )
-@require_http_methods(["POST"])
-@api_view(["POST"])
+@require_http_methods(["GET"])
+@api_view(["GET"])
 def resilienceScore(request:Request):
     """
     Return the resilience score of the project
 
-    :param request: POST Request
-    :type request: HTTP POST
+    :param request: GET Request
+    :type request: HTTP GET
     :return: JSON Response
     :rtype: JSONResponse
 
     """
     try:
-        orgID = request.data["orgID"] if "orgID" in request.data else ""
-        assessmentType = request.data["assessmentType"] if "assessmentType" in request.data else ""
-        data = request.data["data"] if "data" in request.data else []
-        # TODO save shit to db
-        return Response()
+        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
+        if isinstance(orgaAsDict, Exception):
+            raise ValidationError("No organization found")
+        if OrganizationDetailsSKI.resilienceScore in orgaAsDict[OrganizationDescription.details]:
+            return Response({OrganizationDetailsSKI.resilienceScore.value: orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.resilienceScore]})
+        else:
+            return Response({OrganizationDetailsSKI.resilienceScore.value: []})
     except (Exception) as error:
         message = f"Error in {resilienceScore.cls.__name__}: {str(error)}"
         exception = str(error)
