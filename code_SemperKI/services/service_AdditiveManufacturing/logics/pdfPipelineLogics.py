@@ -258,7 +258,7 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                                 val = 0
                         if val != 0:
                             outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
-                    elif subKey == "tensile_modulus" and subValue is not None and subValue != "":
+                    elif (subKey == "tensile_modulus" or subKey == "youngs_modulus") and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "GPa":
                             if subValue.get("unit", "") == "MPa":
@@ -286,6 +286,8 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                                 val = 0
                         if val != 0:
                             outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength, NodePropertyDescription.value: str(val), NodePropertyDescription.unit: "MPa", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                    elif subKey == "poisson_ratio" and subValue is not None and subValue != "":
+                        outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.poissonRatio, NodePropertyDescription.key: NodePropertiesAMMaterial.poissonRatio, NodePropertyDescription.value: str(subValue), NodePropertyDescription.unit: "", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
                     elif subKey == "elastic_modulus" and subValue is not None and subValue != "":
                         val = subValue.get("value", 0)
                         if subValue.get("unit", "") != "GPa":

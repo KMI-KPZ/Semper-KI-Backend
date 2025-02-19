@@ -83,9 +83,10 @@ class MaterialDetails(StrEnumExactlyAsDefined):
     """
     id = enum.auto()
     title = enum.auto()
-    propList = enum.auto()
     imgPath = enum.auto()
-
+    medianPrice = enum.auto()
+    propList = enum.auto()
+    colors = enum.auto()
 
 ##################################################
 # What defines a material?
@@ -252,3 +253,4 @@ class FilterCategories(StrEnumExactlyAsDefined):
     density = enum.auto()
     elongationAtBreak = enum.auto()
     certificates = enum.auto()
+

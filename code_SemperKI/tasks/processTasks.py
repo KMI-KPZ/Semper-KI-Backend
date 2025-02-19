@@ -6,29 +6,29 @@ Silvio Weging 2024
 Contains: Tasks that are needed for almost every process 
             and which shall be run in the background
 """
+import logging, enum
 from time import sleep
+
 from django.conf import settings
-import logging
 
 from Generic_Backend.code_General.connections.mailer import MailingClass
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementBase, ProfileManagementOrganization, Organization
 from Generic_Backend.code_General.definitions import UserNotificationTargets, SessionContent, UserDetails, OrganizationDetails, ProfileClasses, FileObjectContent
 from Generic_Backend.code_General.modelFiles.userModel import UserDescription
 from Generic_Backend.code_General.utilities.asyncTask import runInBackground
+from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 import code_SemperKI.connections.content.postgresql.pgProcesses as DBProcessesAccess
 import code_SemperKI.utilities.websocket as websocket
 import code_SemperKI.utilities.locales as Locales
 import code_SemperKI.handlers.public.files as FileHandler
 
-from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails, NotificationSettingsUserSemperKI, NotificationSettingsOrgaSemperKI
+from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails, NotificationSettingsUserSemperKI, NotificationSettingsOrgaSemperKI, ValidationSteps
 from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
 from ..modelFiles.processModel import Process
 from ..serviceManager import serviceManager
 
 loggerError = logging.getLogger("errors")
-
-
 ####################################################################
 @runInBackground
 def sendEMail(IDOfReceiver:str, notification:str, subject:list[str], message:list[str], processTitle:str) -> None:
@@ -81,8 +81,18 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
     """
     try:
         valid = True
+        validationResults = {}
         # Check if service was correctly defined
         if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails)[0]:
+            valid = False
+            validationResults[ValidationSteps.serviceReady] = False
+        else:
+            validationResults[ValidationSteps.serviceReady] = True
+
+        # run service specific tasks
+        validationResults[ValidationSteps.serviceSpecificTasks] = {}
+        resultOfServiceTasks = serviceManager.getService(processObj.serviceType).serviceSpecificTasks(session, processObj, validationResults)
+        if isinstance(resultOfServiceTasks, Exception):
             valid = False
 
         # Check if parameters make sense
@@ -102,25 +112,27 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         elif currentProcessObj.processStatus != processStatusAsInt(ProcessStatusAsString.VERIFYING):
             return # Not needed anymore
         
-        # Get all details and set status in database    
+        # save results in database
+        retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.verificationResults, validationResults, "SYSTEM")
+        if isinstance(retVal, Exception):
+            raise retVal
+        
+        # Get all details and set status in database
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = ["email","subjects","statusUpdate"]
-        contentForEvent = ""
         if valid:
             message = ["email","content","verificationSuccessful"]
             retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
             if isinstance(retVal, Exception):
                 raise retVal
-            contentForEvent = retVal
         else: # Else: set to failed
             message = ["email","content","verificationFailed"]
             retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
             if isinstance(retVal, Exception):
                 raise retVal
-            contentForEvent = retVal
         # send out mail & Websocket event 
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
-        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, contentForEvent, NotificationSettingsUserSemperKI.verification, True)  
+        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.verification, True)  
         
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")

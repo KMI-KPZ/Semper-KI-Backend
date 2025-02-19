@@ -19,12 +19,11 @@ from code_SemperKI.definitions import ProcessUpdates
 from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.modelFiles.processModel import ProcessDescription
 from code_SemperKI.modelFiles.projectModel import ProjectDescription
-from code_SemperKI.services.service_AdditiveManufacturing.definitions import ServiceDetails, MaterialDetails
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.locales import manageTranslations
 
-from ..definitions import SERVICE_NAME, NodeTypesAM, NodePropertiesAMMaterial, FilterCategories
+from ..definitions import SERVICE_NAME, NodeTypesAM, NodePropertiesAMMaterial, FilterCategories, ServiceDetails, MaterialDetails
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -64,7 +63,7 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
                     color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,color[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
             colors.append(color)
 
-    output["materials"].append({"id": materialEntry[pgKnowledgeGraph.NodeDescription.nodeID], "title": materialEntry[pgKnowledgeGraph.NodeDescription.nodeName], "propList": materialEntry[pgKnowledgeGraph.NodeDescription.properties], "imgPath": imgPath, "medianPrice": materialPrices[materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID]] if materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., "colors": colors})
+    output["materials"].append({MaterialDetails.id: materialEntry[pgKnowledgeGraph.NodeDescription.nodeID], MaterialDetails.title: materialEntry[pgKnowledgeGraph.NodeDescription.nodeName], MaterialDetails.propList: materialEntry[pgKnowledgeGraph.NodeDescription.properties], MaterialDetails.imgPath: imgPath, MaterialDetails.medianPrice: materialPrices[materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID]] if materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., MaterialDetails.colors: colors})
     # TODO use translation here for nodeName
     return None
 ##################################################
@@ -160,6 +159,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
         for entry in materialList:
             # use only entries from system
             if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] is True:
+                # sort out those that have no connection to an organization (and are therefore not in use)
+                if len(pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(entry[pgKnowledgeGraph.NodeDescription.uniqueID])) == 1:
+                    continue
+                
                 # adhere to the filters:
                 append = True
                 for filterEntry in filters["filters"]:

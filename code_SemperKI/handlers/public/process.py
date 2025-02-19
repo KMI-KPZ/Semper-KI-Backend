@@ -112,6 +112,8 @@ class SResProcessDetails(serializers.Serializer):
     imagePath = serializers.URLField(required=False)
     priorities = serializers.DictField(allow_empty=True, required=False)
     prices = serializers.DictField(allow_empty=True, required=False)
+    verificationResults = serializers.DictField(allow_empty=True, required=False)
+    additionalInput = serializers.DictField(allow_empty=True, required=False)
 
 #######################################################
 class SResFiles(serializers.Serializer):

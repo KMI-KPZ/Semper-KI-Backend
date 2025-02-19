@@ -151,5 +151,13 @@ class Assembly(Semper.ServiceBase):
 
         """
         return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+        return {}
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Assembly(), settings.STATIC_URL+"media/A.png")

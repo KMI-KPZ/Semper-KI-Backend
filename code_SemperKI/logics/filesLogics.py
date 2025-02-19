@@ -157,12 +157,12 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
 #######################################################
 
 #######################################################
-def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:
+def getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:
     """
     Obtain file(s) information from a process
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -175,7 +175,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     """
     try:
         # Retrieve the files info from either the session or the database
-        contentManager = ManageC.ManageContent(request.session)
+        contentManager = ManageC.ManageContent(session)
         interface = contentManager.getCorrectInterface("downloadFileStream")
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
@@ -206,12 +206,12 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
 
 
 #######################################################
-def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]:
+def getFileObject(session, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]:
     """
     Get file from storage and return it as accessible object - you have to decrypt it if necessary
 
-    :param request: Request of user for a specific file of a process
-    :type request: HttpRequest
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -224,7 +224,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
     """
     try:
         isRemote = False
-        fileOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        fileOfThisProcess, flag = getFilesInfoFromProcess(session, projectID, processID, fileID)
         if flag is False:
             return (None, False, False)
 
@@ -242,7 +242,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
                 return (None, False, False)
             
         logger.info(
-            f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},"
+            f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},"
             f"{Logging.Predicate.FETCHED},accessed,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(
                 datetime.now()))
 
@@ -254,13 +254,13 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
 
 
 #######################################################
-def getFileReadableStream(request:Request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
+def getFileReadableStream(session, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -272,7 +272,7 @@ def getFileReadableStream(request:Request, projectID, processID, fileID) -> tupl
 
     """
     try:
-        fileObj, flag, isRemote = getFileObject(request, projectID, processID, fileID)
+        fileObj, flag, isRemote = getFileObject(session, projectID, processID, fileID)
         if flag is False:
             return (None, False)
 

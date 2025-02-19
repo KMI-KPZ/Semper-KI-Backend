@@ -98,6 +98,7 @@ newPaths= {
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
+    "testPreview": ("private/testPreview/", testResponse.testPreview),
 
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),

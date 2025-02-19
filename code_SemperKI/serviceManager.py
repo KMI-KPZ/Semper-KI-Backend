@@ -127,6 +127,14 @@ class ServiceBase(ABC):
         Get the service specific details for a contractor
 
         """
+    
+    ###################################################
+    @abstractmethod
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
 
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):

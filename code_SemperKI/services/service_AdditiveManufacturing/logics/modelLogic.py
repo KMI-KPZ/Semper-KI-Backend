@@ -326,7 +326,7 @@ def logicForUpdateModel(request, validatedInput):
         if model[FileObjectContent.isFile] is False:
             calculationResult = calculateBoundaryDataForNonFileModel(model)
         else:
-            uploadedModel, flag = getFileReadableStream(request, projectID, processID, fileID)
+            uploadedModel, flag = getFileReadableStream(request.session, projectID, processID, fileID)
             if flag is False:
                 return (Exception(f"Error while accessing file {model[FileObjectContent.fileName]}"), 500)
             calculationResult = calculateBoundaryData(uploadedModel, nameOfFile, model[FileObjectContent.size], model[FileContentsAM.scalingFactor]/100.)
@@ -576,7 +576,7 @@ def logicForCheckModel(request, functionName:str, projectID:str, processID:str, 
             #     else:
             #         raise Exception("Validation failed")
 
-            fileContent, flag = getFileReadableStream(request, projectID, processID, model[FileObjectContent.id])
+            fileContent, flag = getFileReadableStream(request.session, projectID, processID, model[FileObjectContent.id])
             if flag:
                 resultData = calculateBoundaryData(fileContent, modelName, model[FileObjectContent.size], scalingFactor) # getBoundaryData(fileContent, modelName)
             else:

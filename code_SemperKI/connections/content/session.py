@@ -782,6 +782,11 @@ class ProcessManagementSession(AbstractContentInterface):
                         dependentProcess[oppositeKey].append(processID)
                 self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
                 outContent = content
+
+            elif updateType == ProcessUpdates.additionalInput:
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = content
+                self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.additionalInput: content})
+                outContent = content
             else:
                 raise Exception(f"updateProcess {updateType} not implemented")
             

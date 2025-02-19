@@ -768,6 +768,16 @@ class ProcessManagementBase(AbstractContentInterface):
                     connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
                 outContent = content
+            
+            elif updateType == ProcessUpdates.verificationResults:
+                currentProcess.processDetails[ProcessDetails.verificationResults] = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.verificationResults: content})
+                outContent = content
+            
+            elif updateType == ProcessUpdates.additionalInput:
+                currentProcess.processDetails[ProcessDetails.additionalInput] = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.additionalInput: content})
+                outContent = content
 
             currentProcess.save()
             return (outContent, outAdditionalInformation)
@@ -854,6 +864,14 @@ class ProcessManagementBase(AbstractContentInterface):
                     currentProcess.dependenciesOut.remove(connectedProcess)
                     connectedProcess.dependenciesIn.remove(currentProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
+
+            elif updateType == ProcessUpdates.verificationResults:
+                del currentProcess.processDetails[ProcessDetails.verificationResults]
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.verificationResults})
+
+            elif updateType == ProcessUpdates.additionalInput:
+                del currentProcess.processDetails[ProcessDetails.additionalInput]
+                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             currentProcess.save()
             return True
