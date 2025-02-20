@@ -19,7 +19,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import pagesizes
 
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 from rest_framework import status
 from rest_framework.request import Request
@@ -39,6 +39,7 @@ from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDesc
 from ..utilities.basics import testPicture
 from django.http.request import HttpRequest
 from ..serviceManager import serviceManager
+from ..utilities.filePreview import createAndStorePreview
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -119,11 +120,17 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
             for file in request.FILES.getlist(fileName):
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID + "/" + processID + "/" + fileID
+
+                # generate preview
+                previewPath = createAndStorePreview(file, nameOfFile, remote, filePath)
+                if isinstance(previewPath, Exception):
+                    return previewPath, status.HTTP_500_INTERNAL_SERVER_ERROR
+
                 changes["changes"][ProcessUpdates.files][fileID] = {}
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = nameOfFile
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = testPicture
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = previewPath
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdByID] = content.getClient()
@@ -379,7 +386,7 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
         filesArray = []
 
         # Retrieve the files infos from either the session or the database
-        filesOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID)
+        filesOfThisProcess, flag = getFilesInfoFromProcess(request.session, projectID, processID)
         if flag is False:
             return filesOfThisProcess # will be HTTPResponse
         
@@ -505,7 +512,7 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
     """
     try:
         # Retrieve the files infos from either the session or the database
-        fileOfThisProcess, flag = getFilesInfoFromProcess(request._request, projectID, processID, fileID)
+        fileOfThisProcess, flag = getFilesInfoFromProcess(request.session, projectID, processID, fileID)
         if flag == False:
             return Exception(str(fileOfThisProcess.content)), fileOfThisProcess.status_code # Response if something went wrong
 

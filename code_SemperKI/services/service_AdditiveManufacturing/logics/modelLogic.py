@@ -31,6 +31,7 @@ from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.basics import testPicture
 from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream
 from code_SemperKI.logics.processLogics import updateProcessFunction
+from code_SemperKI.utilities.filePreview import createAndStorePreview
 
 from ..definitions import *
 
@@ -69,7 +70,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         modelToBeSaved[FileObjectContent.id] = fileID
         modelToBeSaved[FileObjectContent.path] = ""
         modelToBeSaved[FileObjectContent.fileName] = validatedInput["name"]
-        modelToBeSaved[FileObjectContent.imgPath] = ""
+        modelToBeSaved[FileObjectContent.imgPath] = testPicture
         modelToBeSaved[FileObjectContent.tags] = validatedInput["tags"] if "tags" in validatedInput["tags"] else []
         modelToBeSaved[FileObjectContent.licenses] = []
         modelToBeSaved[FileObjectContent.certificates] = []
@@ -180,12 +181,17 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID+"/"+processID+"/"+fileID
+
+                # create preview
+                previewPath = createAndStorePreview(model, nameOfFile, remote, filePath)
+                if isinstance(previewPath, Exception):
+                    return (previewPath, 500)
                 
                 modelsToBeSaved[fileID] = {}
                 modelsToBeSaved[fileID][FileObjectContent.id] = fileID
                 modelsToBeSaved[fileID][FileObjectContent.path] = filePath
                 modelsToBeSaved[fileID][FileObjectContent.fileName] = nameOfFile
-                modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
+                modelsToBeSaved[fileID][FileObjectContent.imgPath] = previewPath
                 modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
                 modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
                 modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]

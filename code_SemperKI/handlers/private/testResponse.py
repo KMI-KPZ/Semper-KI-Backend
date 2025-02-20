@@ -5,10 +5,12 @@ Silvio Weging 2023
 
 Contains: Handling test calls
 """
-import platform, subprocess, json, requests, io, logging, os
+import platform, subprocess, json, requests, io, logging, os, tempfile, zipfile
 from io import BytesIO
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
+
+from Generic_Backend.code_General.utilities.files import createFileResponse
 
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 
@@ -141,14 +143,14 @@ def stlToBinJpg(file) -> str:
 
 #######################################################
 class SReqUploadTestFiles(serializers.Serializer):
-    file = serializers.FileField()
+    files = serializers.ListField(child=serializers.FileField())
 ##################################################
 @extend_schema(
      summary="File upload for a process",
      description=" ",
      request={
         "multipart/form-data": SReqUploadTestFiles
-    },	
+    },
      tags=['Test - Files'],
      responses={
          200: None,
@@ -158,7 +160,8 @@ class SReqUploadTestFiles(serializers.Serializer):
  )
 @api_view(['POST'])
 def testPreview(request:Request):
-    #from preview_generator.manager import PreviewManager
+    from preview_generator.manager import PreviewManager
+    from preview_generator.exception import UnsupportedMimeType
     inSerializer = SReqUploadTestFiles(data=request.data)
     if not inSerializer.is_valid():
         message = f"Verification failed in {testPreview.cls.__name__}"
@@ -169,18 +172,35 @@ def testPreview(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    #cache_path = '/tmp/preview_cache'
-    # This doesn't work as intended since it NEEDS a real file
-    #manager = PreviewManager(cache_path, create_folder= True)
-    outStr = ""
-    fileNames = list(request.FILES.keys())
-    for fileName in fileNames:
-        for file in request.FILES.getlist(fileName):
-            #fileNameRoot, extension= os.path.splitext(file.name)
-            #print(file.name, fileNameRoot, extension)
-            #fileContent = file.read()
-            #path_to_preview_image = manager.get_jpeg_preview(fileNameRoot, file_ext=extension)
-            #print(path_to_preview_image)
-            outStr = stlToBinJpg(file)
-    return Response(outStr, status=status.HTTP_200_OK)
+    
+    zipFile = BytesIO()
+    with zipfile.ZipFile(zipFile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+        with tempfile.TemporaryDirectory() as tempDir: # because get_jpeg_preview does not accept BytesIO, we have to use this bs
+            manager = PreviewManager(tempDir+"/previews", create_folder= True)
+            fileNames = list(request.FILES.keys())
+            for fileName in fileNames:
+                for file in request.FILES.getlist(fileName):
+                    temporaryFileName = tempDir+"/"+file.name
+                    temporaryFile = open(temporaryFileName, 'wb')
+                    temporaryFile.write(file.read())
+                    temporaryFile.close()
+                    fileNameRoot, extension= os.path.splitext(file.name)
+                    #print(file.name, fileNameRoot, extension)
+                    #fileContent = file.read()
+                    try:
+                        path_to_preview_image = manager.get_jpeg_preview(temporaryFileName)
+                        f = open(path_to_preview_image, 'rb')
+                        zf.writestr(fileNameRoot+".jpg", f.read())
+                        f.close()
+                        #outStr = stlToBinJpg(file)
+                    except UnsupportedMimeType as unsupported:
+                        loggerError.error(f"Unsupported file type: {str(unsupported)}")
+                        continue
+                    except Exception as error:
+                        loggerError.error(f"Error while creating preview: {str(error)}")
+                        continue
+    zipFile.seek(0)
+    fileResponse = FileResponse(zipFile, as_attachment=True, filename="files.zip")
+    #fileResponse = createFileResponse(zipFile, filename="files.zip")
+    fileResponse["Content-Disposition"] = 'attachment; filename="files.zip"'.format("files.zip")
+    return fileResponse

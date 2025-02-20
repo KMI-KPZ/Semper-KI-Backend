@@ -15,6 +15,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.utilities.basics import checkVersion, checkIfUserIsLoggedIn, checkIfRightsAreSufficient
 from Generic_Backend.code_General.utilities.files import createFileResponse
@@ -162,11 +163,11 @@ def downloadFileStream(request:Request, projectID, processID, fileID):
 
     """
     try:
-        fileMetaData, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        fileMetaData, flag = getFilesInfoFromProcess(request.session, projectID, processID, fileID)
         if flag is False:
             return fileMetaData
 
-        encryptionAdapter, flag = getFileReadableStream(request, projectID, processID, fileID)
+        encryptionAdapter, flag = getFileReadableStream(request.session, projectID, processID, fileID)
         if flag is False:
             return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -202,7 +203,15 @@ def downloadFileStream(request:Request, projectID, processID, fileID):
         401: ExceptionSerializer,
         404: ExceptionSerializer,
         500: ExceptionSerializer,
-    }
+    },
+    parameters=[OpenApiParameter(
+        name='fileIDs',
+        type={'type': 'array', 'minItems': 1, 'items': {'type': 'string'}},
+        location=OpenApiParameter.QUERY,
+        required=True,
+        style='form',
+        explode=False,
+    )],
 )
 @api_view(["GET"])
 @checkVersion(0.3)
@@ -222,7 +231,11 @@ def downloadFilesAsZip(request:Request, projectID, processID):
     """
      # TODO solve with streaming
     try:
-        return logicForDownloadAsZip(request, projectID, processID, downloadFilesAsZip.__name__)
+        fileResponse = logicForDownloadAsZip(request, projectID, processID, downloadFilesAsZip.__name__)
+        #if isinstance(fileResponse, FileResponse):
+            #fileResponse["Content-Disposition"] = f'attachment; filename="{processID}.zip"'.format(f"{processID}.zip")
+        return fileResponse
+
     except (Exception) as error:
         message = f"Error while downloading files as zip: {str(error)}"
         exception = str(error)

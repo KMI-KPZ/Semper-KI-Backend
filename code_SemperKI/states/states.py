@@ -644,6 +644,7 @@ class SERVICE_IN_PROGRESS(State):
 
         """
         serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
         return stateDict[ProcessStatusAsString.DRAFT]
@@ -846,6 +847,7 @@ class SERVICE_READY(State):
         """
         serviceContent = process.serviceDetails
         #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
         return stateDict[ProcessStatusAsString.DRAFT]
@@ -1769,7 +1771,7 @@ class VERIFICATION_COMPLETED(State):
         To: CONTRACTOR_COMPLETED
         
         """
-        # TODO discard verification
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
         return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
 
     ###################################################
