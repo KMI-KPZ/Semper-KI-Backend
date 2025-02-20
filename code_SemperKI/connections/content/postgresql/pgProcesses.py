@@ -838,11 +838,16 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceDetails})
 
             elif updateType == ProcessUpdates.serviceStatus:
-                currentProcess.serviceStatus = 0 #TODO
+                currentProcess.serviceStatus = 0
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceStatus})
 
             elif updateType == ProcessUpdates.serviceType:
+                if ProcessDetails.additionalInput in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.additionalInput] = {}
+                if currentProcess.serviceType != serviceManager.getNone():
+                    currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, currentProcess.serviceDetails)
                 currentProcess.serviceType = serviceManager.getNone()
+                currentProcess.serviceStatus = 0
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
@@ -870,7 +875,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.verificationResults})
 
             elif updateType == ProcessUpdates.additionalInput:
-                del currentProcess.processDetails[ProcessDetails.additionalInput]
+                currentProcess.processDetails[ProcessDetails.additionalInput] = {}
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             currentProcess.save()

@@ -722,7 +722,7 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
-                currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(currentProcess[ProcessDescription.serviceType]).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
+                currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(content).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
                 self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
             
@@ -838,6 +838,12 @@ class ProcessManagementSession(AbstractContentInterface):
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 
             elif updateType == ProcessUpdates.serviceType:
+                if currentProcess[ProcessDescription.serviceType] != serviceManager.getNone():
+                    serviceType = currentProcess[ProcessDescription.serviceType]
+                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(currentProcess[ProcessDescription.serviceDetails], currentProcess[ProcessDescription.serviceDetails])
+                currentProcess[ProcessDescription.serviceStatus] = 0
+                if ProcessDetails.additionalInput in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
                 currentProcess[ProcessDescription.serviceType] = serviceManager.getNone()
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
@@ -877,6 +883,10 @@ class ProcessManagementSession(AbstractContentInterface):
                     if contentProcessID in dependentProcess.get(oppositeKey, []):
                         dependentProcess[oppositeKey].remove(processID)
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
+
+            elif updateType == ProcessUpdates.additionalInput:
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
+                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             else:
                 raise Exception(f"deleteFromProcess {updateType} not implemented")

@@ -343,6 +343,11 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
         if isinstance(errorOrNot, Exception):
             raise errorOrNot
 
+        # create additionalInput field
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.additionalInput: {}}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
+
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},process {processID}," + str(datetime.now()))
 
@@ -520,6 +525,8 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
             oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
             if ProcessDetails.provisionalContractor in oldProcessDetails:
                 del oldProcessDetails[ProcessDetails.provisionalContractor]
+            if ProcessDetails.verificationResults in oldProcessDetails:
+                del oldProcessDetails[ProcessDetails.verificationResults]
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone
