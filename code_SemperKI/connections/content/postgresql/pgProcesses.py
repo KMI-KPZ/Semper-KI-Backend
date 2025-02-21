@@ -31,6 +31,7 @@ import code_SemperKI.states.stateDescriptions as StateDescriptions
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
+from ....utilities.filePreview import deletePreviewFile
 
 logger = logging.getLogger("errors")
 
@@ -561,6 +562,7 @@ class ProcessManagementBase(AbstractContentInterface):
                         s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
                     else:
                         s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                    deletePreviewFile(allFiles[entry][FileObjectContent.imgPath])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -820,6 +822,7 @@ class ProcessManagementBase(AbstractContentInterface):
                             s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
                         else:
                             s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                        deletePreviewFile(content[entry][FileObjectContent.imgPath])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()

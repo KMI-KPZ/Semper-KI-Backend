@@ -24,11 +24,12 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
 from code_SemperKI.logics.processLogics import updateProcessFunction
-from code_SemperKI.utilities.basics import testPicture
+from code_SemperKI.utilities.basics import previewNotAvailable, previewNotAvailableGER
 from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream
 from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.filePreview import createAndStorePreview
@@ -55,6 +56,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         processID = validatedInput[ProcessDescription.processID]
         groupID = validatedInput["groupID"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
         
         # check if duplicates exist
         existingFileNames = set()
@@ -70,7 +72,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         modelToBeSaved[FileObjectContent.id] = fileID
         modelToBeSaved[FileObjectContent.path] = ""
         modelToBeSaved[FileObjectContent.fileName] = validatedInput["name"]
-        modelToBeSaved[FileObjectContent.imgPath] = testPicture
+        modelToBeSaved[FileObjectContent.imgPath] = previewNotAvailableGER if locale == "de-DE" else previewNotAvailable
         modelToBeSaved[FileObjectContent.tags] = validatedInput["tags"] if "tags" in validatedInput["tags"] else []
         modelToBeSaved[FileObjectContent.licenses] = []
         modelToBeSaved[FileObjectContent.certificates] = []
@@ -138,7 +140,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         
         detailsOfAllFiles = json.loads(validatedInput["details"])
 
-        # TODO: if the file is a repo file, then create a local copy
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
 
         modelNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
@@ -183,7 +185,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 filePath = projectID+"/"+processID+"/"+fileID
 
                 # create preview
-                previewPath = createAndStorePreview(model, nameOfFile, remote, filePath)
+                previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
                 if isinstance(previewPath, Exception):
                     return (previewPath, 500)
                 
@@ -354,6 +356,167 @@ def logicForUpdateModel(request, validatedInput):
     except Exception as e:
         loggerError.error("Error in logicForUpdateModel: %s" % str(e))
         return (e, 500)
+
+##################################################
+class ContentOfRepoModel(StrEnumExactlyAsDefined):
+    """
+    Enum for the content of the model repository
+    """
+    name = enum.auto()
+    license = enum.auto()
+    preview = enum.auto()
+    file = enum.auto()
+
+##################################################
+def logicForGetModelRepository() -> dict|Exception:
+    """
+    Retrieve the model from the repository
+    
+    :return: Dictionary with all repo models
+    :rtype: dict
+    """
+    try:
+        # TODO add more details about the models
+        outDict = {}
+        redisConn = RedisConnection()
+        redisContent = redisConn.retrieveContentJSON("ModelRepository")
+        if redisContent[1] is False:
+            content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
+            outDict = {"repository": {}}
+            for elem in content:
+                path = elem["Key"]
+                splitPath = path.split("/")[1:]
+                if len(splitPath) > 1:
+                    if ContentOfRepoModel.license.value in elem["Metadata"]:
+                        licenseOfFile = elem["Metadata"][ContentOfRepoModel.license.value]
+                    else:
+                        licenseOfFile = ""
+                    if splitPath[0] in outDict["repository"]:
+                        if "Preview" in splitPath[1]:
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        else:
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.file.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        if licenseOfFile != "" and outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] == "":
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] = licenseOfFile
+                    else:
+                        outDict["repository"][splitPath[0]] = {ContentOfRepoModel.name.value: splitPath[0], ContentOfRepoModel.license.value: "", ContentOfRepoModel.preview.value: "", ContentOfRepoModel.file.value: ""}
+                        if "Preview" in splitPath[1]:
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        else:
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.file.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        if licenseOfFile != "" and outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] == "":
+                            outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] = licenseOfFile
+            redisConn.addContentJSON("ModelRepository", outDict)
+        else:
+            outDict = redisContent[0]
+        return outDict
+    except Exception as e:
+        loggerError.error("Error in getModelRepository: %s" % str(e))
+        return e
+    
+##################################################
+def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, int]:
+    """
+    Upload a model from the repository
+
+    :param request: The request object
+    :type request: Request
+    :param validatedInput: The validated input
+    :type validatedInput: Dict
+    :return: Exception and status code
+    :rtype: Tuple[Exception, int]
+
+    """
+    try:
+        # gather the information from the validated input
+        projectID = validatedInput[ProjectDescription.projectID]
+        processID = validatedInput[ProcessDescription.processID]
+        origin = validatedInput["origin"]
+        groupID = validatedInput["groupID"]
+        repoModel = validatedInput["model"] # type: dict
+
+        content = ManageContent(request.session)
+        interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
+        if interface is None:
+            return (Exception("Rights not sufficient in uploadModel"), 401)
+        
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+
+        # pull the model from the repository/redis
+        redisConn = RedisConnection()
+        redisContent = redisConn.retrieveContentJSON("ModelRepository_"+repoModel[ContentOfRepoModel.name.value])
+        if redisContent[1] is False:
+            # TODO: add the model data to redis
+            modelDetails = {}
+        else:
+            modelDetails = redisContent[0]
+        
+        # check if duplicates exist and rename duplicates
+        existingFileNames = set()
+        processContent = interface.getProcess(projectID, processID)
+        if isinstance(processContent, Exception):
+            return (Exception(f"Process not found in {logicForUploadModel.__name__}"), 404)
+        for key in processContent[ProcessDescription.files]:
+            value = processContent[ProcessDescription.files][key]
+            existingFileNames.add(value[FileObjectContent.fileName])
+
+        counterForFileName = 1
+        nameOfFile = repoModel[ContentOfRepoModel.name.value]
+        while nameOfFile in existingFileNames:
+            fileNameRoot, extension= os.path.splitext(nameOfFile)
+            if counterForFileName > 100000:
+                return (Exception("Too many files with the same name uploaded!"), 400)
+            
+            if "_" in fileNameRoot:
+                fileNameRootSplit = fileNameRoot.split("_")
+                try:
+                    counterForFileName = int(fileNameRootSplit[-1])
+                    fileNameRoot = "_".join(fileNameRootSplit[:-1])
+                    counterForFileName += 1
+                except:
+                    pass
+            nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
+            counterForFileName += 1
+
+        # save the model
+        fileID = crypto.generateURLFriendlyRandomString()
+        modelToBeSaved = {}
+        modelToBeSaved[FileObjectContent.id] = fileID
+        modelToBeSaved[FileObjectContent.path] = repoModel[ContentOfRepoModel.file.value]
+        modelToBeSaved[FileObjectContent.fileName] = nameOfFile
+        modelToBeSaved[FileObjectContent.imgPath] = repoModel[ContentOfRepoModel.preview.value]
+        modelToBeSaved[FileObjectContent.tags] = ""
+        modelToBeSaved[FileObjectContent.licenses] = repoModel[ContentOfRepoModel.license.value]
+        modelToBeSaved[FileObjectContent.certificates] = []
+        modelToBeSaved[FileObjectContent.quantity] = 1
+        modelToBeSaved[FileObjectContent.levelOfDetail] = modelDetails["levelOfDetail"]
+        modelToBeSaved[FileObjectContent.isFile] = False
+        modelToBeSaved[FileObjectContent.date] = str(timezone.now())
+        modelToBeSaved[FileObjectContent.createdBy] = userName
+        modelToBeSaved[FileObjectContent.createdByID] = content.getClient()
+        modelToBeSaved[FileObjectContent.size] = 0
+        modelToBeSaved[FileObjectContent.type] = FileTypes.Model
+        modelToBeSaved[FileObjectContent.origin] = origin
+        modelToBeSaved[FileObjectContent.remote] = False
+        modelToBeSaved[FileContentsAM.width] = 0
+        modelToBeSaved[FileContentsAM.height] = 0
+        modelToBeSaved[FileContentsAM.length] = 0
+        modelToBeSaved[FileContentsAM.volume] = 0
+        modelToBeSaved[FileContentsAM.complexity] = 0
+        modelToBeSaved[FileContentsAM.scalingFactor] = 100.0
+                
+        # retrieve calculations
+        calculations = modelDetails["calculations"]
+        
+        # update the process
+
+        # log the action
+
+    except Exception as e:
+        loggerError.error("Error in logicForUploadFromRepository: %s" % str(e))
+        return (e, 500)
+
 
 ##################################################
 def logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]:

@@ -21,6 +21,7 @@ from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...modelFiles.dataModel import DataInterface, DataDescription
 from ...serviceManager import serviceManager
+from ...utilities.filePreview import deletePreviewFile
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
@@ -500,6 +501,7 @@ class ProcessManagementSession(AbstractContentInterface):
                             s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
                         else:
                             s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
+                        deletePreviewFile(files[fileKey][FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -666,6 +668,7 @@ class ProcessManagementSession(AbstractContentInterface):
                         s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
                     else:
                         s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
+                    deletePreviewFile(fileObj[FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -834,6 +837,7 @@ class ProcessManagementSession(AbstractContentInterface):
                             s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
                         else:
                             s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                        deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 

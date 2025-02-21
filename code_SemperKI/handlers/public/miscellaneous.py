@@ -175,7 +175,7 @@ def retrieveResultsFromQuestionnaire(request:Request):
             if isinstance(orgaObj, Exception):
                 raise ValidationError("No organization found")
             if "maturity" in assessmentType.lower():
-                orgaObj.details[OrganizationDetailsSKI.maturityLevel] = data
+                orgaObj.details[OrganizationDetailsSKI.maturityLevel] = [data]
             elif "resilience" in assessmentType.lower():
                 orgaObj.details[OrganizationDetailsSKI.resilienceScore] = data
             else:

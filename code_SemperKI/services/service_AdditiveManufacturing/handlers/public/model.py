@@ -415,31 +415,9 @@ def getModelRepository(request:Request):
 
     """
     try:
-        content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
-        outDict = {"repository": {}}
-        for elem in content:
-            path = elem["Key"]
-            splitPath = path.split("/")[1:]
-            if len(splitPath) > 1:
-                if "license" in elem["Metadata"]:
-                    license = elem["Metadata"]["license"]
-                else:
-                    license = ""
-                if splitPath[0] in outDict["repository"]:
-                    if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    else:
-                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
-                        outDict["repository"][splitPath[0]]["license"] = license
-                else:
-                    outDict["repository"][splitPath[0]] = {"name": splitPath[0], "license": "", "preview": "", "file": ""}
-                    if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    else:
-                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
-                        outDict["repository"][splitPath[0]]["license"] = license
+        outDict = logicForGetModelRepository()
+        if isinstance(outDict,Exception):
+            raise outDict
 
         outSerializer = SResModelRepository(data=outDict)
         if outSerializer.is_valid():

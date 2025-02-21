@@ -141,3 +141,5 @@ def checkVersion(version=0.3):
 
 #######################################################
 testPicture = settings.STATIC_URL+"media/testpicture.jpg"
+previewNotAvailable = settings.STATIC_URL+"media/PreviewNotAvailable.png"
+previewNotAvailableGER = settings.STATIC_URL+"media/KeineVorschauVerfuegbar.png"

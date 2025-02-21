@@ -68,7 +68,6 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
     return None
 ##################################################
 def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Exception, int]:
-
     try:
         # format:
         # "filters":[ {"id":0,

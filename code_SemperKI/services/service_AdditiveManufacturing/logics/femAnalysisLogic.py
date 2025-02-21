@@ -26,14 +26,16 @@ def startFEMAnalysis(session, processObj:Process) -> dict|Exception:
         resultDict = {ServiceDetails.groups: []}
         for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
             groupResult = {}
-            pressure = 150 # user given
-            testType = "compression" # user given
+            pressure = -1 # user given
+            testType = "" # user given
             if checkIfNestedKeyExists(processObj.processDetails, ProcessDetails.additionalInput, ServiceDetails.groups):
                 addInput = processObj.processDetails[ProcessDetails.additionalInput][ServiceDetails.groups][groupIdx]
                 if "pressure" in addInput:
                     pressure = addInput["pressure"]
                 if "testType" in addInput:
                     testType = addInput["testType"]
+            if pressure == -1 or testType == "":
+                continue # no simulation preferred or possible
             # if material has all specifications, the simulation can start for each model
             materialOfProcess = group[ServiceDetails.material]
             poissonRatio = -1

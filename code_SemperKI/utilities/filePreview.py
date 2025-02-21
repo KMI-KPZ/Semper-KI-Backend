@@ -6,7 +6,6 @@ Silvio Weging 2025
 Contains: Functions to create, store and retrieve preview jpgs to uploaded files
 """
 import io, logging, os, tempfile
-from io import BytesIO
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
@@ -14,23 +13,21 @@ from django.conf import settings
 from Generic_Backend.code_General.connections.s3 import manageStaticsS3
 from Generic_Backend.code_General.utilities.files import createFileResponse
 
-from .basics import testPicture
+from .basics import testPicture, previewNotAvailable, previewNotAvailableGER
 
 loggerError = logging.getLogger("errors")
 ##################################################
 try:
     from preview_generator.manager import PreviewManager
-    from preview_generator.exception import UnsupportedMimeType
 
     ##################################################
-    def createAndStorePreview(file:InMemoryUploadedFile, fileName:str, remote:bool, storagePath:str) -> str|Exception:
+    def createAndStorePreview(file:InMemoryUploadedFile, fileName:str, locale:str, storagePath:str) -> str|Exception:
         """
         Create a preview of a file and store it in a given path
         
         """
         try:
             outPath = ""
-            outError = ""
             with tempfile.TemporaryDirectory() as tempDir: # because meshio.read does not accept BytesIO, we have to use this bs
                 manager = PreviewManager(tempDir+"/previews", create_folder= True)
                 temporaryFileName = tempDir+"/"+fileName
@@ -47,19 +44,37 @@ try:
                     f = open(path_to_preview_image, 'rb')
                     manageStaticsS3.uploadFile(remotePath, f, True)
                     f.close()
-                except UnsupportedMimeType as _:
-                    # TODO use token preview picture
-                    outPath = testPicture
-                except Exception as error:
-                    outError = error # has to be done or else the temporary directory will not be deleted
-            if isinstance(outError, Exception):
-                raise outError
+                except Exception as _:
+                    if locale == "de-DE":
+                        outPath = previewNotAvailableGER
+                    else:
+                        outPath = previewNotAvailable
             return outPath
         except Exception as error:
             loggerError.error(f"Error while creating preview: {str(error)}")
             return error
+    
+    ##################################################
+    def deletePreviewFile(path:str) -> None:
+        """
+        Deletes a preview file from the storage
+        
+        """
+        try:
+            if path == previewNotAvailableGER or path == previewNotAvailable:
+                return
+            manageStaticsS3.deleteFile(path)
+        except Exception as error:
+            loggerError.error(f"Error while deleting preview: {str(error)}")
 
 except ImportError:
     # implement the same functions but as dummies that don't do anything
-    def createAndStorePreview(file:BytesIO, fileName:str, remote:bool, storagePath:str) -> str|Exception:
-        return testPicture
+    ##################################################
+    def createAndStorePreview(file:InMemoryUploadedFile, fileName:str, locale:str, storagePath:str) -> str|Exception:
+        if locale == "de-DE":
+            return previewNotAvailableGER
+        else:
+            return previewNotAvailable
+    ##################################################
+    def deletePreviewFile(path:str) -> None:
+        return

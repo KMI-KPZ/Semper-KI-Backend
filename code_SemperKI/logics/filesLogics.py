@@ -84,6 +84,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         assert userName != "", f"In {functionName}: non-empty userName expected"
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
 
         # check if duplicates exist
@@ -122,7 +123,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
                 filePath = projectID + "/" + processID + "/" + fileID
 
                 # generate preview
-                previewPath = createAndStorePreview(file, nameOfFile, remote, filePath)
+                previewPath = createAndStorePreview(file, nameOfFile, locale, filePath)
                 if isinstance(previewPath, Exception):
                     return previewPath, status.HTTP_500_INTERNAL_SERVER_ERROR
 
