@@ -435,7 +435,7 @@ def logicForGetModelRepository() -> dict|Exception:
         redisConn = RedisConnection()
         redisContent = redisConn.retrieveContentJSON("ModelRepository")
         if redisContent[1] is False:
-            content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
+            content = s3.manageRemoteS3.getContentOfBucket("ModelRepository")
             outDict = {"repository": {}}
             for elem in content:
                 path = elem["Key"]
@@ -467,9 +467,9 @@ def logicForGetModelRepository() -> dict|Exception:
                         outDict["repository"][splitPath[0]] = {ContentOfRepoModel.name.value: splitPath[0], ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: 0}
                     
                     if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
                     else:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.file.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                        outDict["repository"][splitPath[0]][ContentOfRepoModel.file.value] = elem["Key"].replace(" ", "%20")
                     if licenseOfFile != "" and outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] == "":
                         outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] = licenseOfFile
                     if certificatesOfFile != [] and outDict["repository"][splitPath[0]][ContentOfRepoModel.certificates.value] == []:
@@ -577,8 +577,8 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
         redisCon = RedisConnection()
         calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
         if calculationsFromRedis[1] is False:
-            model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True)
-            calculationResult = calculateBoundaryData(model, nameOfFile, model.size, 1.0)
+            model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
+            calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
             redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
         else:
             calculationResult = calculationsFromRedis[0]
@@ -586,8 +586,8 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
         # update the process
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        changesArray[groupID] = {ServiceDetails.models: modelToBeSaved, ServiceDetails.calculations: calculationResult}
-        changes = {"changes": {ProcessUpdates.files: modelToBeSaved, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+        changesArray[groupID] = {ServiceDetails.models: {fileID: modelToBeSaved}, ServiceDetails.calculations: {fileID: calculationResult}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
@@ -693,7 +693,7 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
     Calculate some of the stuff ourselves
 
     :param readableObject: The model to be sent to the service with a .read() method
-    :type readableObject: BytesIO | EncryptionAdapter
+    :type readableObject: EncryptionAdapter
     :param filename: The file name
     :type filename: str
     :param fileSize: The size of the file  

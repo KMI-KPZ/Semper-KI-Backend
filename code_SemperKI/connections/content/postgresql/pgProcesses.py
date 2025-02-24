@@ -1381,8 +1381,9 @@ class ProcessManagementBase(AbstractContentInterface):
 
             # Send files from local to remote
             for fileKey in processObj.files:
-                if processObj.files[fileKey][FileObjectContent.remote] or processObj.files[fileKey][FileObjectContent.path] == "" or processObj.files[fileKey][FileObjectContent.deleteFromStorage] is False:
+                if processObj.files[fileKey][FileObjectContent.remote] or processObj.files[fileKey][FileObjectContent.path] == "" or (FileObjectContent.deleteFromStorage in processObj.files[fileKey] and processObj.files[fileKey][FileObjectContent.deleteFromStorage] is False):
                     continue
+
                 pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
                 sendLocalFileToRemote(pathOnStorage)
                 processObj.files[fileKey][FileObjectContent.remote] = True

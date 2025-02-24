@@ -163,7 +163,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR
     
 #######################################################
-def getFileViaPath(filePath, remote):
+def getFileViaPath(filePath, remote:bool, decrypt:bool=True) -> None|BytesIO:
     """
     Get file from storage and return it as accessible object - you have to decrypt it if necessary
 
@@ -177,12 +177,12 @@ def getFileViaPath(filePath, remote):
     """
     try:
         if remote:
-            fileObj, flag = s3.manageRemoteS3.getFileObject(filePath)
+            fileObj, flag = s3.manageRemoteS3.downloadFile(filePath, decrypt)
             if flag is False:
                 logger.warning(f"File {filePath} not found in remote storage")
                 return None
         else:
-            fileObj, flag = s3.manageLocalS3.getFileObject(filePath)
+            fileObj, flag = s3.manageLocalS3.downloadFile(filePath)
             if flag is False:
                 logger.warning(f"File {filePath} not found in local storage")
                 return None
