@@ -63,7 +63,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def createNode(information:dict, createdBy=defaultOwner):
+    def createNode(information:dict, createdBy=defaultOwner, existingNodeID:str=""):
         """
         Creates a node
 
@@ -77,7 +77,10 @@ class Basics():
             startPC = time.perf_counter_ns()
             startPT = time.process_time_ns()
             
-            nodeID = generateURLFriendlyRandomString()
+            if existingNodeID != "":
+                nodeID = existingNodeID
+            else:
+                nodeID = generateURLFriendlyRandomString()
             uniqueID = nodeID
             nodeName = ""
             nodeType = ""
@@ -210,7 +213,7 @@ class Basics():
         if isinstance(result, Exception):
             orgaName = pgProfiles.ProfileManagementBase.getOrganizationName(orgaID)
             information = {NodeDescription.nodeID: orgaID, NodeDescription.nodeName: orgaName, NodeDescription.nodeType: NodeType.organization}
-            Basics.createNode(information, orgaID)
+            Basics.createNode(information, orgaID, orgaID)
 
     ###################################################################################
     @staticmethod

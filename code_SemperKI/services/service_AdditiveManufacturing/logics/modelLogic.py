@@ -444,7 +444,7 @@ def logicForGetModelRepository() -> dict|Exception:
                     if ContentOfRepoModel.license.value in elem["Metadata"]:
                         licenseOfFile = elem["Metadata"][ContentOfRepoModel.license.value]
                     else:
-                        licenseOfFile = ""
+                        licenseOfFile = []
                     if ContentOfRepoModel.certificates.value in elem["Metadata"]:
                         certificatesOfFile = elem["Metadata"][ContentOfRepoModel.certificates.value]
                     else:
@@ -464,7 +464,7 @@ def logicForGetModelRepository() -> dict|Exception:
                     
 
                     if splitPath[0] not in outDict["repository"]:
-                        outDict["repository"][splitPath[0]] = {ContentOfRepoModel.name.value: splitPath[0], ContentOfRepoModel.license.value: "", ContentOfRepoModel.preview.value: "", ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: 0}
+                        outDict["repository"][splitPath[0]] = {ContentOfRepoModel.name.value: splitPath[0], ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: 0}
                     
                     if "Preview" in splitPath[1]:
                         outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
