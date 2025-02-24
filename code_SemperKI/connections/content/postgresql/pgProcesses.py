@@ -19,6 +19,7 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities.files import deleteFileHelper
 
 
 from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
@@ -557,12 +558,8 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                if FileObjectContent.isFile not in allFiles[entry] or allFiles[entry][FileObjectContent.isFile]:
-                    if allFiles[entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                    deletePreviewFile(allFiles[entry][FileObjectContent.imgPath])
+                deleteFileHelper(allFiles[entry])
+                deletePreviewFile(allFiles[entry][FileObjectContent.imgPath])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -817,12 +814,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if FileObjectContent.isFile not in content[entry] or content[entry][FileObjectContent.isFile]:
-                        if content[entry][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
-                        deletePreviewFile(content[entry][FileObjectContent.imgPath])
+                    deleteFileHelper(content[entry])
+                    deletePreviewFile(content[entry][FileObjectContent.imgPath])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()
@@ -1388,6 +1381,8 @@ class ProcessManagementBase(AbstractContentInterface):
 
             # Send files from local to remote
             for fileKey in processObj.files:
+                if processObj.files[fileKey][FileObjectContent.remote] or processObj.files[fileKey][FileObjectContent.path] == "" or processObj.files[fileKey][FileObjectContent.deleteFromStorage] is False:
+                    continue
                 pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
                 sendLocalFileToRemote(pathOnStorage)
                 processObj.files[fileKey][FileObjectContent.remote] = True

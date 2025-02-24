@@ -163,6 +163,36 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR
     
 #######################################################
+def getFileViaPath(filePath, remote):
+    """
+    Get file from storage and return it as accessible object - you have to decrypt it if necessary
+
+    :param filePath: path of the file
+    :type filePath: str
+    :param remote: if the file is remote
+    :type remote: bool
+    :return: fileObject from S3
+    :rtype: object
+
+    """
+    try:
+        if remote:
+            fileObj, flag = s3.manageRemoteS3.getFileObject(filePath)
+            if flag is False:
+                logger.warning(f"File {filePath} not found in remote storage")
+                return None
+        else:
+            fileObj, flag = s3.manageLocalS3.getFileObject(filePath)
+            if flag is False:
+                logger.warning(f"File {filePath} not found in local storage")
+                return None
+
+        return fileObj
+
+    except Exception as error:
+        loggerError.error(f"Error while downloading file: {str(error)}")
+        return None
+
 
 #######################################################
 def getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:

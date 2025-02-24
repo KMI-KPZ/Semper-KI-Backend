@@ -48,6 +48,7 @@ newPaths = {
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
     #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
     "getModelRepository": ("public/service/additive-manufacturing/model/repository/get/", model.getModelRepository),
+    "uploadFromRepository": ("public/service/additive-manufacturing/model/repository/post/", model.uploadFromRepository),
 
     #"checkPrintability": ("public/checkPrintability/",checkService.),
     #"checkPrices": ("public/checkPrices/",checkService.checkPrice),

@@ -14,6 +14,7 @@ from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementUser
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.utilities.files import deleteFileHelper
 
 from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails, ProjectOutput
@@ -496,12 +497,8 @@ class ProcessManagementSession(AbstractContentInterface):
             for currentProcess in processes:
                 files = processes[currentProcess][ProcessDescription.files]
                 for fileKey in files:
-                    if FileObjectContent.isFile not in files[fileKey] or files[fileKey][FileObjectContent.isFile]:
-                        if files[fileKey][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
-                        deletePreviewFile(files[fileKey][FileObjectContent.imgPath])
+                    deleteFileHelper(files[fileKey])
+                    deletePreviewFile(files[fileKey][FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -663,12 +660,8 @@ class ProcessManagementSession(AbstractContentInterface):
             files = currentProcess[ProcessDescription.files]
             for fileKey in files:
                 fileObj = files[fileKey]
-                if FileObjectContent.isFile not in fileObj or fileObj[FileObjectContent.isFile]:
-                    if fileObj[FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
-                    deletePreviewFile(fileObj[FileObjectContent.imgPath])
+                deleteFileHelper(fileObj)
+                deletePreviewFile(fileObj[FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -832,12 +825,8 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if FileObjectContent.isFile not in currentProcess[ProcessDescription.files][entry] or currentProcess[ProcessDescription.files][entry][FileObjectContent.isFile]:
-                        if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
-                        deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                    deleteFileHelper(currentProcess[ProcessDescription.files][entry])
+                    deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 

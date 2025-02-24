@@ -208,12 +208,18 @@ def orgaCreatedSemperKI(orgaHashID:str, oldDetails:dict):
         if OrganizationDetailsSKI.maturityLevel not in oldDetails:
             orga.details[OrganizationDetailsSKI.maturityLevel] = []
         else:
-            orga.details[OrganizationDetailsSKI.maturityLevel] = oldDetails[OrganizationDetailsSKI.maturityLevel]
+            if not isinstance(orga.details[OrganizationDetailsSKI.maturityLevel], list):
+                orga.details[OrganizationDetailsSKI.maturityLevel] = []
+            else:
+                orga.details[OrganizationDetailsSKI.maturityLevel] = oldDetails[OrganizationDetailsSKI.maturityLevel]
         
         if OrganizationDetailsSKI.resilienceScore not in oldDetails:
             orga.details[OrganizationDetailsSKI.resilienceScore] = []
         else:
-            orga.details[OrganizationDetailsSKI.resilienceScore] = oldDetails[OrganizationDetailsSKI.resilienceScore]
+            if not isinstance(orga.details[OrganizationDetailsSKI.resilienceScore], list):
+                orga.details[OrganizationDetailsSKI.resilienceScore] = []
+            else:
+                orga.details[OrganizationDetailsSKI.resilienceScore] = oldDetails[OrganizationDetailsSKI.resilienceScore]
 
         orga.save()
     except Exception as error:
