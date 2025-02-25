@@ -340,6 +340,9 @@ class SReqUpdateModel(serializers.Serializer):
     length = serializers.FloatField(required=False)
     volume = serializers.FloatField(required=False)
     scalingFactor = serializers.FloatField(required=False)
+    femRequested = serializers.BooleanField(required=False)
+    testType = serializers.CharField(max_length=200, required=False)
+    pressure = serializers.FloatField(required=False)
 #######################################################
 @extend_schema(
     summary="Update a model",

@@ -37,12 +37,15 @@ class FileContentsAM(StrEnumExactlyAsDefined):
     What does a file contain?
 
     """
-    width = enum.auto()
-    height = enum.auto()
-    length = enum.auto()
-    volume = enum.auto()
-    complexity = enum.auto()
+    width = enum.auto() # int
+    height = enum.auto() # int
+    length = enum.auto() # int
+    volume = enum.auto() # int
+    complexity = enum.auto() # int
     scalingFactor = enum.auto()
+    femRequested = enum.auto() # bool
+    testType = enum.auto() # str, elongation or compression
+    pressure = enum.auto() # int in MPa
 
 ##################################################
 # How do the calculations look like?

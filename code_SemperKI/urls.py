@@ -67,7 +67,7 @@ newPaths= {
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
     "downloadFilesAsZip": ("public/files/download/zip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
     "deleteFile": ("public/files/delete/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
-    "downloadProcessHistory": ("public/files/download/history/<str:processID>/", files.downloadProcessHistory), 
+    "downloadProcessHistory": ("private/files/download/history/<str:processID>/", files.downloadProcessHistory), # disabled
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),

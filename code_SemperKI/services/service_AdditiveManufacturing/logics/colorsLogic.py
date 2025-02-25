@@ -56,7 +56,7 @@ def logicForSetColor(request, validatedInput, functionName: str) -> tuple[Except
     try:
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface()
-        if interface == None:
+        if interface is None:
             return (Exception(f"Rights not sufficient in {functionName}"), 401)
 
         groupID = validatedInput["groupID"]

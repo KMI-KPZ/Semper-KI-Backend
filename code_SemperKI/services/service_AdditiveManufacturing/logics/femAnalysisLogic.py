@@ -26,16 +26,6 @@ def startFEMAnalysis(session, processObj:Process) -> dict|Exception:
         resultDict = {ServiceDetails.groups: []}
         for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
             groupResult = {}
-            pressure = -1 # user given
-            testType = "" # user given
-            if checkIfNestedKeyExists(processObj.processDetails, ProcessDetails.additionalInput, ServiceDetails.groups):
-                addInput = processObj.processDetails[ProcessDetails.additionalInput][ServiceDetails.groups][groupIdx]
-                if "pressure" in addInput:
-                    pressure = addInput["pressure"]
-                if "testType" in addInput:
-                    testType = addInput["testType"]
-            if pressure == -1 or testType == "":
-                continue # no simulation preferred or possible
             # if material has all specifications, the simulation can start for each model
             materialOfProcess = group[ServiceDetails.material]
             poissonRatio = -1
@@ -54,6 +44,16 @@ def startFEMAnalysis(session, processObj:Process) -> dict|Exception:
             if poissonRatio != -1 and youngsModulus != -1 and yieldingStress != -1 and elongationAtBreak != -1:
                 material = {"Youngs Modulus": youngsModulus, "Poisson Ratio": poissonRatio, "Yielding Stress": yieldingStress, "Elon_at_break": elongationAtBreak}
                 for modelID in group[ServiceDetails.models]:
+                    if FileContentsAM.femRequested not in group[ServiceDetails.models][modelID] or not group[ServiceDetails.models][modelID][FileContentsAM.femRequested]:
+                        continue
+                    if FileContentsAM.testType in group[ServiceDetails.models][modelID]:
+                        testType = group[ServiceDetails.models][modelID][FileContentsAM.testType]
+                    else:
+                        testType = "elongation"
+                    if FileContentsAM.pressure in group[ServiceDetails.models][modelID]:
+                        pressure = group[ServiceDetails.models][modelID][FileContentsAM.pressure]
+                    else:
+                        pressure = 0
                     stlFile, successfulFetch = getFileReadableStream(session, "", processObj.processID, modelID)
                     if successfulFetch:
                         fileContent = stlFile.read(group[ServiceDetails.models][modelID][FileObjectContent.size])

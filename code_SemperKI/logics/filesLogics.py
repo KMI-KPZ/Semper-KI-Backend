@@ -29,6 +29,7 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 from Generic_Backend.code_General.utilities.files import createFileResponse
+from Generic_Backend.code_General.utilities.basics import manualCheckifAdmin
 from Generic_Backend.code_General.definitions import FileObjectContent, Logging, FileTypes
 from Generic_Backend.code_General.connections import s3
 
@@ -222,7 +223,7 @@ def getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str
             return (HttpResponse("Not allowed to see process!", status=401),False)
 
         currentProcess = interface.getProcessObj(projectID, processID)
-        if currentProcess == None:
+        if currentProcess is None:
             return (HttpResponse("Not found!", status=404), False)
         
         if fileID != "":
@@ -231,7 +232,7 @@ def getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str
             
             fileOfThisProcess = currentProcess.files[fileID]
 
-            if contentManager.getClient() != fileOfThisProcess[FileObjectContent.createdByID]:
+            if (not manualCheckifAdmin(session)) and (currentProcess.client != fileOfThisProcess[FileObjectContent.createdByID]) and (currentProcess.contractor is not None and currentProcess.contractor.hashedID != fileOfThisProcess[FileObjectContent.createdByID]):
                 return (HttpResponse("Not allowed to access file!", status=401), False)
 
             return (fileOfThisProcess, True)
@@ -414,34 +415,37 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
      # TODO solve with streaming
     try:
         fileIDs = request.GET['fileIDs'].split(",")
-        filesArray = []
+        userIsAdmin = manualCheckifAdmin(request.session)
 
         # Retrieve the files infos from either the session or the database
         filesOfThisProcess, flag = getFilesInfoFromProcess(request.session, projectID, processID)
         if flag is False:
             return filesOfThisProcess # will be HTTPResponse
         
-        # get files, download them from aws, put them in an array together with their name
-        for elem in filesOfThisProcess:
-            currentEntry = filesOfThisProcess[elem]
-            if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
-                if FileObjectContent.isFile not in currentEntry or currentEntry[FileObjectContent.isFile]:
-                    content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
-                    if flag is False:
-                        content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
-                        if flag is False:
-                            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
-                
-                    filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
-
-        if len(filesArray) == 0:
-            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
+        content = ManageC.ManageContent(request.session)
+        interface = content.getCorrectInterface(functionName)
+        if interface is None:
+            return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
+        currentProcess = interface.getProcessObj(projectID, processID)
         
         # compress each file and put them in the same zip file, all in memory
         zipFile = BytesIO()
         with zipfile.ZipFile(zipFile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-            for f in filesArray:
-                zf.writestr(f[0], f[1].read())
+        # get files, download them from aws, put them in an array together with their name
+            for elem in filesOfThisProcess:
+                currentEntry = filesOfThisProcess[elem]
+                if (not userIsAdmin) and (currentProcess.client != currentEntry[FileObjectContent.createdByID]) and (currentProcess.contractor is not None and currentProcess.contractor.hashedID != currentEntry[FileObjectContent.createdByID]):
+                    return Response("Not allowed to access file(s)!", status=401)
+                if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
+                    if FileObjectContent.isFile not in currentEntry or currentEntry[FileObjectContent.isFile]:
+                        if currentEntry[FileObjectContent.remote]:
+                            content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
+                        else:
+                            content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
+                        if flag is False:
+                            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
+                        zf.writestr(currentEntry[FileObjectContent.fileName], content.read())
+                
         zipFile.seek(0) # reset zip file
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
@@ -454,6 +458,7 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
 def logicForDownloadProcessHistory(request:Request, processID:str, functionName:str):
     """
     Logics for downloading the history of a process
+    TODO: Security!
 
     :param request: HttpRequest
     :type request: HttpRequest

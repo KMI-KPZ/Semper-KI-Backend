@@ -231,7 +231,7 @@ def downloadFilesAsZip(request:Request, projectID, processID):
     """
      # TODO solve with streaming
     try:
-        fileResponse = logicForDownloadAsZip(request, projectID, processID, downloadFilesAsZip.__name__)
+        fileResponse = logicForDownloadAsZip(request, projectID, processID, downloadFilesAsZip.cls.__name__)
         #if isinstance(fileResponse, FileResponse):
             #fileResponse["Content-Disposition"] = f'attachment; filename="{processID}.zip"'.format(f"{processID}.zip")
         return fileResponse

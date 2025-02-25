@@ -76,6 +76,9 @@ def createModel(model:dict, content:dict) -> None:
     model[FileContentsAM.volume] = content[FileContentsAM.volume]
     model[FileContentsAM.complexity] = content[FileContentsAM.complexity]
     model[FileContentsAM.scalingFactor] = content[FileContentsAM.scalingFactor]
+    model[FileContentsAM.femRequested] = content[FileContentsAM.femRequested]
+    model[FileContentsAM.testType] = content[FileContentsAM.testType]
+    model[FileContentsAM.pressure] = content[FileContentsAM.pressure]
 
 #######################################################
 def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Exception, int]:
@@ -131,7 +134,10 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
             FileContentsAM.length: validatedInput["length"],
             FileContentsAM.volume: validatedInput["volume"] if "volume" in validatedInput else 0,
             FileContentsAM.complexity: validatedInput["complexity"],
-            FileContentsAM.scalingFactor: 1.0
+            FileContentsAM.scalingFactor: 1.0,
+            FileContentsAM.femRequested: False,
+            FileContentsAM.testType: "",
+            FileContentsAM.pressure: 0
         })
 
         # calculate values right here
@@ -255,7 +261,10 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     FileContentsAM.height: details["height"] if "height" in details else 0,
                     FileContentsAM.length: details["length"] if "length" in details else 0,
                     FileContentsAM.volume: details["volume"] if "volume" in details else 0,
-                    FileContentsAM.complexity: details["complexity"] if "complexity" in details else 0
+                    FileContentsAM.complexity: details["complexity"] if "complexity" in details else 0,
+                    FileContentsAM.femRequested: details["femRequested"] if "femRequested" in details else False,
+                    FileContentsAM.testType: details["testType"] if "testType" in details else "",
+                    FileContentsAM.pressure: details["pressure"] if "pressure" in details else 0
                 })
                 
                 # calculate values right here
@@ -378,6 +387,12 @@ def logicForUpdateModel(request, validatedInput):
             model[FileContentsAM.complexity] = validatedInput["complexity"]
         if FileContentsAM.scalingFactor.value in validatedInput:
             model[FileContentsAM.scalingFactor] = validatedInput["scalingFactor"]
+        if FileContentsAM.femRequested.value in validatedInput:
+            model[FileContentsAM.femRequested] = validatedInput["femRequested"]
+        if FileContentsAM.testType.value in validatedInput:
+            model[FileContentsAM.testType] = validatedInput["testType"]
+        if FileContentsAM.pressure.value in validatedInput:
+            model[FileContentsAM.pressure] = validatedInput["pressure"]
         
         fromRepository = False
         if model[FileObjectContent.deleteFromStorage] is False:

@@ -23,7 +23,7 @@ from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.services.service_AdditiveManufacturing.utilities import mocks
 from code_SemperKI.utilities.locales import manageTranslations
 
-from ..definitions import SERVICE_NAME, NodeTypesAM, NodePropertiesAMMaterial, FilterCategories, ServiceDetails, MaterialDetails
+from ..definitions import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -49,8 +49,38 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
             # translate properties
             materialEntry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,materialEntry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
 
-    # fetch colors of that material
-    colorsOfMaterial = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(materialEntry[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
+    # fetch colors of that material from organisations
+    # TODO THIS IS JUST TEMPORARY!
+    colorsOfMaterial = []
+    setOfRALOrHex = set()
+    tempMaterials = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID])
+    if isinstance(tempMaterials, Exception):
+        raise tempMaterials
+    for mat in tempMaterials:
+        if mat[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
+            colorsOfMat = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(mat[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
+            if isinstance(colorsOfMat, Exception):
+                raise colorsOfMat
+            for color in colorsOfMat:
+                if color[pgKnowledgeGraph.NodeDescription.active] is True:
+                    add = False
+                    for prop in color[pgKnowledgeGraph.NodeDescription.properties]:
+                        if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMColor.colorRAL:
+                            if prop[pgKnowledgeGraph.NodePropertyDescription.value] not in setOfRALOrHex:
+                                setOfRALOrHex.add(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                                add = True
+                            else:
+                                add = False
+                        elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMColor.colorHEX:
+                            if prop[pgKnowledgeGraph.NodePropertyDescription.value] not in setOfRALOrHex:
+                                setOfRALOrHex.add(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                                add = True
+                            else:
+                                add = False
+                    if add:
+                        colorsOfMaterial.append(color)
+            
+    #colorsOfMaterial = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(materialEntry[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
     # maybe parse the content of the colorNodeArray
     # sort out all inactive nodes
     colors = []
@@ -66,6 +96,28 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
     output["materials"].append({MaterialDetails.id: materialEntry[pgKnowledgeGraph.NodeDescription.nodeID], MaterialDetails.title: materialEntry[pgKnowledgeGraph.NodeDescription.nodeName], MaterialDetails.propList: materialEntry[pgKnowledgeGraph.NodeDescription.properties], MaterialDetails.imgPath: imgPath, MaterialDetails.medianPrice: materialPrices[materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID]] if materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID] in materialPrices else 0., MaterialDetails.colors: colors})
     # TODO use translation here for nodeName
     return None
+
+##################################################
+def filterHelper(filterEntry:dict, nodeEntry:dict, nodeProperty:str) -> bool:
+    """
+    Helper function to filter the materials by a property
+
+    :return: None
+    :rtype: None
+    """
+    appendViaThisFilter = False
+    if filterEntry["question"]["title"] == nodeProperty:
+        if filterEntry["answer"] is not None:
+            answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
+            propertiesOfEntry = nodeEntry[pgKnowledgeGraph.NodeDescription.properties]
+            for prop in propertiesOfEntry:
+                if prop[pgKnowledgeGraph.NodePropertyDescription.key] == nodeProperty:
+                    if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
+                        appendViaThisFilter = True
+                        break
+
+    return appendViaThisFilter
+
 ##################################################
 def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Exception, int]:
     try:
@@ -169,46 +221,13 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                     if filterEntry["isChecked"] is True and append is True:
                         
                         # filter for material tensile strenght
-                        if filterEntry["question"]["title"] == FilterCategories.tensileStrength.value:
-                            appendViaThisFilter = False
-                            if filterEntry["answer"] is not None:
-                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
-                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
-                                for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
-                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
-                                            appendViaThisFilter = True
-                                            break
-
-                                append = appendViaThisFilter
+                        append = filterHelper(filterEntry, entry, NodePropertiesAMMaterial.ultimateTensileStrength)
                         
                         # filter for material density
-                        if filterEntry["question"]["title"] == FilterCategories.density.value:
-                            appendViaThisFilter = False
-                            if filterEntry["answer"] is not None:
-                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
-                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
-                                for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
-                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
-                                            appendViaThisFilter = True
-                                            break
-
-                                append = appendViaThisFilter
+                        append = filterHelper(filterEntry, entry, NodePropertiesAMMaterial.density)
                         
                         # filter for material elongation at break
-                        if filterEntry["question"]["title"] == FilterCategories.elongationAtBreak.value:
-                            appendViaThisFilter = False
-                            if filterEntry["answer"] is not None:
-                                answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
-                                propertiesOfEntry = entry[pgKnowledgeGraph.NodeDescription.properties]
-                                for prop in propertiesOfEntry:
-                                    if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
-                                        if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
-                                            appendViaThisFilter = True
-                                            break
-
-                                append = appendViaThisFilter
+                        append = filterHelper(filterEntry, entry, NodePropertiesAMMaterial.elongationAtBreak)
                         
                         # filter for material certificates
                         if filterEntry["question"]["title"] == FilterCategories.certificates.value:
