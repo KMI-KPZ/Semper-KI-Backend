@@ -366,25 +366,28 @@ def logicForUpdateModel(request, validatedInput):
         model[FileObjectContent.quantity] = validatedInput["quantity"]
         model[FileObjectContent.levelOfDetail] = validatedInput["levelOfDetail"]
         model[FileObjectContent.isFile] = validatedInput["isFile"]
-        if "width" in validatedInput:
+        if FileContentsAM.width.value in validatedInput:
             model[FileContentsAM.width] = validatedInput["width"]
-        if "height" in validatedInput:
+        if FileContentsAM.height.value in validatedInput:
             model[FileContentsAM.height] = validatedInput["height"]
-        if "length" in validatedInput:
+        if FileContentsAM.length.value in validatedInput:
             model[FileContentsAM.length] = validatedInput["length"]
-        if "volume" in validatedInput:
+        if FileContentsAM.volume.value in validatedInput:
             model[FileContentsAM.volume] = validatedInput["volume"]
-        if "complexity" in validatedInput:
+        if FileContentsAM.complexity.value in validatedInput:
             model[FileContentsAM.complexity] = validatedInput["complexity"]
-        if "scalingFactor" in validatedInput:
+        if FileContentsAM.scalingFactor.value in validatedInput:
             model[FileContentsAM.scalingFactor] = validatedInput["scalingFactor"]
         
+        fromRepository = False
+        if model[FileObjectContent.deleteFromStorage] is False:
+            fromRepository = True
 
         # calculate values right here
         if model[FileObjectContent.isFile] is False:
             calculationResult = calculateBoundaryDataForNonFileModel(model)
         else:
-            uploadedModel, flag = getFileReadableStream(request.session, projectID, processID, fileID)
+            uploadedModel, flag = getFileReadableStream(request.session, projectID, processID, fileID, fromRepository)
             if flag is False:
                 return (Exception(f"Error while accessing file {model[FileObjectContent.fileName]}"), 500)
             calculationResult = calculateBoundaryData(uploadedModel, nameOfFile, model[FileObjectContent.size], model[FileContentsAM.scalingFactor]/100.)
@@ -416,6 +419,7 @@ class ContentOfRepoModel(StrEnumExactlyAsDefined):
     license = enum.auto()
     preview = enum.auto()
     file = enum.auto()
+    tags = enum.auto()
     certificates = enum.auto()
     levelOfDetail = enum.auto()
     complexity = enum.auto()
@@ -431,16 +435,19 @@ def logicForGetModelRepository() -> dict|Exception:
     """
     try:
         # TODO add more details about the models
-        outDict = {}
-        redisConn = RedisConnection()
-        redisContent = redisConn.retrieveContentJSON("ModelRepository")
-        if redisContent[1] is False:
-            content = s3.manageRemoteS3.getContentOfBucket("ModelRepository")
+            outDict = {}
+        #redisConn = RedisConnection()
+        #redisContent = redisConn.retrieveContentJSON("ModelRepository")
+        #if redisContent[1] is False:
+            content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.AWS_BUCKET_NAME+"/ModelRepository")
             outDict = {"repository": {}}
             for elem in content:
                 path = elem["Key"]
                 splitPath = path.split("/")[1:]
-                if len(splitPath) > 1:
+                pathWithoutBucket = '/'.join(splitPath)
+                sizeOfFile = elem["Size"]
+                nameOfFile = splitPath[1]
+                if path[-1] != "/":
                     if ContentOfRepoModel.license.value in elem["Metadata"]:
                         licenseOfFile = elem["Metadata"][ContentOfRepoModel.license.value]
                     else:
@@ -449,10 +456,10 @@ def logicForGetModelRepository() -> dict|Exception:
                         certificatesOfFile = elem["Metadata"][ContentOfRepoModel.certificates.value]
                     else:
                         certificatesOfFile = []
-                    if ContentOfRepoModel.size.value in elem["Metadata"]:
-                        sizeOfFile = elem["Metadata"][ContentOfRepoModel.size.value]
+                    if ContentOfRepoModel.tags.value in elem["Metadata"]:
+                        tagsOfFile = elem["Metadata"][ContentOfRepoModel.tags.value]
                     else:
-                        sizeOfFile = 0
+                        tagsOfFile = []
                     if ContentOfRepoModel.levelOfDetail.value in elem["Metadata"]:
                         levelOfDetailOfFile = elem["Metadata"][ContentOfRepoModel.levelOfDetail.value]
                     else:
@@ -463,27 +470,29 @@ def logicForGetModelRepository() -> dict|Exception:
                         complexityOfFile = 0
                     
 
-                    if splitPath[0] not in outDict["repository"]:
-                        outDict["repository"][splitPath[0]] = {ContentOfRepoModel.name.value: splitPath[0], ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: 0}
+                    if nameOfFile not in outDict["repository"]:
+                        outDict["repository"][nameOfFile] = {ContentOfRepoModel.name.value: nameOfFile, ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.tags.value: [], ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: sizeOfFile}
                     
-                    if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
+                    if "Preview" in splitPath[2]:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+path.replace(" ", "%20")
                     else:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.file.value] = elem["Key"].replace(" ", "%20")
-                    if licenseOfFile != "" and outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] == "":
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.license.value] = licenseOfFile
-                    if certificatesOfFile != [] and outDict["repository"][splitPath[0]][ContentOfRepoModel.certificates.value] == []:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.certificates.value] = certificatesOfFile
-                    if sizeOfFile != 0 and outDict["repository"][splitPath[0]][ContentOfRepoModel.size.value] == 0:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.size.value] = sizeOfFile
-                    if levelOfDetailOfFile != 1 and outDict["repository"][splitPath[0]][ContentOfRepoModel.levelOfDetail.value] == 1:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.levelOfDetail.value] = levelOfDetailOfFile
-                    if complexityOfFile != 0 and outDict["repository"][splitPath[0]][ContentOfRepoModel.complexity.value] == 0:
-                        outDict["repository"][splitPath[0]][ContentOfRepoModel.complexity.value] = complexityOfFile
-            redisConn.addContentJSON("ModelRepository", outDict)
-        else:
-            outDict = redisContent[0]
-        return outDict
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.file.value] = pathWithoutBucket.replace(" ", "%20")
+                    if licenseOfFile != "" and outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] == "":
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] = licenseOfFile
+                    if certificatesOfFile != [] and outDict["repository"][nameOfFile][ContentOfRepoModel.certificates.value] == []:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.certificates.value] = certificatesOfFile
+                    if sizeOfFile != 0 and outDict["repository"][nameOfFile][ContentOfRepoModel.size.value] == 0:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.size.value] = sizeOfFile
+                    if tagsOfFile != [] and outDict["repository"][nameOfFile][ContentOfRepoModel.tags.value] == []:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.tags.value] = tagsOfFile
+                    if levelOfDetailOfFile != 1 and outDict["repository"][nameOfFile][ContentOfRepoModel.levelOfDetail.value] == 1:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.levelOfDetail.value] = levelOfDetailOfFile
+                    if complexityOfFile != 0 and outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] == 0:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] = complexityOfFile
+            #redisConn.addContentJSON("ModelRepository", outDict)
+        #else:
+            #outDict = redisContent[0]
+            return outDict
     except Exception as e:
         loggerError.error("Error in getModelRepository: %s" % str(e))
         return e
@@ -575,13 +584,13 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
 
         # retrieve calculations
         redisCon = RedisConnection()
-        calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
-        if calculationsFromRedis[1] is False:
-            model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
-            calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
-            redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
-        else:
-            calculationResult = calculationsFromRedis[0]
+        #calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
+        #if calculationsFromRedis[1] is False:
+        model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
+        calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
+            #redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
+        #else:
+            #calculationResult = calculationsFromRedis[0]
 
         # update the process
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]

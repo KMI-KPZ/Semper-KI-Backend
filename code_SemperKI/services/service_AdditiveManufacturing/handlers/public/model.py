@@ -449,9 +449,14 @@ def deleteModel(request:Request, projectID:str, processID:str, groupID:str, file
 #######################################################
 class SResRepoContent(serializers.Serializer):
     name = serializers.CharField()
-    license= serializers.CharField()
+    license= serializers.ListField(child=serializers.CharField())
     preview=serializers.CharField()
     file=serializers.CharField()
+    certificates=serializers.ListField(child=serializers.CharField())
+    tags=serializers.ListField(child=serializers.CharField())
+    levelOfDetail=serializers.IntegerField()
+    complexity=serializers.IntegerField()
+    size=serializers.IntegerField()
 
 #######################################################
 class SResModelRepository(serializers.Serializer):

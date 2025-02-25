@@ -292,7 +292,7 @@ def getFileObject(session, projectID: str, processID: str, fileID: str) -> tuple
 
 
 #######################################################
-def getFileReadableStream(session, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
+def getFileReadableStream(session, projectID, processID, fileID, fromRepository:bool=False) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
@@ -329,7 +329,7 @@ def getFileReadableStream(session, projectID, processID, fileID) -> tuple[Encryp
 
         encryptionAdapter = EncryptionAdapter(streamingBody)
 
-        if isRemote is False:
+        if isRemote is False or fromRepository is True:
             # local files are not encrypted
             return (encryptionAdapter, True)
 
