@@ -1643,6 +1643,123 @@ class VERIFYING(State):
         return super().onButtonEvent(event, interface, process) # do not change
 
 #######################################################
+class VERIFICATION_FAILED(State):
+    """
+    Process is currently being verified
+
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFICATION_FAILED)
+    name = ProcessStatusAsString.VERIFICATION_FAILED
+    fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+        """
+        Buttons for VERIFYING
+
+        """
+        if client or admin:
+            return [
+                {
+                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
+                    "icon": IconType.ArrowBackIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "backstepStatus",
+                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.secondary,
+                    "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.DELETE, # do not change
+                    "icon": IconType.DeleteIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": { "type": "deleteProcess" },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
+                }
+            ] 
+        else:
+            return []
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        return []
+
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_COMPLETED:
+        """
+        To: CONTRACTOR_COMPLETED
+        
+        """
+        # delete verification results
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface, process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
 class VERIFICATION_COMPLETED(State):
     """
     Process has been verified

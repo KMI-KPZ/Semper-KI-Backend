@@ -449,11 +449,10 @@ def logicForGetModelRepository() -> dict|Exception:
     :rtype: dict
     """
     try:
-        # TODO add more details about the models
-            outDict = {}
-        #redisConn = RedisConnection()
-        #redisContent = redisConn.retrieveContentJSON("ModelRepository")
-        #if redisContent[1] is False:
+        outDict = {}
+        redisConn = RedisConnection()
+        redisContent = redisConn.retrieveContentJSON("ModelRepository")
+        if redisContent[1] is False:
             content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.AWS_BUCKET_NAME+"/ModelRepository")
             outDict = {"repository": {}}
             for elem in content:
@@ -504,10 +503,10 @@ def logicForGetModelRepository() -> dict|Exception:
                         outDict["repository"][nameOfFile][ContentOfRepoModel.levelOfDetail.value] = levelOfDetailOfFile
                     if complexityOfFile != 0 and outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] == 0:
                         outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] = complexityOfFile
-            #redisConn.addContentJSON("ModelRepository", outDict)
-        #else:
-            #outDict = redisContent[0]
-            return outDict
+            redisConn.addContentJSON("ModelRepository", outDict)
+        else:
+            outDict = redisContent[0]
+        return outDict
     except Exception as e:
         loggerError.error("Error in getModelRepository: %s" % str(e))
         return e
@@ -594,18 +593,21 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
             FileContentsAM.length: 0,
             FileContentsAM.volume: 0,
             FileContentsAM.complexity: repoModel[FileContentsAM.complexity.value],
-            FileContentsAM.scalingFactor: 100.0
+            FileContentsAM.scalingFactor: 100.0,
+            FileContentsAM.femRequested: False,
+            FileContentsAM.testType: "",
+            FileContentsAM.pressure: 0
         })
 
         # retrieve calculations
         redisCon = RedisConnection()
-        #calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
-        #if calculationsFromRedis[1] is False:
-        model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
-        calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
-            #redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
-        #else:
-            #calculationResult = calculationsFromRedis[0]
+        calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
+        if calculationsFromRedis[1] is False:
+            model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
+            calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
+            redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
+        else:
+            calculationResult = calculationsFromRedis[0]
 
         # update the process
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]

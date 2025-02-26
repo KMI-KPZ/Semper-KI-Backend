@@ -106,7 +106,7 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # But first, check if the status has been changed in the meantime (gone back or cancelled or something)
         sleep(3)
         currentProcessObj = DBProcessesAccess.ProcessManagementBase.getProcessObj("", processObj.processID)
-        if currentProcessObj == None:
+        if currentProcessObj is None:
             # Process doesn't exist anymore
             return
         elif currentProcessObj.processStatus != processStatusAsInt(ProcessStatusAsString.VERIFYING):
@@ -120,19 +120,19 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Get all details and set status in database
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = ["email","subjects","statusUpdate"]
-        if valid:
-            message = ["email","content","verificationSuccessful"]
-            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
-            if isinstance(retVal, Exception):
-                raise retVal
-        else: # Else: set to failed
-            message = ["email","content","verificationFailed"]
-            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLICATION), "SYSTEM")
-            if isinstance(retVal, Exception):
-                raise retVal
-        # send out mail & Websocket event 
+        #if valid:
+        #    message = ["email","content","verificationSuccessful"]
+        #    retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
+        #    if isinstance(retVal, Exception):
+        #        raise retVal
+        #else: # Else: set to failed
+        message = ["email","content","verificationFailed"]
+        retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_FAILED), "SYSTEM")
+        if isinstance(retVal, Exception):
+            raise retVal
+        # send out mail & Websocket event
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
-        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.verification, True)  
+        websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.verification, True)
         
     except Exception as error:
         loggerError.error(f"Error while verifying process: {str(error)}")

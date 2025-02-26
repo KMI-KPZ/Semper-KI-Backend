@@ -847,8 +847,9 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+                if ProcessDetails.provisionalContractor in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
                 assert isinstance(content, list), "DependencyIn Content is not a list"
@@ -867,12 +868,14 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
 
             elif updateType == ProcessUpdates.verificationResults:
-                del currentProcess.processDetails[ProcessDetails.verificationResults]
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.verificationResults})
+                if ProcessDetails.verificationResults in currentProcess.processDetails:
+                    del currentProcess.processDetails[ProcessDetails.verificationResults]
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.verificationResults})
 
             elif updateType == ProcessUpdates.additionalInput:
-                currentProcess.processDetails[ProcessDetails.additionalInput] = {}
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
+                if ProcessDetails.additionalInput in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.additionalInput] = {}
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             currentProcess.save()
             return True

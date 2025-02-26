@@ -127,7 +127,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
 
     try:
         if existingContent == deletedContent:
-            existingContent = {}
+            return {}
         groupIdxForExistingContent = 0
         for idx in range(len(deletedContent[ServiceDetails.groups])):
             deletedContentGroup = deletedContent[ServiceDetails.groups][idx]
@@ -164,7 +164,7 @@ def deleteServiceDetails(existingContent, deletedContent) -> dict:
             groupIdxForExistingContent += 1
 
     except (Exception) as error:
-        logger.error(f'Generic error in updateServiceDetails(3D Print): {str(error)}')
+        logger.error(f'Generic error in deleteServiceDetails(3D Print): {str(error)}')
     
     return existingContent
 

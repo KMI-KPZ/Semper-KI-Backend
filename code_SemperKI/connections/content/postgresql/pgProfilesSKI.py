@@ -208,7 +208,7 @@ def orgaCreatedSemperKI(orgaHashID:str, oldDetails:dict):
         if OrganizationDetailsSKI.maturityLevel not in oldDetails:
             orga.details[OrganizationDetailsSKI.maturityLevel] = []
         else:
-            if not isinstance(orga.details[OrganizationDetailsSKI.maturityLevel], list):
+            if not isinstance(oldDetails[OrganizationDetailsSKI.maturityLevel], list):
                 orga.details[OrganizationDetailsSKI.maturityLevel] = []
             else:
                 orga.details[OrganizationDetailsSKI.maturityLevel] = oldDetails[OrganizationDetailsSKI.maturityLevel]
@@ -216,7 +216,7 @@ def orgaCreatedSemperKI(orgaHashID:str, oldDetails:dict):
         if OrganizationDetailsSKI.resilienceScore not in oldDetails:
             orga.details[OrganizationDetailsSKI.resilienceScore] = []
         else:
-            if not isinstance(orga.details[OrganizationDetailsSKI.resilienceScore], list):
+            if not isinstance(oldDetails[OrganizationDetailsSKI.resilienceScore], list):
                 orga.details[OrganizationDetailsSKI.resilienceScore] = []
             else:
                 orga.details[OrganizationDetailsSKI.resilienceScore] = oldDetails[OrganizationDetailsSKI.resilienceScore]

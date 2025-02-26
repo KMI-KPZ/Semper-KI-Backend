@@ -862,8 +862,9 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = {}
-                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+                if ProcessDetails.provisionalContractor in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = {}
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
@@ -878,8 +879,9 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
 
             elif updateType == ProcessUpdates.additionalInput:
-                currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
-                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
+                if ProcessDetails.additionalInput in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             else:
                 raise Exception(f"deleteFromProcess {updateType} not implemented")
