@@ -23,6 +23,7 @@ from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...modelFiles.dataModel import DataInterface, DataDescription
 from ...serviceManager import serviceManager
 from ...utilities.filePreview import deletePreviewFile
+from ...utilities.basics import kissLogo
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
@@ -642,7 +643,11 @@ class ProcessManagementSession(AbstractContentInterface):
 
         now = timezone.now()
 
-        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client).toDict())
+        createdProcess = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
+        # initialize some details here
+        createdProcess.processDetails[ProcessDetails.imagePath] = [kissLogo]
+
+        self.structuredSessionObj.setProcess(projectID, processID, createdProcess.toDict())
 
     ###################################################
     def deleteProcess(self, processID:str, processObj=None):
@@ -710,8 +715,16 @@ class ProcessManagementSession(AbstractContentInterface):
                 outContent = content[MessageInterfaceFromFrontend.text]
 
             elif updateType == ProcessUpdates.files:
+                # if this is the first file, remove the default image from the processDetails
+                if ProcessDetails.imagePath in currentProcess[ProcessDescription.processDetails]:
+                    if currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] == [serviceManager.getImgPath(content)]:
+                        currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
+                else:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
+                
                 for entry in content:
                     currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].append(content[entry][FileObjectContent.imgPath])
                     self.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     outContent += content[entry][FileObjectContent.fileName] + ","
                 outContent = outContent.rstrip(",")
@@ -719,6 +732,7 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
                 currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(content).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [serviceManager.getImgPath(content)]
                 self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
             
@@ -827,6 +841,7 @@ class ProcessManagementSession(AbstractContentInterface):
                 for entry in content:
                     deleteFileHelper(currentProcess[ProcessDescription.files][entry])
                     deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].remove(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 
@@ -837,6 +852,7 @@ class ProcessManagementSession(AbstractContentInterface):
                 currentProcess[ProcessDescription.serviceStatus] = 0
                 if ProcessDetails.additionalInput in currentProcess[ProcessDescription.processDetails]:
                     currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [kissLogo]
                 currentProcess[ProcessDescription.serviceType] = serviceManager.getNone()
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 

@@ -10,11 +10,11 @@ import json, enum, copy
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .projectModel import Project, ProjectInterface
-from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization, OrganizationDescription
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
+from .projectModel import Project, ProjectInterface
+from ..serviceManager import serviceManager
 ###################################################
 class ProcessDescription(StrEnumExactlyAsDefined):
     """
@@ -247,7 +247,8 @@ class ProcessInterface():
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
-
+    
+    ###################################################
     def save(self) -> None:
         """
         Save to database

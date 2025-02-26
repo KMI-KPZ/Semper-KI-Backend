@@ -200,6 +200,19 @@ class _ServicesManager():
         """
 
         return self._services[savedService][ServicesStructure.object]
+    
+    ###################################################
+    def getImgPath(self, savedService : int) -> str:
+        """
+        Depending on the service, select the correct Image path
+
+        :param savedService: The selected service saved in the dictionary _services
+        :type savedService: int
+        :return: The respective Image path
+        :rtype: str
+        """
+
+        return self._services[savedService][ServicesStructure.imgPath]
 
     ####################################################################################
     def getAllServices(self) -> list:

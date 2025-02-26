@@ -604,10 +604,11 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
         calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
         if calculationsFromRedis[1] is False:
             model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
-            calculationResult = calculateBoundaryData(model, nameOfFile, repoModel[FileObjectContent.size.value], 1.0)
+            calculationResult = calculateBoundaryData(model, repoModel[ContentOfRepoModel.name.value], repoModel[FileObjectContent.size.value], 1.0)
             redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
         else:
             calculationResult = calculationsFromRedis[0]
+        calculationResult[Calculations.filename.value] = nameOfFile
 
         # update the process
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
@@ -745,18 +746,18 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
         scalingFactorTimesThree = scalingFactor*scalingFactor*scalingFactor
 
         result = {
-                "filename": fileName,
-                "measurements": {
-                    "volume": float(volume)*scalingFactorTimesThree,
-                    "surfaceArea": float(surface_area)*scalingFactor*scalingFactor,
-                    "mbbDimensions": {
-                        "_1": float(bounding_box[0])*scalingFactor,
-                        "_2": float(bounding_box[1])*scalingFactor,
-                        "_3": float(bounding_box[2])*scalingFactor,
+                Calculations.filename.value: fileName,
+                Calculations.measurements.value: {
+                    Measurements.volume.value: float(volume)*scalingFactorTimesThree,
+                    Measurements.surfaceArea.value: float(surface_area)*scalingFactor*scalingFactor,
+                    Measurements.mbbDimensions.value: {
+                        MbbDimensions._1.value: float(bounding_box[0])*scalingFactor,
+                        MbbDimensions._2.value: float(bounding_box[1])*scalingFactor,
+                        MbbDimensions._3.value: float(bounding_box[2])*scalingFactor,
                     },
-                    "mbbVolume": float(volumeBB)* scalingFactorTimesThree,
+                    Measurements.mbbVolume.value: float(volumeBB)* scalingFactorTimesThree,
                 },
-                "status_code": 200
+                Calculations.status_code.value: 200
             }
         return result
     except Exception as error:
@@ -775,18 +776,18 @@ def calculateBoundaryDataForNonFileModel(model:dict) -> dict:
     
     """
     fakeCalculation = {
-            "filename": model[FileObjectContent.fileName],
-            "measurements": {
-                "volume": float(model[FileContentsAM.volume]),
-                "surfaceArea": 0.0,
-                "mbbDimensions": {
-                    "_1": float(model[FileContentsAM.width]),
-                    "_2": float(model[FileContentsAM.length]),
-                    "_3": float(model[FileContentsAM.height]),
+            Calculations.filename.value: model[FileObjectContent.fileName],
+            Calculations.measurements.value: {
+                Measurements.volume.value: float(model[FileContentsAM.volume]),
+                Measurements.surfaceArea.value: 0.0,
+                Measurements.mbbDimensions.value: {
+                    MbbDimensions._1.value: float(model[FileContentsAM.width]),
+                    MbbDimensions._2.value: float(model[FileContentsAM.length]),
+                    MbbDimensions._3.value: float(model[FileContentsAM.height]),
                 },
-                "mbbVolume": float(model[FileContentsAM.width]*model[FileContentsAM.length]*model[FileContentsAM.height]),
+                Measurements.mbbVolume.value: float(model[FileContentsAM.width]*model[FileContentsAM.length]*model[FileContentsAM.height]),
             },
-            "status_code": 200
+            Calculations.status_code.value: 200
         }
     return fakeCalculation
 

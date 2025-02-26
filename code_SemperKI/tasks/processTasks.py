@@ -120,16 +120,16 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Get all details and set status in database
         processTitle = processObj.processDetails[ProcessDetails.title] if ProcessDetails.title in processObj.processDetails else processObj.processID
         subject = ["email","subjects","statusUpdate"]
-        #if valid:
-        #    message = ["email","content","verificationSuccessful"]
-        #    retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
-        #    if isinstance(retVal, Exception):
-        #        raise retVal
-        #else: # Else: set to failed
-        message = ["email","content","verificationFailed"]
-        retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_FAILED), "SYSTEM")
-        if isinstance(retVal, Exception):
-            raise retVal
+        if valid:
+            message = ["email","content","verificationSuccessful"]
+            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_COMPLETED), "SYSTEM")
+            if isinstance(retVal, Exception):
+                raise retVal
+        else: # Else: set to failed
+            message = ["email","content","verificationFailed"]
+            retVal = DBProcessesAccess.ProcessManagementBase.updateProcess("", processObj.processID, ProcessUpdates.processStatus, processStatusAsInt(ProcessStatusAsString.VERIFICATION_FAILED), "SYSTEM")
+            if isinstance(retVal, Exception):
+                raise retVal
         # send out mail & Websocket event
         sendEMail(processObj.client, NotificationSettingsUserSemperKI.verification, subject, message, processTitle)
         websocket.fireWebsocketEventsForProcess(processObj.project.projectID, processObj.processID, session, ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.verification, True)

@@ -33,6 +33,7 @@ from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
 from ....utilities.filePreview import deletePreviewFile
+from ....utilities.basics import kissLogo
 
 logger = logging.getLogger("errors")
 
@@ -690,9 +691,17 @@ class ProcessManagementBase(AbstractContentInterface):
                     getAdditionalInformation = True
                 elif len(content) > 1:
                     outContent = "files"
+                
+                # if this is the first file, remove the default image from the processDetails
+                if ProcessDetails.imagePath in currentProcess.processDetails:
+                    if currentProcess.processDetails[ProcessDetails.imagePath] == [serviceManager.getImgPath(currentProcess.serviceType)]:
+                        currentProcess.processDetails[ProcessDetails.imagePath] = []
+                else:
+                    currentProcess.processDetails[ProcessDetails.imagePath] = []
 
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
+                    currentProcess.processDetails[ProcessDetails.imagePath].append(content[entry][FileObjectContent.imgPath])
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     if getAdditionalInformation:
                         outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
@@ -722,6 +731,7 @@ class ProcessManagementBase(AbstractContentInterface):
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).initializeServiceDetails(currentProcess.serviceDetails)
+                currentProcess.processDetails[ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess.serviceType)]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
 
@@ -816,6 +826,7 @@ class ProcessManagementBase(AbstractContentInterface):
                 for entry in content:
                     deleteFileHelper(content[entry])
                     deletePreviewFile(content[entry][FileObjectContent.imgPath])
+                    currentProcess.processDetails[ProcessDetails.imagePath].remove(content[entry][FileObjectContent.imgPath])
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()
@@ -842,6 +853,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     currentProcess.processDetails[ProcessDetails.additionalInput] = {}
                 if currentProcess.serviceType != serviceManager.getNone():
                     currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, currentProcess.serviceDetails)
+                currentProcess.processDetails[ProcessDetails.imagePath] = [kissLogo]
                 currentProcess.serviceType = serviceManager.getNone()
                 currentProcess.serviceStatus = 0
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
@@ -1092,6 +1104,9 @@ class ProcessManagementBase(AbstractContentInterface):
             projectObj = ProcessManagementBase.getProjectObj(projectID)
 
             defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
+
+            # initialize some details
+            defaultProcessObj.processDetails[ProcessDetails.imagePath] = [kissLogo]
 
             processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
             ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)
