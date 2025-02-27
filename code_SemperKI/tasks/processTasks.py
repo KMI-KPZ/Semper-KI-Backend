@@ -85,9 +85,9 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         # Check if service was correctly defined
         if valid and not serviceManager.getService(processObj.serviceType).serviceReady(processObj.serviceDetails)[0]:
             valid = False
-            validationResults[ValidationSteps.serviceReady] = False
+            validationResults[ValidationSteps.serviceReady] = {ValidationInformationForFrontend.isSuccessful: False, ValidationInformationForFrontend.reason: ""}
         else:
-            validationResults[ValidationSteps.serviceReady] = True
+            validationResults[ValidationSteps.serviceReady] = {ValidationInformationForFrontend.isSuccessful: True}
 
         # run service specific tasks
         validationResults[ValidationSteps.serviceSpecificTasks] = {}

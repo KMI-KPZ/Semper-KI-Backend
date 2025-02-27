@@ -201,7 +201,11 @@
           {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
           {"name": "density", "key": "density", "value": "1.31", "unit": "g/cm³", "type": "number"},
           {"name": "printingSpeed", "key": "printingSpeed", "value": "4.8", "unit": "cm/h", "type": "number"},
-          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"}
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"},
+          {"name": "poissonRatio", "key": "poissonRatio", "value": "0.35", "unit": "", "type": "number"},
+          {"name": "tensileModulus", "key": "tensileModulus", "value": "2798", "unit": "MPa", "type": "number"},
+          {"name": "elongationAtBreak", "key": "elongationAtBreak", "value": "0.04", "unit": "%", "type": "number"},
+          {"name": "ultimateTensileStrength", "key": "ultimateTensileStrength", "value": "64.083", "unit": "MPa", "type": "number"}
           ],
           "active": true
       }

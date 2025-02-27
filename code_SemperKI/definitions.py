@@ -346,3 +346,4 @@ class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
     
     """
     isSuccessful = enum.auto()
+    reason = enum.auto()
