@@ -304,7 +304,7 @@ def calculate_average_results(results_list):
     return avg_results
 
 ##################################################
-def run_FEM_test(material, pressure, stl_file, stl_fileName, test_type):
+def run_FEM_test(material, pressure, stl_file, stl_fileName, test_type, resultQueue):
     try:# print("\nStarte FEM-Simulationen mit Mittelwertberechnung...")
         output_data = {}
         with tempfile.TemporaryDirectory() as tempDir: # because meshio.read does not accept BytesIO, we have to use this bs
@@ -362,10 +362,10 @@ def run_FEM_test(material, pressure, stl_file, stl_fileName, test_type):
                     "Mittlere maximale Dehnung": f"{avg_results[direction]['max. Dehnung']} ± {avg_results[direction]['Standardabweichungen']['Dehnung']:.4f}"
                 }
 
-        return output_data
+        resultQueue.put(output_data)
     except Exception as e:
         print(f"Error in FEM-Simulation: {e}")
-        return {"Error": str(e)}
+        resultQueue.put({"Error": str(e)})
 
 ##################################################
 # When used as a script

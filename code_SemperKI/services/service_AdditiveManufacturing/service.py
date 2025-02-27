@@ -9,7 +9,7 @@ from django.conf import settings
 
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
-from code_SemperKI.definitions import PricesDetails, ValidationSteps
+from code_SemperKI.definitions import PricesDetails, ValidationSteps, ValidationInformationForFrontend
 
 from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
@@ -166,12 +166,12 @@ class AdditiveManufacturing(Semper.ServiceBase):
         Do service specific tasks
 
         """
-        successful = True
         resultDict = startFEMAnalysis(session, processObj)
-        if isinstance(resultDict, Exception):
-            successful = False
-        validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = successful
-        return resultDict
+        if resultDict[ServiceDetails.groups] == []:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: True}
+        else:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: False, "groups": resultDict[ServiceDetails.groups]}
+        return validationResults
 
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing(), settings.STATIC_URL+"media/AM.png")

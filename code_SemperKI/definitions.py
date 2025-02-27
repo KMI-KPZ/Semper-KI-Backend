@@ -338,3 +338,11 @@ class ValidationSteps(StrEnumExactlyAsDefined):
     """
     serviceReady = enum.auto()
     serviceSpecificTasks = enum.auto()
+
+##################################################
+class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
+    """
+    What is the content of the verification stuff that the frontend needs
+    
+    """
+    isSuccessful = enum.auto()

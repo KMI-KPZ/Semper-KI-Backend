@@ -30,7 +30,7 @@ import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
 
-from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
+from ..definitions import ProcessDescription, ValidationSteps, ValidationInformationForFrontend, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -1675,7 +1675,7 @@ class VERIFICATION_FAILED(State):
 
         """
         if client or admin:
-            return [
+            buttonList = [
                 {
                     "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
                     "icon": IconType.ArrowBackIcon,
@@ -1702,8 +1702,33 @@ class VERIFICATION_FAILED(State):
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": "process",
+                },
+                {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
+                    "icon": IconType.ArrowForwardIcon,
+                    "iconPosition": "right",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
+                        },
+                    },
+                    "active": False,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": "process",
                 }
-            ] 
+            ]
+            whatsMissing = self.missingForCompletion("", process)
+            if len(whatsMissing) == 0:
+                buttonList[2]["active"] = True #set forward button to active
+            else:
+                buttonList[2]["active"] = True
+                for entry in whatsMissing:
+                    if entry["key"] == "Process-VerificationFailed":
+                        buttonList[2]["active"] = False # that's the only thing that can make the button inactive
+                        break
+            return buttonList
         else:
             return []
     
@@ -1732,7 +1757,19 @@ class VERIFICATION_FAILED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return []
+        # Evaluate the verification results
+        outArray = []
+        if ProcessDetails.verificationResults in process.processDetails:
+            verificationResults = process.processDetails[ProcessDetails.verificationResults]
+            if ValidationSteps.serviceReady in verificationResults and verificationResults[ValidationSteps.serviceReady] is False:
+                outArray.append({"key": "Process-VerificationFailed"})
+            if ValidationSteps.serviceSpecificTasks in verificationResults:
+                for key in verificationResults[ValidationSteps.serviceSpecificTasks]:
+                    if isinstance(verificationResults[ValidationSteps.serviceSpecificTasks][key], dict) and ValidationInformationForFrontend.isSuccessful in verificationResults[ValidationSteps.serviceSpecificTasks][key]:
+                        if verificationResults[ValidationSteps.serviceSpecificTasks][key][ValidationInformationForFrontend.isSuccessful] is False:
+                            outArray.append({"key": "Service-VerificationFailed"})
+                            break
+        return outArray
 
     ###################################################
     # Transitions

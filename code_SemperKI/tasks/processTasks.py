@@ -23,7 +23,7 @@ import code_SemperKI.utilities.websocket as websocket
 import code_SemperKI.utilities.locales as Locales
 import code_SemperKI.handlers.public.files as FileHandler
 
-from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ProcessDetails, NotificationSettingsUserSemperKI, NotificationSettingsOrgaSemperKI, ValidationSteps
+from ..definitions import ProcessDescription, ProcessUpdates, ProjectDetails, ValidationInformationForFrontend, ProcessDetails, NotificationSettingsUserSemperKI, NotificationSettingsOrgaSemperKI, ValidationSteps
 from ..states.stateDescriptions import ProcessStatusAsString, processStatusAsInt
 from ..modelFiles.processModel import Process
 from ..serviceManager import serviceManager
@@ -94,6 +94,10 @@ def verificationOfProcess(processObj:Process, session): # ProcessInterface not n
         resultOfServiceTasks = serviceManager.getService(processObj.serviceType).serviceSpecificTasks(session, processObj, validationResults)
         if isinstance(resultOfServiceTasks, Exception):
             valid = False
+        for key in resultOfServiceTasks[ValidationSteps.serviceSpecificTasks]:
+            if resultOfServiceTasks[ValidationSteps.serviceSpecificTasks][key][ValidationInformationForFrontend.isSuccessful] is False:
+                valid = False
+                break
 
         # Check if parameters make sense
 
