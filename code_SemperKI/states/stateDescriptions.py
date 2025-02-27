@@ -64,9 +64,9 @@ def processStatusAsInt(statusString:str) -> int:
     elif statusString == ProcessStatusAsString.VERIFYING:
         return 400
     elif statusString == ProcessStatusAsString.VERIFICATION_FAILED:
-        return 402
-    elif statusString == ProcessStatusAsString.VERIFICATION_COMPLETED:
         return 401
+    elif statusString == ProcessStatusAsString.VERIFICATION_COMPLETED:
+        return 402
     elif statusString == ProcessStatusAsString.REQUEST_COMPLETED:
         return 500
     elif statusString == ProcessStatusAsString.OFFER_COMPLETED:
@@ -117,9 +117,9 @@ def processStatusFromIntToStr(statusCode:int) -> str:
         return ProcessStatusAsString.CONTRACTOR_COMPLETED
     elif statusCode == 400:
         return ProcessStatusAsString.VERIFYING
-    elif statusCode == 402:
-        return ProcessStatusAsString.VERIFICATION_FAILED
     elif statusCode == 401:
+        return ProcessStatusAsString.VERIFICATION_FAILED
+    elif statusCode == 402:
         return ProcessStatusAsString.VERIFICATION_COMPLETED
     elif statusCode == 500:
         return ProcessStatusAsString.REQUEST_COMPLETED

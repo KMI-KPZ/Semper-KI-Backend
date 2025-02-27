@@ -6,6 +6,7 @@ Silvio Weging 2025
 Contains: Functions to create, store and retrieve preview jpgs to uploaded files
 """
 import io, logging, os, tempfile
+from multiprocessing import Process as MPProcess, Queue as MPQueue
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.conf import settings
@@ -21,6 +22,20 @@ try:
     from preview_generator.manager import PreviewManager
 
     ##################################################
+    def createPreviewInSeparateTask(temporaryFilePath:str, tempDir:str, resultQueue:MPQueue) -> None:
+        """
+        Create a preview of a file in a separate task
+        
+        """
+        try:
+            manager = PreviewManager(tempDir+"/previews", create_folder= True)
+            result = manager.get_jpeg_preview(temporaryFilePath)
+            resultQueue.put(result)
+        except Exception as error:
+            loggerError.error(f"Error while creating preview in separate task: {str(error)}")
+            resultQueue.put(error)
+
+    ##################################################
     def createAndStorePreview(file:InMemoryUploadedFile, fileName:str, locale:str, storagePath:str) -> str|Exception:
         """
         Create a preview of a file and store it in a given path
@@ -29,7 +44,6 @@ try:
         try:
             outPath = ""
             with tempfile.TemporaryDirectory() as tempDir: # because meshio.read does not accept BytesIO, we have to use this bs
-                manager = PreviewManager(tempDir+"/previews", create_folder= True)
                 temporaryFileName = tempDir+"/"+fileName
                 temporaryFile = open(temporaryFileName, 'wb')
                 temporaryFile.write(file.read())
@@ -40,10 +54,24 @@ try:
                 remotePath = "public/previews/" + basePath
                 outPath = settings.STATIC_URL + "previews/" + basePath
                 try:
+                    path_to_preview_image = ""
+                    #resultQueue = MPQueue()
+                    #previewTask = MPProcess(target=createPreviewInSeparateTask, args=(temporaryFileName, tempDir, resultQueue))
+                    # TODO send this to another task since this can fail
+                    manager = PreviewManager(tempDir+"/previews", create_folder= True)
                     path_to_preview_image = manager.get_jpeg_preview(temporaryFileName)
+                    #previewTask.start()
+                    #previewTask.join(60)
+                    #previewTask.close()
+                    #if not resultQueue.empty():
+                        #path_to_preview_image = resultQueue.get()
+                    if isinstance(path_to_preview_image, Exception):
+                        raise path_to_preview_image
                     f = open(path_to_preview_image, 'rb')
                     manageStaticsS3.uploadFile(remotePath, f, True)
                     f.close()
+                    #else:
+                        #raise Exception("Preview creation took too long")
                 except Exception as _:
                     if locale == "de-DE":
                         outPath = previewNotAvailableGER

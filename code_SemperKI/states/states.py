@@ -1774,6 +1774,18 @@ class VERIFICATION_FAILED(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFICATION_FAILED | REQUEST_COMPLETED:
+        """
+        From: VERIFICATION_FAILED
+        To: VERIFICATION_FAILED | REQUEST_COMPLETED
+
+        """
+        retVal = interface.sendProcess(process, interface.getSession() , interface.getUserID())
+        if isinstance(retVal, Exception):
+            return stateDict[ProcessStatusAsString.VERIFICATION_FAILED]
+        return stateDict[ProcessStatusAsString.REQUEST_COMPLETED]
+    ###################################################
     def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           CONTRACTOR_COMPLETED:
         """
@@ -1786,7 +1798,7 @@ class VERIFICATION_FAILED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):

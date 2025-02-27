@@ -35,6 +35,7 @@ from code_SemperKI.logics.processLogics import updateProcessFunction
 from code_SemperKI.utilities.filePreview import createAndStorePreview
 
 from ..definitions import *
+from ..utilities.stpToStl import transformSTPtoSTL
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -207,6 +208,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
             # rename duplicates
             counterForFileName = 1
             nameOfFile = fileName
+            fileNameRoot, extension= os.path.splitext(nameOfFile)
             while nameOfFile in existingFileNames:
                 fileNameRoot, extension= os.path.splitext(nameOfFile)
                 if counterForFileName > 100000:
@@ -223,6 +225,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
                 counterForFileName += 1
             for model in request.FILES.getlist(fileName):
+                modelSize = model.size
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
                     if detail["fileName"] == fileName or detail["fileName"] == "file":
@@ -230,6 +233,17 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID+"/"+processID+"/"+fileID
+
+                # transform from step to stl if necessary
+                if extension == ".step" or extension == ".stp" or extension == ".STP" or extension == ".STEP":
+                    # save original file
+                    # TODO
+                    # transform to stl
+                    model = transformSTPtoSTL(model, nameOfFile)
+                    modelSize = model.__sizeof__()
+                    nameOfFile = nameOfFile.split(".")[0] + ".stl"
+                    if isinstance(model, Exception):
+                        return (model, 500)
 
                 # create preview
                 previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
@@ -251,7 +265,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     FileObjectContent.date: str(timezone.now()),
                     FileObjectContent.createdBy: userName,
                     FileObjectContent.createdByID: content.getClient(),
-                    FileObjectContent.size: model.size,
+                    FileObjectContent.size: modelSize,
                     FileObjectContent.type: FileTypes.Model,
                     FileObjectContent.origin: origin,
                     FileObjectContent.remote: False,
@@ -269,7 +283,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 
                 # calculate values right here
                 scalingFactor = modelsToBeSaved[fileID][FileContentsAM.scalingFactor]/100.
-                result = calculateBoundaryData(model, nameOfFile, model.size, scalingFactor)
+                result = calculateBoundaryData(model, nameOfFile, modelSize, scalingFactor)
                 if result["status_code"] != 200:
                     return (Exception(f"Error while calculating measurements for file {nameOfFile}"), 500)
                 calculationsToBeSaved[fileID] = result
