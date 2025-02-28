@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install -r requirements.txt
 
 # Install preview generator and dependencies
-RUN apt-get -y install poppler-utils libfile-mimeinfo-perl libimage-exiftool-perl ghostscript libsecret-1-0 zlib1g-dev libjpeg-dev imagemagick libmagic1 webp inkscape libreoffice ffmpeg xvfb
+RUN apt-get -y install poppler-utils libfile-mimeinfo-perl libimage-exiftool-perl ghostscript libsecret-1-0 zlib1g-dev libjpeg-dev imagemagick libmagic1 webp inkscape libreoffice ffmpeg xvfb libsm6 libxext6 libgl1
 #RUN DRAWIO_VERSION="15.7.3" && curl -LO https://github.com/jgraph/drawio-desktop/releases/download/v${DRAWIO_VERSION}/drawio-x86_64-${DRAWIO_VERSION}.AppImage && mv drawio-x86_64-${DRAWIO_VERSION}.AppImage /usr/local/bin/drawio
 #RUN pip install preview-generator[drawio]
 RUN pip install preview-generator[3D]
