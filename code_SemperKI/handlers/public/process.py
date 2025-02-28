@@ -109,9 +109,11 @@ class SResProcessDetails(serializers.Serializer):
     title = serializers.CharField(max_length=200, required=False)
     clientBillingAddress = serializers.DictField(allow_empty=True, required=False)
     clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)
-    imagePath = serializers.URLField(required=False)
+    imagePath = serializers.ListField(child=serializers.URLField(), required=False, allow_empty=True)
     priorities = serializers.DictField(allow_empty=True, required=False)
     prices = serializers.DictField(allow_empty=True, required=False)
+    verificationResults = serializers.DictField(allow_empty=True, required=False)
+    additionalInput = serializers.DictField(allow_empty=True, required=False)
 
 #######################################################
 class SResFiles(serializers.Serializer):
@@ -255,7 +257,7 @@ def updateProcess(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateProcess.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -330,7 +332,7 @@ def deleteProcesses(request:Request, projectID):
     """
     try:
         processIDs = request.GET['processIDs'].split(",")
-        retVal = deleteProcessFunction(request.session, processIDs)
+        retVal = deleteProcessFunction(request.session, processIDs, projectID)
         if isinstance(retVal, Exception):
             raise retVal
         return retVal
@@ -390,7 +392,7 @@ def getProcessHistory(request:Request, processID):
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(getProcessHistory.cls.__name__)
         if interface is None:
-            logger.error("Rights not sufficient in getProcessHistory")
+            loggerError.error("Rights not sufficient in getProcessHistory")
             return Response("Insufficient rights", status=status.HTTP_401_UNAUTHORIZED)
 
         processObj = interface.getProcessObj("", processID)
@@ -438,6 +440,10 @@ class SResContractors(serializers.Serializer):
     name = serializers.CharField(max_length=200)
     branding = serializers.DictField()
     prices = serializers.DictField()
+    distance = serializers.FloatField()
+    contractorCoordinates = serializers.ListField(child=serializers.FloatField(), required=False)
+    verified = serializers.BooleanField(required=False) # AM service only
+    groups = serializers.ListField(child=serializers.IntegerField(), required=False) # AM service only
 
 
 #########################################################################
@@ -545,7 +551,7 @@ def cloneProcesses(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {cloneProcesses.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

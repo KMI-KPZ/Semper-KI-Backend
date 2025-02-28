@@ -22,7 +22,8 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
-from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfUserIsAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkIfRightsAreSufficient, checkIfUserIsLoggedIn, checkIfUserIsAdmin
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementOrganization
 
 from code_SemperKI.definitions import *
@@ -31,8 +32,11 @@ from code_SemperKI.utilities.basics import *
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
+from code_SemperKI.utilities.locales import manageTranslations
 
 from ....utilities import sparqlQueries
+from ....definitions import *
+from ....logics.ontoLogics import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -51,6 +55,7 @@ loggerError = logging.getLogger("errors")
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -67,20 +72,10 @@ def onto_getGraph(request:Request):
 
     """
     try:
-        result = pgKnowledgeGraph.Basics.getGraph()
+        result, statusCode = logicForGetGraph(request)
         if isinstance(result, Exception):
             raise result
-        outDict = {"Nodes": [], "Edges": []}
-        for entry in result["nodes"]:
-            outEntry = {"id": entry[pgKnowledgeGraph.NodeDescription.nodeID], "name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "type": entry[pgKnowledgeGraph.NodeDescription.nodeType]}
-            outDict["Nodes"].append(outEntry)
-        for entry in result["edges"]:
-            outEntry = {"source": entry[0], "target": entry[1]}
-            outDict["Edges"].append(outEntry)
-
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},graph," + str(datetime.now()))
-
-        outSerializer = SResGraphForFrontend(data=outDict)
+        outSerializer = SResGraphForFrontend(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -107,6 +102,7 @@ def onto_getGraph(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -123,17 +119,9 @@ def onto_getResources(request:Request, resourceType:str):
 
     """
     try:
-        resultsOfQueries = {"resources": []}
-        # materialsRes = sparqlQueries.getAllMaterials.sendQuery()
-        # for elem in materialsRes:
-        #     title = elem["Material"]["value"]
-        #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
-        result = pgKnowledgeGraph.Basics.getNodesByType(resourceType)
+        result, statusCode = logicForGetResources(request, resourceType)
         if isinstance(result, Exception):
             raise result
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType}," + str(datetime.now()))
-
         outSerializer = SResNode(data=result, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -162,6 +150,7 @@ def onto_getResources(request:Request, resourceType:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -178,19 +167,65 @@ def onto_getNodeViaID(request:Request, nodeID:str):
 
     """
     try:
-        nodeInfo = pgKnowledgeGraph.Basics.getNode(nodeID)
-        if isinstance(nodeInfo, Exception):
-            raise nodeInfo
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
-
-        outSerializer = SResNode(data=nodeInfo.toDict())
+        result, statusCode = logicForGetNodeViaID(request, nodeID)
+        if isinstance(result, Exception):
+            raise result
+        outSerializer = SResNode(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
             raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {onto_getNodeViaID.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Get all nodes that share that nodes unique ID",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_getNodesByUniqueID(request:Request, nodeID:str):
+    """
+    Get all nodes with a certain type
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param nodeType: The type of the nodes
+    :type nodeType: str
+    :return: list of nodes
+    :rtype: Response
+
+    """
+    try:
+        result, statusCode = logicForGetNodesByUniqueID(request, nodeID)
+        if isinstance(result, Exception):
+            raise result
+        outSerializer = SResNode(data=result, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {onto_getNodesByUniqueID.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -211,6 +246,7 @@ def onto_getNodeViaID(request:Request, nodeID:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -232,12 +268,10 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         #     title = elem["Material"]["value"]
         #     resultsOfQueries["materials"].append({"title": title, "URI": elem["Material"]["value"]})
 
-        result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(nodeID, resourceType)
+        result, statusCode = logicForGetAssociatedResources(request, nodeID, resourceType)
         if isinstance(result, Exception):
             raise result
         
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighbor nodes of {nodeID} of type {resourceType}," + str(datetime.now()))
-
         outSerializer = SResNode(data=result, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -266,6 +300,7 @@ def onto_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["GET"])
@@ -282,16 +317,10 @@ def onto_getNeighbors(request:Request, nodeID:str):
 
     """
     try:
-        result = pgKnowledgeGraph.Basics.getEdgesForNode(nodeID)
+        result, statusCode = logicForGetNeighbors(request, nodeID)
         if isinstance(result, Exception):
             raise result
-        
-        # remove nodes not belonging to the system
-        filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID}," + str(datetime.now()))
-
-        outSerializer = SResNode(data=filteredOutput, many=True)
+        outSerializer = SResNode(data=result, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -321,6 +350,7 @@ def onto_getNeighbors(request:Request, nodeID:str):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["POST"])
@@ -341,7 +371,7 @@ def onto_addNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_addNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -349,14 +379,12 @@ def onto_addNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        # TODO Sparql
-        result = pgKnowledgeGraph.Basics.createNode(validatedInput)
+        
+        result, statusCode = logicForAddNode(request, validatedInput)
         if isinstance(result, Exception):
             raise result
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},node {result.nodeID}," + str(datetime.now()))
 
-        outSerializer = SResNode(data=result.toDict())
+        outSerializer = SResNode(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -407,6 +435,7 @@ class SReqCreateOrUpdateAndLinkAdmin(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @checkIfUserIsAdmin()
@@ -427,7 +456,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -436,51 +465,10 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
             
         validatedInput = inSerializer.data
         
-        if validatedInput["type"] == "create":
-            # create node for the system
-            if "nodeID" in validatedInput["node"]:
-                del validatedInput["node"]["nodeID"]
-            resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], pgKnowledgeGraph.defaultOwner)
-            if isinstance(resultNode, Exception):
-                raise resultNode
-            # create edges
-            for nodeIDFromEdge in validatedInput["edges"]["create"]:
-                # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
-                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
-                if isinstance(otherNode, Exception):
-                    raise otherNode
-
-                # create edge to new node
-                result = pgKnowledgeGraph.Basics.createEdge(otherNode.nodeID, resultNode.nodeID) 
-                if isinstance(result, Exception):
-                    raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
-                if isinstance(result, Exception):
-                    raise result
-
-        elif validatedInput["type"] == "update":
-            # update node
-            resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
-            if isinstance(resultNode, Exception):
-                raise resultNode
-            # create edges
-            for nodeIDFromEdge in validatedInput["edges"]["create"]:
-                # create edge to new node
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
-                if isinstance(result, Exception):
-                    raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
-                if isinstance(result, Exception):
-                    raise result
-        else:
-            return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
-
-        logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},created or updated,{Logging.Object.OBJECT},nodes and edges for orga {orgaID}," + str(datetime.now()))
-
+        result, statusCode = logicForCreateOrUpdateAndLinkNodes(request, validatedInput)
+        if isinstance(result, Exception):
+            raise result
+        
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {onto_createOrUpdateAndLinkNodes.cls.__name__}: {str(error)}"
@@ -505,6 +493,7 @@ def onto_createOrUpdateAndLinkNodes(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["PATCH"])
@@ -525,7 +514,7 @@ def onto_updateNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {onto_updateNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -533,14 +522,12 @@ def onto_updateNode(request:Request):
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         validatedInput = inSerializer.data
-        # TODO KG
-        result = pgKnowledgeGraph.Basics.updateNode(validatedInput["nodeID"], validatedInput)
+        
+        result, statusCode = logicForUpdateNode(request, validatedInput)
         if isinstance(result, Exception):
             raise result
         
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.EDITED},updated,{Logging.Object.OBJECT},node {validatedInput['nodeID']}," + str(datetime.now()))
-
-        outSerializer = SResNode(data=result.toDict())
+        outSerializer = SResNode(data=result)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -567,6 +554,7 @@ def onto_updateNode(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["DELETE"])
@@ -585,12 +573,9 @@ def onto_deleteNode(request:Request, nodeID:str):
 
     """
     try:
-        # TODO KG
-        result = pgKnowledgeGraph.Basics.deleteNode(nodeID)
+        result, statusCode = logicForDeleteNode(request, nodeID)
         if isinstance(result, Exception):
             raise result
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},node {nodeID}," + str(datetime.now()))
 
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
@@ -620,6 +605,7 @@ class SReqOntoCreateEdge(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["POST"])
@@ -641,23 +627,18 @@ def onto_addEdge(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {onto_addEdge.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        entityIDs = serializedInput.data["entityIDs"]
-        ID1 = entityIDs[0]
-        ID2 = entityIDs[1]
-        # TODO Sparql
-        result = pgKnowledgeGraph.Basics.createEdge(ID1, ID2) 
+        validatedInput = serializedInput.data
+
+        result, statusCode = logicForAddEdge(request, validatedInput)
         if isinstance(result, Exception):
             raise result
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.CREATED},created,{Logging.Object.OBJECT},edge from {ID1} to {ID2}," + str(datetime.now()))
-
         return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
@@ -683,6 +664,7 @@ def onto_addEdge(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @checkIfUserIsAdmin()
 @require_http_methods(["DELETE"])
@@ -703,13 +685,10 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
 
     """
     try:
-        # TODO Sparql
-        result = pgKnowledgeGraph.Basics.deleteEdge(entity1ID, entity2ID)
+        result, statusCode = logicForDeleteEdge(request, entity1ID, entity2ID)
         if isinstance(result, Exception):
             raise result
-        
-        logger.info(f"{Logging.Subject.ADMIN},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},edge from {entity1ID} to {entity2ID}," + str(datetime.now()))
-        
+
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {onto_removeEdge.cls.__name__}: {str(error)}"
@@ -721,3 +700,45 @@ def onto_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+#######################################################
+@extend_schema(
+    summary="Create material type nodes from existing materials",
+    description=" ",
+    tags=['FE - AM Resources Ontology'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsLoggedIn()
+@checkIfUserIsAdmin()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def onto_createMaterialTypeNodes(request:Request):
+    """
+    Create material type nodes from existing materials
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Success or not
+    :rtype: Response
+
+    """
+    try:
+        result, statusCode = logicForCreateMaterialTypeNodes()
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success")
+    except (Exception) as error:
+        message = f"Error in {onto_createMaterialTypeNodes.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

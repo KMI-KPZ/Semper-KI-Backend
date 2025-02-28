@@ -7,14 +7,36 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 
 ##################################################
-# What makes up the 3D print service
+# What makes up the Assembly service
 import enum
 
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
+##################################################
+# Service specific definitions
+SERVICE_NAME = "ASSEMBLY"
+SERVICE_NUMBER = 8
+
+###################################################
 class ServiceDetails(StrEnumExactlyAsDefined):
     """
     What does the service consists of 
 
     """
-    pass
+
+####################################################
+class NodeTypesA(StrEnumExactlyAsDefined):
+    """
+    What possible types can a node have in the A service?
+    
+    """
+    organization = enum.auto() # the orga node
+
+##################################################
+class OrganizationDetailsA(StrEnumExactlyAsDefined):
+    """
+    What are the details of an organization?
+    
+    """
+
+##################################################

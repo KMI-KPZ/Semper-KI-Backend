@@ -10,11 +10,12 @@ Contains: Am specific database knowledge graph stuff
 
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertiesTypesOfEntries, NodePropertyDescription
 from code_SemperKI.connections.content.postgresql.pgKnowledgeGraph import Logic, Basics
+from code_SemperKI.utilities.locales import manageTranslations
 
 from ...definitions import *
 
 ##################################################
-def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
+def getPropertyDefinitionForNodeType(nodeType:str, userLocale:str) -> list[dict]:
     """
     For different node types, different properties are important. 
     Retrieve those, especially for the Frontend.
@@ -30,199 +31,264 @@ def getPropertyDefinitionForNodeType(nodeType:str) -> list[dict]:
         case NodeTypesAM.organization:
             pass
         case NodeTypesAM.printer:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.nozzleDiameter,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.nozzleDiameter]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.nozzleDiameter,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.certificates,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.certificates]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.lossOfMaterial,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.lossOfMaterial]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.lossOfMaterial,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "%",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.fixedCosts,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.fixedCosts]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.fixedCosts,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineBatchDistance,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.machineBatchDistance]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.machineBatchDistance,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.fillRate,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.fillRate]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.fillRate,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "%",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildHeight,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.chamberBuildHeight]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildHeight,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildWidth,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.chamberBuildWidth]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildWidth,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.chamberBuildLength,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.chamberBuildLength]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.chamberBuildLength,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "mm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.buildRate,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.buildRate]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.buildRate,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "cm³/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.averagePowerConsumption,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.averagePowerConsumption]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.averagePowerConsumption,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/kWh",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.possibleLayerHeights,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.possibleLayerHeights]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.possibleLayerHeights,
                             NodePropertyDescription.value: "15, 75",
                             NodePropertyDescription.unit: "µm",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineUsageCosts,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.machineUsageCosts]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.machineUsageCosts,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            #outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.scanSpeed,
-            #                NodePropertyDescription.value: "mm/s",
-            #                NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineSurfaceArea,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.machineSurfaceArea]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.machineSurfaceArea,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "m²",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.simpleMachineSetUp,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.simpleMachineSetUp]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.simpleMachineSetUp,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.complexMachineSetUp,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.complexMachineSetUp]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.complexMachineSetUp,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.machineHourlyRate,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.machineHourlyRate]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.machineHourlyRate,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.costRatePersonalMachine,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.costRatePersonalMachine]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.costRatePersonalMachine,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.coatingTime,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.coatingTime]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.coatingTime,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMPrinter.maxPrintingSpeed,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMPrinter.maxPrintingSpeed]),
+                            NodePropertyDescription.key: NodePropertiesAMPrinter.maxPrintingSpeed,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            
         case NodeTypesAM.material:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.foodSafe,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.foodSafe]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.foodSafe,
                             NodePropertyDescription.value: "License;License;...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.heatResistant,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.heatResistant]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.heatResistant,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "°C",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.flexible,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.flexible]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.flexible,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.smooth,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.smooth]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.smooth,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "Ra",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.eModul,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.eModul]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.eModul,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.poissonRatio,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.poissonRatio]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.poissonRatio,
                             NodePropertyDescription.value: "1",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.certificates,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.certificates]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.density,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.density]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.density,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "g/cm³",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.printingSpeed]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "cm/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterial.acquisitionCosts,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.acquisitionCosts]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.acquisitionCosts,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/kg",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.ultimateTensileStrength]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.ultimateTensileStrength,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.tensileModulus]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.tensileModulus,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "GPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.elongationAtBreak]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.elongationAtBreak,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "%",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.flexuralStrength]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.flexuralStrength,
+                            NodePropertyDescription.value: "0",
+                            NodePropertyDescription.unit: "MPa",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterial.specificMaterialType]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterial.specificMaterialType,
+                            NodePropertyDescription.value: "PLA, ABS, ...",
+                            NodePropertyDescription.unit: "",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.additionalRequirement:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.foodSafe,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.foodSafe]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.foodSafe,
                             NodePropertyDescription.value: "License;License;...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.heatResistant,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.heatResistant]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.heatResistant,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "°C",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.smooth,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.smooth]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.smooth,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "MPa",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.certificates,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.certificates]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.treatmentCosts,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.treatmentCosts]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.treatmentCosts,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€/h",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMAdditionalRequirement.fixedCosts,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMAdditionalRequirement.fixedCosts]),
+                            NodePropertyDescription.key: NodePropertiesAMAdditionalRequirement.fixedCosts,
                             NodePropertyDescription.value: "0",
                             NodePropertyDescription.unit: "€",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.number})
-
         case NodeTypesAM.color:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMColor.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMColor.foodSafe,
-                            NodePropertyDescription.value: "License;License;...",
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorHEX]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.colorHEX,
+                            NodePropertyDescription.value: "#000000, #FFFFFF",
                             NodePropertyDescription.unit: "",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.string})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMColor.color,
-                            NodePropertyDescription.value: "000000",
-                            NodePropertyDescription.unit: "#Hex",
-                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.color})
-            outList.append({NodePropertyDescription.name: NodePropertiesAMColor.certificates,
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.array})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.colorRAL]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.colorRAL,
+                            NodePropertyDescription.value: "RAL 1000",
+                            NodePropertyDescription.unit: "",
+                            NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMColor.certificates]),
+                            NodePropertyDescription.key: NodePropertiesAMColor.certificates,
                             NodePropertyDescription.value: "CE, MD, ...",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.materialType:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterialType.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterialType.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterialType.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.materialCategory:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMMaterialCategory.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMMaterialCategory.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMMaterialCategory.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
         case NodeTypesAM.technology:
-            outList.append({NodePropertyDescription.name: NodePropertiesAMTechnology.imgPath,
+            outList.append({NodePropertyDescription.name: manageTranslations.getTranslation(userLocale, ["service",SERVICE_NAME,NodePropertiesAMTechnology.imgPath]),
+                            NodePropertyDescription.key: NodePropertiesAMTechnology.imgPath,
                             NodePropertyDescription.value: "",
                             NodePropertyDescription.unit: "",
                             NodePropertyDescription.type: NodePropertiesTypesOfEntries.text})
@@ -263,11 +329,11 @@ class LogicAM(Logic):
             chamberLength = 0
             for printerProperty in printer[NodeDescription.properties]:
                 # filter via build volume
-                if printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildHeight:
+                if printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildHeight:
                     chamberHeight = float(printerProperty[NodePropertyDescription.value])
-                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildWidth:
+                elif printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildWidth:
                     chamberWidth = float(printerProperty[NodePropertyDescription.value])
-                elif printerProperty[NodePropertyDescription.name] == NodePropertiesAMPrinter.chamberBuildLength:
+                elif printerProperty[NodePropertyDescription.key] == NodePropertiesAMPrinter.chamberBuildLength:
                     chamberLength = float(printerProperty[NodePropertyDescription.value])
 
             if (calculatedValues[0] <= float(chamberLength) and \

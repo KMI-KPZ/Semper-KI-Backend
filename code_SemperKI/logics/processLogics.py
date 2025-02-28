@@ -1,11 +1,12 @@
 """
 Part of Semper-KI software
 
-Silvio Weging 2024
+Silvio Weging 2024,
+Akshay NS 2024
 
 Contains: Logic for the processes
 """
-import logging, numpy, copy
+import logging, numpy, copy, time
 
 from datetime import datetime
 
@@ -16,6 +17,13 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.conf import settings
 
+from geopy.adapters import AioHTTPAdapter
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+from geopy.exc import GeocoderServiceError
+import asyncio
+from asgiref.sync import sync_to_async, async_to_sync
+
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, manualCheckIfRightsAreSufficientForSpecificOperation, manualCheckifAdmin, manualCheckifLoggedIn
@@ -24,7 +32,7 @@ from Generic_Backend.code_General.connections import s3
 
 from code_SemperKI.states.states import StateMachine, signalDependencyToOtherProcesses, processStatusAsInt, ProcessStatusAsString
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.serviceManager import serviceManager
+from code_SemperKI.serviceManager import serviceManager, ServiceBase
 from code_SemperKI.definitions import *
 from code_SemperKI.states.states import getButtonsForProcess, getMissingElements, getFlatStatus
 from code_SemperKI.connections.content.postgresql import pgProcesses
@@ -34,6 +42,89 @@ from ..modelFiles.processModel import Process, ProcessInterface
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
+####################################################################################
+async def calculateGeodesicDistance(userCoords:tuple, orgaCoords:tuple) -> tuple:
+        """
+        Calculate the geodesic distance between two addresses
+
+        :param userCoords: The first address' coordinates
+        :type userCoords: tuple
+        :param orgaCoords: The second address' coordinates
+        :type orgaCoords: tuple
+        :return: The distance between the two coordinates
+        :rtype: float | exception
+
+        """
+        try:
+            if None not in userCoords and None not in orgaCoords and userCoords != (0,0) and orgaCoords != (0,0):
+                distance = geodesic(userCoords, orgaCoords).kilometers
+                return round(distance, 2)
+            else:
+                return -1.0
+
+        except Exception as e:
+            loggerError.error("Error in calculateGeodesicDistance: %s" % e)
+            return -1.0
+        
+####################################################################################
+def calculateAddInfoForEachContractor(contractor, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict, idx:int):
+    """
+    Parallelized for loop over every contractor
+
+    """
+    try:
+        # calculate price for service
+        # await sync_to_async(
+        if isinstance(contractor, tuple):
+            contractorID = contractor[0] # contractor 0 contains the id, 1 contains if the contractor is verified and 2 contains a list of all groups that contractor can serve
+        else:
+            contractorID = contractor
+
+        priceOfContractor = service.calculatePriceForService(processObj, {"contractor": contractor}, transferObject) #await asyncio.to_thread(service.calculatePriceForService, processObj, {"orgaID": contractorID}, transferObject)
+        contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=contractorID) #await asyncio.to_thread(pgProfiles.ProfileManagementOrganization.getOrganization, hashedID=contractorID)
+        if isinstance(contractorContentFromDB, Exception):
+            return {"error": contractorContentFromDB}
+        
+        coordsContractor = (0,0)
+        if savedCoords == (0,0):
+            distance = -1.0
+        else:
+            #retrieve addresses and calculate distance
+            for idKey, entry in contractorContentFromDB[OrganizationDescription.details][OrganizationDetails.addresses].items():
+                if Addresses.standard in entry and entry[Addresses.standard]:
+                    if AddressesSKI.coordinates in entry:
+                        coordsContractor = entry[AddressesSKI.coordinates]
+                        break
+                else:
+                    if AddressesSKI.coordinates in entry:
+                        coordsContractor = entry[AddressesSKI.coordinates]
+
+            distance = async_to_sync(calculateGeodesicDistance)(savedCoords, coordsContractor) #await calculateGeodesicDistance(savedCoords, coordsContractor)
+
+        contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
+                                OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
+                                OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
+                                "distance": distance,
+                                "contractorCoordinates": coordsContractor,
+                                ProcessDetails.prices: priceOfContractor}
+        # add service specific details
+        contractorToBeAdded = serviceManager.getService(processObj.serviceType).getServiceSpecificContractorDetails(contractorToBeAdded, contractor)
+        return contractorToBeAdded
+    except Exception as e: 
+        return {"error": e}
+
+####################################################################################
+def parallelLoop(listOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
+    """
+    The main loop
+    
+    """
+    try:
+        #return await asyncio.gather(*[calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))])
+        return [calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))]
+    except Exception as e:
+        loggerError.error("Error in parallelLoop: %s" % e)
+        return []
 ####################################################################################
 def logicForGetContractors(processObj:Process):
     """
@@ -49,26 +140,19 @@ def logicForGetContractors(processObj:Process):
         
         service = serviceManager.getService(serviceType)
 
-        listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
+        coordsOfUser = (0,0)
+        if ProcessDetails.clientDeliverAddress in processObj.processDetails:
+            address1 = processObj.processDetails[ProcessDetails.clientDeliverAddress]
+            if AddressesSKI.coordinates in address1:
+                coordsOfUser = address1[AddressesSKI.coordinates]
         
-        # Format coming back from SPARQL is [{"ServiceProviderName": {"type": "literal", "value": "..."}, "ID": {"type": "literal", "value": "..."}}]
-        # Therefore parse it
-        listOfResultingContractors = []
-        for contractor in listOfFilteredContractors:
-            idOfContractor = ""
-            if "ID" in contractor:
-                idOfContractor = contractor["ID"]["value"]
-            else:
-                idOfContractor = contractor
-            priceOfContractor = service.calculatePriceForService(processObj, {"orgaID": idOfContractor}, transferObject)
-            contractorContentFromDB = pgProfiles.ProfileManagementOrganization.getOrganization(hashedID=idOfContractor)
-            if isinstance(contractorContentFromDB, Exception):
-                raise contractorContentFromDB
-            contractorToBeAdded = {OrganizationDescription.hashedID: contractorContentFromDB[OrganizationDescription.hashedID],
-                                   OrganizationDescription.name: contractorContentFromDB[OrganizationDescription.name],
-                                   OrganizationDescription.details: contractorContentFromDB[OrganizationDescription.details],
-                                   ProcessDetails.prices: priceOfContractor}
-            listOfResultingContractors.append(contractorToBeAdded)
+        listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
+        if len(listOfFilteredContractors) == 0:
+            return [], 200
+
+        # Loop could be parallelized but tests fail if it is
+        # This is due to django not closing the database calls correctly. If there is some other solution to to_thread above then by all means...
+        listOfResultingContractors = parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject) #asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
         
         #if settings.DEBUG:
         #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
@@ -82,6 +166,8 @@ def logicForGetContractors(processObj:Process):
             userPrioritiesVector = [4 for i in range(numberOfPriorities)]
         listOfContractorsWithPriorities = []
         for entry in listOfResultingContractors:
+            if "error" in entry:
+                raise entry["error"]
             if OrganizationDetails.priorities in entry[OrganizationDescription.details]:
                 prioList = []
                 for priority in entry[OrganizationDescription.details][OrganizationDetails.priorities]:
@@ -99,12 +185,9 @@ def logicForGetContractors(processObj:Process):
             processObj.processDetails[ProcessDetails.prices][contractor[0][OrganizationDescription.hashedID]] = copy.deepcopy(contractor[0][ProcessDetails.prices])
             # but parse away the details for the frontend
             del contractor[0][ProcessDetails.prices][PricesDetails.details]
-            listOfResultingContractors.append({
-                OrganizationDescription.hashedID: contractor[0][OrganizationDescription.hashedID],
-                OrganizationDescription.name: contractor[0][OrganizationDescription.name],
-                OrganizationDetails.branding: contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {},
-                ProcessDetails.prices: contractor[0][ProcessDetails.prices]
-            })
+            contractor[0][OrganizationDetails.branding] = contractor[0][OrganizationDescription.details][OrganizationDetails.branding] if OrganizationDetails.branding in contractor[0][OrganizationDescription.details] else {}
+            del contractor[0][OrganizationDescription.details]
+            listOfResultingContractors.append(contractor[0])
         processObj.save()
         return (listOfResultingContractors, 200)
 
@@ -137,7 +220,7 @@ def parseProcessOutputForFrontend(processObj:Process|ProcessInterface, contentMa
         contractor = False
         if processObj.contractor is not None:
             contractor = processObj.contractor.hashedID == userID
-        buttons = getButtonsForProcess(processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
+        buttons = getButtonsForProcess(interface, processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
         outDict = processObj.toDict()
         outDict[ProcessOutput.processStatusButtons] = buttons
 
@@ -223,10 +306,16 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
         
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(functionName)
-        if interface == None:
+        if interface is None:
             return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
             
         client = contentManager.getClient()
+        projectObj = interface.getProjectObj(projectID)
+        if projectObj is None:
+            return Exception("Project not found!"), 404
+        if client != projectObj.client:
+            return Exception("Not allowed to create process in this project!"), 401
+        
         interface.createProcess(projectID, processID, client)
 
         # set default addresses here
@@ -237,7 +326,7 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
                 clientAddresses = clientObject[UserDescription.details][UserDetails.addresses]
                 for key in clientAddresses:
                     entry = clientAddresses[key]
-                    if entry["standard"]:
+                    if entry[Addresses.standard]:
                         defaultAddress = entry
                         break
             addressesForProcess = {ProcessDetails.clientDeliverAddress: defaultAddress, ProcessDetails.clientBillingAddress: defaultAddress}
@@ -251,6 +340,11 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
             raise errorOrNot
         # set default title of the process
         errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
+
+        # create additionalInput field
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.additionalInput: {}}, client)
         if isinstance(errorOrNot, Exception):
             raise errorOrNot
 
@@ -283,7 +377,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface("updateProcess")
         if interface == None:
-            logger.error("Rights not sufficient in updateProcess")
+            loggerError.error("Rights not sufficient in updateProcess")
             return ("", False)
         
         client = contentManager.getClient()
@@ -291,7 +385,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
         
         for processID in processIDs:
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in updateProcess")
+                loggerError.error("Rights not sufficient in updateProcess")
                 return ("", False)
 
             if "deletions" in changes:
@@ -299,7 +393,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files):
                         if not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                            logger.error("Rights not sufficient in updateProcess")
+                            loggerError.error("Rights not sufficient in updateProcess")
                             return ("", False)
                         
                     returnVal = interface.deleteFromProcess(projectID, processID, elem, changes["deletions"][elem], client)
@@ -311,7 +405,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
                 for elem in changes["changes"]:
                     # exclude people not having sufficient rights for that specific operation
                     if client != GlobalDefaults.anonymous and (elem == ProcessUpdates.messages or elem == ProcessUpdates.files) and not manualCheckIfRightsAreSufficientForSpecificOperation(request.session, "updateProcess", str(elem)):
-                        logger.error("Rights not sufficient in updateProcess")
+                        loggerError.error("Rights not sufficient in updateProcess")
                         return ("", False)
                     fireEvent = False
                     # for websocket events
@@ -342,7 +436,7 @@ def updateProcessFunction(request:Request, changes:dict, projectID:str, processI
     
 #######################################################
 #deleteProcessFunction
-def deleteProcessFunction(session, processIDs:list[str]):
+def deleteProcessFunction(session, processIDs:list[str], projectID:str):
     """
     Delete the processes
 
@@ -357,14 +451,24 @@ def deleteProcessFunction(session, processIDs:list[str]):
     try:
         contentManager = ManageContent(session)
         interface = contentManager.getCorrectInterface("deleteProcesses")
-        if interface == None:
-            logger.error("Rights not sufficient in deleteProcesses")
+        if interface is None:
+            loggerError.error("Rights not sufficient in deleteProcesses")
             return HttpResponse("Insufficient rights!", status=401)
 
         for processID in processIDs:
+            # check visibility
             if not contentManager.checkRightsForProcess(processID):
-                logger.error("Rights not sufficient in deleteProcesses")
+                loggerError.error("Rights not sufficient in deleteProcesses")
                 return HttpResponse("Insufficient rights!", status=401)
+            # check accessability
+            processClient = interface.getProcessObj(projectID, processID)
+            if isinstance(processClient, Exception):
+                raise processClient
+            processClient = processClient.client
+            if processClient != contentManager.getClient():
+                loggerError.error("Rights not sufficient in deleteProcesses")
+                return HttpResponse("Insufficient rights!", status=401)
+            
             result = interface.deleteProcess(processID)
             if result is False:
                 raise Exception("Error in deleteProcessFunction")
@@ -421,6 +525,8 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
             oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
             if ProcessDetails.provisionalContractor in oldProcessDetails:
                 del oldProcessDetails[ProcessDetails.provisionalContractor]
+            if ProcessDetails.verificationResults in oldProcessDetails:
+                del oldProcessDetails[ProcessDetails.verificationResults]
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone

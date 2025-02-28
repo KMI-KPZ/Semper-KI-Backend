@@ -1,0 +1,62 @@
+{
+	"organization": {
+	  "powerCosts": "0.17 €/kWh",
+	  "margin": "10 %",
+	  "personnelCosts": "0 €/h",
+	  "costRatePersonnelEngineering": "35 €/h",
+	  "repairCosts": "0.025 %",
+	  "additionalFixedCosts": "0 €",
+	  "costRateEquipmentEngineering": "2 €/h",
+	  "fixedCostsEquipmentEngineering": "2 €/kWh",
+	  "safetyGasCosts": "20 €/h",
+	  "roomCosts": "14.5 €/m²"
+	},
+	"material": {
+	  "density": "4.43 g/cm³",
+	  "printingSpeed": "60 cm/h",
+	  "acquisitionCosts": "400 €"
+	},
+	"postProcessings": {
+	  "cleaning": {
+		"fixedCostsPostProcessing": "0 €",
+		"treatmentCostsPostProcessing": "0 €"
+	  }
+	},
+	"models": {
+	  "testModel_1": {
+		"levelOfDetail": 1,
+		"quantity": 1,
+		"complexity": 1,
+		"height": "100 mm",
+		"length": "100 mm",
+		"width": "100 mm",
+		"volume": "1000000 mm³",
+		"id": "testModel_1"
+	  }
+	},
+	"printers": [
+	  {
+		"technology": "Powder Bed Fusion",
+		"properties": 
+		  {
+			"costRatePersonalMachine": "26 €/h",
+			"chamberBuildHeight": "500 mm",
+			"chamberBuildWidth": "500 mm",
+			"chamberBuildLength": "500 mm",
+			"lossOfMaterial": "30 %",
+			"machineBatchDistance": "10 mm",
+			"possibleLayerHeights": "75, 30, 15",
+			"machineSurfaceArea": "1.8 m²",
+			"machineSetUpSimple": "1",
+			"machineSetUpComplex": "2",
+			"averagePowerConsumption": "5 €/kWh",
+			"machineUsageCosts": "51.8 €/h",
+			"coatingTime": "9 h",
+			"buildRate": "50 cm³/h",
+			"fillRate": "100 %",
+			"nozzleDiameter": "0.4 mm",
+			"maxPrintingSpeed": "60 cm/h"
+		  }
+	  }
+	]
+}

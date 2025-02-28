@@ -24,7 +24,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
-from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, manualCheckifAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
+from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfUserIsAdmin, manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 
 from code_SemperKI.definitions import *
 from code_SemperKI.modelFiles.nodesModel import NodeDescription
@@ -38,7 +38,8 @@ loggerError = logging.getLogger("errors")
 
 #######################################################
 class SResProperties(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    key = serializers.CharField(max_length=200)
     value = serializers.CharField(max_length=200, allow_blank=True)
     unit = serializers.CharField(max_length=200, allow_blank=True, required=False)
     type = serializers.CharField(max_length=200)
@@ -144,7 +145,7 @@ def createNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -254,7 +255,7 @@ def updateNode(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {updateNode.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -321,6 +322,57 @@ def getNodesByType(request:Request, nodeType:str):
             raise Exception(outSerializer.errors)
     except (Exception) as error:
         message = f"Error in {getNodesByType.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+@extend_schema(
+    summary="Get all nodes that share that nodes unique ID",
+    description=" ",
+    tags=['BE - Graph'],
+    request=None,
+    responses={
+        200: serializers.ListSerializer(child=SResNode()),
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def getNodesByUniqueID(request:Request, nodeID:str):
+    """
+    Get all nodes with a certain type
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :param nodeType: The type of the nodes
+    :type nodeType: str
+    :return: list of nodes
+    :rtype: Response
+
+    """
+    try:
+        result = pgKnowledgeGraph.Basics.getNode(nodeID)
+        if isinstance(result, Exception):
+            raise result
+        result = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(result.uniqueID)
+        if isinstance(result, Exception):
+            raise result
+
+        outSerializer = SResNode(data=result, many=True)
+        if outSerializer.is_valid():
+            return Response(outSerializer.data, status=status.HTTP_200_OK)
+        else:
+            raise Exception(outSerializer.errors)
+    except (Exception) as error:
+        message = f"Error in {getNodesByUniqueID.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -409,7 +461,7 @@ def getNodesByTypeAndProperty(request:Request, nodeType:str, nodeProperty:str, v
 
     """
     try:
-        result = pgKnowledgeGraph.Basics.getNodesByTypeAndProperty(nodeType, nodeProperty, value)
+        result = pgKnowledgeGraph.Basics.getNodesByTypeAndPropertyAndValue(nodeType, nodeProperty, value)
         if isinstance(result, Exception):
             raise result
 
@@ -610,7 +662,7 @@ def createEdge(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createEdge.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -824,6 +876,8 @@ class SReqGraph(serializers.Serializer):
 )
 
 @require_http_methods(["POST"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["POST"])
 @checkVersion(0.3)
 def createGraph(request:Request):
@@ -841,7 +895,7 @@ def createGraph(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {createGraph.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -884,7 +938,8 @@ def createGraph(request:Request):
 @checkVersion(0.3)
 def loadTestGraph(request:Request):
     """
-    Loads the test graph from the file
+    Loads the test graph from the file.
+    KEEP THIS, IT'S USED FOR TESTS
 
     :param request: GET Request
     :type request: HTTP GET
@@ -920,7 +975,9 @@ def loadTestGraph(request:Request):
         500: ExceptionSerializer
     }
 )
+@require_http_methods(["GET"])
 @loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["GET"])
 @checkVersion(0.3)
 def loadTestGraphViaAPI(request:Request):
@@ -934,16 +991,13 @@ def loadTestGraphViaAPI(request:Request):
 
     """
     try:
-        if manualCheckifAdmin(request.session):
-            testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
-            tGAsDict = json.loads(testGraph)
-            result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
-            return Response("Success", status=status.HTTP_200_OK)
-        else:
-            return Response("Not authorized", status=status.HTTP_401_UNAUTHORIZED)
+        testGraph = open(str(settings.BASE_DIR)+'/testGraph.json').read()
+        tGAsDict = json.loads(testGraph)
+        result = pgKnowledgeGraph.Basics.createGraph(tGAsDict)
+        return Response("Success", status=status.HTTP_200_OK)
 
     except (Exception) as error:
-        message = f"Error in {loadTestGraphViaAPI.cls.__name__}: {str(error)}"
+        message = f"Error in {loadTestGraph.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
@@ -966,6 +1020,8 @@ def loadTestGraphViaAPI(request:Request):
 )
 
 @require_http_methods(["DELETE"])
+@loginViaAPITokenIfAvailable()
+@checkIfUserIsAdmin()
 @api_view(["DELETE"])
 @checkVersion(0.3)
 def deleteGraph(request:Request):

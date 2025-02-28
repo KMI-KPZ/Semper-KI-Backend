@@ -11,3 +11,4 @@ import code_SemperKI.services.service_AdditiveManufacturing.service
 import code_SemperKI.services.service_AdditiveManufacturing.urls
 import code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries
 import code_SemperKI.services.service_AdditiveManufacturing.utilities.signals
+import code_SemperKI.services.service_AdditiveManufacturing.modelFiles

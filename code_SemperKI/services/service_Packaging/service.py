@@ -5,28 +5,31 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
+from django.conf import settings
+
 import code_SemperKI.serviceManager as Semper
+from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
 
-from .connections.postgresql.pgService import updateServiceDetails as P_updateServiceDetails, deleteServiceDetails as P_deleteServiceDetails, serviceReady as P_serviceReady, cloneServiceDetails as P_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as P_checkIfSelectionIsAvailable
-
+from .connections.postgresql.pgService import initializeService as P_initializeService, updateServiceDetails as P_updateServiceDetails, deleteServiceDetails as P_deleteServiceDetails, isFileRelevantForService as P_isFileRelevantForService, serviceReady as P_serviceReady, cloneServiceDetails as P_cloneServiceDetails
+from .logics.checkServiceLogic import checkIfSelectionIsAvailable as P_checkIfSelectionIsAvailable
+from .connections.filterViaSparql import *
+from .definitions import SERVICE_NAME, SERVICE_NUMBER
+from .logics.costs import Costs
 ###################################################
 class Packaging(Semper.ServiceBase):
     """
     All connections of this service that Semper-KI should know about
     
     """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
 
     ###################################################
-    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+    def initializeServiceDetails(self, serviceDetails:dict) -> None:
         """
         Initialize the service
 
         """
-        return {}
+        return P_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -38,13 +41,13 @@ class Packaging(Semper.ServiceBase):
         return P_updateServiceDetails(existingContent, newContent)
     
     ###################################################
-    def deleteServiceDetails(self, existingContent, newContent):
+    def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Run service specific update of service details
 
         """
 
-        return P_deleteServiceDetails(existingContent, newContent)
+        return P_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
     def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
@@ -52,7 +55,17 @@ class Packaging(Semper.ServiceBase):
         Check if a file is relevant for the service
 
         """
-        return False
+        return P_isFileRelevantForService(existingContent, fileID)
+
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        outContent = {}
+
+        return outContent
     
     ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
@@ -60,15 +73,8 @@ class Packaging(Semper.ServiceBase):
         Checks, if service is completely defined
         
         """
-        return P_serviceReady(existingContent)
-    
-    ###################################################
-    def parseServiceDetails(self, existingContent) -> dict:
-        """
-        Parse the service details for Frontend
-
-        """
-        return {}
+        completeOrNot, listOfMissingStuff = P_serviceReady(existingContent)
+        return (completeOrNot, listOfMissingStuff)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -102,23 +108,54 @@ class Packaging(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :param transferObject: The object that is used to transfer data between services
+        :param transferObject: Transfer object with additional information
         :type transferObject: object
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return {}
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts() 
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+            
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
+        
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
+        :param processObj: The process in question
+        :type processObj: ProcessInterface|Process
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
+
         """
-        return [], {}
+        filteredContractors = Filter()
 
-SERVICE_NAME = "PACKAGING"
-SERVICE_NUMBER = 5
+        outList = filteredContractors.getFilteredContractors(processObj)
+        
+        return outList, filteredContractors
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Packaging())
+        """
+        return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+        return {}
+
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Packaging(), settings.STATIC_URL+"media/P.png")

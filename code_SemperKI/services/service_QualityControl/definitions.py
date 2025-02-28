@@ -7,14 +7,36 @@ Contains: Definitions, Classes, Enums to describe Elements in the Backend as wel
 """
 
 ##################################################
-# What makes up the 3D print service
+# What makes up the Quality Control service
 import enum
 
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
+##################################################
+# Service specific definitions
+SERVICE_NAME = "QUALITY_CONTROL"
+SERVICE_NUMBER = 6
+
+###################################################
 class ServiceDetails(StrEnumExactlyAsDefined):
     """
     What does the service consists of 
 
     """
-    pass
+
+####################################################
+class NodeTypesQC(StrEnumExactlyAsDefined):
+    """
+    What possible types can a node have in the QC service?
+    
+    """
+    organization = enum.auto() # the orga node
+
+##################################################
+class OrganizationDetailsQC(StrEnumExactlyAsDefined):
+    """
+    What are the details of an organization?
+    
+    """
+
+##################################################

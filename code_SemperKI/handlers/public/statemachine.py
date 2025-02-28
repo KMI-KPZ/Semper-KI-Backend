@@ -20,7 +20,6 @@ from Generic_Backend.code_General.utilities.basics import checkVersion
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.manageContent import ManageContent
-from code_SemperKI.handlers.public.process import cloneProcesses, deleteProcessFunction
 from code_SemperKI.states.states import StateMachine, InterfaceForStateChange
 from code_SemperKI.logics.statemachineLogics import logicForStatusButtonRequest
 
@@ -115,7 +114,7 @@ def statusButtonRequest(request:Request):
         if not inSerializer.is_valid():
             message = "Verification failed in statusButtonRequest"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)

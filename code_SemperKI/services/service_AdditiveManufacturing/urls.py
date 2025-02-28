@@ -21,8 +21,8 @@ Including another URLconf
 
 from django.urls import path
 
-from .handlers.public.resources import orga, onto, kgDBAM
-from .handlers.public import materials, checkService, filter, model, postProcessings
+from .handlers.public.resources import orga, onto, kgDBAM, pdfPipeline, verification, colors
+from .handlers.public import materials, checkService, filter, model, postProcessings, costs
 
 from code_SemperKI.urls import paths, urlpatterns
 
@@ -43,22 +43,33 @@ newPaths = {
 
     "uploadModel": ("public/service/additive-manufacturing/model/upload/",model.uploadModels),
     "uploadModelWithoutFile": ("public/service/additive-manufacturing/model/upload-wo-file/", model.uploadModelWithoutFile),
+    "updateModel": ("public/service/additive-manufacturing/model/update/", model.updateModel),
     "deleteModel": ("public/service/additive-manufacturing/model/delete/<str:projectID>/<str:processID>/<int:groupID>/<str:fileID>/",model.deleteModel),
     "checkModel": ("public/service/additive-manufacturing/model/check/<str:projectID>/<str:processID>/<str:fileID>/", model.checkModel),
     #"remeshSTLToTetraheadras": ("public/service/additive-manufacturing/model/remeshSTLToTetraheadras/<str:projectID>/<str:processID>/<str:fileID>/", model.remeshSTLToTetraheadras),
     "getModelRepository": ("public/service/additive-manufacturing/model/repository/get/", model.getModelRepository),
+    "uploadFromRepository": ("public/service/additive-manufacturing/model/repository/post/", model.uploadFromRepository),
 
     #"checkPrintability": ("public/checkPrintability/",checkService.),
     #"checkPrices": ("public/checkPrices/",checkService.checkPrice),
     #"checkLogistics": ("public/checkLogistics/",checkService.checkLogistics),
     
     #"checkModelTest": ("public/checkModelTest/", checkService.getChemnitzData),
+    "getVerificationForOrganization": ("public/service/additive-manufacturing/verification/get/", verification.getVerificationForOrganization),
+    "createVerificationForOrganization": ("public/service/additive-manufacturing/verification/create/", verification.createVerificationForOrganization),
+    "updateVerificationForOrganization": ("public/service/additive-manufacturing/verification/update/", verification.updateVerificationForOrganization),
+    "deleteVerificationForOrganization": ("public/service/additive-manufacturing/verification/delete/<str:printerID>/<str:materialID>/", verification.deleteVerificationForOrganization),
+
 
     "getPropertyDefinitionFrontend": ("public/service/additive-manufacturing/resources/onto/nodes/properties/get/by-type/<str:nodeType>/", kgDBAM.getPropertyDefinitionFrontend),
     
+    "getRALList": ("public/service/additive-manufacturing/resources/colors/getRALList/", colors.getRALList),
+    #"setColor": ("public/service/additive-manufacturing/resources/colors/set/", colors.setColor),
+
     "onto_getGraph": ("public/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
     "onto_getResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
     "onto_getNodeViaID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
+    "onto_getNodesByUniqueID": ("public/service/additive-manufacturing/resources/onto/admin/nodes/by-unique-id/get/<str:nodeID>/", onto.onto_getNodesByUniqueID),
     "onto_getAssociatedResources": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
     "onto_getNeighbors": ("public/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
     "onto_addEdge": ("public/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
@@ -67,6 +78,7 @@ newPaths = {
     "onto_addNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
     "onto_updateNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
     "onto_deleteNode": ("public/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    "onto_createMaterialTypeNodes": ("public/service/additive-manufacturing/resources/onto/admin/nodes/createMaterialTypeNodes/", onto.onto_createMaterialTypeNodes),
     
     #"orga_getPrinters": ("public/orga/getPrinters/",resources.orga_getPrinters),
     #"orga_addPrinter": ("public/orga/addPrinter/",resources.orga_addPrinter),
@@ -95,7 +107,31 @@ newPaths = {
     "orga_deleteAllFromOrga": ("public/service/additive-manufacturing/resources/orga/edge/all/delete/", orga.orga_removeAll),
     "orga_getRequestsForAdditions": ("public/service/additive-manufacturing/resources/orga/request/get/", orga.orga_getRequestsForAdditions),
     "orga_makeRequestForAdditions": ("public/service/additive-manufacturing/resources/orga/request/post/", orga.orga_makeRequestForAdditions),
-    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests)
+    "orga_cloneTestGraphToOrgaForTests": ("private/service/additive-manufacturing/resources/orga/cloneTestGraphToOrgaForTests/", orga.cloneTestGraphToOrgaForTests),
+
+    ########################
+    "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
+    "apiExtractPDFsTest": ("public/api/extractFromJSON/", pdfPipeline.extractFromJSON),
+    "loadInitGraphViaAPI": ("public/api/graph/loadInitGraph/", kgDBAM.loadInitGraphViaAPI),
+    "apiCalculateCosts": ("public/api/calculateCosts/", costs.apiCalculateCosts),
+    "apiOnto_getGraph": ("public/api/service/additive-manufacturing/resources/onto/admin/graph/get/", onto.onto_getGraph),
+    "apiOnto_getResources": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/by-type/get/<str:resourceType>/",onto.onto_getResources),
+    "apiOnto_getNodeViaID": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/by-id/get/<str:nodeID>/", onto.onto_getNodeViaID),
+    "apiOnto_getAssociatedResources": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/get/<str:nodeID>/<str:resourceType>/", onto.onto_getAssociatedResources),
+    "apiOnto_getNeighbors": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/neighbors/all/get/<str:nodeID>/", onto.onto_getNeighbors),
+    "apiOnto_addEdge": ("public/api/service/additive-manufacturing/resources/onto/admin/edge/create/",onto.onto_addEdge),
+    "apiOnto_createOrUpdateAndLinkNodes": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/create-and-link/", onto.onto_createOrUpdateAndLinkNodes),
+    "apiOnto_removeEdge": ("public/api/service/additive-manufacturing/resources/onto/admin/edge/delete/<str:entity1ID>/<str:entity2ID>/",onto.onto_removeEdge),
+    "apiOnto_addNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/create/",onto.onto_addNode),
+    "apiOnto_updateNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/update/",onto.onto_updateNode),
+    "apiOnto_deleteNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
+    "apiOnto_createMaterialTypeNodes": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/createMaterialTypeNodes/", onto.onto_createMaterialTypeNodes),
+    
+    "apiGetVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/get/", verification.getVerificationForOrganization),
+    "apiCreateVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/create/", verification.createVerificationForOrganization),
+    "apiUpdateVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/update/", verification.updateVerificationForOrganization),
+    "apiDeleteVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/delete/<str:printerID>/<str:materialID>/", verification.deleteVerificationForOrganization),
+
 }
 
 # add paths

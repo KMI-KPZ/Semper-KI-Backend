@@ -7,6 +7,7 @@ Contains: Metaclass that handles the services
 """
 import enum, copy
 
+
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
 from abc import ABC, abstractmethod
@@ -119,6 +120,22 @@ class ServiceBase(ABC):
 
         """
 
+    ###################################################
+    @abstractmethod
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+    
+    ###################################################
+    @abstractmethod
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):
     """
@@ -128,6 +145,7 @@ class ServicesStructure(StrEnumExactlyAsDefined):
     object = enum.auto()
     name = enum.auto()
     identifier = enum.auto()
+    imgPath = enum.auto()
 
 ######################################################
 class _ServicesManager():
@@ -142,10 +160,11 @@ class _ServicesManager():
         self._defaultName = "None"
         self._defaultIdx = 0
         self._services = {}
-        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx} 
+        self._imgPath = ""
+        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx, ServicesStructure.imgPath: self._imgPath} 
 
     ###################################################
-    def register(self, name:str, identifier:int, serviceClassObject):
+    def register(self, name:str, identifier:int, serviceClassObject, imgPath:str) -> None:
         """
         Registers a new service class
         
@@ -157,7 +176,7 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier}
+        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier, ServicesStructure.imgPath: imgPath}
 
     ###################################################
     def getNone(self) -> int:
@@ -181,6 +200,19 @@ class _ServicesManager():
         """
 
         return self._services[savedService][ServicesStructure.object]
+    
+    ###################################################
+    def getImgPath(self, savedService : int) -> str:
+        """
+        Depending on the service, select the correct Image path
+
+        :param savedService: The selected service saved in the dictionary _services
+        :type savedService: int
+        :return: The respective Image path
+        :rtype: str
+        """
+
+        return self._services[savedService][ServicesStructure.imgPath]
 
     ####################################################################################
     def getAllServices(self) -> list:
