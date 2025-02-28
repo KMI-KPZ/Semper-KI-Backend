@@ -127,6 +127,11 @@ newPaths = {
     "apiOnto_deleteNode": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/delete/<str:nodeID>/",onto.onto_deleteNode),
     "apiOnto_createMaterialTypeNodes": ("public/api/service/additive-manufacturing/resources/onto/admin/nodes/createMaterialTypeNodes/", onto.onto_createMaterialTypeNodes),
     
+    "apiGetVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/get/", verification.getVerificationForOrganization),
+    "apiCreateVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/create/", verification.createVerificationForOrganization),
+    "apiUpdateVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/update/", verification.updateVerificationForOrganization),
+    "apiDeleteVerificationForOrganization": ("public/api/service/additive-manufacturing/verification/delete/<str:printerID>/<str:materialID>/", verification.deleteVerificationForOrganization),
+
 }
 
 # add paths

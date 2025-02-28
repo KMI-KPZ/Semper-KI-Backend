@@ -825,8 +825,12 @@ class ProcessManagementBase(AbstractContentInterface):
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     deleteFileHelper(content[entry])
-                    deletePreviewFile(content[entry][FileObjectContent.imgPath])
-                    currentProcess.processDetails[ProcessDetails.imagePath].remove(content[entry][FileObjectContent.imgPath])
+                    if FileObjectContent.imgPath in content[entry]:
+                        deletePreviewFile(content[entry][FileObjectContent.imgPath])
+                    if ProcessDetails.imagePath in currentProcess.processDetails:
+                        currentProcess.processDetails[ProcessDetails.imagePath].remove(content[entry][FileObjectContent.imgPath])
+                        if len(currentProcess.processDetails[ProcessDetails.imagePath]) == 0:
+                            currentProcess.processDetails[ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess.serviceType)]
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()

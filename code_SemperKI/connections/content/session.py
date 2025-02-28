@@ -717,7 +717,7 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType == ProcessUpdates.files:
                 # if this is the first file, remove the default image from the processDetails
                 if ProcessDetails.imagePath in currentProcess[ProcessDescription.processDetails]:
-                    if currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] == [serviceManager.getImgPath(content)]:
+                    if currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] == [serviceManager.getImgPath(currentProcess[ProcessDescription.serviceType])]:
                         currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
                 else:
                     currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
@@ -840,8 +840,12 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType == ProcessUpdates.files:
                 for entry in content:
                     deleteFileHelper(currentProcess[ProcessDescription.files][entry])
-                    deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
-                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].remove(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                    if FileObjectContent.imgPath in currentProcess[ProcessDescription.files][entry]:
+                        deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                    if ProcessDetails.imagePath in currentProcess[ProcessDescription.processDetails]:
+                        currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].remove(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                        if len(currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath]) == 0:
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess[ProcessDescription.serviceType])]
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 

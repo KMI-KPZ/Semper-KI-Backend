@@ -39,7 +39,7 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, contractor=False, admin=False):
+def getButtonsForProcess(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, contractor=False, admin=False):
     """
     Look at process status of every process of a project and add respective buttons
 
@@ -57,7 +57,7 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
     """
 
     processStatusAsString = processStatusFromIntToStr(process.processStatus)
-    return stateDict[processStatusAsString].buttons(process, client, contractor, admin)
+    return stateDict[processStatusAsString].buttons(interface, process, client, contractor, admin)
 
 ##################################################
 def getMissingElements(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
@@ -291,7 +291,7 @@ class State(ABC):
 
     ###################################################
     @abstractmethod
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self,interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -439,7 +439,7 @@ class DRAFT(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         None
         """
@@ -553,7 +553,7 @@ class SERVICE_IN_PROGRESS(State):
         pass
     
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to draft
 
@@ -724,7 +724,7 @@ class SERVICE_READY(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Finish this service and go to overview
 
@@ -915,7 +915,7 @@ class SERVICE_COMPLETED(State):
         return listOfMissingThings
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Choose contractor
 
@@ -967,7 +967,7 @@ class SERVICE_COMPLETED(State):
                 },
             ]
             
-            if len(self.missingForCompletion("", process)) == 0:
+            if len(self.missingForCompletion(interface, process)) == 0:
                 buttonsList[2]["active"] = True #set forward button to active
 
         return buttonsList
@@ -1072,7 +1072,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
@@ -1248,7 +1248,7 @@ class SERVICE_COMPLICATION(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to Draft
 
@@ -1385,7 +1385,7 @@ class CONTRACTOR_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for  CONTRACTOR_COMPLETED 
 
@@ -1527,7 +1527,7 @@ class VERIFYING(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for VERIFYING
 
@@ -1669,7 +1669,7 @@ class VERIFICATION_FAILED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for VERIFYING
 
@@ -1719,7 +1719,7 @@ class VERIFICATION_FAILED(State):
                     "showIn": "process",
                 }
             ]
-            whatsMissing = self.missingForCompletion("", process)
+            whatsMissing = self.missingForCompletion(interface, process)
             if len(whatsMissing) == 0:
                 buttonList[2]["active"] = True #set forward button to active
             else:
@@ -1834,7 +1834,7 @@ class VERIFICATION_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Manual Request
 
@@ -1978,7 +1978,7 @@ class REQUEST_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for REQUEST_COMPLETED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
@@ -2021,7 +2021,7 @@ class REQUEST_COMPLETED(State):
                     "showIn": "process",
                 }
             ])
-            if len(self.missingForCompletion("", process)) == 0:
+            if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
         return outArr
     
@@ -2050,11 +2050,13 @@ class REQUEST_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        # Scan for file with origin "ContractFiles"
-        for fileID, file in process.files.items():
-            if file[FileObjectContent.origin] == "ContractFiles":
-                return []
-        return [{"key": "Process-ContractFiles"}]
+        if interface.getUserID() == process.contractor.hashedID:
+            # Scan for file with origin "ContractFiles"
+            for fileID, file in process.files.items():
+                if file[FileObjectContent.origin] == "ContractFiles":
+                    return []
+            return [{"key": "Process-ContractFiles"}]
+        return []
 
     ###################################################
     # Transitions
@@ -2124,7 +2126,7 @@ class OFFER_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for OFFER_COMPLETED, no Back-Button
 
@@ -2262,7 +2264,7 @@ class OFFER_REJECTED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         No Buttons
 
@@ -2367,7 +2369,7 @@ class CONFIRMATION_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for CONFIRMATION_COMPLETED, no Back-Button
 
@@ -2476,7 +2478,7 @@ class CONFIRMATION_REJECTED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         No Buttons
 
@@ -2581,7 +2583,7 @@ class PRODUCTION_IN_PROGRESS(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_IN_PROGRESS, no Back-Button
 
@@ -2715,7 +2717,7 @@ class PRODUCTION_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_COMPLETED, no Back-Button
 
@@ -2757,7 +2759,7 @@ class PRODUCTION_COMPLETED(State):
                     "showIn": "process",
                 }
             ] )
-            if len(self.missingForCompletion("", process)) == 0:
+            if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
         return outArr
     
@@ -2786,12 +2788,14 @@ class PRODUCTION_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-
-        # Scan for file with origin "PaymentFiles"
-        for fileID, file in process.files.items():
-            if file[FileObjectContent.origin] == "PaymentFiles":
-                return []
-        return [{"key": "Process-Payment"}]
+        if interface.getUserID() == process.contractor.hashedID:
+            # Scan for file with origin "PaymentFiles"
+            for fileID, file in process.files.items():
+                if file[FileObjectContent.origin] == "PaymentFiles":
+                    return []
+            return [{"key": "Process-Payment"}]
+        else:
+            return []
 
     ###################################################
     # Transitions
@@ -2861,7 +2865,7 @@ class DELIVERY_IN_PROGRESS(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_IN_PROGRESS, no Back-Button
 
@@ -2969,7 +2973,7 @@ class DELIVERY_COMPLETED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_COMPLETED, no Back-Button
 
@@ -3133,7 +3137,7 @@ class DISPUTE(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
@@ -3276,7 +3280,7 @@ class COMPLETED(State):
 
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -3379,7 +3383,7 @@ class FAILED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
@@ -3482,7 +3486,7 @@ class CANCELED(State):
         pass
 
     ###################################################
-    def buttons(self, process, client=True, contractor=False, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 

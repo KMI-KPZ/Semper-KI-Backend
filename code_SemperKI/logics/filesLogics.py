@@ -149,7 +149,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
                     returnVal = s3.manageLocalS3.uploadFile(filePath, file)
                     if returnVal is not True:
                         return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+                    
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:

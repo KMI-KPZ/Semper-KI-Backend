@@ -220,7 +220,7 @@ def parseProcessOutputForFrontend(processObj:Process|ProcessInterface, contentMa
         contractor = False
         if processObj.contractor is not None:
             contractor = processObj.contractor.hashedID == userID
-        buttons = getButtonsForProcess(processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
+        buttons = getButtonsForProcess(interface, processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
         outDict = processObj.toDict()
         outDict[ProcessOutput.processStatusButtons] = buttons
 
