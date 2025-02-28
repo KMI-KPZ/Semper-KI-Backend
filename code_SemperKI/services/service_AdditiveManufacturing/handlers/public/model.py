@@ -117,7 +117,7 @@ class SReqUploadModels(serializers.Serializer):
     tags=['FE - AM Models'],
     request={
         "multipart/form-data": SReqUploadModels
-    },	
+    },
     #request=SReqUploadModels,
     responses={
         200: None,
@@ -251,7 +251,76 @@ def uploadModelWithoutFile(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+#######################################################
+class SReqUploadModelsFromRepo(serializers.Serializer):
+    projectID = serializers.CharField(max_length=200)
+    processID = serializers.CharField(max_length=200)
+    groupID = serializers.IntegerField()
+    model = serializers.DictField()
+    origin = serializers.CharField(default="Service",max_length=200)
+
+#######################################################
+@extend_schema(
+    summary="Upload a model from the repository",
+    description=" ",
+    tags=['FE - AM Models'],
+    request=SReqUploadModelsFromRepo,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        404: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["POST"])
+@api_view(["POST"])
+@checkVersion(0.3)
+def uploadFromRepository(request:Request):
+    """
+    Upload a model from the repository
+
+    :param request: POST Request
+    :type request: HTTP POST
+    :return: Successful or not
+    :rtype: Response
+
+    """
+    try:
+        inSerializer = SReqUploadModelsFromRepo(data=request.data)
+        if not inSerializer.is_valid():
+            message = f"Verification failed in {uploadFromRepository.cls.__name__}"
+            exception = f"Verification failed {inSerializer.errors}"
+            logger.error(message)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        validatedInput = inSerializer.data
+
+        exception, value = logicForUploadFromRepository(request, validatedInput)
+        if exception is not None:
+            message = str(exception)
+            loggerError.error(exception)
+            exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+            if exceptionSerializer.is_valid():
+                return Response(exceptionSerializer.data, status=value)
+            else:
+                return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {uploadFromRepository.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 #######################################################
 class SReqUpdateModel(serializers.Serializer):
     projectID = serializers.CharField(max_length=513)
@@ -271,6 +340,9 @@ class SReqUpdateModel(serializers.Serializer):
     length = serializers.FloatField(required=False)
     volume = serializers.FloatField(required=False)
     scalingFactor = serializers.FloatField(required=False)
+    femRequested = serializers.BooleanField(required=False)
+    testType = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    pressure = serializers.FloatField(required=False)
 #######################################################
 @extend_schema(
     summary="Update a model",
@@ -380,9 +452,14 @@ def deleteModel(request:Request, projectID:str, processID:str, groupID:str, file
 #######################################################
 class SResRepoContent(serializers.Serializer):
     name = serializers.CharField()
-    license= serializers.CharField()
+    license= serializers.ListField(child=serializers.CharField())
     preview=serializers.CharField()
     file=serializers.CharField()
+    certificates=serializers.ListField(child=serializers.CharField())
+    tags=serializers.ListField(child=serializers.CharField())
+    levelOfDetail=serializers.IntegerField()
+    complexity=serializers.IntegerField()
+    size=serializers.IntegerField()
 
 #######################################################
 class SResModelRepository(serializers.Serializer):
@@ -415,31 +492,9 @@ def getModelRepository(request:Request):
 
     """
     try:
-        content = s3.manageRemoteS3Buckets.getContentOfBucket("ModelRepository")
-        outDict = {"repository": {}}
-        for elem in content:
-            path = elem["Key"]
-            splitPath = path.split("/")[1:]
-            if len(splitPath) > 1:
-                if "license" in elem["Metadata"]:
-                    license = elem["Metadata"]["license"]
-                else:
-                    license = ""
-                if splitPath[0] in outDict["repository"]:
-                    if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    else:
-                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
-                        outDict["repository"][splitPath[0]]["license"] = license
-                else:
-                    outDict["repository"][splitPath[0]] = {"name": splitPath[0], "license": "", "preview": "", "file": ""}
-                    if "Preview" in splitPath[1]:
-                        outDict["repository"][splitPath[0]]["preview"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    else:
-                        outDict["repository"][splitPath[0]]["file"] = s3.manageRemoteS3Buckets.getDownloadLinkPrefix()+elem["Key"].replace(" ", "%20")
-                    if license != "" and outDict["repository"][splitPath[0]]["license"] == "":
-                        outDict["repository"][splitPath[0]]["license"] = license
+        outDict = logicForGetModelRepository()
+        if isinstance(outDict,Exception):
+            raise outDict
 
         outSerializer = SResModelRepository(data=outDict)
         if outSerializer.is_valid():

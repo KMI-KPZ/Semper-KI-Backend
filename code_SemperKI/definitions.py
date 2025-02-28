@@ -88,6 +88,8 @@ class ProcessUpdates(StrEnumExactlyAsDefined):
     provisionalContractor = enum.auto()
     dependenciesIn = enum.auto()
     dependenciesOut = enum.auto()
+    verificationResults = enum.auto()
+    additionalInput = enum.auto()
 
 ####################################################################################
 # Enum for processDetails
@@ -112,6 +114,8 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     imagePath = enum.auto()
     priorities = enum.auto()
     prices = enum.auto()
+    verificationResults = enum.auto()
+    additionalInput = enum.auto()
 
 ####################################################################################
 # Enum for the output of the process
@@ -327,3 +331,19 @@ class UnitsForPriceCalculation(enum.StrEnum):
     grammPerCubicCentimeter = "g/cm³"
     euroPerHourPerSquareMeter = "€/(h*m²)"
     
+##################################################
+class ValidationSteps(StrEnumExactlyAsDefined):
+    """
+    The steps of the validation process
+    """
+    serviceReady = enum.auto()
+    serviceSpecificTasks = enum.auto()
+
+##################################################
+class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
+    """
+    What is the content of the verification stuff that the frontend needs
+    
+    """
+    isSuccessful = enum.auto()
+    reason = enum.auto()

@@ -23,6 +23,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient, checkIfUserIsLoggedIn
+from Generic_Backend.code_General.utilities.apiCalls import loginViaAPITokenIfAvailable
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.basics import *
@@ -57,6 +58,7 @@ class SResVerification(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @api_view(["GET"])
@@ -113,6 +115,7 @@ class SReqVerification(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["POST"])
 @api_view(["POST"])
@@ -172,6 +175,7 @@ def createVerificationForOrganization(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["PATCH"])
 @api_view(["PATCH"])
@@ -230,6 +234,7 @@ def updateVerificationForOrganization(request:Request):
         500: ExceptionSerializer
     }
 )
+@loginViaAPITokenIfAvailable()
 @checkIfUserIsLoggedIn()
 @require_http_methods(["DELETE"])
 @api_view(["DELETE"])

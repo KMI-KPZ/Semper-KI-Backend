@@ -5,10 +5,17 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
-import code_SemperKI.serviceManager as Semper
+from django.conf import settings
 
-from .connections.postgresql.pgService import updateServiceDetails as QC_updateServiceDetails, deleteServiceDetails as QC_deleteServiceDetails, serviceReady as QC_serviceReady, cloneServiceDetails as QC_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as QC_checkIfSelectionIsAvailable
+import code_SemperKI.serviceManager as Semper
+from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
+
+from .connections.postgresql.pgService import initializeService as QC_initializeService, updateServiceDetails as QC_updateServiceDetails, deleteServiceDetails as QC_deleteServiceDetails, isFileRelevantForService as QC_isFileRelevantForService, serviceReady as QC_serviceReady, cloneServiceDetails as QC_cloneServiceDetails
+from .logics.checkServiceLogic import checkIfSelectionIsAvailable as QC_checkIfSelectionIsAvailable
+from .connections.filterViaSparql import *
+from .definitions import SERVICE_NAME, SERVICE_NUMBER
+from .logics.costs import Costs
 
 ###################################################
 class QualityControl(Semper.ServiceBase):
@@ -16,17 +23,14 @@ class QualityControl(Semper.ServiceBase):
     All connections of this service that Semper-KI should know about
     
     """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
 
     ###################################################
-    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+    def initializeServiceDetails(self, serviceDetails:dict) -> None:
         """
         Initialize the service
 
         """
-        return {}
+        return QC_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -38,13 +42,13 @@ class QualityControl(Semper.ServiceBase):
         return QC_updateServiceDetails(existingContent, newContent)
     
     ###################################################
-    def deleteServiceDetails(self, existingContent, newContent):
+    def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Run service specific update of service details
 
         """
 
-        return QC_deleteServiceDetails(existingContent, newContent)
+        return QC_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
     def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
@@ -52,23 +56,26 @@ class QualityControl(Semper.ServiceBase):
         Check if a file is relevant for the service
 
         """
-        return False
-    
-    ###################################################
-    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
-        """
-        Checks, if service is completely defined
-        
-        """
-        return QC_serviceReady(existingContent)
-    
+        return QC_isFileRelevantForService(existingContent, fileID)
+
     ###################################################
     def parseServiceDetails(self, existingContent) -> dict:
         """
         Parse the service details for Frontend
 
         """
-        return {}
+        outContent = {}
+
+        return outContent
+
+    ###################################################
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
+        """
+        Checks, if service is completely defined
+        
+        """
+        completeOrNot, listOfMissingStuff = QC_serviceReady(existingContent)
+        return (completeOrNot, listOfMissingStuff)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -77,6 +84,7 @@ class QualityControl(Semper.ServiceBase):
         
         """
         return QC_checkIfSelectionIsAvailable(processObj)
+
     
     ####################################################################################
     def cloneServiceDetails(self, existingContent:dict, newProcess) -> dict:
@@ -102,21 +110,39 @@ class QualityControl(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :param transferObject: Object to transfer data to the pricing function
+        :param transferObject: Transfer object with additional information
         :type transferObject: object
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return {}
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts() 
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+            
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
+        
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
+        :param processObj: The process in question
+        :type processObj: ProcessInterface|Process
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
+
         """
-        return [], {}
+        filteredContractors = Filter()
+
+        outList = filteredContractors.getFilteredContractors(processObj)
+        
+        return outList, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
@@ -125,8 +151,13 @@ class QualityControl(Semper.ServiceBase):
 
         """
         return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
 
-SERVICE_NAME = "QUALITY_CONTROL"
-SERVICE_NUMBER = 6
+        """
+        return {}
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl(), settings.STATIC_URL+"media/QC.png")

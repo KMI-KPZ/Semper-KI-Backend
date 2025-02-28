@@ -24,18 +24,62 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
+from Generic_Backend.code_General.connections.redis import RedisConnection
 
 from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.definitions import *
 from code_SemperKI.logics.processLogics import updateProcessFunction
-from code_SemperKI.utilities.basics import testPicture
-from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream
+from code_SemperKI.utilities.basics import previewNotAvailable, previewNotAvailableGER
+from code_SemperKI.logics.filesLogics import logicForDeleteFile, getFileReadableStream, getFileViaPath
 from code_SemperKI.logics.processLogics import updateProcessFunction
+from code_SemperKI.utilities.filePreview import createAndStorePreview
 
 from ..definitions import *
+from ..utilities.stpToStl import transformSTPtoSTL
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
+
+#######################################################
+def createModel(model:dict, content:dict) -> None:
+    """
+    Fill the model with details
+    
+    :param content: The content of the model
+    :type content: Dict
+    :param model: The model
+    :type model: Dict
+    :return: None
+    :rtype: None
+    
+    """
+    model[FileObjectContent.id] = content[FileObjectContent.id]
+    model[FileObjectContent.path] = content[FileObjectContent.path]
+    model[FileObjectContent.fileName] = content[FileObjectContent.fileName]
+    model[FileObjectContent.imgPath] = content[FileObjectContent.imgPath]
+    model[FileObjectContent.tags] = content[FileObjectContent.tags]
+    model[FileObjectContent.licenses] = content[FileObjectContent.licenses]
+    model[FileObjectContent.certificates] = content[FileObjectContent.certificates]
+    model[FileObjectContent.quantity] = content[FileObjectContent.quantity]
+    model[FileObjectContent.levelOfDetail] = content[FileObjectContent.levelOfDetail]
+    model[FileObjectContent.isFile] = content[FileObjectContent.isFile]
+    model[FileObjectContent.date] = str(timezone.now())
+    model[FileObjectContent.createdBy] = content[FileObjectContent.createdBy]
+    model[FileObjectContent.createdByID] = content[FileObjectContent.createdByID]
+    model[FileObjectContent.size] = content[FileObjectContent.size]
+    model[FileObjectContent.type] = content[FileObjectContent.type]
+    model[FileObjectContent.origin] = content[FileObjectContent.origin]
+    model[FileObjectContent.remote] = content[FileObjectContent.remote]
+    model[FileObjectContent.deleteFromStorage] = content[FileObjectContent.deleteFromStorage]
+    model[FileContentsAM.width] = content[FileContentsAM.width]
+    model[FileContentsAM.height] = content[FileContentsAM.height]
+    model[FileContentsAM.length] = content[FileContentsAM.length]
+    model[FileContentsAM.volume] = content[FileContentsAM.volume]
+    model[FileContentsAM.complexity] = content[FileContentsAM.complexity]
+    model[FileContentsAM.scalingFactor] = content[FileContentsAM.scalingFactor]
+    model[FileContentsAM.femRequested] = content[FileContentsAM.femRequested]
+    model[FileContentsAM.testType] = content[FileContentsAM.testType]
+    model[FileContentsAM.pressure] = content[FileContentsAM.pressure]
 
 #######################################################
 def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Exception, int]:
@@ -54,6 +98,7 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
         processID = validatedInput[ProcessDescription.processID]
         groupID = validatedInput["groupID"]
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
         
         # check if duplicates exist
         existingFileNames = set()
@@ -66,29 +111,35 @@ def logicForUploadModelWithoutFile(validatedInput:dict, request) -> tuple[Except
 
         fileID = crypto.generateURLFriendlyRandomString()
         modelToBeSaved = {}
-        modelToBeSaved[FileObjectContent.id] = fileID
-        modelToBeSaved[FileObjectContent.path] = ""
-        modelToBeSaved[FileObjectContent.fileName] = validatedInput["name"]
-        modelToBeSaved[FileObjectContent.imgPath] = ""
-        modelToBeSaved[FileObjectContent.tags] = validatedInput["tags"] if "tags" in validatedInput["tags"] else []
-        modelToBeSaved[FileObjectContent.licenses] = []
-        modelToBeSaved[FileObjectContent.certificates] = []
-        modelToBeSaved[FileObjectContent.quantity] = validatedInput["quantity"]
-        modelToBeSaved[FileObjectContent.levelOfDetail] = validatedInput["levelOfDetail"]
-        modelToBeSaved[FileObjectContent.isFile] = False
-        modelToBeSaved[FileObjectContent.date] = str(timezone.now())
-        modelToBeSaved[FileObjectContent.createdBy] = userName
-        modelToBeSaved[FileObjectContent.createdByID] = content.getClient()
-        modelToBeSaved[FileObjectContent.size] = 0
-        modelToBeSaved[FileObjectContent.type] = FileTypes.Model
-        modelToBeSaved[FileObjectContent.origin] = validatedInput["origin"]
-        modelToBeSaved[FileObjectContent.remote] = False
-        modelToBeSaved[FileContentsAM.width] = validatedInput["width"]
-        modelToBeSaved[FileContentsAM.height] = validatedInput["height"]
-        modelToBeSaved[FileContentsAM.length] = validatedInput["length"]
-        modelToBeSaved[FileContentsAM.volume] = validatedInput["volume"] if "volume" in validatedInput else 0
-        modelToBeSaved[FileContentsAM.complexity] = validatedInput["complexity"]
-        modelToBeSaved[FileContentsAM.scalingFactor] = 1.0
+        createModel(modelToBeSaved, {
+            FileObjectContent.id: fileID,
+            FileObjectContent.path: "",
+            FileObjectContent.fileName: validatedInput["name"],
+            FileObjectContent.imgPath: previewNotAvailableGER if locale == "de-DE" else previewNotAvailable,
+            FileObjectContent.tags: validatedInput["tags"] if "tags" in validatedInput["tags"] else [],
+            FileObjectContent.licenses: [],
+            FileObjectContent.certificates: [],
+            FileObjectContent.quantity: validatedInput["quantity"],
+            FileObjectContent.levelOfDetail: validatedInput["levelOfDetail"],
+            FileObjectContent.isFile: False,
+            FileObjectContent.date: str(timezone.now()),
+            FileObjectContent.createdBy: userName,
+            FileObjectContent.createdByID: content.getClient(),
+            FileObjectContent.size: 0,
+            FileObjectContent.type: FileTypes.Model,
+            FileObjectContent.origin: validatedInput["origin"],
+            FileObjectContent.remote: False,
+            FileObjectContent.deleteFromStorage: False,
+            FileContentsAM.width: validatedInput["width"],
+            FileContentsAM.height: validatedInput["height"],
+            FileContentsAM.length: validatedInput["length"],
+            FileContentsAM.volume: validatedInput["volume"] if "volume" in validatedInput else 0,
+            FileContentsAM.complexity: validatedInput["complexity"],
+            FileContentsAM.scalingFactor: 1.0,
+            FileContentsAM.femRequested: False,
+            FileContentsAM.testType: "",
+            FileContentsAM.pressure: 0
+        })
 
         # calculate values right here
         calculationResult = calculateBoundaryDataForNonFileModel(modelToBeSaved)
@@ -137,7 +188,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
         
         detailsOfAllFiles = json.loads(validatedInput["details"])
 
-        # TODO: if the file is a repo file, then create a local copy
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
 
         modelNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
@@ -157,6 +208,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
             # rename duplicates
             counterForFileName = 1
             nameOfFile = fileName
+            fileNameRoot, extension= os.path.splitext(nameOfFile)
             while nameOfFile in existingFileNames:
                 fileNameRoot, extension= os.path.splitext(nameOfFile)
                 if counterForFileName > 100000:
@@ -173,6 +225,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
                 counterForFileName += 1
             for model in request.FILES.getlist(fileName):
+                modelSize = model.size
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
                     if detail["fileName"] == fileName or detail["fileName"] == "file":
@@ -180,29 +233,57 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         break
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID+"/"+processID+"/"+fileID
+
+                # transform from step to stl if necessary
+                if extension == ".step" or extension == ".stp" or extension == ".STP" or extension == ".STEP":
+                    # save original file
+                    # TODO
+                    # transform to stl
+                    model = transformSTPtoSTL(model, nameOfFile)
+                    modelSize = model.__sizeof__()
+                    nameOfFile = nameOfFile.split(".")[0] + ".stl"
+                    if isinstance(model, Exception):
+                        return (model, 500)
+
+                # create preview
+                previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
+                if isinstance(previewPath, Exception):
+                    return (previewPath, 500)
                 
                 modelsToBeSaved[fileID] = {}
-                modelsToBeSaved[fileID][FileObjectContent.id] = fileID
-                modelsToBeSaved[fileID][FileObjectContent.path] = filePath
-                modelsToBeSaved[fileID][FileObjectContent.fileName] = nameOfFile
-                modelsToBeSaved[fileID][FileObjectContent.imgPath] = testPicture
-                modelsToBeSaved[fileID][FileObjectContent.tags] = details["tags"]
-                modelsToBeSaved[fileID][FileObjectContent.licenses] = details["licenses"]
-                modelsToBeSaved[fileID][FileObjectContent.certificates] = details["certificates"]
-                modelsToBeSaved[fileID][FileObjectContent.quantity] = details["quantity"] if "quantity" in details else 1
-                modelsToBeSaved[fileID][FileObjectContent.levelOfDetail] = details["levelOfDetail"] if "levelOfDetail" in details else 1
-                modelsToBeSaved[fileID][FileObjectContent.isFile] = True
-                modelsToBeSaved[fileID][FileObjectContent.date] = str(timezone.now())
-                modelsToBeSaved[fileID][FileObjectContent.createdBy] = userName
-                modelsToBeSaved[fileID][FileObjectContent.createdByID] = content.getClient()
-                modelsToBeSaved[fileID][FileObjectContent.size] = model.size
-                modelsToBeSaved[fileID][FileObjectContent.type] = FileTypes.Model
-                modelsToBeSaved[fileID][FileObjectContent.origin] = origin
-                modelsToBeSaved[fileID][FileContentsAM.scalingFactor] = float(details["scalingFactor"]) if "scalingFactor" in details else 100.0
+                createModel(modelsToBeSaved[fileID], {
+                    FileObjectContent.id: fileID,
+                    FileObjectContent.path: filePath,
+                    FileObjectContent.fileName: nameOfFile,
+                    FileObjectContent.imgPath: previewPath,
+                    FileObjectContent.tags: details["tags"],
+                    FileObjectContent.licenses: details["licenses"],
+                    FileObjectContent.certificates: details["certificates"],
+                    FileObjectContent.quantity: details["quantity"] if "quantity" in details else 1,
+                    FileObjectContent.levelOfDetail: details["levelOfDetail"] if "levelOfDetail" in details else 1,
+                    FileObjectContent.isFile: True,
+                    FileObjectContent.date: str(timezone.now()),
+                    FileObjectContent.createdBy: userName,
+                    FileObjectContent.createdByID: content.getClient(),
+                    FileObjectContent.size: modelSize,
+                    FileObjectContent.type: FileTypes.Model,
+                    FileObjectContent.origin: origin,
+                    FileObjectContent.remote: False,
+                    FileObjectContent.deleteFromStorage: True,
+                    FileContentsAM.scalingFactor: float(details["scalingFactor"]) if "scalingFactor" in details else 100.0,
+                    FileContentsAM.width: details["width"] if "width" in details else 0,
+                    FileContentsAM.height: details["height"] if "height" in details else 0,
+                    FileContentsAM.length: details["length"] if "length" in details else 0,
+                    FileContentsAM.volume: details["volume"] if "volume" in details else 0,
+                    FileContentsAM.complexity: details["complexity"] if "complexity" in details else 0,
+                    FileContentsAM.femRequested: details["femRequested"] if "femRequested" in details else False,
+                    FileContentsAM.testType: details["testType"] if "testType" in details else "",
+                    FileContentsAM.pressure: details["pressure"] if "pressure" in details else 0
+                })
                 
                 # calculate values right here
                 scalingFactor = modelsToBeSaved[fileID][FileContentsAM.scalingFactor]/100.
-                result = calculateBoundaryData(model, nameOfFile, model.size, scalingFactor)
+                result = calculateBoundaryData(model, nameOfFile, modelSize, scalingFactor)
                 if result["status_code"] != 200:
                     return (Exception(f"Error while calculating measurements for file {nameOfFile}"), 500)
                 calculationsToBeSaved[fileID] = result
@@ -308,30 +389,41 @@ def logicForUpdateModel(request, validatedInput):
         model[FileObjectContent.quantity] = validatedInput["quantity"]
         model[FileObjectContent.levelOfDetail] = validatedInput["levelOfDetail"]
         model[FileObjectContent.isFile] = validatedInput["isFile"]
-        if "width" in validatedInput:
+        if FileContentsAM.width.value in validatedInput:
             model[FileContentsAM.width] = validatedInput["width"]
-        if "height" in validatedInput:
+        if FileContentsAM.height.value in validatedInput:
             model[FileContentsAM.height] = validatedInput["height"]
-        if "length" in validatedInput:
+        if FileContentsAM.length.value in validatedInput:
             model[FileContentsAM.length] = validatedInput["length"]
-        if "volume" in validatedInput:
+        if FileContentsAM.volume.value in validatedInput:
             model[FileContentsAM.volume] = validatedInput["volume"]
-        if "complexity" in validatedInput:
+        if FileContentsAM.complexity.value in validatedInput:
             model[FileContentsAM.complexity] = validatedInput["complexity"]
-        if "scalingFactor" in validatedInput:
+        if FileContentsAM.scalingFactor.value in validatedInput:
             model[FileContentsAM.scalingFactor] = validatedInput["scalingFactor"]
+        if FileContentsAM.femRequested.value in validatedInput:
+            model[FileContentsAM.femRequested] = validatedInput["femRequested"]
+        if FileContentsAM.testType.value in validatedInput:
+            model[FileContentsAM.testType] = validatedInput["testType"]
+        if FileContentsAM.pressure.value in validatedInput:
+            model[FileContentsAM.pressure] = validatedInput["pressure"]
         
+        fromRepository = False
+        if model[FileObjectContent.deleteFromStorage] is False:
+            fromRepository = True
 
         # calculate values right here
         if model[FileObjectContent.isFile] is False:
             calculationResult = calculateBoundaryDataForNonFileModel(model)
+        else:
+            uploadedModel, flag = getFileReadableStream(request.session, projectID, processID, fileID, fromRepository)
+            if flag is False:
+                return (Exception(f"Error while accessing file {model[FileObjectContent.fileName]}"), 500)
+            calculationResult = calculateBoundaryData(uploadedModel, nameOfFile, model[FileObjectContent.size], model[FileContentsAM.scalingFactor]/100.)
 
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]
-        if model[FileObjectContent.isFile] is False:
-            changesArray[groupID] = {ServiceDetails.models: {fileID: model}, ServiceDetails.calculations: {fileID: calculationResult}}
-        else:
-            changesArray[groupID] = {ServiceDetails.models: {fileID: model}}
+        changesArray[groupID] = {ServiceDetails.models: {fileID: model}, ServiceDetails.calculations: {fileID: calculationResult}}
         changes = {"changes": {ProcessUpdates.files: {fileID: model}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
 
         # Save into files field of the process
@@ -346,6 +438,213 @@ def logicForUpdateModel(request, validatedInput):
     except Exception as e:
         loggerError.error("Error in logicForUpdateModel: %s" % str(e))
         return (e, 500)
+
+##################################################
+class ContentOfRepoModel(StrEnumExactlyAsDefined):
+    """
+    Enum for the content of the model repository
+    """
+    name = enum.auto()
+    license = enum.auto()
+    preview = enum.auto()
+    file = enum.auto()
+    tags = enum.auto()
+    certificates = enum.auto()
+    levelOfDetail = enum.auto()
+    complexity = enum.auto()
+    size = enum.auto()
+
+##################################################
+def logicForGetModelRepository() -> dict|Exception:
+    """
+    Retrieve the model from the repository
+    
+    :return: Dictionary with all repo models
+    :rtype: dict
+    """
+    try:
+        outDict = {}
+        redisConn = RedisConnection()
+        redisContent = redisConn.retrieveContentJSON("ModelRepository")
+        if redisContent[1] is False:
+            content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.AWS_BUCKET_NAME+"/ModelRepository")
+            outDict = {"repository": {}}
+            for elem in content:
+                path = elem["Key"]
+                splitPath = path.split("/")[1:]
+                pathWithoutBucket = '/'.join(splitPath)
+                sizeOfFile = elem["Size"]
+                nameOfFile = splitPath[1]
+                if path[-1] != "/":
+                    if ContentOfRepoModel.license.value in elem["Metadata"]:
+                        licenseOfFile = elem["Metadata"][ContentOfRepoModel.license.value]
+                    else:
+                        licenseOfFile = []
+                    if ContentOfRepoModel.certificates.value in elem["Metadata"]:
+                        certificatesOfFile = elem["Metadata"][ContentOfRepoModel.certificates.value]
+                    else:
+                        certificatesOfFile = []
+                    if ContentOfRepoModel.tags.value in elem["Metadata"]:
+                        tagsOfFile = elem["Metadata"][ContentOfRepoModel.tags.value]
+                    else:
+                        tagsOfFile = []
+                    if ContentOfRepoModel.levelOfDetail.value in elem["Metadata"]:
+                        levelOfDetailOfFile = elem["Metadata"][ContentOfRepoModel.levelOfDetail.value]
+                    else:
+                        levelOfDetailOfFile = 1
+                    if ContentOfRepoModel.complexity.value in elem["Metadata"]:
+                        complexityOfFile = elem["Metadata"][ContentOfRepoModel.complexity.value]
+                    else:
+                        complexityOfFile = 0
+                    
+
+                    if nameOfFile not in outDict["repository"]:
+                        outDict["repository"][nameOfFile] = {ContentOfRepoModel.name.value: nameOfFile, ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.tags.value: [], ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: sizeOfFile}
+                    
+                    if "Preview" in splitPath[2]:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+path.replace(" ", "%20")
+                    else:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.file.value] = pathWithoutBucket.replace(" ", "%20")
+                    if licenseOfFile != "" and outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] == "":
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] = licenseOfFile
+                    if certificatesOfFile != [] and outDict["repository"][nameOfFile][ContentOfRepoModel.certificates.value] == []:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.certificates.value] = certificatesOfFile
+                    if sizeOfFile != 0 and outDict["repository"][nameOfFile][ContentOfRepoModel.size.value] == 0:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.size.value] = sizeOfFile
+                    if tagsOfFile != [] and outDict["repository"][nameOfFile][ContentOfRepoModel.tags.value] == []:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.tags.value] = tagsOfFile
+                    if levelOfDetailOfFile != 1 and outDict["repository"][nameOfFile][ContentOfRepoModel.levelOfDetail.value] == 1:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.levelOfDetail.value] = levelOfDetailOfFile
+                    if complexityOfFile != 0 and outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] == 0:
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.complexity.value] = complexityOfFile
+            redisConn.addContentJSON("ModelRepository", outDict)
+        else:
+            outDict = redisContent[0]
+        return outDict
+    except Exception as e:
+        loggerError.error("Error in getModelRepository: %s" % str(e))
+        return e
+    
+##################################################
+def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, int]:
+    """
+    Upload a model from the repository
+
+    :param request: The request object
+    :type request: Request
+    :param validatedInput: The validated input
+    :type validatedInput: Dict
+    :return: Exception and status code
+    :rtype: Tuple[Exception, int]
+
+    """
+    try:
+        # gather the information from the validated input
+        projectID = validatedInput[ProjectDescription.projectID]
+        processID = validatedInput[ProcessDescription.processID]
+        origin = validatedInput["origin"]
+        groupID = validatedInput["groupID"]
+        repoModel = validatedInput["model"] # type: dict
+
+        content = ManageContent(request.session)
+        interface = content.getCorrectInterface(updateProcessFunction.__name__) # if that fails, no files were uploaded and nothing happened
+        if interface is None:
+            return Exception("Rights not sufficient in uploadModel"), 401
+        
+        userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
+
+        # check if duplicates exist and rename duplicates
+        existingFileNames = set()
+        processContent = interface.getProcess(projectID, processID)
+        if isinstance(processContent, Exception):
+            return (Exception(f"Process not found in {logicForUploadModel.__name__}"), 404)
+        for key in processContent[ProcessDescription.files]:
+            value = processContent[ProcessDescription.files][key]
+            existingFileNames.add(value[FileObjectContent.fileName])
+
+        counterForFileName = 1
+        nameOfFile = repoModel[ContentOfRepoModel.name.value]
+        while nameOfFile in existingFileNames:
+            fileNameRoot, extension= os.path.splitext(nameOfFile)
+            if counterForFileName > 100000:
+                return (Exception("Too many files with the same name uploaded!"), 400)
+            
+            if "_" in fileNameRoot:
+                fileNameRootSplit = fileNameRoot.split("_")
+                try:
+                    counterForFileName = int(fileNameRootSplit[-1])
+                    fileNameRoot = "_".join(fileNameRootSplit[:-1])
+                    counterForFileName += 1
+                except:
+                    pass
+            nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
+            counterForFileName += 1
+
+        # save the model
+        fileID = crypto.generateURLFriendlyRandomString()
+        modelToBeSaved = {}
+        createModel(modelToBeSaved, {
+            FileObjectContent.id: fileID,
+            FileObjectContent.path: repoModel[ContentOfRepoModel.file.value],
+            FileObjectContent.fileName: nameOfFile,
+            FileObjectContent.imgPath: repoModel[ContentOfRepoModel.preview.value],
+            FileObjectContent.tags: [],
+            FileObjectContent.licenses: repoModel[ContentOfRepoModel.license.value],
+            FileObjectContent.certificates: repoModel[FileObjectContent.certificates.value],
+            FileObjectContent.quantity: 1,
+            FileObjectContent.levelOfDetail: repoModel[FileObjectContent.levelOfDetail.value],
+            FileObjectContent.isFile: True,
+            FileObjectContent.date: str(timezone.now()),
+            FileObjectContent.createdBy: userName,
+            FileObjectContent.createdByID: content.getClient(),
+            FileObjectContent.size: repoModel[FileObjectContent.size.value],
+            FileObjectContent.type: FileTypes.Model,
+            FileObjectContent.origin: origin,
+            FileObjectContent.remote: True,
+            FileObjectContent.deleteFromStorage: False,
+            FileContentsAM.width: 0,
+            FileContentsAM.height: 0,
+            FileContentsAM.length: 0,
+            FileContentsAM.volume: 0,
+            FileContentsAM.complexity: repoModel[FileContentsAM.complexity.value],
+            FileContentsAM.scalingFactor: 100.0,
+            FileContentsAM.femRequested: False,
+            FileContentsAM.testType: "",
+            FileContentsAM.pressure: 0
+        })
+
+        # retrieve calculations
+        redisCon = RedisConnection()
+        calculationsFromRedis = redisCon.retrieveContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value])
+        if calculationsFromRedis[1] is False:
+            model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
+            calculationResult = calculateBoundaryData(model, repoModel[ContentOfRepoModel.name.value], repoModel[FileObjectContent.size.value], 1.0)
+            redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
+        else:
+            calculationResult = calculationsFromRedis[0]
+        calculationResult[Calculations.filename.value] = nameOfFile
+
+        # update the process
+        groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
+        changesArray = [{} for i in range(len(groups))]
+        changesArray[groupID] = {ServiceDetails.models: {fileID: modelToBeSaved}, ServiceDetails.calculations: {fileID: calculationResult}}
+        changes = {"changes": {ProcessUpdates.files: {fileID: modelToBeSaved}, ProcessUpdates.serviceDetails: {ServiceDetails.groups: changesArray}}}
+
+        # Save into files field of the process
+        message, flag = updateProcessFunction(request, changes, projectID, [processID])
+        if flag is False: # this should not happen
+            return Exception("Rights not sufficient for uploadModels"), 401
+        if isinstance(message, Exception):
+            return message, 500
+        
+        # log the action
+        logger.info(f"{Logging.Subject.USER},{userName},{Logging.Predicate.CREATED},uploaded,{Logging.Object.OBJECT},models,"+str(datetime.now()))
+        return None, 200
+
+    except Exception as e:
+        loggerError.error("Error in logicForUploadFromRepository: %s" % str(e))
+        return e, 500
+
 
 ##################################################
 def logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]:
@@ -435,7 +734,7 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
     Calculate some of the stuff ourselves
 
     :param readableObject: The model to be sent to the service with a .read() method
-    :type readableObject: BytesIO | EncryptionAdapter
+    :type readableObject: EncryptionAdapter
     :param filename: The file name
     :type filename: str
     :param fileSize: The size of the file  
@@ -461,18 +760,18 @@ def calculateBoundaryData(readableObject:EncryptionAdapter, fileName:str, fileSi
         scalingFactorTimesThree = scalingFactor*scalingFactor*scalingFactor
 
         result = {
-                "filename": fileName,
-                "measurements": {
-                    "volume": float(volume)*scalingFactorTimesThree,
-                    "surfaceArea": float(surface_area)*scalingFactor*scalingFactor,
-                    "mbbDimensions": {
-                        "_1": float(bounding_box[0])*scalingFactor,
-                        "_2": float(bounding_box[1])*scalingFactor,
-                        "_3": float(bounding_box[2])*scalingFactor,
+                Calculations.filename.value: fileName,
+                Calculations.measurements.value: {
+                    Measurements.volume.value: float(volume)*scalingFactorTimesThree,
+                    Measurements.surfaceArea.value: float(surface_area)*scalingFactor*scalingFactor,
+                    Measurements.mbbDimensions.value: {
+                        MbbDimensions._1.value: float(bounding_box[0])*scalingFactor,
+                        MbbDimensions._2.value: float(bounding_box[1])*scalingFactor,
+                        MbbDimensions._3.value: float(bounding_box[2])*scalingFactor,
                     },
-                    "mbbVolume": float(volumeBB)* scalingFactorTimesThree,
+                    Measurements.mbbVolume.value: float(volumeBB)* scalingFactorTimesThree,
                 },
-                "status_code": 200
+                Calculations.status_code.value: 200
             }
         return result
     except Exception as error:
@@ -491,18 +790,18 @@ def calculateBoundaryDataForNonFileModel(model:dict) -> dict:
     
     """
     fakeCalculation = {
-            "filename": model[FileObjectContent.fileName],
-            "measurements": {
-                "volume": float(model[FileContentsAM.volume]),
-                "surfaceArea": 0.0,
-                "mbbDimensions": {
-                    "_1": float(model[FileContentsAM.width]),
-                    "_2": float(model[FileContentsAM.length]),
-                    "_3": float(model[FileContentsAM.height]),
+            Calculations.filename.value: model[FileObjectContent.fileName],
+            Calculations.measurements.value: {
+                Measurements.volume.value: float(model[FileContentsAM.volume]),
+                Measurements.surfaceArea.value: 0.0,
+                Measurements.mbbDimensions.value: {
+                    MbbDimensions._1.value: float(model[FileContentsAM.width]),
+                    MbbDimensions._2.value: float(model[FileContentsAM.length]),
+                    MbbDimensions._3.value: float(model[FileContentsAM.height]),
                 },
-                "mbbVolume": float(model[FileContentsAM.width]*model[FileContentsAM.length]*model[FileContentsAM.height]),
+                Measurements.mbbVolume.value: float(model[FileContentsAM.width]*model[FileContentsAM.length]*model[FileContentsAM.height]),
             },
-            "status_code": 200
+            Calculations.status_code.value: 200
         }
     return fakeCalculation
 
@@ -574,7 +873,7 @@ def logicForCheckModel(request, functionName:str, projectID:str, processID:str, 
             #     else:
             #         raise Exception("Validation failed")
 
-            fileContent, flag = getFileReadableStream(request, projectID, processID, model[FileObjectContent.id])
+            fileContent, flag = getFileReadableStream(request.session, projectID, processID, model[FileObjectContent.id])
             if flag:
                 resultData = calculateBoundaryData(fileContent, modelName, model[FileObjectContent.size], scalingFactor) # getBoundaryData(fileContent, modelName)
             else:

@@ -60,14 +60,14 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
-    "maturityLevel": ("public/questionnaire/maturityLevel/", miscellaneous.maturityLevel),
-    "resilienceScore": ("public/questionnaire/resilienceScore/", miscellaneous.resilienceScore),
+    "maturityLevel": ("public/questionnaire/maturityLevel/get/", miscellaneous.maturityLevel),
+    "resilienceScore": ("public/questionnaire/resilienceScore/get/", miscellaneous.resilienceScore),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
     "downloadFilesAsZip": ("public/files/download/zip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
     "deleteFile": ("public/files/delete/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
-    "downloadProcessHistory": ("public/files/download/history/<str:processID>/", files.downloadProcessHistory), 
+    "downloadProcessHistory": ("private/files/download/history/<str:processID>/", files.downloadProcessHistory), # disabled
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
@@ -79,6 +79,7 @@ newPaths= {
     "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
     "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
     "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
+    "getNodesByUniqueID": ("private/nodes/get/by-uniqueID/<str:nodeID>/", knowledgeGraphDB.getNodesByUniqueID),
     "getSpecificNeighborsByType": ("private/edges/get/by-type/<str:nodeID>/<str:nodeType>/", knowledgeGraphDB.getSpecificNeighborsByType),
     "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
     "getNodesByTypeAndProperty": ("private/edges/get/by-property-and-type/<str:nodeType>/<str:nodeProperty>/<str:value>/", knowledgeGraphDB.getNodesByTypeAndProperty),
@@ -97,6 +98,7 @@ newPaths= {
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
+    "testPreview": ("private/testPreview/", testResponse.testPreview),
 
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),

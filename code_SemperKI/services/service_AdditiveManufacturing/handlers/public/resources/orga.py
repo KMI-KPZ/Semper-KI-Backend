@@ -27,14 +27,16 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
-from code_SemperKI.services.service_AdditiveManufacturing.logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
-from code_SemperKI.services.service_AdditiveManufacturing.utilities.basics import checkIfOrgaHasAMAsService
 from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.locales import manageTranslations
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 
+
+from ....definitions import *
+from ....logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
+from ....utilities.basics import checkIfOrgaHasAMAsService
 from ....utilities import sparqlQueries
 from ....service import SERVICE_NUMBER, SERVICE_NAME
 
@@ -74,7 +76,7 @@ def orga_getGraph(request:Request):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.Basics.getGraph(orgaID)
+        result = pgKnowledgeGraph.Basics.getGraph(orgaID, [NodeTypesAM.technology.value, NodeTypesAM.materialCategory.value])
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -489,9 +491,8 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
         
         if validatedInput["type"] == "create":
-            # create node for the orga and link it to the orga
-            if "nodeID" in validatedInput["node"]:
-                del validatedInput["node"]["nodeID"]
+            #if "nodeID" in validatedInput["node"]:
+            #    del validatedInput["node"]["nodeID"]
             resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
@@ -509,22 +510,44 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(otherNode, Exception):
                     raise otherNode
+                if otherNode.nodeType != NodeTypesAM.technology.value and otherNode.nodeType != NodeTypesAM.materialCategory.value:
+                    nodeIDToBeConnected = otherNode.nodeID
+                    if otherNode.createdBy != orgaID:
+                        copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
+                        if isinstance(copiedNode, Exception):
+                            raise copiedNode
+                        nodeIDToBeConnected = copiedNode.nodeID
+                        # if the new node is a material or printer, make connection to its category
+                        if otherNode.nodeType == NodeTypesAM.material.value:
+                            categoryToBeConnected = NodeTypesAM.materialCategory.value
+                        elif otherNode.nodeType == NodeTypesAM.printer.value:
+                            categoryToBeConnected = NodeTypesAM.technology.value
+                        else:
+                            categoryToBeConnected = None
 
-                nodeIDToBeConnected = otherNode.nodeID
-                if otherNode.createdBy != orgaID:
-                    copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
-                    if isinstance(copiedNode, Exception):
-                        raise copiedNode
-                    nodeIDToBeConnected = copiedNode.nodeID
-
-                # create edge to new node
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
-                if isinstance(result, Exception):
-                    raise result
-                # create edge to orga
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
-                if isinstance(result, Exception):
-                    raise result
+                        if categoryToBeConnected is not None:
+                            result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(otherNode.nodeID,categoryToBeConnected)
+                            if isinstance(result, Exception):
+                                raise result
+                            for categoryNode in result:
+                                if categoryNode[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner:
+                                    newResult = pgKnowledgeGraph.Basics.createEdge(categoryNode[pgKnowledgeGraph.NodeDescription.nodeID], copiedNode.nodeID)
+                                    if isinstance(newResult, Exception):
+                                        raise newResult
+                                    break     
+                    # create edge to new node
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
+                    if isinstance(result, Exception):
+                        raise result
+                    # create edge to orga
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
+                    if isinstance(result, Exception):
+                        raise result
+                else:
+                    # create edge to system category
+                    result = pgKnowledgeGraph.Basics.createEdge(otherNode.nodeID, resultNode.nodeID) 
+                    if isinstance(result, Exception):
+                        raise result
             
         elif validatedInput["type"] == "update":
             # update node
@@ -542,10 +565,14 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
-                # create edge to orga
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
+                # create edge to orga if necessary
+                result = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
+                if result.nodeType != NodeTypesAM.technology.value and result.nodeType != NodeTypesAM.materialCategory.value:
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
+                    if isinstance(result, Exception):
+                        raise result
         else:
             return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
 

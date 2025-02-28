@@ -19,6 +19,7 @@ from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.connections import s3
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists, findFirstOccurence, manualCheckifLoggedIn
+from Generic_Backend.code_General.utilities.files import deleteFileHelper
 
 
 from code_SemperKI.connections.content.postgresql.pgProfilesSKI import gatherUserHashIDsAndNotificationPreference
@@ -31,6 +32,8 @@ import code_SemperKI.states.stateDescriptions as StateDescriptions
 from ..abstractInterface import AbstractContentInterface
 from ..session import ProcessManagementSession
 from ....tasks.processTasks import verificationOfProcess, sendProcessEMails, sendLocalFileToRemote
+from ....utilities.filePreview import deletePreviewFile
+from ....utilities.basics import kissLogo
 
 logger = logging.getLogger("errors")
 
@@ -556,11 +559,8 @@ class ProcessManagementBase(AbstractContentInterface):
             allFiles = currentProcess.files
             # delete files as well
             for entry in allFiles:
-                if FileObjectContent.isFile not in allFiles[entry] or allFiles[entry][FileObjectContent.isFile]:
-                    if allFiles[entry][FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(allFiles[entry][FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(allFiles[entry][FileObjectContent.path])
+                deleteFileHelper(allFiles[entry])
+                deletePreviewFile(allFiles[entry][FileObjectContent.imgPath])
             
             # if that was the last process, delete the project as well
             # if len(currentProcess.project.processes.all()) == 1:
@@ -691,9 +691,17 @@ class ProcessManagementBase(AbstractContentInterface):
                     getAdditionalInformation = True
                 elif len(content) > 1:
                     outContent = "files"
+                
+                # if this is the first file, remove the default image from the processDetails
+                if ProcessDetails.imagePath in currentProcess.processDetails:
+                    if currentProcess.processDetails[ProcessDetails.imagePath] == [serviceManager.getImgPath(currentProcess.serviceType)]:
+                        currentProcess.processDetails[ProcessDetails.imagePath] = []
+                else:
+                    currentProcess.processDetails[ProcessDetails.imagePath] = []
 
                 for entry in content:
                     currentProcess.files[content[entry][FileObjectContent.id]] = content[entry]
+                    currentProcess.processDetails[ProcessDetails.imagePath].append(content[entry][FileObjectContent.imgPath])
                     ProcessManagementBase.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     if getAdditionalInformation:
                         outAdditionalInformation[FileObjectContent.createdBy] = content[entry][FileObjectContent.createdBy]
@@ -723,6 +731,7 @@ class ProcessManagementBase(AbstractContentInterface):
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess.serviceType = content
                 currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).initializeServiceDetails(currentProcess.serviceDetails)
+                currentProcess.processDetails[ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess.serviceType)]
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
 
@@ -768,6 +777,16 @@ class ProcessManagementBase(AbstractContentInterface):
                     connectedProcess.save()
                 ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {ProcessUpdates.dependenciesOut: content})
                 outContent = content
+            
+            elif updateType == ProcessUpdates.verificationResults:
+                currentProcess.processDetails[ProcessDetails.verificationResults] = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.verificationResults: content})
+                outContent = content
+            
+            elif updateType == ProcessUpdates.additionalInput:
+                currentProcess.processDetails[ProcessDetails.additionalInput] = content
+                ProcessManagementBase.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.additionalInput: content})
+                outContent = content
 
             currentProcess.save()
             return (outContent, outAdditionalInformation)
@@ -805,11 +824,13 @@ class ProcessManagementBase(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if FileObjectContent.isFile not in content[entry] or content[entry][FileObjectContent.isFile]:
-                        if content[entry][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(content[entry][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(content[entry][FileObjectContent.path])
+                    deleteFileHelper(content[entry])
+                    if FileObjectContent.imgPath in content[entry]:
+                        deletePreviewFile(content[entry][FileObjectContent.imgPath])
+                    if ProcessDetails.imagePath in currentProcess.processDetails:
+                        currentProcess.processDetails[ProcessDetails.imagePath].remove(content[entry][FileObjectContent.imgPath])
+                        if len(currentProcess.processDetails[ProcessDetails.imagePath]) == 0:
+                            currentProcess.processDetails[ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess.serviceType)]
                     ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
                     del currentProcess.files[content[entry][FileObjectContent.id]]
                     dataID = crypto.generateURLFriendlyRandomString()
@@ -828,16 +849,23 @@ class ProcessManagementBase(AbstractContentInterface):
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceDetails})
 
             elif updateType == ProcessUpdates.serviceStatus:
-                currentProcess.serviceStatus = 0 #TODO
+                currentProcess.serviceStatus = 0
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceStatus})
 
             elif updateType == ProcessUpdates.serviceType:
+                if ProcessDetails.additionalInput in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.additionalInput] = {}
+                if currentProcess.serviceType != serviceManager.getNone():
+                    currentProcess.serviceDetails = serviceManager.getService(currentProcess.serviceType).deleteServiceDetails(currentProcess.serviceDetails, currentProcess.serviceDetails)
+                currentProcess.processDetails[ProcessDetails.imagePath] = [kissLogo]
                 currentProcess.serviceType = serviceManager.getNone()
+                currentProcess.serviceStatus = 0
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
-                ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+                if ProcessDetails.provisionalContractor in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.provisionalContractor] = {}
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType == ProcessUpdates.dependenciesIn:
                 assert isinstance(content, list), "DependencyIn Content is not a list"
@@ -854,6 +882,16 @@ class ProcessManagementBase(AbstractContentInterface):
                     currentProcess.dependenciesOut.remove(connectedProcess)
                     connectedProcess.dependenciesIn.remove(currentProcess)
                 ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": ProcessUpdates.dependenciesOut})
+
+            elif updateType == ProcessUpdates.verificationResults:
+                if ProcessDetails.verificationResults in currentProcess.processDetails:
+                    del currentProcess.processDetails[ProcessDetails.verificationResults]
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.verificationResults})
+
+            elif updateType == ProcessUpdates.additionalInput:
+                if ProcessDetails.additionalInput in currentProcess.processDetails:
+                    currentProcess.processDetails[ProcessDetails.additionalInput] = {}
+                    ProcessManagementBase.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             currentProcess.save()
             return True
@@ -1070,6 +1108,9 @@ class ProcessManagementBase(AbstractContentInterface):
             projectObj = ProcessManagementBase.getProjectObj(projectID)
 
             defaultProcessObj = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
+
+            # initialize some details
+            defaultProcessObj.processDetails[ProcessDetails.imagePath] = [kissLogo]
 
             processObj, flag = Process.objects.update_or_create(processID=processID, defaults={ProcessDescription.project: projectObj, ProcessDescription.serviceType: defaultProcessObj.serviceType, ProcessDescription.serviceStatus: defaultProcessObj.serviceStatus, ProcessDescription.serviceDetails: defaultProcessObj.serviceDetails, ProcessDescription.processDetails: defaultProcessObj.processDetails, ProcessDescription.processStatus: defaultProcessObj.processStatus, ProcessDescription.client: client, ProcessDescription.files: defaultProcessObj.files, ProcessDescription.messages: defaultProcessObj.messages, ProcessDescription.updatedWhen: now})
             ProcessManagementBase.createDataEntry({}, crypto.generateURLFriendlyRandomString(), processID, DataType.CREATION, client)
@@ -1348,7 +1389,7 @@ class ProcessManagementBase(AbstractContentInterface):
         try:
 
             # Check if process is verified
-            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_COMPLETED):
+            if processObj.processStatus < StateDescriptions.processStatusAsInt(StateDescriptions.ProcessStatusAsString.VERIFICATION_FAILED):
                 raise Exception("Not verified yet!")
             
             contractorObj = Organization.objects.get(hashedID=processObj.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.hashedID])
@@ -1362,6 +1403,9 @@ class ProcessManagementBase(AbstractContentInterface):
 
             # Send files from local to remote
             for fileKey in processObj.files:
+                if processObj.files[fileKey][FileObjectContent.remote] or processObj.files[fileKey][FileObjectContent.path] == "" or (FileObjectContent.deleteFromStorage in processObj.files[fileKey] and processObj.files[fileKey][FileObjectContent.deleteFromStorage] is False):
+                    continue
+
                 pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
                 sendLocalFileToRemote(pathOnStorage)
                 processObj.files[fileKey][FileObjectContent.remote] = True

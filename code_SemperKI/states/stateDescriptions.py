@@ -26,6 +26,7 @@ class ProcessStatusAsString(StrEnumExactlyAsDefined):
     SERVICE_COMPLETED = enum.auto(), #Service abgeschlossen
     CONTRACTOR_COMPLETED = enum.auto(), #auftragnehmer ausgewählt
     VERIFYING = enum.auto(), #verifizierung in bearbeitung
+    VERIFICATION_FAILED = enum.auto(), #verifizierung fehlgeschlagen
     VERIFICATION_COMPLETED = enum.auto(), #verifizierung abgeschlossen
     REQUEST_COMPLETED = enum.auto(), #auftrag raus
     OFFER_COMPLETED = enum.auto(), #angebot raus
@@ -62,8 +63,10 @@ def processStatusAsInt(statusString:str) -> int:
         return 300
     elif statusString == ProcessStatusAsString.VERIFYING:
         return 400
-    elif statusString == ProcessStatusAsString.VERIFICATION_COMPLETED:
+    elif statusString == ProcessStatusAsString.VERIFICATION_FAILED:
         return 401
+    elif statusString == ProcessStatusAsString.VERIFICATION_COMPLETED:
+        return 402
     elif statusString == ProcessStatusAsString.REQUEST_COMPLETED:
         return 500
     elif statusString == ProcessStatusAsString.OFFER_COMPLETED:
@@ -115,6 +118,8 @@ def processStatusFromIntToStr(statusCode:int) -> str:
     elif statusCode == 400:
         return ProcessStatusAsString.VERIFYING
     elif statusCode == 401:
+        return ProcessStatusAsString.VERIFICATION_FAILED
+    elif statusCode == 402:
         return ProcessStatusAsString.VERIFICATION_COMPLETED
     elif statusCode == 500:
         return ProcessStatusAsString.REQUEST_COMPLETED

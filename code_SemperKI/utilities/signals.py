@@ -89,7 +89,7 @@ class SemperKISignalReceivers():
         """
         If a user gets initialized, set the SemperKI specific details
         """
-        orgaCreatedSemperKI(orgaHashID=kwargs["orgaID"])
+        orgaCreatedSemperKI(orgaHashID=kwargs["orgaID"], oldDetails=kwargs["oldDetails"])
         Basics.createOrganizationNode(orgaID=kwargs["orgaID"])
     
     ###########################################################

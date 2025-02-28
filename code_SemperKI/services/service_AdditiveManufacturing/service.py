@@ -5,15 +5,18 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
+from django.conf import settings
+
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
-from code_SemperKI.definitions import PricesDetails
+from code_SemperKI.definitions import PricesDetails, ValidationSteps, ValidationInformationForFrontend
 
 from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER, ServiceSpecificDetailsForContractors
 from .logics.costsLogic import Costs
+from .logics.femAnalysisLogic import startFEMAnalysis
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
@@ -156,6 +159,19 @@ class AdditiveManufacturing(Semper.ServiceBase):
         existingDetails[ServiceSpecificDetailsForContractors.verified] = contractor[1]
         existingDetails[ServiceSpecificDetailsForContractors.groups] = contractor[2]
         return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+        resultDict = startFEMAnalysis(session, processObj)
+        if resultDict[ServiceDetails.groups] == []:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: True}
+        else:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: False, "groups": resultDict[ServiceDetails.groups]}
+        return validationResults
 
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing(), settings.STATIC_URL+"media/AM.png")

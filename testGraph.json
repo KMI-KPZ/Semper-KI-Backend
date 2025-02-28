@@ -128,7 +128,7 @@
   },
   {
     "node": {
-      "nodeTempID": 20,
+      "nodeTempID": 21,
       "nodeName": "Irrelevant",
       "nodeType": "material",
       "context": "Material is not important.",
@@ -138,6 +138,54 @@
         "active": true
     },
     "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 23,
+      "nodeName": "Resin",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 24,
+      "nodeName": "Wax",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 25,
+      "nodeName": "Acrylic",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 26,
+      "nodeName": "Quarz",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
   },
   {
     "node": {
@@ -153,7 +201,11 @@
           {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
           {"name": "density", "key": "density", "value": "1.31", "unit": "g/cm³", "type": "number"},
           {"name": "printingSpeed", "key": "printingSpeed", "value": "4.8", "unit": "cm/h", "type": "number"},
-          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"}
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"},
+          {"name": "poissonRatio", "key": "poissonRatio", "value": "0.35", "unit": "", "type": "number"},
+          {"name": "tensileModulus", "key": "tensileModulus", "value": "2798", "unit": "MPa", "type": "number"},
+          {"name": "elongationAtBreak", "key": "elongationAtBreak", "value": "0.04", "unit": "%", "type": "number"},
+          {"name": "ultimateTensileStrength", "key": "ultimateTensileStrength", "value": "64.083", "unit": "MPa", "type": "number"}
           ],
           "active": true
       }
@@ -323,15 +375,49 @@
     },
     "edges": [
       {
-        "nodeTempID": 3,
-        "nodeName": "Black",
+        "nodeTempID": 22,
+        "nodeName": "Color irrelevant",
         "nodeType": "color",
         "context": "The default color",
         "properties": [
           {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "color", "key": "color", "value": "000000", "unit": "#Hex", "type": "string"}
+          {"name": "colorRAL", "key": "colorRAL", "value": "RAL 9004", "unit": "", "type": "text"},
+          {"name": "certificates", "key": "certificates", "value": "", "unit": "", "type": "text"}
         ],
         "active": true
+      },
+      {
+        "nodeTempID": 23
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 11
+    },
+    "edges": [
+      {
+        "nodeTempID": 24
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 12
+    },
+    "edges": [
+      {
+        "nodeTempID": 25
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 13
+    },
+    "edges": [
+      {
+        "nodeTempID": 26
       }
     ]
   }

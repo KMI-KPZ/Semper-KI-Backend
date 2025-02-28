@@ -63,7 +63,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def createNode(information:dict, createdBy=defaultOwner):
+    def createNode(information:dict, createdBy=defaultOwner, existingNodeID:str=""):
         """
         Creates a node
 
@@ -77,7 +77,10 @@ class Basics():
             startPC = time.perf_counter_ns()
             startPT = time.process_time_ns()
             
-            nodeID = generateURLFriendlyRandomString()
+            if existingNodeID != "":
+                nodeID = existingNodeID
+            else:
+                nodeID = generateURLFriendlyRandomString()
             uniqueID = nodeID
             nodeName = ""
             nodeType = ""
@@ -90,7 +93,7 @@ class Basics():
             for content in information:
                 match content:
                     case NodeDescription.nodeID:
-                        nodeID = information[NodeDescription.nodeID]
+                        uniqueID = information[NodeDescription.nodeID] # it's a clone
                     case "nodeTempID": # for testGraph
                         pass
                     case NodeDescription.nodeName:
@@ -210,7 +213,7 @@ class Basics():
         if isinstance(result, Exception):
             orgaName = pgProfiles.ProfileManagementBase.getOrganizationName(orgaID)
             information = {NodeDescription.nodeID: orgaID, NodeDescription.nodeName: orgaName, NodeDescription.nodeType: NodeType.organization}
-            Basics.createNode(information, orgaID)
+            Basics.createNode(information, orgaID, orgaID)
 
     ###################################################################################
     @staticmethod
@@ -576,7 +579,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def getSpecificNeighborsByType(nodeID:str, neighborNodeType:str):
+    def getSpecificNeighborsByType(nodeID:str, neighborNodeType:str) -> list[dict]|Exception:
         """
         Return all neighbors that have the specified neighborNodeType
 
@@ -669,7 +672,7 @@ class Basics():
 
     ##################################################
     @staticmethod
-    def getGraph(createdBy=""):
+    def getGraph(createdBy="", allowedNodeTypes:list[str]=[]):
         """
         Return the whole graph
 
@@ -683,11 +686,11 @@ class Basics():
             allNodes = Node.objects.all()
             outDict = {"nodes": [], "edges": []}
             for entry in allNodes:
-                if createdBy != "" and entry.createdBy != createdBy:
+                if createdBy != "" and entry.createdBy != createdBy and entry.nodeType not in allowedNodeTypes:
                     continue
                 outDict["nodes"].append(entry.toDict())
                 for neighbor in entry.edges.all():
-                    if createdBy != "" and neighbor.createdBy != createdBy:
+                    if createdBy != "" and neighbor.createdBy != createdBy and neighbor.nodeType not in allowedNodeTypes:
                         continue
                     outDict["edges"].append([entry.nodeID,neighbor.nodeID])
             

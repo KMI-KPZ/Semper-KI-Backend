@@ -27,6 +27,7 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
+    color = enum.auto()
     context = enum.auto()
 
 ##################################################
@@ -36,12 +37,15 @@ class FileContentsAM(StrEnumExactlyAsDefined):
     What does a file contain?
 
     """
-    width = enum.auto()
-    height = enum.auto()
-    length = enum.auto()
-    volume = enum.auto()
-    complexity = enum.auto()
+    width = enum.auto() # int
+    height = enum.auto() # int
+    length = enum.auto() # int
+    volume = enum.auto() # int
+    complexity = enum.auto() # int
     scalingFactor = enum.auto()
+    femRequested = enum.auto() # bool
+    testType = enum.auto() # str, elongation or compression
+    pressure = enum.auto() # int in MPa
 
 ##################################################
 # How do the calculations look like?
@@ -82,9 +86,10 @@ class MaterialDetails(StrEnumExactlyAsDefined):
     """
     id = enum.auto()
     title = enum.auto()
-    propList = enum.auto()
     imgPath = enum.auto()
-
+    medianPrice = enum.auto()
+    propList = enum.auto()
+    colors = enum.auto()
 
 ##################################################
 # What defines a material?
@@ -185,9 +190,8 @@ class NodePropertiesAMColor(StrEnumExactlyAsDefined):
     What are the properties, a color node can have?
     """
     imgPath = enum.auto() # mocks.testPicture
-    foodSafe = enum.auto() #"FDA;10/2011"
-    heatResistant = enum.auto() #250 
-    color = enum.auto()  # 9005RAL;Black
+    colorRAL = enum.auto()  # RAL 9005
+    colorHEX = enum.auto()  # #000000;#FFFFFF
     certificates = enum.auto() # CE, MD, ...
 
 ##################################################
@@ -239,3 +243,17 @@ class ServiceSpecificDetailsForContractors(StrEnumExactlyAsDefined):
     """
     verified = enum.auto()
     groups = enum.auto()
+
+##################################################
+class FilterCategories(StrEnumExactlyAsDefined):
+    """
+    What filters can be applied?
+
+    """
+    materialCategory = enum.auto()
+    materialType = enum.auto()
+    tensileStrength = enum.auto()
+    density = enum.auto()
+    elongationAtBreak = enum.auto()
+    certificates = enum.auto()
+

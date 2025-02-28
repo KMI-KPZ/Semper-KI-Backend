@@ -19,7 +19,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import pagesizes
 
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 from rest_framework import status
 from rest_framework.request import Request
@@ -29,6 +29,7 @@ from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
 from Generic_Backend.code_General.utilities.crypto import EncryptionAdapter
 from Generic_Backend.code_General.utilities.files import createFileResponse
+from Generic_Backend.code_General.utilities.basics import manualCheckifAdmin
 from Generic_Backend.code_General.definitions import FileObjectContent, Logging, FileTypes
 from Generic_Backend.code_General.connections import s3
 
@@ -39,6 +40,7 @@ from ..definitions import ProcessUpdates, DataType, ProcessDescription, DataDesc
 from ..utilities.basics import testPicture
 from django.http.request import HttpRequest
 from ..serviceManager import serviceManager
+from ..utilities.filePreview import createAndStorePreview
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -83,6 +85,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         fileNames = list(request.FILES.keys())
         userName = pgProfiles.ProfileManagementBase.getUserName(request.session)
         assert userName != "", f"In {functionName}: non-empty userName expected"
+        locale = pgProfiles.ProfileManagementBase.getUserLocale(request.session)
         changes = {"changes": {ProcessUpdates.files: {}}}
 
         # check if duplicates exist
@@ -119,11 +122,17 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
             for file in request.FILES.getlist(fileName):
                 fileID = crypto.generateURLFriendlyRandomString()
                 filePath = projectID + "/" + processID + "/" + fileID
+
+                # generate preview
+                previewPath = createAndStorePreview(file, nameOfFile, locale, filePath)
+                if isinstance(previewPath, Exception):
+                    return previewPath, status.HTTP_500_INTERNAL_SERVER_ERROR
+
                 changes["changes"][ProcessUpdates.files][fileID] = {}
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.path] = filePath
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.fileName] = nameOfFile
-                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = testPicture
+                changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.imgPath] = previewPath
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.date] = str(timezone.now())
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdBy] = userName
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.createdByID] = content.getClient()
@@ -140,7 +149,7 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
                     returnVal = s3.manageLocalS3.uploadFile(filePath, file)
                     if returnVal is not True:
                         return Response("Failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+                    
         # Save into files field of the process
         message, flag = updateProcessFunction(request, changes, projectID, [processID])
         if flag is False:
@@ -155,14 +164,44 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
         return e, status.HTTP_500_INTERNAL_SERVER_ERROR
     
 #######################################################
+def getFileViaPath(filePath, remote:bool, decrypt:bool=True) -> None|BytesIO:
+    """
+    Get file from storage and return it as accessible object - you have to decrypt it if necessary
+
+    :param filePath: path of the file
+    :type filePath: str
+    :param remote: if the file is remote
+    :type remote: bool
+    :return: fileObject from S3
+    :rtype: object
+
+    """
+    try:
+        if remote:
+            fileObj, flag = s3.manageRemoteS3.downloadFile(filePath, decrypt)
+            if flag is False:
+                logger.warning(f"File {filePath} not found in remote storage")
+                return None
+        else:
+            fileObj, flag = s3.manageLocalS3.downloadFile(filePath)
+            if flag is False:
+                logger.warning(f"File {filePath} not found in local storage")
+                return None
+
+        return fileObj
+
+    except Exception as error:
+        loggerError.error(f"Error while downloading file: {str(error)}")
+        return None
+
 
 #######################################################
-def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:
+def getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str="") -> tuple[object, bool]:
     """
     Obtain file(s) information from a process
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -175,7 +214,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
     """
     try:
         # Retrieve the files info from either the session or the database
-        contentManager = ManageC.ManageContent(request.session)
+        contentManager = ManageC.ManageContent(session)
         interface = contentManager.getCorrectInterface("downloadFileStream")
         if interface == None:
             return (HttpResponse("Not logged in or rights insufficient!", status=401),False)
@@ -184,7 +223,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
             return (HttpResponse("Not allowed to see process!", status=401),False)
 
         currentProcess = interface.getProcessObj(projectID, processID)
-        if currentProcess == None:
+        if currentProcess is None:
             return (HttpResponse("Not found!", status=404), False)
         
         if fileID != "":
@@ -193,7 +232,7 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
             
             fileOfThisProcess = currentProcess.files[fileID]
 
-            if contentManager.getClient() != fileOfThisProcess[FileObjectContent.createdByID]:
+            if (not manualCheckifAdmin(session)) and (currentProcess.client != fileOfThisProcess[FileObjectContent.createdByID]) and (currentProcess.contractor is not None and currentProcess.contractor.hashedID != fileOfThisProcess[FileObjectContent.createdByID]):
                 return (HttpResponse("Not allowed to access file!", status=401), False)
 
             return (fileOfThisProcess, True)
@@ -206,12 +245,12 @@ def getFilesInfoFromProcess(request: HttpRequest, projectID: str, processID: str
 
 
 #######################################################
-def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]:
+def getFileObject(session, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]:
     """
     Get file from storage and return it as accessible object - you have to decrypt it if necessary
 
-    :param request: Request of user for a specific file of a process
-    :type request: HttpRequest
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -224,7 +263,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
     """
     try:
         isRemote = False
-        fileOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID, fileID)
+        fileOfThisProcess, flag = getFilesInfoFromProcess(session, projectID, processID, fileID)
         if flag is False:
             return (None, False, False)
 
@@ -242,7 +281,7 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
                 return (None, False, False)
             
         logger.info(
-            f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},"
+            f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(session)},"
             f"{Logging.Predicate.FETCHED},accessed,{Logging.Object.OBJECT},file {fileOfThisProcess[FileObjectContent.fileName]}," + str(
                 datetime.now()))
 
@@ -254,13 +293,13 @@ def getFileObject(request: HttpRequest, projectID: str, processID: str, fileID: 
 
 
 #######################################################
-def getFileReadableStream(request:Request, projectID, processID, fileID) -> tuple[EncryptionAdapter, bool]:
+def getFileReadableStream(session, projectID, processID, fileID, fromRepository:bool=False) -> tuple[EncryptionAdapter, bool]:
     """
     Get file from storage and return it as readable object where the content can be read in desired chunks
     (will be decrypted if necessary)
 
-    :param request: Request of user for a specific file of a process
-    :type request: HTTP POST
+    :param session: Session of the user
+    :type session: dict-like object
     :param projectID: Project ID
     :type projectID: str
     :param processID: process ID
@@ -272,7 +311,7 @@ def getFileReadableStream(request:Request, projectID, processID, fileID) -> tupl
 
     """
     try:
-        fileObj, flag, isRemote = getFileObject(request, projectID, processID, fileID)
+        fileObj, flag, isRemote = getFileObject(session, projectID, processID, fileID)
         if flag is False:
             return (None, False)
 
@@ -291,7 +330,7 @@ def getFileReadableStream(request:Request, projectID, processID, fileID) -> tupl
 
         encryptionAdapter = EncryptionAdapter(streamingBody)
 
-        if isRemote is False:
+        if isRemote is False or fromRepository is True:
             # local files are not encrypted
             return (encryptionAdapter, True)
 
@@ -376,34 +415,37 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
      # TODO solve with streaming
     try:
         fileIDs = request.GET['fileIDs'].split(",")
-        filesArray = []
+        userIsAdmin = manualCheckifAdmin(request.session)
 
         # Retrieve the files infos from either the session or the database
-        filesOfThisProcess, flag = getFilesInfoFromProcess(request, projectID, processID)
+        filesOfThisProcess, flag = getFilesInfoFromProcess(request.session, projectID, processID)
         if flag is False:
             return filesOfThisProcess # will be HTTPResponse
         
-        # get files, download them from aws, put them in an array together with their name
-        for elem in filesOfThisProcess:
-            currentEntry = filesOfThisProcess[elem]
-            if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
-                if FileObjectContent.isFile not in currentEntry or currentEntry[FileObjectContent.isFile]:
-                    content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
-                    if flag is False:
-                        content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
-                        if flag is False:
-                            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
-                
-                    filesArray.append( (currentEntry[FileObjectContent.fileName], content) )
-
-        if len(filesArray) == 0:
-            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
+        content = ManageC.ManageContent(request.session)
+        interface = content.getCorrectInterface(functionName)
+        if interface is None:
+            return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
+        currentProcess = interface.getProcessObj(projectID, processID)
         
         # compress each file and put them in the same zip file, all in memory
         zipFile = BytesIO()
         with zipfile.ZipFile(zipFile, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-            for f in filesArray:
-                zf.writestr(f[0], f[1].read())
+        # get files, download them from aws, put them in an array together with their name
+            for elem in filesOfThisProcess:
+                currentEntry = filesOfThisProcess[elem]
+                if (not userIsAdmin) and (currentProcess.client != currentEntry[FileObjectContent.createdByID]) and (currentProcess.contractor is not None and currentProcess.contractor.hashedID != currentEntry[FileObjectContent.createdByID]):
+                    return Response("Not allowed to access file(s)!", status=401)
+                if FileObjectContent.id in currentEntry and currentEntry[FileObjectContent.id] in fileIDs:
+                    if FileObjectContent.isFile not in currentEntry or currentEntry[FileObjectContent.isFile]:
+                        if currentEntry[FileObjectContent.remote]:
+                            content, flag = s3.manageRemoteS3.downloadFile(currentEntry[FileObjectContent.path])
+                        else:
+                            content, flag = s3.manageLocalS3.downloadFile(currentEntry[FileObjectContent.path])
+                        if flag is False:
+                            return Response("Not found!", status=status.HTTP_404_NOT_FOUND)
+                        zf.writestr(currentEntry[FileObjectContent.fileName], content.read())
+                
         zipFile.seek(0) # reset zip file
 
         logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},downloaded,{Logging.Object.OBJECT},files as zip," + str(datetime.now()))        
@@ -416,6 +458,7 @@ def logicForDownloadAsZip(request:Request, projectID:str, processID:str, functio
 def logicForDownloadProcessHistory(request:Request, processID:str, functionName:str):
     """
     Logics for downloading the history of a process
+    TODO: Security!
 
     :param request: HttpRequest
     :type request: HttpRequest
@@ -505,7 +548,7 @@ def logicForDeleteFile(request:Request, projectID:str, processID:str, fileID:str
     """
     try:
         # Retrieve the files infos from either the session or the database
-        fileOfThisProcess, flag = getFilesInfoFromProcess(request._request, projectID, processID, fileID)
+        fileOfThisProcess, flag = getFilesInfoFromProcess(request.session, projectID, processID, fileID)
         if flag == False:
             return Exception(str(fileOfThisProcess.content)), fileOfThisProcess.status_code # Response if something went wrong
 

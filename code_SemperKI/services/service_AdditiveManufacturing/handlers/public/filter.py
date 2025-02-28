@@ -63,6 +63,7 @@ def getFilters(request:Request):
     try:
         # TODO use translation here for nodeName
         allMaterialCategories = [{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        allMaterialTypes = [{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialType) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
         allMaterials = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
         minTensileStrengthRange = 9999
         maxTensileStrengthRange = 0
@@ -120,9 +121,9 @@ def getFilters(request:Request):
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"materialCategory", # TODO define somewhere
-                     "category":"MATERIAL", # TODO define somewhere
-                     "type":"SELECTION", # TODO define somewhere
+                     "title":FilterCategories.materialCategory.value,
+                     "category":"MATERIAL",
+                     "type":"SELECTION",
                      "range":None,
                      "values":allMaterialCategories,
                      "units":None
@@ -134,7 +135,21 @@ def getFilters(request:Request):
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"tensileStrength",
+                     "title":FilterCategories.materialType,
+                     "category":"MATERIAL",
+                     "type":"SELECTION",
+                     "range":None,
+                     "values":allMaterialTypes,
+                     "units":None
+                     },
+                "answer":None
+                },
+                {"id":2,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.tensileStrength,
                      "category":"MATERIAL",
                      "type":"SLIDER",
                      "range":tensileStrengthRange,
@@ -143,12 +158,12 @@ def getFilters(request:Request):
                     },
                 "answer":None
                 },
-                {"id":2,
+                {"id":3,
                  "isChecked":False,
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"density",
+                     "title":FilterCategories.density,
                      "category":"MATERIAL",
                      "type":"SLIDER",
                      "range":densityRange,
@@ -157,12 +172,12 @@ def getFilters(request:Request):
                     },
                 "answer":None
                 },
-                {"id":3,
+                {"id":4,
                  "isChecked":False,
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"elongationAtBreak",
+                     "title":FilterCategories.elongationAtBreak,
                      "category":"MATERIAL",
                      "type":"SLIDER",
                      "range":elongationAtBreakRange,
@@ -171,12 +186,12 @@ def getFilters(request:Request):
                     },
                 "answer":None
                 },
-                {"id":4,
+                {"id":5,
                  "isChecked":False,
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"certificates",
+                     "title":FilterCategories.certificates,
                      "category":"MATERIAL",
                      "type":"MULTISELECTION",
                      "range":None,

@@ -5,10 +5,18 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
-import code_SemperKI.serviceManager as Semper
+from django.conf import settings
 
-from .connections.postgresql.pgService import updateServiceDetails as A_updateServiceDetails, deleteServiceDetails as A_deleteServiceDetails, serviceReady as A_serviceReady, cloneServiceDetails as A_cloneServiceDetails
-from .handlers.checkService import checkIfSelectionIsAvailable as A_checkIfSelectionIsAvailable
+import code_SemperKI.serviceManager as Semper
+from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails
+
+from .connections.postgresql.pgService import initializeService as A_initializeService, updateServiceDetails as A_updateServiceDetails, deleteServiceDetails as A_deleteServiceDetails, isFileRelevantForService as A_isFileRelevantForService, serviceReady as A_serviceReady, cloneServiceDetails as A_cloneServiceDetails
+from .logics.checkServiceLogic import checkIfSelectionIsAvailable as A_checkIfSelectionIsAvailable
+from .connections.filterViaSparql import *
+from .definitions import SERVICE_NAME, SERVICE_NUMBER
+from .logics.costs import Costs
+
 
 ###################################################
 class Assembly(Semper.ServiceBase):
@@ -16,17 +24,14 @@ class Assembly(Semper.ServiceBase):
     All connections of this service that Semper-KI should know about
     
     """
-    ###################################################
-    def __init__(self) -> None:
-        super().__init__()
 
     ###################################################
-    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+    def initializeServiceDetails(self, serviceDetails:dict) -> None:
         """
         Initialize the service
 
         """
-        return {}
+        return A_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -38,13 +43,13 @@ class Assembly(Semper.ServiceBase):
         return A_updateServiceDetails(existingContent, newContent)
     
     ###################################################
-    def deleteServiceDetails(self, existingContent, newContent):
+    def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Run service specific update of service details
 
         """
 
-        return A_deleteServiceDetails(existingContent, newContent)
+        return A_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
     def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
@@ -52,15 +57,7 @@ class Assembly(Semper.ServiceBase):
         Check if a file is relevant for the service
 
         """
-        return False
-    
-    ###################################################
-    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
-        """
-        Checks, if service is completely defined
-        
-        """
-        return A_serviceReady(existingContent)
+        return A_isFileRelevantForService(existingContent, fileID)
     
     ###################################################
     def parseServiceDetails(self, existingContent) -> dict:
@@ -68,7 +65,18 @@ class Assembly(Semper.ServiceBase):
         Parse the service details for Frontend
 
         """
-        return {}
+        outContent = {}
+        
+        return outContent
+
+    ###################################################
+    def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
+        """
+        Checks, if service is completely defined
+        
+        """
+        completeOrNot, listOfMissingStuff =  A_serviceReady(existingContent)
+        return (completeOrNot, listOfMissingStuff)
     
     ###################################################
     def checkIfSelectionIsAvailable(self, processObj) -> bool:
@@ -102,21 +110,39 @@ class Assembly(Semper.ServiceBase):
         :type process: ProcessInterface|Process
         :param additionalArguments: Various parameters, differs for every service
         :type additionalArguments: dict
-        :param transferObject: Object that is needed to calculate the price
+        :param transferObject: Transfer object with additional information
         :type transferObject: object
-        :return: Dictionary with all pricing details
-        :rtype: dict
+        :return: Minimum and maximum price
+        :rtype: tuple[float, float]
 
         """
-        return {}
+        costsObject = Costs(process, additionalArguments, transferObject)
+        costs = costsObject.calculateCosts() 
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+            
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
+        
+        return outDict
 
     ###################################################
     def getFilteredContractors(self, processObj) -> tuple[list, object]:
         """
         Get a list of contractors that can do the job
 
+        :param processObj: The process in question
+        :type processObj: ProcessInterface|Process
+        :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+        :rtype: tuple[list, object]
+
         """
-        return [], {}
+        filteredContractors = Filter()
+
+        outList = filteredContractors.getFilteredContractors(processObj)
+        
+        return outList, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
@@ -125,8 +151,13 @@ class Assembly(Semper.ServiceBase):
 
         """
         return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
 
-SERVICE_NAME = "ASSEMBLY"
-SERVICE_NUMBER = 8
+        """
+        return {}
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Assembly())
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Assembly(), settings.STATIC_URL+"media/A.png")

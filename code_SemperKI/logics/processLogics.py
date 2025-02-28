@@ -220,7 +220,7 @@ def parseProcessOutputForFrontend(processObj:Process|ProcessInterface, contentMa
         contractor = False
         if processObj.contractor is not None:
             contractor = processObj.contractor.hashedID == userID
-        buttons = getButtonsForProcess(processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
+        buttons = getButtonsForProcess(interface, processObj, processObj.client == userID, contractor, adminOrNot) # calls current node of the state machine
         outDict = processObj.toDict()
         outDict[ProcessOutput.processStatusButtons] = buttons
 
@@ -340,6 +340,11 @@ def logicForCreateProcessID(request:Request, projectID:str, functionName:str):
             raise errorOrNot
         # set default title of the process
         errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.title: processID[:10]}, client)
+        if isinstance(errorOrNot, Exception):
+            raise errorOrNot
+
+        # create additionalInput field
+        errorOrNot = interface.updateProcess(projectID, processID, ProcessUpdates.processDetails, {ProcessDetails.additionalInput: {}}, client)
         if isinstance(errorOrNot, Exception):
             raise errorOrNot
 
@@ -520,6 +525,8 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
             oldProcessDetails = copy.deepcopy(oldProcess.processDetails)
             if ProcessDetails.provisionalContractor in oldProcessDetails:
                 del oldProcessDetails[ProcessDetails.provisionalContractor]
+            if ProcessDetails.verificationResults in oldProcessDetails:
+                del oldProcessDetails[ProcessDetails.verificationResults]
             errorOrNone = pgProcesses.ProcessManagementBase.updateProcess(newProjectID, newProcessID, ProcessUpdates.processDetails, oldProcessDetails, oldProcess.client)
             if isinstance(errorOrNone, Exception):
                 raise errorOrNone
