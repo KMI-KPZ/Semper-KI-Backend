@@ -52,7 +52,6 @@ class SResRALListEntry(serializers.Serializer):
         500: ExceptionSerializer
     }
 )
-@checkIfUserIsLoggedIn()
 @require_http_methods(["GET"])
 @api_view(["GET"])
 @checkVersion(0.3)
