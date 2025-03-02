@@ -510,7 +510,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(otherNode, Exception):
                     raise otherNode
-                if otherNode.nodeType != NodeTypesAM.technology.value and otherNode.nodeType != NodeTypesAM.materialCategory.value:
+                if otherNode.nodeType != NodeTypesAM.technology.value and otherNode.nodeType != NodeTypesAM.materialCategory.value and otherNode.nodeType != NodeTypesAM.materialType.value:
                     nodeIDToBeConnected = otherNode.nodeID
                     if otherNode.createdBy != orgaID:
                         copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
@@ -569,7 +569,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 result = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
-                if result.nodeType != NodeTypesAM.technology.value and result.nodeType != NodeTypesAM.materialCategory.value:
+                if result.nodeType != NodeTypesAM.technology.value and result.nodeType != NodeTypesAM.materialCategory.value and result.nodeType != NodeTypesAM.materialType.value:
                     result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
                     if isinstance(result, Exception):
                         raise result
