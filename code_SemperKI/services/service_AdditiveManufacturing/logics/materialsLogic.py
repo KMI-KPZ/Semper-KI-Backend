@@ -105,7 +105,7 @@ def filterHelper(filterEntry:dict, nodeEntry:dict, nodeProperty:str) -> bool:
     :return: None
     :rtype: None
     """
-    appendViaThisFilter = False
+    appendViaThisFilter = True
     if filterEntry["question"]["title"] == nodeProperty:
         if filterEntry["answer"] is not None:
             answerRange = [filterEntry["answer"]["value"]["min"], filterEntry["answer"]["value"]["max"]]
@@ -115,6 +115,8 @@ def filterHelper(filterEntry:dict, nodeEntry:dict, nodeProperty:str) -> bool:
                     if float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) >= answerRange[0] and float(prop[pgKnowledgeGraph.NodePropertyDescription.value]) <= answerRange[1]:
                         appendViaThisFilter = True
                         break
+                    else:
+                        appendViaThisFilter = False
 
     return appendViaThisFilter
 
@@ -217,6 +219,10 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
                 # adhere to the filters:
                 append = True
                 for filterEntry in filters["filters"]:
+                    # skip the category and type filters
+                    if filterEntry["question"]["title"] == FilterCategories.materialType.value or filterEntry["question"]["title"] == FilterCategories.materialCategory.value:
+                        continue
+                    
                     # see if filter is selected and the value has not been ruled out somewhere
                     if filterEntry["isChecked"] is True and append is True:
                         
