@@ -308,7 +308,7 @@ def parseMaterialJSONToDBKGFormat(jsonData:dict) -> dict|Exception:
                 for subKey, subValue in value.items():
                     if subKey == "printing_speed" and subValue is not None and subValue != "":
                             if subValue.get("unit", "") == "mm/s":
-                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: str(value.get("printing_speed", 0)), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
+                                outDict[NodeDescription.properties].append({NodePropertyDescription.name: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.key: NodePropertiesAMMaterial.printingSpeed, NodePropertyDescription.value: str(subValue.get("value", 0)), NodePropertyDescription.unit: "mm/s", NodePropertyDescription.type: NodePropertiesTypesOfEntries.number.value})
             elif key == "material_type" and value is not None and len(value) > 0:
                 if "general_material_type" in value and value["general_material_type"] is not None and value["general_material_type"] != "Other":
                     outDict["materialType"] = value["general_material_type"]

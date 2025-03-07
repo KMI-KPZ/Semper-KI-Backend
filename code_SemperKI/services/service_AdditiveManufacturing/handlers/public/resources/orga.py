@@ -499,12 +499,15 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
             exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
+            
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
                 result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
+                
             # create edges
+            connectedToSystem = False
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
                 otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
@@ -513,6 +516,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                 if otherNode.nodeType != NodeTypesAM.technology.value and otherNode.nodeType != NodeTypesAM.materialCategory.value and otherNode.nodeType != NodeTypesAM.materialType.value:
                     nodeIDToBeConnected = otherNode.nodeID
                     if otherNode.createdBy != orgaID:
+                        connectedToSystem = True
                         copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
                         if isinstance(copiedNode, Exception):
                             raise copiedNode
@@ -548,6 +552,11 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
                     result = pgKnowledgeGraph.Basics.createEdge(otherNode.nodeID, resultNode.nodeID) 
                     if isinstance(result, Exception):
                         raise result
+            # if the node is not connected to any system node, look for the most similar one and connect that or create a new one
+            if not connectedToSystem:
+                result = pgKnowledgeGraph.Logic.checkIfSimilarNodeExists(resultNode.nodeID)
+                if isinstance(result, Exception):
+                    raise result
             
         elif validatedInput["type"] == "update":
             # update node
