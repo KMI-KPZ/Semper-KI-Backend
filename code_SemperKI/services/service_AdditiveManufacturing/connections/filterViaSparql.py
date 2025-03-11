@@ -10,6 +10,7 @@ import copy, logging
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 from code_SemperKI.modelFiles.processModel import Process, ProcessInterface
+from code_SemperKI.definitions import ContractorParsingForFrontend
 
 from ..connections.postgresql import pgKG, pgVerification
 from ..definitions import *
@@ -33,6 +34,7 @@ class Filter():
         """
         self.resultGroups = []
         self.printerGroups = []
+        self.errors = []
 
     ##################################################
     def filterByMaterialAndColor(self, chosenMaterial:dict, chosenColor:dict, groupIdx:int) -> None|Exception:
@@ -87,7 +89,10 @@ class Filter():
                                     if verification.status == pgVerification.VerificationStatus.verified:
                                         setOfVerifiedManufacturerIDs.add(entry[NodeDescription.createdBy])
                                         break
-                
+                        else:
+                            if chosenColor != {}:
+                                self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.color.value}
+        
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
             
             if len(listOfSetsForManufacturers) > 0:
@@ -108,6 +113,9 @@ class Filter():
                             else:
                                 self.resultGroups[groupIdx][manufacturer] = (manufacturer, False)
             elif len(chosenMaterial) > 0:
+                if self.errors[groupIdx] == {}:
+                    self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.material.value}
+                # else it is a color error and already set
                 self.resultGroups[groupIdx].clear()
         except Exception as e:
             loggerError.error(f"Error in filterByMaterial: {e}")
@@ -160,6 +168,7 @@ class Filter():
                         for manufacturer in manufacturersWhoCanDoItAll:
                             self.resultGroups[groupIdx][manufacturer] = manufacturer
             elif len(chosenPostProcessings) > 0:
+                self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.postProcessing.value}
                 self.resultGroups[groupIdx].clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPostProcessings: {e}")
@@ -217,32 +226,39 @@ class Filter():
                     self.resultGroups[groupIdx].clear()
                     self.resultGroups[groupIdx].update(copiedDict)
             elif len(calculations) > 0:
+                self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.printer.value}
                 self.resultGroups[groupIdx].clear()
         except Exception as e:
             loggerError.error(f"Error in filterByPrinter: {e}")
             return e
 
     ##################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> list:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> dict:
         """
         Get the filtered contractors
 
-        :return: List of suitable contractors
-        :rtype: list
+        :return: Object with list of suitable contractors
+        :rtype: dict
         
         """
         try:
-            self.resultGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
-            self.printerGroups = [{} for i in range(len(processObj.serviceDetails[ServiceDetails.groups]))]
+            numberOfGroups = len(processObj.serviceDetails[ServiceDetails.groups])
+            self.resultGroups = [{} for i in range(numberOfGroups)]
+            self.printerGroups = [{} for i in range(numberOfGroups)]
+            self.errors = [{} for i in range(numberOfGroups)]
             for groupIdx, group in enumerate(processObj.serviceDetails[ServiceDetails.groups]):
                 retVal = self.filterByMaterialAndColor(processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.material], processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.color], groupIdx)
                 if isinstance(retVal, Exception):
                     raise retVal
+                if self.errors[groupIdx] != {}: # if there is an error, no need to check post-processings
+                    continue
                 chosenPostProcessings = processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.postProcessings]
                 if chosenPostProcessings != {}:
                     retVal = self.filterByPostProcessings(chosenPostProcessings, groupIdx)
                     if isinstance(retVal, Exception):
                         raise retVal
+                    if self.errors[groupIdx] != {}: # if there is an error, no need to check printers
+                        continue
                 calculations = processObj.serviceDetails[ServiceDetails.groups][groupIdx][ServiceDetails.calculations]
                 retVal = self.filterByPrinter(calculations, groupIdx)
                 if isinstance(retVal, Exception):
@@ -261,7 +277,7 @@ class Filter():
                     else:
                         outDict[contractorID] = (contractorTuple[0], contractorTuple[1], [groupIdx])
 
-            return list(outDict.values())
+            return {ContractorParsingForFrontend.contractors: list(outDict.values()), ContractorParsingForFrontend.errors: self.errors}
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")
             return e

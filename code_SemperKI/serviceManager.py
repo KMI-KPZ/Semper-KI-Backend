@@ -114,7 +114,7 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
-    def getFilteredContractors(self, processObj) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj) -> tuple[dict, object]:
         """
         Get a list of contractors that can do the job
 

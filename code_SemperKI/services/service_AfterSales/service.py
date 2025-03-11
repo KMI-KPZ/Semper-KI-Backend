@@ -127,7 +127,7 @@ class AfterSales(Semper.ServiceBase):
         return outDict
 
     ###################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[dict, object]:
         """
         Get a list of contractors that are available for this service
 
@@ -139,9 +139,9 @@ class AfterSales(Semper.ServiceBase):
         """
         filteredContractors = Filter()
 
-        outList = filteredContractors.getFilteredContractors(processObj)
+        outDict = filteredContractors.getFilteredContractors(processObj)
         
-        return outList, filteredContractors
+        return outDict, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:

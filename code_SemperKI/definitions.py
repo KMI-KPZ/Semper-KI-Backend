@@ -347,3 +347,14 @@ class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
     """
     isSuccessful = enum.auto()
     reason = enum.auto()
+
+##################################################
+class ContractorParsingForFrontend(StrEnumExactlyAsDefined):
+    """
+    How the frontend wants the output of the contractors
+    
+    """
+    contractors = enum.auto()
+    errors = enum.auto()
+    groupID = enum.auto()
+    error = enum.auto()

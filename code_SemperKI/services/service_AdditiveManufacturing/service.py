@@ -130,7 +130,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return outDict
 
     ###################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[dict, object]:
         """
         Get a list of contractors that are available for this service
 
@@ -144,11 +144,11 @@ class AdditiveManufacturing(Semper.ServiceBase):
         
         filteredContractors = Filter()
 
-        outList = filteredContractors.getFilteredContractors(processObj)
-        if isinstance(outList, Exception):
-            outList = []
+        outDict = filteredContractors.getFilteredContractors(processObj)
+        if isinstance(outDict, Exception):
+            outDict = []
         
-        return outList, filteredContractors
+        return outDict, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
