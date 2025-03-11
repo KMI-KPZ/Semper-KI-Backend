@@ -69,7 +69,6 @@ class NodePropertiesTypesOfEntries(StrEnumExactlyAsDefined):
     number = enum.auto()
     text = enum.auto()
     string = enum.auto()
-    color = enum.auto()
     array = enum.auto()
 
 ##################################################

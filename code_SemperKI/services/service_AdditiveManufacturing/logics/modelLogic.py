@@ -225,7 +225,11 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                 nameOfFile = fileNameRoot + "_" + str(counterForFileName) + extension
                 counterForFileName += 1
             for model in request.FILES.getlist(fileName):
+                originalModel = model
+                originalName = nameOfFile
+                transformed = False
                 modelSize = model.size
+                originalModelSize = modelSize
                 details = {}
                 for detail in detailsOfAllFiles: # details are not in the same order as the models
                     if detail["fileName"] == fileName or detail["fileName"] == "file":
@@ -236,8 +240,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
 
                 # transform from step to stl if necessary
                 if extension == ".step" or extension == ".stp" or extension == ".STP" or extension == ".STEP":
-                    # save original file
-                    # TODO
+                    transformed = True
                     # transform to stl
                     model = transformSTPtoSTL(model, nameOfFile)
                     modelSize = model.__sizeof__()
@@ -268,7 +271,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     FileObjectContent.size: modelSize,
                     FileObjectContent.type: FileTypes.Model,
                     FileObjectContent.origin: origin,
-                    FileObjectContent.remote: False,
+                    FileObjectContent.remote: remote,
                     FileObjectContent.deleteFromStorage: True,
                     FileContentsAM.scalingFactor: float(details["scalingFactor"]) if "scalingFactor" in details else 100.0,
                     FileContentsAM.width: details["width"] if "width" in details else 0,
@@ -298,6 +301,60 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     returnVal = s3.manageLocalS3.uploadFile(filePath, model)
                     if returnVal is not True:
                         return (Exception(f"File {fileName} could not be saved to local storage"), 500)
+                
+                if transformed:
+                    # save original file
+                    stpFileID = crypto.generateURLFriendlyRandomString()
+                    filePathSTPFile = projectID+"/"+processID+"/"+stpFileID
+                    
+                    stpFile = {}
+                    createModel(stpFile, {
+                        FileObjectContent.id: stpFileID,
+                        FileObjectContent.path: filePathSTPFile,
+                        FileObjectContent.fileName: originalName,
+                        FileObjectContent.imgPath: previewPath,
+                        FileObjectContent.tags: details["tags"],
+                        FileObjectContent.licenses: details["licenses"],
+                        FileObjectContent.certificates: details["certificates"],
+                        FileObjectContent.quantity: details["quantity"] if "quantity" in details else 1,
+                        FileObjectContent.levelOfDetail: details["levelOfDetail"] if "levelOfDetail" in details else 1,
+                        FileObjectContent.isFile: True,
+                        FileObjectContent.date: str(timezone.now()),
+                        FileObjectContent.createdBy: userName,
+                        FileObjectContent.createdByID: content.getClient(),
+                        FileObjectContent.size: originalModelSize,
+                        FileObjectContent.type: FileTypes.File,
+                        FileObjectContent.origin: origin,
+                        FileObjectContent.remote: remote,
+                        FileObjectContent.deleteFromStorage: True,
+                        FileContentsAM.width: 0,
+                        FileContentsAM.height: 0,
+                        FileContentsAM.length: 0,
+                        FileContentsAM.volume: 0,
+                        FileContentsAM.complexity: 0,
+                        FileContentsAM.scalingFactor: 1.0,
+                        FileContentsAM.femRequested: False,
+                        FileContentsAM.testType: "",
+                        FileContentsAM.pressure: 0
+                    })
+                    
+                    if remote:
+                        returnVal = s3.manageRemoteS3.uploadFile(filePathSTPFile, originalModel)
+                        if returnVal is not True:
+                            return (Exception(f"File {fileName} could not be saved to remote storage"), 500)
+                    else:
+                        returnVal = s3.manageLocalS3.uploadFile(filePathSTPFile, originalModel)
+                        if returnVal is not True:
+                            return (Exception(f"File {fileName} could not be saved to local storage"), 500)
+                        
+                    # Save into files field of the process
+                    changes = {"changes": {ProcessUpdates.files: {fileID: stpFile}}}
+                    message, flag = updateProcessFunction(request, changes, projectID, [processID])
+                    if flag is False: # this should not happen
+                        return (Exception("Rights not sufficient for uploadModels"), 401)
+                    if isinstance(message, Exception):
+                        return (message, 500)
+
 
         groups = interface.getProcess(projectID, processID)[ProcessDescription.serviceDetails][ServiceDetails.groups]
         changesArray = [{} for i in range(len(groups))]

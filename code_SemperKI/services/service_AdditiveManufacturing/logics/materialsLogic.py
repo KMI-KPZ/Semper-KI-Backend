@@ -28,7 +28,7 @@ from ..definitions import *
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 ####################################################################################
-def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:list):
+def appendHelper(materialEntry:dict, materialsWithSameUID:list[dict], locale:str, materialPrices:dict, output:list):
     """
     Helper function to determine if an entry should be appended to the output list
 
@@ -50,13 +50,9 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
             materialEntry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,materialEntry[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.key]])
 
     # fetch colors of that material from organisations
-    # TODO THIS IS JUST TEMPORARY!
     colorsOfMaterial = []
     setOfRALOrHex = set()
-    tempMaterials = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(materialEntry[pgKnowledgeGraph.NodeDescription.uniqueID])
-    if isinstance(tempMaterials, Exception):
-        raise tempMaterials
-    for mat in tempMaterials:
+    for mat in materialsWithSameUID:
         if mat[pgKnowledgeGraph.NodeDescription.createdBy] != pgKnowledgeGraph.defaultOwner:
             colorsOfMat = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(mat[pgKnowledgeGraph.NodeDescription.nodeID], NodeTypesAM.color)
             if isinstance(colorsOfMat, Exception):
@@ -72,8 +68,11 @@ def appendHelper(materialEntry:dict, locale:str, materialPrices:dict, output:lis
                             else:
                                 add = False
                         elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMColor.colorHEX:
-                            if prop[pgKnowledgeGraph.NodePropertyDescription.value] not in setOfRALOrHex:
-                                setOfRALOrHex.add(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                            colorArray = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
+                            colorArray.sort() # sort to have always the same order
+                            colorString = ",".join(colorArray)
+                            if colorString not in setOfRALOrHex:
+                                setOfRALOrHex.add(colorString)
                                 add = True
                             else:
                                 add = False
@@ -212,8 +211,19 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
         for entry in materialList:
             # use only entries from system
             if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner and entry[pgKnowledgeGraph.NodeDescription.active] is True:
+                # sort out those that have no active organisation clones
+                materialsWithSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(entry[pgKnowledgeGraph.NodeDescription.uniqueID])
+                if isinstance(materialsWithSameUID, Exception):
+                    raise materialsWithSameUID
                 # sort out those that have no connection to an organization (and are therefore not in use)
-                if len(pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(entry[pgKnowledgeGraph.NodeDescription.uniqueID])) == 1:
+                if len(materialsWithSameUID) == 1:
+                    continue
+                active = False
+                for mat in materialsWithSameUID:
+                    if mat[pgKnowledgeGraph.NodeDescription.active] is True:
+                        active = True
+                        break
+                if not active:
                     continue
                 
                 # adhere to the filters:
@@ -254,9 +264,8 @@ def logicForRetrieveMaterialWithFilter(filters, locale:str) -> tuple[dict|Except
 
                                 append = appendViaThisFilter
 
-
                 if append:
-                    appendHelper(entry, locale, materialPrices, output)
+                    appendHelper(entry, materialsWithSameUID, locale, materialPrices, output)
         # sort by price
         output["materials"] = sorted(output["materials"], key=lambda x: x["medianPrice"])
 
