@@ -73,7 +73,7 @@ class SemperKISignalReceivers():
         """
         If a user gets initialized, set the SemperKI specific details
         """
-        userCreatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"])
+        userCreatedSemperKI(userHashID=kwargs["userID"],session=kwargs["session"],oldDetails=kwargs["oldDetails"])
 
     ###########################################################
     @staticmethod
