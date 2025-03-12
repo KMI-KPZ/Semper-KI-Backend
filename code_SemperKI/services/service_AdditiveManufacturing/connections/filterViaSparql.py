@@ -277,7 +277,10 @@ class Filter():
                     else:
                         outDict[contractorID] = (contractorTuple[0], contractorTuple[1], [groupIdx])
 
-            return {ContractorParsingForFrontend.contractors: list(outDict.values()), ContractorParsingForFrontend.errors: self.errors}
+            # filter out empty objects
+            outErrors = [err for err in self.errors if err != {}]
+
+            return {ContractorParsingForFrontend.contractors: list(outDict.values()), ContractorParsingForFrontend.errors: outErrors}
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")
             return e
