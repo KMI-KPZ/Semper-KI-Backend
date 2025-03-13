@@ -206,7 +206,7 @@ class Costs():
                 technology = "Material Extrusion"
                 if apiGivenContent == {}:
                     technologies = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)
-                    technology = technologies[0][pgKG.NodeDescription.nodeName] if len(technologies) > 0 else "Material Extrusion"
+                    technology = technologies[0][pgKG.NodeDescription.nodeName] if technologies is not None and len(technologies) > 0 else "Material Extrusion"
                 else:
                     technology = printer["technology"]
                 
@@ -543,8 +543,8 @@ class Costs():
                 totalCostsForEveryPrinter = []
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"] = [{} for _ in range(len(self.listOfValuesForEveryPrinter))]
                 for printerIdx, printer in enumerate(self.listOfValuesForEveryPrinter):
-                    
                     # calculate layer thickness corresponding to the levelOfDetail
+                    print("layer thickness: ", printer[self.PrinterValues.layerThickness])
                     layerThicknessArrayLength = len(printer[self.PrinterValues.layerThickness])
                     layerThickness = 75. # default value
                     match levelOfDetail:
@@ -555,9 +555,6 @@ class Costs():
                         case 2:
                             layerThickness = printer[self.PrinterValues.layerThickness][layerThicknessArrayLength - 1]
                             
-                    
-                        
-
                     printingSpeedForMaterialAndPrinter = self.minimalPrintingSpeed
                     # if extrusion printer and build rate is not set, calculate it
                     if printingSpeedForMaterialAndPrinter > printer[self.PrinterValues.maxPrintingSpeed]:
