@@ -418,6 +418,21 @@ class ButtonDefinitions:
                     "buttonVariant": ButtonTypes.primary,
                     "showIn": ShowIn.Active,
                 }
+    forwardToDispute = {
+                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
+                    "icon": IconType.QuestionAnswerIcon,
+                    "iconPosition": "left",
+                    "action": {
+                        "type": "request",
+                        "data": {
+                            "type": "forwardStatus",
+                            "targetStatus": ProcessStatusAsString.DISPUTE,
+                        },
+                    },
+                    "active": True,
+                    "buttonVariant": ButtonTypes.primary,
+                    "showIn": ShowIn.Active,
+                }
     forwardToCompleted = {
                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
                     "icon": IconType.DoneAllIcon,

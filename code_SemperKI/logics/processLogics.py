@@ -146,8 +146,8 @@ def logicForGetContractors(processObj:Process):
                 coordsOfUser = address1[AddressesSKI.coordinates]
         
         dictOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
-        if len(dictOfFilteredContractors) == 0:
-            return [], 200
+        if len(dictOfFilteredContractors[ContractorParsingForFrontend.contractors.value]) == 0:
+            return {ContractorParsingForFrontend.contractors: [], ContractorParsingForFrontend.errors: dictOfFilteredContractors[ContractorParsingForFrontend.errors.value]}, 200
 
         # Loop could be parallelized but tests fail if it is
         # This is due to django not closing the database calls correctly. If there is some other solution to to_thread above then by all means...

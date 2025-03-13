@@ -58,6 +58,7 @@ class Filter():
             setOfVerifiedManufacturerIDs = set()
             material = pgKnowledgeGraph.Basics.getNode(chosenMaterial[MaterialDetails.id])
             nodesWithTheSameUID = pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID(material.uniqueID)
+            colorNotAvailable = False
             # filter for those of orgas and retrieve the orgaID
             for entry in nodesWithTheSameUID:
                 if NodeDescription.active in entry and entry[NodeDescription.active]:
@@ -91,7 +92,10 @@ class Filter():
                                         break
                         else:
                             if chosenColor != {}:
-                                self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.color.value}
+                                colorNotAvailable = True
+            if colorNotAvailable and len(setOfManufacturerIDs) == 0:
+                if self.errors[groupIdx] == {}:
+                    self.errors[groupIdx] = {ContractorParsingForFrontend.groupID: groupIdx, ContractorParsingForFrontend.error: FilterErrors.color.value}
         
             listOfSetsForManufacturers.append(setOfManufacturerIDs)
             

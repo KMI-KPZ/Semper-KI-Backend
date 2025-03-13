@@ -549,11 +549,17 @@ class SERVICE_IN_PROGRESS(State):
 
         """
         if client or admin:
-            return [
+            buttonList =  [
+                ButtonDefinitions.editServiceSelection,
                 ButtonDefinitions.backToDraft,
                 ButtonDefinitions.deleteProcess,
                 ButtonDefinitions.forwardToServiceCompleted
             ]
+            if self.missingForCompletion(interface, process):
+                buttonList[-1]["active"] = False
+            else:
+                buttonList[-1]["active"] = True
+            return buttonList
         else:
             return []
     
@@ -930,7 +936,7 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -974,33 +980,9 @@ class WAITING_FOR_OTHER_PROCESS(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": ShowIn.Active,
-                },
-                {
-                    "title": ButtonLabels.DELETE_PROCESS, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": ShowIn.Active,
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess
             ] 
         else:
             return []
@@ -1461,6 +1443,25 @@ class VERIFYING(State):
         return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
 
     ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
     def to_VERIFICATION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFYING | VERIFICATION_COMPLETED:
         """
@@ -1483,7 +1484,7 @@ class VERIFYING(State):
 
     ###################################################
     updateTransitions = [to_VERIFICATION_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1613,6 +1614,27 @@ class VERIFICATION_FAILED(State):
         """
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
         return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
 
     ###################################################
     def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1639,7 +1661,7 @@ class VERIFICATION_FAILED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1749,6 +1771,27 @@ class VERIFICATION_COMPLETED(State):
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
         return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
 
     ###################################################
     def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1776,7 +1819,7 @@ class VERIFICATION_COMPLETED(State):
 
     ###################################################
     updateTransitions = [to_REQUEST_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -2653,51 +2696,9 @@ class DELIVERY_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
-                    "icon": IconType.QuestionAnswerIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DISPUTE,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToDispute,
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted
             ] )
         if contractor or admin:
             outArr.extend([

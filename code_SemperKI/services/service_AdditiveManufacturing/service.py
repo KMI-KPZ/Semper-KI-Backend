@@ -146,7 +146,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         if isinstance(outDict, Exception):
-            outDict = []
+            outDict = {}
         
         return outDict, filteredContractors
     
