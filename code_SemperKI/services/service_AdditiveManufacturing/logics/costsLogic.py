@@ -228,7 +228,7 @@ class Costs():
                         case NodePropertiesAMPrinter.machineBatchDistance:
                             valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = float(value)
                         case NodePropertiesAMPrinter.possibleLayerHeights:
-                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [float(x) for x in value.split(",")].sort(reverse=True)
+                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [float(x) for x in value.rstrip(",").split(",")].sort(reverse=True)
                         case NodePropertiesAMPrinter.machineSurfaceArea:
                             valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = float(value)
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
@@ -266,7 +266,7 @@ class Costs():
                     valuesForThisPrinter[self.PrinterValues.lossOfMaterial.value] = 30
                 if self.PrinterValues.machineBatchDistance not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = 10
-                if self.PrinterValues.layerThickness not in valuesForThisPrinter:
+                if self.PrinterValues.layerThickness not in valuesForThisPrinter or valuesForThisPrinter[self.PrinterValues.layerThickness.value] is None:
                     valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [75.]
                 if self.PrinterValues.machineSurfaceArea not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = 1.8
@@ -544,7 +544,6 @@ class Costs():
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"] = [{} for _ in range(len(self.listOfValuesForEveryPrinter))]
                 for printerIdx, printer in enumerate(self.listOfValuesForEveryPrinter):
                     # calculate layer thickness corresponding to the levelOfDetail
-                    print("layer thickness: ", printer[self.PrinterValues.layerThickness])
                     layerThicknessArrayLength = len(printer[self.PrinterValues.layerThickness])
                     layerThickness = 75. # default value
                     match levelOfDetail:
