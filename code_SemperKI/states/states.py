@@ -29,6 +29,7 @@ import code_SemperKI.tasks.processTasks as ProcessTasks
 import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
+from .stateButtons import ButtonDefinitions
 
 from ..definitions import ProcessDescription, ValidationSteps, ValidationInformationForFrontend, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
@@ -444,18 +445,7 @@ class DRAFT(State):
         None
         """
         if client or admin:
-            return [{
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }]
+            return [ButtonDefinitions.deleteProcess]
         return []
     
     ###################################################
@@ -560,48 +550,9 @@ class SERVICE_IN_PROGRESS(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToServiceCompleted
             ]
         else:
             return []
@@ -730,50 +681,17 @@ class SERVICE_READY(State):
 
         """
         if client or admin:
-            return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
-            ] 
+            buttonList = [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToServiceCompleted
+            ]
+
+            buttonList[-1]["active"] = True
+            return buttonList
+
         else:
             return []
     
@@ -923,67 +841,17 @@ class SERVICE_COMPLETED(State):
         buttonsList = []
         if client or admin:
             buttonsList = [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_READY,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToServiceReady,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.fowardToContractorCompleted,
             ]
             
             if len(self.missingForCompletion(interface, process)) == 0:
-                buttonsList[2]["active"] = True #set forward button to active
+                buttonsList[-1]["active"] = True #set forward button to active
 
         return buttonsList
     
@@ -1119,10 +987,10 @@ class WAITING_FOR_OTHER_PROCESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
+                    "showIn": ShowIn.Active,
                 },
                 {
-                    "title": ButtonLabels.DELETE, # do not change
+                    "title": ButtonLabels.DELETE_PROCESS, # do not change
                     "icon": IconType.DeleteIcon,
                     "iconPosition": "left",
                     "action": {
@@ -1131,7 +999,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
                     },
                     "active": True,
                     "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
+                    "showIn": ShowIn.Active,
                 }
             ] 
         else:
@@ -1282,34 +1150,9 @@ class SERVICE_COMPLICATION(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-            ] 
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.fowardToServiceInProgress
+            ]
         else:
             return []
     
@@ -1419,79 +1262,16 @@ class CONTRACTOR_COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.VERIFYING,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
-            ] 
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToServiceCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToVerifying
+            ]
         else:
             return []
     
@@ -1615,78 +1395,15 @@ class VERIFYING(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                { # this button shall not do anything
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.VERIFYING,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.fowardToVerificationCompleted
             ] 
         else:
             return []
@@ -1810,87 +1527,24 @@ class VERIFICATION_FAILED(State):
         """
         if client or admin:
             buttonList = [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToRequestCompleted
             ]
             whatsMissing = self.missingForCompletion(interface, process)
             if len(whatsMissing) == 0:
-                buttonList[2]["active"] = True #set forward button to active
+                buttonList[-1]["active"] = True #set forward button to active
             else:
-                buttonList[2]["active"] = True
+                buttonList[-1]["active"] = True
                 for entry in whatsMissing:
                     if entry["key"] == "Process-VerificationFailed":
-                        buttonList[2]["active"] = False # that's the only thing that can make the button inactive
+                        buttonList[-1]["active"] = False # that's the only thing that can make the button inactive
                         break
             return buttonList
         else:
@@ -2028,78 +1682,16 @@ class VERIFICATION_COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "up",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToRequestCompleted
             ] 
         else:
             return []
@@ -2232,36 +1824,8 @@ class REQUEST_COMPLETED(State):
         if contractor or admin: # contractor
             outArr = [] # reset as to not duplicate the button
             outArr.extend([
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToOfferRejected,
+                ButtonDefinitions.forwardToOfferCompleted
             ])
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
@@ -2376,36 +1940,8 @@ class OFFER_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend([
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToConfirmationRejected,
+                ButtonDefinitions.forwardToConfirmationCompleted
             ])
         if contractor:
             outArr.extend(
@@ -2514,18 +2050,7 @@ class OFFER_REJECTED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
         if contractor or admin:
             outArr.extend([
@@ -2622,21 +2147,7 @@ class CONFIRMATION_COMPLETED(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToProductionInProgress
             ] )
         return outArr
     
@@ -2728,18 +2239,7 @@ class CONFIRMATION_REJECTED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
         if contractor or admin:
             outArr.extend([
@@ -2836,36 +2336,8 @@ class PRODUCTION_IN_PROGRESS(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardProductionCompleted
             ] )
         return outArr
     
@@ -2970,36 +2442,8 @@ class PRODUCTION_COMPLETED(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                    "icon": IconType.LocalShippingIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToDeliveryInProgress
             ] )
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
@@ -3115,21 +2559,7 @@ class DELIVERY_IN_PROGRESS(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToDeliveryCompleted
             ] )
         if contractor or admin:
             outArr.extend([
@@ -3387,36 +2817,8 @@ class DISPUTE(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted  
             ] )
         if contractor or admin:
             outArr.extend([
@@ -3529,30 +2931,8 @@ class COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3632,30 +3012,8 @@ class FAILED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3735,30 +3093,8 @@ class CANCELED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
