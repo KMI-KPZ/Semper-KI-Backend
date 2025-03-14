@@ -923,6 +923,16 @@ class SERVICE_COMPLETED(State):
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         else:
             return self
+        
+    ##################################################
+    def to_SERVICE_IN_PROGRESS_Button(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: {}}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
     
     ###################################################
     def to_SERVICE_READY_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -936,7 +946,7 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):

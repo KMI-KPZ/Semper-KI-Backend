@@ -228,7 +228,7 @@ class Costs():
                         case NodePropertiesAMPrinter.machineBatchDistance:
                             valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = float(value)
                         case NodePropertiesAMPrinter.possibleLayerHeights:
-                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [float(x) for x in value.rstrip(",").split(",")].sort(reverse=True)
+                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = sorted([float(x) for x in value.rstrip(",").split(",")], reverse=True)
                         case NodePropertiesAMPrinter.machineSurfaceArea:
                             valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = float(value)
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
