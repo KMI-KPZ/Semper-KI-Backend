@@ -553,7 +553,7 @@ class SERVICE_IN_PROGRESS(State):
                 ButtonDefinitions.editServiceSelection,
                 ButtonDefinitions.backToDraft,
                 ButtonDefinitions.deleteProcess,
-                ButtonDefinitions.forwardToServiceCompleted
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
             ]
             if self.missingForCompletion(interface, process):
                 buttonList[-1]["active"] = False
@@ -692,7 +692,7 @@ class SERVICE_READY(State):
                 ButtonDefinitions.deleteServiceDetails,
                 ButtonDefinitions.backToDraft,
                 ButtonDefinitions.deleteProcess,
-                ButtonDefinitions.forwardToServiceCompleted
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
             ]
 
             buttonList[-1]["active"] = True
@@ -853,7 +853,7 @@ class SERVICE_COMPLETED(State):
                 ButtonDefinitions.deleteContractorCompleted,
                 ButtonDefinitions.backToServiceReady,
                 ButtonDefinitions.deleteProcess,
-                ButtonDefinitions.fowardToContractorCompleted,
+                copy.deepcopy(ButtonDefinitions.fowardToContractorCompleted)
             ]
             
             if len(self.missingForCompletion(interface, process)) == 0:
@@ -1546,7 +1546,7 @@ class VERIFICATION_FAILED(State):
                 ButtonDefinitions.editVerification,
                 ButtonDefinitions.deleteVerification,
                 ButtonDefinitions.deleteProcess,
-                ButtonDefinitions.forwardToRequestCompleted
+                copy.deepcopy(ButtonDefinitions.forwardToRequestCompleted)
             ]
             whatsMissing = self.missingForCompletion(interface, process)
             if len(whatsMissing) == 0:
@@ -1878,7 +1878,7 @@ class REQUEST_COMPLETED(State):
             outArr = [] # reset as to not duplicate the button
             outArr.extend([
                 ButtonDefinitions.forwardToOfferRejected,
-                ButtonDefinitions.forwardToOfferCompleted
+                copy.deepcopy(ButtonDefinitions.forwardToOfferCompleted)
             ])
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
@@ -2496,7 +2496,7 @@ class PRODUCTION_COMPLETED(State):
         if contractor or admin:
             outArr.extend( [
                 ButtonDefinitions.forwardToFailed,
-                ButtonDefinitions.forwardToDeliveryInProgress
+                copy.deepcopy(ButtonDefinitions.forwardToDeliveryInProgress)
             ] )
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
