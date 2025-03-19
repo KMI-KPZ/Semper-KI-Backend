@@ -1,0 +1,87 @@
+code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask
+============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Alexander Peetz 2025
+   Silvio Weging 2025
+
+   Contains: FEM simulation
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results
+   code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test
+
+
+Module Contents
+---------------
+
+.. py:data:: mockMaterials
+
+.. py:function:: calculate_surface_area(mesh_data)
+
+   Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.
+
+
+.. py:function:: calculate_bbox_volume_ratio(mesh_data)
+
+   Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.
+
+
+.. py:function:: calculate_bounding_box(mesh)
+
+.. py:function:: pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt)
+
+.. py:function:: determine_opt_amount_Tets(mesh_data)
+
+.. py:function:: determine_ELF(mesh_data)
+
+.. py:function:: read_and_tetrahedralize(mesh_data, elf)
+
+.. py:function:: define_dofs(ib)
+
+.. py:function:: define_displacements(pressure, test_type)
+
+.. py:function:: yield_stress(array, threshold)
+
+   threshold: yielding stress of material
+
+
+.. py:function:: calculate_displacements_and_stresses(mesh, lame_params, poisson_ratio, ib, K, dofs, displacements, bbox_length, material)
+
+.. py:function:: calculate_average_results(results_list)
+
+   Berechnet Mittelwerte der Simulationsergebnisse
+
+
+.. py:function:: run_FEM_test(material, pressure, stl_file, stl_fileName, test_type, resultQueue)
+

@@ -23,7 +23,7 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
-class Filter():
+class FilterAS():
     """
     Filter and save results
     

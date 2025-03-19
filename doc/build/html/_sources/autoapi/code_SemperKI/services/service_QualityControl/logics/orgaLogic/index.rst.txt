@@ -1,0 +1,44 @@
+code_SemperKI.services.service_QualityControl.logics.orgaLogic
+==============================================================
+
+.. py:module:: code_SemperKI.services.service_QualityControl.logics.orgaLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Logic functions for service specific organization KG stuff
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_QualityControl.logics.orgaLogic.logger
+   code_SemperKI.services.service_QualityControl.logics.orgaLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_QualityControl.logics.orgaLogic.logicForCloneTestGraphToOrgaForTests
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: logicForCloneTestGraphToOrgaForTests(request)
+
+   Clone the test graph to the organization graph for testing purposes
+
+

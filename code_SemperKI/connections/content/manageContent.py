@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2024
 
 Contains: Manages the content of the session and the database
+
 """
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn, manualCheckIfRightsAreSufficient
 from Generic_Backend.code_General.definitions import SessionContent, GlobalDefaults

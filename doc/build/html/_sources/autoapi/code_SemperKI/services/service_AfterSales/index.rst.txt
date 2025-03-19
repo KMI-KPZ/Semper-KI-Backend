@@ -1,0 +1,23 @@
+code_SemperKI.services.service_AfterSales
+=========================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_AfterSales/connections/index
+   /autoapi/code_SemperKI/services/service_AfterSales/definitions/index
+   /autoapi/code_SemperKI/services/service_AfterSales/handlers/index
+   /autoapi/code_SemperKI/services/service_AfterSales/imports/index
+   /autoapi/code_SemperKI/services/service_AfterSales/logics/index
+   /autoapi/code_SemperKI/services/service_AfterSales/service/index
+   /autoapi/code_SemperKI/services/service_AfterSales/tests/index
+   /autoapi/code_SemperKI/services/service_AfterSales/urls/index
+   /autoapi/code_SemperKI/services/service_AfterSales/utilities/index
+
+

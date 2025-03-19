@@ -1,0 +1,129 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics
+======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Logic functions for service specific organization KG stuff
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetGraph
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetResources
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetNodeViaID
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetNodesByUniqueID
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetAssociatedResources
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForGetNeighbors
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForAddNode
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForCreateOrUpdateAndLinkNodes
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForUpdateNode
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForDeleteNode
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForAddEdge
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForDeleteEdge
+   code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics.logicForCreateMaterialTypeNodes
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: logicForGetGraph(request: rest_framework.request.Request) -> tuple[dict | Exception, int]
+
+   Returns the graph for frontend
+
+
+
+.. py:function:: logicForGetResources(request: rest_framework.request.Request, resourceType: str) -> tuple[list[dict] | Exception, int]
+
+   Gathers all available resources of a certain type from the KG
+
+
+
+.. py:function:: logicForGetNodeViaID(request: rest_framework.request.Request, nodeID: str) -> tuple[dict | Exception, int]
+
+   Retrieve all info about a node via its ID
+
+
+
+.. py:function:: logicForGetNodesByUniqueID(request: rest_framework.request.Request, nodeID: str) -> tuple[list[dict] | Exception, int]
+
+   Retrieve all nodes with a certain unique ID
+
+
+
+.. py:function:: logicForGetAssociatedResources(request: rest_framework.request.Request, nodeID: str, resourceType: str) -> tuple[list[dict] | Exception, int]
+
+   Gather neighboring resources of a certain type from the KG
+
+
+
+.. py:function:: logicForGetNeighbors(request: rest_framework.request.Request, nodeID: str)
+
+   Gather all neighbors of a node inside an orga from the KG
+
+
+
+.. py:function:: logicForAddNode(request: rest_framework.request.Request, validatedInput) -> tuple[dict | Exception, int]
+
+   Add a new node to the KG
+
+
+
+.. py:function:: logicForCreateOrUpdateAndLinkNodes(request, validatedInput) -> tuple[None | Exception, int]
+
+   Combined access for frontend to create and update together with linking
+
+
+
+.. py:function:: logicForUpdateNode(request: rest_framework.request.Request, validatedInput) -> tuple[dict | Exception, int]
+
+   Updates the values of a node
+
+
+
+.. py:function:: logicForDeleteNode(request: rest_framework.request.Request, nodeID: str) -> tuple[None | Exception, int]
+
+   Deletes a node from the graph by ID
+
+
+
+.. py:function:: logicForAddEdge(request: rest_framework.request.Request, validatedInput) -> tuple[None | Exception, int]
+
+   Add an edge to the KG
+
+
+
+.. py:function:: logicForDeleteEdge(request: rest_framework.request.Request, nodeID1: str, nodeID2: str) -> tuple[None | Exception, int]
+
+   Deletes an edge from the KG
+
+
+
+.. py:function:: logicForCreateMaterialTypeNodes() -> tuple[None | Exception, int]
+
+   Create nodeType nodes from existing material nodes
+
+
+

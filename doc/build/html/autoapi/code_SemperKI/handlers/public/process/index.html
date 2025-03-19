@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.handlers.public.process &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.handlers.public.project" href="../project/index.html" />
+    <link rel="prev" title="code_SemperKI.handlers.public.miscellaneous" href="../miscellaneous/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.handlers.public.process">
+<span id="code-semperki-handlers-public-process"></span><h1>code_SemperKI.handlers.public.process<a class="headerlink" href="#module-code_SemperKI.handlers.public.process" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Akshay NS 2024</p>
+<p>Contains: Handlers for processes</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.logger" title="code_SemperKI.handlers.public.process.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.loggerError" title="code_SemperKI.handlers.public.process.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessID" title="code_SemperKI.handlers.public.process.SResProcessID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProcessID</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails" title="code_SemperKI.handlers.public.process.SResProcessDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProcessDetails</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResFiles" title="code_SemperKI.handlers.public.process.SResFiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResFiles</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResMessages" title="code_SemperKI.handlers.public.process.SResMessages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResMessages</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResButtonAction" title="code_SemperKI.handlers.public.process.SResButtonAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResButtonAction</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons" title="code_SemperKI.handlers.public.process.SResProcessStatusButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProcessStatusButtons</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractor" title="code_SemperKI.handlers.public.process.SResContractor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResContractor</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess" title="code_SemperKI.handlers.public.process.SResProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProcess</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess" title="code_SemperKI.handlers.public.process.SReqUpdateProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUpdateProcess</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry" title="code_SemperKI.handlers.public.process.SResHistoryEntry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResHistoryEntry</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessHistory" title="code_SemperKI.handlers.public.process.SResProcessHistory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProcessHistory</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent" title="code_SemperKI.handlers.public.process.SResContractorsContent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResContractorsContent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResErrors" title="code_SemperKI.handlers.public.process.SResErrors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResErrors</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractors" title="code_SemperKI.handlers.public.process.SResContractors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResContractors</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess" title="code_SemperKI.handlers.public.process.SReqsCloneProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqsCloneProcess</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.createProcessID" title="code_SemperKI.handlers.public.process.createProcessID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createProcessID</span></code></a>(request, projectID)</p></td>
+<td><p>Create process ID for frontend</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.getProcess" title="code_SemperKI.handlers.public.process.getProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getProcess</span></code></a>(request, projectID, processID)</p></td>
+<td><p>Retrieve complete process.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.updateProcess" title="code_SemperKI.handlers.public.process.updateProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateProcess</span></code></a>(request)</p></td>
+<td><p>Update stuff about the process</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.deleteProcesses" title="code_SemperKI.handlers.public.process.deleteProcesses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteProcesses</span></code></a>(request, projectID)</p></td>
+<td><p>Delete one or more processes</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.getProcessHistory" title="code_SemperKI.handlers.public.process.getProcessHistory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getProcessHistory</span></code></a>(request, processID)</p></td>
+<td><p>See who has done what and when</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.getContractors" title="code_SemperKI.handlers.public.process.getContractors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getContractors</span></code></a>(request, processID)</p></td>
+<td><p>Get all suitable Contractors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.process.cloneProcesses" title="code_SemperKI.handlers.public.process.cloneProcesses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cloneProcesses</span></code></a>(request)</p></td>
+<td><p>Duplicate selected processes. Works only for logged in users.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessID">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResProcessID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessID" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessID.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessID.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.createProcessID">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">createProcessID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.createProcessID" title="Link to this definition">¶</a></dt>
+<dd><p>Create process ID for frontend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – id of the project the created process should belong to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>process ID as string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResProcessDetails</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.provisionalContractor">
+<span class="sig-name descname"><span class="pre">provisionalContractor</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.provisionalContractor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.amount" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.inputParameters">
+<span class="sig-name descname"><span class="pre">inputParameters</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.inputParameters" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.clientBillingAddress">
+<span class="sig-name descname"><span class="pre">clientBillingAddress</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.clientBillingAddress" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.clientDeliverAddress">
+<span class="sig-name descname"><span class="pre">clientDeliverAddress</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.clientDeliverAddress" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.imagePath">
+<span class="sig-name descname"><span class="pre">imagePath</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.imagePath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.priorities">
+<span class="sig-name descname"><span class="pre">priorities</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.priorities" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.prices">
+<span class="sig-name descname"><span class="pre">prices</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.prices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.verificationResults">
+<span class="sig-name descname"><span class="pre">verificationResults</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.verificationResults" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessDetails.additionalInput">
+<span class="sig-name descname"><span class="pre">additionalInput</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessDetails.additionalInput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResFiles">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResFiles</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResFiles" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResMessages">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResMessages</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResMessages" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResButtonAction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResButtonAction</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResButtonAction" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResButtonAction.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResButtonAction.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResButtonAction.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResButtonAction.data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResProcessStatusButtons</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.icon">
+<span class="sig-name descname"><span class="pre">icon</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.icon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.iconPosition">
+<span class="sig-name descname"><span class="pre">iconPosition</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.iconPosition" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.action">
+<span class="sig-name descname"><span class="pre">action</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.action" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.buttonVariant">
+<span class="sig-name descname"><span class="pre">buttonVariant</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.buttonVariant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessStatusButtons.showIn">
+<span class="sig-name descname"><span class="pre">showIn</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.showIn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResContractor</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractor.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractor.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractor.hashedID">
+<span class="sig-name descname"><span class="pre">hashedID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractor.hashedID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResProcess</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.project">
+<span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.project" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.serviceDetails">
+<span class="sig-name descname"><span class="pre">serviceDetails</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.serviceDetails" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.processStatus">
+<span class="sig-name descname"><span class="pre">processStatus</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.processStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.serviceType">
+<span class="sig-name descname"><span class="pre">serviceType</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.serviceType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.serviceStatus">
+<span class="sig-name descname"><span class="pre">serviceStatus</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.serviceStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.processDetails">
+<span class="sig-name descname"><span class="pre">processDetails</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.processDetails" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.dependenciesIn">
+<span class="sig-name descname"><span class="pre">dependenciesIn</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.dependenciesIn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.dependenciesOut">
+<span class="sig-name descname"><span class="pre">dependenciesOut</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.dependenciesOut" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.client">
+<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.client" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.files">
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.files" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.messages">
+<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.messages" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.contractor">
+<span class="sig-name descname"><span class="pre">contractor</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.contractor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.updatedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.accessedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.processStatusButtons">
+<span class="sig-name descname"><span class="pre">processStatusButtons</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.processStatusButtons" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.processErrors">
+<span class="sig-name descname"><span class="pre">processErrors</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.processErrors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcess.flatProcessStatus">
+<span class="sig-name descname"><span class="pre">flatProcessStatus</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcess.flatProcessStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.getProcess">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">getProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.getProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve complete process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response with list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqUpdateProcess">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SReqUpdateProcess</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqUpdateProcess.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqUpdateProcess.processIDs">
+<span class="sig-name descname"><span class="pre">processIDs</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.processIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqUpdateProcess.changes">
+<span class="sig-name descname"><span class="pre">changes</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.changes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqUpdateProcess.deletions">
+<span class="sig-name descname"><span class="pre">deletions</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.deletions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.updateProcess">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">updateProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.updateProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Update stuff about the process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP PATCH</em>) – Request with content</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Message if it worked or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.deleteProcesses">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">deleteProcesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.deleteProcesses" title="Link to this definition">¶</a></dt>
+<dd><p>Delete one or more processes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – id of the project</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTPRespone</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResHistoryEntry</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.createdBy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResHistoryEntry.details">
+<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.details" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessHistory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResProcessHistory</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessHistory" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResProcessHistory.history">
+<span class="sig-name descname"><span class="pre">history</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResProcessHistory.history" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.getProcessHistory">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">getProcessHistory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.getProcessHistory" title="Link to this definition">¶</a></dt>
+<dd><p>See who has done what and when</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The process of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON of process history</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResContractorsContent</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.hashedID">
+<span class="sig-name descname"><span class="pre">hashedID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.hashedID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.branding">
+<span class="sig-name descname"><span class="pre">branding</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.branding" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.prices">
+<span class="sig-name descname"><span class="pre">prices</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.prices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.distance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.contractorCoordinates">
+<span class="sig-name descname"><span class="pre">contractorCoordinates</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.contractorCoordinates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.verified">
+<span class="sig-name descname"><span class="pre">verified</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.verified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractorsContent.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractorsContent.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResErrors">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResErrors</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResErrors" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResErrors.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResErrors.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResErrors.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResErrors.error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractors">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SResContractors</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractors.contractors">
+<span class="sig-name descname"><span class="pre">contractors</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractors.contractors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SResContractors.errors">
+<span class="sig-name descname"><span class="pre">errors</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SResContractors.errors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.getContractors">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">getContractors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.getContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Get all suitable Contractors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET request</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process a contractor is chosen for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of contractors and some details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqsCloneProcess">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">SReqsCloneProcess</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">serializers.Serializer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqsCloneProcess.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.SReqsCloneProcess.processIDs">
+<span class="sig-name descname"><span class="pre">processIDs</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess.processIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.process.cloneProcesses">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.process.</span></span><span class="sig-name descname"><span class="pre">cloneProcesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.process.cloneProcesses" title="Link to this definition">¶</a></dt>
+<dd><p>Duplicate selected processes. Works only for logged in users.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP POST</em>) – POST request from statusButtonRequest</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – The project ID of the project the processes belonged to</p></li>
+<li><p><strong>processIDs</strong> (<em>list</em><em> of </em><em>strings</em>) – List of processes to be cloned</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with project and process IDs</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">code_SemperKI.handlers</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../../private/index.html">code_SemperKI.handlers.private</a></li>
+<li class="toctree-l6 current"><a class="reference internal" href="../index.html">code_SemperKI.handlers.public</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../admin/index.html">code_SemperKI.handlers.public.admin</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../files/index.html">code_SemperKI.handlers.public.files</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../miscellaneous/index.html">code_SemperKI.handlers.public.miscellaneous</a></li>
+<li class="toctree-l8 current"><a class="current reference internal" href="#">code_SemperKI.handlers.public.process</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessID"><code class="docutils literal notranslate"><span class="pre">SResProcessID</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessID.processID"><code class="docutils literal notranslate"><span class="pre">SResProcessID.processID</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.createProcessID"><code class="docutils literal notranslate"><span class="pre">createProcessID()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.provisionalContractor"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.provisionalContractor</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.amount"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.amount</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.inputParameters"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.inputParameters</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.title"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.title</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.clientBillingAddress"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.clientBillingAddress</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.clientDeliverAddress"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.clientDeliverAddress</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.imagePath"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.imagePath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.priorities"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.priorities</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.prices"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.prices</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.verificationResults"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.verificationResults</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessDetails.additionalInput"><code class="docutils literal notranslate"><span class="pre">SResProcessDetails.additionalInput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResFiles"><code class="docutils literal notranslate"><span class="pre">SResFiles</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResMessages"><code class="docutils literal notranslate"><span class="pre">SResMessages</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResButtonAction"><code class="docutils literal notranslate"><span class="pre">SResButtonAction</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResButtonAction.type"><code class="docutils literal notranslate"><span class="pre">SResButtonAction.type</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResButtonAction.data"><code class="docutils literal notranslate"><span class="pre">SResButtonAction.data</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.title"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.title</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.icon"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.icon</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.iconPosition"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.iconPosition</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.action"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.action</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.active"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.active</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.buttonVariant"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.buttonVariant</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessStatusButtons.showIn"><code class="docutils literal notranslate"><span class="pre">SResProcessStatusButtons.showIn</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractor"><code class="docutils literal notranslate"><span class="pre">SResContractor</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractor.name"><code class="docutils literal notranslate"><span class="pre">SResContractor.name</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractor.hashedID"><code class="docutils literal notranslate"><span class="pre">SResContractor.hashedID</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess"><code class="docutils literal notranslate"><span class="pre">SResProcess</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.processID"><code class="docutils literal notranslate"><span class="pre">SResProcess.processID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.project"><code class="docutils literal notranslate"><span class="pre">SResProcess.project</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.serviceDetails"><code class="docutils literal notranslate"><span class="pre">SResProcess.serviceDetails</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.processStatus"><code class="docutils literal notranslate"><span class="pre">SResProcess.processStatus</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.serviceType"><code class="docutils literal notranslate"><span class="pre">SResProcess.serviceType</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.serviceStatus"><code class="docutils literal notranslate"><span class="pre">SResProcess.serviceStatus</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.processDetails"><code class="docutils literal notranslate"><span class="pre">SResProcess.processDetails</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.dependenciesIn"><code class="docutils literal notranslate"><span class="pre">SResProcess.dependenciesIn</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.dependenciesOut"><code class="docutils literal notranslate"><span class="pre">SResProcess.dependenciesOut</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.client"><code class="docutils literal notranslate"><span class="pre">SResProcess.client</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.files"><code class="docutils literal notranslate"><span class="pre">SResProcess.files</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.messages"><code class="docutils literal notranslate"><span class="pre">SResProcess.messages</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.contractor"><code class="docutils literal notranslate"><span class="pre">SResProcess.contractor</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.createdWhen"><code class="docutils literal notranslate"><span class="pre">SResProcess.createdWhen</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.updatedWhen"><code class="docutils literal notranslate"><span class="pre">SResProcess.updatedWhen</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.accessedWhen"><code class="docutils literal notranslate"><span class="pre">SResProcess.accessedWhen</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.processStatusButtons"><code class="docutils literal notranslate"><span class="pre">SResProcess.processStatusButtons</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.processErrors"><code class="docutils literal notranslate"><span class="pre">SResProcess.processErrors</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcess.flatProcessStatus"><code class="docutils literal notranslate"><span class="pre">SResProcess.flatProcessStatus</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.getProcess"><code class="docutils literal notranslate"><span class="pre">getProcess()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess"><code class="docutils literal notranslate"><span class="pre">SReqUpdateProcess</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.projectID"><code class="docutils literal notranslate"><span class="pre">SReqUpdateProcess.projectID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.processIDs"><code class="docutils literal notranslate"><span class="pre">SReqUpdateProcess.processIDs</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.changes"><code class="docutils literal notranslate"><span class="pre">SReqUpdateProcess.changes</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqUpdateProcess.deletions"><code class="docutils literal notranslate"><span class="pre">SReqUpdateProcess.deletions</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.updateProcess"><code class="docutils literal notranslate"><span class="pre">updateProcess()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.deleteProcesses"><code class="docutils literal notranslate"><span class="pre">deleteProcesses()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.createdBy"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry.createdBy</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.createdWhen"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry.createdWhen</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.type"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry.type</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.data"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry.data</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResHistoryEntry.details"><code class="docutils literal notranslate"><span class="pre">SResHistoryEntry.details</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessHistory"><code class="docutils literal notranslate"><span class="pre">SResProcessHistory</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResProcessHistory.history"><code class="docutils literal notranslate"><span class="pre">SResProcessHistory.history</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.getProcessHistory"><code class="docutils literal notranslate"><span class="pre">getProcessHistory()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.hashedID"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.hashedID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.name"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.name</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.branding"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.branding</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.prices"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.prices</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.distance"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.distance</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.contractorCoordinates"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.contractorCoordinates</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.verified"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.verified</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractorsContent.groups"><code class="docutils literal notranslate"><span class="pre">SResContractorsContent.groups</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResErrors"><code class="docutils literal notranslate"><span class="pre">SResErrors</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResErrors.groupID"><code class="docutils literal notranslate"><span class="pre">SResErrors.groupID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResErrors.error"><code class="docutils literal notranslate"><span class="pre">SResErrors.error</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractors"><code class="docutils literal notranslate"><span class="pre">SResContractors</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractors.contractors"><code class="docutils literal notranslate"><span class="pre">SResContractors.contractors</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SResContractors.errors"><code class="docutils literal notranslate"><span class="pre">SResContractors.errors</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.getContractors"><code class="docutils literal notranslate"><span class="pre">getContractors()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess"><code class="docutils literal notranslate"><span class="pre">SReqsCloneProcess</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess.projectID"><code class="docutils literal notranslate"><span class="pre">SReqsCloneProcess.projectID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.process.SReqsCloneProcess.processIDs"><code class="docutils literal notranslate"><span class="pre">SReqsCloneProcess.processIDs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.process.cloneProcesses"><code class="docutils literal notranslate"><span class="pre">cloneProcesses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../project/index.html">code_SemperKI.handlers.public.project</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../statemachine/index.html">code_SemperKI.handlers.public.statemachine</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../index.html">code_SemperKI.handlers</a><ul>
+  <li><a href="../index.html">code_SemperKI.handlers.public</a><ul>
+      <li>Previous: <a href="../miscellaneous/index.html" title="previous chapter">code_SemperKI.handlers.public.miscellaneous</a></li>
+      <li>Next: <a href="../project/index.html" title="next chapter">code_SemperKI.handlers.public.project</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../_sources/autoapi/code_SemperKI/handlers/public/process/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

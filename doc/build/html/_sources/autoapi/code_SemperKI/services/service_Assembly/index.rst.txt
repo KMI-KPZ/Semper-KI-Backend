@@ -1,0 +1,23 @@
+code_SemperKI.services.service_Assembly
+=======================================
+
+.. py:module:: code_SemperKI.services.service_Assembly
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_Assembly/connections/index
+   /autoapi/code_SemperKI/services/service_Assembly/definitions/index
+   /autoapi/code_SemperKI/services/service_Assembly/handlers/index
+   /autoapi/code_SemperKI/services/service_Assembly/imports/index
+   /autoapi/code_SemperKI/services/service_Assembly/logics/index
+   /autoapi/code_SemperKI/services/service_Assembly/service/index
+   /autoapi/code_SemperKI/services/service_Assembly/tests/index
+   /autoapi/code_SemperKI/services/service_Assembly/urls/index
+   /autoapi/code_SemperKI/services/service_Assembly/utilities/index
+
+

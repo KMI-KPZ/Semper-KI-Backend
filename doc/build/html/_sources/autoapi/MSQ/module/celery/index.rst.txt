@@ -1,0 +1,66 @@
+MSQ.module.celery
+=================
+
+.. py:module:: MSQ.module.celery
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2023
+
+   Contains: Configuration for Celery worker
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   MSQ.module.celery.broker_url
+   MSQ.module.celery.backend_url
+   MSQ.module.celery.app
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   MSQ.module.celery.request_task
+   MSQ.module.celery.fire_and_forget
+   MSQ.module.celery.task_success_handler
+
+
+Module Contents
+---------------
+
+.. py:data:: broker_url
+
+.. py:data:: backend_url
+
+.. py:data:: app
+
+.. py:function:: request_task(id: str)
+
+   Communicate to backend, that task is finished
+
+   :param id: The task ID
+   :type id: str
+
+
+.. py:function:: fire_and_forget(id: str)
+
+   Send out request but don't await answer
+
+   :param id: The task ID
+   :type id: str
+
+
+.. py:function:: task_success_handler(sender=None, result=None, **kwargs)
+
+   Gets called after every celery task that has conmpleted successfully.
+
+
+

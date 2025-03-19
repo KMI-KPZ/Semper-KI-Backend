@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.urls`
-============================
+code_SemperKI.urls
+==================
 
 .. py:module:: code_SemperKI.urls
 
@@ -25,4 +25,20 @@
        2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 
 
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.urls.newPaths
+   code_SemperKI.urls.key
+
+
+Module Contents
+---------------
+
+.. py:data:: newPaths
+
+.. py:data:: key
 

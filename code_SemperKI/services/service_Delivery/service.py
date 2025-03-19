@@ -137,7 +137,7 @@ class Delivery(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterD()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

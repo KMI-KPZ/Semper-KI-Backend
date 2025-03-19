@@ -1,0 +1,16 @@
+code_SemperKI.services.service_PostProcessing.connections
+=========================================================
+
+.. py:module:: code_SemperKI.services.service_PostProcessing.connections
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_PostProcessing/connections/filterViaSparql/index
+   /autoapi/code_SemperKI/services/service_PostProcessing/connections/postgresql/index
+
+

@@ -1,0 +1,191 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification
+===========================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Verification handlers
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.SResVerification
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.SReqVerification
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.getVerificationForOrganization
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.createVerificationForOrganization
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.updateVerificationForOrganization
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification.deleteVerificationForOrganization
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SResVerification(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: organizationID
+
+
+   .. py:attribute:: printerID
+
+
+   .. py:attribute:: materialID
+
+
+   .. py:attribute:: status
+
+
+   .. py:attribute:: details
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+.. py:function:: getVerificationForOrganization(request: rest_framework.request.Request)
+
+   Get the current verification for the organization",
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Response
+   :rtype: JSON Response
+
+
+
+.. py:class:: SReqVerification(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: printerID
+
+
+   .. py:attribute:: materialID
+
+
+   .. py:attribute:: status
+
+
+   .. py:attribute:: details
+
+
+.. py:function:: createVerificationForOrganization(request: rest_framework.request.Request)
+
+   Create a verification for the organization
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: updateVerificationForOrganization(request: rest_framework.request.Request)
+
+   Update a verification for the organization
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: deleteVerificationForOrganization(request: rest_framework.request.Request, printerID: str, materialID: str)
+
+   Delete a verification for the organization
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param printerID: HashID of the printer
+   :type printerID: str
+   :param materialID: HashID of the material
+   :type materialID: str
+   :return: Success or not
+   :rtype: Response
+
+
+

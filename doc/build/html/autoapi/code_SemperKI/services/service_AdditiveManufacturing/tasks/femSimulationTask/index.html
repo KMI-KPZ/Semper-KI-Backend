@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.tests" href="../../tests/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.tasks" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask">
+<span id="code-semperki-services-service-additivemanufacturing-tasks-femsimulationtask"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Alexander Peetz 2025
+Silvio Weging 2025</p>
+<p>Contains: FEM simulation</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mockMaterials</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_surface_area</span></code></a>(mesh_data)</p></td>
+<td><p>Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_bbox_volume_ratio</span></code></a>(mesh_data)</p></td>
+<td><p>Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_bounding_box</span></code></a>(mesh)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pid_controller</span></code></a>(setpoint, current_value, prev_error, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_opt_amount_Tets</span></code></a>(mesh_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_ELF</span></code></a>(mesh_data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_and_tetrahedralize</span></code></a>(mesh_data, elf)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_dofs</span></code></a>(ib)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_displacements</span></code></a>(pressure, test_type)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">yield_stress</span></code></a>(array, threshold)</p></td>
+<td><p>threshold: yielding stress of material</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_displacements_and_stresses</span></code></a>(mesh, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_average_results</span></code></a>(results_list)</p></td>
+<td><p>Berechnet Mittelwerte der Simulationsergebnisse</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_FEM_test</span></code></a>(material, pressure, stl_file, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">mockMaterials</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_surface_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area" title="Link to this definition">¶</a></dt>
+<dd><p>Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_bbox_volume_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio" title="Link to this definition">¶</a></dt>
+<dd><p>Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">pid_controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integral</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ki</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">determine_opt_amount_Tets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">determine_ELF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">read_and_tetrahedralize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">define_dofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ib</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">define_displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pressure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">yield_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress" title="Link to this definition">¶</a></dt>
+<dd><p>threshold: yielding stress of material</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_displacements_and_stresses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lame_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poisson_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ib</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_average_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results" title="Link to this definition">¶</a></dt>
+<dd><p>Berechnet Mittelwerte der Simulationsergebnisse</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">run_FEM_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stl_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stl_fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resultQueue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../../connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask</a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.mockMaterials"><code class="docutils literal notranslate"><span class="pre">mockMaterials</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area"><code class="docutils literal notranslate"><span class="pre">calculate_surface_area()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio"><code class="docutils literal notranslate"><span class="pre">calculate_bbox_volume_ratio()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box"><code class="docutils literal notranslate"><span class="pre">calculate_bounding_box()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller"><code class="docutils literal notranslate"><span class="pre">pid_controller()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets"><code class="docutils literal notranslate"><span class="pre">determine_opt_amount_Tets()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF"><code class="docutils literal notranslate"><span class="pre">determine_ELF()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize"><code class="docutils literal notranslate"><span class="pre">read_and_tetrahedralize()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs"><code class="docutils literal notranslate"><span class="pre">define_dofs()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements"><code class="docutils literal notranslate"><span class="pre">define_displacements()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress"><code class="docutils literal notranslate"><span class="pre">yield_stress()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses"><code class="docutils literal notranslate"><span class="pre">calculate_displacements_and_stresses()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results"><code class="docutils literal notranslate"><span class="pre">calculate_average_results()</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test"><code class="docutils literal notranslate"><span class="pre">run_FEM_test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+      <li>Next: <a href="../../tests/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/tasks/femSimulationTask/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

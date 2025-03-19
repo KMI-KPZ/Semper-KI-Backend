@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.modelFiles.projectModel`
-===============================================
+code_SemperKI.modelFiles.projectModel
+=====================================
 
 .. py:module:: code_SemperKI.modelFiles.projectModel
 
@@ -13,111 +13,138 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    code_SemperKI.modelFiles.projectModel.ProjectDescription
    code_SemperKI.modelFiles.projectModel.Project
+   code_SemperKI.modelFiles.projectModel.ProjectInterface
 
 
-
+Module Contents
+---------------
 
 .. py:class:: ProjectDescription
 
-   Bases: :py:obj:`code_General.utilities.customStrEnum.StrEnumExactylAsDefined`
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
 
    What does a project consists of?
 
 
+
    .. py:attribute:: projectID
-      
 
-      
 
-   .. py:attribute:: status
-      
+   .. py:attribute:: projectStatus
 
-      
 
    .. py:attribute:: client
-      
 
-      
 
-   .. py:attribute:: details
-      
+   .. py:attribute:: projectDetails
 
-      
 
    .. py:attribute:: createdWhen
-      
 
-      
 
    .. py:attribute:: updatedWhen
-      
 
-      
 
    .. py:attribute:: accessedWhen
-      
-
-      
 
 
 .. py:class:: Project(*args, **kwargs)
 
    Bases: :py:obj:`django.db.models.Model`
 
+
    Project class.
 
    :projectID: Unique ID for that project, primary key
-   :status: Current state of the project
+   :projectStatus: Current state of the project
+   :client: The hashed ID of the client that created the project
+   :projectDetails: Details like name and such
    :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
    :updatedWhen: Date and time at which the entry was updated
    :accessedWhen: Last date and time the data was fetched from the database, automatically set
 
+
    .. py:attribute:: projectID
-      
 
-      
 
-   .. py:attribute:: status
-      
+   .. py:attribute:: projectStatus
 
-      
 
    .. py:attribute:: client
-      
 
-      
 
-   .. py:attribute:: details
-      
+   .. py:attribute:: projectDetails
 
-      
 
    .. py:attribute:: createdWhen
-      
 
-      
 
    .. py:attribute:: updatedWhen
-      
 
-      
 
    .. py:attribute:: accessedWhen
-      
 
-      
 
    .. py:method:: toDict()
 
+
+.. py:class:: ProjectInterface(projectID: str, currentTime: str, client)
+
+   Project class interface
+
+   :projectID: Unique ID for that project, primary key
+   :projectStatus: Current state of the project
+   :client: The hashed ID of the client that created the project
+   :projectDetails: Details like name and such
+   :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+   :updatedWhen: Date and time at which the entry was updated
+   :accessedWhen: Last date and time the data was fetched from the database, automatically set
+
+
+   .. py:attribute:: projectID
+      :value: ''
+
+
+
+   .. py:attribute:: projectStatus
+      :value: 0
+
+
+
+   .. py:attribute:: client
+      :value: ''
+
+
+
+   .. py:attribute:: projectDetails
+
+
+   .. py:attribute:: createdWhen
+      :value: ''
+
+
+
+   .. py:attribute:: updatedWhen
+      :value: ''
+
+
+
+   .. py:attribute:: accessedWhen
+      :value: ''
+
+
+
+   .. py:method:: setValues(projectStatus, client, projectDetails, updatedWhen, accessedWhen) -> None
+
+
+   .. py:method:: toDict()
 
 

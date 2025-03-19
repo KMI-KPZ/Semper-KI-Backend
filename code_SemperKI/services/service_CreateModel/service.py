@@ -138,7 +138,7 @@ class CreateModel(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterCM()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

@@ -137,7 +137,7 @@ class PostProcessing(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterPP()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

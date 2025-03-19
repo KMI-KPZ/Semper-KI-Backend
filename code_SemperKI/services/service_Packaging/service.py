@@ -136,7 +136,7 @@ class Packaging(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterP()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

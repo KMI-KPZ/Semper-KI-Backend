@@ -1,0 +1,131 @@
+code_SemperKI.handlers.public.miscellaneous
+===========================================
+
+.. py:module:: code_SemperKI.handlers.public.miscellaneous
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2024
+
+   Contains: Handlers for miscellaneous [services, statusbuttons]
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.miscellaneous.logger
+   code_SemperKI.handlers.public.miscellaneous.loggerError
+   code_SemperKI.handlers.public.miscellaneous.loggerDebug
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.miscellaneous.SResServices
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.miscellaneous.getServices
+   code_SemperKI.handlers.public.miscellaneous.retrieveResultsFromQuestionnaire
+   code_SemperKI.handlers.public.miscellaneous.maturityLevel
+   code_SemperKI.handlers.public.miscellaneous.resilienceScore
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:data:: loggerDebug
+
+.. py:class:: SResServices(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:function:: getServices(request: rest_framework.request.Request)
+
+   Return the offered services
+
+   :param request: The request object
+   :type request: Dict
+   :return: The Services as dictionary with string and integer coding
+   :rtype: JSONResponse
+
+
+
+.. py:function:: retrieveResultsFromQuestionnaire(request: rest_framework.request.Request)
+
+   Retrieve the results from the questionnaire made by KMI
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Nothing
+   :rtype: ResponseRedirect
+
+
+
+.. py:function:: maturityLevel(request: rest_framework.request.Request)
+
+   Return the maturity level of the project
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Response
+   :rtype: JSONResponse
+
+
+
+.. py:function:: resilienceScore(request: rest_framework.request.Request)
+
+   Return the resilience score of the project
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Response
+   :rtype: JSONResponse
+
+
+

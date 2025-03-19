@@ -1,0 +1,200 @@
+code_SemperKI.logics.filesLogics
+================================
+
+.. py:module:: code_SemperKI.logics.filesLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: File upload handling logics
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.filesLogics.logger
+   code_SemperKI.logics.filesLogics.loggerError
+   code_SemperKI.logics.filesLogics.loggerInfo
+   code_SemperKI.logics.filesLogics.loggerDebug
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.filesLogics.logicForUploadFiles
+   code_SemperKI.logics.filesLogics.getFileViaPath
+   code_SemperKI.logics.filesLogics.getFilesInfoFromProcess
+   code_SemperKI.logics.filesLogics.getFileObject
+   code_SemperKI.logics.filesLogics.getFileReadableStream
+   code_SemperKI.logics.filesLogics.moveFileToRemote
+   code_SemperKI.logics.filesLogics.logicForDownloadAsZip
+   code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory
+   code_SemperKI.logics.filesLogics.logicForDeleteFile
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:data:: loggerInfo
+
+.. py:data:: loggerDebug
+
+.. py:function:: logicForUploadFiles(request, validatedInput: dict, functionName: str)
+
+   Logics for uploading files
+
+   :param request: HttpRequest
+   :type request: HttpRequest
+   :param validatedInput: The input
+   :type validatedInput: dict
+   :param functionName: name of the handler
+   :type functionName: str
+   :return: Nothing or Exception
+   :rtype: None|Exception, int
+
+
+
+.. py:function:: getFileViaPath(filePath, remote: bool, decrypt: bool = True) -> None | io.BytesIO
+
+   Get file from storage and return it as accessible object - you have to decrypt it if necessary
+
+   :param filePath: path of the file
+   :type filePath: str
+   :param remote: if the file is remote
+   :type remote: bool
+   :return: fileObject from S3
+   :rtype: object
+
+
+
+.. py:function:: getFilesInfoFromProcess(session, projectID: str, processID: str, fileID: str = '') -> tuple[object, bool]
+
+   Obtain file(s) information from a process
+
+   :param session: Session of the user
+   :type session: dict-like object
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :param fileID: file ID, if given then only that file is returned, else all files
+   :type fileID: Str
+   :return: file metadata or Error HttpResponse  , retrieval success
+   :rtype: (dict|HttpResponse, bool)
+
+
+
+.. py:function:: getFileObject(session, projectID: str, processID: str, fileID: str) -> tuple[object, bool, bool]
+
+   Get file from storage and return it as accessible object - you have to decrypt it if necessary
+
+   :param session: Session of the user
+   :type session: dict-like object
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :param fileID: file ID
+   :type fileID: Str
+   :return: (fileObject from S3, retrieval success, is remote location)
+   :rtype: (object, bool, bool)
+
+
+
+.. py:function:: getFileReadableStream(session, projectID, processID, fileID, fromRepository: bool = False) -> tuple[Generic_Backend.code_General.utilities.crypto.EncryptionAdapter, bool]
+
+   Get file from storage and return it as readable object where the content can be read in desired chunks
+   (will be decrypted if necessary)
+
+   :param session: Session of the user
+   :type session: dict-like object
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :param fileID: file ID
+   :type fileID: Str
+   :return: Saved content
+   :rtype: EncryptionAdapter
+
+
+
+.. py:function:: moveFileToRemote(fileKeyLocal, fileKeyRemote, deleteLocal=True, printDebugInfo=False) -> bool
+
+   Move a file from local to remote storage with on the fly encryption not managing other information
+
+   :param fileKeyLocal: The key with which to retrieve the file again later
+   :type fileKeyLocal: Str
+   :param fileKeyRemote: The key with which to retrieve the file again later
+   :type fileKeyRemote: Str
+   :param delteLocal: If set to True the local file will be deleted after the transfer
+   :type delteLocal: bool
+   :return: Success or error
+   :rtype: Bool or Error
+
+
+
+.. py:function:: logicForDownloadAsZip(request: rest_framework.request.Request, projectID: str, processID: str, functionName: str)
+
+   Logics for downloading files as a zip file
+
+   :param request: HttpRequest
+   :type request: HttpRequest
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: Process ID
+   :type processID: str
+   :param functionName: name of the handler
+   :type functionName: str
+   :return: HttpResponse
+   :rtype: HttpResponse
+
+
+
+.. py:function:: logicForDownloadProcessHistory(request: rest_framework.request.Request, processID: str, functionName: str)
+
+   Logics for downloading the history of a process
+   TODO: Security!
+
+   :param request: HttpRequest
+   :type request: HttpRequest
+   :param processID: Process ID
+   :type processID: str
+   :param functionName: name of the handler
+   :type functionName: str
+   :return: HttpResponse
+   :rtype: HttpResponse
+
+
+
+.. py:function:: logicForDeleteFile(request: rest_framework.request.Request, projectID: str, processID: str, fileID: str, functionName: str, serviceRequestsDeletion=False)
+
+   Logics for deleting a file
+
+   :param request: HttpRequest
+   :type request: HttpRequest
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: Process ID
+   :type processID: str
+   :param fileID: File ID
+   :type fileID: str
+   :param functionName: name of the handler
+   :type functionName: str
+   :return: None or Exception, statusCode
+   :rtype: None|Exception, int
+
+
+

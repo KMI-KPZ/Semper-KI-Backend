@@ -1,0 +1,3080 @@
+code_SemperKI.states.states
+===========================
+
+.. py:module:: code_SemperKI.states.states
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.states.states.logger
+   code_SemperKI.states.states.loggerError
+   code_SemperKI.states.states.stateDict
+   code_SemperKI.states.states.instance
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.states.states.StateMachine
+   code_SemperKI.states.states.State
+   code_SemperKI.states.states.DRAFT
+   code_SemperKI.states.states.SERVICE_IN_PROGRESS
+   code_SemperKI.states.states.SERVICE_READY
+   code_SemperKI.states.states.SERVICE_COMPLETED
+   code_SemperKI.states.states.WAITING_FOR_OTHER_PROCESS
+   code_SemperKI.states.states.SERVICE_COMPLICATION
+   code_SemperKI.states.states.CONTRACTOR_COMPLETED
+   code_SemperKI.states.states.VERIFYING
+   code_SemperKI.states.states.VERIFICATION_FAILED
+   code_SemperKI.states.states.VERIFICATION_COMPLETED
+   code_SemperKI.states.states.REQUEST_COMPLETED
+   code_SemperKI.states.states.OFFER_COMPLETED
+   code_SemperKI.states.states.OFFER_REJECTED
+   code_SemperKI.states.states.CONFIRMATION_COMPLETED
+   code_SemperKI.states.states.CONFIRMATION_REJECTED
+   code_SemperKI.states.states.PRODUCTION_IN_PROGRESS
+   code_SemperKI.states.states.PRODUCTION_COMPLETED
+   code_SemperKI.states.states.DELIVERY_IN_PROGRESS
+   code_SemperKI.states.states.DELIVERY_COMPLETED
+   code_SemperKI.states.states.DISPUTE
+   code_SemperKI.states.states.COMPLETED
+   code_SemperKI.states.states.FAILED
+   code_SemperKI.states.states.CANCELED
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.states.states.getButtonsForProcess
+   code_SemperKI.states.states.getMissingElements
+   code_SemperKI.states.states.getFlatStatus
+   code_SemperKI.states.states.signalCompleteToDependentProcesses
+   code_SemperKI.states.states.signalDependencyToOtherProcesses
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getButtonsForProcess(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface, client=True, contractor=False, admin=False)
+
+   Look at process status of every process of a project and add respective buttons
+
+   :param process: The current process in question
+   :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+   :param client: Whether the current user is the client or the contractor
+   :type client: Bool
+   :param contractor: Whether the current user is the contractor
+   :type contractor: Bool
+   :param admin: Whether the current user is an admin (which may see all buttons) or not
+   :type admin: Bool
+   :return: The buttons corresponding to the status
+   :rtype: Dict
+
+
+
+.. py:function:: getMissingElements(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+   Ask the state what it needs to move forward
+
+   :param interface: The session or database interface
+   :type interface: ProcessManagementSession | ProcessManagementBase
+   :param process: The current process in question
+   :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+   :return: list of elements that are missing, coded for frontend
+   :rtype: list[str]
+
+
+
+.. py:function:: getFlatStatus(processStatusCode: int, client=True) -> str
+
+   Get code string if something is required from the user for that status
+
+   :param processStatusCode: The current status of the process
+   :type processStatusCode: int
+   :param client: Signals, if the user is the client of the process or not
+   :type client: Bool
+   :returns: The flat status string from FlatProcessStatus
+   :rtype: str
+
+
+
+.. py:function:: signalCompleteToDependentProcesses(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, processObj: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> None
+
+   If a state transitions to completed, signal all dependent processes, that this happened.
+
+   :param interface: The session or database interface
+   :type interface: ProcessManagementSession | ProcessManagementBase
+   :param processObj: The current process
+   :type processObj: Process | ProcessInterface
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: signalDependencyToOtherProcesses(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, processObj: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> None
+
+   If a process adds a dependency, signal all dependent processes, that this happened.
+
+   :param interface: The session or database interface
+   :type interface: ProcessManagementSession | ProcessManagementBase
+   :param processObj: The current process
+   :type processObj: Process | ProcessInterface
+   :param currentClient: Who is ordering that?
+   :type currentClient: str
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:data:: stateDict
+
+.. py:class:: StateMachine(initialAsStr: str = '', initialAsInt: int = -1)
+
+   Bases: :py:obj:`object`
+
+
+   A simple state machine that mimics the functionality of a device from a 
+   high level.
+
+
+   .. py:method:: showPaths()
+
+      Show the paths that this machine can take
+
+
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      If the conditions are met, the status code is updated
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :param currentClient: Who is ordering that update?
+      :type currentClient: str
+      :return: Nothing
+      :rtype: None
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :param currentClient: Who is ordering that update?
+      :type currentClient: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+.. py:class:: State
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract State class providing the implementation interface
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+      :abstractmethod:
+
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+      :abstractmethod:
+
+
+      Which buttons should be shown in this state
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+      :abstractmethod:
+
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+      :abstractmethod:
+
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: __repr__()
+
+      Leverages the __str__ method to describe the State.
+
+
+
+
+   .. py:method:: __str__()
+
+      Returns the name of the State.
+
+
+
+
+.. py:class:: DRAFT
+
+   Bases: :py:obj:`State`
+
+
+   The draft state, default
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      None
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT | SERVICE_IN_PROGRESS
+
+      Check if service has been chosen
+
+
+
+
+   .. py:method:: to_WAITING_FOR_OTHER_PROCESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT | WAITING_FOR_OTHER_PROCESS
+
+      Check if other process exists before this one
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: SERVICE_IN_PROGRESS
+
+   Bases: :py:obj:`State`
+
+
+   The service is being edited
+
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Back to draft
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_READY(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS | SERVICE_READY
+
+      Check if service has been fully defined
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLICATION(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS | SERVICE_COMPLICATION
+
+      Service Conditions not OK
+
+
+
+
+   .. py:method:: to_WAITING_FOR_OTHER_PROCESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS | WAITING_FOR_OTHER_PROCESS
+
+      Check if other process exists before this one
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: SERVICE_READY
+
+   Bases: :py:obj:`State`
+
+
+   Service is ready
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Finish this service and go to overview
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Service changed 
+
+
+
+   .. py:method:: to_SERVICE_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED
+
+      Service is completely defined
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLICATION(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS | SERVICE_COMPLICATION
+
+      Service Conditions not OK
+
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: SERVICE_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Service is ready and has been declared as completely described
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Choose contractor
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_CONTRACTOR_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED | CONTRACTOR_COMPLETED
+
+      Contractor was selected
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLICATION(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED | SERVICE_COMPLICATION
+
+      Service Conditions not OK
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS | SERVICE_COMPLETED
+
+      Service changed 
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS_Button(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Service changed 
+
+
+
+   .. py:method:: to_SERVICE_READY_Button(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_READY
+
+      Button was pressed, go back
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: WAITING_FOR_OTHER_PROCESS
+
+   Bases: :py:obj:`State`
+
+
+   Waiting for other preceding Process
+
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for WAITING_FOR_OTHER_PROCESS
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_SERVICE_READY(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> WAITING_FOR_OTHER_PROCESS | SERVICE_READY
+
+      Check if service has been fully defined
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> WAITING_FOR_OTHER_PROCESS | SERVICE_IN_PROGRESS
+
+      From: WAITING_FORT_OTHER_PROGRESS
+      To: SERVICE_IN_PROGRESS
+
+      Must be triggered from the outside, for example when a process is finished, it signals all outgoing dependend processes of this
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> WAITING_FOR_OTHER_PROCESS | DRAFT
+
+      If no service was selected, return to draft after dependency was fulfilled
+
+
+
+
+   .. py:method:: to_DRAFT_viaButton(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      To: DRAFT
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: SERVICE_COMPLICATION
+
+   Bases: :py:obj:`State`
+
+
+   Service Complication happened
+
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Back to Draft
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLICATION | SERVICE_IN_PROGRESS | SERVICE_READY
+
+      From: SERVICE_COMPLICATION
+      To: SERVICE_IN_PROGRESS | SERVICE_READY
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: CONTRACTOR_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Contractor has been chosen (opens page for verification in frontend)
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for  CONTRACTOR_COMPLETED 
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_VERIFYING(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> VERIFYING
+
+      Starts verification
+      From: CONTRACTOR_COMPLETED
+      To: VERIFYING
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED
+
+      To: SERVICE_COMPLETED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: VERIFYING
+
+   Bases: :py:obj:`State`
+
+
+   Process is currently being verified
+
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: False
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for VERIFYING
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_READY(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_READY
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_VERIFICATION_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> VERIFYING | VERIFICATION_COMPLETED
+
+      From: VERIFYING
+      To: VERIFICATION_COMPLETED
+
+
+
+
+   .. py:method:: to_CONTRACTOR_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> CONTRACTOR_COMPLETED
+
+      To: CONTRACTOR_COMPLETED
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: VERIFICATION_FAILED
+
+   Bases: :py:obj:`State`
+
+
+   Process is currently being verified
+
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for VERIFYING
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_READY(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_READY
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_REQUEST_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> VERIFICATION_FAILED | REQUEST_COMPLETED
+
+      From: VERIFICATION_FAILED
+      To: VERIFICATION_FAILED | REQUEST_COMPLETED
+
+
+
+
+   .. py:method:: to_CONTRACTOR_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> CONTRACTOR_COMPLETED
+
+      To: CONTRACTOR_COMPLETED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: VERIFICATION_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Process has been verified
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Manual Request
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DRAFT(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DRAFT
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_IN_PROGRESS
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_READY(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_READY
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_SERVICE_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> SERVICE_COMPLETED
+
+      Button was pressed, clean up and go back
+
+
+
+
+   .. py:method:: to_REQUEST_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> VERIFICATION_COMPLETED | REQUEST_COMPLETED
+
+      From: VERIFICATION_COMPLETED
+      To: REQUEST_COMPLETED
+
+      Is called from the outside by a finished verification
+
+
+
+   .. py:method:: to_CONTRACTOR_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> CONTRACTOR_COMPLETED
+
+      To: CONTRACTOR_COMPLETED
+
+
+
+
+   .. py:attribute:: updateTransitions
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: REQUEST_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Contractor was informed about possible contract
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for REQUEST_COMPLETED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_OFFER_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> REQUEST_COMPLETED | OFFER_COMPLETED
+
+      From: REQUEST_COMPLETED
+      To: OFFER_COMPLETED
+
+
+
+
+   .. py:method:: to_OFFER_REJECTED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> REQUEST_COMPLETED | OFFER_REJECTED
+
+      From: REQUEST_COMPLETED
+      To: OFFER_REJECTED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: OFFER_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Order Confirmed by Contractor
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for OFFER_COMPLETED, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_CONFIRMATION_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> OFFER_COMPLETED | CONFIRMATION_COMPLETED
+
+      From: OFFER_COMPLETED
+      To: CONFIRMATION_COMPLETED
+
+
+
+
+   .. py:method:: to_CONFIRMATION_REJECTED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> OFFER_COMPLETED | CONFIRMATION_REJECTED
+
+      From: OFFER_COMPLETED
+      To: CONFIRMATION_REJECTED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: OFFER_REJECTED
+
+   Bases: :py:obj:`State`
+
+
+   Order Rejected by Contractor
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      No Buttons
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: CONFIRMATION_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Order Confirmed by Client
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for CONFIRMATION_COMPLETED, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_PRODUCTION_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> CONFIRMATION_COMPLETED | PRODUCTION_IN_PROGRESS
+
+      From: CONFIRMATION_COMPLETED
+      To: PRODUCTION_IN_PROGRESS
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: CONFIRMATION_REJECTED
+
+   Bases: :py:obj:`State`
+
+
+   Order rejected by Client
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      No Buttons
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: PRODUCTION_IN_PROGRESS
+
+   Bases: :py:obj:`State`
+
+
+   Order is in Production
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for PRODUCTION_IN_PROGRESS, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_PRODUCTION_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> PRODUCTION_IN_PROGRESS | PRODUCTION_COMPLETED
+
+      From: PRODUCTION_IN_PROGRESS
+      To: DELIVERY_IN_PROGRESS
+
+
+
+
+   .. py:method:: to_FAILED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> PRODUCTION_IN_PROGRESS | FAILED
+
+      From: PRODUCTION_IN_PROGRESS
+      To: FAILED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: PRODUCTION_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Order is in Production
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for PRODUCTION_COMPLETED, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DELIVERY_IN_PROGRESS(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> PRODUCTION_COMPLETED | DELIVERY_IN_PROGRESS
+
+      From: PRODUCTION_IN_PROGRESS
+      To: DELIVERY_IN_PROGRESS
+
+
+
+
+   .. py:method:: to_FAILED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> PRODUCTION_COMPLETED | FAILED
+
+      From: PRODUCTION_COMPLETED
+      To: FAILED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: DELIVERY_IN_PROGRESS
+
+   Bases: :py:obj:`State`
+
+
+   Order is being delivered
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for DELIVERY_IN_PROGRESS, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_DELIVERY_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DELIVERY_IN_PROGRESS | DELIVERY_COMPLETED
+
+      From: DELIVERY_IN_PROGRESS
+      To: DELIVERY_COMPLETED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: DELIVERY_COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Order is being delivered
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for DELIVERY_COMPLETED, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DELIVERY_COMPLETED | COMPLETED
+
+      From: DELIVERY_COMPLETED
+      To: COMPLETED
+
+
+
+
+   .. py:method:: to_DISPUTE(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DELIVERY_COMPLETED | DISPUTE
+
+      From: DELIVERY_COMPLETED
+      To: DISPUTE
+
+
+
+
+   .. py:method:: to_FAILED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DELIVERY_COMPLETED | FAILED
+
+      From: DELIVERY_COMPLETED
+      To: FAILED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: DISPUTE
+
+   Bases: :py:obj:`State`
+
+
+   Dispute over Delivery
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Buttons for DISPUTE, no Back-Button
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:method:: to_COMPLETED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DISPUTE | COMPLETED
+
+      From: DISPUTE
+      To: COMPLETED
+
+
+
+
+   .. py:method:: to_FAILED(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> DISPUTE | FAILED
+
+      From: DISPUTE
+      To: FAILED
+
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: COMPLETED
+
+   Bases: :py:obj:`State`
+
+
+   Order has been completed
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Delete and clone (client only)
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: FAILED
+
+   Bases: :py:obj:`State`
+
+
+   Contractor has failed the contract
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Delete and clone (client only)
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:class:: CANCELED
+
+   Bases: :py:obj:`State`
+
+
+   Order has been canceled
+
+
+   .. py:attribute:: statusCode
+      :value: 0
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: fireEvent
+      :value: True
+
+
+
+   .. py:method:: entryCalls(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Call functions that should be called when entering this state
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: buttons(interface, process, client=True, contractor=False, admin=False) -> list
+
+      Delete and clone (client only)
+
+
+
+
+   .. py:method:: getFlatStatus(client: bool) -> str
+
+      Get code string if something is required from the user for that status
+
+      :param client: Signals, if the user is the client of the process or not
+      :type client: Bool
+      :returns: The flat status string from FlatProcessStatus
+      :rtype: str
+
+
+
+   .. py:method:: missingForCompletion(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> list[str]
+
+      Ask the state what it needs to move forward
+
+      :param process: The current process in question
+      :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+      :return: list of elements that are missing, coded for frontend
+      :rtype: list[str]
+
+
+
+   .. py:attribute:: updateTransitions
+      :value: []
+
+
+
+   .. py:attribute:: buttonTransitions
+
+
+   .. py:method:: onUpdateEvent(interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      Handle events that are delegated to this State.
+
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+   .. py:method:: onButtonEvent(event: str, interface: code_SemperKI.connections.content.session.ProcessManagementSession | code_SemperKI.connections.content.postgresql.pgProcesses.ProcessManagementBase, process: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface)
+
+      A button was pressed, advance state accordingly
+
+      :param event: The button pressed, as ProcessStatusAsString
+      :type event: str
+      :param interface: The session or database interface
+      :type interface: ProcessManagementSession | ProcessManagementBase
+      :param process: The process object
+      :type process: Process | ProcessInterface
+      :return: Same or next object in state machine
+      :rtype: State Object
+
+
+
+
+.. py:data:: instance
+

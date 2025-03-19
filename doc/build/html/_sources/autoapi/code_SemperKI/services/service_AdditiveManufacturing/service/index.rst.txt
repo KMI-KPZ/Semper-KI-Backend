@@ -1,0 +1,140 @@
+code_SemperKI.services.service_AdditiveManufacturing.service
+============================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.service
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Class which describes the service in particular
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.service.AdditiveManufacturing
+
+
+Module Contents
+---------------
+
+.. py:class:: AdditiveManufacturing
+
+   Bases: :py:obj:`code_SemperKI.serviceManager.ServiceBase`
+
+
+   All functions of this service
+
+
+
+   .. py:method:: initializeServiceDetails(serviceDetails) -> None
+
+      Initialize the service
+
+
+
+
+   .. py:method:: updateServiceDetails(existingContent, newContent)
+
+      Run service specific update of service details
+
+
+
+
+   .. py:method:: deleteServiceDetails(existingContent, deletedContent)
+
+      Delete stuff from a service
+
+
+
+
+   .. py:method:: isFileRelevantForService(existingContent, fileID: str) -> bool
+
+      Check if a file is relevant for the service
+
+
+
+
+   .. py:method:: parseServiceDetails(existingContent) -> dict
+
+      Parse the service details for Frontend
+
+
+
+
+   .. py:method:: serviceReady(existingContent) -> tuple[bool, list[str]]
+
+      Checks if the service is completely defined
+
+
+
+
+   .. py:method:: checkIfSelectionIsAvailable(processObj: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> bool
+
+      Checks, if the selection of the service is available (material, ...)
+
+
+
+
+   .. py:method:: cloneServiceDetails(existingContent: dict, newProcess: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> dict
+
+      Clone content of the service
+
+      :param existingContent: What the process currently holds about the service
+      :type existingContent: dict
+      :param newProcess: The new process as object
+      :type newProcess: Process|ProcessInterface
+      :return: The copy of the service details
+      :rtype: dict
+
+
+
+
+   .. py:method:: calculatePriceForService(process: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process, additionalArguments: dict, transferObject: object) -> dict
+
+      Calculate the price for all content of the service
+
+      :param process: The process with all its details
+      :type process: ProcessInterface|Process
+      :param additionalArguments: Various parameters, differs for every service
+      :type additionalArguments: dict
+      :param transferObject: Transfer object with additional information
+      :type transferObject: Filter
+      :return: Minimum and maximum price
+      :rtype: tuple[float, float]
+
+
+
+
+   .. py:method:: getFilteredContractors(processObj: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> tuple[dict, object]
+
+      Get a list of contractors that are available for this service
+
+      :param processObj: The process in question
+      :type processObj: ProcessInterface|Process
+      :return: List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations
+      :rtype: tuple[list, object]
+
+
+
+
+   .. py:method:: getServiceSpecificContractorDetails(existingDetails: dict, contractor: object) -> dict
+
+      Get the service specific details for a contractor
+
+
+
+
+   .. py:method:: serviceSpecificTasks(session, processObj, validationResults: dict) -> dict | Exception
+
+      Do service specific tasks
+
+
+
+

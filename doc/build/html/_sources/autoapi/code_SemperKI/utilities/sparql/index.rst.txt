@@ -1,0 +1,245 @@
+code_SemperKI.utilities.sparql
+==============================
+
+.. py:module:: code_SemperKI.utilities.sparql
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Thomas Skodawessely 2024
+
+   Contains: Helper Classes to handle Sparql Queries
+
+
+   UNUSED! WILL BE DELETED SOON!
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.sparql.QueryType
+   code_SemperKI.utilities.sparql.SparqlQueryManager
+   code_SemperKI.utilities.sparql.SparqlResource
+
+
+Module Contents
+---------------
+
+.. py:class:: QueryType(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   The type of query
+
+
+
+   .. py:attribute:: GET
+      :value: 1
+
+
+
+   .. py:attribute:: INSERT
+      :value: 2
+
+
+
+   .. py:attribute:: UPDATE
+      :value: 3
+
+
+
+   .. py:attribute:: DELETE
+      :value: 4
+
+
+
+.. py:class:: SparqlQueryManager(redisConnection, oauthTokenManager, endpoint, updateEndpoint)
+
+   .. py:attribute:: redisCon
+      :type:  Generic_Backend.code_General.connections.redis.RedisConnection
+
+
+   .. py:attribute:: oauthTokenManager
+      :type:  Generic_Backend.code_General.utilities.oauth.ManageToken
+
+
+   .. py:attribute:: endpoint
+      :type:  SPARQLWrapper.SPARQLWrapper
+
+
+   .. py:attribute:: updateEndpoint
+      :type:  SPARQLWrapper.SPARQLWrapper
+
+
+   .. py:method:: setup()
+
+      sets up the sparql query manager by loading all queries from the configured class properties containing a dict with keys
+      from QueryType and values as path to the query file.
+
+
+
+   .. py:method:: loadConfig(name, config)
+
+      loads the queries from the config dict and sets them to the sparql resource object
+      :param name: name of the property to set
+      :type name: str
+      :param config: config dict containing the query paths
+      :type config: dict
+
+
+
+
+   .. py:method:: loadQueryFromPath(path)
+
+      Load a query from a file path
+
+      :param path: The file path
+      :type path: str
+      :return: Query content
+      :rtype: str
+
+
+
+
+   .. py:method:: sendQuery()
+
+      Send query via sparql to endpoint
+
+      :return: Query result
+      :rtype: JSON
+
+
+
+
+   .. py:method:: getResources() -> dict
+
+      Returns resource details
+
+      :return: Dictionary with resources names as key and the resource as value
+      :rtype: dict
+
+
+
+
+   .. py:method:: getResourcesAndTypes() -> dict
+
+      Returns resource details and types
+
+      :return: Dictionary with resources names as key and the resource types as array
+      :rtype: dict
+
+
+
+
+.. py:class:: SparqlResource(endpoint: SPARQLWrapper.SPARQLWrapper, updateEndpoint: SPARQLWrapper.SPARQLWrapper, oauthToken: Generic_Backend.code_General.utilities.oauth.ManageToken)
+
+   Contains queries from files and handles access methods to them
+
+
+   .. py:attribute:: endpoint
+      :type:  SPARQLWrapper.SPARQLWrapper
+      :value: None
+
+
+
+   .. py:attribute:: updateEndpoint
+      :type:  SPARQLWrapper.SPARQLWrapper
+      :value: None
+
+
+
+   .. py:attribute:: oauthToken
+      :type:  Generic_Backend.code_General.utilities.oauth.ManageToken
+      :value: None
+
+
+
+   .. py:attribute:: _getQuery
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: _insertQuery
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: _updateQuery
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: _deleteQuery
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: _vars
+      :type:  dict
+
+
+   .. py:method:: setQuery(queryType: QueryType, query: str)
+
+
+   .. py:method:: _sendQuery(query, endpoint=None)
+
+      Send SPARQL query.
+      :param self: Contains sparql query as obj
+      :type self: Object
+      :return: result of query
+      :rtype: JSON
+
+
+
+
+   .. py:method:: hasGet()
+
+
+   .. py:method:: hasInsert()
+
+
+   .. py:method:: hasUpdate()
+
+
+   .. py:method:: hasDelete()
+
+
+   .. py:method:: has(queryType: QueryType)
+
+
+   .. py:method:: getAll()
+
+
+   .. py:method:: get(filter)
+
+
+   .. py:method:: insert(data: dict)
+
+
+   .. py:method:: update(data, filter=None)
+
+
+   .. py:method:: delete(filter)
+
+
+   .. py:method:: extractVars(query)
+
+      extract all vars (noted as [$VARNAME] in query) from query via regex
+
+
+
+   .. py:method:: getVars(queryType: QueryType)
+
+
+   .. py:method:: getSupportedQueryTypes() -> list
+
+

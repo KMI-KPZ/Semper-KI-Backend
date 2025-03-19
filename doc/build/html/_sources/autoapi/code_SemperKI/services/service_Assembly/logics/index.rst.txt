@@ -1,0 +1,17 @@
+code_SemperKI.services.service_Assembly.logics
+==============================================
+
+.. py:module:: code_SemperKI.services.service_Assembly.logics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_Assembly/logics/checkServiceLogic/index
+   /autoapi/code_SemperKI/services/service_Assembly/logics/costs/index
+   /autoapi/code_SemperKI/services/service_Assembly/logics/orgaLogic/index
+
+

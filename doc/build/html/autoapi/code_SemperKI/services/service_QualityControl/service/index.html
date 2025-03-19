@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_QualityControl.service &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_QualityControl.tests" href="../tests/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_QualityControl.logics.orgaLogic" href="../logics/orgaLogic/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_QualityControl.service">
+<span id="code-semperki-services-service-qualitycontrol-service"></span><h1>code_SemperKI.services.service_QualityControl.service<a class="headerlink" href="#module-code_SemperKI.services.service_QualityControl.service" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Class which describes the service in particular</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl" title="code_SemperKI.services.service_QualityControl.service.QualityControl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QualityControl</span></code></a></p></td>
+<td><p>All connections of this service that Semper-KI should know about</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_QualityControl.service.</span></span><span class="sig-name descname"><span class="pre">QualityControl</span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../serviceManager/index.html#code_SemperKI.serviceManager.ServiceBase" title="code_SemperKI.serviceManager.ServiceBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_SemperKI.serviceManager.ServiceBase</span></code></a></p>
+<p>All connections of this service that Semper-KI should know about</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.initializeServiceDetails">
+<span class="sig-name descname"><span class="pre">initializeServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serviceDetails</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.initializeServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.updateServiceDetails">
+<span class="sig-name descname"><span class="pre">updateServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newContent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.updateServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Run service specific update of service details</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.deleteServiceDetails">
+<span class="sig-name descname"><span class="pre">deleteServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deletedContent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.deleteServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Run service specific update of service details</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.isFileRelevantForService">
+<span class="sig-name descname"><span class="pre">isFileRelevantForService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.isFileRelevantForService" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a file is relevant for the service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.parseServiceDetails">
+<span class="sig-name descname"><span class="pre">parseServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.parseServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Parse the service details for Frontend</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.serviceReady">
+<span class="sig-name descname"><span class="pre">serviceReady</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.serviceReady" title="Link to this definition">¶</a></dt>
+<dd><p>Checks, if service is completely defined</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.checkIfSelectionIsAvailable">
+<span class="sig-name descname"><span class="pre">checkIfSelectionIsAvailable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.checkIfSelectionIsAvailable" title="Link to this definition">¶</a></dt>
+<dd><p>Checks, if the selection of the service is available (material, …)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.cloneServiceDetails">
+<span class="sig-name descname"><span class="pre">cloneServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newProcess</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.cloneServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Clone content of the service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>existingContent</strong> (<em>dict</em>) – What the process currently holds about the service</p></li>
+<li><p><strong>newProcess</strong> (<a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><em>Process</em></a><em>|</em><a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><em>ProcessInterface</em></a>) – The new process as object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The copy of the service details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.calculatePriceForService">
+<span class="sig-name descname"><span class="pre">calculatePriceForService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additionalArguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transferObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.calculatePriceForService" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the price for all content of the service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> (<a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><em>ProcessInterface</em></a><em>|</em><a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><em>Process</em></a>) – The process with all its details</p></li>
+<li><p><strong>additionalArguments</strong> (<em>dict</em>) – Various parameters, differs for every service</p></li>
+<li><p><strong>transferObject</strong> (<em>object</em>) – Transfer object with additional information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Minimum and maximum price</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.getFilteredContractors">
+<span class="sig-name descname"><span class="pre">getFilteredContractors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.getFilteredContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Get a list of contractors that can do the job</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processObj</strong> (<a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><em>ProcessInterface</em></a><em>|</em><a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><em>Process</em></a>) – The process in question</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of suitable contractors and a transfer object with additional information, can be used for example to calculate a price based on prior calculations</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list, object]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.getServiceSpecificContractorDetails">
+<span class="sig-name descname"><span class="pre">getServiceSpecificContractorDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingDetails</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.getServiceSpecificContractorDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Get the service specific details for a contractor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_QualityControl.service.QualityControl.serviceSpecificTasks">
+<span class="sig-name descname"><span class="pre">serviceSpecificTasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validationResults</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.serviceSpecificTasks" title="Link to this definition">¶</a></dt>
+<dd><p>Do service specific tasks</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../../service_AdditiveManufacturing/index.html">code_SemperKI.services.service_AdditiveManufacturing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_QualityControl</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../connections/index.html">code_SemperKI.services.service_QualityControl.connections</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../definitions/index.html">code_SemperKI.services.service_QualityControl.definitions</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../handlers/index.html">code_SemperKI.services.service_QualityControl.handlers</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../imports/index.html">code_SemperKI.services.service_QualityControl.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../logics/index.html">code_SemperKI.services.service_QualityControl.logics</a></li>
+<li class="toctree-l8 current"><a class="current reference internal" href="#">code_SemperKI.services.service_QualityControl.service</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl"><code class="docutils literal notranslate"><span class="pre">QualityControl</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.initializeServiceDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.initializeServiceDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.updateServiceDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.updateServiceDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.deleteServiceDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.deleteServiceDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.isFileRelevantForService"><code class="docutils literal notranslate"><span class="pre">QualityControl.isFileRelevantForService()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.parseServiceDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.parseServiceDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.serviceReady"><code class="docutils literal notranslate"><span class="pre">QualityControl.serviceReady()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.checkIfSelectionIsAvailable"><code class="docutils literal notranslate"><span class="pre">QualityControl.checkIfSelectionIsAvailable()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.cloneServiceDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.cloneServiceDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.calculatePriceForService"><code class="docutils literal notranslate"><span class="pre">QualityControl.calculatePriceForService()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.getFilteredContractors"><code class="docutils literal notranslate"><span class="pre">QualityControl.getFilteredContractors()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.getServiceSpecificContractorDetails"><code class="docutils literal notranslate"><span class="pre">QualityControl.getServiceSpecificContractorDetails()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_QualityControl.service.QualityControl.serviceSpecificTasks"><code class="docutils literal notranslate"><span class="pre">QualityControl.serviceSpecificTasks()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../tests/index.html">code_SemperKI.services.service_QualityControl.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../urls/index.html">code_SemperKI.services.service_QualityControl.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../utilities/index.html">code_SemperKI.services.service_QualityControl.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_QualityControl</a><ul>
+      <li>Previous: <a href="../logics/orgaLogic/index.html" title="previous chapter">code_SemperKI.services.service_QualityControl.logics.orgaLogic</a></li>
+      <li>Next: <a href="../tests/index.html" title="next chapter">code_SemperKI.services.service_QualityControl.tests</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../_sources/autoapi/code_SemperKI/services/service_QualityControl/service/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

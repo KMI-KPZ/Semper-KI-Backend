@@ -20,7 +20,7 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
-class Filter():
+class FilterAM():
     """
     Filter and save results
     

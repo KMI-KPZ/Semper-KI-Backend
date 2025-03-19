@@ -1,0 +1,117 @@
+code_SemperKI.utilities.basics
+==============================
+
+.. py:module:: code_SemperKI.utilities.basics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Basic stuff like decorators and such that is imported in Semper KI
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.basics.testPicture
+   code_SemperKI.utilities.basics.previewNotAvailable
+   code_SemperKI.utilities.basics.previewNotAvailableGER
+   code_SemperKI.utilities.basics.kissLogo
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.basics.VersioningForHandlers
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.basics.manualCheckIfUserMaySeeProject
+   code_SemperKI.utilities.basics.manualCheckIfUserMaySeeProcess
+   code_SemperKI.utilities.basics.checkIfUserMaySeeProcess
+   code_SemperKI.utilities.basics.checkVersion
+
+
+Module Contents
+---------------
+
+.. py:function:: manualCheckIfUserMaySeeProject(session, userID: str, projectID: str) -> bool
+
+   Look for all users of the project and check if they are allowed to see it
+
+   :param userID: The hashID of the user
+   :type userID: str
+   :param projectID: The projectID of the project in question
+   :type projectID: str
+   :return: True if the user belongs to the rightful, false if not
+   :rtype: Bool
+
+
+
+.. py:function:: manualCheckIfUserMaySeeProcess(session, userID: str, processID: str) -> bool
+
+   Look for all users of the process and check if they are allowed to see it
+
+   :param userID: The hashID of the user
+   :type userID: str
+   :param processID: The processID of the process in question
+   :type processID: str
+   :return: True if the user belongs to the rightful, false if not
+   :rtype: Bool
+
+
+
+.. py:function:: checkIfUserMaySeeProcess(json=False)
+
+   Check whether a user may see details about this process or not.
+
+   :param json: Controls if the output is in JSON Format or not
+   :type json: Bool
+   :return: Response whether the user may see the process or not. If so, call the function.
+   :rtype: HTTPRespone/JSONResponse, Func
+
+
+.. py:class:: VersioningForHandlers(allowedVersions)
+
+   Bases: :py:obj:`rest_framework.versioning.AcceptHeaderVersioning`
+
+
+   GET /something/ HTTP/1.1
+   Host: example.com
+   Accept: application/json; version=1.0
+
+
+   .. py:attribute:: allowed_versions
+      :value: ['0.3']
+
+
+
+.. py:function:: checkVersion(version=0.3)
+
+   Checks if the version is supported or not. If not, returns an error message.
+
+   :param version: Version of the API to check if it is supported or not
+   :type version: Float
+   :return: Response whether the version is supported or not
+   :rtype: HTTPRespone
+
+
+.. py:data:: testPicture
+
+.. py:data:: previewNotAvailable
+
+.. py:data:: previewNotAvailableGER
+
+.. py:data:: kissLogo
+

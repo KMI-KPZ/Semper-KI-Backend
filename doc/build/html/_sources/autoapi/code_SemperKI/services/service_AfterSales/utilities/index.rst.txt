@@ -1,0 +1,18 @@
+code_SemperKI.services.service_AfterSales.utilities
+===================================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales.utilities
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_AfterSales/utilities/basics/index
+   /autoapi/code_SemperKI/services/service_AfterSales/utilities/mocks/index
+   /autoapi/code_SemperKI/services/service_AfterSales/utilities/signals/index
+   /autoapi/code_SemperKI/services/service_AfterSales/utilities/sparqlQueries/index
+
+

@@ -138,7 +138,7 @@ class QualityControl(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterQC()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

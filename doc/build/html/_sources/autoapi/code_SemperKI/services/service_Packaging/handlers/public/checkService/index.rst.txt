@@ -1,0 +1,15 @@
+code_SemperKI.services.service_Packaging.handlers.public.checkService
+=====================================================================
+
+.. py:module:: code_SemperKI.services.service_Packaging.handlers.public.checkService
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handlers using simulation to check the processes
+
+
+

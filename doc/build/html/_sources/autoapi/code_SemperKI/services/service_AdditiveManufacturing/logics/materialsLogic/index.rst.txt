@@ -1,0 +1,70 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Logic for the materials
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.appendHelper
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.filterHelper
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.logicForRetrieveMaterialWithFilter
+   code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic.logicForSetMaterial
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: appendHelper(materialEntry: dict, materialsWithSameUID: list[dict], locale: str, materialPrices: dict, output: list)
+
+   Helper function to determine if an entry should be appended to the output list
+
+   :return: True if the entry should be appended, False otherwise
+   :rtype: bool
+
+
+.. py:function:: filterHelper(filterEntry: dict, nodeEntry: dict, nodeProperty: str) -> bool
+
+   Helper function to filter the materials by a property
+
+   :return: None
+   :rtype: None
+
+
+.. py:function:: logicForRetrieveMaterialWithFilter(filters, locale: str) -> tuple[dict | Exception, int]
+
+.. py:function:: logicForSetMaterial(request, validatedInput, functionName) -> tuple[dict | Exception, int]
+
+   Set a material
+
+   :param request: The request
+   :type request: Request
+   :return: The material or Exception and status code
+   :rtype: dict|Exception, int
+
+

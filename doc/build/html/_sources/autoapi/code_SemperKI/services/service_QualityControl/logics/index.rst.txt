@@ -1,0 +1,17 @@
+code_SemperKI.services.service_QualityControl.logics
+====================================================
+
+.. py:module:: code_SemperKI.services.service_QualityControl.logics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_QualityControl/logics/checkServiceLogic/index
+   /autoapi/code_SemperKI/services/service_QualityControl/logics/costs/index
+   /autoapi/code_SemperKI/services/service_QualityControl/logics/orgaLogic/index
+
+

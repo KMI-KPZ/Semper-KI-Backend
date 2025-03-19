@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.utilities.signals`
-=========================================
+code_SemperKI.utilities.signals
+===============================
 
 .. py:module:: code_SemperKI.utilities.signals
 
@@ -13,11 +13,17 @@
 
 
 
-Module Contents
----------------
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.signals.semperKISignalDispatcher
+   code_SemperKI.utilities.signals.semperKISignalReceiver
+
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
@@ -25,16 +31,8 @@ Classes
    code_SemperKI.utilities.signals.SemperKISignalReceivers
 
 
-
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   code_SemperKI.utilities.signals.semperKISignalDispatcher
-   code_SemperKI.utilities.signals.semperKISignalReceiver
-
+Module Contents
+---------------
 
 .. py:class:: SemperKISignalDispatchers
 
@@ -43,46 +41,96 @@ Attributes
 
 
 .. py:data:: semperKISignalDispatcher
-   
-
-   
 
 .. py:class:: SemperKISignalReceivers
 
    Defines signal receivers from other apps
 
 
+
    .. py:method:: receiverForLogin(sender, **kwargs)
       :staticmethod:
 
+
       If a user logged in, what shall be done?
+
 
 
 
    .. py:method:: receiverForLogout(sender, **kwargs)
       :staticmethod:
 
+
       If a user logged out, what shall be done?
+
 
 
 
    .. py:method:: receiverForWebsocketConnect(sender, **kwargs)
       :staticmethod:
 
+
       If websocket connected, what shall be done?
+
 
 
 
    .. py:method:: receiverForWebsocketDisconnect(sender, **kwargs)
       :staticmethod:
 
+
       If websocket disconnected, what shall be done?
 
 
 
 
-.. py:data:: semperKISignalReceiver
-   
+   .. py:method:: receiverForUserCreated(sender, **kwargs)
+      :staticmethod:
 
-   
+
+      If a user gets initialized, set the SemperKI specific details
+
+
+
+   .. py:method:: receiverForUserDetailsUpdate(sender, **kwargs)
+      :staticmethod:
+
+
+      If a user gets updated, set the SemperKI specific details
+
+
+
+   .. py:method:: receiverForOrgaCreated(sender, **kwargs)
+      :staticmethod:
+
+
+      If a user gets initialized, set the SemperKI specific details
+
+
+
+   .. py:method:: receiverForOrgaUpdated(sender, **kwargs)
+      :staticmethod:
+
+
+      If am orga gets updated, set the SemperKI specific details
+
+
+
+   .. py:method:: receiverForOrgaDeleted(sender, **kwargs)
+      :staticmethod:
+
+
+      If an organization is deleted, delete all nodes
+
+
+
+   .. py:method:: receiverForUserDeleted(sender, **kwargs)
+      :staticmethod:
+
+
+      If a user is deleted, do something
+
+
+
+.. py:data:: semperKISignalReceiver
 

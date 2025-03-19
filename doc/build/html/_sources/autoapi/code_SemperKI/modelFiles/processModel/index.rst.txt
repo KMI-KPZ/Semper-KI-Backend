@@ -1,123 +1,84 @@
-:py:mod:`code_SemperKI.modelFiles.processModel`
-===============================================
+code_SemperKI.modelFiles.processModel
+=====================================
 
 .. py:module:: code_SemperKI.modelFiles.processModel
 
-.. autoapi-nested-parse::
-
-   Part of Semper-KI software
-
-   Silvio Weging 2023
-
-   Contains: Model for processes
-
-
-
-Module Contents
----------------
 
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    code_SemperKI.modelFiles.processModel.ProcessDescription
    code_SemperKI.modelFiles.processModel.Process
+   code_SemperKI.modelFiles.processModel.ManyToManySimulation
+   code_SemperKI.modelFiles.processModel.ProcessInterface
 
 
-
+Module Contents
+---------------
 
 .. py:class:: ProcessDescription
 
-   Bases: :py:obj:`code_General.utilities.customStrEnum.StrEnumExactylAsDefined`
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
 
    What makes up a process object for creation in the database
 
 
-   .. py:attribute:: processID
-      
 
-      
+   .. py:attribute:: processID
+
 
    .. py:attribute:: project
-      
 
-      
 
    .. py:attribute:: processDetails
-      
 
-      
 
    .. py:attribute:: processStatus
-      
 
-      
 
    .. py:attribute:: serviceDetails
-      
 
-      
 
    .. py:attribute:: serviceStatus
-      
 
-      
 
    .. py:attribute:: serviceType
-      
 
-      
 
    .. py:attribute:: client
-      
 
-      
 
    .. py:attribute:: contractor
-      
 
-      
 
    .. py:attribute:: files
-      
 
-      
 
    .. py:attribute:: messages
-      
 
-      
 
    .. py:attribute:: dependenciesIn
-      
 
-      
 
    .. py:attribute:: dependenciesOut
-      
 
-      
 
    .. py:attribute:: createdWhen
-      
 
-      
 
    .. py:attribute:: updatedWhen
-      
 
-      
 
    .. py:attribute:: accessedWhen
-      
-
-      
 
 
 .. py:class:: Process(*args, **kwargs)
 
    Bases: :py:obj:`django.db.models.Model`
+
 
    Process management class.
 
@@ -138,100 +99,193 @@ Classes
    :updatedWhen: Date and time at which the entry was updated
    :accessedWhen: Last date and time the entry was fetched from the database, automatically set
 
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: project
+
+
+   .. py:attribute:: processDetails
+
+
+   .. py:attribute:: processStatus
+
+
+   .. py:attribute:: serviceDetails
+
+
+   .. py:attribute:: serviceStatus
+
+
+   .. py:attribute:: serviceType
+
+
+   .. py:attribute:: client
+
+
+   .. py:attribute:: contractor
+
+
+   .. py:attribute:: files
+
+
+   .. py:attribute:: messages
+
+
+   .. py:attribute:: dependenciesIn
+
+
+   .. py:attribute:: dependenciesOut
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
    .. py:class:: Meta
 
       .. py:attribute:: indexes
-         
-
-         
 
 
-   .. py:attribute:: processID
-      
-
-      
-
-   .. py:attribute:: project
-      
-
-      
-
-   .. py:attribute:: processDetails
-      
-
-      
-
-   .. py:attribute:: processStatus
-      
-
-      
-
-   .. py:attribute:: serviceDetails
-      
-
-      
-
-   .. py:attribute:: serviceStatus
-      
-
-      
-
-   .. py:attribute:: serviceType
-      
-
-      
-
-   .. py:attribute:: client
-      
-
-      
-
-   .. py:attribute:: contractor
-      
-
-      
-
-   .. py:attribute:: files
-      
-
-      
-
-   .. py:attribute:: messages
-      
-
-      
-
-   .. py:attribute:: dependenciesIn
-      
-
-      
-
-   .. py:attribute:: dependenciesOut
-      
-
-      
-
-   .. py:attribute:: createdWhen
-      
-
-      
-
-   .. py:attribute:: updatedWhen
-      
-
-      
-
-   .. py:attribute:: accessedWhen
-      
-
-      
 
    .. py:method:: __str__()
 
-      Return str(self).
+
+   .. py:method:: toDict()
+
+
+.. py:class:: ManyToManySimulation
+
+   Simulate a many to many field for session
+
+
+
+   .. py:attribute:: _arrayOfProcesses
+      :value: []
+
+
+
+   .. py:method:: initialize(dependencies: list[str]) -> None
+
+
+   .. py:method:: add(pi: ProcessInterface)
+
+      Add a process interface to the array
+
+
+
+   .. py:method:: all() -> list[str]
+
+      Get array for iteration
+
+
+
+.. py:class:: ProcessInterface(project: code_SemperKI.modelFiles.projectModel.ProjectInterface, processID: str, currentTime: str, client: str)
+
+   Process management class interface.
+
+   :processID: Unique ID for that process, primary key
+   :project: ProjectInterface of project that this process belongs to
+   :processDetails: Name of the process and stuff
+   :processStatus: How everything is going in general
+   :serviceDetails: Details for that service
+   :serviceStatus: How everything is going for the service
+   :serviceType: Which service it is
+   :client: Who started the process
+   :contractor: Who gets to handle it
+   :files: Registrar keeping check, which files are currently there, link to Data model
+   :messages: same as files but for chat messages
+   :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+   :updatedWhen: Date and time at which the entry was updated
+   :accessedWhen: Last date and time the entry was fetched from the database, automatically set
+
+
+   .. py:attribute:: processID
+      :value: ''
+
+
+
+   .. py:attribute:: project
+
+
+   .. py:attribute:: processDetails
+
+
+   .. py:attribute:: processStatus
+      :value: 0
+
+
+
+   .. py:attribute:: serviceDetails
+
+
+   .. py:attribute:: serviceStatus
+      :value: 0
+
+
+
+   .. py:attribute:: serviceType
+      :value: 0
+
+
+
+   .. py:attribute:: dependenciesIn
+
+
+   .. py:attribute:: dependenciesOut
+
+
+   .. py:attribute:: client
+      :value: ''
+
+
+
+   .. py:attribute:: contractor
+      :value: None
+
+
+
+   .. py:attribute:: files
+
+
+   .. py:attribute:: messages
+
+
+   .. py:attribute:: createdWhen
+      :value: ''
+
+
+
+   .. py:attribute:: updatedWhen
+      :value: ''
+
+
+
+   .. py:attribute:: accessedWhen
+      :value: ''
+
+
+
+   .. py:method:: setValues(processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, dependenciedIn, dependenciesOut, updatedWhen, accessedWhen) -> None
+
+      Setter
+
+
 
 
    .. py:method:: toDict()
+
+
+   .. py:method:: save() -> None
+
+      Save to database
+
 
 
 

@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2024
 
 Contains: Abstract interface for content of session and database
+
 """
 
 from abc import ABC, abstractmethod

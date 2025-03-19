@@ -138,7 +138,7 @@ class Assembly(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterA()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         

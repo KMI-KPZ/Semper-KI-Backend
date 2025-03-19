@@ -1,0 +1,123 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics
+=============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging, Mahdi Hedayat Mahmoudi 2024
+
+   Contains: Handler for processing pdfs to json
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.extractTextWithLlamaparse
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.extractTextWithPymupdf
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.extractTextWithPdfplumber
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.printerRole
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.parsePrinterJSONToDBKGFormat
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.parseMaterialJSONToDBKGFormat
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.insertIntoKG
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.convertAndInsertIntoKG
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.logicForPDFPipeline
+   code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics.logicForExtractFromJSON
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: extractTextWithLlamaparse(pdf_stream, fileName='derp.pdf')
+
+   Extract text using LlamaParse.
+   Uses AI to extract text from PDFs.
+
+
+
+.. py:function:: extractTextWithPymupdf(pdf_stream)
+
+   Extract text using PyMuPDF.
+   Worst of the three
+
+
+
+.. py:function:: extractTextWithPdfplumber(pdf_stream)
+
+   Extract text using pdfplumber.
+   Best using no AI
+
+
+
+.. py:function:: printerRole() -> str
+
+   The role for the OpenAI chat interface for printer factsheets
+
+
+
+.. py:function:: parsePrinterJSONToDBKGFormat(jsonData: dict) -> list[dict] | Exception
+
+   Insert JSON data from a printer into KG database format. Since printers have multiple configurations, an array is returned.
+
+   :param jsonData: The extracted data from the factsheet
+   :type jsonData: dict
+   :param category: The category of the factsheet
+   :type category: str
+   :return: The data in KG format
+   :rtype: list[dict]
+
+
+.. py:function:: parseMaterialJSONToDBKGFormat(jsonData: dict) -> dict | Exception
+
+   Insert JSON data (one at a time) into KG database format
+
+   :param jsonData: The extracted data from the factsheet
+   :type jsonData: dict
+   :param category: The category of the factsheet
+   :type category: str
+   :return: The data in KG format
+   :rtype: dict
+
+
+.. py:function:: insertIntoKG(dataDict: dict | list, category: str) -> None | Exception
+
+   Insert extracted data into KG
+
+
+
+.. py:function:: convertAndInsertIntoKG(textContent: str, category: str, gptModel: str, insertIntoKGFlag: bool, listOfJSONs: list) -> None | Exception
+
+   Do the rest
+
+
+
+.. py:function:: logicForPDFPipeline(validatedInput, files)
+
+   Logic for extracting data from uploaded pdf files
+
+
+
+.. py:function:: logicForExtractFromJSON(validatedInput)
+
+   Logic for extracting data from JSON and add it to the KG
+
+
+

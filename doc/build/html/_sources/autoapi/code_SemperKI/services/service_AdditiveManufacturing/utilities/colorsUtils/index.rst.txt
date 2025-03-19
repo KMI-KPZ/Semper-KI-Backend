@@ -1,0 +1,47 @@
+code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Imports the RAL to hex and name color table
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils.logger
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils.getRALDict
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getRALDict()
+
+   Retrieve the RAL color table from the Redis database
+
+   :return: RAL color table
+   :rtype: dict
+
+

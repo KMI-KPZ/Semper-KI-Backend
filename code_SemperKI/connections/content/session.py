@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2024
 
 Contains: Offers an interface to access the session dictionary in a structured way
+
 """
 
 from django.utils import timezone

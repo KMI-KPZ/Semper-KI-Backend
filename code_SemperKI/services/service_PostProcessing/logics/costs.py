@@ -19,7 +19,7 @@ from code_SemperKI.definitions import *
 
 from ..definitions import *
 from ..connections.postgresql import pgKG
-from ..connections.filterViaSparql import Filter
+from ..connections.filterViaSparql import FilterPP
 
 
 logger = logging.getLogger("logToFile")
@@ -38,7 +38,7 @@ class Costs():
     """
 
     ##################################################
-    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:Filter) -> None:
+    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:FilterPP) -> None:
         """
         Gather input variables
 

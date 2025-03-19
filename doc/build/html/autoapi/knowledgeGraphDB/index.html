@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>knowledgeGraphDB &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="BenchyMcMarkface" href="../BenchyMcMarkface/index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-knowledgeGraphDB">
+<span id="knowledgegraphdb"></span><h1>knowledgeGraphDB<a class="headerlink" href="#module-knowledgeGraphDB" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Handlers for handling the database backed knowledge graph</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.logger" title="knowledgeGraphDB.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.loggerError" title="knowledgeGraphDB.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResProperties" title="knowledgeGraphDB.SResProperties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResProperties</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResNode" title="knowledgeGraphDB.SResNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResNode</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode" title="knowledgeGraphDB.SReqCreateNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqCreateNode</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode" title="knowledgeGraphDB.SReqUpdateNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUpdateNode</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SReqTwoNodes" title="knowledgeGraphDB.SReqTwoNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqTwoNodes</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResGraph" title="knowledgeGraphDB.SResGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResGraph</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResInitialNodes" title="knowledgeGraphDB.SResInitialNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResInitialNodes</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResInitialEdges" title="knowledgeGraphDB.SResInitialEdges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResInitialEdges</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SResGraphForFrontend" title="knowledgeGraphDB.SResGraphForFrontend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResGraphForFrontend</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph" title="knowledgeGraphDB.SReqCreateNodeOfGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.SReqGraph" title="knowledgeGraphDB.SReqGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqGraph</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getNode" title="knowledgeGraphDB.getNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNode</span></code></a>(request, nodeID)</p></td>
+<td><p>Return node by id</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.createNode" title="knowledgeGraphDB.createNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createNode</span></code></a>(request)</p></td>
+<td><p>Creates a new node</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.deleteNode" title="knowledgeGraphDB.deleteNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteNode</span></code></a>(request, nodeID)</p></td>
+<td><p>Deletes a node from the graph by ID</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.updateNode" title="knowledgeGraphDB.updateNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateNode</span></code></a>(request)</p></td>
+<td><p>Updates the values of a node</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getNodesByType" title="knowledgeGraphDB.getNodesByType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNodesByType</span></code></a>(request, nodeType)</p></td>
+<td><p>Get all nodes with a certain type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.getNodesByUniqueID" title="knowledgeGraphDB.getNodesByUniqueID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNodesByUniqueID</span></code></a>(request, nodeID)</p></td>
+<td><p>Get all nodes with a certain type</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getNodesByProperty" title="knowledgeGraphDB.getNodesByProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNodesByProperty</span></code></a>(request, property)</p></td>
+<td><p>Get all nodes with a certain property</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.getNodesByTypeAndProperty" title="knowledgeGraphDB.getNodesByTypeAndProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNodesByTypeAndProperty</span></code></a>(request, nodeType, ...)</p></td>
+<td><p>Get all nodes with a certain property</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getEdgesForNode" title="knowledgeGraphDB.getEdgesForNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getEdgesForNode</span></code></a>(request, nodeID)</p></td>
+<td><p>Return all edges belonging to a node</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.getSpecificNeighborsByType" title="knowledgeGraphDB.getSpecificNeighborsByType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getSpecificNeighborsByType</span></code></a>(request, nodeID, nodeType)</p></td>
+<td><p>Retrieve all neighbors of a node with a specific type</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getSpecificNeighborsByProperty" title="knowledgeGraphDB.getSpecificNeighborsByProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getSpecificNeighborsByProperty</span></code></a>(request, nodeID, property)</p></td>
+<td><p>Retrieve all neighbors of a node with a specific property</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.createEdge" title="knowledgeGraphDB.createEdge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createEdge</span></code></a>(request)</p></td>
+<td><p>Creates an edge between two nodes</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.deleteEdge" title="knowledgeGraphDB.deleteEdge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteEdge</span></code></a>(request, nodeID1, nodeID2)</p></td>
+<td><p>Deletes an existing edge</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.getGraph" title="knowledgeGraphDB.getGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGraph</span></code></a>(request)</p></td>
+<td><p>Returns the graph</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.getGraphForFrontend" title="knowledgeGraphDB.getGraphForFrontend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGraphForFrontend</span></code></a>(request)</p></td>
+<td><p>Returns the graph for frontend</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.createGraph" title="knowledgeGraphDB.createGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createGraph</span></code></a>(request)</p></td>
+<td><p>Create a graph from json</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.loadTestGraph" title="knowledgeGraphDB.loadTestGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loadTestGraph</span></code></a>(request)</p></td>
+<td><p>Loads the test graph from the file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#knowledgeGraphDB.loadTestGraphViaAPI" title="knowledgeGraphDB.loadTestGraphViaAPI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loadTestGraphViaAPI</span></code></a>(request)</p></td>
+<td><p>Loads the test graph from the file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#knowledgeGraphDB.deleteGraph" title="knowledgeGraphDB.deleteGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteGraph</span></code></a>(request)</p></td>
+<td><p>Deletes the whole graph</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="knowledgeGraphDB.logger">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#knowledgeGraphDB.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="knowledgeGraphDB.loggerError">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#knowledgeGraphDB.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResProperties" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#knowledgeGraphDB.SResProperties.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#knowledgeGraphDB.SResProperties.key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#knowledgeGraphDB.SResProperties.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#knowledgeGraphDB.SResProperties.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResProperties.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#knowledgeGraphDB.SResProperties.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.uniqueID">
+<span class="sig-name descname"><span class="pre">uniqueID</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.uniqueID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.context" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.createdBy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.clonedFrom">
+<span class="sig-name descname"><span class="pre">clonedFrom</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.clonedFrom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.updatedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResNode.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#knowledgeGraphDB.SResNode.accessedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getNode">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getNode" title="Link to this definition">¶</a></dt>
+<dd><p>Return node by id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SReqCreateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNode.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNode.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNode.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNode.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNode.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNode.context" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNode.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNode.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.createNode">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">createNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.createNode" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a new node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The node with ID</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.deleteNode">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">deleteNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.deleteNode" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes a node from the graph by ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SReqUpdateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.context" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqUpdateNode.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqUpdateNode.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.updateNode">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">updateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.updateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the values of a node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP PATCH</em>) – PATCH Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated node</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getNodesByType">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getNodesByType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getNodesByType" title="Link to this definition">¶</a></dt>
+<dd><p>Get all nodes with a certain type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeType</strong> (<em>str</em>) – The type of the nodes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getNodesByUniqueID">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getNodesByUniqueID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getNodesByUniqueID" title="Link to this definition">¶</a></dt>
+<dd><p>Get all nodes with a certain type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeType</strong> (<em>str</em>) – The type of the nodes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getNodesByProperty">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getNodesByProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getNodesByProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Get all nodes with a certain property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>property</strong> (<em>str</em>) – The property of the nodes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getNodesByTypeAndProperty">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getNodesByTypeAndProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeProperty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getNodesByTypeAndProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Get all nodes with a certain property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeType</strong> (<em>str</em>) – The type of the node</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – The value of the property</p></li>
+<li><p><strong>nodeProperty</strong> (<em>str</em>) – The property of the node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getEdgesForNode">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getEdgesForNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getEdgesForNode" title="Link to this definition">¶</a></dt>
+<dd><p>Return all edges belonging to a node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getSpecificNeighborsByType">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getSpecificNeighborsByType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getSpecificNeighborsByType" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all neighbors of a node with a specific type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+<li><p><strong>nodeType</strong> (<em>str</em>) – The type of the neighbors of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of nodes with the specified type</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getSpecificNeighborsByProperty">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getSpecificNeighborsByProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getSpecificNeighborsByProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all neighbors of a node with a specific property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+<li><p><strong>property</strong> (<em>str</em>) – The property of the neighbors of interest</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of nodes with the specified property</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqTwoNodes">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SReqTwoNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SReqTwoNodes" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqTwoNodes.nodeID1">
+<span class="sig-name descname"><span class="pre">nodeID1</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqTwoNodes.nodeID1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqTwoNodes.nodeID2">
+<span class="sig-name descname"><span class="pre">nodeID2</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqTwoNodes.nodeID2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.createEdge">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">createEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.createEdge" title="Link to this definition">¶</a></dt>
+<dd><p>Creates an edge between two nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Succes or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.deleteEdge">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">deleteEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.deleteEdge" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes an existing edge</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p></li>
+<li><p><strong>nodeID1</strong> (<em>str</em>) – The first node</p></li>
+<li><p><strong>nodeID2</strong> (<em>str</em>) – The second node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraph">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraph.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#knowledgeGraphDB.SResGraph.nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraph.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#knowledgeGraphDB.SResGraph.edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getGraph">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with graph</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialNodes">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResInitialNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResInitialNodes" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialNodes.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#knowledgeGraphDB.SResInitialNodes.id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialNodes.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#knowledgeGraphDB.SResInitialNodes.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialNodes.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#knowledgeGraphDB.SResInitialNodes.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialEdges">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResInitialEdges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResInitialEdges" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialEdges.source">
+<span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#knowledgeGraphDB.SResInitialEdges.source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResInitialEdges.target">
+<span class="sig-name descname"><span class="pre">target</span></span><a class="headerlink" href="#knowledgeGraphDB.SResInitialEdges.target" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraphForFrontend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SResGraphForFrontend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SResGraphForFrontend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraphForFrontend.Nodes">
+<span class="sig-name descname"><span class="pre">Nodes</span></span><a class="headerlink" href="#knowledgeGraphDB.SResGraphForFrontend.Nodes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SResGraphForFrontend.Edges">
+<span class="sig-name descname"><span class="pre">Edges</span></span><a class="headerlink" href="#knowledgeGraphDB.SResGraphForFrontend.Edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.getGraphForFrontend">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">getGraphForFrontend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.getGraphForFrontend" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the graph for frontend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with graph</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SReqCreateNodeOfGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.nodeTempID">
+<span class="sig-name descname"><span class="pre">nodeTempID</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeTempID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.context" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqCreateNodeOfGraph.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqGraph">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">SReqGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.SReqGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqGraph.node">
+<span class="sig-name descname"><span class="pre">node</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqGraph.node" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="knowledgeGraphDB.SReqGraph.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#knowledgeGraphDB.SReqGraph.edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.createGraph">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">createGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.createGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Create a graph from json</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The constructed Graph</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.loadTestGraph">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">loadTestGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.loadTestGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Loads the test graph from the file.
+KEEP THIS, IT’S USED FOR TESTS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.loadTestGraphViaAPI">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">loadTestGraphViaAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.loadTestGraphViaAPI" title="Link to this definition">¶</a></dt>
+<dd><p>Loads the test graph from the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="knowledgeGraphDB.deleteGraph">
+<span class="sig-prename descclassname"><span class="pre">knowledgeGraphDB.</span></span><span class="sig-name descname"><span class="pre">deleteGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#knowledgeGraphDB.deleteGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes the whole graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testResponse/index.html">testResponse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_General/index.html">code_General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../code_SemperKI/index.html">code_SemperKI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">knowledgeGraphDB</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResProperties"><code class="docutils literal notranslate"><span class="pre">SResProperties</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResProperties.name"><code class="docutils literal notranslate"><span class="pre">SResProperties.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResProperties.key"><code class="docutils literal notranslate"><span class="pre">SResProperties.key</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResProperties.value"><code class="docutils literal notranslate"><span class="pre">SResProperties.value</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResProperties.unit"><code class="docutils literal notranslate"><span class="pre">SResProperties.unit</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResProperties.type"><code class="docutils literal notranslate"><span class="pre">SResProperties.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResNode"><code class="docutils literal notranslate"><span class="pre">SResNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.nodeID"><code class="docutils literal notranslate"><span class="pre">SResNode.nodeID</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.uniqueID"><code class="docutils literal notranslate"><span class="pre">SResNode.uniqueID</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.nodeName"><code class="docutils literal notranslate"><span class="pre">SResNode.nodeName</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.nodeType"><code class="docutils literal notranslate"><span class="pre">SResNode.nodeType</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.context"><code class="docutils literal notranslate"><span class="pre">SResNode.context</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.properties"><code class="docutils literal notranslate"><span class="pre">SResNode.properties</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.createdBy"><code class="docutils literal notranslate"><span class="pre">SResNode.createdBy</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.clonedFrom"><code class="docutils literal notranslate"><span class="pre">SResNode.clonedFrom</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.active"><code class="docutils literal notranslate"><span class="pre">SResNode.active</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.createdWhen"><code class="docutils literal notranslate"><span class="pre">SResNode.createdWhen</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.updatedWhen"><code class="docutils literal notranslate"><span class="pre">SResNode.updatedWhen</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResNode.accessedWhen"><code class="docutils literal notranslate"><span class="pre">SResNode.accessedWhen</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getNode"><code class="docutils literal notranslate"><span class="pre">getNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode"><code class="docutils literal notranslate"><span class="pre">SReqCreateNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode.nodeName"><code class="docutils literal notranslate"><span class="pre">SReqCreateNode.nodeName</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode.nodeType"><code class="docutils literal notranslate"><span class="pre">SReqCreateNode.nodeType</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode.context"><code class="docutils literal notranslate"><span class="pre">SReqCreateNode.context</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNode.properties"><code class="docutils literal notranslate"><span class="pre">SReqCreateNode.properties</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.createNode"><code class="docutils literal notranslate"><span class="pre">createNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.deleteNode"><code class="docutils literal notranslate"><span class="pre">deleteNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.nodeID"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.nodeID</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.nodeName"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.nodeName</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.nodeType"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.nodeType</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.context"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.context</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.active"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.active</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqUpdateNode.properties"><code class="docutils literal notranslate"><span class="pre">SReqUpdateNode.properties</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.updateNode"><code class="docutils literal notranslate"><span class="pre">updateNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getNodesByType"><code class="docutils literal notranslate"><span class="pre">getNodesByType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getNodesByUniqueID"><code class="docutils literal notranslate"><span class="pre">getNodesByUniqueID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getNodesByProperty"><code class="docutils literal notranslate"><span class="pre">getNodesByProperty()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getNodesByTypeAndProperty"><code class="docutils literal notranslate"><span class="pre">getNodesByTypeAndProperty()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getEdgesForNode"><code class="docutils literal notranslate"><span class="pre">getEdgesForNode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getSpecificNeighborsByType"><code class="docutils literal notranslate"><span class="pre">getSpecificNeighborsByType()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getSpecificNeighborsByProperty"><code class="docutils literal notranslate"><span class="pre">getSpecificNeighborsByProperty()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SReqTwoNodes"><code class="docutils literal notranslate"><span class="pre">SReqTwoNodes</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqTwoNodes.nodeID1"><code class="docutils literal notranslate"><span class="pre">SReqTwoNodes.nodeID1</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqTwoNodes.nodeID2"><code class="docutils literal notranslate"><span class="pre">SReqTwoNodes.nodeID2</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.createEdge"><code class="docutils literal notranslate"><span class="pre">createEdge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.deleteEdge"><code class="docutils literal notranslate"><span class="pre">deleteEdge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResGraph"><code class="docutils literal notranslate"><span class="pre">SResGraph</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResGraph.nodes"><code class="docutils literal notranslate"><span class="pre">SResGraph.nodes</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResGraph.edges"><code class="docutils literal notranslate"><span class="pre">SResGraph.edges</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getGraph"><code class="docutils literal notranslate"><span class="pre">getGraph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResInitialNodes"><code class="docutils literal notranslate"><span class="pre">SResInitialNodes</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResInitialNodes.id"><code class="docutils literal notranslate"><span class="pre">SResInitialNodes.id</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResInitialNodes.name"><code class="docutils literal notranslate"><span class="pre">SResInitialNodes.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResInitialNodes.type"><code class="docutils literal notranslate"><span class="pre">SResInitialNodes.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResInitialEdges"><code class="docutils literal notranslate"><span class="pre">SResInitialEdges</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResInitialEdges.source"><code class="docutils literal notranslate"><span class="pre">SResInitialEdges.source</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResInitialEdges.target"><code class="docutils literal notranslate"><span class="pre">SResInitialEdges.target</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SResGraphForFrontend"><code class="docutils literal notranslate"><span class="pre">SResGraphForFrontend</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResGraphForFrontend.Nodes"><code class="docutils literal notranslate"><span class="pre">SResGraphForFrontend.Nodes</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SResGraphForFrontend.Edges"><code class="docutils literal notranslate"><span class="pre">SResGraphForFrontend.Edges</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.getGraphForFrontend"><code class="docutils literal notranslate"><span class="pre">getGraphForFrontend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeID"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.nodeID</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeTempID"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.nodeTempID</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeName"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.nodeName</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.nodeType"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.nodeType</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.context"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.context</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.active"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.active</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqCreateNodeOfGraph.properties"><code class="docutils literal notranslate"><span class="pre">SReqCreateNodeOfGraph.properties</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.SReqGraph"><code class="docutils literal notranslate"><span class="pre">SReqGraph</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqGraph.node"><code class="docutils literal notranslate"><span class="pre">SReqGraph.node</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#knowledgeGraphDB.SReqGraph.edges"><code class="docutils literal notranslate"><span class="pre">SReqGraph.edges</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.createGraph"><code class="docutils literal notranslate"><span class="pre">createGraph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.loadTestGraph"><code class="docutils literal notranslate"><span class="pre">loadTestGraph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.loadTestGraphViaAPI"><code class="docutils literal notranslate"><span class="pre">loadTestGraphViaAPI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#knowledgeGraphDB.deleteGraph"><code class="docutils literal notranslate"><span class="pre">deleteGraph()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">API Reference</a><ul>
+      <li>Previous: <a href="../BenchyMcMarkface/index.html" title="previous chapter">BenchyMcMarkface</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../_sources/autoapi/knowledgeGraphDB/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

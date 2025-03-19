@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.connections.content.postgresql.pgKnowledgeGraph &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.connections.content.postgresql.pgProcesses" href="../pgProcesses/index.html" />
+    <link rel="prev" title="code_SemperKI.connections.content.postgresql" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.connections.content.postgresql.pgKnowledgeGraph">
+<span id="code-semperki-connections-content-postgresql-pgknowledgegraph"></span><h1>code_SemperKI.connections.content.postgresql.pgKnowledgeGraph<a class="headerlink" href="#module-code_SemperKI.connections.content.postgresql.pgKnowledgeGraph" title="Link to this heading">¶</a></h1>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerConsole</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerPerformance</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Basics</span></code></a></p></td>
+<td><p>Basis access to the model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic" title="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Logic</span></code></a></p></td>
+<td><p>Everything that requires some calculation or logic behind it</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">loggerConsole</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">loggerPerformance</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">Basics</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics" title="Link to this definition">¶</a></dt>
+<dd><p>Basis access to the model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNode" title="Link to this definition">¶</a></dt>
+<dd><p>Gets a node by ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Node or Error</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node">Node</a>|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">information</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">createdBy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">defaultOwner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">existingNodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createNode" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>information</strong> (<em>dict</em>) – What the node contains right from the start</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Created Node or Error</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node">Node</a>|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">copyNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><span class="pre">Node</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">createdBy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">defaultOwner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyNode" title="Link to this definition">¶</a></dt>
+<dd><p>Copy an existing node, therefore giving it a new creator and nodeiD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><em>Node</em></a>) – The existing node</p></li>
+<li><p><strong>createdBy</strong> (<em>str</em>) – Who ordered the copy (usually an organization)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New Node</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node">Node</a>|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyGraphForNewOwner">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">copyGraphForNewOwner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">createdBy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">defaultOwner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyGraphForNewOwner" title="Link to this definition">¶</a></dt>
+<dd><p>Copy the whole graph for another owner</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>createdBy</strong> (<em>str</em>) – The new owner</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createOrganizationNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createOrganizationNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orgaID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createOrganizationNode" title="Link to this definition">¶</a></dt>
+<dd><p>Create a node for an organization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>orgaID</strong> (<em>str</em>) – The ID of the organization</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteAllNodesFromOrganization">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteAllNodesFromOrganization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orgaID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteAllNodesFromOrganization" title="Link to this definition">¶</a></dt>
+<dd><p>Gather all nodes belonging to an organization and delete them</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>orgaID</strong> (<em>str</em>) – The ID of the organization</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.updateNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">updateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">information</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.updateNode" title="Link to this definition">¶</a></dt>
+<dd><p>This function updates the given node with the given information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeID</strong> (<em>str</em>) – the id of the node</p></li>
+<li><p><strong>information</strong> (<em>dict</em>) – the information to update</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated node or Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node">Node</a>|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteNode" title="Link to this definition">¶</a></dt>
+<dd><p>Delete the node via ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None | Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getEdgesForNode">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getEdgesForNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getEdgesForNode" title="Link to this definition">¶</a></dt>
+<dd><p>Return all neighbors to a node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all neighbors and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getIfEdgeExists">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getIfEdgeExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node1ID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2ID</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getIfEdgeExists" title="Link to this definition">¶</a></dt>
+<dd><p>Return if an edge exists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node1ID</strong> (<em>str</em>) – The id of the first node</p></li>
+<li><p><strong>node2ID</strong> (<em>str</em>) – The id of the second node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If edge exists or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createEdge">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createEdge" title="Link to this definition">¶</a></dt>
+<dd><p>links two nodes together.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeID1</strong> (<em>str</em>) – nodeID1 ID of the first node.</p></li>
+<li><p><strong>nodeID2</strong> (<em>str</em>) – nodeID2 ID of the second node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None | Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteEdge">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteEdge" title="Link to this definition">¶</a></dt>
+<dd><p>deletes the edge between two nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeID1</strong> (<em>str</em>) – nodeID1 ID of the first node.</p></li>
+<li><p><strong>nodeID2</strong> (<em>str</em>) – nodeID2 ID of the second node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None | Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByType">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNodesByType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByType" title="Link to this definition">¶</a></dt>
+<dd><p>Return all nodes with a given type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodeType</strong> (<em>str</em>) – The type of the node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all nodes and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSystemNodesByType">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getSystemNodesByType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSystemNodesByType" title="Link to this definition">¶</a></dt>
+<dd><p>Return all nodes with a given type from the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodeType</strong> (<em>str</em>) – The type of the node</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all nodes and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByProperty">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNodesByProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Return all nodes with a given property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>property</strong> (<em>str</em>) – A specific property</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all nodes and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndProperty">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNodesByTypeAndProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeProperty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Return all nodes of a given type with a certain property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeType</strong> (<em>str</em>) – The node type</p></li>
+<li><p><strong>nodeProperty</strong> (<em>str</em>) – A specific property</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all nodes and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndPropertyAndValue">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNodesByTypeAndPropertyAndValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeProperty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndPropertyAndValue" title="Link to this definition">¶</a></dt>
+<dd><p>Return all nodes of a given type with a certain property
+UNUSED</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeType</strong> (<em>str</em>) – The node type</p></li>
+<li><p><strong>nodeProperty</strong> (<em>str</em>) – A specific property</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – The value that is searched</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all nodes and their info</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByType">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getSpecificNeighborsByType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborNodeType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByType" title="Link to this definition">¶</a></dt>
+<dd><p>Return all neighbors that have the specified neighborNodeType</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeID</strong> (<em>str</em>) – The ID of the node to look for neighbors</p></li>
+<li><p><strong>neighborNodeType</strong> (<em>str</em>) – The type of neighbor that we want to find</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of neighbors</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByProperty">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getSpecificNeighborsByProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborProperty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByProperty" title="Link to this definition">¶</a></dt>
+<dd><p>Return all neighbors that have the specified neighborNodeType</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodeID</strong> (<em>str</em>) – The ID of the node to look for neighbors</p></li>
+<li><p><strong>neighborProperty</strong> (<em>str</em>) – The type of neighbor that we want to find</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of neighbors</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getAllNodesThatShareTheUniqueID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uniqueID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID" title="Link to this definition">¶</a></dt>
+<dd><p>Gather all nodes that share a unique ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>uniqueID</strong> (<em>str</em>) – The ID that is unique across all copies</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of nodes in dict format</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict] | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getGraph">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">createdBy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowedNodeTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Return the whole graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The graph as Dictionary of nodes and edges</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createGraph">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Create graph from input</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>graph</strong> (<em>list</em><em> of </em><em>the nodes and their edges</em>) – The graph</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Created Graph or Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteGraph">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteGraph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Delete the whole graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None or Exception</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.</span></span><span class="sig-name descname"><span class="pre">Logic</span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic" title="Link to this definition">¶</a></dt>
+<dd><p>Everything that requires some calculation or logic behind it</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfPropertyIsSimilar">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkIfPropertyIsSimilar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfPropertyIsSimilar" title="Link to this definition">¶</a></dt>
+<dd><p>Check if two properties are similar</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkAndUpdateProperties">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkAndUpdateProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propertiesToCompareTo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkAndUpdateProperties" title="Link to this definition">¶</a></dt>
+<dd><p>Check if properties are similar or not. If so, update them if necessary. Return both the properties and if they are similar</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.similarityHelper">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">similarityHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listOfNodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><span class="pre">Node</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.similarityHelper" title="Link to this definition">¶</a></dt>
+<dd><p>Helper function for the similarity check</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listOfNodes</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – List of nodes to check for similarity</p></li>
+<li><p><strong>node</strong> (<a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><em>Node</em></a>) – The node to which the similarity is checked</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If a similar node was found or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfSimilarNodeExists">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkIfSimilarNodeExists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../../../modelFiles/nodesModel/index.html#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><span class="pre">Node</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfSimilarNodeExists" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a similar node already exists</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../index.html">code_SemperKI.connections</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../../../cmem/index.html">code_SemperKI.connections.cmem</a></li>
+<li class="toctree-l6 current"><a class="reference internal" href="../../index.html">code_SemperKI.connections.content</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../../abstractInterface/index.html">code_SemperKI.connections.content.abstractInterface</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../manageContent/index.html">code_SemperKI.connections.content.manageContent</a></li>
+<li class="toctree-l8 current"><a class="reference internal" href="../index.html">code_SemperKI.connections.content.postgresql</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="current reference internal" href="#">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph</a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole"><code class="docutils literal notranslate"><span class="pre">loggerConsole</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance"><code class="docutils literal notranslate"><span class="pre">loggerPerformance</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics"><code class="docutils literal notranslate"><span class="pre">Basics</span></code></a><ul>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNode"><code class="docutils literal notranslate"><span class="pre">Basics.getNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createNode"><code class="docutils literal notranslate"><span class="pre">Basics.createNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyNode"><code class="docutils literal notranslate"><span class="pre">Basics.copyNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.copyGraphForNewOwner"><code class="docutils literal notranslate"><span class="pre">Basics.copyGraphForNewOwner()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createOrganizationNode"><code class="docutils literal notranslate"><span class="pre">Basics.createOrganizationNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteAllNodesFromOrganization"><code class="docutils literal notranslate"><span class="pre">Basics.deleteAllNodesFromOrganization()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.updateNode"><code class="docutils literal notranslate"><span class="pre">Basics.updateNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteNode"><code class="docutils literal notranslate"><span class="pre">Basics.deleteNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getEdgesForNode"><code class="docutils literal notranslate"><span class="pre">Basics.getEdgesForNode()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getIfEdgeExists"><code class="docutils literal notranslate"><span class="pre">Basics.getIfEdgeExists()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createEdge"><code class="docutils literal notranslate"><span class="pre">Basics.createEdge()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteEdge"><code class="docutils literal notranslate"><span class="pre">Basics.deleteEdge()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByType"><code class="docutils literal notranslate"><span class="pre">Basics.getNodesByType()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSystemNodesByType"><code class="docutils literal notranslate"><span class="pre">Basics.getSystemNodesByType()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByProperty"><code class="docutils literal notranslate"><span class="pre">Basics.getNodesByProperty()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndProperty"><code class="docutils literal notranslate"><span class="pre">Basics.getNodesByTypeAndProperty()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getNodesByTypeAndPropertyAndValue"><code class="docutils literal notranslate"><span class="pre">Basics.getNodesByTypeAndPropertyAndValue()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByType"><code class="docutils literal notranslate"><span class="pre">Basics.getSpecificNeighborsByType()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getSpecificNeighborsByProperty"><code class="docutils literal notranslate"><span class="pre">Basics.getSpecificNeighborsByProperty()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getAllNodesThatShareTheUniqueID"><code class="docutils literal notranslate"><span class="pre">Basics.getAllNodesThatShareTheUniqueID()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.getGraph"><code class="docutils literal notranslate"><span class="pre">Basics.getGraph()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.createGraph"><code class="docutils literal notranslate"><span class="pre">Basics.createGraph()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics.deleteGraph"><code class="docutils literal notranslate"><span class="pre">Basics.deleteGraph()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic"><code class="docutils literal notranslate"><span class="pre">Logic</span></code></a><ul>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfPropertyIsSimilar"><code class="docutils literal notranslate"><span class="pre">Logic.checkIfPropertyIsSimilar()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkAndUpdateProperties"><code class="docutils literal notranslate"><span class="pre">Logic.checkAndUpdateProperties()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.similarityHelper"><code class="docutils literal notranslate"><span class="pre">Logic.similarityHelper()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic.checkIfSimilarNodeExists"><code class="docutils literal notranslate"><span class="pre">Logic.checkIfSimilarNodeExists()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="../pgProcesses/index.html">code_SemperKI.connections.content.postgresql.pgProcesses</a></li>
+<li class="toctree-l10"><a class="reference internal" href="../pgProfilesSKI/index.html">code_SemperKI.connections.content.postgresql.pgProfilesSKI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../session/index.html">code_SemperKI.connections.content.session</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../coypu/index.html">code_SemperKI.connections.coypu</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../openai/index.html">code_SemperKI.connections.openai</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.connections</a><ul>
+  <li><a href="../../index.html">code_SemperKI.connections.content</a><ul>
+  <li><a href="../index.html">code_SemperKI.connections.content.postgresql</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">code_SemperKI.connections.content.postgresql</a></li>
+      <li>Next: <a href="../pgProcesses/index.html" title="next chapter">code_SemperKI.connections.content.postgresql.pgProcesses</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../_sources/autoapi/code_SemperKI/connections/content/postgresql/pgKnowledgeGraph/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

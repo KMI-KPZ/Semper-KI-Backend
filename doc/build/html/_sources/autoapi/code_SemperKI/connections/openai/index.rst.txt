@@ -1,0 +1,62 @@
+code_SemperKI.connections.openai
+================================
+
+.. py:module:: code_SemperKI.connections.openai
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging, Mahdi Hedayat Mahmoudi 2024
+
+   Contains: Calls to "Open"AI API
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.openai.logger
+   code_SemperKI.connections.openai.openaiManager
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.openai.OpenAIManager
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.openai.callChatInterface
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: OpenAIManager
+
+   Manage openAI client
+
+
+
+   .. py:attribute:: client
+
+
+.. py:data:: openaiManager
+
+.. py:function:: callChatInterface(gptModel: str, factsheet: str, roleOfSystem: str, responseFormat) -> dict
+
+   Send messages to the message api and gather response
+
+
+

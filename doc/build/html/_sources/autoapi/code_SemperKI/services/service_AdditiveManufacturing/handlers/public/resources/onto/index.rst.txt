@@ -1,0 +1,367 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto
+===================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Calls to ontology for adding and retrieving data
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.SReqNodeFEAdmin
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.SReqEdgesFEAdmin
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.SReqCreateOrUpdateAndLinkAdmin
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.SReqOntoCreateEdge
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getGraph
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getResources
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getNodeViaID
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getNodesByUniqueID
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getAssociatedResources
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_getNeighbors
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_addNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_createOrUpdateAndLinkNodes
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_updateNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_deleteNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_addEdge
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_removeEdge
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto.onto_createMaterialTypeNodes
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: onto_getGraph(request: rest_framework.request.Request)
+
+   Returns the graph for frontend
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with graph
+   :rtype: Response
+
+
+
+.. py:function:: onto_getResources(request: rest_framework.request.Request, resourceType: str)
+
+   Gathers all available resources of a certain type from the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with resource of the type available
+   :rtype: JSON Response
+
+
+
+.. py:function:: onto_getNodeViaID(request: rest_framework.request.Request, nodeID: str)
+
+   Retrieve all info about a node via its ID
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Json
+   :rtype: Response
+
+
+
+.. py:function:: onto_getNodesByUniqueID(request: rest_framework.request.Request, nodeID: str)
+
+   Get all nodes with a certain type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeType: The type of the nodes
+   :type nodeType: str
+   :return: list of nodes
+   :rtype: Response
+
+
+
+.. py:function:: onto_getAssociatedResources(request: rest_framework.request.Request, nodeID: str, resourceType: str)
+
+   Gather neighboring resources of a certain type from the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with resource of the type available
+   :rtype: JSON Response
+
+
+
+.. py:function:: onto_getNeighbors(request: rest_framework.request.Request, nodeID: str)
+
+   Gather all neighbors of a node inside an orga from the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with neighbors
+   :rtype: JSON Response
+
+
+
+.. py:function:: onto_addNode(request: rest_framework.request.Request)
+
+   Creates a new node
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: The node with ID
+   :rtype: Response
+
+
+
+.. py:class:: SReqNodeFEAdmin(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: properties
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: active
+
+
+.. py:class:: SReqEdgesFEAdmin(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: create
+
+
+   .. py:attribute:: delete
+
+
+.. py:class:: SReqCreateOrUpdateAndLinkAdmin(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: node
+
+
+   .. py:attribute:: edges
+
+
+.. py:function:: onto_createOrUpdateAndLinkNodes(request: rest_framework.request.Request)
+
+   Combined access for frontend to create and update together with linking
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: JSON
+   :rtype: Response
+
+
+
+.. py:function:: onto_updateNode(request: rest_framework.request.Request)
+
+   Updates the values of a node
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: The updated node
+   :rtype: Response
+
+
+
+.. py:function:: onto_deleteNode(request: rest_framework.request.Request, nodeID: str)
+
+   Deletes a node from the graph by ID
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:class:: SReqOntoCreateEdge(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: entityIDs
+
+
+.. py:function:: onto_addEdge(request: rest_framework.request.Request)
+
+   Links two things in the knowledge graph
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Succes or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: onto_removeEdge(request: rest_framework.request.Request, entity1ID: str, entity2ID: str)
+
+   Remove the connection of two entities
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param entity1ID: The ID of the first thing
+   :type entity1ID: str
+   :param entity2ID: The ID of the second thing
+   :type entity2ID: str
+   :return: Success or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: onto_createMaterialTypeNodes(request: rest_framework.request.Request)
+
+   Create material type nodes from existing materials
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Success or not
+   :rtype: Response
+
+
+

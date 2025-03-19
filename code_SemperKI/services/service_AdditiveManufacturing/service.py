@@ -142,7 +142,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         # filter by choice of material, post-processings, build plate, etc...
         
-        filteredContractors = Filter()
+        filteredContractors = FilterAM()
 
         outDict = filteredContractors.getFilteredContractors(processObj)
         if isinstance(outDict, Exception):

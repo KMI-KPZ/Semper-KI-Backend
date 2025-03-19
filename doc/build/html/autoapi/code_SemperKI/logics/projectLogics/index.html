@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.logics.projectLogics &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="code_SemperKI.logics.statemachineLogics" href="../statemachineLogics/index.html" />
+    <link rel="prev" title="code_SemperKI.logics.processLogics" href="../processLogics/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.logics.projectLogics">
+<span id="code-semperki-logics-projectlogics"></span><h1>code_SemperKI.logics.projectLogics<a class="headerlink" href="#module-code_SemperKI.logics.projectLogics" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Logic for the projects</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logger" title="code_SemperKI.logics.projectLogics.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.loggerError" title="code_SemperKI.logics.projectLogics.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetFlatProjects" title="code_SemperKI.logics.projectLogics.logicForGetFlatProjects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForGetFlatProjects</span></code></a>(→ tuple[dict | Exception, int])</p></td>
+<td><p>Get the projects for the dashboard</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard" title="code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForGetProjectForDashboard</span></code></a>(...)</p></td>
+<td><p>Get the full project</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetProject" title="code_SemperKI.logics.projectLogics.logicForGetProject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForGetProject</span></code></a>(request, projectID, functionName)</p></td>
+<td><p>Get the full project but with flat processes</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForCreateProjectID" title="code_SemperKI.logics.projectLogics.logicForCreateProjectID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForCreateProjectID</span></code></a>(request, validatedInput, ...)</p></td>
+<td><p>Create a project and return its ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForUpdateProject" title="code_SemperKI.logics.projectLogics.logicForUpdateProject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForUpdateProject</span></code></a>(request, validatedInput, ...)</p></td>
+<td><p>Update a project</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForDeleteProjects" title="code_SemperKI.logics.projectLogics.logicForDeleteProjects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForDeleteProjects</span></code></a>(request, functionName)</p></td>
+<td><p>Delete projects</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForSaveProjects" title="code_SemperKI.logics.projectLogics.logicForSaveProjects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForSaveProjects</span></code></a>(session)</p></td>
+<td><p>Save the projects to the session</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForGetFlatProjects">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForGetFlatProjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForGetFlatProjects" title="Link to this definition">¶</a></dt>
+<dd><p>Get the projects for the dashboard</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The projects or Exception and status code</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict|Exception, int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForGetProjectForDashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard" title="Link to this definition">¶</a></dt>
+<dd><p>Get the full project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>WSGIRequest</em>) – The request</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – The project ID</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – The name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The project</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[dict, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForGetProject">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForGetProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForGetProject" title="Link to this definition">¶</a></dt>
+<dd><p>Get the full project but with flat processes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>WSGIRequest</em>) – The request</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – The project ID</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – The name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The project</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[dict, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForCreateProjectID">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForCreateProjectID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validatedInput</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForCreateProjectID" title="Link to this definition">¶</a></dt>
+<dd><p>Create a project and return its ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>WSGIRequest</em>) – The request</p></li>
+<li><p><strong>validatedInput</strong> (<em>dict</em>) – The validated input</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – The name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The project ID</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[dict|Exception, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForUpdateProject">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForUpdateProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validatedInput</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForUpdateProject" title="Link to this definition">¶</a></dt>
+<dd><p>Update a project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>WSGIRequest</em>) – The request</p></li>
+<li><p><strong>validatedInput</strong> (<em>dict</em>) – The validated input</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – The name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing or exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[None|Exception, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForDeleteProjects">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForDeleteProjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForDeleteProjects" title="Link to this definition">¶</a></dt>
+<dd><p>Delete projects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>WSGIRequest</em>) – The request</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – The name of the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing or exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[None|Exception, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.projectLogics.logicForSaveProjects">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.projectLogics.</span></span><span class="sig-name descname"><span class="pre">logicForSaveProjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.projectLogics.logicForSaveProjects" title="Link to this definition">¶</a></dt>
+<dd><p>Save the projects to the session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session</strong> (<em>dict</em>) – The session</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">code_SemperKI.logics</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../filesLogics/index.html">code_SemperKI.logics.filesLogics</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../processLogics/index.html">code_SemperKI.logics.processLogics</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">code_SemperKI.logics.projectLogics</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetFlatProjects"><code class="docutils literal notranslate"><span class="pre">logicForGetFlatProjects()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard"><code class="docutils literal notranslate"><span class="pre">logicForGetProjectForDashboard()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForGetProject"><code class="docutils literal notranslate"><span class="pre">logicForGetProject()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForCreateProjectID"><code class="docutils literal notranslate"><span class="pre">logicForCreateProjectID()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForUpdateProject"><code class="docutils literal notranslate"><span class="pre">logicForUpdateProject()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForDeleteProjects"><code class="docutils literal notranslate"><span class="pre">logicForDeleteProjects()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.projectLogics.logicForSaveProjects"><code class="docutils literal notranslate"><span class="pre">logicForSaveProjects()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../statemachineLogics/index.html">code_SemperKI.logics.statemachineLogics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">code_SemperKI</a><ul>
+  <li><a href="../index.html">code_SemperKI.logics</a><ul>
+      <li>Previous: <a href="../processLogics/index.html" title="previous chapter">code_SemperKI.logics.processLogics</a></li>
+      <li>Next: <a href="../statemachineLogics/index.html" title="next chapter">code_SemperKI.logics.statemachineLogics</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/code_SemperKI/logics/projectLogics/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

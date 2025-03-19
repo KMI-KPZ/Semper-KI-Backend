@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
 """
 import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined

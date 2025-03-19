@@ -1,0 +1,583 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handling of model files
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: mbbDimensionsSerializer(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: _1
+
+
+   .. py:attribute:: _2
+
+
+   .. py:attribute:: _3
+
+
+.. py:class:: MeasurementsSerializer(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: surfaceArea
+
+
+   .. py:attribute:: mbbDimensions
+
+
+   .. py:attribute:: mbbVolume
+
+
+.. py:class:: SResCheckModel(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: filename
+
+
+   .. py:attribute:: measurements
+
+
+   .. py:attribute:: status_code
+
+
+.. py:function:: checkModel(request: rest_framework.request.Request, projectID: str, processID: str, fileID: str)
+
+   Calculate model properties like boundary and volume
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with dimensions and such
+   :rtype: JSON Response
+
+
+
+.. py:class:: SReqUploadModels(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: details
+
+
+   .. py:attribute:: origin
+
+
+   .. py:attribute:: file
+
+
+.. py:function:: uploadModels(request: rest_framework.request.Request)
+
+   File upload for multiple files.
+   TODO: Verify files, python-magic could help, or https://github.com/mbourqui/django-constrainedfilefield as well as https://stackoverflow.com/questions/20272579/django-validate-file-type-of-uploaded-file
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Response with information about the file
+   :rtype: Response
+
+
+
+.. py:class:: SReqUploadWithoutFile(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: levelOfDetail
+
+
+   .. py:attribute:: width
+
+
+   .. py:attribute:: height
+
+
+   .. py:attribute:: length
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: quantity
+
+
+   .. py:attribute:: tags
+
+
+   .. py:attribute:: origin
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: complexity
+
+
+.. py:function:: uploadModelWithoutFile(request: rest_framework.request.Request)
+
+   Upload a model but without the file
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Success or not
+   :rtype: HTTPResponse
+
+
+
+.. py:class:: SReqUploadModelsFromRepo(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: model
+
+
+   .. py:attribute:: origin
+
+
+.. py:function:: uploadFromRepository(request: rest_framework.request.Request)
+
+   Upload a model from the repository
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Successful or not
+   :rtype: Response
+
+
+
+.. py:class:: SReqUpdateModel(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: levelOfDetail
+
+
+   .. py:attribute:: quantity
+
+
+   .. py:attribute:: isFile
+
+
+   .. py:attribute:: tags
+
+
+   .. py:attribute:: licenses
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: fileName
+
+
+   .. py:attribute:: complexity
+
+
+   .. py:attribute:: width
+
+
+   .. py:attribute:: height
+
+
+   .. py:attribute:: length
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: scalingFactor
+
+
+   .. py:attribute:: femRequested
+
+
+   .. py:attribute:: testType
+
+
+   .. py:attribute:: pressure
+
+
+.. py:function:: updateModel(request: rest_framework.request.Request)
+
+   Update a model
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: deleteModel(request: rest_framework.request.Request, projectID: str, processID: str, groupID: str, fileID: str)
+
+   Delete the model and the file with it, if not done already
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :return: Successful or not
+   :rtype: Response
+
+
+
+.. py:class:: SResRepoContent(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: license
+
+
+   .. py:attribute:: preview
+
+
+   .. py:attribute:: file
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: tags
+
+
+   .. py:attribute:: levelOfDetail
+
+
+   .. py:attribute:: complexity
+
+
+   .. py:attribute:: size
+
+
+.. py:class:: SResModelRepository(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: repository
+
+
+.. py:function:: getModelRepository(request: rest_framework.request.Request)
+
+   Get previews and file names of 3D models from our curated repository
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with names of files, link to preview files and link to files themselves
+   :rtype: JSON Response
+
+
+
