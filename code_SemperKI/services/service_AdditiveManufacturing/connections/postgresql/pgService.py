@@ -9,7 +9,7 @@ Contains: Functions specific for 3D printing service that access the database di
 from Generic_Backend.code_General.definitions import FileObjectContent
 from code_SemperKI.modelFiles.processModel import Process, ProcessInterface
 
-from ...definitions import ServiceDetails
+from ...definitions import ServiceDetails, MaterialDetails, PostProcessDetails
 import logging
 logger = logging.getLogger("errors")
 
@@ -277,4 +277,30 @@ def cloneServiceDetails(existingContent:dict, newProcess:Process|ProcessInterfac
     
     return outDict
 
+###################################################
+def getSearchableDetails(existingContent:dict) -> list:
+    """
+    Get the searchable details for the frontend
+
+    :param existingContent: What the process currently holds about the service
+    :type existingContent: dict
+    :return: The searchable details
+    :rtype: list
+
+    """
+    outList = []
+    if ServiceDetails.groups not in existingContent:
+        return outList
+    for group in existingContent[ServiceDetails.groups]:
+        if ServiceDetails.models in group:
+            for model in group[ServiceDetails.models]:
+                outList.append(group[ServiceDetails.models][model][FileObjectContent.fileName])
+        if ServiceDetails.material in group and MaterialDetails.title in group[ServiceDetails.material]:
+            outList.append(group[ServiceDetails.material][MaterialDetails.title])
+        if ServiceDetails.postProcessings in group:
+            for postProcessing in group[ServiceDetails.postProcessings]:
+                if PostProcessDetails.title in group[ServiceDetails.postProcessings][postProcessing]:
+                    outList.append(group[ServiceDetails.postProcessings][postProcessing][PostProcessDetails.title])
+
+    return outList
     

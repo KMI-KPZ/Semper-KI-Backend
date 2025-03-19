@@ -137,6 +137,14 @@ class ServiceBase(ABC):
 
         """
 
+    ###################################################
+    @abstractmethod
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+
 ###################################################
 class ServicesStructure(StrEnumExactlyAsDefined):
     """

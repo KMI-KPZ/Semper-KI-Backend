@@ -11,7 +11,7 @@ import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails, ValidationSteps, ValidationInformationForFrontend
 
-from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
+from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails, getSearchableDetails as AM_getSearchableDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
 from .definitions import SERVICE_NAME, SERVICE_NUMBER, ServiceSpecificDetailsForContractors
@@ -172,6 +172,15 @@ class AdditiveManufacturing(Semper.ServiceBase):
         else:
             validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: False, "groups": resultDict[ServiceDetails.groups]}
         return validationResults
+    
+    ###################################################
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+        return AM_getSearchableDetails(existingContent)
+
 
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing(), settings.STATIC_URL+"media/AM.png")

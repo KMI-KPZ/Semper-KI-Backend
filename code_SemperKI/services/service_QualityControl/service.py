@@ -159,5 +159,13 @@ class QualityControl(Semper.ServiceBase):
 
         """
         return {}
+    
+    ###################################################
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+        return []
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl(), settings.STATIC_URL+"media/QC.png")
