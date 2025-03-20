@@ -243,6 +243,8 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                     transformed = True
                     # transform to stl
                     model = transformSTPtoSTL(model, nameOfFile)
+                    if model is None:
+                        return (Exception(f"Error while transforming file {nameOfFile}"), 500)
                     modelSize = model.__sizeof__()
                     nameOfFile = nameOfFile.split(".")[0] + ".stl"
                     if isinstance(model, Exception):

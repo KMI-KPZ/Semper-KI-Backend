@@ -125,8 +125,6 @@ class TestAdditiveManufacturing(TestCase):
         self.createUser(client)
         projectObj, processObj = self.createProjectAndProcess(client)
 
-        # TODO set stuff so that the service is complete
-
         # set service type to 1
         changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
         response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
@@ -181,8 +179,8 @@ class TestAdditiveManufacturing(TestCase):
         getProcPathSplit = paths["getProcess"][0].split("/")
         getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         response = json.loads(client.get("/"+getProcPath).content)
-        self.assertIs("processStatusButtons" in response and len(response["processStatusButtons"]) > 0 and "action" in response["processStatusButtons"][2], True, f'{response}')
-        buttonData = response["processStatusButtons"][2]["action"]["data"]
+        self.assertIs("processStatusButtons" in response and len(response["processStatusButtons"]) > 0 and "action" in response["processStatusButtons"][-1], True, f'{response}')
+        buttonData = response["processStatusButtons"][-1]["action"]["data"]
         button = {"buttonData":buttonData, "projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]]}
         response = client.post("/"+paths["statusButtonRequest"][0], json.dumps(button), content_type="application/json")
         self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")

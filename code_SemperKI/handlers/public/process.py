@@ -485,7 +485,7 @@ def getContractors(request:Request, processID:str):
     try:
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface() # checks not needed for rights, was done in the decorators
-        processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
+        processObj = interface.getProcessObj("", processID) # Login was required here so projectID is not necessary
         if processObj is None:
             raise Exception("Process ID not found in session or db")
  
