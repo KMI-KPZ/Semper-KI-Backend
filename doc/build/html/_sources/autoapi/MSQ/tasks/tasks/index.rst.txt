@@ -1,0 +1,31 @@
+MSQ.tasks.tasks
+===============
+
+.. py:module:: MSQ.tasks.tasks
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   MSQ.tasks.tasks.dummy
+   MSQ.tasks.tasks.callfTetWild
+
+
+Module Contents
+---------------
+
+.. py:function:: dummy(a: int, b: str)
+
+.. py:function:: callfTetWild(inputFilePath: str)
+
+   Call fTetWild library to convert stl mesh to tetrahedral mesh
+
+   :param inputFilePath: Path to STL file
+   :type inputFilePath: str
+   :return: The resulting mesh file
+   :rtype: BytesIO file 
+
+
+

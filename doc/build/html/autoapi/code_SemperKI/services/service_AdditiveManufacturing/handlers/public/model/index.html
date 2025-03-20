@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings" href="../postProcessings/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials" href="../materials/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model">
+<span id="code-semperki-services-service-additivemanufacturing-handlers-public-model"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Handling of model files</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mbbDimensionsSerializer</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MeasurementsSerializer</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResCheckModel</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUploadModels</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUploadWithoutFile</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqUpdateModel</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResRepoContent</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResModelRepository</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkModel</span></code></a>(request, projectID, processID, fileID)</p></td>
+<td><p>Calculate model properties like boundary and volume</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uploadModels</span></code></a>(request)</p></td>
+<td><p>File upload for multiple files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uploadModelWithoutFile</span></code></a>(request)</p></td>
+<td><p>Upload a model but without the file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uploadFromRepository</span></code></a>(request)</p></td>
+<td><p>Upload a model from the repository</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updateModel</span></code></a>(request)</p></td>
+<td><p>Update a model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deleteModel</span></code></a>(request, projectID, processID, groupID, fileID)</p></td>
+<td><p>Delete the model and the file with it, if not done already</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getModelRepository</span></code></a>(request)</p></td>
+<td><p>Get previews and file names of 3D models from our curated repository</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">mbbDimensionsSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._1">
+<span class="sig-name descname"><span class="pre">_1</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._2">
+<span class="sig-name descname"><span class="pre">_2</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._3">
+<span class="sig-name descname"><span class="pre">_3</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">MeasurementsSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.surfaceArea">
+<span class="sig-name descname"><span class="pre">surfaceArea</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.surfaceArea" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbDimensions">
+<span class="sig-name descname"><span class="pre">mbbDimensions</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbDimensions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbVolume">
+<span class="sig-name descname"><span class="pre">mbbVolume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbVolume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SResCheckModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.filename" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.measurements">
+<span class="sig-name descname"><span class="pre">measurements</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.measurements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.status_code">
+<span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.status_code" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">checkModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate model properties like boundary and volume</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with dimensions and such</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SReqUploadModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.details">
+<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.details" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.origin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.file">
+<span class="sig-name descname"><span class="pre">file</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">uploadModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels" title="Link to this definition">¶</a></dt>
+<dd><p>File upload for multiple files.
+TODO: Verify files, python-magic could help, or <a class="reference external" href="https://github.com/mbourqui/django-constrainedfilefield">https://github.com/mbourqui/django-constrainedfilefield</a> as well as <a class="reference external" href="https://stackoverflow.com/questions/20272579/django-validate-file-type-of-uploaded-file">https://stackoverflow.com/questions/20272579/django-validate-file-type-of-uploaded-file</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response with information about the file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SReqUploadWithoutFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.levelOfDetail">
+<span class="sig-name descname"><span class="pre">levelOfDetail</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.levelOfDetail" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.width" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.height" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.length">
+<span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.quantity">
+<span class="sig-name descname"><span class="pre">quantity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.quantity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.tags" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.origin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.complexity">
+<span class="sig-name descname"><span class="pre">complexity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.complexity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">uploadModelWithoutFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile" title="Link to this definition">¶</a></dt>
+<dd><p>Upload a model but without the file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTPResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SReqUploadModelsFromRepo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.origin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">uploadFromRepository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository" title="Link to this definition">¶</a></dt>
+<dd><p>Upload a model from the repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Successful or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SReqUpdateModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.processID">
+<span class="sig-name descname"><span class="pre">processID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.processID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.levelOfDetail">
+<span class="sig-name descname"><span class="pre">levelOfDetail</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.levelOfDetail" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.quantity">
+<span class="sig-name descname"><span class="pre">quantity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.quantity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.isFile">
+<span class="sig-name descname"><span class="pre">isFile</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.isFile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.tags" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.licenses">
+<span class="sig-name descname"><span class="pre">licenses</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.licenses" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.fileName">
+<span class="sig-name descname"><span class="pre">fileName</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.fileName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.complexity">
+<span class="sig-name descname"><span class="pre">complexity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.complexity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.width" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.height" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.length">
+<span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.scalingFactor">
+<span class="sig-name descname"><span class="pre">scalingFactor</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.scalingFactor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.femRequested">
+<span class="sig-name descname"><span class="pre">femRequested</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.femRequested" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.testType">
+<span class="sig-name descname"><span class="pre">testType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.testType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.pressure">
+<span class="sig-name descname"><span class="pre">pressure</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.pressure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">updateModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel" title="Link to this definition">¶</a></dt>
+<dd><p>Update a model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP PATCH</em>) – PATCH Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">deleteModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel" title="Link to this definition">¶</a></dt>
+<dd><p>Delete the model and the file with it, if not done already</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Successful or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SResRepoContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.license">
+<span class="sig-name descname"><span class="pre">license</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.license" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.preview">
+<span class="sig-name descname"><span class="pre">preview</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.preview" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.file">
+<span class="sig-name descname"><span class="pre">file</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.tags" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.levelOfDetail">
+<span class="sig-name descname"><span class="pre">levelOfDetail</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.levelOfDetail" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.complexity">
+<span class="sig-name descname"><span class="pre">complexity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.complexity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.size">
+<span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">SResModelRepository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository.repository">
+<span class="sig-name descname"><span class="pre">repository</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository.repository" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.</span></span><span class="sig-name descname"><span class="pre">getModelRepository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository" title="Link to this definition">¶</a></dt>
+<dd><p>Get previews and file names of 3D models from our curated repository</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with names of files, link to preview files and link to files themselves</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../../../connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l8 current"><a class="reference internal" href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul class="current">
+<li class="toctree-l11 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l12"><a class="reference internal" href="../checkService/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../costs/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../filter/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.filter</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../materials/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials</a></li>
+<li class="toctree-l12 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model</a><ul>
+<li class="toctree-l13"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l13"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l13"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l13"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer"><code class="docutils literal notranslate"><span class="pre">mbbDimensionsSerializer</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._1"><code class="docutils literal notranslate"><span class="pre">mbbDimensionsSerializer._1</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._2"><code class="docutils literal notranslate"><span class="pre">mbbDimensionsSerializer._2</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.mbbDimensionsSerializer._3"><code class="docutils literal notranslate"><span class="pre">mbbDimensionsSerializer._3</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer"><code class="docutils literal notranslate"><span class="pre">MeasurementsSerializer</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.volume"><code class="docutils literal notranslate"><span class="pre">MeasurementsSerializer.volume</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.surfaceArea"><code class="docutils literal notranslate"><span class="pre">MeasurementsSerializer.surfaceArea</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbDimensions"><code class="docutils literal notranslate"><span class="pre">MeasurementsSerializer.mbbDimensions</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.MeasurementsSerializer.mbbVolume"><code class="docutils literal notranslate"><span class="pre">MeasurementsSerializer.mbbVolume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel"><code class="docutils literal notranslate"><span class="pre">SResCheckModel</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.filename"><code class="docutils literal notranslate"><span class="pre">SResCheckModel.filename</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.measurements"><code class="docutils literal notranslate"><span class="pre">SResCheckModel.measurements</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResCheckModel.status_code"><code class="docutils literal notranslate"><span class="pre">SResCheckModel.status_code</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.checkModel"><code class="docutils literal notranslate"><span class="pre">checkModel()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.projectID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.projectID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.processID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.processID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.groupID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.groupID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.details"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.details</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.origin"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.origin</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModels.file"><code class="docutils literal notranslate"><span class="pre">SReqUploadModels.file</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModels"><code class="docutils literal notranslate"><span class="pre">uploadModels()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.projectID"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.projectID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.processID"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.processID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.groupID"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.groupID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.levelOfDetail"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.levelOfDetail</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.width"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.width</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.height"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.height</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.length"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.length</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.volume"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.volume</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.quantity"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.quantity</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.tags"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.tags</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.origin"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.origin</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.name"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.name</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadWithoutFile.complexity"><code class="docutils literal notranslate"><span class="pre">SReqUploadWithoutFile.complexity</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadModelWithoutFile"><code class="docutils literal notranslate"><span class="pre">uploadModelWithoutFile()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.projectID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo.projectID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.processID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo.processID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.groupID"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo.groupID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.model"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo.model</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUploadModelsFromRepo.origin"><code class="docutils literal notranslate"><span class="pre">SReqUploadModelsFromRepo.origin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.uploadFromRepository"><code class="docutils literal notranslate"><span class="pre">uploadFromRepository()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.projectID"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.projectID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.processID"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.processID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.groupID"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.groupID</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.id"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.id</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.levelOfDetail"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.levelOfDetail</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.quantity"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.quantity</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.isFile"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.isFile</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.tags"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.tags</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.licenses"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.licenses</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.certificates"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.certificates</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.fileName"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.fileName</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.complexity"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.complexity</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.width"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.width</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.height"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.height</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.length"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.length</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.volume"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.volume</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.scalingFactor"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.scalingFactor</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.femRequested"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.femRequested</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.testType"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.testType</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SReqUpdateModel.pressure"><code class="docutils literal notranslate"><span class="pre">SReqUpdateModel.pressure</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.updateModel"><code class="docutils literal notranslate"><span class="pre">updateModel()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.deleteModel"><code class="docutils literal notranslate"><span class="pre">deleteModel()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent"><code class="docutils literal notranslate"><span class="pre">SResRepoContent</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.name"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.name</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.license"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.license</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.preview"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.preview</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.file"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.file</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.certificates"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.certificates</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.tags"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.tags</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.levelOfDetail"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.levelOfDetail</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.complexity"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.complexity</span></code></a></li>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResRepoContent.size"><code class="docutils literal notranslate"><span class="pre">SResRepoContent.size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository"><code class="docutils literal notranslate"><span class="pre">SResModelRepository</span></code></a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.SResModelRepository.repository"><code class="docutils literal notranslate"><span class="pre">SResModelRepository.repository</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model.getModelRepository"><code class="docutils literal notranslate"><span class="pre">getModelRepository()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l12"><a class="reference internal" href="../postProcessings/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../resources/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul>
+      <li>Previous: <a href="../materials/index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials</a></li>
+      <li>Next: <a href="../postProcessings/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/model/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

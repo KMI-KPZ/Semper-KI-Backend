@@ -1,0 +1,31 @@
+code_SemperKI.services.service_PostProcessing.handlers.public.resources.kgDBPP
+==============================================================================
+
+.. py:module:: code_SemperKI.services.service_PostProcessing.handlers.public.resources.kgDBPP
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: General handlers for the AM knowledge graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_PostProcessing.handlers.public.resources.kgDBPP.logger
+   code_SemperKI.services.service_PostProcessing.handlers.public.resources.kgDBPP.loggerError
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+

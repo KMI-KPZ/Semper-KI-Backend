@@ -1,0 +1,49 @@
+code_SemperKI.services.service_AdditiveManufacturing.utilities.stpToStl
+=======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.utilities.stpToStl
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Transform a STEP file to an STL file
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.stpToStl.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.stpToStl.transformSTPtoSTL
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:function:: transformSTPtoSTL(stpFile: django.core.files.uploadedfile.InMemoryUploadedFile, fileName: str) -> io.BytesIO | Exception
+
+   Transform a STEP file to an STL file
+
+   :param stpFile: The STEP file
+   :type stpFile: InMemoryUploadedFile
+   :param fileName: The name of the file
+   :type fileName: str
+   :return: The STL file
+   :rtype: BytesIO|Exception
+
+
+

@@ -1,0 +1,60 @@
+code_SemperKI.services.service_AdditiveManufacturing.utilities.signals
+======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.utilities.signals
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Signals send by the other apps which relate to the Additive Manufacturing service
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.signals.additiveManufacturingSignalReceiver
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.signals.AdditiveManufacturingSignalReceivers
+
+
+Module Contents
+---------------
+
+.. py:class:: AdditiveManufacturingSignalReceivers
+
+   Defines signal receivers from other apps
+
+
+
+   .. py:method:: receiverForOrgaServiceSelection(sender, **kwargs)
+      :staticmethod:
+
+
+      If an organization selects a service, what shall be done?
+
+
+
+
+   .. py:method:: receiverForOrgaServiceDeletion(sender, **kwargs)
+      :staticmethod:
+
+
+      If an organization deletes a service, what shall be done?
+
+
+
+
+.. py:data:: additiveManufacturingSignalReceiver
+

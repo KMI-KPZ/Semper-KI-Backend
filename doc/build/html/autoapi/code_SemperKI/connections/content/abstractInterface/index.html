@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.connections.content.abstractInterface &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.connections.content.manageContent" href="../manageContent/index.html" />
+    <link rel="prev" title="code_SemperKI.connections.content" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.connections.content.abstractInterface">
+<span id="code-semperki-connections-content-abstractinterface"></span><h1>code_SemperKI.connections.content.abstractInterface<a class="headerlink" href="#module-code_SemperKI.connections.content.abstractInterface" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Abstract interface for content of session and database</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface" title="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AbstractContentInterface</span></code></a></p></td>
+<td><p>Abstract class with functions that session and postgres interfaces have to comply to</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.connections.content.abstractInterface.</span></span><span class="sig-name descname"><span class="pre">AbstractContentInterface</span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract class with functions that session and postgres interfaces have to comply to</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getSession">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getSession</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getSession" title="Link to this definition">¶</a></dt>
+<dd><p>Get the session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The session</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Django session obj(dict)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProject">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProject" title="Link to this definition">¶</a></dt>
+<dd><p>Create the project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p></li>
+<li><p><strong>client</strong> (<em>str</em>) – anonymous client, necessary for interface</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectObj">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProjectObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectObj" title="Link to this definition">¶</a></dt>
+<dd><p>Return the project and all its details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Project Object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../modelFiles/projectModel/index.html#code_SemperKI.modelFiles.projectModel.ProjectInterface" title="code_SemperKI.modelFiles.projectModel.ProjectInterface">ProjectInterface</a> | <a class="reference internal" href="../../../modelFiles/projectModel/index.html#code_SemperKI.modelFiles.projectModel.Project" title="code_SemperKI.modelFiles.projectModel.Project">Project</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProject">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProject" title="Link to this definition">¶</a></dt>
+<dd><p>Get info about one project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projectID</strong> (<em>str</em>) – ID of the project</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict with info about that project</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProject">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">updateProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../definitions/index.html#code_SemperKI.definitions.ProjectUpdates" title="code_SemperKI.definitions.ProjectUpdates"><span class="pre">code_SemperKI.definitions.ProjectUpdates</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProject" title="Link to this definition">¶</a></dt>
+<dd><p>Change details of an project like its status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – project ID that this project belongs to</p></li>
+<li><p><strong>updateType</strong> (<em>EnumUpdates</em>) – changed project details</p></li>
+<li><p><strong>content</strong> (<em>json dict</em>) – changed project, can be many stuff</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag if it worked or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProject">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProject" title="Link to this definition">¶</a></dt>
+<dd><p>Delete specific project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projectID</strong> (<em>str</em>) – unique project ID to be deleted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag if it worked or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectsFlat">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProjectsFlat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectsFlat" title="Link to this definition">¶</a></dt>
+<dd><p>Get all projects for that user but with limited detail.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session</strong> (<em>dict</em>) – session of that user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sorted list with projects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProcess">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Create the process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process</p></li>
+<li><p><strong>client</strong> (<em>str</em>) – anonymous client, necessary for interface</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcess">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process and all its details as dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing the process</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessObj">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProcessObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessObj" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process and all its details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Process Object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface">ProcessInterface</a> | <a class="reference internal" href="../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process">Process</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessDependencies">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getProcessDependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessDependencies" title="Link to this definition">¶</a></dt>
+<dd><p>Return the process dependencies</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Incoming and outgoing dependencies</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list,list]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProcess">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processObj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Delete specific process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processID</strong> (<em>str</em>) – unique process ID to be deleted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag if it worked or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProcess">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">updateProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../definitions/index.html#code_SemperKI.definitions.ProcessUpdates" title="code_SemperKI.definitions.ProcessUpdates"><span class="pre">code_SemperKI.definitions.ProcessUpdates</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updatedBy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Change details of a process like its status, or save communication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – Project that this process belongs to</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – unique processID to be edited</p></li>
+<li><p><strong>updateType</strong> (<em>EnumUpdates</em>) – changed process details</p></li>
+<li><p><strong>content</strong> (<em>json dict</em>) – changed process, can be many stuff</p></li>
+<li><p><strong>updatedBy</strong> (<em>str</em>) – ID of the person who updated the process (for history)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Content that is relevant to an event</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[str,dict] | Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteFromProcess">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteFromProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../definitions/index.html#code_SemperKI.definitions.ProcessUpdates" title="code_SemperKI.definitions.ProcessUpdates"><span class="pre">code_SemperKI.definitions.ProcessUpdates</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deletedBy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteFromProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Delete details of a process like its status, or content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – Project that this process belongs to</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – unique process ID to be edited</p></li>
+<li><p><strong>updateType</strong> (<em>EnumUpdates</em>) – changed process details</p></li>
+<li><p><strong>content</strong> (<em>json dict</em>) – deletions</p></li>
+<li><p><strong>deletedBy</strong> (<em>str</em>) – ID of the person who deleted from the process (for history)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag if it worked or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getUserID">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getUserID</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getUserID" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve UserID from session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>UserID</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.checkIfFilesAreRemote">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkIfFilesAreRemote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.checkIfFilesAreRemote" title="Link to this definition">¶</a></dt>
+<dd><p>If at least one file is remote, say so to trigger upload to remote for new files as well</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projectID</strong> (<em>str</em>) – The ID of the project that the process is part of</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – The ID of the process in question</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if remote, false if local</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getData">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processObj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getData" title="Link to this definition">¶</a></dt>
+<dd><p>Get all data associated with the process (aka history).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processID</strong> (<em>str</em>) – process ID for a process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of all data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createDataEntry">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">createDataEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">typeOfData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">createdBy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IDofData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createDataEntry" title="Link to this definition">¶</a></dt>
+<dd><p>Create an entry in the Data table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dict in JSON</em>) – The data itself</p></li>
+<li><p><strong>dataID</strong> (<em>Str</em>) – The ID of that date</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – process it belongs to</p></li>
+<li><p><strong>typeOfData</strong> (<a class="reference internal" href="../../../definitions/index.html#code_SemperKI.definitions.DataType" title="code_SemperKI.definitions.DataType"><em>DataType</em></a>) – The type of this data</p></li>
+<li><p><strong>createdBy</strong> (<em>Str</em>) – Who created it (hashed ID)</p></li>
+<li><p><strong>details</strong> (<em>JSON Dict</em>) – Some metadata</p></li>
+<li><p><strong>IDofData</strong> (<em>Str</em>) – If the data has an id, save it</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">code_SemperKI.connections</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../../cmem/index.html">code_SemperKI.connections.cmem</a></li>
+<li class="toctree-l6 current"><a class="reference internal" href="../index.html">code_SemperKI.connections.content</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8 current"><a class="current reference internal" href="#">code_SemperKI.connections.content.abstractInterface</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getSession"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getSession()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProject"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.createProject()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectObj"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProjectObj()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProject"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProject()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProject"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.updateProject()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProject"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.deleteProject()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProjectsFlat"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProjectsFlat()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createProcess"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.createProcess()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcess"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProcess()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessObj"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProcessObj()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getProcessDependencies"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getProcessDependencies()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteProcess"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.deleteProcess()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.updateProcess"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.updateProcess()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.deleteFromProcess"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.deleteFromProcess()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getUserID"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getUserID()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.checkIfFilesAreRemote"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.checkIfFilesAreRemote()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.getData"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.getData()</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.connections.content.abstractInterface.AbstractContentInterface.createDataEntry"><code class="docutils literal notranslate"><span class="pre">AbstractContentInterface.createDataEntry()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../manageContent/index.html">code_SemperKI.connections.content.manageContent</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../postgresql/index.html">code_SemperKI.connections.content.postgresql</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../session/index.html">code_SemperKI.connections.content.session</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../coypu/index.html">code_SemperKI.connections.coypu</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../openai/index.html">code_SemperKI.connections.openai</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../index.html">code_SemperKI.connections</a><ul>
+  <li><a href="../index.html">code_SemperKI.connections.content</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">code_SemperKI.connections.content</a></li>
+      <li>Next: <a href="../manageContent/index.html" title="next chapter">code_SemperKI.connections.content.manageContent</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../_sources/autoapi/code_SemperKI/connections/content/abstractInterface/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

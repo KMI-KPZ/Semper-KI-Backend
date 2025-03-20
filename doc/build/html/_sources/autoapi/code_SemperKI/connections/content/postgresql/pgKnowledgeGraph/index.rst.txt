@@ -1,0 +1,421 @@
+code_SemperKI.connections.content.postgresql.pgKnowledgeGraph
+=============================================================
+
+.. py:module:: code_SemperKI.connections.content.postgresql.pgKnowledgeGraph
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.logger
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerConsole
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerError
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.loggerPerformance
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Basics
+   code_SemperKI.connections.content.postgresql.pgKnowledgeGraph.Logic
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerConsole
+
+.. py:data:: loggerError
+
+.. py:data:: loggerPerformance
+
+.. py:class:: Basics
+
+   Basis access to the model
+
+
+
+   .. py:method:: getNode(nodeID: str)
+      :staticmethod:
+
+
+      Gets a node by ID
+
+      :param nodeID: The id of the node
+      :type nodeID: str
+      :return: Node or Error
+      :rtype: Node|Exception  
+
+
+
+   .. py:method:: createNode(information: dict, createdBy=defaultOwner, existingNodeID: str = '')
+      :staticmethod:
+
+
+      Creates a node
+
+      :param information: What the node contains right from the start
+      :type information: dict
+      :return: Created Node or Error
+      :rtype: Node|Exception
+
+
+
+
+   .. py:method:: copyNode(node: Node, createdBy: str = defaultOwner)
+      :staticmethod:
+
+
+      Copy an existing node, therefore giving it a new creator and nodeiD
+
+      :param node: The existing node
+      :type node: Node
+      :param createdBy: Who ordered the copy (usually an organization)
+      :type createdBy: str
+      :return: New Node
+      :rtype: Node|Exception
+
+
+
+
+   .. py:method:: copyGraphForNewOwner(createdBy: str = defaultOwner)
+      :staticmethod:
+
+
+      Copy the whole graph for another owner
+
+      :param createdBy: The new owner
+      :type createdBy: str
+      :return: None
+      :rtype: None | Exception
+
+
+
+   .. py:method:: createOrganizationNode(orgaID: str)
+      :staticmethod:
+
+
+      Create a node for an organization
+
+      :param orgaID: The ID of the organization
+      :type orgaID: str
+      :return: None
+      :rtype: None
+
+
+
+
+   .. py:method:: deleteAllNodesFromOrganization(orgaID: str)
+      :staticmethod:
+
+
+      Gather all nodes belonging to an organization and delete them
+
+      :param orgaID: The ID of the organization
+      :type orgaID: str
+      :return: None
+      :rtype: None
+
+
+
+
+   .. py:method:: updateNode(nodeID: str, information: dict)
+      :staticmethod:
+
+
+      This function updates the given node with the given information
+
+      :param nodeID: the id of the node
+      :type nodeID: str
+      :param information: the information to update
+      :type information: dict
+      :return: The updated node or Exception
+      :rtype: Node|Exception
+
+
+
+   .. py:method:: deleteNode(nodeID: str)
+      :staticmethod:
+
+
+      Delete the node via ID
+
+      :param nodeID: The id of the node
+      :type nodeID: str
+      :return: None | Exception
+      :rtype: None | Exception
+
+
+
+
+   .. py:method:: getEdgesForNode(nodeID: str) -> list[dict]
+      :staticmethod:
+
+
+      Return all neighbors to a node
+
+      :param nodeID: The id of the node
+      :type nodeID: str
+      :return: List with all neighbors and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getIfEdgeExists(node1ID: str, node2ID) -> bool
+      :staticmethod:
+
+
+      Return if an edge exists
+
+      :param node1ID: The id of the first node
+      :type node1ID: str
+      :param node2ID: The id of the second node
+      :type node2ID: str
+      :return: If edge exists or not
+      :rtype: bool
+
+
+
+
+   .. py:method:: createEdge(nodeID1: str, nodeID2: str)
+      :staticmethod:
+
+
+      links two nodes together.
+
+      :param nodeID1: nodeID1 ID of the first node.
+      :type nodeID1: str
+      :param nodeID2: nodeID2 ID of the second node.
+      :type nodeID2: str
+      :return: None | Exception
+      :rtype: None | Exception
+
+
+
+   .. py:method:: deleteEdge(nodeID1: str, nodeID2: str)
+      :staticmethod:
+
+
+      deletes the edge between two nodes.
+
+      :param nodeID1: nodeID1 ID of the first node.
+      :type nodeID1: str
+      :param nodeID2: nodeID2 ID of the second node.
+      :type nodeID2: str
+      :return: None | Exception
+      :rtype: None | Exception
+
+
+
+   .. py:method:: getNodesByType(nodeType: str) -> list[dict]
+      :staticmethod:
+
+
+      Return all nodes with a given type
+
+      :param nodeType: The type of the node
+      :type nodeType: str
+      :return: List with all nodes and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getSystemNodesByType(nodeType: str) -> list[dict]
+      :staticmethod:
+
+
+      Return all nodes with a given type from the system
+
+      :param nodeType: The type of the node
+      :type nodeType: str
+      :return: List with all nodes and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getNodesByProperty(property: str) -> list[dict]
+      :staticmethod:
+
+
+      Return all nodes with a given property
+
+      :param property: A specific property
+      :type property: str
+      :return: List with all nodes and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getNodesByTypeAndProperty(nodeType: str, nodeProperty: str)
+      :staticmethod:
+
+
+      Return all nodes of a given type with a certain property
+
+      :param nodeType: The node type
+      :type nodeType: str
+      :param nodeProperty: A specific property
+      :type nodeProperty: str
+      :return: List with all nodes and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getNodesByTypeAndPropertyAndValue(nodeType: str, nodeProperty: str, value: str)
+      :staticmethod:
+
+
+      Return all nodes of a given type with a certain property
+      UNUSED
+
+      :param nodeType: The node type
+      :type nodeType: str
+      :param nodeProperty: A specific property
+      :type nodeProperty: str
+      :param value: The value that is searched
+      :type value: str
+      :return: List with all nodes and their info
+      :rtype: list of dicts
+
+
+
+
+   .. py:method:: getSpecificNeighborsByType(nodeID: str, neighborNodeType: str) -> list[dict] | Exception
+      :staticmethod:
+
+
+      Return all neighbors that have the specified neighborNodeType
+
+      :param nodeID: The ID of the node to look for neighbors
+      :type nodeID: str
+      :param neighborNodeType: The type of neighbor that we want to find
+      :type neighborNodeType: str
+      :return: list of neighbors
+      :rtype: list    
+
+
+
+   .. py:method:: getSpecificNeighborsByProperty(nodeID: str, neighborProperty: str)
+      :staticmethod:
+
+
+      Return all neighbors that have the specified neighborNodeType
+
+      :param nodeID: The ID of the node to look for neighbors
+      :type nodeID: str
+      :param neighborProperty: The type of neighbor that we want to find
+      :type neighborProperty: str
+      :return: list of neighbors
+      :rtype: list    
+
+
+
+   .. py:method:: getAllNodesThatShareTheUniqueID(uniqueID: str)
+      :staticmethod:
+
+
+      Gather all nodes that share a unique ID
+
+      :param uniqueID: The ID that is unique across all copies
+      :type uniqueID: str
+      :return: list of nodes in dict format
+      :rtype: list[dict] | Exception
+
+
+
+
+   .. py:method:: getGraph(createdBy='', allowedNodeTypes: list[str] = [])
+      :staticmethod:
+
+
+      Return the whole graph
+
+      :return: The graph as Dictionary of nodes and edges
+      :rtype: Dict | Exception
+
+
+
+   .. py:method:: createGraph(graph: list)
+      :staticmethod:
+
+
+      Create graph from input
+
+      :param graph: The graph
+      :type graph: list of the nodes and their edges
+      :return: Created Graph or Exception
+      :rtype: Dict | Exception
+
+
+
+   .. py:method:: deleteGraph()
+      :staticmethod:
+
+
+      Delete the whole graph
+
+      :return: None or Exception
+      :rtype: None | Exception
+
+
+
+.. py:class:: Logic
+
+   Everything that requires some calculation or logic behind it
+
+
+
+   .. py:method:: checkIfPropertyIsSimilar(property1: dict, property2: dict) -> bool | None
+      :staticmethod:
+
+
+      Check if two properties are similar
+
+
+
+
+   .. py:method:: checkAndUpdateProperties(properties: dict, propertiesToCompareTo: dict) -> tuple[bool, float, list[dict] | Exception]
+      :staticmethod:
+
+
+      Check if properties are similar or not. If so, update them if necessary. Return both the properties and if they are similar
+
+
+
+
+   .. py:method:: similarityHelper(listOfNodes: list[dict], node: Node) -> bool | Exception
+      :staticmethod:
+
+
+      Helper function for the similarity check
+
+      :param listOfNodes: List of nodes to check for similarity
+      :type listOfNodes: list[dict]
+      :param node: The node to which the similarity is checked
+      :type node: Node
+      :return: If a similar node was found or not
+      :rtype: bool | Exception
+
+
+
+
+   .. py:method:: checkIfSimilarNodeExists(nodeID: str) -> Node | Exception
+      :staticmethod:
+
+
+      Check if a similar node already exists
+
+
+
+

@@ -1,25 +1,28 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>API Reference &#8212; KISS-backend 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MSQ" href="MSQ/index.html" />
+    <link rel="prev" title="Welcome to the documentation of the backend of Semper-KI!" href="../index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -32,185 +35,614 @@
           <div class="body" role="main">
             
   <section id="api-reference">
-<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading">¶</a></h1>
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
 <p>This page contains auto-generated API reference documentation <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="manage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">manage</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="quickDebug/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">quickDebug</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="BenchyMcMarkface/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">BenchyMcMarkface</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="code_General/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code_General/connections/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/connections/postgresql/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.postgresql</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_General/connections/postgresql/pgProfiles/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.postgresql.pgProfiles</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="MSQ/index.html">MSQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="MSQ/handlers/index.html">MSQ.handlers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="MSQ/handlers/interface/index.html">MSQ.handlers.interface</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/connections/auth0/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.auth0</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/connections/mailer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.mailer</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/connections/redis/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.redis</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/connections/s3/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.connections.s3</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="MSQ/module/index.html">MSQ.module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="MSQ/module/celery/index.html">MSQ.module.celery</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/handlers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/admin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.admin</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/authentification/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.authentification</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/email/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.email</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/files/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.files</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/frontpage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.frontpage</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/organizations/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.organizations</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/profiles/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.profiles</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/statistics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.statistics</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/testResponse/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.testResponse</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/websocket/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.handlers.websocket</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/helper/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.helper</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/helper/classes/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.helper.classes</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/management/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.management</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/management/commands/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.management.commands</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_General/management/commands/create_db/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.management.commands.create_db</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_General/management/commands/generate_env/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.management.commands.generate_env</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_General/management/commands/mail/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.management.commands.mail</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="MSQ/tasks/index.html">MSQ.tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="MSQ/tasks/tasks/index.html">MSQ.tasks.tasks</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/modelFiles/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.modelFiles</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/organizationModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.modelFiles.organizationModel</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/userModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.modelFiles.userModel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="conf/index.html">conf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main/index.html">main</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="main/apps/index.html">main.apps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/asgi/index.html">main.asgi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/checks/index.html">main.checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/helper/index.html">main.helper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="main/helper/classes/index.html">main.helper.classes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/settings/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/base/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.base</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/debug/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.debug</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/debug_local/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.debug_local</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/local/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.local</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/local_container/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.local_container</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/production/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.production</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/settings/stage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.settings.stage</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/templates/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.templates</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/utilities/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/basics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities.basics</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/crypto/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities.crypto</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/customStrEnum/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/rights/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities.rights</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/signals/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.utilities.signals</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/apps/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.apps</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/asgi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.asgi</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/checks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.checks</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.definitions</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/imports/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.imports</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.models</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/tests/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.tests</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/urls/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.urls</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_General/wsgi/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_General.wsgi</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="code_SemperKI/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/code_services/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/connections/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.connections</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/connections/postgresql/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.connections.postgresql</span></code></a><ul>
-<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/connections/postgresql/pgService/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.connections.postgresql.pgService</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/connections/cmem/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.connections.cmem</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/handlers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.handlers</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/handlers/checkService/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.handlers.checkService</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/handlers/filter/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.handlers.filter</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/handlers/model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.handlers.model</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/handlers/resources/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.handlers.resources</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/utilities/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.utilities</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/utilities/mocks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.utilities.mocks</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.definitions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/imports/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.imports</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/service/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.service</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/tests/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.tests</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_AdditiveManufacturing/urls/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_AdditiveManufacturing.urls</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/connections/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.connections</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/connections/postgresql/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.connections.postgresql</span></code></a><ul>
-<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/connections/postgresql/pgService/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.connections.postgresql.pgService</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/management/index.html">main.management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="main/management/commands/index.html">main.management.commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="main/management/commands/bufferTest/index.html">main.management.commands.bufferTest</a></li>
+<li class="toctree-l4"><a class="reference internal" href="main/management/commands/create_db/index.html">main.management.commands.create_db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="main/management/commands/generate_env/index.html">main.management.commands.generate_env</a></li>
+<li class="toctree-l4"><a class="reference internal" href="main/management/commands/mail/index.html">main.management.commands.mail</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/handlers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.handlers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.definitions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/imports/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.imports</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/code_services/code_service_CreateModel/service/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.code_services.code_service_CreateModel.service</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/settings/index.html">main.settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/base/index.html">main.settings.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/debug/index.html">main.settings.debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/debug_local/index.html">main.settings.debug_local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/helper/index.html">main.settings.helper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/local/index.html">main.settings.local</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/local_container/index.html">main.settings.local_container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/production/index.html">main.settings.production</a></li>
+<li class="toctree-l3"><a class="reference internal" href="main/settings/staging/index.html">main.settings.staging</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="main/urls/index.html">main.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/wsgi/index.html">main.wsgi</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="test/index.html">test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="manage/index.html">manage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_General/index.html">code_General</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_General/connections/index.html">code_General.connections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/connections/auth0/index.html">code_General.connections.auth0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/connections/mailer/index.html">code_General.connections.mailer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/connections/postgresql/index.html">code_General.connections.postgresql</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_General/connections/postgresql/pgAPIToken/index.html">code_General.connections.postgresql.pgAPIToken</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_General/connections/postgresql/pgEvents/index.html">code_General.connections.postgresql.pgEvents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_General/connections/postgresql/pgProfiles/index.html">code_General.connections.postgresql.pgProfiles</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/connections/redis/index.html">code_General.connections.redis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/connections/s3/index.html">code_General.connections.s3</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/definitions/index.html">code_General.definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/handlers/index.html">code_General.handlers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/admin/index.html">code_General.handlers.admin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/apiToken/index.html">code_General.handlers.apiToken</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/authentification/index.html">code_General.handlers.authentification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/email/index.html">code_General.handlers.email</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/events/index.html">code_General.handlers.events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/files/index.html">code_General.handlers.files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/frontpage/index.html">code_General.handlers.frontpage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/organizations/index.html">code_General.handlers.organizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/statistics/index.html">code_General.handlers.statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/testResponse/index.html">code_General.handlers.testResponse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/users/index.html">code_General.handlers.users</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/handlers/websocket/index.html">code_General.handlers.websocket</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/imports/index.html">code_General.imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/logics/index.html">code_General.logics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/adminLogics/index.html">code_General.logics.adminLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/authenticationLogics/index.html">code_General.logics.authenticationLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/emailLogics/index.html">code_General.logics.emailLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/eventLogics/index.html">code_General.logics.eventLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/filesLogics/index.html">code_General.logics.filesLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/organizationLogics/index.html">code_General.logics.organizationLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/statisticsLogics/index.html">code_General.logics.statisticsLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/logics/userLogics/index.html">code_General.logics.userLogics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/modelFiles/index.html">code_General.modelFiles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/apiTokenModel/index.html">code_General.modelFiles.apiTokenModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/eventModel/index.html">code_General.modelFiles.eventModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/filesModel/index.html">code_General.modelFiles.filesModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/organizationModel/index.html">code_General.modelFiles.organizationModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/modelFiles/userModel/index.html">code_General.modelFiles.userModel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/models/index.html">code_General.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/settings/index.html">code_General.settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/settings/base/index.html">code_General.settings.base</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/templates/index.html">code_General.templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/tests/index.html">code_General.tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/urls/index.html">code_General.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/utilities/index.html">code_General.utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/apiCalls/index.html">code_General.utilities.apiCalls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/asyncTask/index.html">code_General.utilities.asyncTask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/basics/index.html">code_General.utilities.basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/createFilePreviews/index.html">code_General.utilities.createFilePreviews</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/crypto/index.html">code_General.utilities.crypto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/customStrEnum/index.html">code_General.utilities.customStrEnum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/files/index.html">code_General.utilities.files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/mocks/index.html">code_General.utilities.mocks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/oauth/index.html">code_General.utilities.oauth</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/rights/index.html">code_General.utilities.rights</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/signals/index.html">code_General.utilities.signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_General/utilities/temporaryFolder/index.html">code_General.utilities.temporaryFolder</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/connections/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.connections</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/postgresql/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.connections.postgresql</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/connections/postgresql/pgProcesses/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.connections.postgresql.pgProcesses</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_SemperKI/index.html">code_SemperKI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/connections/index.html">code_SemperKI.connections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/cmem/index.html">code_SemperKI.connections.cmem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/content/index.html">code_SemperKI.connections.content</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/connections/content/abstractInterface/index.html">code_SemperKI.connections.content.abstractInterface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/connections/content/manageContent/index.html">code_SemperKI.connections.content.manageContent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/connections/content/postgresql/index.html">code_SemperKI.connections.content.postgresql</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/connections/content/postgresql/pgKnowledgeGraph/index.html">code_SemperKI.connections.content.postgresql.pgKnowledgeGraph</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/connections/content/postgresql/pgProcesses/index.html">code_SemperKI.connections.content.postgresql.pgProcesses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/connections/content/postgresql/pgProfilesSKI/index.html">code_SemperKI.connections.content.postgresql.pgProfilesSKI</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/cmem/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.connections.cmem</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/coypu/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.connections.coypu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/connections/content/session/index.html">code_SemperKI.connections.content.session</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/handlers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/admin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.admin</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/files/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.files</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/frontpage/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.frontpage</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/manageServices/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.manageServices</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/projectAndProcessManagement/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.projectAndProcessManagement</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/sparqlQueries/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.sparqlQueries</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/testResponse/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.handlers.testResponse</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/coypu/index.html">code_SemperKI.connections.coypu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/connections/openai/index.html">code_SemperKI.connections.openai</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/management/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.management</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/management/commands/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.management.commands</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/management/commands/services/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.management.commands.services</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/handlers/index.html">code_SemperKI.handlers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/private/index.html">code_SemperKI.handlers.private</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/private/knowledgeGraphDB/index.html">code_SemperKI.handlers.private.knowledgeGraphDB</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/private/testResponse/index.html">code_SemperKI.handlers.private.testResponse</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/handlers/public/index.html">code_SemperKI.handlers.public</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/admin/index.html">code_SemperKI.handlers.public.admin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/files/index.html">code_SemperKI.handlers.public.files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/miscellaneous/index.html">code_SemperKI.handlers.public.miscellaneous</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/process/index.html">code_SemperKI.handlers.public.process</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/project/index.html">code_SemperKI.handlers.public.project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/handlers/public/statemachine/index.html">code_SemperKI.handlers.public.statemachine</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/modelFiles/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.modelFiles</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/dataModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.modelFiles.dataModel</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/processModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.modelFiles.processModel</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/projectModel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.modelFiles.projectModel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/logics/index.html">code_SemperKI.logics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/logics/filesLogics/index.html">code_SemperKI.logics.filesLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/logics/processLogics/index.html">code_SemperKI.logics.processLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/logics/projectLogics/index.html">code_SemperKI.logics.projectLogics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/logics/statemachineLogics/index.html">code_SemperKI.logics.statemachineLogics</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/settings/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.settings</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/settings/base/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.settings.base</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/modelFiles/index.html">code_SemperKI.modelFiles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/dataModel/index.html">code_SemperKI.modelFiles.dataModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/nodesModel/index.html">code_SemperKI.modelFiles.nodesModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/processModel/index.html">code_SemperKI.modelFiles.processModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/modelFiles/projectModel/index.html">code_SemperKI.modelFiles.projectModel</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/utilities/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.utilities</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/signals/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.utilities.signals</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/services/index.html">code_SemperKI.services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/filterViaSparql/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/postgresql/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/postgresql/pgProfilesSKIAM/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgProfilesSKIAM</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/postgresql/pgService/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/connections/postgresql/pgVerification/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/apps/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.apps</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.definitions</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/imports/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.imports</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.models</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/services/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.services</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/tests/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.tests</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/urls/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.urls</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="conf/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">conf</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/checkService/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/costs/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/filter/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/materials/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/model/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/postProcessings/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/colors/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/kgDBAM/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/onto/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/orga/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/pdfPipeline/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/verification/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/checkServiceLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/colorsLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/costsLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/femAnalysisLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.femAnalysisLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/materialsLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.materialsLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/modelLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/ontoLogics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.ontoLogics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/orgaLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.orgaLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/pdfPipelineLogics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.pdfPipelineLogics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/logics/verificationLogic/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/modelFiles/verificationModel/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/tasks/femSimulationTask/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/basics/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/colorsUtils/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.colorsUtils</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/mocks/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/responseFormatsForPDFExtraction/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/signals/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/sparqlQueries/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AdditiveManufacturing/utilities/stpToStl/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities.stpToStl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/index.html">code_SemperKI.services.service_AfterSales.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/filterViaSparql/index.html">code_SemperKI.services.service_AfterSales.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/postgresql/index.html">code_SemperKI.services.service_AfterSales.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_AfterSales.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/postgresql/pgProfilesSKIAS/index.html">code_SemperKI.services.service_AfterSales.connections.postgresql.pgProfilesSKIAS</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/connections/postgresql/pgService/index.html">code_SemperKI.services.service_AfterSales.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/definitions/index.html">code_SemperKI.services.service_AfterSales.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/index.html">code_SemperKI.services.service_AfterSales.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/index.html">code_SemperKI.services.service_AfterSales.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/checkService/index.html">code_SemperKI.services.service_AfterSales.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/filter/index.html">code_SemperKI.services.service_AfterSales.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/resources/index.html">code_SemperKI.services.service_AfterSales.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/resources/kgDBAS/index.html">code_SemperKI.services.service_AfterSales.handlers.public.resources.kgDBAS</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/resources/onto/index.html">code_SemperKI.services.service_AfterSales.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/handlers/public/resources/orga/index.html">code_SemperKI.services.service_AfterSales.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/imports/index.html">code_SemperKI.services.service_AfterSales.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/logics/index.html">code_SemperKI.services.service_AfterSales.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/logics/checkServiceLogic/index.html">code_SemperKI.services.service_AfterSales.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/logics/costs/index.html">code_SemperKI.services.service_AfterSales.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/logics/orgaLogic/index.html">code_SemperKI.services.service_AfterSales.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/service/index.html">code_SemperKI.services.service_AfterSales.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/tests/index.html">code_SemperKI.services.service_AfterSales.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/urls/index.html">code_SemperKI.services.service_AfterSales.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/utilities/index.html">code_SemperKI.services.service_AfterSales.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/utilities/basics/index.html">code_SemperKI.services.service_AfterSales.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/utilities/mocks/index.html">code_SemperKI.services.service_AfterSales.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/utilities/signals/index.html">code_SemperKI.services.service_AfterSales.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_AfterSales/utilities/sparqlQueries/index.html">code_SemperKI.services.service_AfterSales.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_Assembly/index.html">code_SemperKI.services.service_Assembly</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/index.html">code_SemperKI.services.service_Assembly.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/filterViaSparql/index.html">code_SemperKI.services.service_Assembly.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/postgresql/index.html">code_SemperKI.services.service_Assembly.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_Assembly.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/postgresql/pgProfilesSKIA/index.html">code_SemperKI.services.service_Assembly.connections.postgresql.pgProfilesSKIA</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/connections/postgresql/pgService/index.html">code_SemperKI.services.service_Assembly.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/definitions/index.html">code_SemperKI.services.service_Assembly.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/index.html">code_SemperKI.services.service_Assembly.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/index.html">code_SemperKI.services.service_Assembly.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/checkService/index.html">code_SemperKI.services.service_Assembly.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/filter/index.html">code_SemperKI.services.service_Assembly.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/resources/index.html">code_SemperKI.services.service_Assembly.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/resources/kgDBA/index.html">code_SemperKI.services.service_Assembly.handlers.public.resources.kgDBA</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/resources/onto/index.html">code_SemperKI.services.service_Assembly.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Assembly/handlers/public/resources/orga/index.html">code_SemperKI.services.service_Assembly.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/imports/index.html">code_SemperKI.services.service_Assembly.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/logics/index.html">code_SemperKI.services.service_Assembly.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/logics/checkServiceLogic/index.html">code_SemperKI.services.service_Assembly.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/logics/costs/index.html">code_SemperKI.services.service_Assembly.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/logics/orgaLogic/index.html">code_SemperKI.services.service_Assembly.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/service/index.html">code_SemperKI.services.service_Assembly.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/tests/index.html">code_SemperKI.services.service_Assembly.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/urls/index.html">code_SemperKI.services.service_Assembly.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Assembly/utilities/index.html">code_SemperKI.services.service_Assembly.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/utilities/basics/index.html">code_SemperKI.services.service_Assembly.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/utilities/mocks/index.html">code_SemperKI.services.service_Assembly.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/utilities/signals/index.html">code_SemperKI.services.service_Assembly.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Assembly/utilities/sparqlQueries/index.html">code_SemperKI.services.service_Assembly.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/index.html">code_SemperKI.services.service_CreateModel.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/filterViaSparql/index.html">code_SemperKI.services.service_CreateModel.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/postgresql/index.html">code_SemperKI.services.service_CreateModel.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_CreateModel.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/postgresql/pgProfilesSKICM/index.html">code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/connections/postgresql/pgService/index.html">code_SemperKI.services.service_CreateModel.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/definitions/index.html">code_SemperKI.services.service_CreateModel.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/index.html">code_SemperKI.services.service_CreateModel.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/index.html">code_SemperKI.services.service_CreateModel.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/checkService/index.html">code_SemperKI.services.service_CreateModel.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/filter/index.html">code_SemperKI.services.service_CreateModel.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/resources/index.html">code_SemperKI.services.service_CreateModel.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/resources/kgDBCM/index.html">code_SemperKI.services.service_CreateModel.handlers.public.resources.kgDBCM</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/resources/onto/index.html">code_SemperKI.services.service_CreateModel.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/handlers/public/resources/orga/index.html">code_SemperKI.services.service_CreateModel.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/imports/index.html">code_SemperKI.services.service_CreateModel.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/logics/index.html">code_SemperKI.services.service_CreateModel.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/logics/checkServiceLogic/index.html">code_SemperKI.services.service_CreateModel.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/logics/costs/index.html">code_SemperKI.services.service_CreateModel.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/logics/orgaLogic/index.html">code_SemperKI.services.service_CreateModel.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/service/index.html">code_SemperKI.services.service_CreateModel.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/tests/index.html">code_SemperKI.services.service_CreateModel.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/urls/index.html">code_SemperKI.services.service_CreateModel.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/utilities/index.html">code_SemperKI.services.service_CreateModel.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/utilities/basics/index.html">code_SemperKI.services.service_CreateModel.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/utilities/mocks/index.html">code_SemperKI.services.service_CreateModel.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/utilities/signals/index.html">code_SemperKI.services.service_CreateModel.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_CreateModel/utilities/sparqlQueries/index.html">code_SemperKI.services.service_CreateModel.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_Delivery/index.html">code_SemperKI.services.service_Delivery</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/index.html">code_SemperKI.services.service_Delivery.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/filterViaSparql/index.html">code_SemperKI.services.service_Delivery.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/postgresql/index.html">code_SemperKI.services.service_Delivery.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_Delivery.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/postgresql/pgProfilesSKID/index.html">code_SemperKI.services.service_Delivery.connections.postgresql.pgProfilesSKID</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/connections/postgresql/pgService/index.html">code_SemperKI.services.service_Delivery.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/definitions/index.html">code_SemperKI.services.service_Delivery.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/index.html">code_SemperKI.services.service_Delivery.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/index.html">code_SemperKI.services.service_Delivery.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/checkService/index.html">code_SemperKI.services.service_Delivery.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/filter/index.html">code_SemperKI.services.service_Delivery.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/resources/index.html">code_SemperKI.services.service_Delivery.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/resources/kgDBD/index.html">code_SemperKI.services.service_Delivery.handlers.public.resources.kgDBD</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/resources/onto/index.html">code_SemperKI.services.service_Delivery.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Delivery/handlers/public/resources/orga/index.html">code_SemperKI.services.service_Delivery.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/imports/index.html">code_SemperKI.services.service_Delivery.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/logics/index.html">code_SemperKI.services.service_Delivery.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/logics/checkServiceLogic/index.html">code_SemperKI.services.service_Delivery.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/logics/costs/index.html">code_SemperKI.services.service_Delivery.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/logics/orgaLogic/index.html">code_SemperKI.services.service_Delivery.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/service/index.html">code_SemperKI.services.service_Delivery.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/tests/index.html">code_SemperKI.services.service_Delivery.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/urls/index.html">code_SemperKI.services.service_Delivery.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Delivery/utilities/index.html">code_SemperKI.services.service_Delivery.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/utilities/basics/index.html">code_SemperKI.services.service_Delivery.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/utilities/mocks/index.html">code_SemperKI.services.service_Delivery.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/utilities/signals/index.html">code_SemperKI.services.service_Delivery.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Delivery/utilities/sparqlQueries/index.html">code_SemperKI.services.service_Delivery.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_Packaging/index.html">code_SemperKI.services.service_Packaging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/index.html">code_SemperKI.services.service_Packaging.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/filterViaSparql/index.html">code_SemperKI.services.service_Packaging.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/postgresql/index.html">code_SemperKI.services.service_Packaging.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_Packaging.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/postgresql/pgProfilesSKIP/index.html">code_SemperKI.services.service_Packaging.connections.postgresql.pgProfilesSKIP</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/connections/postgresql/pgService/index.html">code_SemperKI.services.service_Packaging.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/definitions/index.html">code_SemperKI.services.service_Packaging.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/index.html">code_SemperKI.services.service_Packaging.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/index.html">code_SemperKI.services.service_Packaging.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/checkService/index.html">code_SemperKI.services.service_Packaging.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/filter/index.html">code_SemperKI.services.service_Packaging.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/resources/index.html">code_SemperKI.services.service_Packaging.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/resources/kgDBP/index.html">code_SemperKI.services.service_Packaging.handlers.public.resources.kgDBP</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/resources/onto/index.html">code_SemperKI.services.service_Packaging.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_Packaging/handlers/public/resources/orga/index.html">code_SemperKI.services.service_Packaging.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/imports/index.html">code_SemperKI.services.service_Packaging.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/logics/index.html">code_SemperKI.services.service_Packaging.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/logics/checkServiceLogic/index.html">code_SemperKI.services.service_Packaging.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/logics/costs/index.html">code_SemperKI.services.service_Packaging.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/logics/orgaLogic/index.html">code_SemperKI.services.service_Packaging.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/service/index.html">code_SemperKI.services.service_Packaging.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/tests/index.html">code_SemperKI.services.service_Packaging.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/urls/index.html">code_SemperKI.services.service_Packaging.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_Packaging/utilities/index.html">code_SemperKI.services.service_Packaging.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/utilities/basics/index.html">code_SemperKI.services.service_Packaging.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/utilities/mocks/index.html">code_SemperKI.services.service_Packaging.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/utilities/signals/index.html">code_SemperKI.services.service_Packaging.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_Packaging/utilities/sparqlQueries/index.html">code_SemperKI.services.service_Packaging.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/index.html">code_SemperKI.services.service_PostProcessing.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/filterViaSparql/index.html">code_SemperKI.services.service_PostProcessing.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/postgresql/index.html">code_SemperKI.services.service_PostProcessing.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_PostProcessing.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/postgresql/pgProfilesSKIPP/index.html">code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/connections/postgresql/pgService/index.html">code_SemperKI.services.service_PostProcessing.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/definitions/index.html">code_SemperKI.services.service_PostProcessing.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/index.html">code_SemperKI.services.service_PostProcessing.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/index.html">code_SemperKI.services.service_PostProcessing.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/checkService/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/filter/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/resources/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/resources/kgDBPP/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.resources.kgDBPP</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/resources/onto/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/handlers/public/resources/orga/index.html">code_SemperKI.services.service_PostProcessing.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/imports/index.html">code_SemperKI.services.service_PostProcessing.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/logics/index.html">code_SemperKI.services.service_PostProcessing.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/logics/checkServiceLogic/index.html">code_SemperKI.services.service_PostProcessing.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/logics/costs/index.html">code_SemperKI.services.service_PostProcessing.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/logics/orgaLogic/index.html">code_SemperKI.services.service_PostProcessing.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/service/index.html">code_SemperKI.services.service_PostProcessing.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/tests/index.html">code_SemperKI.services.service_PostProcessing.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/urls/index.html">code_SemperKI.services.service_PostProcessing.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/utilities/index.html">code_SemperKI.services.service_PostProcessing.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/utilities/basics/index.html">code_SemperKI.services.service_PostProcessing.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/utilities/mocks/index.html">code_SemperKI.services.service_PostProcessing.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/utilities/signals/index.html">code_SemperKI.services.service_PostProcessing.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_PostProcessing/utilities/sparqlQueries/index.html">code_SemperKI.services.service_PostProcessing.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/index.html">code_SemperKI.services.service_QualityControl.connections</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/filterViaSparql/index.html">code_SemperKI.services.service_QualityControl.connections.filterViaSparql</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/postgresql/index.html">code_SemperKI.services.service_QualityControl.connections.postgresql</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/postgresql/pgKG/index.html">code_SemperKI.services.service_QualityControl.connections.postgresql.pgKG</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/postgresql/pgProfilesSKIQC/index.html">code_SemperKI.services.service_QualityControl.connections.postgresql.pgProfilesSKIQC</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/connections/postgresql/pgService/index.html">code_SemperKI.services.service_QualityControl.connections.postgresql.pgService</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/definitions/index.html">code_SemperKI.services.service_QualityControl.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/index.html">code_SemperKI.services.service_QualityControl.handlers</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/index.html">code_SemperKI.services.service_QualityControl.handlers.public</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/checkService/index.html">code_SemperKI.services.service_QualityControl.handlers.public.checkService</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/filter/index.html">code_SemperKI.services.service_QualityControl.handlers.public.filter</a></li>
+<li class="toctree-l6"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/resources/index.html">code_SemperKI.services.service_QualityControl.handlers.public.resources</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/resources/kgDBQC/index.html">code_SemperKI.services.service_QualityControl.handlers.public.resources.kgDBQC</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/resources/onto/index.html">code_SemperKI.services.service_QualityControl.handlers.public.resources.onto</a></li>
+<li class="toctree-l7"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/handlers/public/resources/orga/index.html">code_SemperKI.services.service_QualityControl.handlers.public.resources.orga</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/imports/index.html">code_SemperKI.services.service_QualityControl.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/logics/index.html">code_SemperKI.services.service_QualityControl.logics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/logics/checkServiceLogic/index.html">code_SemperKI.services.service_QualityControl.logics.checkServiceLogic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/logics/costs/index.html">code_SemperKI.services.service_QualityControl.logics.costs</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/logics/orgaLogic/index.html">code_SemperKI.services.service_QualityControl.logics.orgaLogic</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/service/index.html">code_SemperKI.services.service_QualityControl.service</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/tests/index.html">code_SemperKI.services.service_QualityControl.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/urls/index.html">code_SemperKI.services.service_QualityControl.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/utilities/index.html">code_SemperKI.services.service_QualityControl.utilities</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/utilities/basics/index.html">code_SemperKI.services.service_QualityControl.utilities.basics</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/utilities/mocks/index.html">code_SemperKI.services.service_QualityControl.utilities.mocks</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/utilities/signals/index.html">code_SemperKI.services.service_QualityControl.utilities.signals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="code_SemperKI/services/service_QualityControl/utilities/sparqlQueries/index.html">code_SemperKI.services.service_QualityControl.utilities.sparqlQueries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/settings/index.html">code_SemperKI.settings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/settings/base/index.html">code_SemperKI.settings.base</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/states/index.html">code_SemperKI.states</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/states/stateButtons/index.html">code_SemperKI.states.stateButtons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/states/stateDescriptions/index.html">code_SemperKI.states.stateDescriptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/states/states/index.html">code_SemperKI.states.states</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/tasks/index.html">code_SemperKI.tasks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/tasks/processTasks/index.html">code_SemperKI.tasks.processTasks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/utilities/index.html">code_SemperKI.utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/basics/index.html">code_SemperKI.utilities.basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/filePreview/index.html">code_SemperKI.utilities.filePreview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/locales/index.html">code_SemperKI.utilities.locales</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/serializer/index.html">code_SemperKI.utilities.serializer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/signals/index.html">code_SemperKI.utilities.signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/sparql/index.html">code_SemperKI.utilities.sparql</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_SemperKI/utilities/websocket/index.html">code_SemperKI.utilities.websocket</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
 </ul>
 </div>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="note">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Created with <a class="reference external" href="https://github.com/readthedocs/sphinx-autoapi">sphinx-autoapi</a></p>
 </aside>
@@ -222,7 +654,7 @@
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../index.html">KISS-backend</a></h1>
 
@@ -233,28 +665,40 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_General/index.html">code_General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_SemperKI/index.html">code_SemperKI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to the documentation of the backend of Semper-KI!</a></li>
+      <li>Next: <a href="MSQ/index.html" title="next chapter">MSQ</a></li>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -268,11 +712,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, Silvio Weging.
+      &#169;2023, Silvio Weging.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="../_sources/autoapi/index.rst.txt"

@@ -1,0 +1,62 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM
+=====================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: General handlers for the AM knowledge graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM.getPropertyDefinitionFrontend
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM.loadInitGraphViaAPI
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getPropertyDefinitionFrontend(request: rest_framework.request.Request, nodeType: str)
+
+   Retrieves the definition of possible properties for a specific node type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON
+   :rtype: Response
+
+
+
+.. py:function:: loadInitGraphViaAPI(request: rest_framework.request.Request)
+
+   Loads the initial graph from the file
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Success or not
+   :rtype: Response
+
+
+

@@ -1,0 +1,776 @@
+code_SemperKI.handlers.private.knowledgeGraphDB
+===============================================
+
+.. py:module:: code_SemperKI.handlers.private.knowledgeGraphDB
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handlers for handling the database backed knowledge graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.private.knowledgeGraphDB.logger
+   code_SemperKI.handlers.private.knowledgeGraphDB.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResProperties
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.SReqCreateNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.SReqUpdateNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.SReqTwoNodes
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResGraph
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResInitialNodes
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResInitialEdges
+   code_SemperKI.handlers.private.knowledgeGraphDB.SResGraphForFrontend
+   code_SemperKI.handlers.private.knowledgeGraphDB.SReqCreateNodeOfGraph
+   code_SemperKI.handlers.private.knowledgeGraphDB.SReqGraph
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.private.knowledgeGraphDB.getNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.createNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.deleteNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.updateNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.getNodesByType
+   code_SemperKI.handlers.private.knowledgeGraphDB.getNodesByUniqueID
+   code_SemperKI.handlers.private.knowledgeGraphDB.getNodesByProperty
+   code_SemperKI.handlers.private.knowledgeGraphDB.getNodesByTypeAndProperty
+   code_SemperKI.handlers.private.knowledgeGraphDB.getEdgesForNode
+   code_SemperKI.handlers.private.knowledgeGraphDB.getSpecificNeighborsByType
+   code_SemperKI.handlers.private.knowledgeGraphDB.getSpecificNeighborsByProperty
+   code_SemperKI.handlers.private.knowledgeGraphDB.createEdge
+   code_SemperKI.handlers.private.knowledgeGraphDB.deleteEdge
+   code_SemperKI.handlers.private.knowledgeGraphDB.getGraph
+   code_SemperKI.handlers.private.knowledgeGraphDB.getGraphForFrontend
+   code_SemperKI.handlers.private.knowledgeGraphDB.createGraph
+   code_SemperKI.handlers.private.knowledgeGraphDB.loadTestGraph
+   code_SemperKI.handlers.private.knowledgeGraphDB.loadTestGraphViaAPI
+   code_SemperKI.handlers.private.knowledgeGraphDB.deleteGraph
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SResProperties(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: key
+
+
+   .. py:attribute:: value
+
+
+   .. py:attribute:: unit
+
+
+   .. py:attribute:: type
+
+
+.. py:class:: SResNode(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: uniqueID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: properties
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: clonedFrom
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+.. py:function:: getNode(request: rest_framework.request.Request, nodeID: str)
+
+   Return node by id
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :return: 
+   :rtype: Response
+
+
+
+.. py:class:: SReqCreateNode(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: properties
+
+
+.. py:function:: createNode(request: rest_framework.request.Request)
+
+   Creates a new node
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: The node with ID
+   :rtype: Response
+
+
+
+.. py:function:: deleteNode(request: rest_framework.request.Request, nodeID: str)
+
+   Deletes a node from the graph by ID
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:class:: SReqUpdateNode(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: properties
+
+
+.. py:function:: updateNode(request: rest_framework.request.Request)
+
+   Updates the values of a node
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: The updated node
+   :rtype: Response
+
+
+
+.. py:function:: getNodesByType(request: rest_framework.request.Request, nodeType: str)
+
+   Get all nodes with a certain type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeType: The type of the nodes
+   :type nodeType: str
+   :return: list of nodes
+   :rtype: Response
+
+
+
+.. py:function:: getNodesByUniqueID(request: rest_framework.request.Request, nodeID: str)
+
+   Get all nodes with a certain type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeType: The type of the nodes
+   :type nodeType: str
+   :return: list of nodes
+   :rtype: Response
+
+
+
+.. py:function:: getNodesByProperty(request: rest_framework.request.Request, property: str)
+
+   Get all nodes with a certain property
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param property: The property of the nodes
+   :type property: str
+   :return: list of nodes
+   :rtype: Response
+
+
+
+.. py:function:: getNodesByTypeAndProperty(request: rest_framework.request.Request, nodeType: str, nodeProperty: str, value: str)
+
+   Get all nodes with a certain property
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeType: The type of the node
+   :type nodeType: str
+   :param value: The value of the property
+   :type value: str
+   :param nodeProperty: The property of the node
+   :type nodeProperty: str
+   :return: list of nodes
+   :rtype: Response
+
+
+
+.. py:function:: getEdgesForNode(request: rest_framework.request.Request, nodeID: str)
+
+   Return all edges belonging to a node
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :return: List of nodes
+   :rtype: Response
+
+
+
+.. py:function:: getSpecificNeighborsByType(request: rest_framework.request.Request, nodeID: str, nodeType: str)
+
+   Retrieve all neighbors of a node with a specific type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :param nodeType: The type of the neighbors of interest
+   :type nodeType: str
+   :return: List of nodes with the specified type
+   :rtype: Response
+
+
+
+.. py:function:: getSpecificNeighborsByProperty(request: rest_framework.request.Request, nodeID: str, property: str)
+
+   Retrieve all neighbors of a node with a specific property
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :param property: The property of the neighbors of interest
+   :type property: str
+   :return: List of nodes with the specified property
+   :rtype: Response
+
+
+
+.. py:class:: SReqTwoNodes(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID1
+
+
+   .. py:attribute:: nodeID2
+
+
+.. py:function:: createEdge(request: rest_framework.request.Request)
+
+   Creates an edge between two nodes
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Succes or not
+   :rtype: Response
+
+
+
+.. py:function:: deleteEdge(request: rest_framework.request.Request, nodeID1: str, nodeID2: str)
+
+   Deletes an existing edge
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param nodeID1: The first node
+   :type nodeID1: str
+   :param nodeID2: The second node
+   :type nodeID2: str
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:class:: SResGraph(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodes
+
+
+   .. py:attribute:: edges
+
+
+.. py:function:: getGraph(request: rest_framework.request.Request)
+
+   Returns the graph
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with graph
+   :rtype: Response
+
+
+
+.. py:class:: SResInitialNodes(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: type
+
+
+.. py:class:: SResInitialEdges(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: source
+
+
+   .. py:attribute:: target
+
+
+.. py:class:: SResGraphForFrontend(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: Nodes
+
+
+   .. py:attribute:: Edges
+
+
+.. py:function:: getGraphForFrontend(request: rest_framework.request.Request)
+
+   Returns the graph for frontend
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with graph
+   :rtype: Response
+
+
+
+.. py:class:: SReqCreateNodeOfGraph(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: nodeTempID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: properties
+
+
+.. py:class:: SReqGraph(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: node
+
+
+   .. py:attribute:: edges
+
+
+.. py:function:: createGraph(request: rest_framework.request.Request)
+
+   Create a graph from json
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: The constructed Graph
+   :rtype: Response
+
+
+
+.. py:function:: loadTestGraph(request: rest_framework.request.Request)
+
+   Loads the test graph from the file.
+   KEEP THIS, IT'S USED FOR TESTS
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: loadTestGraphViaAPI(request: rest_framework.request.Request)
+
+   Loads the test graph from the file
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: deleteGraph(request: rest_framework.request.Request)
+
+   Deletes the whole graph
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :return: Success or not
+   :rtype: Response
+
+
+

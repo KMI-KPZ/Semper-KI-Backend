@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.models`
-==============================
+code_SemperKI.models
+====================
 
 .. py:module:: code_SemperKI.models
 

@@ -98,10 +98,18 @@ except ImportError:
     # implement the same functions but as dummies that don't do anything
     ##################################################
     def createAndStorePreview(file:InMemoryUploadedFile, fileName:str, locale:str, storagePath:str) -> str|Exception:
+        """
+        Create a preview of a file and store it in a given path
+        
+        """
         if locale == "de-DE":
             return previewNotAvailableGER
         else:
             return previewNotAvailable
     ##################################################
     def deletePreviewFile(path:str) -> None:
+        """
+        Deletes a preview file from the storage
+        
+        """
         return

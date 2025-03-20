@@ -1,25 +1,28 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>code_SemperKI.modelFiles.projectModel &#8212; KISS-backend 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-    <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="code_SemperKI.models" href="../../models/index.html" />
+    <link rel="prev" title="code_SemperKI.modelFiles.processModel" href="../processModel/index.html" />
    
   <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -32,14 +35,12 @@
           <div class="body" role="main">
             
   <section id="module-code_SemperKI.modelFiles.projectModel">
-<span id="code-semperki-modelfiles-projectmodel"></span><h1><a class="reference internal" href="#module-code_SemperKI.modelFiles.projectModel" title="code_SemperKI.modelFiles.projectModel"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.modelFiles.projectModel</span></code></a><a class="headerlink" href="#module-code_SemperKI.modelFiles.projectModel" title="Permalink to this heading">¶</a></h1>
+<span id="code-semperki-modelfiles-projectmodel"></span><h1>code_SemperKI.modelFiles.projectModel<a class="headerlink" href="#module-code_SemperKI.modelFiles.projectModel" title="Link to this heading">¶</a></h1>
 <p>Part of Semper-KI software</p>
 <p>Silvio Weging 2023</p>
 <p>Contains: Model for projects</p>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
 <section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription" title="code_SemperKI.modelFiles.projectModel.ProjectDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectDescription</span></code></a></p></td>
@@ -48,61 +49,73 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project" title="code_SemperKI.modelFiles.projectModel.Project"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Project</span></code></a></p></td>
 <td><p>Project class.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface" title="code_SemperKI.modelFiles.projectModel.ProjectInterface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectInterface</span></code></a></p></td>
+<td><p>Project class interface</p></td>
+</tr>
 </tbody>
 </table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.projectModel.</span></span><span class="sig-name descname"><span class="pre">ProjectDescription</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.projectModel.</span></span><span class="sig-name descname"><span class="pre">ProjectDescription</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>What does a project consists of?</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.projectID">
-<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectID" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.status">
-<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.projectStatus">
+<span class="sig-name descname"><span class="pre">projectStatus</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectStatus" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.client">
-<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.client" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.client" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.details">
-<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.details" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.projectDetails">
+<span class="sig-name descname"><span class="pre">projectDetails</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectDetails" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.createdWhen">
-<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.createdWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.createdWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.updatedWhen">
-<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.updatedWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectDescription.accessedWhen">
-<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.accessedWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.accessedWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.projectModel.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.projectModel.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.db.models.Model</span></code></p>
 <p>Project class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">ProjectID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Unique ID for that project, primary key</p>
 </dd>
-<dt class="field-even">Status<span class="colon">:</span></dt>
+<dt class="field-even">ProjectStatus<span class="colon">:</span></dt>
 <dd class="field-even"><p>Current state of the project</p>
+</dd>
+<dt class="field-odd">Client<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The hashed ID of the client that created the project</p>
+</dd>
+<dt class="field-even">ProjectDetails<span class="colon">:</span></dt>
+<dd class="field-even"><p>Details like name and such</p>
 </dd>
 <dt class="field-odd">CreatedWhen<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Automatically assigned date and time(UTC+0) when the entry is created</p>
@@ -116,47 +129,120 @@
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.projectID">
-<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.projectID" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.projectID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.status">
-<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.projectStatus">
+<span class="sig-name descname"><span class="pre">projectStatus</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.projectStatus" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.client">
-<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.client" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.client" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.details">
-<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.details" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.projectDetails">
+<span class="sig-name descname"><span class="pre">projectDetails</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.projectDetails" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.createdWhen">
-<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.createdWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.createdWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.updatedWhen">
-<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.updatedWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.updatedWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.accessedWhen">
-<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.accessedWhen" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.accessedWhen" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.Project.toDict">
-<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.toDict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.Project.toDict" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.projectModel.</span></span><span class="sig-name descname"><span class="pre">ProjectInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">currentTime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface" title="Link to this definition">¶</a></dt>
+<dd><p>Project class interface</p>
+<dl class="field-list simple">
+<dt class="field-odd">ProjectID<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Unique ID for that project, primary key</p>
+</dd>
+<dt class="field-even">ProjectStatus<span class="colon">:</span></dt>
+<dd class="field-even"><p>Current state of the project</p>
+</dd>
+<dt class="field-odd">Client<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The hashed ID of the client that created the project</p>
+</dd>
+<dt class="field-even">ProjectDetails<span class="colon">:</span></dt>
+<dd class="field-even"><p>Details like name and such</p>
+</dd>
+<dt class="field-odd">CreatedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Automatically assigned date and time(UTC+0) when the entry is created</p>
+</dd>
+<dt class="field-even">UpdatedWhen<span class="colon">:</span></dt>
+<dd class="field-even"><p>Date and time at which the entry was updated</p>
+</dd>
+<dt class="field-odd">AccessedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Last date and time the data was fetched from the database, automatically set</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.projectStatus">
+<span class="sig-name descname"><span class="pre">projectStatus</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.client">
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.client" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.projectDetails">
+<span class="sig-name descname"><span class="pre">projectDetails</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectDetails" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.updatedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.accessedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.setValues">
+<span class="sig-name descname"><span class="pre">setValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projectStatus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectDetails</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updatedWhen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accessedWhen</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.setValues" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.projectModel.ProjectInterface.toDict">
+<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.toDict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -165,7 +251,7 @@
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../../../index.html">KISS-backend</a></h1>
 
@@ -176,28 +262,115 @@
 
 
 
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">code_SemperKI.modelFiles</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../dataModel/index.html">code_SemperKI.modelFiles.dataModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../nodesModel/index.html">code_SemperKI.modelFiles.nodesModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../processModel/index.html">code_SemperKI.modelFiles.processModel</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">code_SemperKI.modelFiles.projectModel</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription"><code class="docutils literal notranslate"><span class="pre">ProjectDescription</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectID"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.projectID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectStatus"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.projectStatus</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.client"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.client</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.projectDetails"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.projectDetails</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.createdWhen"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.createdWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.updatedWhen"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.updatedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectDescription.accessedWhen"><code class="docutils literal notranslate"><span class="pre">ProjectDescription.accessedWhen</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project"><code class="docutils literal notranslate"><span class="pre">Project</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.projectID"><code class="docutils literal notranslate"><span class="pre">Project.projectID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.projectStatus"><code class="docutils literal notranslate"><span class="pre">Project.projectStatus</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.client"><code class="docutils literal notranslate"><span class="pre">Project.client</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.projectDetails"><code class="docutils literal notranslate"><span class="pre">Project.projectDetails</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.createdWhen"><code class="docutils literal notranslate"><span class="pre">Project.createdWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.updatedWhen"><code class="docutils literal notranslate"><span class="pre">Project.updatedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.accessedWhen"><code class="docutils literal notranslate"><span class="pre">Project.accessedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.Project.toDict"><code class="docutils literal notranslate"><span class="pre">Project.toDict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface"><code class="docutils literal notranslate"><span class="pre">ProjectInterface</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectID"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.projectID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectStatus"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.projectStatus</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.client"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.client</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.projectDetails"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.projectDetails</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.createdWhen"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.createdWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.updatedWhen"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.updatedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.accessedWhen"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.accessedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.setValues"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.setValues()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.projectModel.ProjectInterface.toDict"><code class="docutils literal notranslate"><span class="pre">ProjectInterface.toDict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">code_SemperKI</a><ul>
+  <li><a href="../index.html">code_SemperKI.modelFiles</a><ul>
+      <li>Previous: <a href="../processModel/index.html" title="previous chapter">code_SemperKI.modelFiles.processModel</a></li>
+      <li>Next: <a href="../../models/index.html" title="next chapter">code_SemperKI.models</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -211,11 +384,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, Silvio Weging.
+      &#169;2023, Silvio Weging.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="../../../../_sources/autoapi/code_SemperKI/modelFiles/projectModel/index.rst.txt"

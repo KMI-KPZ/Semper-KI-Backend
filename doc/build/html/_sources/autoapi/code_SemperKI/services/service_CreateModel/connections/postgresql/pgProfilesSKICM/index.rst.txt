@@ -1,0 +1,68 @@
+code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM
+=================================================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Connector to the profiles of the Generic Backend which adds stuff to the details specific to this service
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM.updateUserDetailsSemperKICM
+   code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM.updateOrgaDetailsSemperKICM
+   code_SemperKI.services.service_CreateModel.connections.postgresql.pgProfilesSKICM.deleteOrgaDetailsSemperKICM
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: updateUserDetailsSemperKICM(userHashID: str, session)
+
+   Look for user, update details according to CM specific fields
+
+   :param userHashID: The ID transmitted via signal
+   :type userHashID: str
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: updateOrgaDetailsSemperKICM(orgaHashID: str)
+
+   Look for orga, update details according to CM specific fields
+
+   :param orgaHashID: The ID transmitted via signal
+   :type orgaHashID: str
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: deleteOrgaDetailsSemperKICM(orgaHashID: str)
+
+   Look for orga, delete details according to CM specific fields
+
+   :param orgaHashID: The ID transmitted via signal
+   :type orgaHashID: str
+   :return: Nothing
+   :rtype: None
+
+

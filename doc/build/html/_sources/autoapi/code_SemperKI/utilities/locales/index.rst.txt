@@ -1,0 +1,74 @@
+code_SemperKI.utilities.locales
+===============================
+
+.. py:module:: code_SemperKI.utilities.locales
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Class for managing the locales-file
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.locales.loggerError
+   code_SemperKI.utilities.locales.manageTranslations
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.locales.ManageTranslations
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:class:: ManageTranslations(filePathAndName)
+
+   Manages the translations of certain keys saved into the translations.json
+
+
+
+   .. py:attribute:: filePathAndName
+
+
+   .. py:attribute:: redisCon
+
+
+   .. py:method:: retrieveContentFromRedis(initial=False) -> str
+
+      Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
+
+      :return: The translation as JSON
+      :rtype: str
+
+
+
+
+   .. py:method:: getTranslation(locale: str, keyArr: list[str]) -> str
+
+      Get the correct translation for a certain list of keys from the json
+
+      :param locale: The locale string retrieved from either the profile or the session
+      :type locale: str
+      :param keyArr: path to take inside the json e.g. email, subjects, confirmedByClient
+      :type keyArr: list[str]
+      :return: The correct word/sentence
+      :rtype: str
+
+
+
+.. py:data:: manageTranslations
+

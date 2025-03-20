@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.connections.coypu`
-=========================================
+code_SemperKI.connections.coypu
+===============================
 
 .. py:module:: code_SemperKI.connections.coypu
 
@@ -13,36 +13,36 @@
 
 
 
-Module Contents
----------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   code_SemperKI.connections.coypu.ManageQueries
-
-
-
-
 Attributes
-~~~~~~~~~~
+----------
 
 .. autoapisummary::
 
    code_SemperKI.connections.coypu.getExampleNews
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.coypu.ManageQueries
+
+
+Module Contents
+---------------
+
 .. py:class:: ManageQueries(filePathAndName)
 
    Contains query from file as object
 
 
-   .. py:attribute:: redisCon
-      
 
-      
+   .. py:attribute:: redisCon
+
+
+   .. py:attribute:: endpoint
+
 
    .. py:method:: sendQuery()
 
@@ -56,7 +56,4 @@ Attributes
 
 
 .. py:data:: getExampleNews
-   
-
-   
 

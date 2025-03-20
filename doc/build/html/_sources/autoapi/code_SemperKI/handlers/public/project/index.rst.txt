@@ -1,0 +1,424 @@
+code_SemperKI.handlers.public.project
+=====================================
+
+.. py:module:: code_SemperKI.handlers.public.project
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handlers for projects
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.project.logger
+   code_SemperKI.handlers.public.project.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.project.SResGetProject
+   code_SemperKI.handlers.public.project.SResFlatProjectsEntry
+   code_SemperKI.handlers.public.project.SResGetFlatProjects
+   code_SemperKI.handlers.public.project.SReqCreateProjectID
+   code_SemperKI.handlers.public.project.SResCreateProjectID
+   code_SemperKI.handlers.public.project.SReqUpdateProjectChanges
+   code_SemperKI.handlers.public.project.SReqUpdateProject
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.project.getFlatProjects
+   code_SemperKI.handlers.public.project.getProject
+   code_SemperKI.handlers.public.project.getProjectForDashboard
+   code_SemperKI.handlers.public.project.createProjectID
+   code_SemperKI.handlers.public.project.updateProject
+   code_SemperKI.handlers.public.project.deleteProjects
+   code_SemperKI.handlers.public.project.saveProjects
+   code_SemperKI.handlers.public.project.saveProjectsViaWebsocket
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SResGetProject(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: projectStatus
+
+
+   .. py:attribute:: client
+
+
+   .. py:attribute:: projectDetails
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+   .. py:attribute:: processes
+
+
+.. py:class:: SResFlatProjectsEntry(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: projectStatus
+
+
+   .. py:attribute:: client
+
+
+   .. py:attribute:: projectDetails
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+   .. py:attribute:: processesCount
+
+
+   .. py:attribute:: processIDs
+
+
+   .. py:attribute:: owner
+
+
+   .. py:attribute:: searchableData
+
+
+.. py:class:: SResGetFlatProjects(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projects
+
+
+.. py:function:: getFlatProjects(request: rest_framework.request.Request)
+
+   Retrieve all projects.
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Response with dict
+   :rtype: JSON Response
+
+
+
+.. py:function:: getProject(request, projectID)
+
+   Retrieve project with flat processes.
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param projectID: id of the project
+   :type projectID: str
+   :return: Response with dict
+   :rtype: JSON Response
+
+
+
+.. py:function:: getProjectForDashboard(request: rest_framework.request.Request, projectID)
+
+   Retrieve all projects for the dashboard
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Response
+   :rtype: JSONResponse
+
+
+
+.. py:class:: SReqCreateProjectID(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: title
+
+
+.. py:class:: SResCreateProjectID(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+.. py:function:: createProjectID(request: rest_framework.request.Request)
+
+   Create project and send ID to frontend
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: project ID as string
+   :rtype: JSONResponse
+
+
+
+.. py:class:: SReqUpdateProjectChanges(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectStatus
+
+
+   .. py:attribute:: projectDetails
+
+
+.. py:class:: SReqUpdateProject(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: changes
+
+
+.. py:function:: updateProject(request: rest_framework.request.Request)
+
+   Update stuff about the project
+
+   :param request: Request with content
+   :type request: HTTP PATCH
+   :return: Message if it worked or not
+   :rtype: HTTPResponse
+
+
+
+.. py:function:: deleteProjects(request: rest_framework.request.Request)
+
+   Delete whole projects
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :return: Success or not
+   :rtype: HTTPResponse
+
+
+
+.. py:function:: saveProjects(request: rest_framework.request.Request)
+
+   Save projects to database
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Response if sent successfully or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: saveProjectsViaWebsocket(session)
+
+   Save projects to database
+
+   :param session: session of user
+   :type session: Dict
+   :return: None
+   :rtype: None
+
+
+

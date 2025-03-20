@@ -1,0 +1,31 @@
+code_SemperKI.services.service_Packaging.handlers.public.resources.onto
+=======================================================================
+
+.. py:module:: code_SemperKI.services.service_Packaging.handlers.public.resources.onto
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Calls to ontology for adding and retrieving data
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Packaging.handlers.public.resources.onto.logger
+   code_SemperKI.services.service_Packaging.handlers.public.resources.onto.loggerError
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+

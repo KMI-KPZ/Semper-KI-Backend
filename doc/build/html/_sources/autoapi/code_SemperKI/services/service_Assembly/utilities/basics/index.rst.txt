@@ -1,0 +1,34 @@
+code_SemperKI.services.service_Assembly.utilities.basics
+========================================================
+
+.. py:module:: code_SemperKI.services.service_Assembly.utilities.basics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Basic implementations regarding the A service
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Assembly.utilities.basics.checkIfOrgaHasAAsService
+
+
+Module Contents
+---------------
+
+.. py:function:: checkIfOrgaHasAAsService()
+
+   Check whether an orga can change their resources
+
+   :return: Response whether the orga can change their resources or not. If so, call the function.
+   :rtype: Response, Func
+
+

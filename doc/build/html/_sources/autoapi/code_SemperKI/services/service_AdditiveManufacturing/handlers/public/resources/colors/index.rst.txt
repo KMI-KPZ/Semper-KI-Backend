@@ -1,0 +1,180 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors
+=====================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Handler for color specific requests
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.SResRALListEntry
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.SReqColor
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.SReqSetColor
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.getRALList
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors.setColor
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SResRALListEntry(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: RAL
+
+
+   .. py:attribute:: RALName
+
+
+   .. py:attribute:: Hex
+
+
+.. py:function:: getRALList(request: rest_framework.request.Request)
+
+   Get the RAL table and convert to frontend format
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Array with RAL table
+   :rtype: JSONResponse
+
+
+
+.. py:class:: SReqColor(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+.. py:class:: SReqSetColor(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: color
+
+
+.. py:function:: setColor(request: rest_framework.request.Request)
+
+   Set the color
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Success or not
+   :rtype: Response
+
+
+

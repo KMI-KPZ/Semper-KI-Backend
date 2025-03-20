@@ -1,0 +1,429 @@
+code_SemperKI.handlers.public.process
+=====================================
+
+.. py:module:: code_SemperKI.handlers.public.process
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2024
+
+   Contains: Handlers for processes
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.process.logger
+   code_SemperKI.handlers.public.process.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.process.SResProcessID
+   code_SemperKI.handlers.public.process.SResProcessDetails
+   code_SemperKI.handlers.public.process.SResFiles
+   code_SemperKI.handlers.public.process.SResMessages
+   code_SemperKI.handlers.public.process.SResButtonAction
+   code_SemperKI.handlers.public.process.SResProcessStatusButtons
+   code_SemperKI.handlers.public.process.SResContractor
+   code_SemperKI.handlers.public.process.SResProcess
+   code_SemperKI.handlers.public.process.SReqUpdateProcess
+   code_SemperKI.handlers.public.process.SResHistoryEntry
+   code_SemperKI.handlers.public.process.SResProcessHistory
+   code_SemperKI.handlers.public.process.SResContractorsContent
+   code_SemperKI.handlers.public.process.SResErrors
+   code_SemperKI.handlers.public.process.SResContractors
+   code_SemperKI.handlers.public.process.SReqsCloneProcess
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.process.createProcessID
+   code_SemperKI.handlers.public.process.getProcess
+   code_SemperKI.handlers.public.process.updateProcess
+   code_SemperKI.handlers.public.process.deleteProcesses
+   code_SemperKI.handlers.public.process.getProcessHistory
+   code_SemperKI.handlers.public.process.getContractors
+   code_SemperKI.handlers.public.process.cloneProcesses
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SResProcessID
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: processID
+
+
+.. py:function:: createProcessID(request: rest_framework.request.Request, projectID)
+
+   Create process ID for frontend
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param projectID: id of the project the created process should belong to
+   :type projectID: str
+   :return: process ID as string
+   :rtype: JSONResponse
+
+
+
+.. py:class:: SResProcessDetails
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: provisionalContractor
+
+
+   .. py:attribute:: amount
+
+
+   .. py:attribute:: inputParameters
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: clientBillingAddress
+
+
+   .. py:attribute:: clientDeliverAddress
+
+
+   .. py:attribute:: imagePath
+
+
+   .. py:attribute:: priorities
+
+
+   .. py:attribute:: prices
+
+
+   .. py:attribute:: verificationResults
+
+
+   .. py:attribute:: additionalInput
+
+
+.. py:class:: SResFiles
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+.. py:class:: SResMessages
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+.. py:class:: SResButtonAction
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: data
+
+
+.. py:class:: SResProcessStatusButtons
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: icon
+
+
+   .. py:attribute:: iconPosition
+
+
+   .. py:attribute:: action
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: buttonVariant
+
+
+   .. py:attribute:: showIn
+
+
+.. py:class:: SResContractor
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: hashedID
+
+
+.. py:class:: SResProcess
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: project
+
+
+   .. py:attribute:: serviceDetails
+
+
+   .. py:attribute:: processStatus
+
+
+   .. py:attribute:: serviceType
+
+
+   .. py:attribute:: serviceStatus
+
+
+   .. py:attribute:: processDetails
+
+
+   .. py:attribute:: dependenciesIn
+
+
+   .. py:attribute:: dependenciesOut
+
+
+   .. py:attribute:: client
+
+
+   .. py:attribute:: files
+
+
+   .. py:attribute:: messages
+
+
+   .. py:attribute:: contractor
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+   .. py:attribute:: processStatusButtons
+
+
+   .. py:attribute:: processErrors
+
+
+   .. py:attribute:: flatProcessStatus
+
+
+.. py:function:: getProcess(request: rest_framework.request.Request, projectID, processID)
+
+   Retrieve complete process.
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Response with list
+   :rtype: JSON Response
+
+
+
+.. py:class:: SReqUpdateProcess
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processIDs
+
+
+   .. py:attribute:: changes
+
+
+   .. py:attribute:: deletions
+
+
+.. py:function:: updateProcess(request: rest_framework.request.Request)
+
+   Update stuff about the process
+
+   :param request: Request with content
+   :type request: HTTP PATCH
+   :return: Message if it worked or not
+   :rtype: HTTPResponse
+
+
+
+.. py:function:: deleteProcesses(request: rest_framework.request.Request, projectID)
+
+   Delete one or more processes
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param projectID: id of the project
+   :type projectID: str
+   :return: Success or not
+   :rtype: HTTPRespone
+
+
+
+.. py:class:: SResHistoryEntry
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: data
+
+
+   .. py:attribute:: details
+
+
+.. py:class:: SResProcessHistory
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: history
+
+
+.. py:function:: getProcessHistory(request: rest_framework.request.Request, processID)
+
+   See who has done what and when
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param processID: The process of interest
+   :type processID: str
+   :return: JSON of process history
+   :rtype: JSON Response
+
+
+
+.. py:class:: SResContractorsContent
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: hashedID
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: branding
+
+
+   .. py:attribute:: prices
+
+
+   .. py:attribute:: distance
+
+
+   .. py:attribute:: contractorCoordinates
+
+
+   .. py:attribute:: verified
+
+
+   .. py:attribute:: groups
+
+
+.. py:class:: SResErrors
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: error
+
+
+.. py:class:: SResContractors
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: contractors
+
+
+   .. py:attribute:: errors
+
+
+.. py:function:: getContractors(request: rest_framework.request.Request, processID: str)
+
+   Get all suitable Contractors.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :param processID: The ID of the process a contractor is chosen for
+   :type processID: str
+   :return: List of contractors and some details
+   :rtype: JSON
+
+
+
+.. py:class:: SReqsCloneProcess
+
+   Bases: :py:obj:`serializers.Serializer`
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processIDs
+
+
+.. py:function:: cloneProcesses(request: rest_framework.request.Request)
+
+   Duplicate selected processes. Works only for logged in users.
+
+   :param request: POST request from statusButtonRequest
+   :type request: HTTP POST
+   :param projectID: The project ID of the project the processes belonged to
+   :type projectID: str
+   :param processIDs: List of processes to be cloned
+   :type processIDs: list of strings
+   :return: JSON with project and process IDs
+   :rtype: JSONResponse
+
+
+

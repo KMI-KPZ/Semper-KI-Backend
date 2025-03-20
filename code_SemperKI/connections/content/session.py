@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2024
 
 Contains: Offers an interface to access the session dictionary in a structured way
+
 """
 
 from django.utils import timezone
@@ -15,6 +16,7 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import profi
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.utilities import crypto
 from Generic_Backend.code_General.utilities.files import deleteFileHelper
+from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription
 
 from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
 from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails, ProjectOutput
@@ -523,8 +525,28 @@ class ProcessManagementSession(AbstractContentInterface):
                 allProjects[idx][ProjectOutput.processesCount] = len(processes) # no check needed since session is self contained
                 allProjects[idx][ProjectOutput.processIDs] = list(processes.keys())
                 # gather searchable data
-                allProjects[idx][ProjectOutput.searchableData] = []
-                # TODO
+                searchableData = []
+                for processID in processes:
+                    process = self.structuredSessionObj.getProcessPerID(processID)
+                    # title
+                    if ProcessDetails.title in process[ProcessDescription.processDetails]:
+                        searchableData.append(process[ProcessDescription.processDetails][ProcessDetails.title])
+
+                    # file names
+                    if ProcessDescription.files in process and process[ProcessDescription.files] is not None and process[ProcessDescription.files] != {}: 
+                        for file in process[ProcessDescription.files]:
+                            searchableData.append(process[ProcessDescription.files][file][FileObjectContent.fileName])
+
+                    # contractor name
+                    if ProcessDetails.provisionalContractor in process[ProcessDescription.processDetails] and process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] is not None and process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] != {}:
+                        if isinstance(process.processDetails[ProcessDetails.provisionalContractor], dict):
+                            searchableData.append(process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor][OrganizationDescription.name])
+
+                    # service specific stuff
+                    if ProcessDescription.serviceDetails in process and ProcessDescription.serviceType in process and process[ProcessDescription.serviceType] is not serviceManager.getNone():
+                        searchableData.extend(serviceManager.getService(process[ProcessDescription.serviceType]).getSearchableDetails(process[ProcessDescription.serviceDetails]))
+
+                allProjects[idx][ProjectOutput.searchableData] = searchableData
                 
                 if SessionContentSemperKI.processes in allProjects[idx]:
                     del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that

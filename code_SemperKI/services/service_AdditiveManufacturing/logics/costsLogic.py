@@ -19,7 +19,7 @@ from code_SemperKI.definitions import *
 
 from ..definitions import *
 from ..connections.postgresql import pgKG
-from ..connections.filterViaSparql import Filter
+from ..connections.filterViaSparql import FilterAM
 
 
 logger = logging.getLogger("logToFile")
@@ -38,7 +38,7 @@ class Costs():
     """
 
     ##################################################
-    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:Filter, apiGivenContent:dict={}) -> None:
+    def __init__(self, process:ProcessInterface|Process, additionalArguments:dict, filterObject:FilterAM, apiGivenContent:dict={}) -> None:
         """
         Gather input variables
 
@@ -121,15 +121,15 @@ class Costs():
         
         technology = enum.auto()
         costRatePersonalMachine = enum.auto()
-        buildChamberHeight = enum.auto()
-        buildChamberLength = enum.auto()
-        buildChamberWidth = enum.auto()
-        machineMaterialLoss = enum.auto()
+        chamberBuildHeight = enum.auto()
+        chamberBuildLength = enum.auto()
+        chamberBuildWidth = enum.auto()
+        lossOfMaterial = enum.auto()
         machineBatchDistance = enum.auto()
         layerThickness = enum.auto()
         machineSurfaceArea = enum.auto()
-        machineSetUpSimple = enum.auto()
-        machineSetUpComplex = enum.auto()
+        simpleMachineSetUp = enum.auto()
+        complexMachineSetUp = enum.auto()
         averagePowerConsumption = enum.auto()
         machineHourlyRate = enum.auto()
         # Powder Bed fusion only:
@@ -173,10 +173,23 @@ class Costs():
             self.minimalPrintingSpeed = sys.float_info.max # largest float
             material = group[ServiceDetails.material]
             valuesForThisMaterial = {}
-            valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial.value] = float(material.get(NodePropertiesAMMaterial.acquisitionCosts, 400))
-            valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial.value] = float(material.get(NodePropertiesAMMaterial.density, 4.43))
-            if NodePropertiesAMMaterial.printingSpeed in material and material[NodePropertiesAMMaterial.printingSpeed] < self.minimalPrintingSpeed:
-                self.minimalPrintingSpeed = float(material[NodePropertiesAMMaterial.printingSpeed])
+            for props in material["propList"]:
+                value = props["value"]
+                match props["key"]:
+                    case NodePropertiesAMMaterial.acquisitionCosts:
+                        valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial.value] = float(value)
+                    case NodePropertiesAMMaterial.density:
+                        valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial.value] = float(value)
+                    case NodePropertiesAMMaterial.printingSpeed:
+                        if float(value) < self.minimalPrintingSpeed:
+                            self.minimalPrintingSpeed = float(value)
+                        valuesForThisMaterial[self.MaterialValues.maxPrintingSpeed.value] = float(value)
+            if self.MaterialValues.priceOfSpecificMaterial not in valuesForThisMaterial:
+                valuesForThisMaterial[self.MaterialValues.priceOfSpecificMaterial.value] = 25
+            if self.MaterialValues.densityOfSpecificMaterial not in valuesForThisMaterial:
+                valuesForThisMaterial[self.MaterialValues.densityOfSpecificMaterial.value] = 1.0
+            if self.MaterialValues.maxPrintingSpeed not in valuesForThisMaterial:
+                valuesForThisMaterial[self.MaterialValues.maxPrintingSpeed.value] = 60
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["materialParameters"] = valuesForThisMaterial
             self.listOfValuesForEveryMaterial.append(valuesForThisMaterial)
 
@@ -193,7 +206,7 @@ class Costs():
                 technology = "Material Extrusion"
                 if apiGivenContent == {}:
                     technologies = pgKG.Basics.getSpecificNeighborsByType(printer[pgKG.NodeDescription.nodeID], pgKG.NodeTypesAM.technology)
-                    technology = technologies[0][pgKG.NodeDescription.nodeName] if len(technologies) > 0 else "Material Extrusion"
+                    technology = technologies[0][pgKG.NodeDescription.nodeName] if technologies is not None and len(technologies) > 0 else "Material Extrusion"
                 else:
                     technology = printer["technology"]
                 
@@ -205,23 +218,23 @@ class Costs():
                         case NodePropertiesAMPrinter.costRatePersonalMachine:
                             valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine.value] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildHeight:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberHeight.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.chamberBuildHeight.value] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildLength:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberLength.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.chamberBuildLength.value] = float(value)
                         case NodePropertiesAMPrinter.chamberBuildWidth:
-                            valuesForThisPrinter[self.PrinterValues.buildChamberWidth.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.chamberBuildWidth.value] = float(value)
                         case NodePropertiesAMPrinter.lossOfMaterial:
-                            valuesForThisPrinter[self.PrinterValues.machineMaterialLoss.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.lossOfMaterial.value] = float(value)
                         case NodePropertiesAMPrinter.machineBatchDistance:
                             valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = float(value)
                         case NodePropertiesAMPrinter.possibleLayerHeights:
-                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [float(x) for x in value.split(",")].sort(reverse=True)
+                            valuesForThisPrinter[self.PrinterValues.layerThickness.value] = sorted([float(x) for x in value.rstrip(",").split(",")], reverse=True)
                         case NodePropertiesAMPrinter.machineSurfaceArea:
                             valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = float(value)
                         case NodePropertiesAMPrinter.simpleMachineSetUp:
-                            valuesForThisPrinter[self.PrinterValues.machineSetUpSimple.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.simpleMachineSetUp.value] = float(value)
                         case NodePropertiesAMPrinter.complexMachineSetUp:
-                            valuesForThisPrinter[self.PrinterValues.machineSetUpComplex.value] = float(value)
+                            valuesForThisPrinter[self.PrinterValues.complexMachineSetUp.value] = float(value)
                         case NodePropertiesAMPrinter.averagePowerConsumption:
                             valuesForThisPrinter[self.PrinterValues.averagePowerConsumption.value] = float(value)
                         case NodePropertiesAMPrinter.machineHourlyRate:
@@ -241,39 +254,39 @@ class Costs():
                         
 
                 # default values
-                if NodePropertiesAMPrinter.costRatePersonalMachine not in propertiesOfPrinter:
+                if self.PrinterValues.costRatePersonalMachine not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.costRatePersonalMachine.value] = 26
-                if NodePropertiesAMPrinter.chamberBuildHeight not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.buildChamberHeight.value] = 500
-                if NodePropertiesAMPrinter.chamberBuildLength not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.buildChamberLength.value] = 500
-                if NodePropertiesAMPrinter.chamberBuildWidth not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.buildChamberWidth.value] = 500
-                if NodePropertiesAMPrinter.lossOfMaterial not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.machineMaterialLoss.value] = 30
-                if NodePropertiesAMPrinter.machineBatchDistance not in propertiesOfPrinter:
+                if self.PrinterValues.chamberBuildHeight not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.chamberBuildHeight.value] = 500
+                if self.PrinterValues.chamberBuildLength not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.chamberBuildLength.value] = 500
+                if self.PrinterValues.chamberBuildWidth not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.chamberBuildWidth.value] = 500
+                if self.PrinterValues.lossOfMaterial not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.lossOfMaterial.value] = 30
+                if self.PrinterValues.machineBatchDistance not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineBatchDistance.value] = 10
-                if NodePropertiesAMPrinter.possibleLayerHeights not in propertiesOfPrinter:
+                if self.PrinterValues.layerThickness not in valuesForThisPrinter or valuesForThisPrinter[self.PrinterValues.layerThickness.value] is None:
                     valuesForThisPrinter[self.PrinterValues.layerThickness.value] = [75.]
-                if NodePropertiesAMPrinter.machineSurfaceArea not in propertiesOfPrinter:
+                if self.PrinterValues.machineSurfaceArea not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineSurfaceArea.value] = 1.8
-                if NodePropertiesAMPrinter.simpleMachineSetUp not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.machineSetUpSimple.value] = 1
-                if NodePropertiesAMPrinter.complexMachineSetUp not in propertiesOfPrinter:
-                    valuesForThisPrinter[self.PrinterValues.machineSetUpComplex.value] = 2
-                if NodePropertiesAMPrinter.averagePowerConsumption not in propertiesOfPrinter:
+                if self.PrinterValues.simpleMachineSetUp not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.simpleMachineSetUp.value] = 1
+                if self.PrinterValues.complexMachineSetUp not in valuesForThisPrinter:
+                    valuesForThisPrinter[self.PrinterValues.complexMachineSetUp.value] = 2
+                if self.PrinterValues.averagePowerConsumption not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.averagePowerConsumption.value] = 5
-                if NodePropertiesAMPrinter.machineHourlyRate not in propertiesOfPrinter:
+                if self.PrinterValues.machineHourlyRate not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.machineHourlyRate.value] = 51.80
                 # Poweder bed fusion only:
-                if NodePropertiesAMPrinter.coatingTime not in propertiesOfPrinter:
+                if self.PrinterValues.coatingTime not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.coatingTime.value] = 9
                 # Extrusion only:
-                if NodePropertiesAMPrinter.fillRate not in propertiesOfPrinter:
+                if self.PrinterValues.fillRate not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.fillRate.value] = 1.0
-                if NodePropertiesAMPrinter.nozzleDiameter not in propertiesOfPrinter:
+                if self.PrinterValues.nozzleDiameter not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.nozzleDiameter.value] = 0.4
-                if NodePropertiesAMPrinter.maxPrintingSpeed not in propertiesOfPrinter:
+                if self.PrinterValues.maxPrintingSpeed not in valuesForThisPrinter:
                     valuesForThisPrinter[self.PrinterValues.maxPrintingSpeed.value] = 60
                 # build rate will be calculated in the calculateCostsForPrinter function if not set
                 self.listOfValuesForEveryPrinter.append(valuesForThisPrinter)
@@ -303,15 +316,15 @@ class Costs():
         """
         try:
             # C09 - Calculation of max. printed parts in z-dimension, batch distance is only between the parts, first layer and last layer of the chamber is fully used
-            theoMaxBatchSizeHeight = math.floor((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) // (partHeight + printer[self.PrinterValues.machineBatchDistance]))
+            theoMaxBatchSizeHeight = math.floor((printer[self.PrinterValues.chamberBuildHeight] + printer[self.PrinterValues.machineBatchDistance]) // (partHeight + printer[self.PrinterValues.machineBatchDistance]))
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeHeight"] = theoMaxBatchSizeHeight
 
             # C10 - Calculation of max. printed parts in x-dimension, batch distance is  between everything, first layer and last layer of the chamber isnt fully used
-            theoMaxBatchSizeLength = math.floor((printer[self.PrinterValues.buildChamberLength] ) // (partLength + printer[self.PrinterValues.machineBatchDistance]))
+            theoMaxBatchSizeLength = math.floor((printer[self.PrinterValues.chamberBuildLength] ) // (partLength + printer[self.PrinterValues.machineBatchDistance]))
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeLength"] = theoMaxBatchSizeLength
 
             # C11 - Calculation of max. printed parts in y-dimension, batch distance is  between everything, first layer and last layer of the chamber isnt fully used
-            theoMaxBatchSizeWidth = math.floor((printer[self.PrinterValues.buildChamberWidth] ) // (partWidth + printer[self.PrinterValues.machineBatchDistance]))
+            theoMaxBatchSizeWidth = math.floor((printer[self.PrinterValues.chamberBuildWidth] ) // (partWidth + printer[self.PrinterValues.machineBatchDistance]))
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["theoMaxBatchSizeWidth"] = theoMaxBatchSizeWidth
 
             # C12 - Calculation of max. printed parts in xy-plain
@@ -355,11 +368,11 @@ class Costs():
                 raise ValueError("Quantity check failed")
 
             # C30 - Calculates the summ of all unused heigth of the chamber in mm for all batches excluding batch n
-            heightOffsetFirstBatchN1 = ((printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * theoMaxBatchSizeHeight) * (minBatchQuantity - 1)
+            heightOffsetFirstBatchN1 = ((printer[self.PrinterValues.chamberBuildHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * theoMaxBatchSizeHeight) * (minBatchQuantity - 1)
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["heightOffsetFirstBatchN1"] = heightOffsetFirstBatchN1
 
             # C31 - Calculates unused heigth of the chamber in mm for  batch n
-            heightOffsetLastBatchN = (printer[self.PrinterValues.buildChamberHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * usedBatchSizeHeight
+            heightOffsetLastBatchN = (printer[self.PrinterValues.chamberBuildHeight] + printer[self.PrinterValues.machineBatchDistance]) - (partHeight + printer[self.PrinterValues.machineBatchDistance]) * usedBatchSizeHeight
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["heightOffsetLastBatchN"] = heightOffsetLastBatchN
 
             # C32 - Ratio between used chamber height and unused chamber height over all batches
@@ -370,14 +383,14 @@ class Costs():
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["exposureTimeBatch"] = exposureTimeBatch
 
             # C105 - Beschichtungszeit Batch ==(AUFRUNDEN(((C2*1000)/C77);0)*C94)/3600
-            coatingTimeBatch = (math.ceil((printer[self.PrinterValues.buildChamberHeight] * 1000.) / layerThickness) * printer[self.PrinterValues.coatingTime]) / 3600.
+            coatingTimeBatch = (math.ceil((printer[self.PrinterValues.chamberBuildHeight] * 1000.) / layerThickness) * printer[self.PrinterValues.coatingTime]) / 3600.
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["coatingTimeBatch"] = coatingTimeBatch
 
             # C106 - Beschichtungszeit Quantity =((AUFRUNDEN((((((C2-C30)*(C22-1))+(C2-C31))*1000)/C77);0)*C94)/3600)
             coatingTimeQuantity = ((math.ceil((((((
-                                        printer[self.PrinterValues.buildChamberHeight] - heightOffsetFirstBatchN1) * (
+                                        printer[self.PrinterValues.chamberBuildHeight] - heightOffsetFirstBatchN1) * (
                                         minBatchQuantity - 1)) + (
-                                        printer[self.PrinterValues.buildChamberHeight] - heightOffsetLastBatchN)) * 1000.) / layerThickness)) * printer[self.PrinterValues.coatingTime]) / 3600.)
+                                        printer[self.PrinterValues.chamberBuildHeight] - heightOffsetLastBatchN)) * 1000.) / layerThickness)) * printer[self.PrinterValues.coatingTime]) / 3600.)
             self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["coatingTimeQuantity"] = coatingTimeQuantity
 
             # C79 - Druckdauer Batch =C105+C108
@@ -414,7 +427,7 @@ class Costs():
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["materialCostPrintingQuantity"] = materialCostPrintingQuantity
 
                 # C44 - machine material loss for the part
-                costMachineMaterialLossPart = materialCostPrintingPart * (printer[self.PrinterValues.machineMaterialLoss] / 100)
+                costMachineMaterialLossPart = materialCostPrintingPart * (printer[self.PrinterValues.lossOfMaterial] / 100)
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costMachineMaterialLossPart"] = costMachineMaterialLossPart
 
                 # C46 - cost for material loss per quantity
@@ -530,7 +543,6 @@ class Costs():
                 totalCostsForEveryPrinter = []
                 self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"] = [{} for _ in range(len(self.listOfValuesForEveryPrinter))]
                 for printerIdx, printer in enumerate(self.listOfValuesForEveryPrinter):
-                    
                     # calculate layer thickness corresponding to the levelOfDetail
                     layerThicknessArrayLength = len(printer[self.PrinterValues.layerThickness])
                     layerThickness = 75. # default value
@@ -542,9 +554,6 @@ class Costs():
                         case 2:
                             layerThickness = printer[self.PrinterValues.layerThickness][layerThicknessArrayLength - 1]
                             
-                    
-                        
-
                     printingSpeedForMaterialAndPrinter = self.minimalPrintingSpeed
                     # if extrusion printer and build rate is not set, calculate it
                     if printingSpeedForMaterialAndPrinter > printer[self.PrinterValues.maxPrintingSpeed]:
@@ -580,7 +589,7 @@ class Costs():
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["electricityCostPerHour"] = electricityCostPerHour
 
                     # C68 - cost for personal machine
-                    costPersonalMachine = printer[self.PrinterValues.costRatePersonalMachine] * (printer[self.PrinterValues.machineSetUpSimple] + printer[self.PrinterValues.machineSetUpComplex])
+                    costPersonalMachine = printer[self.PrinterValues.costRatePersonalMachine] * (printer[self.PrinterValues.simpleMachineSetUp] + printer[self.PrinterValues.complexMachineSetUp])
                     self.detailedCalculations[ServiceDetails.groups.value][groupID]["costsPerModel"][modelID]["costsForEveryPrinter"][printerIdx]["costPersonalMachine"] = costPersonalMachine
 
                     # C70 - cost personal pre process

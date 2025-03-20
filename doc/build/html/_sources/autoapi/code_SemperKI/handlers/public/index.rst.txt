@@ -1,0 +1,20 @@
+code_SemperKI.handlers.public
+=============================
+
+.. py:module:: code_SemperKI.handlers.public
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/handlers/public/admin/index
+   /autoapi/code_SemperKI/handlers/public/files/index
+   /autoapi/code_SemperKI/handlers/public/miscellaneous/index
+   /autoapi/code_SemperKI/handlers/public/process/index
+   /autoapi/code_SemperKI/handlers/public/project/index
+   /autoapi/code_SemperKI/handlers/public/statemachine/index
+
+

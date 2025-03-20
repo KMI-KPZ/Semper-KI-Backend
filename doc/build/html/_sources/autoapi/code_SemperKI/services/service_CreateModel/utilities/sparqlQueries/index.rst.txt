@@ -1,0 +1,37 @@
+code_SemperKI.services.service_CreateModel.utilities.sparqlQueries
+==================================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.utilities.sparqlQueries
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Services using the sparql endpoint regarding Create Model
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.utilities.sparqlQueries.SparqlParameters
+
+
+Module Contents
+---------------
+
+.. py:class:: SparqlParameters
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   All parameters that could be important for a query. Not all are used every time.
+
+
+   .. py:attribute:: ID
+
+

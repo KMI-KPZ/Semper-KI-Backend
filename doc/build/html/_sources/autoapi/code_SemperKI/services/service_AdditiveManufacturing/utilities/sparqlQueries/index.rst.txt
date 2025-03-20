@@ -1,0 +1,92 @@
+code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries
+============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Services using the sparql endpoint regarding 3D Printer Data
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.getAllMaterials
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.getAllPrinters
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.getServiceProviders
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.createEntryForContractor
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.updateEntryForContractor
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.deleteAllFromContractor
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.deleteLinkPrinterMaterialOfContractor
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.deletePrinterOfContractor
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.getManufacturersByBuildPlate
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.getManufacturersByMaterial
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.sparqlQueries.SparqlParameters
+
+
+Module Contents
+---------------
+
+.. py:class:: SparqlParameters
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   All parameters that could be important for a query. Not all are used every time.
+
+
+   .. py:attribute:: ID
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: PrinterModel
+
+
+   .. py:attribute:: Material
+
+
+   .. py:attribute:: min_length
+
+
+   .. py:attribute:: min_width
+
+
+   .. py:attribute:: min_height
+
+
+.. py:data:: getAllMaterials
+
+.. py:data:: getAllPrinters
+
+.. py:data:: getServiceProviders
+
+.. py:data:: createEntryForContractor
+
+.. py:data:: updateEntryForContractor
+
+.. py:data:: deleteAllFromContractor
+
+.. py:data:: deleteLinkPrinterMaterialOfContractor
+
+.. py:data:: deletePrinterOfContractor
+
+.. py:data:: getManufacturersByBuildPlate
+
+.. py:data:: getManufacturersByMaterial
+

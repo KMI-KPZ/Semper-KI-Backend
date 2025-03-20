@@ -1,5 +1,5 @@
-:py:mod:`BenchyMcMarkface`
-==========================
+BenchyMcMarkface
+================
 
 .. py:module:: BenchyMcMarkface
 
@@ -21,12 +21,9 @@
 
 
 
-Module Contents
----------------
-
 
 Functions
-~~~~~~~~~
+---------
 
 .. autoapisummary::
 
@@ -37,6 +34,8 @@ Functions
    BenchyMcMarkface.startFromDjango
 
 
+Module Contents
+---------------
 
 .. py:function:: request(url)
    :async:
@@ -55,5 +54,4 @@ Functions
 
 
 .. py:function:: startFromDjango(request)
-
 

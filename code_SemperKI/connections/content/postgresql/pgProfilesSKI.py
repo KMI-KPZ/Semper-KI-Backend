@@ -23,7 +23,7 @@ from logging import getLogger
 logger = getLogger("errors")
 
 ####################################################################################
-def userCreatedSemperKI(userHashID:str, session):
+def userCreatedSemperKI(userHashID:str, session, oldDetails:dict):
     """
     Look for (new) user, update details according to Semper-KI specific fields
 
@@ -31,12 +31,19 @@ def userCreatedSemperKI(userHashID:str, session):
     :type userHashID: str
     :param session: The session object
     :type session: Session
+    :param oldDetails: The old details of the user
+    :type oldDetails: dict
     :return: Nothing
     :rtype: None
     """
     try:
         user, _ = ProfileManagementBase.getUserViaHash(userHashID)
         existingDetails = copy.deepcopy(user.details)
+
+        if UserDetailsSKI.todos in oldDetails:
+            user.details[UserDetailsSKI.todos] = oldDetails[UserDetailsSKI.todos]
+        else:
+            user.details[UserDetailsSKI.todos] = {}
 
         if UserDetails.notificationSettings in existingDetails:
             existingDetails = existingDetails[UserDetails.notificationSettings]
@@ -147,6 +154,8 @@ def userUpdatedSemperKI(userHashID:str, session, updates):
                         user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
                     else:
                         user.details[UserDetails.addresses][addressID][AddressesSKI.coordinates] = (0,0)
+        elif UserDetailsSKI.todos in updates:
+            user.details[UserDetailsSKI.todos] = updates[UserDetailsSKI.todos]
         user.save()
         return None
     except Exception as error:
@@ -220,6 +229,14 @@ def orgaCreatedSemperKI(orgaHashID:str, oldDetails:dict):
                 orga.details[OrganizationDetailsSKI.resilienceScore] = []
             else:
                 orga.details[OrganizationDetailsSKI.resilienceScore] = oldDetails[OrganizationDetailsSKI.resilienceScore]
+        
+        if OrganizationDetailsSKI.todos not in oldDetails:
+            orga.details[OrganizationDetailsSKI.todos] = {}
+        else:
+            if not isinstance(oldDetails[OrganizationDetailsSKI.todos], dict):
+                orga.details[OrganizationDetailsSKI.todos] = {}
+            else:
+                orga.details[OrganizationDetailsSKI.todos] = oldDetails[OrganizationDetailsSKI.todos]
 
         orga.save()
     except Exception as error:
@@ -252,6 +269,8 @@ def orgaUpdatedSemperKI(orgaHashID:str, session, updates):
                         orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = coordsOfAddress
                     else:
                         orga.details[OrganizationDetails.addresses][addressID][AddressesSKI.coordinates] = (0,0)
+        elif OrganizationDetailsSKI.todos in updates:
+            orga.details[OrganizationDetailsSKI.todos] = updates[OrganizationDetailsSKI.todos]
         
         orga.save()
         return None

@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.definitions &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.handlers" href="../handlers/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification" href="../connections/postgresql/pgVerification/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.definitions">
+<span id="code-semperki-services-service-additivemanufacturing-definitions"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.definitions<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.definitions" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SERVICE_NAME</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SERVICE_NUMBER</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServiceDetails</span></code></a></p></td>
+<td><p>What does the service consists of</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileContentsAM</span></code></a></p></td>
+<td><p>What does a file contain?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Calculations</span></code></a></p></td>
+<td><p>What does a calculation entry contain?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Measurements</span></code></a></p></td>
+<td><p>What does a measurement entry contain?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MbbDimensions</span></code></a></p></td>
+<td><p>What does a mbbDimensions entry contain?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaterialDetails</span></code></a></p></td>
+<td><p>What does a material entry contain?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PostProcessDetails</span></code></a></p></td>
+<td><p>What does a postprocess entry contain?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeTypesAM</span></code></a></p></td>
+<td><p>What possible types can a node have in the AM service?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter</span></code></a></p></td>
+<td><p>What are the properties, a printer node can have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial</span></code></a></p></td>
+<td><p>What are the properties, a material node can have?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement</span></code></a></p></td>
+<td><p>What are the properties, a additional requirement node can have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMColor</span></code></a></p></td>
+<td><p>What are the properties, a color node can have?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialCategory</span></code></a></p></td>
+<td><p>What are the properties, a material category node can have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMTechnology</span></code></a></p></td>
+<td><p>What are the properties, a technology node can have?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialType</span></code></a></p></td>
+<td><p>What are the properties, a material type node can have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrganizationDetailsAM</span></code></a></p></td>
+<td><p>What are the details of an organization?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServiceSpecificDetailsForContractors</span></code></a></p></td>
+<td><p>What are the details of a service for contractors?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FilterCategories</span></code></a></p></td>
+<td><p>What filters can be applied?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors" title="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FilterErrors</span></code></a></p></td>
+<td><p>What can go wrong when filtering?</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">SERVICE_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ADDITIVE_MANUFACTURING'</span></em><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">SERVICE_NUMBER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">ServiceDetails</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does the service consists of</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.models">
+<span class="sig-name descname"><span class="pre">models</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.models" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.material">
+<span class="sig-name descname"><span class="pre">material</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.material" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.postProcessings">
+<span class="sig-name descname"><span class="pre">postProcessings</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.postProcessings" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.calculations">
+<span class="sig-name descname"><span class="pre">calculations</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.calculations" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.color">
+<span class="sig-name descname"><span class="pre">color</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.color" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.context" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">FileContentsAM</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a file contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.width" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.height" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.length">
+<span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.complexity">
+<span class="sig-name descname"><span class="pre">complexity</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.complexity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.scalingFactor">
+<span class="sig-name descname"><span class="pre">scalingFactor</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.scalingFactor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.femRequested">
+<span class="sig-name descname"><span class="pre">femRequested</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.femRequested" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.testType">
+<span class="sig-name descname"><span class="pre">testType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.testType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.pressure">
+<span class="sig-name descname"><span class="pre">pressure</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.pressure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">Calculations</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a calculation entry contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.filename" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.measurements">
+<span class="sig-name descname"><span class="pre">measurements</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.measurements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.status_code">
+<span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.status_code" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">Measurements</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a measurement entry contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.surfaceArea">
+<span class="sig-name descname"><span class="pre">surfaceArea</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.surfaceArea" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbDimensions">
+<span class="sig-name descname"><span class="pre">mbbDimensions</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbDimensions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbVolume">
+<span class="sig-name descname"><span class="pre">mbbVolume</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbVolume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">MbbDimensions</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a mbbDimensions entry contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._1">
+<span class="sig-name descname"><span class="pre">_1</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._2">
+<span class="sig-name descname"><span class="pre">_2</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._3">
+<span class="sig-name descname"><span class="pre">_3</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">MaterialDetails</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a material entry contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.medianPrice">
+<span class="sig-name descname"><span class="pre">medianPrice</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.medianPrice" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.propList">
+<span class="sig-name descname"><span class="pre">propList</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.propList" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.colors">
+<span class="sig-name descname"><span class="pre">colors</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.colors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">PostProcessDetails</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a postprocess entry contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.id" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.checked">
+<span class="sig-name descname"><span class="pre">checked</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.checked" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.selectedValue">
+<span class="sig-name descname"><span class="pre">selectedValue</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.selectedValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.valueList">
+<span class="sig-name descname"><span class="pre">valueList</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.valueList" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodeTypesAM</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What possible types can a node have in the AM service?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.organization">
+<span class="sig-name descname"><span class="pre">organization</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.organization" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.printer">
+<span class="sig-name descname"><span class="pre">printer</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.printer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.material">
+<span class="sig-name descname"><span class="pre">material</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.material" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.additionalRequirement">
+<span class="sig-name descname"><span class="pre">additionalRequirement</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.additionalRequirement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.color">
+<span class="sig-name descname"><span class="pre">color</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.color" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialCategory">
+<span class="sig-name descname"><span class="pre">materialCategory</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialCategory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.technology">
+<span class="sig-name descname"><span class="pre">technology</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.technology" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialType">
+<span class="sig-name descname"><span class="pre">materialType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMPrinter</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a printer node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.nozzleDiameter">
+<span class="sig-name descname"><span class="pre">nozzleDiameter</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.nozzleDiameter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.lossOfMaterial">
+<span class="sig-name descname"><span class="pre">lossOfMaterial</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.lossOfMaterial" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fixedCosts">
+<span class="sig-name descname"><span class="pre">fixedCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fixedCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineBatchDistance">
+<span class="sig-name descname"><span class="pre">machineBatchDistance</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineBatchDistance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fillRate">
+<span class="sig-name descname"><span class="pre">fillRate</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fillRate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildHeight">
+<span class="sig-name descname"><span class="pre">chamberBuildHeight</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildHeight" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildWidth">
+<span class="sig-name descname"><span class="pre">chamberBuildWidth</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildWidth" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildLength">
+<span class="sig-name descname"><span class="pre">chamberBuildLength</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildLength" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.buildRate">
+<span class="sig-name descname"><span class="pre">buildRate</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.buildRate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.averagePowerConsumption">
+<span class="sig-name descname"><span class="pre">averagePowerConsumption</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.averagePowerConsumption" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.possibleLayerHeights">
+<span class="sig-name descname"><span class="pre">possibleLayerHeights</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.possibleLayerHeights" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineUsageCosts">
+<span class="sig-name descname"><span class="pre">machineUsageCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineUsageCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineSurfaceArea">
+<span class="sig-name descname"><span class="pre">machineSurfaceArea</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineSurfaceArea" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.simpleMachineSetUp">
+<span class="sig-name descname"><span class="pre">simpleMachineSetUp</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.simpleMachineSetUp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.complexMachineSetUp">
+<span class="sig-name descname"><span class="pre">complexMachineSetUp</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.complexMachineSetUp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineHourlyRate">
+<span class="sig-name descname"><span class="pre">machineHourlyRate</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineHourlyRate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.costRatePersonalMachine">
+<span class="sig-name descname"><span class="pre">costRatePersonalMachine</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.costRatePersonalMachine" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.coatingTime">
+<span class="sig-name descname"><span class="pre">coatingTime</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.coatingTime" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.maxPrintingSpeed">
+<span class="sig-name descname"><span class="pre">maxPrintingSpeed</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.maxPrintingSpeed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMMaterial</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a material node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.foodSafe">
+<span class="sig-name descname"><span class="pre">foodSafe</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.foodSafe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.heatResistant">
+<span class="sig-name descname"><span class="pre">heatResistant</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.heatResistant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexible">
+<span class="sig-name descname"><span class="pre">flexible</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexible" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.smooth">
+<span class="sig-name descname"><span class="pre">smooth</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.smooth" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.eModul">
+<span class="sig-name descname"><span class="pre">eModul</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.eModul" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.poissonRatio">
+<span class="sig-name descname"><span class="pre">poissonRatio</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.poissonRatio" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.density">
+<span class="sig-name descname"><span class="pre">density</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.density" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.printingSpeed">
+<span class="sig-name descname"><span class="pre">printingSpeed</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.printingSpeed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.acquisitionCosts">
+<span class="sig-name descname"><span class="pre">acquisitionCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.acquisitionCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.ultimateTensileStrength">
+<span class="sig-name descname"><span class="pre">ultimateTensileStrength</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.ultimateTensileStrength" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.tensileModulus">
+<span class="sig-name descname"><span class="pre">tensileModulus</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.tensileModulus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.elongationAtBreak">
+<span class="sig-name descname"><span class="pre">elongationAtBreak</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.elongationAtBreak" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexuralStrength">
+<span class="sig-name descname"><span class="pre">flexuralStrength</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexuralStrength" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.specificMaterialType">
+<span class="sig-name descname"><span class="pre">specificMaterialType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.specificMaterialType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMAdditionalRequirement</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a additional requirement node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.heatResistant">
+<span class="sig-name descname"><span class="pre">heatResistant</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.heatResistant" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.smooth">
+<span class="sig-name descname"><span class="pre">smooth</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.smooth" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.foodSafe">
+<span class="sig-name descname"><span class="pre">foodSafe</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.foodSafe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.treatmentCosts">
+<span class="sig-name descname"><span class="pre">treatmentCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.treatmentCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.fixedCosts">
+<span class="sig-name descname"><span class="pre">fixedCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.fixedCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMColor</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a color node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorRAL">
+<span class="sig-name descname"><span class="pre">colorRAL</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorRAL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorHEX">
+<span class="sig-name descname"><span class="pre">colorHEX</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorHEX" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMMaterialCategory</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a material category node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMTechnology</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a technology node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesAMMaterialType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a material type node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">OrganizationDetailsAM</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the details of an organization?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.powerCosts">
+<span class="sig-name descname"><span class="pre">powerCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.powerCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.margin">
+<span class="sig-name descname"><span class="pre">margin</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.margin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.personnelCosts">
+<span class="sig-name descname"><span class="pre">personnelCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.personnelCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRatePersonnelEngineering">
+<span class="sig-name descname"><span class="pre">costRatePersonnelEngineering</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRatePersonnelEngineering" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.repairCosts">
+<span class="sig-name descname"><span class="pre">repairCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.repairCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.additionalFixedCosts">
+<span class="sig-name descname"><span class="pre">additionalFixedCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.additionalFixedCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRateEquipmentEngineering">
+<span class="sig-name descname"><span class="pre">costRateEquipmentEngineering</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRateEquipmentEngineering" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.fixedCostsEquipmentEngineering">
+<span class="sig-name descname"><span class="pre">fixedCostsEquipmentEngineering</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.fixedCostsEquipmentEngineering" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.safetyGasCosts">
+<span class="sig-name descname"><span class="pre">safetyGasCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.safetyGasCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.roomCosts">
+<span class="sig-name descname"><span class="pre">roomCosts</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.roomCosts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">ServiceSpecificDetailsForContractors</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the details of a service for contractors?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.verified">
+<span class="sig-name descname"><span class="pre">verified</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.verified" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">FilterCategories</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What filters can be applied?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialCategory">
+<span class="sig-name descname"><span class="pre">materialCategory</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialCategory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialType">
+<span class="sig-name descname"><span class="pre">materialType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.tensileStrength">
+<span class="sig-name descname"><span class="pre">tensileStrength</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.tensileStrength" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.density">
+<span class="sig-name descname"><span class="pre">density</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.density" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.elongationAtBreak">
+<span class="sig-name descname"><span class="pre">elongationAtBreak</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.elongationAtBreak" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.certificates">
+<span class="sig-name descname"><span class="pre">certificates</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.certificates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.definitions.</span></span><span class="sig-name descname"><span class="pre">FilterErrors</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What can go wrong when filtering?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.material">
+<span class="sig-name descname"><span class="pre">material</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.material" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.color">
+<span class="sig-name descname"><span class="pre">color</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.color" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.postProcessing">
+<span class="sig-name descname"><span class="pre">postProcessing</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.postProcessing" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.printer">
+<span class="sig-name descname"><span class="pre">printer</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.printer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+<li class="toctree-l8 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.definitions</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME"><code class="docutils literal notranslate"><span class="pre">SERVICE_NAME</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER"><code class="docutils literal notranslate"><span class="pre">SERVICE_NUMBER</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceDetails</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.groups"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.groups</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.models"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.models</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.material"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.material</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.postProcessings"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.postProcessings</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.calculations"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.calculations</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.color"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.color</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails.context"><code class="docutils literal notranslate"><span class="pre">ServiceDetails.context</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM"><code class="docutils literal notranslate"><span class="pre">FileContentsAM</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.width"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.width</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.height"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.height</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.length"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.length</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.volume"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.volume</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.complexity"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.complexity</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.scalingFactor"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.scalingFactor</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.femRequested"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.femRequested</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.testType"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.testType</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM.pressure"><code class="docutils literal notranslate"><span class="pre">FileContentsAM.pressure</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations"><code class="docutils literal notranslate"><span class="pre">Calculations</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.filename"><code class="docutils literal notranslate"><span class="pre">Calculations.filename</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.measurements"><code class="docutils literal notranslate"><span class="pre">Calculations.measurements</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations.status_code"><code class="docutils literal notranslate"><span class="pre">Calculations.status_code</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements"><code class="docutils literal notranslate"><span class="pre">Measurements</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.volume"><code class="docutils literal notranslate"><span class="pre">Measurements.volume</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.surfaceArea"><code class="docutils literal notranslate"><span class="pre">Measurements.surfaceArea</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbDimensions"><code class="docutils literal notranslate"><span class="pre">Measurements.mbbDimensions</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements.mbbVolume"><code class="docutils literal notranslate"><span class="pre">Measurements.mbbVolume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions"><code class="docutils literal notranslate"><span class="pre">MbbDimensions</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._1"><code class="docutils literal notranslate"><span class="pre">MbbDimensions._1</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._2"><code class="docutils literal notranslate"><span class="pre">MbbDimensions._2</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions._3"><code class="docutils literal notranslate"><span class="pre">MbbDimensions._3</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails"><code class="docutils literal notranslate"><span class="pre">MaterialDetails</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.id"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.id</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.title"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.title</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.imgPath"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.imgPath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.medianPrice"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.medianPrice</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.propList"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.propList</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails.colors"><code class="docutils literal notranslate"><span class="pre">MaterialDetails.colors</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.id"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.id</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.title"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.title</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.checked"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.checked</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.selectedValue"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.selectedValue</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.valueList"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.valueList</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.type"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.type</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails.imgPath"><code class="docutils literal notranslate"><span class="pre">PostProcessDetails.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.organization"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.organization</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.printer"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.printer</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.material"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.material</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.additionalRequirement"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.additionalRequirement</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.color"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.color</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialCategory"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.materialCategory</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.technology"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.technology</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM.materialType"><code class="docutils literal notranslate"><span class="pre">NodeTypesAM.materialType</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.imgPath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.nozzleDiameter"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.nozzleDiameter</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.certificates"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.certificates</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.lossOfMaterial"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.lossOfMaterial</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fixedCosts"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.fixedCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineBatchDistance"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.machineBatchDistance</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.fillRate"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.fillRate</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildHeight"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.chamberBuildHeight</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildWidth"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.chamberBuildWidth</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.chamberBuildLength"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.chamberBuildLength</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.buildRate"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.buildRate</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.averagePowerConsumption"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.averagePowerConsumption</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.possibleLayerHeights"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.possibleLayerHeights</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineUsageCosts"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.machineUsageCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineSurfaceArea"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.machineSurfaceArea</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.simpleMachineSetUp"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.simpleMachineSetUp</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.complexMachineSetUp"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.complexMachineSetUp</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.machineHourlyRate"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.machineHourlyRate</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.costRatePersonalMachine"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.costRatePersonalMachine</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.coatingTime"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.coatingTime</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter.maxPrintingSpeed"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMPrinter.maxPrintingSpeed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.imgPath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.foodSafe"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.foodSafe</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.heatResistant"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.heatResistant</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexible"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.flexible</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.smooth"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.smooth</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.eModul"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.eModul</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.poissonRatio"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.poissonRatio</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.certificates"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.certificates</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.density"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.density</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.printingSpeed"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.printingSpeed</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.acquisitionCosts"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.acquisitionCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.ultimateTensileStrength"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.ultimateTensileStrength</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.tensileModulus"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.tensileModulus</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.elongationAtBreak"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.elongationAtBreak</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.flexuralStrength"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.flexuralStrength</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial.specificMaterialType"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterial.specificMaterialType</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.imgPath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.heatResistant"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.heatResistant</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.smooth"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.smooth</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.foodSafe"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.foodSafe</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.certificates"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.certificates</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.treatmentCosts"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.treatmentCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement.fixedCosts"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMAdditionalRequirement.fixedCosts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMColor</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMColor.imgPath</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorRAL"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMColor.colorRAL</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.colorHEX"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMColor.colorHEX</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor.certificates"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMColor.certificates</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialCategory</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialCategory.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMTechnology</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMTechnology.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialType</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType.imgPath"><code class="docutils literal notranslate"><span class="pre">NodePropertiesAMMaterialType.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.powerCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.powerCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.margin"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.margin</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.personnelCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.personnelCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRatePersonnelEngineering"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.costRatePersonnelEngineering</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.repairCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.repairCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.additionalFixedCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.additionalFixedCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.costRateEquipmentEngineering"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.costRateEquipmentEngineering</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.fixedCostsEquipmentEngineering"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.fixedCostsEquipmentEngineering</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.safetyGasCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.safetyGasCosts</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM.roomCosts"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsAM.roomCosts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificDetailsForContractors</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.verified"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificDetailsForContractors.verified</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors.groups"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificDetailsForContractors.groups</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories"><code class="docutils literal notranslate"><span class="pre">FilterCategories</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialCategory"><code class="docutils literal notranslate"><span class="pre">FilterCategories.materialCategory</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.materialType"><code class="docutils literal notranslate"><span class="pre">FilterCategories.materialType</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.tensileStrength"><code class="docutils literal notranslate"><span class="pre">FilterCategories.tensileStrength</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.density"><code class="docutils literal notranslate"><span class="pre">FilterCategories.density</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.elongationAtBreak"><code class="docutils literal notranslate"><span class="pre">FilterCategories.elongationAtBreak</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories.certificates"><code class="docutils literal notranslate"><span class="pre">FilterCategories.certificates</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors"><code class="docutils literal notranslate"><span class="pre">FilterErrors</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.material"><code class="docutils literal notranslate"><span class="pre">FilterErrors.material</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.color"><code class="docutils literal notranslate"><span class="pre">FilterErrors.color</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.postProcessing"><code class="docutils literal notranslate"><span class="pre">FilterErrors.postProcessing</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors.printer"><code class="docutils literal notranslate"><span class="pre">FilterErrors.printer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../handlers/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+      <li>Previous: <a href="../connections/postgresql/pgVerification/index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification</a></li>
+      <li>Next: <a href="../handlers/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/definitions/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

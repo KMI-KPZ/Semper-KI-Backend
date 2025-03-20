@@ -127,7 +127,7 @@ class AfterSales(Semper.ServiceBase):
         return outDict
 
     ###################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[dict, object]:
         """
         Get a list of contractors that are available for this service
 
@@ -137,11 +137,11 @@ class AfterSales(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterAS()
 
-        outList = filteredContractors.getFilteredContractors(processObj)
+        outDict = filteredContractors.getFilteredContractors(processObj)
         
-        return outList, filteredContractors
+        return outDict, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
@@ -158,5 +158,13 @@ class AfterSales(Semper.ServiceBase):
 
         """
         return {}
+    
+    ###################################################
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+        return []
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AfterSales(), settings.STATIC_URL+"media/AS.png")

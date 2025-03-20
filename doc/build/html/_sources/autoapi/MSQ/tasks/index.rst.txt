@@ -1,0 +1,15 @@
+MSQ.tasks
+=========
+
+.. py:module:: MSQ.tasks
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/MSQ/tasks/tasks/index
+
+

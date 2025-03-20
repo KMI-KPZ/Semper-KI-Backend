@@ -1,0 +1,98 @@
+code_SemperKI.tasks.processTasks
+================================
+
+.. py:module:: code_SemperKI.tasks.processTasks
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Tasks that are needed for almost every process 
+               and which shall be run in the background
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.tasks.processTasks.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.tasks.processTasks.sendEMail
+   code_SemperKI.tasks.processTasks.verificationOfProcess
+   code_SemperKI.tasks.processTasks.sendProcessEMails
+   code_SemperKI.tasks.processTasks.sendLocalFileToRemote
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:function:: sendEMail(IDOfReceiver: str, notification: str, subject: list[str], message: list[str], processTitle: str) -> None
+
+   Send an E-Mail asynchronously
+
+   :param IDOfReceiver: ID of receiving user/orga
+   :type IDOfReceiver: str 
+   :param notification: The notification setting
+   :type notification: str
+   :param subject: What the mail is about
+   :type subject: str 
+   :param message: The actual message
+   :type message: str 
+   :param processTitle: What is the process called?
+   :type processTitle: str
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: verificationOfProcess(processObj: code_SemperKI.modelFiles.processModel.Process, session)
+
+   Verify a process' integrity
+
+   :param processObj: The process in question
+   :type processObj: Process
+   :param session: The session of the user who clicked
+   :type session: Django Session Object
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: sendProcessEMails(processObj: code_SemperKI.modelFiles.processModel.Process, contractorObj: Generic_Backend.code_General.connections.postgresql.pgProfiles.Organization, session)
+
+   Send the e-mails regarding the process on their merry way to the user and the contractor
+
+   :param processObj: The process belonging to the project
+   :type processObj: Process
+   :param contractorObj: The contractor that the process is send to
+   :type contractorObj: Organization
+   :param session: The session of the user
+   :type session: Django Session Object (dict-like)
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: sendLocalFileToRemote(pathOnStorage: str)
+
+   Send a file from local storage to remote storage in the background
+
+   :param pathOnStorage: The path on both s3 directories
+   :type pathOnStorage: str
+   :return: Nothing
+   :rtype: None
+
+
+

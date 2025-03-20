@@ -1,0 +1,78 @@
+code_SemperKI.services.service_Assembly.logics.costs
+====================================================
+
+.. py:module:: code_SemperKI.services.service_Assembly.logics.costs
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Cost calculations for this service
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Assembly.logics.costs.logger
+   code_SemperKI.services.service_Assembly.logics.costs.loggerError
+   code_SemperKI.services.service_Assembly.logics.costs.PLATFORM_MARGIN
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Assembly.logics.costs.Costs
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:data:: PLATFORM_MARGIN
+   :value: 10.0
+
+
+.. py:class:: Costs(process: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process, additionalArguments: dict, filterObject: code_SemperKI.services.service_Assembly.connections.filterViaSparql.FilterA)
+
+   Calculate all costs associated with the assembly process for one organization
+
+
+
+   .. py:attribute:: processObj
+
+
+   .. py:attribute:: additionalArguments
+
+
+   .. py:attribute:: filterObject
+
+
+   .. py:attribute:: detailedCalculations
+
+
+   .. py:method:: calculateCosts() -> list[tuple[float, float]] | Exception
+
+      Calculate all costs
+
+
+
+
+   .. py:method:: getEncryptedCostOverview() -> str
+
+      Encrypt the detailed cost overview
+
+      :return: encrypted cost overview as str
+      :rtype: str
+
+
+

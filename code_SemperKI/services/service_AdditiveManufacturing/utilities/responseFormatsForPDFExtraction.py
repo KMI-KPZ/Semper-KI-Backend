@@ -9,7 +9,8 @@ from typing import List, Optional, Union, Literal
 # Enumeration of 3D printer types
 class PrinterType(str, Enum):
     """
-    Enumeration for the different types of 3D printing technologies.
+    Enumeration for the different types of 3D printing technologies
+
     """
     binder_jetting = "Binder Jetting"
     directed_energy_deposition = "Directed Energy Deposition"
@@ -25,7 +26,8 @@ class PrinterType(str, Enum):
 class OrganizationType(str, Enum):
     """
     Enumeration for the type of organization associated with the printer.
-    It could be a manufacturer, distributor, service provider, etc.
+    It could be a manufacturer, distributor, service provider, etc
+
     """
     manufacturer = "manufacturer"
     distributor = "distributor"
@@ -35,10 +37,11 @@ class OrganizationType(str, Enum):
 
 
 # Model representing an organization
-class Organization(BaseModel):
+class ManufacturingOrganization(BaseModel):
     """
     Represents an organization involved with the 3D printer.
-    This could be a manufacturer, distributor, or service provider.
+    This could be a manufacturer, distributor, or service provider
+
     """
     type: OrganizationType
     organization_name: str
@@ -48,7 +51,8 @@ class Organization(BaseModel):
 class Dimension(BaseModel):
     """
     Represents a dimension with a value and a unit.
-    Used for defining dimensions like width, length, or height.
+    Used for defining dimensions like width, length, or height
+
     """
     value: float
     unit: str
@@ -58,7 +62,8 @@ class Dimension(BaseModel):
 class PrinterDimensions(BaseModel):
     """
     Represents the physical dimensions of the printer.
-    This includes width, length, and height dimensions.
+    This includes width, length, and height dimensions
+
     """
     width: Dimension
     length: Dimension
@@ -67,7 +72,8 @@ class PrinterDimensions(BaseModel):
 
 class MachineSurfaceArea(BaseModel):
     """
-    Represents the surface area of the machine with a unit (e.g., m², ft²).
+    Represents the surface area of the machine with a unit (e.g., m², ft²)
+
     """
     value: float  # The surface area value
     unit: str  # Unit of surface area, e.g., m², ft²
@@ -79,7 +85,8 @@ class MachineSurfaceArea(BaseModel):
 
 class PhysicalProperties(BaseModel):
     """
-    Represents the weight of the printer along with its dimensions.
+    Represents the weight of the printer along with its dimensions
+
     """
     weight: Dimension  # The weight of the printer
     dimensions: PrinterDimensions  # The physical dimensions of the printer
@@ -94,7 +101,8 @@ class BuildVolume(BaseModel):
 
 class LayerThickness(BaseModel):
     """
-    Represents the layer thickness specifications for 3D printing.
+    Represents the layer thickness specifications for 3D printing
+
     """
     min_thickness: Dimension  # Minimum layer thickness
     max_thickness: Dimension  # Maximum layer thickness
@@ -103,7 +111,8 @@ class LayerThickness(BaseModel):
 # New features: Chamber build dimensions, batch distance, and build rate
 class ChamberBuild(BaseModel):
     """
-    Represents the dimensions of the build chamber and batch settings.
+    Represents the dimensions of the build chamber and batch settings
+
     """
     width: Dimension  # Width of the build chamber
     length: Dimension  # Length of the build chamber
@@ -111,14 +120,16 @@ class ChamberBuild(BaseModel):
 
 class PrintingSpeed(BaseModel):
     """
-    Represents the physical properties of the material.
+    Represents the physical properties of the material
+
     """
     printing_speed: Dimension
 
 
 class BuildRate(BaseModel):
     """
-    Represents the build rate of the printer.
+    Represents the build rate of the printer
+
     """
     value: float  # The build rate value
     unit: str  # Unit of build rate, e.g., cm³/h
@@ -131,7 +142,8 @@ class BuildRate(BaseModel):
 # Model for representing power consumption
 class PowerConsumption(BaseModel):
     """
-    Represents the average power consumption of the printer.
+    Represents the average power consumption of the printer
+
     """
     value: float  # Average power consumption value
     unit: str  # Unit for power consumption, defaulting to €/kWh
@@ -144,7 +156,8 @@ class PowerConsumption(BaseModel):
 # Enumeration for various certifications
 class Certification(str, Enum):
     """
-    Enumeration for different certifications that a 3D printer might have.
+    Enumeration for different certifications that a 3D printer might have
+
     """
     CE = "CE"
     FDA = "FDA"
@@ -159,7 +172,8 @@ class Certification(str, Enum):
 # Enumeration for various file formats
 class FileFormat(str, Enum):
     """
-    Enumeration for common input file formats supported by 3D printers.
+    Enumeration for common input file formats supported by 3D printers
+
     """
     STL = "STL"  # Stereolithography
     OBJ = "OBJ"  # Wavefront Object
@@ -177,7 +191,8 @@ class FileFormat(str, Enum):
 # Printer specifications model
 class PrinterSpecifications(BaseModel):
     """
-    Core specifications of the printer.
+    Core specifications of the printer
+
     """
     printing_technology: PrinterType
     build_volume: BuildVolume
@@ -204,7 +219,8 @@ class PrinterSpecifications(BaseModel):
 # Enumeration for printer module types
 class ModuleType(str, Enum):
     """
-    Enumeration for different module types in the 3D printing system.
+    Enumeration for different module types in the 3D printing system
+
     """
     printing = "Printing Module"  # Handles additive manufacturing
     post_curing = "Post-Curing Module"  # Used for curing materials post-printing
@@ -218,7 +234,8 @@ class ModuleType(str, Enum):
 # Enumeration for printer module types
 class ConfigurationType(str, Enum):
     """
-    Enumeration for different module types in the 3D printing system.
+    Enumeration for different module types in the 3D printing system
+
     """
     printing = "Printing Module"
     post_curing = "Post-Curing Module"
@@ -230,7 +247,10 @@ class ConfigurationType(str, Enum):
 
 # Model for representing each printer module
 class PrinterConfiguration(BaseModel):
-    """Represents a printer module or the printer itself if standalone."""
+    """
+    Represents a printer module or the printer itself if standalone.
+    
+    """
     configuration_name: str # Name of the module or printer
     configuration_type: ConfigurationType
     physical_properties: PhysicalProperties = Field(default_factory=PhysicalProperties)  # Physical properties of the module
@@ -239,14 +259,20 @@ class PrinterConfiguration(BaseModel):
 
 # Updated PrinterModel to handle cases with or without modules
 class PrinterModel(BaseModel):
-    """Represents a collection of printer modules or standalone printer details."""
+    """
+    Represents a collection of printer modules or standalone printer details.
+    
+    """
     printer_names: Optional[List[str]] = Field(default_factory=list)  # Main name of the printer
     #configuration_names: Optional[List[str]] = Field(default_factory=list)  
     configurations: Optional[List[PrinterConfiguration]] = Field(default_factory=list)  
 
 
     def is_standalone(self) -> bool:
-        """Helper method to check if the printer is standalone (without modules)."""
+        """
+        Helper method to check if the printer is standalone (without modules).
+        
+        """
         return len(self.configurations) == 0
 
 
@@ -254,9 +280,10 @@ class PrinterModel(BaseModel):
 # Aggregated response model for a 3D printer specification analysis
 class PrinterResponse(BaseModel):
     """
-    Aggregated response model for 3D printer data extraction.
+    Aggregated response model for 3D printer data extraction
+
     """
-    organization: Organization
+    organization: ManufacturingOrganization
     printer_model: PrinterModel
     summary: str
 
@@ -267,7 +294,8 @@ class PrinterResponse(BaseModel):
 
 class GeneralMaterialTypeEnum(str, Enum):
     """
-    Enumeration for general material types.
+    Enumeration for general material types
+
     """
     polymer = "Polymer"
     photopolymer = "Photopolymer"
@@ -281,7 +309,8 @@ class GeneralMaterialTypeEnum(str, Enum):
 
 class PhotopolymerMaterialTypeEnum(str, Enum):
     """
-    Enumeration for photopolymer material types.
+    Enumeration for photopolymer material types
+
     """
     acrylic = "Acrylic"
     acrylic_like = "Acrylic-like"
@@ -293,7 +322,10 @@ class PhotopolymerMaterialTypeEnum(str, Enum):
     other = "Other"
 
 class PolymerMaterialTypeEnum(str, Enum):
-    """Enumeration for polymer material types."""
+    """
+    Enumeration for polymer material types.
+    
+    """
     abs = "ABS"
     abs_pbt_like = "ABS/PBT-like"
     abs_pc = "ABS/PC"
@@ -359,7 +391,10 @@ class PolymerMaterialTypeEnum(str, Enum):
     other = "Other"
 
 class CeramicMaterialTypeEnum(str, Enum):
-    """Enumeration for ceramic material types."""
+    """
+    Enumeration for ceramic material types.
+    
+    """
     alumina = "Alumina"
     glass = "Glass"
     gypsum_like = "Gypsum-like"
@@ -374,7 +409,10 @@ class CeramicMaterialTypeEnum(str, Enum):
 
 
 class MetalMaterialTypeEnum(str, Enum):
-    """Enumeration for metal material types."""
+    """
+    Enumeration for metal material types.
+    
+    """
     aluminum = "Aluminum"
     amorphous_metal = "Amorphous Metal"
     bronze = "Bronze"
@@ -401,7 +439,10 @@ class MetalMaterialTypeEnum(str, Enum):
     other = "Other"
 
 class CompositeMaterialTypeEnum(str, Enum):
-    """Enumeration for composite material types."""
+    """
+    Enumeration for composite material types.
+    
+    """
     abs_pc_carbon = "ABS/PC-Carbon"
     abs_pc_glass = "ABS/PC-Glass"
     abs_aramid = "ABS-Aramid"
@@ -421,13 +462,19 @@ class CompositeMaterialTypeEnum(str, Enum):
     other = "Other"
 
 class SandMaterialTypeEnum(str, Enum):
-    """Enumeration for sand material types."""
+    """
+    Enumeration for sand material types.
+    
+    """
     silicate = "Silicate"
     zircon = "Zircon"
     other = "Other"
 
 class WaxMaterialTypeEnum(str, Enum):
-    """Enumeration for wax material types."""
+    """
+    Enumeration for wax material types.
+    
+    """
     wax = "Wax"
     wax_like = "Wax-like"
     other = "Other"
@@ -469,6 +516,7 @@ class SpecificWaxMaterialType(SpecificMaterialTypeBase):
 class HardnessScaleEnum(str, Enum):
     """
     Enumeration for hardness scales.
+
     """
     shore_a = "Shore A"
     shore_b = "Shore B"
@@ -483,6 +531,7 @@ class HardnessScaleEnum(str, Enum):
 class MaterialInformation(BaseModel):
     """
     Represents basic material information.
+
     """
     material_supplier: str 
     material_name: str
@@ -496,6 +545,7 @@ class MaterialInformation(BaseModel):
 class AdditiveManufacturingProcessEnum(str, Enum):
     """
     Enumeration for additive manufacturing processes.
+
     """
     binder_jetting = "Binder Jetting"
     directed_energy_deposition = "Directed Energy Deposition"
@@ -541,6 +591,7 @@ class ElongationModulus(BaseModel):
 class MechanicalProperties(BaseModel):
     """
     Represents the mechanical properties of the material.
+
     """
     ultimate_tensile_strength: Optional[UltimateTensileStrength]  
     tensile_modulus: Optional[TensileModulus]  
@@ -555,6 +606,7 @@ class MechanicalProperties(BaseModel):
 class Hardness(BaseModel):
     """
     Represents the hardness properties of the material.
+
     """
     hardness_scale: HardnessScaleEnum
 
@@ -568,6 +620,7 @@ class HeatDeflectionTemperature(BaseModel):
 class ThermalProperties(BaseModel):
     """
     Represents the thermal properties of the material.
+
     """
     heat_deflection_temperature: HeatDeflectionTemperature
     glass_transition_temperature: Range
@@ -575,12 +628,14 @@ class ThermalProperties(BaseModel):
 class PhysicalPropertiesMaterial(BaseModel):
     """
     Represents the physical properties of the material.
+
     """
     density: Optional[Range] 
 
 class PrintingSettings(BaseModel):
     """
     Represents the physical properties of the material.
+
     """
     printing_speed: Optional[Range] 
 
@@ -588,6 +643,7 @@ class PrintingSettings(BaseModel):
 class MaterialResponse(BaseModel):
     """
     Aggregates all material specification sections.
+    
     """
     material_information: MaterialInformation
     am_process: Optional[AdditiveManufacturingProcessEnum] 

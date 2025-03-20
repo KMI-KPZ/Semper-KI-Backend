@@ -1,0 +1,31 @@
+code_SemperKI.services.service_AfterSales.handlers.public.resources.kgDBAS
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales.handlers.public.resources.kgDBAS
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: General handlers for the AS knowledge graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AfterSales.handlers.public.resources.kgDBAS.logger
+   code_SemperKI.services.service_AfterSales.handlers.public.resources.kgDBAS.loggerError
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.logics.filesLogics &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="code_SemperKI.logics.processLogics" href="../processLogics/index.html" />
+    <link rel="prev" title="code_SemperKI.logics" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.logics.filesLogics">
+<span id="code-semperki-logics-fileslogics"></span><h1>code_SemperKI.logics.filesLogics<a class="headerlink" href="#module-code_SemperKI.logics.filesLogics" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2025</p>
+<p>Contains: File upload handling logics</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logger" title="code_SemperKI.logics.filesLogics.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerError" title="code_SemperKI.logics.filesLogics.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerInfo" title="code_SemperKI.logics.filesLogics.loggerInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerInfo</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerDebug" title="code_SemperKI.logics.filesLogics.loggerDebug"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerDebug</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForUploadFiles" title="code_SemperKI.logics.filesLogics.logicForUploadFiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForUploadFiles</span></code></a>(request, validatedInput, functionName)</p></td>
+<td><p>Logics for uploading files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileViaPath" title="code_SemperKI.logics.filesLogics.getFileViaPath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFileViaPath</span></code></a>(→ None | io.BytesIO)</p></td>
+<td><p>Get file from storage and return it as accessible object - you have to decrypt it if necessary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFilesInfoFromProcess" title="code_SemperKI.logics.filesLogics.getFilesInfoFromProcess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFilesInfoFromProcess</span></code></a>(→ tuple[object, bool])</p></td>
+<td><p>Obtain file(s) information from a process</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileObject" title="code_SemperKI.logics.filesLogics.getFileObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFileObject</span></code></a>(→ tuple[object, bool, bool])</p></td>
+<td><p>Get file from storage and return it as accessible object - you have to decrypt it if necessary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileReadableStream" title="code_SemperKI.logics.filesLogics.getFileReadableStream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getFileReadableStream</span></code></a>(...)</p></td>
+<td><p>Get file from storage and return it as readable object where the content can be read in desired chunks</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.moveFileToRemote" title="code_SemperKI.logics.filesLogics.moveFileToRemote"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moveFileToRemote</span></code></a>(→ bool)</p></td>
+<td><p>Move a file from local to remote storage with on the fly encryption not managing other information</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDownloadAsZip" title="code_SemperKI.logics.filesLogics.logicForDownloadAsZip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForDownloadAsZip</span></code></a>(request, projectID, processID, ...)</p></td>
+<td><p>Logics for downloading files as a zip file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory" title="code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForDownloadProcessHistory</span></code></a>(request, processID, ...)</p></td>
+<td><p>Logics for downloading the history of a process</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDeleteFile" title="code_SemperKI.logics.filesLogics.logicForDeleteFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logicForDeleteFile</span></code></a>(request, projectID, processID, ...)</p></td>
+<td><p>Logics for deleting a file</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.loggerInfo">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">loggerInfo</span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.loggerInfo" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.loggerDebug">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">loggerDebug</span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.loggerDebug" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.logicForUploadFiles">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">logicForUploadFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validatedInput</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.logicForUploadFiles" title="Link to this definition">¶</a></dt>
+<dd><p>Logics for uploading files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – HttpRequest</p></li>
+<li><p><strong>validatedInput</strong> (<em>dict</em>) – The input</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – name of the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing or Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None|Exception, int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.getFileViaPath">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">getFileViaPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decrypt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">io.BytesIO</span></span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.getFileViaPath" title="Link to this definition">¶</a></dt>
+<dd><p>Get file from storage and return it as accessible object - you have to decrypt it if necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filePath</strong> (<em>str</em>) – path of the file</p></li>
+<li><p><strong>remote</strong> (<em>bool</em>) – if the file is remote</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fileObject from S3</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.getFilesInfoFromProcess">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">getFilesInfoFromProcess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">object</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.getFilesInfoFromProcess" title="Link to this definition">¶</a></dt>
+<dd><p>Obtain file(s) information from a process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<em>dict-like object</em>) – Session of the user</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – Project ID</p></li>
+<li><p><strong>processID</strong> (<em>Str</em>) – process ID</p></li>
+<li><p><strong>fileID</strong> (<em>Str</em>) – file ID, if given then only that file is returned, else all files</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>file metadata or Error HttpResponse  , retrieval success</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(dict|HttpResponse, bool)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.getFileObject">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">getFileObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">object</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.getFileObject" title="Link to this definition">¶</a></dt>
+<dd><p>Get file from storage and return it as accessible object - you have to decrypt it if necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<em>dict-like object</em>) – Session of the user</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – Project ID</p></li>
+<li><p><strong>processID</strong> (<em>Str</em>) – process ID</p></li>
+<li><p><strong>fileID</strong> (<em>Str</em>) – file ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(fileObject from S3, retrieval success, is remote location)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(object, bool, bool)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.getFileReadableStream">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">getFileReadableStream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fromRepository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Generic_Backend.code_General.utilities.crypto.EncryptionAdapter</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.getFileReadableStream" title="Link to this definition">¶</a></dt>
+<dd><p>Get file from storage and return it as readable object where the content can be read in desired chunks
+(will be decrypted if necessary)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<em>dict-like object</em>) – Session of the user</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – Project ID</p></li>
+<li><p><strong>processID</strong> (<em>Str</em>) – process ID</p></li>
+<li><p><strong>fileID</strong> (<em>Str</em>) – file ID</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Saved content</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../../code_General/utilities/crypto/index.html#code_General.utilities.crypto.EncryptionAdapter" title="code_General.utilities.crypto.EncryptionAdapter">EncryptionAdapter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.moveFileToRemote">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">moveFileToRemote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileKeyLocal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileKeyRemote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deleteLocal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printDebugInfo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.moveFileToRemote" title="Link to this definition">¶</a></dt>
+<dd><p>Move a file from local to remote storage with on the fly encryption not managing other information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fileKeyLocal</strong> (<em>Str</em>) – The key with which to retrieve the file again later</p></li>
+<li><p><strong>fileKeyRemote</strong> (<em>Str</em>) – The key with which to retrieve the file again later</p></li>
+<li><p><strong>delteLocal</strong> (<em>bool</em>) – If set to True the local file will be deleted after the transfer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or error</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool or Error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.logicForDownloadAsZip">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">logicForDownloadAsZip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.logicForDownloadAsZip" title="Link to this definition">¶</a></dt>
+<dd><p>Logics for downloading files as a zip file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – HttpRequest</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – Project ID</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – Process ID</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – name of the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>HttpResponse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">logicForDownloadProcessHistory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory" title="Link to this definition">¶</a></dt>
+<dd><p>Logics for downloading the history of a process
+TODO: Security!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – HttpRequest</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – Process ID</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – name of the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>HttpResponse</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.logics.filesLogics.logicForDeleteFile">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.logics.filesLogics.</span></span><span class="sig-name descname"><span class="pre">logicForDeleteFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projectID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serviceRequestsDeletion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.logics.filesLogics.logicForDeleteFile" title="Link to this definition">¶</a></dt>
+<dd><p>Logics for deleting a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – HttpRequest</p></li>
+<li><p><strong>projectID</strong> (<em>str</em>) – Project ID</p></li>
+<li><p><strong>processID</strong> (<em>str</em>) – Process ID</p></li>
+<li><p><strong>fileID</strong> (<em>str</em>) – File ID</p></li>
+<li><p><strong>functionName</strong> (<em>str</em>) – name of the handler</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None or Exception, statusCode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None|Exception, int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">code_SemperKI.logics</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">code_SemperKI.logics.filesLogics</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerInfo"><code class="docutils literal notranslate"><span class="pre">loggerInfo</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.loggerDebug"><code class="docutils literal notranslate"><span class="pre">loggerDebug</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForUploadFiles"><code class="docutils literal notranslate"><span class="pre">logicForUploadFiles()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileViaPath"><code class="docutils literal notranslate"><span class="pre">getFileViaPath()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFilesInfoFromProcess"><code class="docutils literal notranslate"><span class="pre">getFilesInfoFromProcess()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileObject"><code class="docutils literal notranslate"><span class="pre">getFileObject()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.getFileReadableStream"><code class="docutils literal notranslate"><span class="pre">getFileReadableStream()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.moveFileToRemote"><code class="docutils literal notranslate"><span class="pre">moveFileToRemote()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDownloadAsZip"><code class="docutils literal notranslate"><span class="pre">logicForDownloadAsZip()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDownloadProcessHistory"><code class="docutils literal notranslate"><span class="pre">logicForDownloadProcessHistory()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.logics.filesLogics.logicForDeleteFile"><code class="docutils literal notranslate"><span class="pre">logicForDeleteFile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../processLogics/index.html">code_SemperKI.logics.processLogics</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../projectLogics/index.html">code_SemperKI.logics.projectLogics</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../statemachineLogics/index.html">code_SemperKI.logics.statemachineLogics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">code_SemperKI</a><ul>
+  <li><a href="../index.html">code_SemperKI.logics</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">code_SemperKI.logics</a></li>
+      <li>Next: <a href="../processLogics/index.html" title="next chapter">code_SemperKI.logics.processLogics</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/code_SemperKI/logics/filesLogics/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

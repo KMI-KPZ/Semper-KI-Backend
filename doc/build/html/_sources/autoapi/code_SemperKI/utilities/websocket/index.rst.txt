@@ -1,0 +1,63 @@
+code_SemperKI.utilities.websocket
+=================================
+
+.. py:module:: code_SemperKI.utilities.websocket
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2024
+
+   Contains: handlers for websockets
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.websocket.logger
+   code_SemperKI.utilities.websocket.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.utilities.websocket.fireWebsocketEventsForProcess
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: fireWebsocketEventsForProcess(projectID: str, processID: str, session, event, eventContent, notification: str = '', clientOnly: bool = False, creatorOfEvent: str = '')
+
+   Fire websocket event from a list for a specific project and process. 
+
+   :param projectID: The project ID
+   :type projectID: Str
+   :param processIDArray: The process IDs
+   :type processIDArray: Str
+   :param session: The session of the current user
+   :type session: Dict
+   :param event: The event to fire
+   :type event: Str
+   :param eventContent: The content that triggered this event, for event queue
+   :type eventContent: tuple[str,dict]
+   :param notification: The type of notification
+   :type notification: str
+   :param clientOnly: Should the event fire only for the client, not the contractor
+   :type clientOnly: Bool
+   :param creatorOfEvent: The user that triggered the event
+   :type creatorOfEvent: Str
+   :return: Nothing
+   :rtype: None
+
+

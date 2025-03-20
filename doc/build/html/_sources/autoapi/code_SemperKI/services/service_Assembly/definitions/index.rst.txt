@@ -1,0 +1,75 @@
+code_SemperKI.services.service_Assembly.definitions
+===================================================
+
+.. py:module:: code_SemperKI.services.service_Assembly.definitions
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Assembly.definitions.SERVICE_NAME
+   code_SemperKI.services.service_Assembly.definitions.SERVICE_NUMBER
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Assembly.definitions.ServiceDetails
+   code_SemperKI.services.service_Assembly.definitions.NodeTypesA
+   code_SemperKI.services.service_Assembly.definitions.OrganizationDetailsA
+
+
+Module Contents
+---------------
+
+.. py:data:: SERVICE_NAME
+   :value: 'ASSEMBLY'
+
+
+.. py:data:: SERVICE_NUMBER
+   :value: 8
+
+
+.. py:class:: ServiceDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does the service consists of 
+
+
+
+.. py:class:: NodeTypesA
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What possible types can a node have in the A service?
+
+
+
+   .. py:attribute:: organization
+
+
+.. py:class:: OrganizationDetailsA
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the details of an organization?
+
+
+

@@ -1,0 +1,37 @@
+MSQ.module
+==========
+
+.. py:module:: MSQ.module
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2023
+
+   Contains: Init file for Celery
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/MSQ/module/celery/index
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   MSQ.module.celery_app
+
+
+Package Contents
+----------------
+
+.. py:data:: celery_app
+

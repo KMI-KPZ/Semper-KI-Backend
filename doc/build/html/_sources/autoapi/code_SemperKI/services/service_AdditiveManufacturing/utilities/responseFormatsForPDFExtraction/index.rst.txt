@@ -1,0 +1,2370 @@
+code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction
+==============================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.OrganizationType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ManufacturingOrganization
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.Dimension
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterDimensions
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.MachineSurfaceArea
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PhysicalProperties
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.BuildVolume
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.LayerThickness
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ChamberBuild
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrintingSpeed
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.BuildRate
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PowerConsumption
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.Certification
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.FileFormat
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterSpecifications
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ModuleType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ConfigurationType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterConfiguration
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterModel
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrinterResponse
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.GeneralMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PhotopolymerMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PolymerMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.CeramicMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.MetalMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.CompositeMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SandMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.WaxMaterialTypeEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificMaterialTypeBase
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificPolymerMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificPhotopolymerMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificCeramicMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificMetalMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificCompositeMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificSandMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.SpecificWaxMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.HardnessScaleEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.MaterialInformation
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.AdditiveManufacturingProcessEnum
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.Range
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.UltimateTensileStrength
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.TensileModulus
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ElongationAtBreak
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.FlexuralStrength
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.FlexuralModulus
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ElongationModulus
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.MechanicalProperties
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.Hardness
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.HeatDeflectionTemperature
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.ThermalProperties
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PhysicalPropertiesMaterial
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.PrintingSettings
+   code_SemperKI.services.service_AdditiveManufacturing.utilities.responseFormatsForPDFExtraction.MaterialResponse
+
+
+Module Contents
+---------------
+
+.. py:class:: PrinterType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for the different types of 3D printing technologies
+
+
+
+   .. py:attribute:: binder_jetting
+      :value: 'Binder Jetting'
+
+
+
+   .. py:attribute:: directed_energy_deposition
+      :value: 'Directed Energy Deposition'
+
+
+
+   .. py:attribute:: material_extrusion
+      :value: 'Material Extrusion'
+
+
+
+   .. py:attribute:: material_jetting
+      :value: 'Material Jetting'
+
+
+
+   .. py:attribute:: powder_bed_fusion
+      :value: 'Powder Bed Fusion'
+
+
+
+   .. py:attribute:: sheet_lamination
+      :value: 'Sheet Lamination'
+
+
+
+   .. py:attribute:: vat_photopolymerization
+      :value: 'Vat Photopolymerization'
+
+
+
+   .. py:attribute:: not_reported
+      :value: 'Not reported'
+
+
+
+.. py:class:: OrganizationType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for the type of organization associated with the printer.
+   It could be a manufacturer, distributor, service provider, etc
+
+
+
+   .. py:attribute:: manufacturer
+      :value: 'manufacturer'
+
+
+
+   .. py:attribute:: distributor
+      :value: 'distributor'
+
+
+
+   .. py:attribute:: service_provider
+      :value: 'service_provider'
+
+
+
+   .. py:attribute:: research_institution
+      :value: 'research_institution'
+
+
+
+   .. py:attribute:: other
+      :value: 'other'
+
+
+
+.. py:class:: ManufacturingOrganization(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents an organization involved with the 3D printer.
+   This could be a manufacturer, distributor, or service provider
+
+
+
+   .. py:attribute:: type
+      :type:  OrganizationType
+
+
+   .. py:attribute:: organization_name
+      :type:  str
+
+
+.. py:class:: Dimension(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents a dimension with a value and a unit.
+   Used for defining dimensions like width, length, or height
+
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: PrinterDimensions(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the physical dimensions of the printer.
+   This includes width, length, and height dimensions
+
+
+
+   .. py:attribute:: width
+      :type:  Dimension
+
+
+   .. py:attribute:: length
+      :type:  Dimension
+
+
+   .. py:attribute:: height
+      :type:  Dimension
+
+
+.. py:class:: MachineSurfaceArea(**data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the surface area of the machine with a unit (e.g., m², ft²)
+
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: PhysicalProperties(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the weight of the printer along with its dimensions
+
+
+
+   .. py:attribute:: weight
+      :type:  Dimension
+
+
+   .. py:attribute:: dimensions
+      :type:  PrinterDimensions
+
+
+.. py:class:: BuildVolume(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: width
+      :type:  Dimension
+
+
+   .. py:attribute:: length
+      :type:  Dimension
+
+
+   .. py:attribute:: height
+      :type:  Dimension
+
+
+.. py:class:: LayerThickness(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the layer thickness specifications for 3D printing
+
+
+
+   .. py:attribute:: min_thickness
+      :type:  Dimension
+
+
+   .. py:attribute:: max_thickness
+      :type:  Dimension
+
+
+.. py:class:: ChamberBuild(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the dimensions of the build chamber and batch settings
+
+
+
+   .. py:attribute:: width
+      :type:  Dimension
+
+
+   .. py:attribute:: length
+      :type:  Dimension
+
+
+   .. py:attribute:: height
+      :type:  Dimension
+
+
+.. py:class:: PrintingSpeed(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the physical properties of the material
+
+
+
+   .. py:attribute:: printing_speed
+      :type:  Dimension
+
+
+.. py:class:: BuildRate(**data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the build rate of the printer
+
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: PowerConsumption(**data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the average power consumption of the printer
+
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: Certification
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for different certifications that a 3D printer might have
+
+
+
+   .. py:attribute:: CE
+      :value: 'CE'
+
+
+
+   .. py:attribute:: FDA
+      :value: 'FDA'
+
+
+
+   .. py:attribute:: EMC
+      :value: 'EMC'
+
+
+
+   .. py:attribute:: ISO
+      :value: 'ISO'
+
+
+
+   .. py:attribute:: UL
+      :value: 'UL'
+
+
+
+   .. py:attribute:: RoHS
+      :value: 'RoHS'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: FileFormat
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for common input file formats supported by 3D printers
+
+
+
+   .. py:attribute:: STL
+      :value: 'STL'
+
+
+
+   .. py:attribute:: OBJ
+      :value: 'OBJ'
+
+
+
+   .. py:attribute:: AMF
+      :value: 'AMF'
+
+
+
+   .. py:attribute:: _3MF
+      :value: '3MF'
+
+
+
+   .. py:attribute:: PLY
+      :value: 'PLY'
+
+
+
+   .. py:attribute:: GCODE
+      :value: 'GCODE'
+
+
+
+   .. py:attribute:: STEP
+      :value: 'STEP'
+
+
+
+   .. py:attribute:: IGES
+      :value: 'IGES'
+
+
+
+   .. py:attribute:: X3D
+      :value: 'X3D'
+
+
+
+   .. py:attribute:: VRML
+      :value: 'VRML'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: PrinterSpecifications(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Core specifications of the printer
+
+
+
+   .. py:attribute:: printing_technology
+      :type:  PrinterType
+
+
+   .. py:attribute:: build_volume
+      :type:  BuildVolume
+
+
+   .. py:attribute:: layer_thickness
+      :type:  LayerThickness
+
+
+   .. py:attribute:: possible_layer_heights
+      :type:  Optional[List[float]]
+
+
+   .. py:attribute:: nozzle_diameter
+      :type:  Optional[Dimension]
+
+
+   .. py:attribute:: chamber_build
+      :type:  Optional[ChamberBuild]
+
+
+   .. py:attribute:: machine_batch_distance
+      :type:  Optional[Dimension]
+
+
+   .. py:attribute:: build_rate
+      :type:  Optional[BuildRate]
+
+
+   .. py:attribute:: max_printing_speed
+      :type:  Optional[Dimension]
+
+
+   .. py:attribute:: scan_speed
+      :type:  Optional[Dimension]
+
+
+   .. py:attribute:: coating_time
+      :type:  Optional[float]
+
+
+   .. py:attribute:: printing_speed
+      :type:  Optional[PrintingSpeed]
+
+
+   .. py:attribute:: certificates
+      :type:  Optional[List[str]]
+
+
+   .. py:attribute:: supported_input_file_formats
+      :type:  Optional[List[str]]
+
+
+   .. py:attribute:: compatible_materials
+      :type:  Optional[List[str]]
+
+
+   .. py:attribute:: support_materials
+      :type:  Optional[List[str]]
+
+
+.. py:class:: ModuleType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for different module types in the 3D printing system
+
+
+
+   .. py:attribute:: printing
+      :value: 'Printing Module'
+
+
+
+   .. py:attribute:: post_curing
+      :value: 'Post-Curing Module'
+
+
+
+   .. py:attribute:: mixing
+      :value: 'Mixing Module'
+
+
+
+   .. py:attribute:: default
+      :value: 'Default Module'
+
+
+
+   .. py:attribute:: curing
+      :value: 'Curing Module'
+
+
+
+   .. py:attribute:: inspection
+      :value: 'Inspection Module'
+
+
+
+   .. py:attribute:: support_removal
+      :value: 'Support Material Removal Module'
+
+
+
+   .. py:attribute:: hybrid
+      :value: 'Hybrid Module'
+
+
+
+.. py:class:: ConfigurationType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for different module types in the 3D printing system
+
+
+
+   .. py:attribute:: printing
+      :value: 'Printing Module'
+
+
+
+   .. py:attribute:: post_curing
+      :value: 'Post-Curing Module'
+
+
+
+   .. py:attribute:: mixing
+      :value: 'Mixing Module'
+
+
+
+   .. py:attribute:: default
+      :value: 'Default Module'
+
+
+
+.. py:class:: PrinterConfiguration(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents a printer module or the printer itself if standalone.
+
+
+
+   .. py:attribute:: configuration_name
+      :type:  str
+
+
+   .. py:attribute:: configuration_type
+      :type:  ConfigurationType
+
+
+   .. py:attribute:: physical_properties
+      :type:  PhysicalProperties
+
+
+   .. py:attribute:: specifications
+      :type:  PrinterSpecifications
+
+
+.. py:class:: PrinterModel(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents a collection of printer modules or standalone printer details.
+
+
+
+   .. py:attribute:: printer_names
+      :type:  Optional[List[str]]
+
+
+   .. py:attribute:: configurations
+      :type:  Optional[List[PrinterConfiguration]]
+
+
+   .. py:method:: is_standalone() -> bool
+
+      Helper method to check if the printer is standalone (without modules).
+
+
+
+
+.. py:class:: PrinterResponse(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Aggregated response model for 3D printer data extraction
+
+
+
+   .. py:attribute:: organization
+      :type:  ManufacturingOrganization
+
+
+   .. py:attribute:: printer_model
+      :type:  PrinterModel
+
+
+   .. py:attribute:: summary
+      :type:  str
+
+
+.. py:class:: GeneralMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for general material types
+
+
+
+   .. py:attribute:: polymer
+      :value: 'Polymer'
+
+
+
+   .. py:attribute:: photopolymer
+      :value: 'Photopolymer'
+
+
+
+   .. py:attribute:: metal
+      :value: 'Metal'
+
+
+
+   .. py:attribute:: ceramic
+      :value: 'Ceramic'
+
+
+
+   .. py:attribute:: composite
+      :value: 'Composite'
+
+
+
+   .. py:attribute:: sand
+      :value: 'Sand'
+
+
+
+   .. py:attribute:: wax
+      :value: 'Wax'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: PhotopolymerMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for photopolymer material types
+
+
+
+   .. py:attribute:: acrylic
+      :value: 'Acrylic'
+
+
+
+   .. py:attribute:: acrylic_like
+      :value: 'Acrylic-like'
+
+
+
+   .. py:attribute:: epoxy
+      :value: 'Epoxy'
+
+
+
+   .. py:attribute:: oxycetane_resin
+      :value: 'Oxycetane Resin'
+
+
+
+   .. py:attribute:: polyurethane
+      :value: 'Polyurethane'
+
+
+
+   .. py:attribute:: resin
+      :value: 'Resin'
+
+
+
+   .. py:attribute:: silicon_like
+      :value: 'Silicon-like'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: PolymerMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for polymer material types.
+
+
+
+   .. py:attribute:: abs
+      :value: 'ABS'
+
+
+
+   .. py:attribute:: abs_pbt_like
+      :value: 'ABS/PBT-like'
+
+
+
+   .. py:attribute:: abs_pc
+      :value: 'ABS/PC'
+
+
+
+   .. py:attribute:: abs_pp
+      :value: 'ABS/PP'
+
+
+
+   .. py:attribute:: abs_pp_like
+      :value: 'ABS/PP-like'
+
+
+
+   .. py:attribute:: abs_like
+      :value: 'ABS-like'
+
+
+
+   .. py:attribute:: alumina_like
+      :value: 'Alumina-like'
+
+
+
+   .. py:attribute:: asa
+      :value: 'ASA'
+
+
+
+   .. py:attribute:: bvoh
+      :value: 'BVOH'
+
+
+
+   .. py:attribute:: ce_like
+      :value: 'CE-like'
+
+
+
+   .. py:attribute:: cpe
+      :value: 'CPE'
+
+
+
+   .. py:attribute:: gypsum
+      :value: 'Gypsum'
+
+
+
+   .. py:attribute:: hdpe_like
+      :value: 'HDPE-like'
+
+
+
+   .. py:attribute:: hips
+      :value: 'HIPS'
+
+
+
+   .. py:attribute:: pa
+      :value: 'PA'
+
+
+
+   .. py:attribute:: pa_tpe
+      :value: 'PA/TPE'
+
+
+
+   .. py:attribute:: paek
+      :value: 'PAEK'
+
+
+
+   .. py:attribute:: pa_glass
+      :value: 'PA-Glass'
+
+
+
+   .. py:attribute:: pa_like
+      :value: 'PA-like'
+
+
+
+   .. py:attribute:: pbt
+      :value: 'PBT'
+
+
+
+   .. py:attribute:: pc
+      :value: 'PC'
+
+
+
+   .. py:attribute:: pc_asa
+      :value: 'PC/ASA'
+
+
+
+   .. py:attribute:: pc_pbt
+      :value: 'PC/PBT'
+
+
+
+   .. py:attribute:: pc_ptfe
+      :value: 'PC/PTFE'
+
+
+
+   .. py:attribute:: pc_carbon
+      :value: 'PC/Carbon'
+
+
+
+   .. py:attribute:: pcl
+      :value: 'PCL'
+
+
+
+   .. py:attribute:: pc_like
+      :value: 'PC-like'
+
+
+
+   .. py:attribute:: pctg
+      :value: 'PCTG'
+
+
+
+   .. py:attribute:: pe
+      :value: 'PE'
+
+
+
+   .. py:attribute:: pe_pla
+      :value: 'PE/PLA'
+
+
+
+   .. py:attribute:: peba
+      :value: 'PEBA'
+
+
+
+   .. py:attribute:: peek
+      :value: 'PEEK'
+
+
+
+   .. py:attribute:: peek_like
+      :value: 'PEEK-like'
+
+
+
+   .. py:attribute:: pei
+      :value: 'PEI'
+
+
+
+   .. py:attribute:: pekk
+      :value: 'PEKK'
+
+
+
+   .. py:attribute:: pes
+      :value: 'PES'
+
+
+
+   .. py:attribute:: pet
+      :value: 'PET'
+
+
+
+   .. py:attribute:: pet_carbon
+      :value: 'PET-Carbon'
+
+
+
+   .. py:attribute:: petg
+      :value: 'PETG'
+
+
+
+   .. py:attribute:: pla
+      :value: 'PLA'
+
+
+
+   .. py:attribute:: pla_like
+      :value: 'PLA-like'
+
+
+
+   .. py:attribute:: pmma
+      :value: 'PMMA'
+
+
+
+   .. py:attribute:: pmma_like
+      :value: 'PMMA-like'
+
+
+
+   .. py:attribute:: pom_c
+      :value: 'POM-C'
+
+
+
+   .. py:attribute:: pp
+      :value: 'PP'
+
+
+
+   .. py:attribute:: pp_like
+      :value: 'PP-like'
+
+
+
+   .. py:attribute:: pps
+      :value: 'PPS'
+
+
+
+   .. py:attribute:: ppsu
+      :value: 'PPSU'
+
+
+
+   .. py:attribute:: ps
+      :value: 'PS'
+
+
+
+   .. py:attribute:: psu
+      :value: 'PSU'
+
+
+
+   .. py:attribute:: pva
+      :value: 'PVA'
+
+
+
+   .. py:attribute:: pvc
+      :value: 'PVC'
+
+
+
+   .. py:attribute:: pvdf
+      :value: 'PVDF'
+
+
+
+   .. py:attribute:: rubber_like
+      :value: 'Rubber-like'
+
+
+
+   .. py:attribute:: tpc
+      :value: 'TPC'
+
+
+
+   .. py:attribute:: tpe
+      :value: 'TPE'
+
+
+
+   .. py:attribute:: tpe_like
+      :value: 'TPE-like'
+
+
+
+   .. py:attribute:: tps
+      :value: 'TPS'
+
+
+
+   .. py:attribute:: tpu
+      :value: 'TPU'
+
+
+
+   .. py:attribute:: tpu_like
+      :value: 'TPU-like'
+
+
+
+   .. py:attribute:: wax_like
+      :value: 'Wax-like'
+
+
+
+   .. py:attribute:: wood_like
+      :value: 'Wood-like'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: CeramicMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for ceramic material types.
+
+
+
+   .. py:attribute:: alumina
+      :value: 'Alumina'
+
+
+
+   .. py:attribute:: glass
+      :value: 'Glass'
+
+
+
+   .. py:attribute:: gypsum_like
+      :value: 'Gypsum-like'
+
+
+
+   .. py:attribute:: ha
+      :value: 'HA'
+
+
+
+   .. py:attribute:: pa_carbon
+      :value: 'PA-Carbon'
+
+
+
+   .. py:attribute:: silicon_nitride
+      :value: 'Silicon Nitride'
+
+
+
+   .. py:attribute:: tcp
+      :value: 'TCP'
+
+
+
+   .. py:attribute:: tricalcium_phosphate
+      :value: 'Tricalcium Phosphate'
+
+
+
+   .. py:attribute:: zircon
+      :value: 'Zircon'
+
+
+
+   .. py:attribute:: zirconia
+      :value: 'Zirconia'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: MetalMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for metal material types.
+
+
+
+   .. py:attribute:: aluminum
+      :value: 'Aluminum'
+
+
+
+   .. py:attribute:: amorphous_metal
+      :value: 'Amorphous Metal'
+
+
+
+   .. py:attribute:: bronze
+      :value: 'Bronze'
+
+
+
+   .. py:attribute:: chromite
+      :value: 'Chromite'
+
+
+
+   .. py:attribute:: cobalt
+      :value: 'Cobalt'
+
+
+
+   .. py:attribute:: copper
+      :value: 'Copper'
+
+
+
+   .. py:attribute:: gold
+      :value: 'Gold'
+
+
+
+   .. py:attribute:: iridium
+      :value: 'Iridium'
+
+
+
+   .. py:attribute:: iron
+      :value: 'Iron'
+
+
+
+   .. py:attribute:: magnesium
+      :value: 'Magnesium'
+
+
+
+   .. py:attribute:: nickel
+      :value: 'Nickel'
+
+
+
+   .. py:attribute:: niobium
+      :value: 'Niobium'
+
+
+
+   .. py:attribute:: pa
+      :value: 'PA'
+
+
+
+   .. py:attribute:: platinum
+      :value: 'Platinum'
+
+
+
+   .. py:attribute:: refractory_metal
+      :value: 'Refractory Metal'
+
+
+
+   .. py:attribute:: refractory_metal_bronze
+      :value: 'Refractory Metal, Bronze'
+
+
+
+   .. py:attribute:: silver
+      :value: 'Silver'
+
+
+
+   .. py:attribute:: steel
+      :value: 'Steel'
+
+
+
+   .. py:attribute:: tin
+      :value: 'Tin'
+
+
+
+   .. py:attribute:: titanium
+      :value: 'Titanium'
+
+
+
+   .. py:attribute:: tungsten
+      :value: 'Tungsten'
+
+
+
+   .. py:attribute:: zinc
+      :value: 'Zinc'
+
+
+
+   .. py:attribute:: zirconium
+      :value: 'Zirconium'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: CompositeMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for composite material types.
+
+
+
+   .. py:attribute:: abs_pc_carbon
+      :value: 'ABS/PC-Carbon'
+
+
+
+   .. py:attribute:: abs_pc_glass
+      :value: 'ABS/PC-Glass'
+
+
+
+   .. py:attribute:: abs_aramid
+      :value: 'ABS-Aramid'
+
+
+
+   .. py:attribute:: abs_carbon
+      :value: 'ABS-Carbon'
+
+
+
+   .. py:attribute:: abs_carbon_glass
+      :value: 'ABS/Carbon-Glass'
+
+
+
+   .. py:attribute:: abs_glass
+      :value: 'ABS/Glass'
+
+
+
+   .. py:attribute:: alumina
+      :value: 'Alumina'
+
+
+
+   .. py:attribute:: asa_carbon
+      :value: 'ASA-Carbon'
+
+
+
+   .. py:attribute:: carbon
+      :value: 'Carbon'
+
+
+
+   .. py:attribute:: carbon_nanotubes
+      :value: 'Carbon-Nanotubes'
+
+
+
+   .. py:attribute:: carbon_metal
+      :value: 'Carbon-Metal'
+
+
+
+   .. py:attribute:: carbon_metal_composite
+      :value: 'Carbon-Metal Composite'
+
+
+
+   .. py:attribute:: carbon_polymer
+      :value: 'Carbon-Polymer'
+
+
+
+   .. py:attribute:: carbon_silicone
+      :value: 'Carbon-Silicone'
+
+
+
+   .. py:attribute:: carbon_silicone_ceramic
+      :value: 'Carbon-Silicone-Ceramic'
+
+
+
+   .. py:attribute:: cermet
+      :value: 'Cermet'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: SandMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for sand material types.
+
+
+
+   .. py:attribute:: silicate
+      :value: 'Silicate'
+
+
+
+   .. py:attribute:: zircon
+      :value: 'Zircon'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: WaxMaterialTypeEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for wax material types.
+
+
+
+   .. py:attribute:: wax
+      :value: 'Wax'
+
+
+
+   .. py:attribute:: wax_like
+      :value: 'Wax-like'
+
+
+
+   .. py:attribute:: other
+      :value: 'Other'
+
+
+
+.. py:class:: SpecificMaterialTypeBase(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Polymer', 'Ceramic', 'Metal', 'Composite', 'Sand', 'Wax', 'Other']
+
+
+.. py:class:: SpecificPolymerMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Polymer']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  PolymerMaterialTypeEnum
+
+
+.. py:class:: SpecificPhotopolymerMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Photopolymer']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  PhotopolymerMaterialTypeEnum
+
+
+.. py:class:: SpecificCeramicMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Ceramic']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  CeramicMaterialTypeEnum
+
+
+.. py:class:: SpecificMetalMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Metal']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  MetalMaterialTypeEnum
+
+
+.. py:class:: SpecificCompositeMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Composite']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  CompositeMaterialTypeEnum
+
+
+.. py:class:: SpecificSandMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Sand']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  SandMaterialTypeEnum
+
+
+.. py:class:: SpecificWaxMaterialType(/, **data: Any)
+
+   Bases: :py:obj:`SpecificMaterialTypeBase`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: general_material_type
+      :type:  Literal['Wax']
+
+
+   .. py:attribute:: specific_material_type
+      :type:  WaxMaterialTypeEnum
+
+
+.. py:class:: HardnessScaleEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for hardness scales.
+
+
+
+   .. py:attribute:: shore_a
+      :value: 'Shore A'
+
+
+
+   .. py:attribute:: shore_b
+      :value: 'Shore B'
+
+
+
+   .. py:attribute:: shore_c
+      :value: 'Shore C'
+
+
+
+   .. py:attribute:: shore_d
+      :value: 'Shore D'
+
+
+
+   .. py:attribute:: shore_m
+      :value: 'Shore M'
+
+
+
+   .. py:attribute:: shore_r
+      :value: 'Shore R'
+
+
+
+   .. py:attribute:: not_reported
+      :value: 'Not reported'
+
+
+
+.. py:class:: MaterialInformation(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents basic material information.
+
+
+
+   .. py:attribute:: material_supplier
+      :type:  str
+
+
+   .. py:attribute:: material_name
+      :type:  str
+
+
+   .. py:attribute:: compatible_printers
+      :type:  Optional[List[str]]
+
+
+.. py:class:: AdditiveManufacturingProcessEnum
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration for additive manufacturing processes.
+
+
+
+   .. py:attribute:: binder_jetting
+      :value: 'Binder Jetting'
+
+
+
+   .. py:attribute:: directed_energy_deposition
+      :value: 'Directed Energy Deposition'
+
+
+
+   .. py:attribute:: material_extrusion
+      :value: 'Material Extrusion'
+
+
+
+   .. py:attribute:: material_jetting
+      :value: 'Material Jetting'
+
+
+
+   .. py:attribute:: powder_bed_fusion
+      :value: 'Powder Bed Fusion'
+
+
+
+   .. py:attribute:: sheet_lamination
+      :value: 'Sheet Lamination'
+
+
+
+   .. py:attribute:: vat_photopolymerization
+      :value: 'Vat Photopolymerization'
+
+
+
+   .. py:attribute:: not_reported
+      :value: 'Not reported'
+
+
+
+.. py:class:: Range(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: UltimateTensileStrength(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: TensileModulus(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: ElongationAtBreak(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: FlexuralStrength(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: FlexuralModulus(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: ElongationModulus(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: value
+      :type:  float
+
+
+   .. py:attribute:: unit
+      :type:  str
+
+
+.. py:class:: MechanicalProperties(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the mechanical properties of the material.
+
+
+
+   .. py:attribute:: ultimate_tensile_strength
+      :type:  Optional[UltimateTensileStrength]
+
+
+   .. py:attribute:: tensile_modulus
+      :type:  Optional[TensileModulus]
+
+
+   .. py:attribute:: youngs_modulus
+      :type:  Optional[TensileModulus]
+
+
+   .. py:attribute:: elongation_modulus
+      :type:  Optional[ElongationModulus]
+
+
+   .. py:attribute:: elongation_at_break
+      :type:  Optional[ElongationAtBreak]
+
+
+   .. py:attribute:: elastic_modulus
+      :type:  Optional[TensileModulus]
+
+
+   .. py:attribute:: flexural_strength
+      :type:  Optional[FlexuralStrength]
+
+
+   .. py:attribute:: flexural_modulus
+      :type:  Optional[FlexuralModulus]
+
+
+   .. py:attribute:: poisson_ratio
+      :type:  float
+
+
+.. py:class:: Hardness(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the hardness properties of the material.
+
+
+
+   .. py:attribute:: hardness_scale
+      :type:  HardnessScaleEnum
+
+
+.. py:class:: HeatDeflectionTemperature(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.9/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   Attributes:
+       __class_vars__: The names of the class variables defined on the model.
+       __private_attributes__: Metadata about the private attributes of the model.
+       __signature__: The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+       __pydantic_complete__: Whether model building is completed, or if there are still undefined fields.
+       __pydantic_core_schema__: The core schema of the model.
+       __pydantic_custom_init__: Whether the model has a custom `__init__` function.
+       __pydantic_decorators__: Metadata containing the decorators defined on the model.
+           This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+       __pydantic_generic_metadata__: Metadata for generic models; contains data used for a similar purpose to
+           __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+       __pydantic_parent_namespace__: Parent namespace of the model, used for automatic rebuilding of models.
+       __pydantic_post_init__: The name of the post-init method for the model, if defined.
+       __pydantic_root_model__: Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+       __pydantic_serializer__: The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+       __pydantic_validator__: The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+       __pydantic_extra__: A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+           is set to `'allow'`.
+       __pydantic_fields_set__: The names of fields explicitly set during instantiation.
+       __pydantic_private__: Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: min
+      :type:  Range
+
+
+   .. py:attribute:: max
+      :type:  Range
+
+
+.. py:class:: ThermalProperties(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the thermal properties of the material.
+
+
+
+   .. py:attribute:: heat_deflection_temperature
+      :type:  HeatDeflectionTemperature
+
+
+   .. py:attribute:: glass_transition_temperature
+      :type:  Range
+
+
+.. py:class:: PhysicalPropertiesMaterial(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the physical properties of the material.
+
+
+
+   .. py:attribute:: density
+      :type:  Optional[Range]
+
+
+.. py:class:: PrintingSettings(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents the physical properties of the material.
+
+
+
+   .. py:attribute:: printing_speed
+      :type:  Optional[Range]
+
+
+.. py:class:: MaterialResponse(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Aggregates all material specification sections.
+
+
+
+   .. py:attribute:: material_information
+      :type:  MaterialInformation
+
+
+   .. py:attribute:: am_process
+      :type:  Optional[AdditiveManufacturingProcessEnum]
+
+
+   .. py:attribute:: certificates
+      :type:  Optional[List[str]]
+
+
+   .. py:attribute:: material_type
+      :type:  Union[SpecificPolymerMaterialType, SpecificCeramicMaterialType, SpecificPhotopolymerMaterialType, SpecificMetalMaterialType, SpecificCompositeMaterialType, SpecificSandMaterialType, SpecificWaxMaterialType]
+
+
+   .. py:attribute:: mechanical_properties
+      :type:  MechanicalProperties
+
+
+   .. py:attribute:: physical_properties
+      :type:  PhysicalPropertiesMaterial
+
+
+   .. py:attribute:: printing_settings
+      :type:  PrintingSettings
+
+
+   .. py:attribute:: summary
+      :type:  str
+
+

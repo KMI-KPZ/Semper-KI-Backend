@@ -1,0 +1,17 @@
+code_SemperKI.services.service_AfterSales.logics
+================================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales.logics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_AfterSales/logics/checkServiceLogic/index
+   /autoapi/code_SemperKI/services/service_AfterSales/logics/costs/index
+   /autoapi/code_SemperKI/services/service_AfterSales/logics/orgaLogic/index
+
+

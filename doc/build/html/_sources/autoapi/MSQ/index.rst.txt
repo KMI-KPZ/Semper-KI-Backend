@@ -1,0 +1,17 @@
+MSQ
+===
+
+.. py:module:: MSQ
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/MSQ/handlers/index
+   /autoapi/MSQ/module/index
+   /autoapi/MSQ/tasks/index
+
+

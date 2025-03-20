@@ -1,0 +1,106 @@
+code_SemperKI.services.service_AfterSales.connections.postgresql.pgService
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales.connections.postgresql.pgService
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Service specific connections to the database
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.initializeService
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.updateServiceDetails
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.deleteServiceDetails
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.isFileRelevantForService
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.serviceReady
+   code_SemperKI.services.service_AfterSales.connections.postgresql.pgService.cloneServiceDetails
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: initializeService(serviceDetails: dict) -> dict
+
+   Initialize the service
+
+
+
+.. py:function:: updateServiceDetails(existingContent, newContent) -> dict
+
+   Update the content of the current service in the process
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: Dict
+   :param newContent: What the user changed
+   :type newContent: Dict
+   :return: New service Instance
+   :rtype: Dict
+
+
+.. py:function:: deleteServiceDetails(existingContent, deletedContent) -> dict
+
+   Delete stuff from the service
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: Dict
+   :param deletedContent: What the user wants deleted
+   :type deletedContent: Dict
+   :return: New service Instance
+   :rtype: Dict
+
+
+.. py:function:: isFileRelevantForService(existingContent: dict, fileID: str) -> bool
+
+   Check if a file is relevant for the service
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: Dict
+   :param fileID: The file ID
+   :type fileID: Str
+   :return: True if the file is relevant
+   :rtype: Bool
+
+
+.. py:function:: serviceReady(existingContent: dict) -> tuple[bool, list[str]]
+
+   Check if everything is there
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: Dict
+   :return: True if all components are there
+   :rtype: tuple[bool, list[str]]
+
+
+.. py:function:: cloneServiceDetails(existingContent: dict, newProcess: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface) -> dict
+
+   Clone content of the service
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: dict
+   :param newProcess: The new process as object
+   :type newProcess: Process|ProcessInterface
+   :return: The copy of the service details
+   :rtype: dict
+
+
+

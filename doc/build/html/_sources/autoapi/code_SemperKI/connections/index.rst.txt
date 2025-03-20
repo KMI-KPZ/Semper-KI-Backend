@@ -1,25 +1,18 @@
-:py:mod:`code_SemperKI.connections`
-===================================
+code_SemperKI.connections
+=========================
 
 .. py:module:: code_SemperKI.connections
 
 
-Subpackages
------------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 3
-
-   postgresql/index.rst
-
-
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   cmem/index.rst
-   coypu/index.rst
+   /autoapi/code_SemperKI/connections/cmem/index
+   /autoapi/code_SemperKI/connections/content/index
+   /autoapi/code_SemperKI/connections/coypu/index
+   /autoapi/code_SemperKI/connections/openai/index
 
 

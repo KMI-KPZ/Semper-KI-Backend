@@ -1,0 +1,55 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic
+=======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Logic for handlers for color-specific requests
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic.logicForGetRALList
+   code_SemperKI.services.service_AdditiveManufacturing.logics.colorsLogic.logicForSetColor
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: logicForGetRALList(request) -> list[dict]
+
+   Get the RAL table and convert to frontend format
+
+   :return: The RAL table in frontend format
+   :rtype: list[dict]
+
+
+
+.. py:function:: logicForSetColor(request, validatedInput, functionName: str) -> tuple[Exception, int]
+
+   Set color in the database
+
+
+

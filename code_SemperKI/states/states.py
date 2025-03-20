@@ -29,6 +29,7 @@ import code_SemperKI.tasks.processTasks as ProcessTasks
 import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
+from .stateButtons import ButtonDefinitions
 
 from ..definitions import ProcessDescription, ValidationSteps, ValidationInformationForFrontend, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
@@ -444,18 +445,7 @@ class DRAFT(State):
         None
         """
         if client or admin:
-            return [{
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }]
+            return [ButtonDefinitions.deleteProcess]
         return []
     
     ###################################################
@@ -559,50 +549,17 @@ class SERVICE_IN_PROGRESS(State):
 
         """
         if client or admin:
-            return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+            buttonList =  [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
             ]
+            if self.missingForCompletion(interface, process):
+                buttonList[-1]["active"] = False
+            else:
+                buttonList[-1]["active"] = True
+            return buttonList
         else:
             return []
     
@@ -730,50 +687,17 @@ class SERVICE_READY(State):
 
         """
         if client or admin:
-            return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
-            ] 
+            buttonList = [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
+            ]
+
+            buttonList[-1]["active"] = True
+            return buttonList
+
         else:
             return []
     
@@ -923,52 +847,17 @@ class SERVICE_COMPLETED(State):
         buttonsList = []
         if client or admin:
             buttonsList = [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_READY,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToServiceReady,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.fowardToContractorCompleted)
             ]
             
             if len(self.missingForCompletion(interface, process)) == 0:
-                buttonsList[2]["active"] = True #set forward button to active
+                buttonsList[-1]["active"] = True #set forward button to active
 
         return buttonsList
     
@@ -989,6 +878,18 @@ class SERVICE_COMPLETED(State):
 
 
     # Transitions
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
     ###################################################
     def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
         SERVICE_COMPLETED | CONTRACTOR_COMPLETED:
@@ -1022,6 +923,16 @@ class SERVICE_COMPLETED(State):
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         else:
             return self
+        
+    ##################################################
+    def to_SERVICE_IN_PROGRESS_Button(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: {}}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
     
     ###################################################
     def to_SERVICE_READY_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -1035,7 +946,7 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1079,33 +990,9 @@ class WAITING_FOR_OTHER_PROCESS(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.DRAFT,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess
             ] 
         else:
             return []
@@ -1255,34 +1142,9 @@ class SERVICE_COMPLICATION(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-            ] 
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.fowardToServiceInProgress
+            ]
         else:
             return []
     
@@ -1392,49 +1254,16 @@ class CONTRACTOR_COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.VERIFYING,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
-            ] 
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToServiceCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToVerifying
+            ]
         else:
             return []
     
@@ -1468,6 +1297,30 @@ class CONTRACTOR_COMPLETED(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+    
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
+
+    ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFYING: 
         """
@@ -1490,7 +1343,7 @@ class CONTRACTOR_COMPLETED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1534,48 +1387,15 @@ class VERIFYING(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                { # this button shall not do anything
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.VERIFYING,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.fowardToVerificationCompleted
             ] 
         else:
             return []
@@ -1610,6 +1430,48 @@ class VERIFYING(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
     def to_VERIFICATION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFYING | VERIFICATION_COMPLETED:
         """
@@ -1632,7 +1494,7 @@ class VERIFYING(State):
 
     ###################################################
     updateTransitions = [to_VERIFICATION_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1676,57 +1538,24 @@ class VERIFICATION_FAILED(State):
         """
         if client or admin:
             buttonList = [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToRequestCompleted)
             ]
             whatsMissing = self.missingForCompletion(interface, process)
             if len(whatsMissing) == 0:
-                buttonList[2]["active"] = True #set forward button to active
+                buttonList[-1]["active"] = True #set forward button to active
             else:
-                buttonList[2]["active"] = True
+                buttonList[-1]["active"] = True
                 for entry in whatsMissing:
                     if entry["key"] == "Process-VerificationFailed":
-                        buttonList[2]["active"] = False # that's the only thing that can make the button inactive
+                        buttonList[-1]["active"] = False # that's the only thing that can make the button inactive
                         break
             return buttonList
         else:
@@ -1774,6 +1603,50 @@ class VERIFICATION_FAILED(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
     def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFICATION_FAILED | REQUEST_COMPLETED:
         """
@@ -1798,7 +1671,7 @@ class VERIFICATION_FAILED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1841,48 +1714,16 @@ class VERIFICATION_COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    "icon": IconType.ArrowBackIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "backstepStatus",
-                            "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.secondary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToRequestCompleted
             ] 
         else:
             return []
@@ -1917,6 +1758,52 @@ class VERIFICATION_COMPLETED(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
     def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFICATION_COMPLETED | REQUEST_COMPLETED:
         """
@@ -1942,7 +1829,7 @@ class VERIFICATION_COMPLETED(State):
 
     ###################################################
     updateTransitions = [to_REQUEST_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1990,36 +1877,8 @@ class REQUEST_COMPLETED(State):
         if contractor or admin: # contractor
             outArr = [] # reset as to not duplicate the button
             outArr.extend([
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToOfferRejected,
+                copy.deepcopy(ButtonDefinitions.forwardToOfferCompleted)
             ])
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
@@ -2134,36 +1993,8 @@ class OFFER_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend([
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToConfirmationRejected,
+                ButtonDefinitions.forwardToConfirmationCompleted
             ])
         if contractor:
             outArr.extend(
@@ -2272,18 +2103,7 @@ class OFFER_REJECTED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
         if contractor or admin:
             outArr.extend([
@@ -2380,21 +2200,7 @@ class CONFIRMATION_COMPLETED(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToProductionInProgress
             ] )
         return outArr
     
@@ -2486,18 +2292,7 @@ class CONFIRMATION_REJECTED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
         if contractor or admin:
             outArr.extend([
@@ -2594,36 +2389,8 @@ class PRODUCTION_IN_PROGRESS(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
-                    "icon": IconType.DoneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardProductionCompleted
             ] )
         return outArr
     
@@ -2728,36 +2495,8 @@ class PRODUCTION_COMPLETED(State):
             ])
         if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                    "icon": IconType.LocalShippingIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                        },
-                    },
-                    "active": False,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                copy.deepcopy(ButtonDefinitions.forwardToDeliveryInProgress)
             ] )
             if len(self.missingForCompletion(interface, process)) == 0:
                 outArr[1]["active"] = True #set forward button to active
@@ -2873,21 +2612,7 @@ class DELIVERY_IN_PROGRESS(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
-                    "icon": IconType.ArrowForwardIcon,
-                    "iconPosition": "right",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToDeliveryCompleted
             ] )
         if contractor or admin:
             outArr.extend([
@@ -2981,51 +2706,9 @@ class DELIVERY_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
-                    "icon": IconType.QuestionAnswerIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DISPUTE,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToDispute,
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted
             ] )
         if contractor or admin:
             outArr.extend([
@@ -3145,36 +2828,8 @@ class DISPUTE(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted  
             ] )
         if contractor or admin:
             outArr.extend([
@@ -3287,30 +2942,8 @@ class COMPLETED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3390,30 +3023,8 @@ class FAILED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3493,30 +3104,8 @@ class CANCELED(State):
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.CloneIcon,
-                    "iconPosition": "left",
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcesses" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "process",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []

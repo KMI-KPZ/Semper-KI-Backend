@@ -1,0 +1,350 @@
+code_SemperKI.states.stateDescriptions
+======================================
+
+.. py:module:: code_SemperKI.states.stateDescriptions
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Contains definitions for the state machine
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.states.stateDescriptions.ProcessStatusAsString
+   code_SemperKI.states.stateDescriptions.InterfaceForStateChange
+   code_SemperKI.states.stateDescriptions.ButtonLabels
+   code_SemperKI.states.stateDescriptions.ButtonTypes
+   code_SemperKI.states.stateDescriptions.IconType
+   code_SemperKI.states.stateDescriptions.ShowIn
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.states.stateDescriptions.processStatusAsInt
+   code_SemperKI.states.stateDescriptions.processStatusFromIntToStr
+
+
+Module Contents
+---------------
+
+.. py:class:: ProcessStatusAsString
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   Defines all statuus for the process (independent of the selected service)
+
+
+   .. py:attribute:: DRAFT
+
+
+   .. py:attribute:: WAITING_FOR_OTHER_PROCESS
+
+
+   .. py:attribute:: SERVICE_READY
+
+
+   .. py:attribute:: SERVICE_IN_PROGRESS
+
+
+   .. py:attribute:: SERVICE_COMPLICATION
+
+
+   .. py:attribute:: SERVICE_COMPLETED
+
+
+   .. py:attribute:: CONTRACTOR_COMPLETED
+
+
+   .. py:attribute:: VERIFYING
+
+
+   .. py:attribute:: VERIFICATION_FAILED
+
+
+   .. py:attribute:: VERIFICATION_COMPLETED
+
+
+   .. py:attribute:: REQUEST_COMPLETED
+
+
+   .. py:attribute:: OFFER_COMPLETED
+
+
+   .. py:attribute:: OFFER_REJECTED
+
+
+   .. py:attribute:: CONFIRMATION_COMPLETED
+
+
+   .. py:attribute:: CONFIRMATION_REJECTED
+
+
+   .. py:attribute:: PRODUCTION_IN_PROGRESS
+
+
+   .. py:attribute:: PRODUCTION_COMPLETED
+
+
+   .. py:attribute:: DELIVERY_IN_PROGRESS
+
+
+   .. py:attribute:: DELIVERY_COMPLETED
+
+
+   .. py:attribute:: DISPUTE
+
+
+   .. py:attribute:: COMPLETED
+
+
+   .. py:attribute:: FAILED
+
+
+   .. py:attribute:: CANCELED
+
+
+.. py:function:: processStatusAsInt(statusString: str) -> int
+
+   Defines all statuus for the process as an integer
+
+
+.. py:function:: processStatusFromIntToStr(statusCode: int) -> str
+
+   Interprets the integer back to the string code
+
+
+.. py:class:: InterfaceForStateChange
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does the json consist of that is sent back and forth?
+
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processIDs
+
+
+   .. py:attribute:: buttonData
+
+
+   .. py:attribute:: targetStatus
+
+
+   .. py:attribute:: CLICKED_BUTTON
+
+
+   .. py:attribute:: type
+
+
+.. py:class:: ButtonLabels
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   So that the frontend can render it correctly. 
+   Do not edit unless you change it in the translation file of the frontend as well!
+
+
+
+   .. py:attribute:: BACK
+
+
+   .. py:attribute:: FORWARD
+
+
+   .. py:attribute:: SELECT_SERVICE
+
+
+   .. py:attribute:: SERVICE_COMPLICATION
+
+
+   .. py:attribute:: EDIT
+
+
+   .. py:attribute:: DELETE
+
+
+   .. py:attribute:: DELETE_PROCESS
+
+
+   .. py:attribute:: CONTRACTOR_SELECTED
+
+
+   .. py:attribute:: VERIFYING_AND_REQUESTED
+
+
+   .. py:attribute:: VERIFYING
+
+
+   .. py:attribute:: REQUESTED
+
+
+   .. py:attribute:: CLARIFICATION
+
+
+   .. py:attribute:: CONFIRMED_BY_CONTRACTOR
+
+
+   .. py:attribute:: REJECTED_BY_CONTRACTOR
+
+
+   .. py:attribute:: CONFIRMED_BY_CLIENT
+
+
+   .. py:attribute:: REJECTED_BY_CLIENT
+
+
+   .. py:attribute:: PRODUCTION
+
+
+   .. py:attribute:: DELIVERY
+
+
+   .. py:attribute:: COMPLETED
+
+
+   .. py:attribute:: REPROJECT
+
+
+   .. py:attribute:: DISPUTE
+
+
+   .. py:attribute:: SERVICE_IN_PROGRESS
+
+
+   .. py:attribute:: FAILED
+
+
+   .. py:attribute:: NONE
+
+
+   .. py:attribute:: CLONE
+
+
+.. py:class:: ButtonTypes
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   Types of buttons
+
+
+
+   .. py:attribute:: primary
+
+
+   .. py:attribute:: secondary
+
+
+.. py:class:: IconType
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   Names for the specific icons
+
+
+
+   .. py:attribute:: ArrowBackIcon
+
+
+   .. py:attribute:: ArrowForwardIcon
+
+
+   .. py:attribute:: DeleteIcon
+
+
+   .. py:attribute:: FactoryIcon
+
+
+   .. py:attribute:: TroubleshootIcon
+
+
+   .. py:attribute:: ScheduleSendIcon
+
+
+   .. py:attribute:: MailIcon
+
+
+   .. py:attribute:: QuestionAnswerIcon
+
+
+   .. py:attribute:: DescriptionIcon
+
+
+   .. py:attribute:: CancelIcon
+
+
+   .. py:attribute:: DoneAllIcon
+
+
+   .. py:attribute:: DoneIcon
+
+
+   .. py:attribute:: LocalShippingIcon
+
+
+   .. py:attribute:: TaskIcon
+
+
+   .. py:attribute:: ReplayIcon
+
+
+   .. py:attribute:: CloneIcon
+
+
+.. py:class:: ShowIn
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   Positions where to show certain buttons in the frontend
+
+
+
+   .. py:attribute:: ServiceSelection
+
+
+   .. py:attribute:: ServiceDetails
+
+
+   .. py:attribute:: Contractor
+
+
+   .. py:attribute:: Verification
+
+
+   .. py:attribute:: Request
+
+
+   .. py:attribute:: Contract
+
+
+   .. py:attribute:: Production
+
+
+   .. py:attribute:: Delivery
+
+
+   .. py:attribute:: Completed
+
+
+   .. py:attribute:: Active
+
+

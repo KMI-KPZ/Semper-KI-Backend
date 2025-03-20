@@ -178,6 +178,7 @@ class ButtonLabels(StrEnumExactlyAsDefined):
     SERVICE_COMPLICATION = enum.auto() # TODO not in frontend currently
     EDIT = enum.auto()
     DELETE = enum.auto()
+    DELETE_PROCESS = enum.auto()
     CONTRACTOR_SELECTED = enum.auto()
     VERIFYING_AND_REQUESTED = enum.auto()
     VERIFYING = enum.auto()
@@ -229,3 +230,20 @@ class IconType(StrEnumExactlyAsDefined):
     ReplayIcon = enum.auto()
     CloneIcon = enum.auto() 
 
+
+#######################################################
+class ShowIn(StrEnumExactlyAsDefined):
+    """
+    Positions where to show certain buttons in the frontend
+    
+    """
+    ServiceSelection = enum.auto()
+    ServiceDetails = enum.auto()
+    Contractor = enum.auto()
+    Verification = enum.auto()
+    Request = enum.auto()
+    Contract = enum.auto()
+    Production = enum.auto()
+    Delivery = enum.auto()
+    Completed = enum.auto()
+    Active = enum.auto()

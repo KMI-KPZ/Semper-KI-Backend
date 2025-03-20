@@ -1,0 +1,66 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic
+=============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Logic for verification
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.getVerificationForOrganizationLogic
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.createVerificationForOrganizationLogic
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.updateVerificationForOrganizationLogic
+   code_SemperKI.services.service_AdditiveManufacturing.logics.verificationLogic.deleteVerificationForOrganizationLogic
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getVerificationForOrganizationLogic(request: rest_framework.request.Request) -> tuple[list[dict] | Exception, int]
+
+   Retrieve the current verification for the organization
+
+
+
+.. py:function:: createVerificationForOrganizationLogic(request: rest_framework.request.Request, verifiedInput) -> tuple[dict | Exception, int]
+
+   Create a new verification
+
+
+
+.. py:function:: updateVerificationForOrganizationLogic(request: rest_framework.request.Request, verifiedInput) -> tuple[None | Exception, int]
+
+   Update a verification
+
+
+
+.. py:function:: deleteVerificationForOrganizationLogic(request: rest_framework.request.Request, printerID: str, materialID: str) -> tuple[None | Exception, int]
+
+   Delete a verification
+
+
+

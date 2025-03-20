@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+
 """
 Part of Semper-KI software
 
 Silvio Weging 2024
 
 Contains: The database backed knowledge graph
+
 """
 
 import json, logging, copy, time
