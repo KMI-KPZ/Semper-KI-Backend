@@ -1,0 +1,101 @@
+code_SemperKI.connections.content.manageContent
+===============================================
+
+.. py:module:: code_SemperKI.connections.content.manageContent
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Manages the content of the session and the database
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.manageContent.ManageContent
+
+
+Module Contents
+---------------
+
+.. py:class:: ManageContent(session)
+
+   Class that manages the content, either in session or in postgres
+
+
+
+   .. py:attribute:: currentSession
+
+
+   .. py:attribute:: sessionManagement
+
+
+   .. py:attribute:: postgresManagement
+
+
+   .. py:method:: checkRightsForProject(projectID) -> bool
+
+      Check if user may see project
+
+      :param functionName: The name of the calling function
+      :type functionName: str
+      :param projectID: The projectID of the project in question
+      :type projectID: str
+      :return: True if the user belongs to the rightful, false if not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: checkRightsForProcess(processID) -> bool
+
+      Check if user may see process
+
+      :param processID: The processID of the process in question
+      :type processID: str
+      :return: True if the user belongs to the rightful, false if not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: checkRights(functionName) -> bool
+
+      Check if user is logged in and function may be called
+
+      :param functionName: The name of the calling function
+      :type functionName: str
+      :return: True if the user belongs to the rightful, false if not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: getCorrectInterface(functionName='')
+
+      Return the correct class interface
+
+      :param functionName: The name of the calling function
+      :type functionName: str
+      :return: Either the session or the postgres interface
+      :rtype: ProcessManagementSession | ProcessManagementBase | None
+
+
+
+
+   .. py:method:: getClient()
+
+      Get ID if logged in, "anonymous" if not
+
+      :return: String with clientID
+      :rtype: str
+
+
+
+

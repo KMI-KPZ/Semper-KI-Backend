@@ -1,0 +1,149 @@
+code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel
+=================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Model for database version of the Knowledge Graph
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel.VerificationDescription
+   code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel.VerificationDetails
+   code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel.VerificationStatus
+   code_SemperKI.services.service_AdditiveManufacturing.modelFiles.verificationModel.Verification
+
+
+Module Contents
+---------------
+
+.. py:class:: VerificationDescription
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does the verification table consists of?
+
+
+
+   .. py:attribute:: organizationID
+
+
+   .. py:attribute:: printerID
+
+
+   .. py:attribute:: materialID
+
+
+   .. py:attribute:: status
+
+
+   .. py:attribute:: details
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+.. py:class:: VerificationDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   Details of the verification
+
+
+
+.. py:class:: VerificationStatus
+
+   Bases: :py:obj:`enum.IntEnum`
+
+
+   Status of the verification
+
+
+
+   .. py:attribute:: notInitialized
+      :value: 0
+
+
+
+   .. py:attribute:: initialized
+      :value: 1
+
+
+
+   .. py:attribute:: sent
+      :value: 2
+
+
+
+   .. py:attribute:: verified
+      :value: 3
+
+
+
+.. py:class:: Verification(*args, **kwargs)
+
+   Bases: :py:obj:`django.db.models.Model`
+
+
+   The verification model
+
+
+
+   .. py:attribute:: organizationID
+
+
+   .. py:attribute:: printerID
+
+
+   .. py:attribute:: materialID
+
+
+   .. py:attribute:: status
+
+
+   .. py:attribute:: details
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+   .. py:class:: Meta
+
+      .. py:attribute:: indexes
+
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: toDict()
+
+      Dict representation of the verification
+
+
+
+

@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.imports`
-===============================
+code_SemperKI.imports
+=====================
 
 .. py:module:: code_SemperKI.imports
 
@@ -10,6 +10,7 @@
    Silvio Weging 2023
 
    Contains: Modules that need to be imported
+
 
 
 

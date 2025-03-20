@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline" href="../pdfPipeline/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto" href="../onto/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga">
+<span id="code-semperki-services-service-additivemanufacturing-handlers-public-resources-orga"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Calls to ontology for adding and retrieving data</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SResOrgaResources</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqNodeFEOrga</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqEdgesFEOrga</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqCreateOrUpdateAndLinkOrga</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqOrgaAddEdges</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqRequestForAddition</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getGraph</span></code></a>(request)</p></td>
+<td><p>Returns the graph for frontend</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getResources</span></code></a>(request)</p></td>
+<td><p>Retrieve all KG information about connected resources for an organization</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getNodes</span></code></a>(request, resourceType)</p></td>
+<td><p>Retrieve all nodes from either the system or the orga of a certain type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getNodeViaID</span></code></a>(request, nodeID)</p></td>
+<td><p>Retrieve all info about a node via its ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getAssociatedResources</span></code></a>(request, nodeID, resourceType)</p></td>
+<td><p>Gather neighboring resources of a certain type from the KG</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getNeighbors</span></code></a>(request, nodeID)</p></td>
+<td><p>Gather all neighbors of a node inside an orga from the KG</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_createOrUpdateAndLinkNodes</span></code></a>(request)</p></td>
+<td><p>Combined access for frontend to create and update together with linking</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_createNode</span></code></a>(request)</p></td>
+<td><p>Creates a new node for the organization in the knowledge graph</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_updateNode</span></code></a>(request)</p></td>
+<td><p>Updates a new node for the organization in the knowledge graph</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_deleteNode</span></code></a>(request, nodeID)</p></td>
+<td><p>Deletes a node from the graph by ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_addEdgesToOrga</span></code></a>(request)</p></td>
+<td><p>Links some things to an organization in the knowledge graph</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_addEdgeForOrga</span></code></a>(request)</p></td>
+<td><p>Links two things for an organization in the knowledge graph</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_removeEdgeToOrga</span></code></a>(request, entityID)</p></td>
+<td><p>Remove the connection of an organization to something</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_removeEdge</span></code></a>(request, entity1ID, entity2ID)</p></td>
+<td><p>Deletes the edge between two entities created by the same organization</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_removeAll</span></code></a>(request)</p></td>
+<td><p>Remove all connections of an organization</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_getRequestsForAdditions</span></code></a>(request)</p></td>
+<td><p>Shows the current requests for adding stuff to the KG</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orga_makeRequestForAdditions</span></code></a>(request)</p></td>
+<td><p>Receive a request to add something</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cloneTestGraphToOrgaForTests</span></code></a>(request)</p></td>
+<td><p>Clone the test graph to the orga for the tests</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the graph for frontend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with graph</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SResOrgaResources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources.resources">
+<span class="sig-name descname"><span class="pre">resources</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources.resources" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getResources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all KG information about connected resources for an organization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with list of resources</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resourceType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all nodes from either the system or the orga of a certain type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of nodes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getNodeViaID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve all info about a node via its ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Json</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getAssociatedResources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resourceType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources" title="Link to this definition">¶</a></dt>
+<dd><p>Gather neighboring resources of a certain type from the KG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with resource of the type available</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getNeighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors" title="Link to this definition">¶</a></dt>
+<dd><p>Gather all neighbors of a node inside an orga from the KG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON with neighbors</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SReqNodeFEOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.context" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.createdBy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SReqEdgesFEOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.create">
+<span class="sig-name descname"><span class="pre">create</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.create" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.delete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SReqCreateOrUpdateAndLinkOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.node">
+<span class="sig-name descname"><span class="pre">node</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.node" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_createOrUpdateAndLinkNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes" title="Link to this definition">¶</a></dt>
+<dd><p>Combined access for frontend to create and update together with linking</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_createNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a new node for the organization in the knowledge graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Succes or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_updateNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode" title="Link to this definition">¶</a></dt>
+<dd><p>Updates a new node for the organization in the knowledge graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Succes or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_deleteNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes a node from the graph by ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p></li>
+<li><p><strong>nodeID</strong> (<em>str</em>) – The id of the node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SReqOrgaAddEdges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges.entityIDs">
+<span class="sig-name descname"><span class="pre">entityIDs</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges.entityIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_addEdgesToOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Links some things to an organization in the knowledge graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Succes or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_addEdgeForOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Links two things for an organization in the knowledge graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP PATCH</em>) – PATCH Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Succes or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_removeEdgeToOrga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga" title="Link to this definition">¶</a></dt>
+<dd><p>Remove the connection of an organization to something</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p></li>
+<li><p><strong>entityID</strong> (<em>str</em>) – The ID of the thing removed as an edge to that orga</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_removeEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity1ID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity2ID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes the edge between two entities created by the same organization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or Exception</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_removeAll</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll" title="Link to this definition">¶</a></dt>
+<dd><p>Remove all connections of an organization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP DELETE</em>) – DELETE Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HTTP Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_getRequestsForAdditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions" title="Link to this definition">¶</a></dt>
+<dd><p>Shows the current requests for adding stuff to the KG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">SReqRequestForAddition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.manufacturer">
+<span class="sig-name descname"><span class="pre">manufacturer</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.manufacturer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.url">
+<span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.url" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">orga_makeRequestForAdditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions" title="Link to this definition">¶</a></dt>
+<dd><p>Receive a request to add something</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Success or not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.</span></span><span class="sig-name descname"><span class="pre">cloneTestGraphToOrgaForTests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests" title="Link to this definition">¶</a></dt>
+<dd><p>Clone the test graph to the orga for the tests</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../../../../connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l8 current"><a class="reference internal" href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="reference internal" href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul class="current">
+<li class="toctree-l11 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l12"><a class="reference internal" href="../../checkService/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../costs/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../filter/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.filter</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../materials/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../model/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../postProcessings/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings</a></li>
+<li class="toctree-l12 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a><ul class="current">
+<li class="toctree-l13 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l14"><a class="reference internal" href="../colors/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../kgDBAM/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../onto/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto</a></li>
+<li class="toctree-l14 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga</a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph"><code class="docutils literal notranslate"><span class="pre">orga_getGraph()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources"><code class="docutils literal notranslate"><span class="pre">SResOrgaResources</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources.resources"><code class="docutils literal notranslate"><span class="pre">SResOrgaResources.resources</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources"><code class="docutils literal notranslate"><span class="pre">orga_getResources()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes"><code class="docutils literal notranslate"><span class="pre">orga_getNodes()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID"><code class="docutils literal notranslate"><span class="pre">orga_getNodeViaID()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources"><code class="docutils literal notranslate"><span class="pre">orga_getAssociatedResources()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors"><code class="docutils literal notranslate"><span class="pre">orga_getNeighbors()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeID"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.nodeID</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeName"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.nodeName</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.context"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.context</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.nodeType"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.nodeType</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.properties"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.properties</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.createdBy"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.createdBy</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga.active"><code class="docutils literal notranslate"><span class="pre">SReqNodeFEOrga.active</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga"><code class="docutils literal notranslate"><span class="pre">SReqEdgesFEOrga</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.create"><code class="docutils literal notranslate"><span class="pre">SReqEdgesFEOrga.create</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga.delete"><code class="docutils literal notranslate"><span class="pre">SReqEdgesFEOrga.delete</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga"><code class="docutils literal notranslate"><span class="pre">SReqCreateOrUpdateAndLinkOrga</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.type"><code class="docutils literal notranslate"><span class="pre">SReqCreateOrUpdateAndLinkOrga.type</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.node"><code class="docutils literal notranslate"><span class="pre">SReqCreateOrUpdateAndLinkOrga.node</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga.edges"><code class="docutils literal notranslate"><span class="pre">SReqCreateOrUpdateAndLinkOrga.edges</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes"><code class="docutils literal notranslate"><span class="pre">orga_createOrUpdateAndLinkNodes()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode"><code class="docutils literal notranslate"><span class="pre">orga_createNode()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode"><code class="docutils literal notranslate"><span class="pre">orga_updateNode()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode"><code class="docutils literal notranslate"><span class="pre">orga_deleteNode()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges"><code class="docutils literal notranslate"><span class="pre">SReqOrgaAddEdges</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges.entityIDs"><code class="docutils literal notranslate"><span class="pre">SReqOrgaAddEdges.entityIDs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga"><code class="docutils literal notranslate"><span class="pre">orga_addEdgesToOrga()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga"><code class="docutils literal notranslate"><span class="pre">orga_addEdgeForOrga()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga"><code class="docutils literal notranslate"><span class="pre">orga_removeEdgeToOrga()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge"><code class="docutils literal notranslate"><span class="pre">orga_removeEdge()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll"><code class="docutils literal notranslate"><span class="pre">orga_removeAll()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions"><code class="docutils literal notranslate"><span class="pre">orga_getRequestsForAdditions()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition"><code class="docutils literal notranslate"><span class="pre">SReqRequestForAddition</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.manufacturer"><code class="docutils literal notranslate"><span class="pre">SReqRequestForAddition.manufacturer</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.name"><code class="docutils literal notranslate"><span class="pre">SReqRequestForAddition.name</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.type"><code class="docutils literal notranslate"><span class="pre">SReqRequestForAddition.type</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition.url"><code class="docutils literal notranslate"><span class="pre">SReqRequestForAddition.url</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions"><code class="docutils literal notranslate"><span class="pre">orga_makeRequestForAdditions()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests"><code class="docutils literal notranslate"><span class="pre">cloneTestGraphToOrgaForTests()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="../pdfPipeline/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../verification/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a><ul>
+      <li>Previous: <a href="../onto/index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto</a></li>
+      <li>Next: <a href="../pdfPipeline/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/orga/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

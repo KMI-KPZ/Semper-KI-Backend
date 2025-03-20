@@ -1,0 +1,31 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService
+=================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Handlers using simulation to check the processes
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService.loggerError
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+

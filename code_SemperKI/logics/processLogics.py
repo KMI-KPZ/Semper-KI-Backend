@@ -74,7 +74,6 @@ def calculateAddInfoForEachContractor(contractor, processObj:Process|ProcessInte
     """
     try:
         # calculate price for service
-        # await sync_to_async(
         if isinstance(contractor, tuple):
             contractorID = contractor[0] # contractor 0 contains the id, 1 contains if the contractor is verified and 2 contains a list of all groups that contractor can serve
         else:
@@ -114,14 +113,14 @@ def calculateAddInfoForEachContractor(contractor, processObj:Process|ProcessInte
         return {"error": e}
 
 ####################################################################################
-def parallelLoop(listOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
+def parallelLoop(dictOfFilteredContractors, processObj:Process|ProcessInterface, service:ServiceBase, savedCoords:tuple, transferObject:dict):
     """
     The main loop
     
     """
     try:
         #return await asyncio.gather(*[calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))])
-        return [calculateAddInfoForEachContractor(listOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(listOfFilteredContractors))]
+        return [calculateAddInfoForEachContractor(dictOfFilteredContractors[i], processObj, service, savedCoords, transferObject, i) for i in range(len(dictOfFilteredContractors))]
     except Exception as e:
         loggerError.error("Error in parallelLoop: %s" % e)
         return []
@@ -146,13 +145,13 @@ def logicForGetContractors(processObj:Process):
             if AddressesSKI.coordinates in address1:
                 coordsOfUser = address1[AddressesSKI.coordinates]
         
-        listOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
-        if len(listOfFilteredContractors) == 0:
-            return [], 200
+        dictOfFilteredContractors, transferObject = service.getFilteredContractors(processObj)
+        if len(dictOfFilteredContractors[ContractorParsingForFrontend.contractors.value]) == 0:
+            return {ContractorParsingForFrontend.contractors: [], ContractorParsingForFrontend.errors: dictOfFilteredContractors[ContractorParsingForFrontend.errors.value]}, 200
 
         # Loop could be parallelized but tests fail if it is
         # This is due to django not closing the database calls correctly. If there is some other solution to to_thread above then by all means...
-        listOfResultingContractors = parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject) #asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
+        listOfResultingContractors = parallelLoop(dictOfFilteredContractors[ContractorParsingForFrontend.contractors.value], processObj, service, coordsOfUser, transferObject) #asyncio.run(parallelLoop(listOfFilteredContractors, processObj, service, coordsOfUser, transferObject))
         
         #if settings.DEBUG:
         #    listOfResultingContractors.extend(pgProcesses.ProcessManagementBase.getAllContractors(serviceType))
@@ -189,7 +188,7 @@ def logicForGetContractors(processObj:Process):
             del contractor[0][OrganizationDescription.details]
             listOfResultingContractors.append(contractor[0])
         processObj.save()
-        return (listOfResultingContractors, 200)
+        return ({ContractorParsingForFrontend.contractors: listOfResultingContractors, ContractorParsingForFrontend.errors: dictOfFilteredContractors[ContractorParsingForFrontend.errors.value]}, 200)
 
     except Exception as e:
         loggerError.error("Error in logicForGetContractors: %s" % e)

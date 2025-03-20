@@ -1,0 +1,50 @@
+code_SemperKI.services.service_CreateModel.handlers.public.filter
+=================================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.handlers.public.filter
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handlers of frontend filters for CM service details
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.handlers.public.filter.logger
+   code_SemperKI.services.service_CreateModel.handlers.public.filter.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.handlers.public.filter.getFilters
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getFilters(request: rest_framework.request.Request)
+
+   Retrieve the filters used for this service
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON Response
+   :rtype: JSONResponse
+
+
+

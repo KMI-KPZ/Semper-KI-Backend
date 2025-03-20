@@ -1,0 +1,169 @@
+code_SemperKI.handlers.public.files
+===================================
+
+.. py:module:: code_SemperKI.handlers.public.files
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: File upload handling
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.files.logger
+   code_SemperKI.handlers.public.files.loggerError
+   code_SemperKI.handlers.public.files.loggerInfo
+   code_SemperKI.handlers.public.files.loggerDebug
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.files.SReqUploadFiles
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.files.uploadFiles
+   code_SemperKI.handlers.public.files.downloadFileStream
+   code_SemperKI.handlers.public.files.downloadFilesAsZip
+   code_SemperKI.handlers.public.files.downloadProcessHistory
+   code_SemperKI.handlers.public.files.deleteFile
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:data:: loggerInfo
+
+.. py:data:: loggerDebug
+
+.. py:class:: SReqUploadFiles(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: origin
+
+
+   .. py:attribute:: file
+
+
+.. py:function:: uploadFiles(request: rest_framework.request.Request)
+
+   File upload for a process
+
+   :param request: Request with files in it
+   :type request: HTTP POST
+   :return: Successful or not
+   :rtype: HTTP Response
+
+
+.. py:function:: downloadFileStream(request: rest_framework.request.Request, projectID, processID, fileID)
+
+   Send file to user from storage
+
+   :param request: Request of user for a specific file of a process
+   :type request: HTTP POST
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :param fileID: file ID
+   :type fileID: Str
+   :return: Saved content
+   :rtype: FileResponse
+
+
+
+.. py:function:: downloadFilesAsZip(request: rest_framework.request.Request, projectID, processID)
+
+   Send files to user as zip
+
+   :param request: Request of user for all selected files of a process
+   :type request: HTTP POST
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :return: Saved content
+   :rtype: FileResponse
+
+
+
+.. py:function:: downloadProcessHistory(request: rest_framework.request.Request, processID)
+
+   See who has done what and when and download this as pdf
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param processID: The process of interest
+   :type processID: str
+   :return: PDF of process history
+   :rtype: Fileresponse
+
+
+
+.. py:function:: deleteFile(request: rest_framework.request.Request, projectID, processID, fileID)
+
+   Delete a file from storage
+
+   :param request: Request of user for a specific file of a process
+   :type request: HTTP DELETE
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: process ID
+   :type processID: Str
+   :param fileID: file ID
+   :type fileID: Str
+   :return: Successful or not
+   :rtype: HTTPResponse
+
+
+

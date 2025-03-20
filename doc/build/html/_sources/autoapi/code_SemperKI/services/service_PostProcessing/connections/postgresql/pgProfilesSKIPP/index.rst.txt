@@ -1,0 +1,68 @@
+code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP
+====================================================================================
+
+.. py:module:: code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Connector to the profiles of the Generic Backend which adds stuff to the details specific to this service
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP.updateUserDetailsSemperKIPP
+   code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP.updateOrgaDetailsSemperKIPP
+   code_SemperKI.services.service_PostProcessing.connections.postgresql.pgProfilesSKIPP.deleteOrgaDetailsSemperKIPP
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: updateUserDetailsSemperKIPP(userHashID: str, session)
+
+   Look for user, update details according to PP specific fields
+
+   :param userHashID: The ID transmitted via signal
+   :type userHashID: str
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: updateOrgaDetailsSemperKIPP(orgaHashID: str)
+
+   Look for orga, update details according to PP specific fields
+
+   :param orgaHashID: The ID transmitted via signal
+   :type orgaHashID: str
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: deleteOrgaDetailsSemperKIPP(orgaHashID: str)
+
+   Look for orga, delete details according to PP specific fields
+
+   :param orgaHashID: The ID transmitted via signal
+   :type orgaHashID: str
+   :return: Nothing
+   :rtype: None
+
+

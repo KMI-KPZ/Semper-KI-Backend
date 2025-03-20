@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
 """
 import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
@@ -204,6 +205,12 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
 class OrganizationDetailsSKI(StrEnumExactlyAsDefined):
     maturityLevel = enum.auto()
     resilienceScore = enum.auto()
+    todos = enum.auto()
+
+####################################################################################
+# Enum for user details for SemperKI
+class UserDetailsSKI(StrEnumExactlyAsDefined):
+    todos = enum.auto()
 
 ####################################################################################
 # Enum for Addresses for SemperKI
@@ -347,3 +354,14 @@ class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
     """
     isSuccessful = enum.auto()
     reason = enum.auto()
+
+##################################################
+class ContractorParsingForFrontend(StrEnumExactlyAsDefined):
+    """
+    How the frontend wants the output of the contractors
+    
+    """
+    contractors = enum.auto()
+    errors = enum.auto()
+    groupID = enum.auto()
+    error = enum.auto()

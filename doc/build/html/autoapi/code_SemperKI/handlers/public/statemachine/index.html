@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.handlers.public.statemachine &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.imports" href="../../../imports/index.html" />
+    <link rel="prev" title="code_SemperKI.handlers.public.project" href="../project/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.handlers.public.statemachine">
+<span id="code-semperki-handlers-public-statemachine"></span><h1>code_SemperKI.handlers.public.statemachine<a class="headerlink" href="#module-code_SemperKI.handlers.public.statemachine" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Akshay NS 2024</p>
+<p>Contains: State machine handlers</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.logger" title="code_SemperKI.handlers.public.statemachine.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.loggerError" title="code_SemperKI.handlers.public.statemachine.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData" title="code_SemperKI.handlers.public.statemachine.SReqButtonData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqButtonData</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons" title="code_SemperKI.handlers.public.statemachine.SReqStatusButtons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqStatusButtons</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.getStateMachine" title="code_SemperKI.handlers.public.statemachine.getStateMachine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getStateMachine</span></code></a>(request)</p></td>
+<td><p>Print out the whole state machine and all transitions</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.statusButtonRequest" title="code_SemperKI.handlers.public.statemachine.statusButtonRequest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">statusButtonRequest</span></code></a>(request)</p></td>
+<td><p>Button was clicked, so the state must change (transition inside state machine)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.getStateMachine">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">getStateMachine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.getStateMachine" title="Link to this definition">¶</a></dt>
+<dd><p>Print out the whole state machine and all transitions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP GET</em>) – GET Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response with graph in JSON Format</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqButtonData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">SReqButtonData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqButtonData.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqButtonData.targetStatus">
+<span class="sig-name descname"><span class="pre">targetStatus</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData.targetStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqStatusButtons">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">SReqStatusButtons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqStatusButtons.projectID">
+<span class="sig-name descname"><span class="pre">projectID</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.projectID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqStatusButtons.processIDs">
+<span class="sig-name descname"><span class="pre">processIDs</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.processIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.SReqStatusButtons.buttonData">
+<span class="sig-name descname"><span class="pre">buttonData</span></span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.buttonData" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.handlers.public.statemachine.statusButtonRequest">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.handlers.public.statemachine.</span></span><span class="sig-name descname"><span class="pre">statusButtonRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.handlers.public.statemachine.statusButtonRequest" title="Link to this definition">¶</a></dt>
+<dd><p>Button was clicked, so the state must change (transition inside state machine)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response with new buttons</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../index.html">code_SemperKI.handlers</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../../private/index.html">code_SemperKI.handlers.private</a></li>
+<li class="toctree-l6 current"><a class="reference internal" href="../index.html">code_SemperKI.handlers.public</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../admin/index.html">code_SemperKI.handlers.public.admin</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../files/index.html">code_SemperKI.handlers.public.files</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../miscellaneous/index.html">code_SemperKI.handlers.public.miscellaneous</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../process/index.html">code_SemperKI.handlers.public.process</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../project/index.html">code_SemperKI.handlers.public.project</a></li>
+<li class="toctree-l8 current"><a class="current reference internal" href="#">code_SemperKI.handlers.public.statemachine</a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l9"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.getStateMachine"><code class="docutils literal notranslate"><span class="pre">getStateMachine()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData"><code class="docutils literal notranslate"><span class="pre">SReqButtonData</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData.type"><code class="docutils literal notranslate"><span class="pre">SReqButtonData.type</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqButtonData.targetStatus"><code class="docutils literal notranslate"><span class="pre">SReqButtonData.targetStatus</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons"><code class="docutils literal notranslate"><span class="pre">SReqStatusButtons</span></code></a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.projectID"><code class="docutils literal notranslate"><span class="pre">SReqStatusButtons.projectID</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.processIDs"><code class="docutils literal notranslate"><span class="pre">SReqStatusButtons.processIDs</span></code></a></li>
+<li class="toctree-l11"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.SReqStatusButtons.buttonData"><code class="docutils literal notranslate"><span class="pre">SReqStatusButtons.buttonData</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.handlers.public.statemachine.statusButtonRequest"><code class="docutils literal notranslate"><span class="pre">statusButtonRequest()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../index.html">code_SemperKI.handlers</a><ul>
+  <li><a href="../index.html">code_SemperKI.handlers.public</a><ul>
+      <li>Previous: <a href="../project/index.html" title="previous chapter">code_SemperKI.handlers.public.project</a></li>
+      <li>Next: <a href="../../../imports/index.html" title="next chapter">code_SemperKI.imports</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../_sources/autoapi/code_SemperKI/handlers/public/statemachine/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

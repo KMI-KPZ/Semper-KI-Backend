@@ -1,0 +1,51 @@
+code_SemperKI.services.service_AfterSales.logics.checkServiceLogic
+==================================================================
+
+.. py:module:: code_SemperKI.services.service_AfterSales.logics.checkServiceLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Logic for the After Sales service checking
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AfterSales.logics.checkServiceLogic.logger
+   code_SemperKI.services.service_AfterSales.logics.checkServiceLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AfterSales.logics.checkServiceLogic.checkIfSelectionIsAvailable
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: checkIfSelectionIsAvailable(processObj)
+
+   Check if the selection really is available or not.
+   Currently a dummy
+
+   :param processObj: The process in question
+   :type processObj: Process or ProcessInterface
+   :return: True if everything is in order, False if something is missing
+   :rtype: bool
+
+
+

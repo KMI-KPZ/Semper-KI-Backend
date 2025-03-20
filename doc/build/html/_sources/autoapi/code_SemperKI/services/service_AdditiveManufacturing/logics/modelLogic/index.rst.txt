@@ -1,0 +1,219 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic
+======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.ContentOfRepoModel
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.createModel
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForUploadModelWithoutFile
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForUploadModel
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForUpdateModel
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForGetModelRepository
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForUploadFromRepository
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForDeleteModel
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.getBoundaryData
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.calculateBoundaryData
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.calculateBoundaryDataForNonFileModel
+   code_SemperKI.services.service_AdditiveManufacturing.logics.modelLogic.logicForCheckModel
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: createModel(model: dict, content: dict) -> None
+
+   Fill the model with details
+
+   :param content: The content of the model
+   :type content: Dict
+   :param model: The model
+   :type model: Dict
+   :return: None
+   :rtype: None
+
+
+
+.. py:function:: logicForUploadModelWithoutFile(validatedInput: dict, request) -> tuple[Exception, int]
+
+   The logic for uploading a model without a file
+
+
+
+.. py:function:: logicForUploadModel(validatedInput: dict, request) -> tuple[Exception, int]
+
+   The logic for uploading a model
+
+
+
+.. py:function:: logicForUpdateModel(request, validatedInput)
+
+   Update an existing model
+
+   :param request: The request object
+   :type request: Request
+   :param validatedInput: The validated input
+   :type validatedInput: Dict
+   :return: Exception and status code
+   :rtype: Tuple[Exception, int]
+
+
+
+.. py:class:: ContentOfRepoModel
+
+   Bases: :py:obj:`code_SemperKI.services.service_AdditiveManufacturing.definitions.StrEnumExactlyAsDefined`
+
+
+   Enum for the content of the model repository
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: license
+
+
+   .. py:attribute:: preview
+
+
+   .. py:attribute:: file
+
+
+   .. py:attribute:: tags
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: levelOfDetail
+
+
+   .. py:attribute:: complexity
+
+
+   .. py:attribute:: size
+
+
+.. py:function:: logicForGetModelRepository() -> dict | Exception
+
+   Retrieve the model from the repository
+
+   :return: Dictionary with all repo models
+   :rtype: dict
+
+
+.. py:function:: logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, int]
+
+   Upload a model from the repository
+
+   :param request: The request object
+   :type request: Request
+   :param validatedInput: The validated input
+   :type validatedInput: Dict
+   :return: Exception and status code
+   :rtype: Tuple[Exception, int]
+
+
+
+.. py:function:: logicForDeleteModel(request, projectID, processID, groupID, fileID, functionName) -> tuple[Exception, int]
+
+   The logic for deleting a model
+
+   :param request: The request object
+   :type request: Request
+   :param projectID: The project ID
+   :type projectID: str
+   :param processID: The process ID
+   :type processID: str
+   :param groupID: The group ID
+   :type groupID: int
+   :param fileID: The file ID
+   :type fileID: str
+   :return: Exception and status code
+   :rtype: tuple[Exception, int]
+
+
+
+.. py:function:: getBoundaryData(readableObject, fileName: str = 'ein-dateiname.stl') -> dict
+
+   Send the model to the Chemnitz service and get the dimensions
+
+   :param readableObject: The model to be sent to the service with a .read() method
+   :type readableObject: BytesIO | EncryptionAdapter
+   :param filename: The file name
+   :type filename: str
+   :return: data obtained by IWU service
+   :rtype: Dict
+
+
+
+.. py:function:: calculateBoundaryData(readableObject: Generic_Backend.code_General.utilities.crypto.EncryptionAdapter, fileName: str, fileSize: int, scalingFactor: float) -> dict
+
+   Calculate some of the stuff ourselves
+
+   :param readableObject: The model to be sent to the service with a .read() method
+   :type readableObject: EncryptionAdapter
+   :param filename: The file name
+   :type filename: str
+   :param fileSize: The size of the file  
+   :type fileSize: int
+   :return: data obtained by IWU service
+   :rtype: Dict
+
+
+
+.. py:function:: calculateBoundaryDataForNonFileModel(model: dict) -> dict
+
+   Calculate the same stuff as above but for a model that is not a file
+
+   :param model: The model 
+   :type model: Dict
+   :return: data in IWU format
+   :rtype: Dict
+
+
+
+.. py:function:: logicForCheckModel(request, functionName: str, projectID: str, processID: str, fileID: str) -> tuple[dict | Exception, int]
+
+   Calculate model properties like boundary and volume
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :param functionName: The name of the function
+   :type functionName: str
+   :param projectID: The project ID
+   :type projectID: str
+   :param processID: The process ID
+   :type processID: str
+   :param fileID: The file ID
+   :type fileID: str
+   :return: dict with calculations or an exception and status code
+   :rtype: Tuple[Dict, int]
+
+
+

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.utilities.sparql &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="code_SemperKI.utilities.websocket" href="../websocket/index.html" />
+    <link rel="prev" title="code_SemperKI.utilities.signals" href="../signals/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.utilities.sparql">
+<span id="code-semperki-utilities-sparql"></span><h1>code_SemperKI.utilities.sparql<a class="headerlink" href="#module-code_SemperKI.utilities.sparql" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Thomas Skodawessely 2024</p>
+<p>Contains: Helper Classes to handle Sparql Queries</p>
+<p>UNUSED! WILL BE DELETED SOON!</p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType" title="code_SemperKI.utilities.sparql.QueryType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueryType</span></code></a></p></td>
+<td><p>The type of query</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager" title="code_SemperKI.utilities.sparql.SparqlQueryManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparqlQueryManager</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource" title="code_SemperKI.utilities.sparql.SparqlResource"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparqlResource</span></code></a></p></td>
+<td><p>Contains queries from files and handles access methods to them</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.QueryType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.utilities.sparql.</span></span><span class="sig-name descname"><span class="pre">QueryType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.QueryType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>The type of query</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.QueryType.GET">
+<span class="sig-name descname"><span class="pre">GET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.QueryType.GET" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.QueryType.INSERT">
+<span class="sig-name descname"><span class="pre">INSERT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.QueryType.INSERT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.QueryType.UPDATE">
+<span class="sig-name descname"><span class="pre">UPDATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.QueryType.UPDATE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.QueryType.DELETE">
+<span class="sig-name descname"><span class="pre">DELETE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.QueryType.DELETE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.utilities.sparql.</span></span><span class="sig-name descname"><span class="pre">SparqlQueryManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redisConnection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oauthTokenManager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateEndpoint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.redisCon">
+<span class="sig-name descname"><span class="pre">redisCon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Generic_Backend.code_General.connections.redis.RedisConnection</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.redisCon" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.oauthTokenManager">
+<span class="sig-name descname"><span class="pre">oauthTokenManager</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Generic_Backend.code_General.utilities.oauth.ManageToken</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.oauthTokenManager" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.endpoint">
+<span class="sig-name descname"><span class="pre">endpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SPARQLWrapper.SPARQLWrapper</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.endpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.updateEndpoint">
+<span class="sig-name descname"><span class="pre">updateEndpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SPARQLWrapper.SPARQLWrapper</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.updateEndpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.setup" title="Link to this definition">¶</a></dt>
+<dd><p>sets up the sparql query manager by loading all queries from the configured class properties containing a dict with keys
+from QueryType and values as path to the query file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.loadConfig">
+<span class="sig-name descname"><span class="pre">loadConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.loadConfig" title="Link to this definition">¶</a></dt>
+<dd><p>loads the queries from the config dict and sets them to the sparql resource object
+:param name: name of the property to set
+:type name: str
+:param config: config dict containing the query paths
+:type config: dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.loadQueryFromPath">
+<span class="sig-name descname"><span class="pre">loadQueryFromPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.loadQueryFromPath" title="Link to this definition">¶</a></dt>
+<dd><p>Load a query from a file path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The file path</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Query content</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.sendQuery">
+<span class="sig-name descname"><span class="pre">sendQuery</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.sendQuery" title="Link to this definition">¶</a></dt>
+<dd><p>Send query via sparql to endpoint</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Query result</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.getResources">
+<span class="sig-name descname"><span class="pre">getResources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.getResources" title="Link to this definition">¶</a></dt>
+<dd><p>Returns resource details</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with resources names as key and the resource as value</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlQueryManager.getResourcesAndTypes">
+<span class="sig-name descname"><span class="pre">getResourcesAndTypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.getResourcesAndTypes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns resource details and types</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with resources names as key and the resource types as array</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.utilities.sparql.</span></span><span class="sig-name descname"><span class="pre">SparqlResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SPARQLWrapper.SPARQLWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateEndpoint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SPARQLWrapper.SPARQLWrapper</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oauthToken</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Generic_Backend.code_General.utilities.oauth.ManageToken</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource" title="Link to this definition">¶</a></dt>
+<dd><p>Contains queries from files and handles access methods to them</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.endpoint">
+<span class="sig-name descname"><span class="pre">endpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SPARQLWrapper.SPARQLWrapper</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.endpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.updateEndpoint">
+<span class="sig-name descname"><span class="pre">updateEndpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SPARQLWrapper.SPARQLWrapper</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.updateEndpoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.oauthToken">
+<span class="sig-name descname"><span class="pre">oauthToken</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Generic_Backend.code_General.utilities.oauth.ManageToken</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.oauthToken" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._getQuery">
+<span class="sig-name descname"><span class="pre">_getQuery</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._getQuery" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._insertQuery">
+<span class="sig-name descname"><span class="pre">_insertQuery</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._insertQuery" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._updateQuery">
+<span class="sig-name descname"><span class="pre">_updateQuery</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._updateQuery" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._deleteQuery">
+<span class="sig-name descname"><span class="pre">_deleteQuery</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._deleteQuery" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._vars">
+<span class="sig-name descname"><span class="pre">_vars</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._vars" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.setQuery">
+<span class="sig-name descname"><span class="pre">setQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType" title="code_SemperKI.utilities.sparql.QueryType"><span class="pre">QueryType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.setQuery" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource._sendQuery">
+<span class="sig-name descname"><span class="pre">_sendQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource._sendQuery" title="Link to this definition">¶</a></dt>
+<dd><p>Send SPARQL query.
+:param self: Contains sparql query as obj
+:type self: Object
+:return: result of query
+:rtype: JSON</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.hasGet">
+<span class="sig-name descname"><span class="pre">hasGet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.hasGet" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.hasInsert">
+<span class="sig-name descname"><span class="pre">hasInsert</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.hasInsert" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.hasUpdate">
+<span class="sig-name descname"><span class="pre">hasUpdate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.hasUpdate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.hasDelete">
+<span class="sig-name descname"><span class="pre">hasDelete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.hasDelete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.has">
+<span class="sig-name descname"><span class="pre">has</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType" title="code_SemperKI.utilities.sparql.QueryType"><span class="pre">QueryType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.has" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.getAll">
+<span class="sig-name descname"><span class="pre">getAll</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.getAll" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.get" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.insert">
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.insert" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.update" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.delete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.extractVars">
+<span class="sig-name descname"><span class="pre">extractVars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.extractVars" title="Link to this definition">¶</a></dt>
+<dd><p>extract all vars (noted as [$VARNAME] in query) from query via regex</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.getVars">
+<span class="sig-name descname"><span class="pre">getVars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType" title="code_SemperKI.utilities.sparql.QueryType"><span class="pre">QueryType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.getVars" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.utilities.sparql.SparqlResource.getSupportedQueryTypes">
+<span class="sig-name descname"><span class="pre">getSupportedQueryTypes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#code_SemperKI.utilities.sparql.SparqlResource.getSupportedQueryTypes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">code_SemperKI.utilities</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../basics/index.html">code_SemperKI.utilities.basics</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../filePreview/index.html">code_SemperKI.utilities.filePreview</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../locales/index.html">code_SemperKI.utilities.locales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../serializer/index.html">code_SemperKI.utilities.serializer</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../signals/index.html">code_SemperKI.utilities.signals</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">code_SemperKI.utilities.sparql</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType"><code class="docutils literal notranslate"><span class="pre">QueryType</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType.GET"><code class="docutils literal notranslate"><span class="pre">QueryType.GET</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType.INSERT"><code class="docutils literal notranslate"><span class="pre">QueryType.INSERT</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType.UPDATE"><code class="docutils literal notranslate"><span class="pre">QueryType.UPDATE</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.QueryType.DELETE"><code class="docutils literal notranslate"><span class="pre">QueryType.DELETE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.redisCon"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.redisCon</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.oauthTokenManager"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.oauthTokenManager</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.endpoint"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.endpoint</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.updateEndpoint"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.updateEndpoint</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.setup"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.setup()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.loadConfig"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.loadConfig()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.loadQueryFromPath"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.loadQueryFromPath()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.sendQuery"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.sendQuery()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.getResources"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.getResources()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlQueryManager.getResourcesAndTypes"><code class="docutils literal notranslate"><span class="pre">SparqlQueryManager.getResourcesAndTypes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource"><code class="docutils literal notranslate"><span class="pre">SparqlResource</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.endpoint"><code class="docutils literal notranslate"><span class="pre">SparqlResource.endpoint</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.updateEndpoint"><code class="docutils literal notranslate"><span class="pre">SparqlResource.updateEndpoint</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.oauthToken"><code class="docutils literal notranslate"><span class="pre">SparqlResource.oauthToken</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._getQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource._getQuery</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._insertQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource._insertQuery</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._updateQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource._updateQuery</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._deleteQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource._deleteQuery</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._vars"><code class="docutils literal notranslate"><span class="pre">SparqlResource._vars</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.setQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource.setQuery()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource._sendQuery"><code class="docutils literal notranslate"><span class="pre">SparqlResource._sendQuery()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.hasGet"><code class="docutils literal notranslate"><span class="pre">SparqlResource.hasGet()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.hasInsert"><code class="docutils literal notranslate"><span class="pre">SparqlResource.hasInsert()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.hasUpdate"><code class="docutils literal notranslate"><span class="pre">SparqlResource.hasUpdate()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.hasDelete"><code class="docutils literal notranslate"><span class="pre">SparqlResource.hasDelete()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.has"><code class="docutils literal notranslate"><span class="pre">SparqlResource.has()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.getAll"><code class="docutils literal notranslate"><span class="pre">SparqlResource.getAll()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.get"><code class="docutils literal notranslate"><span class="pre">SparqlResource.get()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.insert"><code class="docutils literal notranslate"><span class="pre">SparqlResource.insert()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.update"><code class="docutils literal notranslate"><span class="pre">SparqlResource.update()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.delete"><code class="docutils literal notranslate"><span class="pre">SparqlResource.delete()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.extractVars"><code class="docutils literal notranslate"><span class="pre">SparqlResource.extractVars()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.getVars"><code class="docutils literal notranslate"><span class="pre">SparqlResource.getVars()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.utilities.sparql.SparqlResource.getSupportedQueryTypes"><code class="docutils literal notranslate"><span class="pre">SparqlResource.getSupportedQueryTypes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../websocket/index.html">code_SemperKI.utilities.websocket</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">code_SemperKI</a><ul>
+  <li><a href="../index.html">code_SemperKI.utilities</a><ul>
+      <li>Previous: <a href="../signals/index.html" title="previous chapter">code_SemperKI.utilities.signals</a></li>
+      <li>Next: <a href="../websocket/index.html" title="next chapter">code_SemperKI.utilities.websocket</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/code_SemperKI/utilities/sparql/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

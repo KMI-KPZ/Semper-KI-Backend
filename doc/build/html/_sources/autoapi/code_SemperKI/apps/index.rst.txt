@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.apps`
-============================
+code_SemperKI.apps
+==================
 
 .. py:module:: code_SemperKI.apps
 
@@ -9,7 +9,31 @@
 
    Thomas Skodawessely 2023
 
-   Contains: Nothing yet
+   Contains: AppConfig
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.apps.SemperKIConfig
+
+
+Module Contents
+---------------
+
+.. py:class:: SemperKIConfig(app_name, app_module)
+
+   Bases: :py:obj:`django.apps.AppConfig`
+
+
+   Class representing a Django application and its configuration.
+
+
+   .. py:attribute:: name
+      :value: 'code_SemperKI'
 
 
 

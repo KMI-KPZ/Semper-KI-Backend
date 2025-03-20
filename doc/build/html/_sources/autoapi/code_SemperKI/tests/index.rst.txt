@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.tests`
-=============================
+code_SemperKI.tests
+===================
 
 .. py:module:: code_SemperKI.tests
 
@@ -13,22 +13,21 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    code_SemperKI.tests.TestProjects
 
 
-
+Module Contents
+---------------
 
 .. py:class:: TestProjects(methodName='runTest')
 
    Bases: :py:obj:`django.test.TestCase`
+
 
    Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
    test isolation.
@@ -41,27 +40,40 @@ Classes
    On database backends with no transaction support, TestCase behaves as
    TransactionTestCase.
 
+
    .. py:attribute:: testFile
-      
 
-      
 
-   .. py:method:: createOrganization(client: django.test.Client, id='', userID='')
+   .. py:method:: fileFactory() -> io.BytesIO
       :classmethod:
 
 
-   .. py:method:: createUser(client: django.test.Client, sub='', name='')
+      Return a copy of the testfile
+
+
+
+
+   .. py:method:: createOrganization(client: django.test.Client)
+      :classmethod:
+
+
+
+   .. py:method:: createUser(client: django.test.Client)
       :staticmethod:
+
 
 
    .. py:method:: createProjectAndProcess(client: django.test.Client)
       :staticmethod:
 
 
+
    .. py:method:: setUpClass()
       :classmethod:
 
+
       Hook method for setting up class fixture before running tests in the class.
+
 
 
    .. py:method:: test_getProject()
@@ -85,7 +97,9 @@ Classes
    .. py:method:: test_uploadAndDownloadFile()
 
 
-   .. py:method:: test_sendProject()
+   .. py:method:: test_processHistory()
 
+
+   .. py:method:: test_stateMachine()
 
 

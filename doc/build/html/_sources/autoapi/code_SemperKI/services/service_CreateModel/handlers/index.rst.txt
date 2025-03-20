@@ -1,0 +1,15 @@
+code_SemperKI.services.service_CreateModel.handlers
+===================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.handlers
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_CreateModel/handlers/public/index
+
+

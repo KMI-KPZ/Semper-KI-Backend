@@ -1,0 +1,327 @@
+code_SemperKI.connections.content.abstractInterface
+===================================================
+
+.. py:module:: code_SemperKI.connections.content.abstractInterface
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Abstract interface for content of session and database
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.abstractInterface.AbstractContentInterface
+
+
+Module Contents
+---------------
+
+.. py:class:: AbstractContentInterface
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract class with functions that session and postgres interfaces have to comply to
+
+
+
+   .. py:method:: getSession()
+      :abstractmethod:
+
+
+      Get the session
+
+      :return: The session
+      :rtype: Django session obj(dict)
+
+
+
+
+   .. py:method:: createProject(projectID: str, client: str)
+      :abstractmethod:
+
+
+      Create the project
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param client: anonymous client, necessary for interface
+      :type client: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: getProjectObj(projectID: str)
+      :abstractmethod:
+
+
+      Return the project and all its details
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :return: Project Object
+      :rtype: ProjectInterface | Project | None
+
+
+
+
+   .. py:method:: getProject(projectID: str)
+      :abstractmethod:
+
+
+      Get info about one project.
+
+      :param projectID: ID of the project
+      :type projectID: str
+      :return: dict with info about that project
+      :rtype: dict
+
+
+
+
+   .. py:method:: updateProject(projectID: str, updateType: code_SemperKI.definitions.ProjectUpdates, content: dict)
+      :abstractmethod:
+
+
+      Change details of an project like its status. 
+
+      :param projectID: project ID that this project belongs to
+      :type projectID: str
+      :param updateType: changed project details
+      :type updateType: EnumUpdates
+      :param content: changed project, can be many stuff
+      :type content: json dict
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: deleteProject(projectID: str)
+      :abstractmethod:
+
+
+      Delete specific project.
+
+      :param projectID: unique project ID to be deleted
+      :type projectID: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: getProjectsFlat(session)
+      :abstractmethod:
+
+
+      Get all projects for that user but with limited detail.
+
+      :param session: session of that user
+      :type session: dict
+      :return: sorted list with projects
+      :rtype: list
+
+
+
+
+   .. py:method:: createProcess(projectID: str, processID: str, client: str)
+      :abstractmethod:
+
+
+      Create the process
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :param client: anonymous client, necessary for interface
+      :type client: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: getProcess(projectID: str, processID: str)
+      :abstractmethod:
+
+
+      Return the process and all its details as dict
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Dictionary containing the process
+      :rtype: dict
+
+
+
+
+   .. py:method:: getProcessObj(projectID: str, processID: str)
+      :abstractmethod:
+
+
+      Return the process and all its details
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Process Object
+      :rtype: ProcessInterface | Process | None
+
+
+
+
+   .. py:method:: getProcessDependencies(projectID: str, processID: str) -> tuple[list, list]
+      :abstractmethod:
+
+
+      Return the process dependencies 
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Incoming and outgoing dependencies
+      :rtype: tuple[list,list]
+
+
+
+
+   .. py:method:: deleteProcess(processID: str, processObj=None)
+      :abstractmethod:
+
+
+      Delete specific process.
+
+      :param processID: unique process ID to be deleted
+      :type processID: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: updateProcess(projectID: str, processID: str, updateType: code_SemperKI.definitions.ProcessUpdates, content: dict, updatedBy: str) -> tuple[str, dict] | Exception
+      :abstractmethod:
+
+
+      Change details of a process like its status, or save communication. 
+
+      :param projectID: Project that this process belongs to
+      :type projectID: str
+      :param processID: unique processID to be edited
+      :type processID: str
+      :param updateType: changed process details
+      :type updateType: EnumUpdates
+      :param content: changed process, can be many stuff
+      :type content: json dict
+      :param updatedBy: ID of the person who updated the process (for history)
+      :type updatedBy: str
+      :return: Content that is relevant to an event
+      :rtype: tuple[str,dict] | Exception
+
+
+
+
+   .. py:method:: deleteFromProcess(projectID: str, processID: str, updateType: code_SemperKI.definitions.ProcessUpdates, content: dict, deletedBy: str)
+      :abstractmethod:
+
+
+      Delete details of a process like its status, or content. 
+
+      :param projectID: Project that this process belongs to
+      :type projectID: str
+      :param processID: unique process ID to be edited
+      :type processID: str
+      :param updateType: changed process details
+      :type updateType: EnumUpdates
+      :param content: deletions
+      :type content: json dict
+      :param deletedBy: ID of the person who deleted from the process (for history)
+      :type deletedBy: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: getUserID() -> str
+      :abstractmethod:
+
+
+      Retrieve UserID from session
+
+      :return: UserID
+      :rtype: str
+
+
+
+   .. py:method:: checkIfFilesAreRemote(projectID: str, processID: str) -> bool
+      :abstractmethod:
+
+
+      If at least one file is remote, say so to trigger upload to remote for new files as well
+
+      :param projectID: The ID of the project that the process is part of
+      :type projectID: str
+      :param processID: The ID of the process in question
+      :type processID: str
+      :return: True if remote, false if local
+      :rtype: bool
+
+
+
+
+   .. py:method:: getData(processID: str, processObj=None) -> list
+      :abstractmethod:
+
+
+      Get all data associated with the process (aka history).
+
+      :param processID: process ID for a process
+      :type processID: str
+      :return: list of all data
+      :rtype: list
+
+
+
+
+   .. py:method:: createDataEntry(data, dataID, processID, typeOfData, createdBy: str, details={}, IDofData='')
+      :abstractmethod:
+
+
+      Create an entry in the Data table
+
+      :param data: The data itself
+      :type data: Dict in JSON
+      :param dataID: The ID of that date
+      :type dataID: Str
+      :param processID: process it belongs to
+      :type processID: str
+      :param typeOfData: The type of this data
+      :type typeOfData: DataType
+      :param createdBy: Who created it (hashed ID)
+      :type createdBy: Str
+      :param details: Some metadata
+      :type details: JSON Dict
+      :param IDofData: If the data has an id, save it
+      :type IDofData: Str
+      :return: Nothing
+      :rtype: None
+
+
+

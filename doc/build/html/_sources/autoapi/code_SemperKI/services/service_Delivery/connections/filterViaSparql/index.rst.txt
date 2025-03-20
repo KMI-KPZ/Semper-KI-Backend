@@ -1,0 +1,63 @@
+code_SemperKI.services.service_Delivery.connections.filterViaSparql
+===================================================================
+
+.. py:module:: code_SemperKI.services.service_Delivery.connections.filterViaSparql
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Functions using the sparql queries to filter for contractors
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Delivery.connections.filterViaSparql.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_Delivery.connections.filterViaSparql.FilterD
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:class:: FilterD
+
+   Filter and save results
+
+
+
+   .. py:method:: filterDContractors(processObj: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> list | Exception
+
+      get all contractors for the given process
+
+      :param processObj: Process object
+      :type processObj: ProcessInterface|Process
+      :return: List of contractors
+      :rtype: List
+
+
+
+   .. py:method:: getFilteredContractors(processObj: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> dict
+
+      Get the filtered contractors
+
+      :return: List of suitable contractors
+      :rtype: list
+
+
+
+

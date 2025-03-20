@@ -128,7 +128,7 @@ class Assembly(Semper.ServiceBase):
         return outDict
 
     ###################################################
-    def getFilteredContractors(self, processObj) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj) -> tuple[dict, object]:
         """
         Get a list of contractors that can do the job
 
@@ -138,11 +138,11 @@ class Assembly(Semper.ServiceBase):
         :rtype: tuple[list, object]
 
         """
-        filteredContractors = Filter()
+        filteredContractors = FilterA()
 
-        outList = filteredContractors.getFilteredContractors(processObj)
+        outDict = filteredContractors.getFilteredContractors(processObj)
         
-        return outList, filteredContractors
+        return outDict, filteredContractors
     
     ###################################################
     def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
@@ -159,5 +159,13 @@ class Assembly(Semper.ServiceBase):
 
         """
         return {}
+    
+    ###################################################
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+        return []
 
 Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, Assembly(), settings.STATIC_URL+"media/A.png")

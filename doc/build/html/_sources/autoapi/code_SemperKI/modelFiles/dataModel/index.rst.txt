@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.modelFiles.dataModel`
-============================================
+code_SemperKI.modelFiles.dataModel
+==================================
 
 .. py:module:: code_SemperKI.modelFiles.dataModel
 
@@ -13,81 +13,65 @@
 
 
 
-Module Contents
----------------
-
 Classes
-~~~~~~~
+-------
 
 .. autoapisummary::
 
    code_SemperKI.modelFiles.dataModel.DataDescription
    code_SemperKI.modelFiles.dataModel.Data
+   code_SemperKI.modelFiles.dataModel.DataInterface
 
 
-
+Module Contents
+---------------
 
 .. py:class:: DataDescription
 
-   Bases: :py:obj:`code_General.utilities.customStrEnum.StrEnumExactylAsDefined`
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
 
    What does a data entry consists of?
 
 
-   .. py:attribute:: dataID
-      
 
-      
+   .. py:attribute:: dataID
+
 
    .. py:attribute:: process
-      
 
-      
+
+   .. py:attribute:: processID
+
 
    .. py:attribute:: type
-      
 
-      
 
    .. py:attribute:: data
-      
 
-      
 
    .. py:attribute:: details
-      
 
-      
 
    .. py:attribute:: createdBy
-      
 
-      
 
    .. py:attribute:: contentID
-      
 
-      
 
    .. py:attribute:: createdWhen
-      
 
-      
 
    .. py:attribute:: updatedWhen
-      
 
-      
 
    .. py:attribute:: accessedWhen
-      
-
-      
 
 
 .. py:class:: Data(*args, **kwargs)
 
    Bases: :py:obj:`django.db.models.Model`
+
 
    Data management class.
 
@@ -102,75 +86,100 @@ Classes
    :updatedWhen: Date and time at which the entry was updated
    :accessedWhen: Last date and time the data was fetched from the database, automatically set
 
+
+   .. py:attribute:: dataID
+
+
+   .. py:attribute:: process
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: data
+
+
+   .. py:attribute:: details
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: contentID
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
    .. py:class:: Meta
 
       .. py:attribute:: ordering
-         :annotation: = ['createdWhen']
+         :value: ['createdWhen']
 
-         
+
 
       .. py:attribute:: indexes
-         
-
-         
 
 
-   .. py:attribute:: dataID
-      
-
-      
-
-   .. py:attribute:: process
-      
-
-      
-
-   .. py:attribute:: type
-      
-
-      
-
-   .. py:attribute:: data
-      
-
-      
-
-   .. py:attribute:: details
-      
-
-      
-
-   .. py:attribute:: createdBy
-      
-
-      
-
-   .. py:attribute:: contentID
-      
-
-      
-
-   .. py:attribute:: createdWhen
-      
-
-      
-
-   .. py:attribute:: updatedWhen
-      
-
-      
-
-   .. py:attribute:: accessedWhen
-      
-
-      
 
    .. py:method:: __str__()
-
-      Return str(self).
 
 
    .. py:method:: toDict()
 
+
+.. py:class:: DataInterface(dataID, processID, type, data, details, createdBy, contentID, createdWhen)
+
+   Data management class as an interface
+
+   :dataID: Primary Key with hash
+   :processID: Link to the process that created this entry
+   :type: Type of data, defined in another enum
+   :data: The data itself
+   :details: Meta data and other information
+   :createdBy: Who created this data
+   :contentID: ID of a file for example, makes searching easier
+   :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+
+
+   .. py:attribute:: dataID
+      :type:  str
+
+
+   .. py:attribute:: processID
+      :type:  str
+
+
+   .. py:attribute:: type
+      :type:  int
+
+
+   .. py:attribute:: data
+      :type:  dict
+
+
+   .. py:attribute:: details
+      :type:  dict
+
+
+   .. py:attribute:: createdBy
+      :type:  str
+
+
+   .. py:attribute:: contentID
+      :type:  str
+
+
+   .. py:attribute:: createdWhen
+      :type:  str
+
+
+   .. py:method:: toDict()
 
 

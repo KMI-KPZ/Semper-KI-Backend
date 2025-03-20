@@ -1,0 +1,230 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic
+======================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Cost calculations for this service
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic.logger
+   code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic.loggerError
+   code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic.PLATFORM_MARGIN
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic.Costs
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.costsLogic.logicForCosts
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:data:: PLATFORM_MARGIN
+   :value: 10.0
+
+
+.. py:class:: Costs(process: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process, additionalArguments: dict, filterObject: code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM, apiGivenContent: dict = {})
+
+   Calculate all costs associated with the additive manufacturing process for one organization
+
+
+
+   .. py:attribute:: processObj
+
+
+   .. py:attribute:: additionalArguments
+
+
+   .. py:attribute:: filterObject
+
+
+   .. py:attribute:: detailedCalculations
+
+
+   .. py:class:: PrinterValues
+
+      Bases: :py:obj:`code_SemperKI.services.service_AdditiveManufacturing.definitions.StrEnumExactlyAsDefined`
+
+
+      Values for every printer
+
+
+
+      .. py:attribute:: technology
+
+
+      .. py:attribute:: costRatePersonalMachine
+
+
+      .. py:attribute:: chamberBuildHeight
+
+
+      .. py:attribute:: chamberBuildLength
+
+
+      .. py:attribute:: chamberBuildWidth
+
+
+      .. py:attribute:: lossOfMaterial
+
+
+      .. py:attribute:: machineBatchDistance
+
+
+      .. py:attribute:: layerThickness
+
+
+      .. py:attribute:: machineSurfaceArea
+
+
+      .. py:attribute:: simpleMachineSetUp
+
+
+      .. py:attribute:: complexMachineSetUp
+
+
+      .. py:attribute:: averagePowerConsumption
+
+
+      .. py:attribute:: machineHourlyRate
+
+
+      .. py:attribute:: coatingTime
+
+
+      .. py:attribute:: buildRate
+
+
+      .. py:attribute:: fillRate
+
+
+      .. py:attribute:: nozzleDiameter
+
+
+      .. py:attribute:: maxPrintingSpeed
+
+
+
+   .. py:class:: MaterialValues
+
+      Bases: :py:obj:`code_SemperKI.services.service_AdditiveManufacturing.definitions.StrEnumExactlyAsDefined`
+
+
+      Values for every material
+
+
+
+      .. py:attribute:: priceOfSpecificMaterial
+
+
+      .. py:attribute:: densityOfSpecificMaterial
+
+
+      .. py:attribute:: maxPrintingSpeed
+
+
+
+   .. py:class:: PostProcessingValues
+
+      Bases: :py:obj:`code_SemperKI.services.service_AdditiveManufacturing.definitions.StrEnumExactlyAsDefined`
+
+
+      Values for every post processing
+
+
+
+      .. py:attribute:: fixedCostsPostProcessing
+
+
+      .. py:attribute:: treatmentCostsPostProcessing
+
+
+
+   .. py:method:: fetchInformation(groupID, group, apiGivenContent: dict = {}) -> None | Exception
+
+      Fetch information about everything
+
+
+
+
+   .. py:method:: calculateCostsForBatches(groupID, modelID, printerIdx, printer: dict, exposureTime: float, partLength: float, partHeight: float, partWidth: float, partQuantity: int, layerThickness: float) -> tuple
+
+      Calculate the costs for the batches
+
+
+
+
+   .. py:method:: calculateCostsForMaterial(groupID, modelID, printerIdx, printer: dict, theoMaxPartsPerBatch: int, partVolume: float, partQuantity: int, productComplexity) -> list
+
+      Calculate the costs for every material
+
+
+
+
+   .. py:method:: calculateCostsForPrinter(groupID, group) -> dict[list[tuple]]
+
+      Calculate the costs for every printer
+
+
+
+
+   .. py:method:: calculateCostsForPostProcessings(groupID: int, group: dict) -> list[float]
+
+      Calculate the costs for the post processings
+
+
+
+
+   .. py:method:: calculateCosts(apiGivenValues: dict = {}) -> list[tuple[float, float]] | Exception
+
+      Calculate all costs
+
+
+
+
+   .. py:method:: getEncryptedCostOverview() -> str
+
+      Encrypt the detailed cost overview
+
+      :return: encrypted cost overview as str
+      :rtype: str
+
+
+
+.. py:function:: logicForCosts(apiGivenValues: dict = {}) -> dict | Exception
+
+   Logic for the costs
+
+   :param apiGivenValues: the values given by the api
+   :type apiGivenValues: dict
+   :return: the costs
+   :rtype: list[tuple[float,float]]
+
+

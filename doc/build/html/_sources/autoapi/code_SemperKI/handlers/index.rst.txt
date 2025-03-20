@@ -1,21 +1,16 @@
-:py:mod:`code_SemperKI.handlers`
-================================
+code_SemperKI.handlers
+======================
 
 .. py:module:: code_SemperKI.handlers
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   admin/index.rst
-   files/index.rst
-   frontpage/index.rst
-   manageServices/index.rst
-   projectAndProcessManagement/index.rst
-   sparqlQueries/index.rst
-   testResponse/index.rst
+   /autoapi/code_SemperKI/handlers/private/index
+   /autoapi/code_SemperKI/handlers/public/index
 
 

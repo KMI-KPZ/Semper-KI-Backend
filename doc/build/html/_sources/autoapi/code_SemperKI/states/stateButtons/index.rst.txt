@@ -1,0 +1,122 @@
+code_SemperKI.states.stateButtons
+=================================
+
+.. py:module:: code_SemperKI.states.stateButtons
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Buttons for the state machine
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.states.stateButtons.ButtonDefinitions
+
+
+Module Contents
+---------------
+
+.. py:class:: ButtonDefinitions
+
+   Define the buttons here and use them in the states
+
+
+
+   .. py:attribute:: deleteProcess
+
+
+   .. py:attribute:: editServiceSelection
+
+
+   .. py:attribute:: deleteServiceDetails
+
+
+   .. py:attribute:: editServiceDetails
+
+
+   .. py:attribute:: editContractorCompleted
+
+
+   .. py:attribute:: deleteContractorCompleted
+
+
+   .. py:attribute:: editVerification
+
+
+   .. py:attribute:: deleteVerification
+
+
+   .. py:attribute:: backToDraft
+
+
+   .. py:attribute:: backToServiceReady
+
+
+   .. py:attribute:: backToServiceCompleted
+
+
+   .. py:attribute:: backToContractorCompleted
+
+
+   .. py:attribute:: forwardToServiceCompleted
+
+
+   .. py:attribute:: fowardToServiceInProgress
+
+
+   .. py:attribute:: fowardToContractorCompleted
+
+
+   .. py:attribute:: forwardToVerifying
+
+
+   .. py:attribute:: fowardToVerificationCompleted
+
+
+   .. py:attribute:: forwardToRequestCompleted
+
+
+   .. py:attribute:: forwardToOfferRejected
+
+
+   .. py:attribute:: forwardToOfferCompleted
+
+
+   .. py:attribute:: forwardToConfirmationRejected
+
+
+   .. py:attribute:: forwardToConfirmationCompleted
+
+
+   .. py:attribute:: forwardToProductionInProgress
+
+
+   .. py:attribute:: forwardToFailed
+
+
+   .. py:attribute:: forwardProductionCompleted
+
+
+   .. py:attribute:: forwardToDeliveryInProgress
+
+
+   .. py:attribute:: forwardToDeliveryCompleted
+
+
+   .. py:attribute:: forwardToDispute
+
+
+   .. py:attribute:: forwardToCompleted
+
+
+   .. py:attribute:: clone
+
+

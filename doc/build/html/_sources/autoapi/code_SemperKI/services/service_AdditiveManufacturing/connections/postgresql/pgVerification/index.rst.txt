@@ -1,0 +1,100 @@
+code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification
+==========================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Access for verification model
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.logger
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.getVerificationObject
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.getVerification
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.createVerification
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.updateVerification
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgVerification.deleteVerification
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: getVerificationObject(orgaHashID: str, printerID: str, materialID: str) -> Verification | Exception
+
+   Retrieve one verification for the organization
+
+
+
+.. py:function:: getVerification(orgaHashID: str) -> list[dict] | Exception
+
+   Retrieve the current verifications for the organization
+
+
+
+.. py:function:: createVerification(orgaHashID: str, printerID: str, materialID: str, status: int = 0, details: dict = {}) -> Verification | Exception
+
+   Create a new verification
+
+   :param orgaHashID: HashID of the organization
+   :type orgaHashID: str
+   :param printerID: HashID of the printer
+   :type printerID: str
+   :param materialID: HashID of the material
+   :type materialID: str
+   :return: Verification|Exception
+   :rtype: Verification|Exception
+
+
+
+.. py:function:: updateVerification(orgaHashID: str, printerID: str, materialID: str, status: int = -1, details: dict = {}) -> Verification | Exception
+
+   Update the verification
+
+   :param orgaHashID: HashID of the organization
+   :type orgaHashID: str
+   :param status: The status of the verification
+   :type status: int
+   :param details: The details of the verification
+   :type details: dict
+   :return: Verification|Exception
+   :rtype: Verification|Exception
+
+
+
+.. py:function:: deleteVerification(orgaHashID: str, printerID: str = '', materialID: str = '') -> None | Exception
+
+   Delete the verification
+
+   :param orgaHashID: HashID of the organization
+   :type orgaHashID: str
+   :param printerID: HashID of the printer
+   :type printerID: str
+   :param materialID: HashID of the material
+   :type materialID: str
+   :return: None|Exception
+   :rtype: None|Exception
+
+
+

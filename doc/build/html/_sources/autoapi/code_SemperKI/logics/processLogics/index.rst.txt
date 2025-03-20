@@ -1,0 +1,173 @@
+code_SemperKI.logics.processLogics
+==================================
+
+.. py:module:: code_SemperKI.logics.processLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024,
+   Akshay NS 2024
+
+   Contains: Logic for the processes
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.processLogics.logger
+   code_SemperKI.logics.processLogics.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.processLogics.calculateGeodesicDistance
+   code_SemperKI.logics.processLogics.calculateAddInfoForEachContractor
+   code_SemperKI.logics.processLogics.parallelLoop
+   code_SemperKI.logics.processLogics.logicForGetContractors
+   code_SemperKI.logics.processLogics.parseProcessOutputForFrontend
+   code_SemperKI.logics.processLogics.logicForGetProcess
+   code_SemperKI.logics.processLogics.logicForCreateProcessID
+   code_SemperKI.logics.processLogics.updateProcessFunction
+   code_SemperKI.logics.processLogics.deleteProcessFunction
+   code_SemperKI.logics.processLogics.logicForCloneProcesses
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: calculateGeodesicDistance(userCoords: tuple, orgaCoords: tuple) -> tuple
+   :async:
+
+
+   Calculate the geodesic distance between two addresses
+
+   :param userCoords: The first address' coordinates
+   :type userCoords: tuple
+   :param orgaCoords: The second address' coordinates
+   :type orgaCoords: tuple
+   :return: The distance between the two coordinates
+   :rtype: float | exception
+
+
+
+.. py:function:: calculateAddInfoForEachContractor(contractor, processObj: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface, service: code_SemperKI.serviceManager.ServiceBase, savedCoords: tuple, transferObject: dict, idx: int)
+
+   Parallelized for loop over every contractor
+
+
+
+.. py:function:: parallelLoop(dictOfFilteredContractors, processObj: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface, service: code_SemperKI.serviceManager.ServiceBase, savedCoords: tuple, transferObject: dict)
+
+   The main loop
+
+
+
+.. py:function:: logicForGetContractors(processObj: code_SemperKI.modelFiles.processModel.Process)
+
+   Get the contractors for the service
+
+   :return: The contractors
+   :rtype: tuple(list|Exception, int)
+
+
+.. py:function:: parseProcessOutputForFrontend(processObj: code_SemperKI.modelFiles.processModel.Process | code_SemperKI.modelFiles.processModel.ProcessInterface, contentManager: code_SemperKI.connections.content.manageContent.ManageContent, functionName: str)
+
+   Add stuff to the usual output of the process for the frontend
+
+   :param processObj: The process object
+   :type processObj: Process | ProcessInterface
+   :param contentManager: The content manager
+   :type contentManager: ManageContent
+   :param functionName: The function name that called this
+   :type functionName: str
+   :return: The process and statusCode
+   :rtype: tuple(dict|Exception, int)
+
+
+
+.. py:function:: logicForGetProcess(request: rest_framework.request.Request, projectID: str, processID: str, functionName: str)
+
+   Get the process
+
+   :param request: The request
+   :type request: Request
+   :param projectID: The project ID
+   :type projectID: str
+   :param processID: The process ID
+   :type processID: str
+   :param functionName: The function name
+   :type functionName: str
+   :return: The process and statusCode
+   :rtype: tuple(dict|Exception, int)
+
+
+
+.. py:function:: logicForCreateProcessID(request: rest_framework.request.Request, projectID: str, functionName: str)
+
+   Create a process and an ID with it
+
+   :param request: The request
+   :type request: Request
+   :param projectID: The project ID
+   :type projectID: str
+   :param functionName: The function name
+   :type functionName: str
+   :return: The processID and statusCode
+   :rtype: tuple(dict|Exception, int)
+
+
+
+.. py:function:: updateProcessFunction(request: rest_framework.request.Request, changes: dict, projectID: str, processIDs: list[str])
+
+   Update process logic
+
+   :param projectID: Project ID
+   :type projectID: Str
+   :param projectID: Process ID
+   :type projectID: Str
+   :return: Message if it worked or not
+   :rtype: Str, bool or Error
+
+
+.. py:function:: deleteProcessFunction(session, processIDs: list[str], projectID: str)
+
+   Delete the processes
+
+   :param session: The session
+   :type session: Django session object (dict-like)
+   :param processIDs: Array of proccess IDs 
+   :type processIDs: list[str]
+   :return: The response
+   :rtype: HttpResponse | Exception
+
+
+
+.. py:function:: logicForCloneProcesses(request: rest_framework.request.Request, oldProjectID: str, oldProcessIDs: list[str], functionName: str)
+
+   Duplicate selected processes. Works only for logged in users.
+
+   :param request: POST request from statusButtonRequest
+   :type request: HTTP POST
+   :param projectID: The project ID of the project the processes belonged to
+   :type projectID: str
+   :param processIDs: List of processes to be cloned
+   :type processIDs: list of strings
+   :param functionName: The function name
+   :type functionName: str
+   :return: ResultDict or Exception and statusCode
+   :rtype: tuple(dict|Exception, int)
+
+
+

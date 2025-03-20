@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.serviceManager &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="code_SemperKI.services" href="../services/index.html" />
+    <link rel="prev" title="code_SemperKI.models" href="../models/index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.serviceManager">
+<span id="code-semperki-servicemanager"></span><h1>code_SemperKI.serviceManager<a class="headerlink" href="#module-code_SemperKI.serviceManager" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Metaclass that handles the services</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.serviceManager.serviceManager" title="code_SemperKI.serviceManager.serviceManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serviceManager</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase" title="code_SemperKI.serviceManager.ServiceBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServiceBase</span></code></a></p></td>
+<td><p>Abstract base class defining the interface that every service has to implement</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure" title="code_SemperKI.serviceManager.ServicesStructure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServicesStructure</span></code></a></p></td>
+<td><p>How the services dictionary is structured</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager" title="code_SemperKI.serviceManager._ServicesManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_ServicesManager</span></code></a></p></td>
+<td><p>The class handling the services</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.serviceManager.</span></span><span class="sig-name descname"><span class="pre">ServiceBase</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class defining the interface that every service has to implement</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.checkIfSelectionIsAvailable">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkIfSelectionIsAvailable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.checkIfSelectionIsAvailable" title="Link to this definition">¶</a></dt>
+<dd><p>Checks, if the selection of the service is available (material, …)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.initializeServiceDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initializeServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serviceDetails</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.initializeServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize the service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.updateServiceDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">updateServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newContent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.updateServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Update a service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.deleteServiceDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deleteServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deletedContent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.deleteServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Delete stuff from a service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.isFileRelevantForService">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isFileRelevantForService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.isFileRelevantForService" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a file is relevant for the service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.parseServiceDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parseServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.parseServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Parse the service details for Frontend</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.serviceReady">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">serviceReady</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.serviceReady" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a service has been defined completely</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.cloneServiceDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cloneServiceDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newProcess</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.cloneServiceDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Clone content of the service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>existingContent</strong> (<em>dict</em>) – What the process currently holds about the service</p></li>
+<li><p><strong>newProcess</strong> (<a class="reference internal" href="../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><em>Process</em></a><em>|</em><a class="reference internal" href="../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><em>ProcessInterface</em></a>) – The new process as object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The copy of the service details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.calculatePriceForService">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculatePriceForService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additionalArguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transferObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.calculatePriceForService" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the price for all content of the service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> (<a class="reference internal" href="../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><em>ProcessInterface</em></a><em>|</em><a class="reference internal" href="../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><em>Process</em></a>) – The process with all its details</p></li>
+<li><p><strong>additionalArguments</strong> (<em>dict</em>) – Various parameters, differs for every service</p></li>
+<li><p><strong>transferObject</strong> (<em>object</em>) – Object to transfer data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with all pricing details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.getFilteredContractors">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getFilteredContractors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.getFilteredContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Get a list of contractors that can do the job</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.getServiceSpecificContractorDetails">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getServiceSpecificContractorDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingDetails</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contractor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.getServiceSpecificContractorDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Get the service specific details for a contractor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServiceBase.serviceSpecificTasks">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">serviceSpecificTasks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validationResults</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServiceBase.serviceSpecificTasks" title="Link to this definition">¶</a></dt>
+<dd><p>Do service specific tasks</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServicesStructure">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.serviceManager.</span></span><span class="sig-name descname"><span class="pre">ServicesStructure</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServicesStructure" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>How the services dictionary is structured</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServicesStructure.object">
+<span class="sig-name descname"><span class="pre">object</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServicesStructure.object" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServicesStructure.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServicesStructure.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServicesStructure.identifier">
+<span class="sig-name descname"><span class="pre">identifier</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServicesStructure.identifier" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.ServicesStructure.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.ServicesStructure.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.serviceManager.</span></span><span class="sig-name descname"><span class="pre">_ServicesManager</span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager" title="Link to this definition">¶</a></dt>
+<dd><p>The class handling the services</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager._defaultName">
+<span class="sig-name descname"><span class="pre">_defaultName</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'None'</span></em><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager._defaultName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager._defaultIdx">
+<span class="sig-name descname"><span class="pre">_defaultIdx</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager._defaultIdx" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager._services">
+<span class="sig-name descname"><span class="pre">_services</span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager._services" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager._imgPath">
+<span class="sig-name descname"><span class="pre">_imgPath</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager._imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serviceClassObject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgPath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.register" title="Link to this definition">¶</a></dt>
+<dd><p>Registers a new service class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the service as given in ServiceTypes</p></li>
+<li><p><strong>serviceClass</strong> (<em>Derived Class Instances</em><em> of </em><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase" title="code_SemperKI.serviceManager.ServiceBase"><em>ServiceBase</em></a>) – The service class</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>) – Parameters for service class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.getNone">
+<span class="sig-name descname"><span class="pre">getNone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.getNone" title="Link to this definition">¶</a></dt>
+<dd><p>Return default object idx</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Idx of none</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.getService">
+<span class="sig-name descname"><span class="pre">getService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savedService</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase" title="code_SemperKI.serviceManager.ServiceBase"><span class="pre">ServiceBase</span></a></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.getService" title="Link to this definition">¶</a></dt>
+<dd><p>Depending on the service, select the correct Service class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>savedService</strong> (<em>int</em>) – The selected service saved in the dictionary _services</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The respective Service class</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Derived class of <a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase" title="code_SemperKI.serviceManager.ServiceBase">ServiceBase</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.getImgPath">
+<span class="sig-name descname"><span class="pre">getImgPath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savedService</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.getImgPath" title="Link to this definition">¶</a></dt>
+<dd><p>Depending on the service, select the correct Image path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>savedService</strong> (<em>int</em>) – The selected service saved in the dictionary _services</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The respective Image path</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.getAllServices">
+<span class="sig-name descname"><span class="pre">getAllServices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.getAllServices" title="Link to this definition">¶</a></dt>
+<dd><p>Return all registered services as list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>all registered services as list</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.toInt">
+<span class="sig-name descname"><span class="pre">toInt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serviceName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.toInt" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the service name to its integer representation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serviceName</strong> (<em>Str</em>) – Name of the service as given in ServiceTypes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Integer Code of that service</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager._ServicesManager.toStr">
+<span class="sig-name descname"><span class="pre">toStr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#code_SemperKI.serviceManager._ServicesManager.toStr" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the service name to its string representation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serviceName</strong> (<em>int</em>) – Int code of the service</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Str Code of that service as given in ServiceTypes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.serviceManager.serviceManager">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.serviceManager.</span></span><span class="sig-name descname"><span class="pre">serviceManager</span></span><a class="headerlink" href="#code_SemperKI.serviceManager.serviceManager" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">code_SemperKI.serviceManager</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase"><code class="docutils literal notranslate"><span class="pre">ServiceBase</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.checkIfSelectionIsAvailable"><code class="docutils literal notranslate"><span class="pre">ServiceBase.checkIfSelectionIsAvailable()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.initializeServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.initializeServiceDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.updateServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.updateServiceDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.deleteServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.deleteServiceDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.isFileRelevantForService"><code class="docutils literal notranslate"><span class="pre">ServiceBase.isFileRelevantForService()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.parseServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.parseServiceDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.serviceReady"><code class="docutils literal notranslate"><span class="pre">ServiceBase.serviceReady()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.cloneServiceDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.cloneServiceDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.calculatePriceForService"><code class="docutils literal notranslate"><span class="pre">ServiceBase.calculatePriceForService()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.getFilteredContractors"><code class="docutils literal notranslate"><span class="pre">ServiceBase.getFilteredContractors()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.getServiceSpecificContractorDetails"><code class="docutils literal notranslate"><span class="pre">ServiceBase.getServiceSpecificContractorDetails()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServiceBase.serviceSpecificTasks"><code class="docutils literal notranslate"><span class="pre">ServiceBase.serviceSpecificTasks()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure"><code class="docutils literal notranslate"><span class="pre">ServicesStructure</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure.object"><code class="docutils literal notranslate"><span class="pre">ServicesStructure.object</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure.name"><code class="docutils literal notranslate"><span class="pre">ServicesStructure.name</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure.identifier"><code class="docutils literal notranslate"><span class="pre">ServicesStructure.identifier</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager.ServicesStructure.imgPath"><code class="docutils literal notranslate"><span class="pre">ServicesStructure.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager"><code class="docutils literal notranslate"><span class="pre">_ServicesManager</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager._defaultName"><code class="docutils literal notranslate"><span class="pre">_ServicesManager._defaultName</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager._defaultIdx"><code class="docutils literal notranslate"><span class="pre">_ServicesManager._defaultIdx</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager._services"><code class="docutils literal notranslate"><span class="pre">_ServicesManager._services</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager._imgPath"><code class="docutils literal notranslate"><span class="pre">_ServicesManager._imgPath</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.register"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.register()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.getNone"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.getNone()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.getService"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.getService()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.getImgPath"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.getImgPath()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.getAllServices"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.getAllServices()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.toInt"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.toInt()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.serviceManager._ServicesManager.toStr"><code class="docutils literal notranslate"><span class="pre">_ServicesManager.toStr()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.serviceManager.serviceManager"><code class="docutils literal notranslate"><span class="pre">serviceManager</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html">code_SemperKI</a><ul>
+      <li>Previous: <a href="../models/index.html" title="previous chapter">code_SemperKI.models</a></li>
+      <li>Next: <a href="../services/index.html" title="next chapter">code_SemperKI.services</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../_sources/autoapi/code_SemperKI/serviceManager/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

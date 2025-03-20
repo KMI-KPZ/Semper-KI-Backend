@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Services for database calls
+
 """
 import enum, logging
 
@@ -1279,20 +1280,39 @@ class ProcessManagementBase(AbstractContentInterface):
             output = []
             
             for project in projects:
-                # if SessionContentSemperKI.CURRENT_PROJECTS in session:
-                #     if project.projectID in session[SessionContentSemperKI.CURRENT_PROJECTS]:
-                #         continue
                 currentProject = project.toDict()
                 processes = project.processes.all()
-                processCount = 0
-                for entry in processes:
-                    if entry.client == currentClient:
-                        processCount += 1
-                currentProject[ProjectOutput.processesCount] = processCount
+                
                 currentProject[ProjectOutput.processIDs] = processes.values_list("processID", flat=True)
                 currentProject[ProjectOutput.owner] = True
-                currentProject[ProjectOutput.searchableData] = []
-                # TODO: add searchable data
+                
+                # gather searchable data and count processes of the current client
+                processCount = 0
+                searchableData = []
+                for process in processes:
+                    if process.client == currentClient:
+                        processCount += 1
+
+                    # title
+                    if ProcessDetails.title in process.processDetails:
+                        searchableData.append(process.processDetails[ProcessDetails.title])
+
+                    # file names
+                    if process.files is not None and process.files != {}: 
+                        for file in process.files:
+                            searchableData.append(process.files[file][FileObjectContent.fileName])
+
+                    # contractor name
+                    if ProcessDetails.provisionalContractor in process.processDetails and process.processDetails[ProcessDetails.provisionalContractor] is not None and process.processDetails[ProcessDetails.provisionalContractor] != {}:
+                        if isinstance(process.processDetails[ProcessDetails.provisionalContractor], dict):
+                            searchableData.append(process.processDetails[ProcessDetails.provisionalContractor][OrganizationDescription.name])
+
+                    # service specific stuff
+                    if process.serviceType is not serviceManager.getNone():
+                        searchableData.extend(serviceManager.getService(process.serviceType).getSearchableDetails(process.serviceDetails))
+
+                currentProject[ProjectOutput.searchableData] = searchableData
+                currentProject[ProjectOutput.processesCount] = processCount
                     
                 output.append(currentProject)
             

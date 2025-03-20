@@ -257,3 +257,14 @@ class FilterCategories(StrEnumExactlyAsDefined):
     elongationAtBreak = enum.auto()
     certificates = enum.auto()
 
+
+##################################################
+class FilterErrors(StrEnumExactlyAsDefined):
+    """
+    What can go wrong when filtering?
+    
+    """
+    material = enum.auto()
+    color = enum.auto()
+    postProcessing = enum.auto()
+    printer = enum.auto()

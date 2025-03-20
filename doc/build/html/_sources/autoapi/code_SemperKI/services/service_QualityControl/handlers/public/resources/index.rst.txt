@@ -1,0 +1,17 @@
+code_SemperKI.services.service_QualityControl.handlers.public.resources
+=======================================================================
+
+.. py:module:: code_SemperKI.services.service_QualityControl.handlers.public.resources
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_QualityControl/handlers/public/resources/kgDBQC/index
+   /autoapi/code_SemperKI/services/service_QualityControl/handlers/public/resources/onto/index
+   /autoapi/code_SemperKI/services/service_QualityControl/handlers/public/resources/orga/index
+
+

@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+
 """
 Part of Semper-KI software
 
 Silvio Weging 2024
 
 Contains: The database backed knowledge graph
+
 """
 
 import json, logging, copy, time
 from datetime import datetime
+from difflib import SequenceMatcher
 from django.utils import timezone
 from django.conf import settings
 
@@ -47,14 +50,14 @@ class Basics():
         :rtype: Node|Exception	
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node = Node.objects.get(nodeID=nodeID)
                 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Node;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Node;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Got node with id {nodeID}")
             return node
         except Exception as error:
@@ -74,8 +77,8 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             if existingNodeID != "":
                 nodeID = existingNodeID
@@ -114,9 +117,9 @@ class Basics():
             createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"uniqueID": uniqueID, "nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "clonedFrom": clonedFrom, "active": active, "updatedWhen": updatedWhen})
             
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Create Node;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Create Node;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Created node with id {nodeID}")
             return createdNode
         except (Exception) as error:
@@ -138,8 +141,8 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             nodeID = generateURLFriendlyRandomString()
             uniqueID = node.uniqueID
@@ -152,9 +155,9 @@ class Basics():
 
             createdNode, _ = Node.objects.update_or_create(nodeID=nodeID, defaults={"uniqueID": uniqueID, "nodeName": nodeName, "nodeType": nodeType, "context": context, "properties": properties, "createdBy": createdBy, "clonedFrom": clonedFrom, "updatedWhen": updatedWhen})
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Copy Node;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Copy Node;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Copied node with new id {nodeID}")
             return createdNode
         except (Exception) as error:
@@ -173,8 +176,8 @@ class Basics():
         :rtype: None | Exception
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             nodes = Node.objects.all()
             for node in nodes:
@@ -187,9 +190,9 @@ class Basics():
                     if isinstance(result, Exception):
                         raise result
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Copy Graph;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Copy Graph;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Graph copied for new owner: {createdBy}")
             return None
 
@@ -258,8 +261,8 @@ class Basics():
         :rtype: Node|Exception
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node = Node.objects.get(nodeID=nodeID)
             for content in information:
@@ -284,9 +287,9 @@ class Basics():
             node.updatedWhen = timezone.now()
             node.save()
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Update Node;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Update Node;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Updated node with id: {nodeID}")	
             return node
         except (Exception) as error:
@@ -307,15 +310,15 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             node = Node.objects.get(nodeID=nodeID)
             node.delete()
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Delete Node;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Delete Node;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f'Deleted node with id {nodeID}')
             return None
         except (Exception) as error:
@@ -335,17 +338,17 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node = Node.objects.get(nodeID=nodeID)
             outList = list()
             for entry in node.edges.all():
                 outList.append(entry.toDict())
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Edges;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Edges;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all neighbors of: {nodeID}")	
             return outList
         except (Exception) as error:
@@ -367,8 +370,8 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node1 = Node.objects.get(nodeID=node1ID)
             node2 = Node.objects.get(nodeID=node2ID)
@@ -376,9 +379,9 @@ class Basics():
             if node2 in node1.edges.all():
                 isInside = True
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Edge;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Edge;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Checked if edge existed between: {node1ID} {node2ID}")	
             return isInside
         except (Exception) as error:
@@ -399,8 +402,8 @@ class Basics():
         :rtype: None | Exception
         """	
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node1 = Node.objects.get(nodeID=nodeID1)
             node2 = Node.objects.get(nodeID=nodeID2)
@@ -409,9 +412,9 @@ class Basics():
             node1.updatedWhen = timezone.now()
             node1.save()
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Create Edge;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Create Edge;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Linked nodes with id: {nodeID1} and {nodeID2}")	
             return None
         except (Exception) as error:
@@ -432,8 +435,8 @@ class Basics():
         :rtype: None | Exception
         """	
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             node1 = Node.objects.get(nodeID=nodeID1)
             node2 = Node.objects.get(nodeID=nodeID2)
@@ -441,9 +444,9 @@ class Basics():
             node1.edges.remove(node2)
             node1.save()
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Delete Edge;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Delete Edge;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Unlinked nodes with id: {nodeID1} and {nodeID2}")	
             return None
         except (Exception) as error:
@@ -463,17 +466,47 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             nodes = Node.objects.filter(nodeType=nodeType)
             outList = list()
             for entry in nodes:
                 outList.append(entry.toDict())
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Nodes By Type;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes By Type;{endPC-startPC};{endPT-startPT}")
+            loggerConsole.info(f"Gathered all nodes by type: {nodeType}")	
+            return outList
+        except (Exception) as error:
+            loggerError.error(f'could not get nodes by type: {str(error)}')
+            return error
+    
+    ##################################################
+    @staticmethod
+    def getSystemNodesByType(nodeType:str) -> list[dict]:
+        """
+        Return all nodes with a given type from the system
+
+        :param nodeType: The type of the node
+        :type nodeType: str
+        :return: List with all nodes and their info
+        :rtype: list of dicts
+        
+        """
+        try:
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
+
+            nodes = Node.objects.filter(nodeType=nodeType).filter(createdBy=defaultOwner)
+            outList = list()
+            for entry in nodes:
+                outList.append(entry.toDict())
+
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes By Type;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all nodes by type: {nodeType}")	
             return outList
         except (Exception) as error:
@@ -493,17 +526,17 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             nodes = Node.objects.filter(properties__icontains=property)
             outList = list()
             for entry in nodes:
                 outList.append(entry.toDict())
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Nodes By Property;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes By Property;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all nodes by property: {property}")	
             return outList
         except (Exception) as error:
@@ -525,17 +558,17 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             nodes = Node.objects.filter(nodeType=nodeType).filter(properties__icontains=nodeProperty)
             outList = list()
             for entry in nodes:
                 outList.append(entry.toDict())
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Nodes By type and property;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes By type and property;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all nodes by type and property: {nodeProperty}")	
             return outList
         except (Exception) as error:
@@ -560,17 +593,17 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             nodes = Node.objects.filter(nodeType=nodeType).filter(properties__icontains=nodeProperty).filter(properties__icontains=value) #"name": "buildVolume", "value": "400x400x400",
             outList = list()
             for entry in nodes:
                 outList.append(entry.toDict())
 
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Nodes By type and property and value;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes By type and property and value;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all nodes by type and property and value: {nodeProperty}")	
             return outList
         except (Exception) as error:
@@ -591,17 +624,17 @@ class Basics():
         :rtype: list	
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             outList = []
             node = Node.objects.get(nodeID=nodeID)	
             for neighbor in node.edges.filter(nodeType=neighborNodeType):
                 outList.append(neighbor.toDict())
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Neighbors By Type;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Neighbors By Type;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all neighbors for {nodeID} by type: {neighborNodeType}")	
             return outList
         except (Exception) as error:
@@ -622,17 +655,17 @@ class Basics():
         :rtype: list	
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             outList = []
             node = Node.objects.get(nodeID=nodeID)	
             for neighbor in node.edges.filter(properties__icontains=neighborProperty):
                 outList.append(neighbor.toDict())
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Neighbors By Property;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Neighbors By Property;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all neighbors for {nodeID} by property: {neighborProperty}")	
             return outList
         except (Exception) as error:
@@ -652,17 +685,17 @@ class Basics():
         
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
             
             outList = []
             nodes = Node.objects.filter(uniqueID=uniqueID)	
             for node in nodes:
                 outList.append(node.toDict())
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Get Nodes with same uniqueID;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Get Nodes with same uniqueID;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info(f"Gathered all nodes with the unique ID {uniqueID}")	
             return outList
         except (Exception) as error:
@@ -680,8 +713,8 @@ class Basics():
         :rtype: Dict | Exception
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             allNodes = Node.objects.all()
             outDict = {"nodes": [], "edges": []}
@@ -694,9 +727,9 @@ class Basics():
                         continue
                     outDict["edges"].append([entry.nodeID,neighbor.nodeID])
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Generate Graph;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Generate Graph;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info("Fetched the whole graph")	
             return outDict
         except (Exception) as error:
@@ -758,14 +791,14 @@ class Basics():
         :rtype: None | Exception
         """
         try:
-            startPC = time.perf_counter_ns()
-            startPT = time.process_time_ns()
+            # startPC = time.perf_counter_ns()
+            # startPT = time.process_time_ns()
 
             Node.objects.all().delete()
             
-            endPC = time.perf_counter_ns()
-            endPT = time.process_time_ns()
-            loggerPerformance.info(f"DB;Delete Graph;{endPC-startPC};{endPT-startPT}")
+            # endPC = time.perf_counter_ns()
+            # endPT = time.process_time_ns()
+            # loggerPerformance.info(f"DB;Delete Graph;{endPC-startPC};{endPT-startPT}")
             loggerConsole.info("Deleted the whole graph")	
             return None
         except (Exception) as error:
@@ -779,20 +812,203 @@ class Logic():
     Everything that requires some calculation or logic behind it
     
     """
-    @staticmethod
     ##################################################
-    def checkProperty(nodeType:str, nodeProperty:str, propertyType:str, comparisonOperator:str, values, separator:str=""):
+    @staticmethod
+    def checkIfPropertyIsSimilar(property1:dict, property2:dict) -> bool|None:
         """
-        Check if property is fulfilled
+        Check if two properties are similar
         
         """
-        # nodesOfTypeWithProperty = Basics.getNodesByTypeAndProperty(nodeType, nodeProperty)
-        # for entry in nodesOfTypeWithProperty:
-        #     for propertyOfNode in entry[NodeDescription.properties]:
-        #         if propertyOfNode[NodePropertyDescription.name] == nodeProperty:
-        #             if propertyType == NodePropertiesTypesOfEntries.number:
-        #                 if separator != "":
-        #                     parsedValues = propertyOfNode[NodePropertyDescription.value].split(separator)
-        #                     if 
-        pass # TODO, later if needed
+        try:
+            # ignore certain keys
+            if property1[NodePropertyDescription.key] in [NodeProperties.imgPath]:
+                return None
+
+            # check if the keys are the same
+            if property1[NodePropertyDescription.key] != property2[NodePropertyDescription.key]:
+                return False
+
+            # if so, check the type (number, text and so on)
+            if property1[NodePropertyDescription.type] != property2[NodePropertyDescription.type]:
+                return False
+
+            # if the type is the same, check the value. In case of numbers use some epsilon
+            if property1[NodePropertyDescription.type] == NodePropertiesTypesOfEntries.number:
+                if abs(float(property1[NodePropertyDescription.value]) - float(property2[NodePropertyDescription.value])) > 0.1:
+                    return False
+            elif property1[NodePropertyDescription.type] == NodePropertiesTypesOfEntries.text or property1[NodePropertyDescription.type] == NodePropertiesTypesOfEntries.string:
+                if SequenceMatcher(a=property1[NodePropertyDescription.value], b=property2[NodePropertyDescription.value]).quick_ratio() < 0.8:
+                    return False
+            elif property1[NodePropertyDescription.type] == NodePropertiesTypesOfEntries.array:
+                firstArray = property1[NodePropertyDescription.value].split(",")
+                secondArray = property2[NodePropertyDescription.value].split(",")
+                if len(firstArray) != len(secondArray):
+                    return False
+                for entry in firstArray:
+                    if entry not in secondArray:
+                        return False
+            
+            return True
+        except Exception as error:
+            loggerError.error(f"Could not check if properties are similar: {error}")
+            return
+
+    ##################################################
+    @staticmethod
+    def checkAndUpdateProperties(properties:dict, propertiesToCompareTo:dict) -> tuple[bool,float,list[dict]|Exception]:
+        """
+        Check if properties are similar or not. If so, update them if necessary. Return both the properties and if they are similar
+        
+        """
+        try:
+            outDict = {}
+            similar = 0
+            different = 0
+            total = 0
+            # check if the properties are the same
+            for propKey, prop in properties.items():
+                if propKey in propertiesToCompareTo:
+                    result = Logic.checkIfPropertyIsSimilar(prop, propertiesToCompareTo[propKey])
+                    if result is not None:
+                        if result:
+                            similar += 1
+                        else:
+                            different += 1
+                        total += 1
+                        outDict[propKey] = prop
+                    else:
+                        outDict[propKey] = propertiesToCompareTo[propKey]
+                else:
+                    outDict[propKey] = prop
+            
+            # calculate similarity via F1 Score
+            if similar == 0:
+                return False, 0., []
+            precision = similar/(similar + different)
+            recall = similar/total
+            f1Score = 2. * (precision * recall) / (precision + recall)
+            if f1Score > 0.8:
+                # fill in the missing properties
+                outList = []
+                for propKey, prop in propertiesToCompareTo.items():
+                    if propKey not in outDict:
+                        outList.append(prop)
+                    else:
+                        outList.append(outDict[propKey])
+                return True, f1Score, outList
+            return False, f1Score, []
+        except Exception as error:
+            loggerError.error(f"Could not check and update properties: {error}")
+            return False, 0., error
+        
+    ##################################################
+    @staticmethod
+    def similarityHelper(listOfNodes:list[dict], node:Node) -> bool|Exception:
+        """
+        Helper function for the similarity check
+
+        :param listOfNodes: List of nodes to check for similarity
+        :type listOfNodes: list[dict]
+        :param node: The node to which the similarity is checked
+        :type node: Node
+        :return: If a similar node was found or not
+        :rtype: bool | Exception
+        
+        """
+        try:
+            similarityList = []
+            systemEdgesOfNode = Basics.getEdgesForNode(node.nodeID)
+            systemEdgesOfNode = {entry[NodeDescription.nodeID]: entry for entry in systemEdgesOfNode if entry[NodeDescription.createdBy] == defaultOwner}
+            # if there is, check if properties of the system node needs to be updated
+            for entry in listOfNodes:
+                if entry[NodeDescription.nodeID] == node.nodeID or entry[NodeDescription.createdBy] != defaultOwner:
+                    continue
+                # but first check if other linked nodes are the same (categories and such)
+                if len(systemEdgesOfNode) != 0:
+                    eligible = True
+                    edges = Basics.getEdgesForNode(entry[NodeDescription.nodeID])
+                    edges = {entry[NodeDescription.nodeID]: entry for entry in edges if entry[NodeDescription.createdBy] == defaultOwner}
+                    for edge in systemEdgesOfNode:
+                        if edge not in edges:
+                            eligible = False
+                            break
+                    if not eligible:
+                        continue
+
+                # get properties
+                entryProps = Basics.getNode(entry[NodeDescription.nodeID]).properties
+                # check if properties are the same
+                similar, f1Score, newProperties = Logic.checkAndUpdateProperties(node.properties, entryProps)
+                if isinstance(newProperties, Exception):
+                    raise newProperties
+                if similar:
+                    similarityList.append((entry[NodeDescription.nodeID], f1Score, newProperties))
+            if len(similarityList) == 0:
+                return False
+            # get the best match
+            similarityList.sort(key=lambda x: x[1], reverse=True)
+            entry = similarityList[0]
+            newProperties = entry[2]
+            nodeIDOfMostSimilar = entry[0]
+            # update the properties of the system node
+            outNode = Basics.updateNode(nodeIDOfMostSimilar, {NodeDescription.properties: newProperties})
+            if isinstance(outNode, Exception):
+                raise outNode
+            # change the uniqueID to the one from the system
+            node.uniqueID = outNode.uniqueID
+            node.save()
+            return True
+        except Exception as error:
+            return error
+    ##################################################
+    @staticmethod
+    def checkIfSimilarNodeExists(nodeID:str) -> Node|Exception:
+        """
+        Check if a similar node already exists
+        
+        """
+        try:
+            # fetch node
+            node = Basics.getNode(nodeID)
+            done = False
+            outNode = None
+
+            # check if there already is a system node within the uniqueIDs
+            nodesWithTheSameUniqueID = Basics.getAllNodesThatShareTheUniqueID(node.uniqueID)
+            if isinstance(nodesWithTheSameUniqueID, Exception):
+                raise nodesWithTheSameUniqueID
+            done = Logic.similarityHelper(nodesWithTheSameUniqueID, node)
+            
+            # if not, look for similar nodes in the system via checking the nodeType and properties
+            if not done:
+                nodesWithTheSameType = Basics.getSystemNodesByType(node.nodeType)
+                if isinstance(nodesWithTheSameType, Exception):
+                    raise nodesWithTheSameType
+                done = Logic.similarityHelper(nodesWithTheSameType, node)
+                if isinstance(done, Exception):
+                    raise done
+
+            # if there is no similar node, create a new one in the system and copy the properties + add edges
+            if not done:
+                outNode = Basics.copyNode(node)
+                if isinstance(outNode, Exception):
+                    raise outNode
+                # create edges to other system nodes
+                edges = Basics.getEdgesForNode(nodeID)
+                if isinstance(edges, Exception):
+                    raise edges
+                for edge in edges:
+                    if edge[NodeDescription.createdBy] == defaultOwner:
+                        exc = Basics.createEdge(outNode.nodeID, edge[NodeDescription.nodeID])
+                        if isinstance(exc, Exception):
+                            raise exc
+                done = True
+            # return the node
+            if done:
+                return outNode
+            else:
+                raise Exception("System node was not created") # this should never happen
+        except Exception as error:
+            loggerError.error(f"Could not check if similar node exists: {error}")
+            return error
                         

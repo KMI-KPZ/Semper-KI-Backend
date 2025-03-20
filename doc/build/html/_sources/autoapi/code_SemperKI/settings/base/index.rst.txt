@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.settings.base`
-=====================================
+code_SemperKI.settings.base
+===========================
 
 .. py:module:: code_SemperKI.settings.base
 
@@ -12,4 +12,17 @@
    Contains: Extention of settings specific for Semper-KI
 
 
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.settings.base.ADDITIONAL_TEMPLATE_DIR_SEMPER_KI
+
+
+Module Contents
+---------------
+
+.. py:data:: ADDITIONAL_TEMPLATE_DIR_SEMPER_KI
 

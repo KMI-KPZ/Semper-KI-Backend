@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification" href="../verification/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga" href="../orga/index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline">
+<span id="code-semperki-services-service-additivemanufacturing-handlers-public-resources-pdfpipeline"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging, Mahdi Hedayat Mahmoudi 2024</p>
+<p>Contains: Handler for processing pdfs to json</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SReqPDFExtraction</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReqExtractFromJSON</span></code></a></p></td>
+<td><p>The BaseSerializer class provides a minimal class which may be used</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extractFromPDF</span></code></a>(request)</p></td>
+<td><p>upload a pdf and get back the converted json</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON" title="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extractFromJSON</span></code></a>(request)</p></td>
+<td><p>Take a json and write it to the KG</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">SReqPDFExtraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.file">
+<span class="sig-name descname"><span class="pre">file</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.category" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.insertIntoKG">
+<span class="sig-name descname"><span class="pre">insertIntoKG</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.insertIntoKG" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.gptModel">
+<span class="sig-name descname"><span class="pre">gptModel</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.gptModel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">extractFromPDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF" title="Link to this definition">¶</a></dt>
+<dd><p>upload a pdf and get back the converted json</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">ReqExtractFromJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">empty</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_framework.serializers.Serializer</span></code></p>
+<p>The BaseSerializer class provides a minimal class which may be used
+for writing custom serializer implementations.</p>
+<p>Note that we strongly restrict the ordering of operations/properties
+that may be used on the serializer in order to enforce correct usage.</p>
+<p>In particular, if a <cite>data=</cite> argument is passed then:</p>
+<p>.is_valid() - Available.
+.initial_data - Available.
+.validated_data - Only available after calling <cite>is_valid()</cite>
+.errors - Only available after calling <cite>is_valid()</cite>
+.data - Only available after calling <cite>is_valid()</cite></p>
+<p>If a <cite>data=</cite> argument is not passed then:</p>
+<p>.is_valid() - Not available.
+.initial_data - Not available.
+.validated_data - Not available.
+.errors - Not available.
+.data - Available.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.category">
+<span class="sig-name descname"><span class="pre">category</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.category" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.</span></span><span class="sig-name descname"><span class="pre">extractFromJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rest_framework.request.Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON" title="Link to this definition">¶</a></dt>
+<dd><p>Take a json and write it to the KG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HTTP POST</em>) – POST Request</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JSON</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSONResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8"><a class="reference internal" href="../../../../connections/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l8 current"><a class="reference internal" href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="reference internal" href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul class="current">
+<li class="toctree-l11 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l12"><a class="reference internal" href="../../checkService/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.checkService</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../costs/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../filter/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.filter</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../materials/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../model/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.model</a></li>
+<li class="toctree-l12"><a class="reference internal" href="../../postProcessings/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.postProcessings</a></li>
+<li class="toctree-l12 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a><ul class="current">
+<li class="toctree-l13 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l14"><a class="reference internal" href="../colors/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.colors</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../kgDBAM/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.kgDBAM</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../onto/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.onto</a></li>
+<li class="toctree-l14"><a class="reference internal" href="../orga/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga</a></li>
+<li class="toctree-l14 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline</a><ul>
+<li class="toctree-l15"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l15"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction"><code class="docutils literal notranslate"><span class="pre">SReqPDFExtraction</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.file"><code class="docutils literal notranslate"><span class="pre">SReqPDFExtraction.file</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.category"><code class="docutils literal notranslate"><span class="pre">SReqPDFExtraction.category</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.insertIntoKG"><code class="docutils literal notranslate"><span class="pre">SReqPDFExtraction.insertIntoKG</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction.gptModel"><code class="docutils literal notranslate"><span class="pre">SReqPDFExtraction.gptModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF"><code class="docutils literal notranslate"><span class="pre">extractFromPDF()</span></code></a></li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON"><code class="docutils literal notranslate"><span class="pre">ReqExtractFromJSON</span></code></a><ul>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.data"><code class="docutils literal notranslate"><span class="pre">ReqExtractFromJSON.data</span></code></a></li>
+<li class="toctree-l17"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON.category"><code class="docutils literal notranslate"><span class="pre">ReqExtractFromJSON.category</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l16"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON"><code class="docutils literal notranslate"><span class="pre">extractFromJSON()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l14"><a class="reference internal" href="../verification/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../../../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources</a><ul>
+      <li>Previous: <a href="../orga/index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga</a></li>
+      <li>Next: <a href="../verification/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.verification</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/pdfPipeline/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

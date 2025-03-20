@@ -1,0 +1,290 @@
+code_SemperKI.serviceManager
+============================
+
+.. py:module:: code_SemperKI.serviceManager
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Metaclass that handles the services
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.serviceManager.serviceManager
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.serviceManager.ServiceBase
+   code_SemperKI.serviceManager.ServicesStructure
+   code_SemperKI.serviceManager._ServicesManager
+
+
+Module Contents
+---------------
+
+.. py:class:: ServiceBase
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class defining the interface that every service has to implement
+
+
+
+   .. py:method:: checkIfSelectionIsAvailable(processObj) -> bool
+      :abstractmethod:
+
+
+      Checks, if the selection of the service is available (material, ...)
+
+
+
+
+   .. py:method:: initializeServiceDetails(serviceDetails: dict) -> dict
+      :abstractmethod:
+
+
+      Initialize the service
+
+
+
+
+   .. py:method:: updateServiceDetails(existingContent, newContent)
+      :abstractmethod:
+
+
+      Update a service
+
+
+
+
+   .. py:method:: deleteServiceDetails(existingContent, deletedContent)
+      :abstractmethod:
+
+
+      Delete stuff from a service
+
+
+
+
+   .. py:method:: isFileRelevantForService(existingContent, fileID: str) -> bool
+      :abstractmethod:
+
+
+      Check if a file is relevant for the service
+
+
+
+
+   .. py:method:: parseServiceDetails(existingContent) -> dict
+      :abstractmethod:
+
+
+      Parse the service details for Frontend
+
+
+
+
+   .. py:method:: serviceReady(existingContent) -> tuple[bool, list[str]]
+      :abstractmethod:
+
+
+      Check if a service has been defined completely
+
+
+
+
+   .. py:method:: cloneServiceDetails(existingContent: dict, newProcess) -> dict
+      :abstractmethod:
+
+
+      Clone content of the service
+
+      :param existingContent: What the process currently holds about the service
+      :type existingContent: dict
+      :param newProcess: The new process as object
+      :type newProcess: Process|ProcessInterface
+      :return: The copy of the service details
+      :rtype: dict
+
+
+
+
+   .. py:method:: calculatePriceForService(process, additionalArguments: dict, transferObject: object) -> dict
+      :abstractmethod:
+
+
+      Calculate the price for all content of the service
+
+      :param process: The process with all its details
+      :type process: ProcessInterface|Process
+      :param additionalArguments: Various parameters, differs for every service
+      :type additionalArguments: dict
+      :param transferObject: Object to transfer data
+      :type transferObject: object
+      :return: Dictionary with all pricing details
+      :rtype: dict
+
+
+
+   .. py:method:: getFilteredContractors(processObj) -> tuple[dict, object]
+      :abstractmethod:
+
+
+      Get a list of contractors that can do the job
+
+
+
+
+   .. py:method:: getServiceSpecificContractorDetails(existingDetails: dict, contractor: object) -> dict
+      :abstractmethod:
+
+
+      Get the service specific details for a contractor
+
+
+
+
+   .. py:method:: serviceSpecificTasks(session, processObj, validationResults: dict) -> dict | Exception
+      :abstractmethod:
+
+
+      Do service specific tasks
+
+
+
+
+.. py:class:: ServicesStructure
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   How the services dictionary is structured
+
+
+
+   .. py:attribute:: object
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: identifier
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: _ServicesManager
+
+   The class handling the services
+
+
+
+   .. py:attribute:: _defaultName
+      :value: 'None'
+
+
+
+   .. py:attribute:: _defaultIdx
+      :value: 0
+
+
+
+   .. py:attribute:: _services
+
+
+   .. py:attribute:: _imgPath
+      :value: ''
+
+
+
+   .. py:method:: register(name: str, identifier: int, serviceClassObject, imgPath: str) -> None
+
+      Registers a new service class
+
+      :param name: The name of the service as given in ServiceTypes
+      :type name: str
+      :param serviceClass: The service class 
+      :type serviceClass: Derived Class Instances of ServiceBase
+      :param kwargs: Parameters for service class
+      :type kwargs: Any
+
+
+
+   .. py:method:: getNone() -> int
+
+      Return default object idx
+
+      :return: Idx of none
+      :rtype: int
+
+
+
+   .. py:method:: getService(savedService: int) -> ServiceBase
+
+      Depending on the service, select the correct Service class
+
+      :param savedService: The selected service saved in the dictionary _services
+      :type savedService: int
+      :return: The respective Service class
+      :rtype: Derived class of ServiceBase
+
+
+
+   .. py:method:: getImgPath(savedService: int) -> str
+
+      Depending on the service, select the correct Image path
+
+      :param savedService: The selected service saved in the dictionary _services
+      :type savedService: int
+      :return: The respective Image path
+      :rtype: str
+
+
+
+   .. py:method:: getAllServices() -> list
+
+      Return all registered services as list
+
+      :return: all registered services as list
+      :rtype: list
+
+
+
+   .. py:method:: toInt(serviceName: str) -> int
+
+      Convert the service name to its integer representation
+
+      :param serviceName: Name of the service as given in ServiceTypes
+      :type serviceName: Str
+      :return: Integer Code of that service
+      :rtype: Int
+
+
+
+   .. py:method:: toStr(index: int) -> str
+
+      Convert the service name to its string representation
+
+      :param serviceName: Int code of the service
+      :type serviceName: int
+      :return: Str Code of that service as given in ServiceTypes
+      :rtype: Str
+
+
+
+.. py:data:: serviceManager
+

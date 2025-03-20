@@ -71,6 +71,7 @@ def getServices(request:Request):
     try:
         
         services = serviceManager.getAllServices()
+        services.sort(key=lambda x: x[ServicesStructure.identifier])
         outList = []
         for entry in services:
             if entry[ServicesStructure.name] == "None":

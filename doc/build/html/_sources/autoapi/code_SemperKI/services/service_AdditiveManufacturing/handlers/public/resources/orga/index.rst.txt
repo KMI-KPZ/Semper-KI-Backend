@@ -1,0 +1,496 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga
+===================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Calls to ontology for adding and retrieving data
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SResOrgaResources
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqNodeFEOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqEdgesFEOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqCreateOrUpdateAndLinkOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqOrgaAddEdges
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.SReqRequestForAddition
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getGraph
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getResources
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodes
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNodeViaID
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getAssociatedResources
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getNeighbors
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createOrUpdateAndLinkNodes
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_createNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_updateNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_deleteNode
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgesToOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_addEdgeForOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdgeToOrga
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeEdge
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_removeAll
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_getRequestsForAdditions
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.orga_makeRequestForAdditions
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.orga.cloneTestGraphToOrgaForTests
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: orga_getGraph(request: rest_framework.request.Request)
+
+   Returns the graph for frontend
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with graph
+   :rtype: Response
+
+
+
+.. py:class:: SResOrgaResources(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: resources
+
+
+.. py:function:: orga_getResources(request: rest_framework.request.Request)
+
+   Retrieve all KG information about connected resources for an organization
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with list of resources
+   :rtype: JSON Response
+
+
+
+.. py:function:: orga_getNodes(request: rest_framework.request.Request, resourceType: str)
+
+   Retrieve all nodes from either the system or the orga of a certain type
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: List of nodes
+   :rtype: Response
+
+
+
+.. py:function:: orga_getNodeViaID(request: rest_framework.request.Request, nodeID: str)
+
+   Retrieve all info about a node via its ID
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Json
+   :rtype: Response
+
+
+
+.. py:function:: orga_getAssociatedResources(request: rest_framework.request.Request, nodeID: str, resourceType: str)
+
+   Gather neighboring resources of a certain type from the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with resource of the type available
+   :rtype: JSON Response
+
+
+
+.. py:function:: orga_getNeighbors(request: rest_framework.request.Request, nodeID: str)
+
+   Gather all neighbors of a node inside an orga from the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON with neighbors
+   :rtype: JSON Response
+
+
+
+.. py:class:: SReqNodeFEOrga(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: context
+
+      Returns the context as passed to the root serializer on initialization.
+
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: properties
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: active
+
+
+.. py:class:: SReqEdgesFEOrga(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: create
+
+
+   .. py:attribute:: delete
+
+
+.. py:class:: SReqCreateOrUpdateAndLinkOrga(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: node
+
+
+   .. py:attribute:: edges
+
+
+.. py:function:: orga_createOrUpdateAndLinkNodes(request: rest_framework.request.Request)
+
+   Combined access for frontend to create and update together with linking
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: JSON
+   :rtype: Response
+
+
+
+.. py:function:: orga_createNode(request: rest_framework.request.Request)
+
+   Creates a new node for the organization in the knowledge graph
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Succes or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_updateNode(request: rest_framework.request.Request)
+
+   Updates a new node for the organization in the knowledge graph
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Succes or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_deleteNode(request: rest_framework.request.Request, nodeID: str)
+
+   Deletes a node from the graph by ID
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param nodeID: The id of the node
+   :type nodeID: str
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:class:: SReqOrgaAddEdges(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: entityIDs
+
+
+.. py:function:: orga_addEdgesToOrga(request: rest_framework.request.Request)
+
+   Links some things to an organization in the knowledge graph
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Succes or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_addEdgeForOrga(request: rest_framework.request.Request)
+
+   Links two things for an organization in the knowledge graph
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: Succes or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_removeEdgeToOrga(request: rest_framework.request.Request, entityID: str)
+
+   Remove the connection of an organization to something
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param entityID: The ID of the thing removed as an edge to that orga
+   :type entityID: str
+   :return: Success or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_removeEdge(request: rest_framework.request.Request, entity1ID: str, entity2ID: str)
+
+   Deletes the edge between two entities created by the same organization
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :return: Success or Exception
+   :rtype: Response
+
+
+
+.. py:function:: orga_removeAll(request: rest_framework.request.Request)
+
+   Remove all connections of an organization
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :return: Success or not
+   :rtype: HTTP Response
+
+
+
+.. py:function:: orga_getRequestsForAdditions(request: rest_framework.request.Request)
+
+   Shows the current requests for adding stuff to the KG
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: JSON
+   :rtype: Response
+
+
+
+.. py:class:: SReqRequestForAddition(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: manufacturer
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: url
+
+
+.. py:function:: orga_makeRequestForAdditions(request: rest_framework.request.Request)
+
+   Receive a request to add something
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: Success or not
+   :rtype: Response
+
+
+
+.. py:function:: cloneTestGraphToOrgaForTests(request: rest_framework.request.Request)
+
+   Clone the test graph to the orga for the tests
+
+   :param request: GET Request
+   :type request: HTTP GET
+   :return: Nothing
+   :rtype: Response
+
+
+

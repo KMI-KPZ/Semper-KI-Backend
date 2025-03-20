@@ -21,10 +21,10 @@ Including another URLconf
 
 from django.urls import path
 
+from code_SemperKI.urls import paths, urlpatterns
+
 from .handlers.public.resources import orga, onto, kgDBQC
 # from .handlers.public import materials, checkService, filter, postProcessings
-
-from code_SemperKI.urls import paths, urlpatterns
 
 
 newPaths = {

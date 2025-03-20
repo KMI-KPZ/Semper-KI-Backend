@@ -10,6 +10,7 @@ import copy, logging
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 from code_SemperKI.modelFiles.nodesModel import NodeDescription, NodePropertyDescription
 from code_SemperKI.modelFiles.processModel import Process, ProcessInterface
+from code_SemperKI.definitions import ContractorParsingForFrontend
 
 from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription
 from Generic_Backend.code_General.connections.postgresql import pgProfiles
@@ -22,7 +23,7 @@ loggerError = logging.getLogger("errors")
 
 
 ##################################################
-class Filter():
+class FilterD():
     """
     Filter and save results
     
@@ -55,7 +56,7 @@ class Filter():
             raise e
 
     ##################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> list:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> dict:
         """
         Get the filtered contractors
 
@@ -68,7 +69,7 @@ class Filter():
             if isinstance(listOfContractors, Exception):
                 raise listOfContractors
             
-            return listOfContractors
+            return {ContractorParsingForFrontend.contractors:listOfContractors, ContractorParsingForFrontend.errors: []}
         except Exception as e:
             loggerError.error(f"Error in getFilteredContractors: {e}")
             raise e

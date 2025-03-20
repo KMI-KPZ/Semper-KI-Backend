@@ -1,0 +1,20 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources
+==============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/colors/index
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/kgDBAM/index
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/onto/index
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/orga/index
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/pdfPipeline/index
+   /autoapi/code_SemperKI/services/service_AdditiveManufacturing/handlers/public/resources/verification/index
+
+

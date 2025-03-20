@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Tests for various functions and services
+
 """
 
 
@@ -14,7 +15,8 @@ from copy import deepcopy
 
 from code_SemperKI.modelFiles.dataModel import DataDescription
 from code_SemperKI.states.stateDescriptions import ProcessStatusAsString
-from .urls import paths
+from code_SemperKI.urls import paths
+
 
 from Generic_Backend.code_General.definitions import SessionContent, UserDescription, OrganizationDescription, ProfileClasses
 from .definitions import ProjectDescription, ProcessDescription, SessionContentSemperKI, ProcessUpdates

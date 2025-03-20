@@ -1,0 +1,121 @@
+code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql
+================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Functions using the sparql queries to filter for contractors
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:class:: FilterAM
+
+   Filter and save results
+
+
+
+   .. py:attribute:: resultGroups
+      :value: []
+
+
+
+   .. py:attribute:: printerGroups
+      :value: []
+
+
+
+   .. py:attribute:: errors
+      :value: []
+
+
+
+   .. py:method:: filterByMaterialAndColor(chosenMaterial: dict, chosenColor: dict, groupIdx: int) -> None | Exception
+
+      Filter by material choice
+
+      :param resultDict: Where the found manufacturers go
+      :type resultDict: dict
+      :param chosenMaterials: The materials in the serviceDetails
+      :type chosenMaterials: dict
+      :return: Nothing, result is written in-place
+      :rtype: None|Exception
+
+
+
+
+   .. py:method:: filterByPostProcessings(chosenPostProcessings: dict, groupIdx: int) -> None | Exception
+
+      Filter by post-processings choice, must be called after filterByMaterial
+
+      :param resultDict: Where the found manufacturers go
+      :type resultDict: dict
+      :param chosenPostProcessings: The post-processings in the serviceDetails
+      :type chosenPostProcessings: dict
+      :return: Nothing, result is written in-place
+      :rtype: None|Exception
+
+
+
+
+   .. py:method:: filterByPrinter(calculations: dict, groupIdx: int) -> None | Exception
+
+      Filter by checking properties of the available printers, must be called after filterByPostProcessings
+
+      :param resultDict: Where the found manufacturers go
+      :type resultDict: dict
+      :param calculations: The calculations in the serviceDetails
+      :type calculations: dict
+      :return: Nothing, result is written in-place
+      :rtype: None|Exception
+
+
+
+
+   .. py:method:: getFilteredContractors(processObj: code_SemperKI.modelFiles.processModel.ProcessInterface | code_SemperKI.modelFiles.processModel.Process) -> dict
+
+      Get the filtered contractors
+
+      :return: Object with list of suitable contractors
+      :rtype: dict
+
+
+
+
+   .. py:method:: getPrintersOfAContractor(contractorID: str, groupIdx: int) -> list
+
+      Get the printers of a contractor
+
+      :param contractorID: The contractor in question
+      :type contractorID: str
+      :return: List of printers
+      :rtype: list
+
+
+
+

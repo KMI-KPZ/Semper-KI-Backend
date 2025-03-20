@@ -73,7 +73,7 @@ class SReqUploadFiles(serializers.Serializer):
      description=" ",
      request={
         "multipart/form-data": SReqUploadFiles
-    },	
+    },
      tags=['FE - Files'],
      responses={
          200: None,

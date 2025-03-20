@@ -435,7 +435,7 @@ def getProcessHistory(request:Request, processID):
 #"getContractors": ("public/getContractors/<str:processID>/", process.getContractors),
 #########################################################################
 #######################################################
-class SResContractors(serializers.Serializer):
+class SResContractorsContent(serializers.Serializer):
     hashedID = serializers.CharField(max_length=200)
     name = serializers.CharField(max_length=200)
     branding = serializers.DictField()
@@ -445,6 +445,13 @@ class SResContractors(serializers.Serializer):
     verified = serializers.BooleanField(required=False) # AM service only
     groups = serializers.ListField(child=serializers.IntegerField(), required=False) # AM service only
 
+class SResErrors(serializers.Serializer):
+    groupID = serializers.IntegerField(required=False)
+    error = serializers.CharField(max_length=200, required=False)
+
+class SResContractors(serializers.Serializer):
+    contractors = serializers.ListField(child=SResContractorsContent(), allow_empty=True)
+    errors = serializers.ListField(child=SResErrors(), allow_empty=True)
 
 #########################################################################
 # Handler    
@@ -454,7 +461,7 @@ class SResContractors(serializers.Serializer):
     tags=['FE - Processes'],
     request=None,
     responses={
-        200: serializers.ListSerializer(child=SResContractors()),
+        200: SResContractors,
         500: ExceptionSerializer
     }
 )
@@ -478,14 +485,14 @@ def getContractors(request:Request, processID:str):
     try:
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface() # checks not needed for rights, was done in the decorators
-        processObj = interface.getProcessObj("", processID) # Login was required here so projectID not necessary
-        if processObj == None:
+        processObj = interface.getProcessObj("", processID) # Login was required here so projectID is not necessary
+        if processObj is None:
             raise Exception("Process ID not found in session or db")
  
-        listOfResultingContractors, statusCode = logicForGetContractors(processObj)
-        if isinstance(listOfResultingContractors, Exception):
+        dictOfResultingContractors, statusCode = logicForGetContractors(processObj)
+        if isinstance(dictOfResultingContractors, Exception):
             message = "Error in getContractors"
-            exception = str(listOfResultingContractors)
+            exception = str(dictOfResultingContractors)
             loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
@@ -493,7 +500,7 @@ def getContractors(request:Request, processID:str):
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        outSerializer = SResContractors(data=listOfResultingContractors, many=True)
+        outSerializer = SResContractors(data=dictOfResultingContractors)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:

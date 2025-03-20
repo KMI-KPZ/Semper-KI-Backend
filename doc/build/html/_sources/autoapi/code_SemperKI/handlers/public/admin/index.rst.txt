@@ -1,0 +1,59 @@
+code_SemperKI.handlers.public.admin
+===================================
+
+.. py:module:: code_SemperKI.handlers.public.admin
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Handling of admin view requests
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.admin.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.handlers.public.admin.getAllProjectsFlatAsAdmin
+   code_SemperKI.handlers.public.admin.getSpecificProjectAsAdmin
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: getAllProjectsFlatAsAdmin(request: rest_framework.request.Request)
+
+   Get all Projects in flat format.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :return: JSON response
+   :rtype: JSONResponse
+
+
+.. py:function:: getSpecificProjectAsAdmin(request: rest_framework.request.Request, projectID)
+
+   Get all info for a specific project.
+
+   :param request: GET request
+   :type request: HTTP GET
+   :param projectID: Project for which details are necessary
+   :type projectID: str
+   :return: JSON response
+   :rtype: JSONResponse
+
+

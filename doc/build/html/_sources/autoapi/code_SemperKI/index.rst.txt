@@ -1,36 +1,30 @@
-:py:mod:`code_SemperKI`
-=======================
+code_SemperKI
+=============
 
 .. py:module:: code_SemperKI
 
 
-Subpackages
------------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 3
-
-   code_services/index.rst
-   connections/index.rst
-   handlers/index.rst
-   management/index.rst
-   modelFiles/index.rst
-   settings/index.rst
-   utilities/index.rst
-
-
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   apps/index.rst
-   definitions/index.rst
-   imports/index.rst
-   models/index.rst
-   services/index.rst
-   tests/index.rst
-   urls/index.rst
+   /autoapi/code_SemperKI/apps/index
+   /autoapi/code_SemperKI/connections/index
+   /autoapi/code_SemperKI/definitions/index
+   /autoapi/code_SemperKI/handlers/index
+   /autoapi/code_SemperKI/imports/index
+   /autoapi/code_SemperKI/logics/index
+   /autoapi/code_SemperKI/modelFiles/index
+   /autoapi/code_SemperKI/models/index
+   /autoapi/code_SemperKI/serviceManager/index
+   /autoapi/code_SemperKI/services/index
+   /autoapi/code_SemperKI/settings/index
+   /autoapi/code_SemperKI/states/index
+   /autoapi/code_SemperKI/tasks/index
+   /autoapi/code_SemperKI/tests/index
+   /autoapi/code_SemperKI/urls/index
+   /autoapi/code_SemperKI/utilities/index
 
 

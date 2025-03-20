@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Metaclass that handles the services
+
 """
 import enum, copy
 
@@ -114,7 +115,7 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
-    def getFilteredContractors(self, processObj) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj) -> tuple[dict, object]:
         """
         Get a list of contractors that can do the job
 
@@ -133,6 +134,14 @@ class ServiceBase(ABC):
     def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
         """
         Do service specific tasks
+
+        """
+
+    ###################################################
+    @abstractmethod
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
 
         """
 
