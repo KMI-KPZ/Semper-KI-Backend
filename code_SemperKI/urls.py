@@ -17,6 +17,7 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+
 """
 
 from django.urls import path, include
@@ -25,10 +26,11 @@ from Generic_Backend.code_General.urls import paths, urlpatterns
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
+
 ##############################################################################
 ### WSGI
 
-from .handlers.public import admin, files, project, process, statemachine, miscellaneous, pdfPipeline
+from .handlers.public import admin, files, project, process, statemachine, miscellaneous
 from .handlers.private import testResponse, knowledgeGraphDB
 from MSQ.handlers import interface
 
@@ -40,15 +42,17 @@ newPaths= {
     
     "createProjectID": ('public/project/create/', project.createProjectID), 
     "getProject": ("public/project/get/<str:projectID>/",project.getProject),
-    "getFlatProjects": ("public/project/getFlat/", project.getFlatProjects),
+    "getFlatProjects": ("public/project/dashboard/all/get/", project.getFlatProjects),
     "updateProject": ("public/project/update/" ,project.updateProject),
     "deleteProjects": ("public/project/delete/" ,project.deleteProjects),
     "saveProjects": ("public/project/save/", project.saveProjects),
+    "getProjectForDashboard": ("public/project/dashboard/get/<str:projectID>/", project.getProjectForDashboard),
 
     "getProcess": ("public/process/get/<str:projectID>/<str:processID>/", process.getProcess),
     "createProcessID": ("public/process/create/<str:projectID>/", process.createProcessID),
     "updateProcess": ("public/process/update/", process.updateProcess), 
     "deleteProcesses": ("public/process/delete/<str:projectID>/", process.deleteProcesses), 
+    "cloneProcesses": ("public/process/clone/", process.cloneProcesses),
     "getProcessHistory": ("public/process/history/get/<str:processID>/", process.getProcessHistory),
     "getContractors": ("public/process/contractors/get/<str:processID>/", process.getContractors),
 
@@ -57,12 +61,14 @@ newPaths= {
 
     "getServices": ("public/services/get/", miscellaneous.getServices), 
     "retrieveResultsFromQuestionnaire": ("public/questionnaire/retrieve/", miscellaneous.retrieveResultsFromQuestionnaire),
+    "maturityLevel": ("public/questionnaire/maturityLevel/get/", miscellaneous.maturityLevel),
+    "resilienceScore": ("public/questionnaire/resilienceScore/get/", miscellaneous.resilienceScore),
 
     "uploadFiles": ("public/files/upload/",files.uploadFiles),
     "downloadFile": ("public/files/download/file/<str:projectID>/<str:processID>/<str:fileID>/", files.downloadFileStream),
     "downloadFilesAsZip": ("public/files/download/zip/<str:projectID>/<str:processID>/",files.downloadFilesAsZip), 
     "deleteFile": ("public/files/delete/<str:projectID>/<str:processID>/<str:fileID>/",files.deleteFile), 
-    "downloadProcessHistory": ("public/files/download/history/<str:processID>/", files.downloadProcessHistory), 
+    "downloadProcessHistory": ("private/files/download/history/<str:processID>/", files.downloadProcessHistory), # disabled
 
     "getAllProjectsFlatAsAdmin": ("public/admin/getAllProjectsFlatAsAdmin/",admin.getAllProjectsFlatAsAdmin),
     "getSpecificProjectAsAdmin": ("public/admin/getSpecificProjectAsAdmin/<str:projectID>/",admin.getSpecificProjectAsAdmin),
@@ -74,6 +80,7 @@ newPaths= {
     "deleteNode": ("private/nodes/delete/<str:nodeID>/", knowledgeGraphDB.deleteNode),
     "updateNode": ("private/nodes/update/", knowledgeGraphDB.updateNode),
     "getEdgesForNode": ("private/edges/get/<str:nodeID>/", knowledgeGraphDB.getEdgesForNode),
+    "getNodesByUniqueID": ("private/nodes/get/by-uniqueID/<str:nodeID>/", knowledgeGraphDB.getNodesByUniqueID),
     "getSpecificNeighborsByType": ("private/edges/get/by-type/<str:nodeID>/<str:nodeType>/", knowledgeGraphDB.getSpecificNeighborsByType),
     "getSpecificNeighborsByProperty": ("private/edges/get/by-property/<str:nodeID>/<str:property>/", knowledgeGraphDB.getSpecificNeighborsByProperty),
     "getNodesByTypeAndProperty": ("private/edges/get/by-property-and-type/<str:nodeType>/<str:nodeProperty>/<str:value>/", knowledgeGraphDB.getNodesByTypeAndProperty),
@@ -92,13 +99,15 @@ newPaths= {
     #"sendRemote": ("private/sendRemote/", interface.sendExampleRemote),
     "sendLocal": ("private/sendLocal/", interface.sendExampleLocal), 
     
+    "testPreview": ("private/testPreview/", testResponse.testPreview),
 
     ########################## API ##############################
     "apiCreateProject": ("public/api/project/create/", project.createProjectID),
     "apiCreateProcess": ("public/api/process/create/<str:projectID>/", process.createProcessID),
-    "apiExtractPDFs": ("public/api/extractFromPDF/", pdfPipeline.extractFromPDF),
-    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraph),
-
+    "apiLoadTestGraph": ("public/api/graph/loadTestGraph/", knowledgeGraphDB.loadTestGraphViaAPI),
+    "apiDeleteGraph": ("public/api/graph/delete/", knowledgeGraphDB.deleteGraph),
+    "apiCreateGraph": ("public/api/graph/create/", knowledgeGraphDB.createGraph),
+    
 }
 
 # add paths

@@ -1,0 +1,135 @@
+code_SemperKI.logics.projectLogics
+==================================
+
+.. py:module:: code_SemperKI.logics.projectLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Logic for the projects
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.projectLogics.logger
+   code_SemperKI.logics.projectLogics.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.projectLogics.logicForGetFlatProjects
+   code_SemperKI.logics.projectLogics.logicForGetProjectForDashboard
+   code_SemperKI.logics.projectLogics.logicForGetProject
+   code_SemperKI.logics.projectLogics.logicForCreateProjectID
+   code_SemperKI.logics.projectLogics.logicForUpdateProject
+   code_SemperKI.logics.projectLogics.logicForDeleteProjects
+   code_SemperKI.logics.projectLogics.logicForSaveProjects
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: logicForGetFlatProjects(request) -> tuple[dict | Exception, int]
+
+   Get the projects for the dashboard
+
+   :return: The projects or Exception and status code
+   :rtype: dict|Exception, int
+
+
+.. py:function:: logicForGetProjectForDashboard(request, projectID: str, functionName: str) -> tuple[dict | Exception, int]
+
+   Get the full project
+
+   :param request: The request
+   :type request: WSGIRequest
+   :param projectID: The project ID
+   :type projectID: str
+   :param functionName: The name of the function
+   :type functionName: str
+   :return: The project
+   :rtype: tuple[dict, int]
+
+
+.. py:function:: logicForGetProject(request, projectID: str, functionName: str)
+
+   Get the full project but with flat processes
+
+   :param request: The request
+   :type request: WSGIRequest
+   :param projectID: The project ID
+   :type projectID: str
+   :param functionName: The name of the function
+   :type functionName: str
+   :return: The project
+   :rtype: tuple[dict, int]
+
+
+
+.. py:function:: logicForCreateProjectID(request, validatedInput: dict, functionName: str)
+
+   Create a project and return its ID
+
+   :param request: The request
+   :type request: WSGIRequest
+   :param validatedInput: The validated input
+   :type validatedInput: dict
+   :param functionName: The name of the function
+   :type functionName: str
+   :return: The project ID
+   :rtype: tuple[dict|Exception, int]
+
+
+
+.. py:function:: logicForUpdateProject(request, validatedInput: dict, functionName: str)
+
+   Update a project
+
+   :param request: The request
+   :type request: WSGIRequest
+   :param validatedInput: The validated input
+   :type validatedInput: dict
+   :param functionName: The name of the function
+   :type functionName: str
+   :return: Nothing or exception
+   :rtype: tuple[None|Exception, int]
+
+
+
+.. py:function:: logicForDeleteProjects(request, functionName: str)
+
+   Delete projects
+
+   :param request: The request
+   :type request: WSGIRequest
+   :param functionName: The name of the function
+   :type functionName: str
+   :return: Nothing or exception
+   :rtype: tuple[None|Exception, int]
+
+
+
+.. py:function:: logicForSaveProjects(session)
+
+   Save the projects to the session
+
+   :param session: The session
+   :type session: dict
+   :return: Nothing
+   :rtype: None
+
+

@@ -1,0 +1,95 @@
+main.management.commands.bufferTest
+===================================
+
+.. py:module:: main.management.commands.bufferTest
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   main.management.commands.bufferTest.logging
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   main.management.commands.bufferTest.Command
+
+
+Module Contents
+---------------
+
+.. py:data:: logging
+
+.. py:class:: Command(stdout=None, stderr=None, no_color=False, force_color=False)
+
+   Bases: :py:obj:`django.core.management.base.BaseCommand`
+
+
+   Loads a file from disk sends it unencrypted to local stack/minio
+   then loads it encrypted to AWS S3 compatible storage and then loads it back meanwhile decrypting it
+   and printing out memory consumption and comparing the files
+   later it uses the moveFileToRemote method to move the file from local stack to remote storage and tests it again
+   should function as a memory consumption and functionality test
+   the goal is to only have a certain amount of memory used like 5MB (x parts used) for the transfer
+
+
+
+   .. py:attribute:: help
+      :value: 'sends a test mail to see if config is correct'
+
+
+
+   .. py:attribute:: debugLogger
+
+
+   .. py:method:: add_arguments(parser)
+
+      :param parser: command line parser
+      :type parser: ArgumentParser
+      :return: None
+      :rtype: None
+
+
+
+   .. py:method:: handle(*args, **options)
+
+      :param self: Command object
+      :type self: Command
+      :param args: arguments
+      :type args: list
+      :param options: options
+      :type options: dict
+      :return: None
+      :rtype: None
+
+
+
+   .. py:method:: _logMemInfo(comment='')
+
+      Print memory info with a comment to the debug logger if it is set
+
+      :param comment: The comment to print
+      :type comment: str
+
+
+
+   .. py:method:: compareFiles(file_path, decryptionAdapter: Generic_Backend.code_General.utilities.crypto.EncryptionAdapter, chunksize: int = 5 * 1024 * 1024)
+
+      Compare two files
+
+      :param file_path: The path to the file to compare
+      :type file_path: str
+      :param decryptionAdapter: The adapter to read the file from
+      :type decryptionAdapter: EncryptionAdapter
+      :param chunksize: The size of the chunks to compare
+      :type chunksize: int
+      :return: True if the files are the same, False if not
+      :rtype: bool
+
+
+

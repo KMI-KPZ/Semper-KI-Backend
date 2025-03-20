@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging, Mahdi Hedayat Mahmoudi 2024
 
 Contains: Calls to "Open"AI API
+
 """
 import logging
 import openai

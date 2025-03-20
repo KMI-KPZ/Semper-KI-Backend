@@ -1,0 +1,17 @@
+code_SemperKI.services.service_CreateModel.logics
+=================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.logics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_CreateModel/logics/checkServiceLogic/index
+   /autoapi/code_SemperKI/services/service_CreateModel/logics/costs/index
+   /autoapi/code_SemperKI/services/service_CreateModel/logics/orgaLogic/index
+
+

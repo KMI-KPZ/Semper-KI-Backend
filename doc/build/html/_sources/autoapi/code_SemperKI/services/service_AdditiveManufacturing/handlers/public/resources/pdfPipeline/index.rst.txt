@@ -1,0 +1,144 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline
+==========================================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging, Mahdi Hedayat Mahmoudi 2024
+
+   Contains: Handler for processing pdfs to json
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.SReqPDFExtraction
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.ReqExtractFromJSON
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromPDF
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.resources.pdfPipeline.extractFromJSON
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SReqPDFExtraction(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: file
+
+
+   .. py:attribute:: category
+
+
+   .. py:attribute:: insertIntoKG
+
+
+   .. py:attribute:: gptModel
+
+
+.. py:function:: extractFromPDF(request: rest_framework.request.Request)
+
+   upload a pdf and get back the converted json
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: JSON
+   :rtype: JSONResponse
+
+
+
+.. py:class:: ReqExtractFromJSON(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: data
+
+
+   .. py:attribute:: category
+
+
+.. py:function:: extractFromJSON(request: rest_framework.request.Request)
+
+   Take a json and write it to the KG
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: JSON
+   :rtype: JSONResponse
+
+

@@ -1,0 +1,31 @@
+code_SemperKI.services.service_CreateModel.handlers.public.resources.kgDBCM
+===========================================================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel.handlers.public.resources.kgDBCM
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: General handlers for the CM knowledge graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_CreateModel.handlers.public.resources.kgDBCM.logger
+   code_SemperKI.services.service_CreateModel.handlers.public.resources.kgDBCM.loggerError
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+

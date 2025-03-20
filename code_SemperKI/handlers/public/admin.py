@@ -68,9 +68,7 @@ def getAllProjectsFlatAsAdmin(request:Request):
     projects = pgProcesses.ProcessManagementBase.getAllProjectsFlat()
     for idx, entry in enumerate(projects):
         clientID = entry[ProcessDescription.client]
-        assert clientID != "", f"In {getAllProjectsFlatAsAdmin.cls.__name__}: non-empty clientID expected"
         userName = pgProfiles.ProfileManagementBase.getUserNameViaHash(clientID)
-        assert userName != "", f"In {getAllProjectsFlatAsAdmin.cls.__name__}: non-empty userName expected"
         projects[idx]["clientName"] = userName
         
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},all projects," + str(datetime.datetime.now()))
@@ -110,8 +108,11 @@ def getSpecificProjectAsAdmin(request:Request, projectID):
     :return: JSON response
     :rtype: JSONResponse
     """
+    project = pgProcesses.ProcessManagementBase.getProject(projectID)
+    if isinstance(project, Exception):
+        return Response({"error": str(project)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     logger.info(f"{Logging.Subject.ADMIN},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.SYSTEM},project {projectID}," + str(datetime.datetime.now()))
-    return JsonResponse(pgProcesses.ProcessManagementBase.getProject(projectID))
+    return JsonResponse(project)
 
     

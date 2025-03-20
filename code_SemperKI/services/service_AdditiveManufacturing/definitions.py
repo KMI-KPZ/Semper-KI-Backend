@@ -22,10 +22,13 @@ class ServiceDetails(StrEnumExactlyAsDefined):
     What does the service consists of 
 
     """
+    groups = enum.auto()
     models = enum.auto()
-    materials = enum.auto()
+    material = enum.auto()
     postProcessings = enum.auto()
     calculations = enum.auto()
+    color = enum.auto()
+    context = enum.auto()
 
 ##################################################
 # Additional FileContents
@@ -34,11 +37,15 @@ class FileContentsAM(StrEnumExactlyAsDefined):
     What does a file contain?
 
     """
-    width = enum.auto()
-    height = enum.auto()
-    length = enum.auto()
-    volume = enum.auto()
-    complexity = enum.auto()
+    width = enum.auto() # int
+    height = enum.auto() # int
+    length = enum.auto() # int
+    volume = enum.auto() # int
+    complexity = enum.auto() # int
+    scalingFactor = enum.auto()
+    femRequested = enum.auto() # bool
+    testType = enum.auto() # str, elongation or compression
+    pressure = enum.auto() # int in MPa
 
 ##################################################
 # How do the calculations look like?
@@ -79,9 +86,10 @@ class MaterialDetails(StrEnumExactlyAsDefined):
     """
     id = enum.auto()
     title = enum.auto()
-    propList = enum.auto()
     imgPath = enum.auto()
-
+    medianPrice = enum.auto()
+    propList = enum.auto()
+    colors = enum.auto()
 
 ##################################################
 # What defines a material?
@@ -157,6 +165,11 @@ class NodePropertiesAMMaterial(StrEnumExactlyAsDefined):
     density = enum.auto() # 1.2 g/cm³
     printingSpeed = enum.auto() # 100 cm/h
     acquisitionCosts = enum.auto() # €/kg
+    ultimateTensileStrength = enum.auto() # MPa
+    tensileModulus = enum.auto() # GPa
+    elongationAtBreak = enum.auto() # %
+    flexuralStrength = enum.auto() # MPa
+    specificMaterialType = enum.auto() # PLA, ABS, ...
 
 ##################################################
 class NodePropertiesAMAdditionalRequirement(StrEnumExactlyAsDefined):
@@ -177,9 +190,8 @@ class NodePropertiesAMColor(StrEnumExactlyAsDefined):
     What are the properties, a color node can have?
     """
     imgPath = enum.auto() # mocks.testPicture
-    foodSafe = enum.auto() #"FDA;10/2011"
-    heatResistant = enum.auto() #250 
-    color = enum.auto()  # 9005RAL;Black
+    colorRAL = enum.auto()  # RAL 9005
+    colorHEX = enum.auto()  # #000000;#FFFFFF
     certificates = enum.auto() # CE, MD, ...
 
 ##################################################
@@ -222,3 +234,37 @@ class OrganizationDetailsAM(StrEnumExactlyAsDefined):
     roomCosts = enum.auto()
 
 # TODO: Service Status Codes
+
+##################################################
+class ServiceSpecificDetailsForContractors(StrEnumExactlyAsDefined):
+    """
+    What are the details of a service for contractors?
+        
+    """
+    verified = enum.auto()
+    groups = enum.auto()
+
+##################################################
+class FilterCategories(StrEnumExactlyAsDefined):
+    """
+    What filters can be applied?
+
+    """
+    materialCategory = enum.auto()
+    materialType = enum.auto()
+    tensileStrength = enum.auto()
+    density = enum.auto()
+    elongationAtBreak = enum.auto()
+    certificates = enum.auto()
+
+
+##################################################
+class FilterErrors(StrEnumExactlyAsDefined):
+    """
+    What can go wrong when filtering?
+    
+    """
+    material = enum.auto()
+    color = enum.auto()
+    postProcessing = enum.auto()
+    printer = enum.auto()

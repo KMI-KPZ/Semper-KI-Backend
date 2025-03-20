@@ -1,25 +1,28 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>code_SemperKI.definitions &#8212; KISS-backend 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="code_SemperKI.handlers" href="../handlers/index.html" />
+    <link rel="prev" title="code_SemperKI.connections.openai" href="../connections/openai/index.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -32,314 +35,902 @@
           <div class="body" role="main">
             
   <section id="module-code_SemperKI.definitions">
-<span id="code-semperki-definitions"></span><h1><a class="reference internal" href="#module-code_SemperKI.definitions" title="code_SemperKI.definitions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">code_SemperKI.definitions</span></code></a><a class="headerlink" href="#module-code_SemperKI.definitions" title="Permalink to this heading">¶</a></h1>
+<span id="code-semperki-definitions"></span><h1>code_SemperKI.definitions<a class="headerlink" href="#module-code_SemperKI.definitions" title="Link to this heading">¶</a></h1>
 <p>Part of Semper-KI software</p>
 <p>Silvio Weging 2023</p>
 <p>Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services</p>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
-<section id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">¶</a></h3>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProcessStatus" title="code_SemperKI.definitions.ProcessStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessStatus</span></code></a></p></td>
-<td><p>Defines all statuus for the process (independent of the selected service)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.SEMPER_KI_VERSION" title="code_SemperKI.definitions.SEMPER_KI_VERSION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SEMPER_KI_VERSION</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.DataType" title="code_SemperKI.definitions.DataType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataType</span></code></a></p></td>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.DataType" title="code_SemperKI.definitions.DataType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataType</span></code></a></p></td>
 <td><p>Defines the types of data that are saved in the database of the same name</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProjectUpdates" title="code_SemperKI.definitions.ProjectUpdates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectUpdates</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProjectUpdates" title="code_SemperKI.definitions.ProjectUpdates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectUpdates</span></code></a></p></td>
 <td><p>What types of updates are there for a project?</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates" title="code_SemperKI.definitions.ProcessUpdates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessUpdates</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates" title="code_SemperKI.definitions.ProcessUpdates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessUpdates</span></code></a></p></td>
 <td><p>What types of updates are there for a process?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProjectDetails" title="code_SemperKI.definitions.ProjectDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectDetails</span></code></a></p></td>
+<td><p>What Details can a Project have?</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails" title="code_SemperKI.definitions.ProcessDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessDetails</span></code></a></p></td>
 <td><p>What Details can a Process have?</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.MessageContent" title="code_SemperKI.definitions.MessageContent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MessageContent</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProcessOutput" title="code_SemperKI.definitions.ProcessOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessOutput</span></code></a></p></td>
+<td><p>What should the output object contain?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput" title="code_SemperKI.definitions.ProjectOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectOutput</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.PricesDetails" title="code_SemperKI.definitions.PricesDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PricesDetails</span></code></a></p></td>
+<td><p>What should the prices object contain?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.MessageContent" title="code_SemperKI.definitions.MessageContent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MessageContent</span></code></a></p></td>
 <td><p>What does a message consists of?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend" title="code_SemperKI.definitions.MessageInterfaceFromFrontend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend</span></code></a></p></td>
+<td><p>What does a message origin consist of?</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.SessionContentSemperKI" title="code_SemperKI.definitions.SessionContentSemperKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SessionContentSemperKI</span></code></a></p></td>
 <td><p>Name of all added keys to the session for uniform naming</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus" title="code_SemperKI.definitions.FlatProcessStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FlatProcessStatus</span></code></a></p></td>
+<td><p>For Frontend</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.OrganizationDetailsSKI" title="code_SemperKI.definitions.OrganizationDetailsSKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OrganizationDetailsSKI</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.UserDetailsSKI" title="code_SemperKI.definitions.UserDetailsSKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UserDetailsSKI</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.AddressesSKI" title="code_SemperKI.definitions.AddressesSKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AddressesSKI</span></code></a></p></td>
+<td><p>What address-specific fields are there for SKI?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI" title="code_SemperKI.definitions.NotificationSettingsUserSemperKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI</span></code></a></p></td>
+<td><p>Which notifications exist for users?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI" title="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI</span></code></a></p></td>
+<td><p>Which notifications exist for orgas?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI" title="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI</span></code></a></p></td>
+<td><p>If the organization has some priorities, they can be set here</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.PriorityTargetsSemperKI" title="code_SemperKI.definitions.PriorityTargetsSemperKI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PriorityTargetsSemperKI</span></code></a></p></td>
+<td><p>What does every priority contain</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum" title="code_SemperKI.definitions.PermissionsEnum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PermissionsEnum</span></code></a></p></td>
+<td><p>What permissions are there?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.MapPermissionsToOrgaNotifications" title="code_SemperKI.definitions.MapPermissionsToOrgaNotifications"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MapPermissionsToOrgaNotifications</span></code></a></p></td>
+<td><p>Contains a dictionary which maps the permissions to the notifications</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields" title="code_SemperKI.definitions.ServiceSpecificFields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ServiceSpecificFields</span></code></a></p></td>
+<td><p>Contains the structure of service specific fields for organization details</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation" title="code_SemperKI.definitions.UnitsForPriceCalculation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnitsForPriceCalculation</span></code></a></p></td>
+<td><p>Contains all units used for price calculation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ValidationSteps" title="code_SemperKI.definitions.ValidationSteps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValidationSteps</span></code></a></p></td>
+<td><p>The steps of the validation process</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ValidationInformationForFrontend" title="code_SemperKI.definitions.ValidationInformationForFrontend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValidationInformationForFrontend</span></code></a></p></td>
+<td><p>What is the content of the verification stuff that the frontend needs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend" title="code_SemperKI.definitions.ContractorParsingForFrontend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ContractorParsingForFrontend</span></code></a></p></td>
+<td><p>How the frontend wants the output of the contractors</p></td>
+</tr>
 </tbody>
 </table>
-<dl class="py class">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></p>
-<p>Defines all statuus for the process (independent of the selected service)</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.DRAFT">
-<span class="sig-name descname"><span class="pre">DRAFT</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.DRAFT" title="Permalink to this definition">¶</a></dt>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.definitions.dataTypeToString" title="code_SemperKI.definitions.dataTypeToString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataTypeToString</span></code></a>(dataType)</p></td>
+<td><p>Convert integer to string</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.SEMPER_KI_VERSION">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">SEMPER_KI_VERSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.2.1'</span></em><a class="headerlink" href="#code_SemperKI.definitions.SEMPER_KI_VERSION" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.WAITING_FOR_OTHER_PROCESS">
-<span class="sig-name descname"><span class="pre">WAITING_FOR_OTHER_PROCESS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">100</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.WAITING_FOR_OTHER_PROCESS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.SERVICE_READY">
-<span class="sig-name descname"><span class="pre">SERVICE_READY</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">200</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.SERVICE_READY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.SERVICE_IN_PROGRESS">
-<span class="sig-name descname"><span class="pre">SERVICE_IN_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">201</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.SERVICE_IN_PROGRESS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.SERVICE_COMPLICATION">
-<span class="sig-name descname"><span class="pre">SERVICE_COMPLICATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">202</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.SERVICE_COMPLICATION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.CONTRACTOR_SELECTED">
-<span class="sig-name descname"><span class="pre">CONTRACTOR_SELECTED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">300</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.CONTRACTOR_SELECTED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.VERIFYING">
-<span class="sig-name descname"><span class="pre">VERIFYING</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">400</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.VERIFYING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.VERIFIED">
-<span class="sig-name descname"><span class="pre">VERIFIED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">500</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.VERIFIED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.REQUESTED">
-<span class="sig-name descname"><span class="pre">REQUESTED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">600</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.REQUESTED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.CLARIFICATION">
-<span class="sig-name descname"><span class="pre">CLARIFICATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">700</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.CLARIFICATION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.CONFIRMED_BY_CONTRACTOR">
-<span class="sig-name descname"><span class="pre">CONFIRMED_BY_CONTRACTOR</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">800</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.CONFIRMED_BY_CONTRACTOR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.REJECTED_BY_CONTRACTOR">
-<span class="sig-name descname"><span class="pre">REJECTED_BY_CONTRACTOR</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">801</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.REJECTED_BY_CONTRACTOR" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.CONFIRMED_BY_CLIENT">
-<span class="sig-name descname"><span class="pre">CONFIRMED_BY_CLIENT</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">900</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.CONFIRMED_BY_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.REJECTED_BY_CLIENT">
-<span class="sig-name descname"><span class="pre">REJECTED_BY_CLIENT</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">901</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.REJECTED_BY_CLIENT" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.PRODUCTION">
-<span class="sig-name descname"><span class="pre">PRODUCTION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1000</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.PRODUCTION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.DELIVERY">
-<span class="sig-name descname"><span class="pre">DELIVERY</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1100</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.DELIVERY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.DISPUTE">
-<span class="sig-name descname"><span class="pre">DISPUTE</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1200</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.DISPUTE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.COMPLETED">
-<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1300</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.COMPLETED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.FAILED">
-<span class="sig-name descname"><span class="pre">FAILED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1400</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.FAILED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessStatus.CANCELED">
-<span class="sig-name descname"><span class="pre">CANCELED</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1500</span></em><a class="headerlink" href="#code_SemperKI.definitions.ProcessStatus.CANCELED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><a class="headerlink" href="#code_SemperKI.definitions.DataType" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><a class="headerlink" href="#code_SemperKI.definitions.DataType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></p>
 <p>Defines the types of data that are saved in the database of the same name</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.CREATION">
-<span class="sig-name descname"><span class="pre">CREATION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.CREATION" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CREATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.CREATION" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.STATUS">
-<span class="sig-name descname"><span class="pre">STATUS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.STATUS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">STATUS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.STATUS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.MESSAGE">
-<span class="sig-name descname"><span class="pre">MESSAGE</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.MESSAGE" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MESSAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.MESSAGE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.FILE">
-<span class="sig-name descname"><span class="pre">FILE</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.FILE" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.FILE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.DELETION">
-<span class="sig-name descname"><span class="pre">DELETION</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.DELETION" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DELETION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.DELETION" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.DETAILS">
-<span class="sig-name descname"><span class="pre">DETAILS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">6</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.DETAILS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DETAILS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.DETAILS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.OTHER">
-<span class="sig-name descname"><span class="pre">OTHER</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">7</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.OTHER" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">OTHER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.OTHER" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.SERVICE">
+<span class="sig-name descname"><span class="pre">SERVICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.SERVICE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.DataType.DEPENDENCY">
+<span class="sig-name descname"><span class="pre">DEPENDENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#code_SemperKI.definitions.DataType.DEPENDENCY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.dataTypeToString">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">dataTypeToString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#code_SemperKI.definitions.DataType" title="code_SemperKI.definitions.DataType"><span class="pre">DataType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.definitions.dataTypeToString" title="Link to this definition">¶</a></dt>
+<dd><p>Convert integer to string</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectUpdates">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProjectUpdates</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProjectUpdates</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>What types of updates are there for a project?</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectUpdates.status">
-<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates.status" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectUpdates.projectStatus">
+<span class="sig-name descname"><span class="pre">projectStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates.projectStatus" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectUpdates.details">
-<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates.details" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectUpdates.projectDetails">
+<span class="sig-name descname"><span class="pre">projectDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectUpdates.projectDetails" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessUpdates</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessUpdates</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>What types of updates are there for a process?</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.messages">
-<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.messages" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.messages" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.files">
-<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.files" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.files" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.serviceDetails">
-<span class="sig-name descname"><span class="pre">serviceDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceDetails" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">serviceDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceDetails" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.serviceType">
-<span class="sig-name descname"><span class="pre">serviceType</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceType" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">serviceType</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceType" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.serviceStatus">
-<span class="sig-name descname"><span class="pre">serviceStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">serviceStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.serviceStatus" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.processDetails">
-<span class="sig-name descname"><span class="pre">processDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.processDetails" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.processDetails" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.processStatus">
-<span class="sig-name descname"><span class="pre">processStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.processStatus" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.processStatus" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.provisionalContractor">
-<span class="sig-name descname"><span class="pre">provisionalContractor</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.provisionalContractor" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">provisionalContractor</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.provisionalContractor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.dependenciesIn">
+<span class="sig-name descname"><span class="pre">dependenciesIn</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.dependenciesIn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.dependenciesOut">
+<span class="sig-name descname"><span class="pre">dependenciesOut</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.dependenciesOut" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.verificationResults">
+<span class="sig-name descname"><span class="pre">verificationResults</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.verificationResults" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessUpdates.additionalInput">
+<span class="sig-name descname"><span class="pre">additionalInput</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessUpdates.additionalInput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProjectDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What Details can a Project have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectDetails.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectDetails.title" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>What Details can a Process have?</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.provisionalContractor">
+<span class="sig-name descname"><span class="pre">provisionalContractor</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.provisionalContractor" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.provisionalContractor">
-<span class="sig-name descname"><span class="pre">provisionalContractor</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.provisionalContractor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.title" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.clientBillingAddress">
+<span class="sig-name descname"><span class="pre">clientBillingAddress</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.clientBillingAddress" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.clientDeliverAddress">
+<span class="sig-name descname"><span class="pre">clientDeliverAddress</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.clientDeliverAddress" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.imagePath">
+<span class="sig-name descname"><span class="pre">imagePath</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.imagePath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.priorities">
+<span class="sig-name descname"><span class="pre">priorities</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.priorities" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.prices">
+<span class="sig-name descname"><span class="pre">prices</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.prices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.verificationResults">
+<span class="sig-name descname"><span class="pre">verificationResults</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.verificationResults" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessDetails.additionalInput">
+<span class="sig-name descname"><span class="pre">additionalInput</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessDetails.additionalInput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProcessOutput</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What should the output object contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessOutput.processStatusButtons">
+<span class="sig-name descname"><span class="pre">processStatusButtons</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessOutput.processStatusButtons" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessOutput.processErrors">
+<span class="sig-name descname"><span class="pre">processErrors</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessOutput.processErrors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProcessOutput.flatProcessStatus">
+<span class="sig-name descname"><span class="pre">flatProcessStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProcessOutput.flatProcessStatus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ProjectOutput</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectOutput.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectOutput.owner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectOutput.processIDs">
+<span class="sig-name descname"><span class="pre">processIDs</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectOutput.processIDs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectOutput.searchableData">
+<span class="sig-name descname"><span class="pre">searchableData</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectOutput.searchableData" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ProjectOutput.processesCount">
+<span class="sig-name descname"><span class="pre">processesCount</span></span><a class="headerlink" href="#code_SemperKI.definitions.ProjectOutput.processesCount" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PricesDetails">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">PricesDetails</span></span><a class="headerlink" href="#code_SemperKI.definitions.PricesDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What should the prices object contain?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PricesDetails.details">
+<span class="sig-name descname"><span class="pre">details</span></span><a class="headerlink" href="#code_SemperKI.definitions.PricesDetails.details" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.MessageContent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">MessageContent</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">MessageContent</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>What does a message consists of?</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.MessageContent.date">
-<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.date" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.date" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.MessageContent.userID">
-<span class="sig-name descname"><span class="pre">userID</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.userID" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">userID</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.userID" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.MessageContent.userName">
-<span class="sig-name descname"><span class="pre">userName</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.userName" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">userName</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.userName" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.MessageContent.text">
-<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.text" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageContent.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">MessageInterfaceFromFrontend</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a message origin consist of?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.messages">
+<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.messages" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.origin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.date" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.userID">
+<span class="sig-name descname"><span class="pre">userID</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.userID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.userName">
+<span class="sig-name descname"><span class="pre">userName</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.userName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MessageInterfaceFromFrontend.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.createdBy" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.SessionContentSemperKI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">SessionContentSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../../code_General/utilities/customStrEnum/index.html#code_General.utilities.customStrEnum.StrEnumExactylAsDefined" title="code_General.utilities.customStrEnum.StrEnumExactylAsDefined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">code_General.utilities.customStrEnum.StrEnumExactylAsDefined</span></code></a></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">SessionContentSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
 <p>Name of all added keys to the session for uniform naming</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.SessionContentSemperKI.CURRENT_PROJECTS">
-<span class="sig-name descname"><span class="pre">CURRENT_PROJECTS</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI.CURRENT_PROJECTS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CURRENT_PROJECTS</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI.CURRENT_PROJECTS" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="code_SemperKI.definitions.SessionContentSemperKI.processes">
-<span class="sig-name descname"><span class="pre">processes</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI.processes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">processes</span></span><a class="headerlink" href="#code_SemperKI.definitions.SessionContentSemperKI.processes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">FlatProcessStatus</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>For Frontend</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.ACTION_REQUIRED">
+<span class="sig-name descname"><span class="pre">ACTION_REQUIRED</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.ACTION_REQUIRED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.WAITING_CONTRACTOR">
+<span class="sig-name descname"><span class="pre">WAITING_CONTRACTOR</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_CONTRACTOR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.WAITING_CLIENT">
+<span class="sig-name descname"><span class="pre">WAITING_CLIENT</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_CLIENT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.WAITING_PROCESS">
+<span class="sig-name descname"><span class="pre">WAITING_PROCESS</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_PROCESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.IN_PROGRESS">
+<span class="sig-name descname"><span class="pre">IN_PROGRESS</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.IN_PROGRESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.FAILED">
+<span class="sig-name descname"><span class="pre">FAILED</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.FAILED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.FlatProcessStatus.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><a class="headerlink" href="#code_SemperKI.definitions.FlatProcessStatus.COMPLETED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.OrganizationDetailsSKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">OrganizationDetailsSKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.OrganizationDetailsSKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.OrganizationDetailsSKI.maturityLevel">
+<span class="sig-name descname"><span class="pre">maturityLevel</span></span><a class="headerlink" href="#code_SemperKI.definitions.OrganizationDetailsSKI.maturityLevel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.OrganizationDetailsSKI.resilienceScore">
+<span class="sig-name descname"><span class="pre">resilienceScore</span></span><a class="headerlink" href="#code_SemperKI.definitions.OrganizationDetailsSKI.resilienceScore" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.OrganizationDetailsSKI.todos">
+<span class="sig-name descname"><span class="pre">todos</span></span><a class="headerlink" href="#code_SemperKI.definitions.OrganizationDetailsSKI.todos" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UserDetailsSKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">UserDetailsSKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.UserDetailsSKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UserDetailsSKI.todos">
+<span class="sig-name descname"><span class="pre">todos</span></span><a class="headerlink" href="#code_SemperKI.definitions.UserDetailsSKI.todos" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.AddressesSKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">AddressesSKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.AddressesSKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What address-specific fields are there for SKI?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.AddressesSKI.coordinates">
+<span class="sig-name descname"><span class="pre">coordinates</span></span><a class="headerlink" href="#code_SemperKI.definitions.AddressesSKI.coordinates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">NotificationSettingsUserSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>Which notifications exist for users?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.verification">
+<span class="sig-name descname"><span class="pre">verification</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.verification" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.processSent">
+<span class="sig-name descname"><span class="pre">processSent</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.processSent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.responseFromContractor">
+<span class="sig-name descname"><span class="pre">responseFromContractor</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.responseFromContractor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.statusChange">
+<span class="sig-name descname"><span class="pre">statusChange</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.statusChange" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.newMessage">
+<span class="sig-name descname"><span class="pre">newMessage</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.newMessage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.actionReminder">
+<span class="sig-name descname"><span class="pre">actionReminder</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.actionReminder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsUserSemperKI.errorOccurred">
+<span class="sig-name descname"><span class="pre">errorOccurred</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.errorOccurred" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">NotificationSettingsOrgaSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>Which notifications exist for orgas?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.processReceived">
+<span class="sig-name descname"><span class="pre">processReceived</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.processReceived" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.responseFromClient">
+<span class="sig-name descname"><span class="pre">responseFromClient</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.responseFromClient" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.statusChange">
+<span class="sig-name descname"><span class="pre">statusChange</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.statusChange" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.newMessage">
+<span class="sig-name descname"><span class="pre">newMessage</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.newMessage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.actionReminder">
+<span class="sig-name descname"><span class="pre">actionReminder</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.actionReminder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.errorOccurred">
+<span class="sig-name descname"><span class="pre">errorOccurred</span></span><a class="headerlink" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.errorOccurred" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">PrioritiesForOrganizationSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>If the organization has some priorities, they can be set here
+Is used for calculations</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.cost">
+<span class="sig-name descname"><span class="pre">cost</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.cost" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quality">
+<span class="sig-name descname"><span class="pre">quality</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quality" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quantity">
+<span class="sig-name descname"><span class="pre">quantity</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quantity" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.resilience">
+<span class="sig-name descname"><span class="pre">resilience</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.resilience" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.sustainability">
+<span class="sig-name descname"><span class="pre">sustainability</span></span><a class="headerlink" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.sustainability" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PriorityTargetsSemperKI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">PriorityTargetsSemperKI</span></span><a class="headerlink" href="#code_SemperKI.definitions.PriorityTargetsSemperKI" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does every priority contain</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PriorityTargetsSemperKI.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#code_SemperKI.definitions.PriorityTargetsSemperKI.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">PermissionsEnum</span></span><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.StrEnum</span></code></p>
+<p>What permissions are there?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.proccessesRead">
+<span class="sig-name descname"><span class="pre">proccessesRead</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes:read'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.proccessesRead" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.processesFiles">
+<span class="sig-name descname"><span class="pre">processesFiles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes:files'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.processesFiles" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.processesMessages">
+<span class="sig-name descname"><span class="pre">processesMessages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes:messages'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.processesMessages" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.processesEdit">
+<span class="sig-name descname"><span class="pre">processesEdit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes:edit'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.processesEdit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.processesDelete">
+<span class="sig-name descname"><span class="pre">processesDelete</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'processes:delete'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.processesDelete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.orgaEdit">
+<span class="sig-name descname"><span class="pre">orgaEdit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'orga:edit'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.orgaEdit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.orgaDelete">
+<span class="sig-name descname"><span class="pre">orgaDelete</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'orga:delete'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.orgaDelete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.orgaRead">
+<span class="sig-name descname"><span class="pre">orgaRead</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'orga:read'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.orgaRead" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.resourcesRead">
+<span class="sig-name descname"><span class="pre">resourcesRead</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'resources:read'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.resourcesRead" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.PermissionsEnum.resourcesEdit">
+<span class="sig-name descname"><span class="pre">resourcesEdit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'resources:edit'</span></em><a class="headerlink" href="#code_SemperKI.definitions.PermissionsEnum.resourcesEdit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MapPermissionsToOrgaNotifications">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">MapPermissionsToOrgaNotifications</span></span><a class="headerlink" href="#code_SemperKI.definitions.MapPermissionsToOrgaNotifications" title="Link to this definition">¶</a></dt>
+<dd><p>Contains a dictionary which maps the permissions to the notifications</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.MapPermissionsToOrgaNotifications.permissionsToNotifications">
+<span class="sig-name descname"><span class="pre">permissionsToNotifications</span></span><a class="headerlink" href="#code_SemperKI.definitions.MapPermissionsToOrgaNotifications.permissionsToNotifications" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ServiceSpecificFields">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ServiceSpecificFields</span></span><a class="headerlink" href="#code_SemperKI.definitions.ServiceSpecificFields" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>Contains the structure of service specific fields for organization details</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ServiceSpecificFields.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#code_SemperKI.definitions.ServiceSpecificFields.key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ServiceSpecificFields.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.definitions.ServiceSpecificFields.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ServiceSpecificFields.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#code_SemperKI.definitions.ServiceSpecificFields.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ServiceSpecificFields.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#code_SemperKI.definitions.ServiceSpecificFields.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">UnitsForPriceCalculation</span></span><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.StrEnum</span></code></p>
+<p>Contains all units used for price calculation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.euroPerkWh">
+<span class="sig-name descname"><span class="pre">euroPerkWh</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'€/kWh'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerkWh" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHour">
+<span class="sig-name descname"><span class="pre">euroPerHour</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'€/h'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHour" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.percent">
+<span class="sig-name descname"><span class="pre">percent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'%'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.percent" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.euroPerKilogram">
+<span class="sig-name descname"><span class="pre">euroPerKilogram</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'€/kg'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerKilogram" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.euro">
+<span class="sig-name descname"><span class="pre">euro</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'€'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euro" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeterPerHour">
+<span class="sig-name descname"><span class="pre">cubicCentimeterPerHour</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cm³/h'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeterPerHour" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.millimeter">
+<span class="sig-name descname"><span class="pre">millimeter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mm'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.millimeter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeter">
+<span class="sig-name descname"><span class="pre">cubicCentimeter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cm³'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.grammPerCubicCentimeter">
+<span class="sig-name descname"><span class="pre">grammPerCubicCentimeter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'g/cm³'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.grammPerCubicCentimeter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHourPerSquareMeter">
+<span class="sig-name descname"><span class="pre">euroPerHourPerSquareMeter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'€/(h*m²)'</span></em><a class="headerlink" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHourPerSquareMeter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationSteps">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ValidationSteps</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationSteps" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>The steps of the validation process</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationSteps.serviceReady">
+<span class="sig-name descname"><span class="pre">serviceReady</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationSteps.serviceReady" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationSteps.serviceSpecificTasks">
+<span class="sig-name descname"><span class="pre">serviceSpecificTasks</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationSteps.serviceSpecificTasks" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationInformationForFrontend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ValidationInformationForFrontend</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationInformationForFrontend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What is the content of the verification stuff that the frontend needs</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationInformationForFrontend.isSuccessful">
+<span class="sig-name descname"><span class="pre">isSuccessful</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationInformationForFrontend.isSuccessful" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ValidationInformationForFrontend.reason">
+<span class="sig-name descname"><span class="pre">reason</span></span><a class="headerlink" href="#code_SemperKI.definitions.ValidationInformationForFrontend.reason" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ContractorParsingForFrontend">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.definitions.</span></span><span class="sig-name descname"><span class="pre">ContractorParsingForFrontend</span></span><a class="headerlink" href="#code_SemperKI.definitions.ContractorParsingForFrontend" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>How the frontend wants the output of the contractors</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ContractorParsingForFrontend.contractors">
+<span class="sig-name descname"><span class="pre">contractors</span></span><a class="headerlink" href="#code_SemperKI.definitions.ContractorParsingForFrontend.contractors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ContractorParsingForFrontend.errors">
+<span class="sig-name descname"><span class="pre">errors</span></span><a class="headerlink" href="#code_SemperKI.definitions.ContractorParsingForFrontend.errors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ContractorParsingForFrontend.groupID">
+<span class="sig-name descname"><span class="pre">groupID</span></span><a class="headerlink" href="#code_SemperKI.definitions.ContractorParsingForFrontend.groupID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.definitions.ContractorParsingForFrontend.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#code_SemperKI.definitions.ContractorParsingForFrontend.error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -348,7 +939,7 @@
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../../index.html">KISS-backend</a></h1>
 
@@ -359,28 +950,272 @@
 
 
 
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../index.html">API Reference</a></li>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">code_SemperKI.definitions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.SEMPER_KI_VERSION"><code class="docutils literal notranslate"><span class="pre">SEMPER_KI_VERSION</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.CREATION"><code class="docutils literal notranslate"><span class="pre">DataType.CREATION</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.STATUS"><code class="docutils literal notranslate"><span class="pre">DataType.STATUS</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.MESSAGE"><code class="docutils literal notranslate"><span class="pre">DataType.MESSAGE</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.FILE"><code class="docutils literal notranslate"><span class="pre">DataType.FILE</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.DELETION"><code class="docutils literal notranslate"><span class="pre">DataType.DELETION</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.DETAILS"><code class="docutils literal notranslate"><span class="pre">DataType.DETAILS</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.OTHER"><code class="docutils literal notranslate"><span class="pre">DataType.OTHER</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.SERVICE"><code class="docutils literal notranslate"><span class="pre">DataType.SERVICE</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.DataType.DEPENDENCY"><code class="docutils literal notranslate"><span class="pre">DataType.DEPENDENCY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.dataTypeToString"><code class="docutils literal notranslate"><span class="pre">dataTypeToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProjectUpdates"><code class="docutils literal notranslate"><span class="pre">ProjectUpdates</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectUpdates.projectStatus"><code class="docutils literal notranslate"><span class="pre">ProjectUpdates.projectStatus</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectUpdates.projectDetails"><code class="docutils literal notranslate"><span class="pre">ProjectUpdates.projectDetails</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.messages"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.messages</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.files"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.files</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.serviceDetails"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.serviceDetails</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.serviceType"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.serviceType</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.serviceStatus"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.serviceStatus</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.processDetails"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.processDetails</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.processStatus"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.processStatus</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.provisionalContractor"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.provisionalContractor</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.dependenciesIn"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.dependenciesIn</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.dependenciesOut"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.dependenciesOut</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.verificationResults"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.verificationResults</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessUpdates.additionalInput"><code class="docutils literal notranslate"><span class="pre">ProcessUpdates.additionalInput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProjectDetails"><code class="docutils literal notranslate"><span class="pre">ProjectDetails</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectDetails.title"><code class="docutils literal notranslate"><span class="pre">ProjectDetails.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails"><code class="docutils literal notranslate"><span class="pre">ProcessDetails</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.provisionalContractor"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.provisionalContractor</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.title"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.title</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.clientBillingAddress"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.clientBillingAddress</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.clientDeliverAddress"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.clientDeliverAddress</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.imagePath"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.imagePath</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.priorities"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.priorities</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.prices"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.prices</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.verificationResults"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.verificationResults</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessDetails.additionalInput"><code class="docutils literal notranslate"><span class="pre">ProcessDetails.additionalInput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProcessOutput"><code class="docutils literal notranslate"><span class="pre">ProcessOutput</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessOutput.processStatusButtons"><code class="docutils literal notranslate"><span class="pre">ProcessOutput.processStatusButtons</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessOutput.processErrors"><code class="docutils literal notranslate"><span class="pre">ProcessOutput.processErrors</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProcessOutput.flatProcessStatus"><code class="docutils literal notranslate"><span class="pre">ProcessOutput.flatProcessStatus</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput"><code class="docutils literal notranslate"><span class="pre">ProjectOutput</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput.owner"><code class="docutils literal notranslate"><span class="pre">ProjectOutput.owner</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput.processIDs"><code class="docutils literal notranslate"><span class="pre">ProjectOutput.processIDs</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput.searchableData"><code class="docutils literal notranslate"><span class="pre">ProjectOutput.searchableData</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ProjectOutput.processesCount"><code class="docutils literal notranslate"><span class="pre">ProjectOutput.processesCount</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.PricesDetails"><code class="docutils literal notranslate"><span class="pre">PricesDetails</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PricesDetails.details"><code class="docutils literal notranslate"><span class="pre">PricesDetails.details</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.MessageContent"><code class="docutils literal notranslate"><span class="pre">MessageContent</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageContent.date"><code class="docutils literal notranslate"><span class="pre">MessageContent.date</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageContent.userID"><code class="docutils literal notranslate"><span class="pre">MessageContent.userID</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageContent.userName"><code class="docutils literal notranslate"><span class="pre">MessageContent.userName</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageContent.text"><code class="docutils literal notranslate"><span class="pre">MessageContent.text</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.messages"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.messages</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.origin"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.origin</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.date"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.date</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.text"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.text</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.userID"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.userID</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.userName"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.userName</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MessageInterfaceFromFrontend.createdBy"><code class="docutils literal notranslate"><span class="pre">MessageInterfaceFromFrontend.createdBy</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.SessionContentSemperKI"><code class="docutils literal notranslate"><span class="pre">SessionContentSemperKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.SessionContentSemperKI.CURRENT_PROJECTS"><code class="docutils literal notranslate"><span class="pre">SessionContentSemperKI.CURRENT_PROJECTS</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.SessionContentSemperKI.processes"><code class="docutils literal notranslate"><span class="pre">SessionContentSemperKI.processes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.ACTION_REQUIRED"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.ACTION_REQUIRED</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_CONTRACTOR"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.WAITING_CONTRACTOR</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_CLIENT"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.WAITING_CLIENT</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.WAITING_PROCESS"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.WAITING_PROCESS</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.IN_PROGRESS"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.IN_PROGRESS</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.FAILED"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.FAILED</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.FlatProcessStatus.COMPLETED"><code class="docutils literal notranslate"><span class="pre">FlatProcessStatus.COMPLETED</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.OrganizationDetailsSKI"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsSKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.OrganizationDetailsSKI.maturityLevel"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsSKI.maturityLevel</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.OrganizationDetailsSKI.resilienceScore"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsSKI.resilienceScore</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.OrganizationDetailsSKI.todos"><code class="docutils literal notranslate"><span class="pre">OrganizationDetailsSKI.todos</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.UserDetailsSKI"><code class="docutils literal notranslate"><span class="pre">UserDetailsSKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UserDetailsSKI.todos"><code class="docutils literal notranslate"><span class="pre">UserDetailsSKI.todos</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.AddressesSKI"><code class="docutils literal notranslate"><span class="pre">AddressesSKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.AddressesSKI.coordinates"><code class="docutils literal notranslate"><span class="pre">AddressesSKI.coordinates</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.verification"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.verification</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.processSent"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.processSent</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.responseFromContractor"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.responseFromContractor</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.statusChange"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.statusChange</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.newMessage"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.newMessage</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.actionReminder"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.actionReminder</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsUserSemperKI.errorOccurred"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsUserSemperKI.errorOccurred</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.processReceived"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.processReceived</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.responseFromClient"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.responseFromClient</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.statusChange"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.statusChange</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.newMessage"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.newMessage</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.actionReminder"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.actionReminder</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.NotificationSettingsOrgaSemperKI.errorOccurred"><code class="docutils literal notranslate"><span class="pre">NotificationSettingsOrgaSemperKI.errorOccurred</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.cost"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.cost</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.time"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.time</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quality"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.quality</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.quantity"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.quantity</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.resilience"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.resilience</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PrioritiesForOrganizationSemperKI.sustainability"><code class="docutils literal notranslate"><span class="pre">PrioritiesForOrganizationSemperKI.sustainability</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.PriorityTargetsSemperKI"><code class="docutils literal notranslate"><span class="pre">PriorityTargetsSemperKI</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PriorityTargetsSemperKI.value"><code class="docutils literal notranslate"><span class="pre">PriorityTargetsSemperKI.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.proccessesRead"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.proccessesRead</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.processesFiles"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.processesFiles</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.processesMessages"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.processesMessages</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.processesEdit"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.processesEdit</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.processesDelete"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.processesDelete</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.orgaEdit"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.orgaEdit</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.orgaDelete"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.orgaDelete</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.orgaRead"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.orgaRead</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.resourcesRead"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.resourcesRead</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.PermissionsEnum.resourcesEdit"><code class="docutils literal notranslate"><span class="pre">PermissionsEnum.resourcesEdit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.MapPermissionsToOrgaNotifications"><code class="docutils literal notranslate"><span class="pre">MapPermissionsToOrgaNotifications</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.MapPermissionsToOrgaNotifications.permissionsToNotifications"><code class="docutils literal notranslate"><span class="pre">MapPermissionsToOrgaNotifications.permissionsToNotifications</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificFields</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields.key"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificFields.key</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields.name"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificFields.name</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields.unit"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificFields.unit</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ServiceSpecificFields.value"><code class="docutils literal notranslate"><span class="pre">ServiceSpecificFields.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerkWh"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.euroPerkWh</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHour"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.euroPerHour</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.percent"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.percent</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerKilogram"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.euroPerKilogram</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euro"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.euro</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeterPerHour"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.cubicCentimeterPerHour</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.millimeter"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.millimeter</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.cubicCentimeter"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.cubicCentimeter</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.grammPerCubicCentimeter"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.grammPerCubicCentimeter</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.UnitsForPriceCalculation.euroPerHourPerSquareMeter"><code class="docutils literal notranslate"><span class="pre">UnitsForPriceCalculation.euroPerHourPerSquareMeter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ValidationSteps"><code class="docutils literal notranslate"><span class="pre">ValidationSteps</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ValidationSteps.serviceReady"><code class="docutils literal notranslate"><span class="pre">ValidationSteps.serviceReady</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ValidationSteps.serviceSpecificTasks"><code class="docutils literal notranslate"><span class="pre">ValidationSteps.serviceSpecificTasks</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ValidationInformationForFrontend"><code class="docutils literal notranslate"><span class="pre">ValidationInformationForFrontend</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ValidationInformationForFrontend.isSuccessful"><code class="docutils literal notranslate"><span class="pre">ValidationInformationForFrontend.isSuccessful</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ValidationInformationForFrontend.reason"><code class="docutils literal notranslate"><span class="pre">ValidationInformationForFrontend.reason</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend"><code class="docutils literal notranslate"><span class="pre">ContractorParsingForFrontend</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend.contractors"><code class="docutils literal notranslate"><span class="pre">ContractorParsingForFrontend.contractors</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend.errors"><code class="docutils literal notranslate"><span class="pre">ContractorParsingForFrontend.errors</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend.groupID"><code class="docutils literal notranslate"><span class="pre">ContractorParsingForFrontend.groupID</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#code_SemperKI.definitions.ContractorParsingForFrontend.error"><code class="docutils literal notranslate"><span class="pre">ContractorParsingForFrontend.error</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">API Reference</a><ul>
+  <li><a href="../index.html">code_SemperKI</a><ul>
+      <li>Previous: <a href="../connections/openai/index.html" title="previous chapter">code_SemperKI.connections.openai</a></li>
+      <li>Next: <a href="../handlers/index.html" title="next chapter">code_SemperKI.handlers</a></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -394,11 +1229,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, Silvio Weging.
+      &#169;2023, Silvio Weging.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="../../../_sources/autoapi/code_SemperKI/definitions/index.rst.txt"

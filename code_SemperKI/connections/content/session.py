@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2024
 
 Contains: Offers an interface to access the session dictionary in a structured way
+
 """
 
 from django.utils import timezone
@@ -11,16 +12,20 @@ import logging, copy
 
 from Generic_Backend.code_General.definitions import GlobalDefaults, SessionContent, FileObjectContent
 from Generic_Backend.code_General.connections import s3
-from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import profileManagement, ProfileManagementUser
 from Generic_Backend.code_General.utilities.basics import manualCheckifLoggedIn
 from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.utilities.files import deleteFileHelper
+from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription
 
 from ...definitions import PriorityTargetsSemperKI, SessionContentSemperKI, MessageInterfaceFromFrontend, DataType
-from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails
+from ...definitions import ProjectUpdates, ProcessUpdates, ProcessDetails, ProjectOutput
 from ...modelFiles.processModel import ProcessInterface, ProcessDescription
 from ...modelFiles.projectModel import ProjectInterface, ProjectDescription
 from ...modelFiles.dataModel import DataInterface, DataDescription
 from ...serviceManager import serviceManager
+from ...utilities.filePreview import deletePreviewFile
+from ...utilities.basics import kissLogo
 import code_SemperKI.states.stateDescriptions as StateDescriptions
 from .abstractInterface import AbstractContentInterface
 
@@ -276,10 +281,19 @@ class ProcessManagementSession(AbstractContentInterface):
         :return: UserID
         :rtype: str
         """
-        if manualCheckifLoggedIn(self.structuredSessionObj.getSession()):
-            return profileManagement[self.structuredSessionObj.getSession()[SessionContent.PG_PROFILE_CLASS]].getClientID(self.structuredSessionObj.getSession())
-        else:
-            return GlobalDefaults.anonymous
+
+        return GlobalDefaults.anonymous
+        
+    ##############################################
+    def getActualUserID(self) -> str:
+        """
+        Retrieve the user behind the organization
+        
+        :return: UserID
+        :rtype: str
+        """
+
+        return GlobalDefaults.anonymous
         
     ##################################################
     def checkIfUserIsClient(self, userHashID, projectID="", processID=""):
@@ -486,11 +500,8 @@ class ProcessManagementSession(AbstractContentInterface):
             for currentProcess in processes:
                 files = processes[currentProcess][ProcessDescription.files]
                 for fileKey in files:
-                    if FileObjectContent.isFile not in files[fileKey] or files[fileKey][FileObjectContent.isFile]:
-                        if files[fileKey][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(files[fileKey][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(files[fileKey][FileObjectContent.path])
+                    deleteFileHelper(files[fileKey])
+                    deletePreviewFile(files[fileKey][FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProject(projectID)
         except (Exception) as error:
             logger.error(f'could not delete project: {str(error)}')
@@ -510,7 +521,33 @@ class ProcessManagementSession(AbstractContentInterface):
         try:
             allProjects = self.structuredSessionObj.getProjects()
             for idx, entry in enumerate(allProjects): # the behaviour of list elements in python drives me crazy
-                allProjects[idx]["processesCount"] = len(self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID]))
+                processes = self.structuredSessionObj.getProcesses(entry[ProjectDescription.projectID])
+                allProjects[idx][ProjectOutput.processesCount] = len(processes) # no check needed since session is self contained
+                allProjects[idx][ProjectOutput.processIDs] = list(processes.keys())
+                # gather searchable data
+                searchableData = []
+                for processID in processes:
+                    process = self.structuredSessionObj.getProcessPerID(processID)
+                    # title
+                    if ProcessDetails.title in process[ProcessDescription.processDetails]:
+                        searchableData.append(process[ProcessDescription.processDetails][ProcessDetails.title])
+
+                    # file names
+                    if ProcessDescription.files in process and process[ProcessDescription.files] is not None and process[ProcessDescription.files] != {}: 
+                        for file in process[ProcessDescription.files]:
+                            searchableData.append(process[ProcessDescription.files][file][FileObjectContent.fileName])
+
+                    # contractor name
+                    if ProcessDetails.provisionalContractor in process[ProcessDescription.processDetails] and process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] is not None and process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor] != {}:
+                        if isinstance(process.processDetails[ProcessDetails.provisionalContractor], dict):
+                            searchableData.append(process[ProcessDescription.processDetails][ProcessDetails.provisionalContractor][OrganizationDescription.name])
+
+                    # service specific stuff
+                    if ProcessDescription.serviceDetails in process and ProcessDescription.serviceType in process and process[ProcessDescription.serviceType] is not serviceManager.getNone():
+                        searchableData.extend(serviceManager.getService(process[ProcessDescription.serviceType]).getSearchableDetails(process[ProcessDescription.serviceDetails]))
+
+                allProjects[idx][ProjectOutput.searchableData] = searchableData
+                
                 if SessionContentSemperKI.processes in allProjects[idx]:
                     del allProjects[idx][SessionContentSemperKI.processes] # frontend doesn't need that
             
@@ -628,7 +665,11 @@ class ProcessManagementSession(AbstractContentInterface):
 
         now = timezone.now()
 
-        self.structuredSessionObj.setProcess(projectID, processID, ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client).toDict())
+        createdProcess = ProcessInterface(ProjectInterface(projectID, str(now), client), processID, str(now), client)
+        # initialize some details here
+        createdProcess.processDetails[ProcessDetails.imagePath] = [kissLogo]
+
+        self.structuredSessionObj.setProcess(projectID, processID, createdProcess.toDict())
 
     ###################################################
     def deleteProcess(self, processID:str, processObj=None):
@@ -646,11 +687,8 @@ class ProcessManagementSession(AbstractContentInterface):
             files = currentProcess[ProcessDescription.files]
             for fileKey in files:
                 fileObj = files[fileKey]
-                if FileObjectContent.isFile not in fileObj or fileObj[FileObjectContent.isFile]:
-                    if fileObj[FileObjectContent.remote]:
-                        s3.manageRemoteS3.deleteFile(fileObj[FileObjectContent.path])
-                    else:
-                        s3.manageLocalS3.deleteFile(fileObj[FileObjectContent.path])
+                deleteFileHelper(fileObj)
+                deletePreviewFile(fileObj[FileObjectContent.imgPath])
             self.structuredSessionObj.deleteProcess(processID)
 
         except (Exception) as error:
@@ -699,14 +737,25 @@ class ProcessManagementSession(AbstractContentInterface):
                 outContent = content[MessageInterfaceFromFrontend.text]
 
             elif updateType == ProcessUpdates.files:
+                # if this is the first file, remove the default image from the processDetails
+                if ProcessDetails.imagePath in currentProcess[ProcessDescription.processDetails]:
+                    if currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] == [serviceManager.getImgPath(currentProcess[ProcessDescription.serviceType])]:
+                        currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
+                else:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = []
+                
                 for entry in content:
                     currentProcess[ProcessDescription.files][content[entry][FileObjectContent.id]] = content[entry]
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].append(content[entry][FileObjectContent.imgPath])
                     self.createDataEntry(content[entry], dataID, processID, DataType.FILE, updatedBy, {}, content[entry][FileObjectContent.id])
                     outContent += content[entry][FileObjectContent.fileName] + ","
                 outContent = outContent.rstrip(",")
 
             elif updateType == ProcessUpdates.serviceType:
                 currentProcess[ProcessDescription.serviceType] = content
+                currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(content).initializeServiceDetails(currentProcess[ProcessDescription.serviceDetails])
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [serviceManager.getImgPath(content)]
+                self.createDataEntry(content, dataID, processID, DataType.SERVICE, updatedBy, {ProcessUpdates.serviceType: content})
                 outContent = content
             
             elif updateType == ProcessUpdates.serviceDetails:
@@ -755,14 +804,20 @@ class ProcessManagementSession(AbstractContentInterface):
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
                 oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                assert isinstance(content, list), "DependencyIn Content is not a list"
+                for contentProcessID in content:
+                    if contentProcessID not in currentProcess.setdefault(dependencyKey, []):
+                        currentProcess[dependencyKey].append(contentProcessID)
                 
-                if content not in currentProcess.setdefault(dependencyKey, []):
-                    currentProcess[dependencyKey].append(content)
-                
-                dependentProcess = self.structuredSessionObj.getProcess(projectID, content)
-                if processID not in dependentProcess.setdefault(oppositeKey, []):
-                    dependentProcess[oppositeKey].append(processID)
+                    dependentProcess = self.structuredSessionObj.getProcess(projectID, contentProcessID)
+                    if processID not in dependentProcess.setdefault(oppositeKey, []):
+                        dependentProcess[oppositeKey].append(processID)
                 self.createDataEntry(content, dataID, processID, DataType.DEPENDENCY, updatedBy, {updateType: content})
+                outContent = content
+
+            elif updateType == ProcessUpdates.additionalInput:
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = content
+                self.createDataEntry(content, dataID, processID, DataType.OTHER, updatedBy, {ProcessUpdates.additionalInput: content})
                 outContent = content
             else:
                 raise Exception(f"updateProcess {updateType} not implemented")
@@ -806,15 +861,24 @@ class ProcessManagementSession(AbstractContentInterface):
 
             elif updateType == ProcessUpdates.files:
                 for entry in content:
-                    if FileObjectContent.isFile not in currentProcess[ProcessDescription.files][entry] or currentProcess[ProcessDescription.files][entry][FileObjectContent.isFile]:
-                        if currentProcess[ProcessDescription.files][entry][FileObjectContent.remote]:
-                            s3.manageRemoteS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
-                        else:
-                            s3.manageLocalS3.deleteFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.path])
+                    deleteFileHelper(currentProcess[ProcessDescription.files][entry])
+                    if FileObjectContent.imgPath in currentProcess[ProcessDescription.files][entry]:
+                        deletePreviewFile(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                    if ProcessDetails.imagePath in currentProcess[ProcessDescription.processDetails]:
+                        currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath].remove(currentProcess[ProcessDescription.files][entry][FileObjectContent.imgPath])
+                        if len(currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath]) == 0:
+                            currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [serviceManager.getImgPath(currentProcess[ProcessDescription.serviceType])]
                     del currentProcess[ProcessDescription.files][entry]
                     self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.FILE, "content": entry})
 
             elif updateType == ProcessUpdates.serviceType:
+                if currentProcess[ProcessDescription.serviceType] != serviceManager.getNone():
+                    serviceType = currentProcess[ProcessDescription.serviceType]
+                    currentProcess[ProcessDescription.serviceDetails] = serviceManager.getService(serviceType).deleteServiceDetails(currentProcess[ProcessDescription.serviceDetails], currentProcess[ProcessDescription.serviceDetails])
+                currentProcess[ProcessDescription.serviceStatus] = 0
+                if ProcessDetails.additionalInput in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
+                currentProcess[ProcessDescription.processDetails][ProcessDetails.imagePath] = [kissLogo]
                 currentProcess[ProcessDescription.serviceType] = serviceManager.getNone()
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.SERVICE, "content": ProcessUpdates.serviceType})
 
@@ -840,14 +904,26 @@ class ProcessManagementSession(AbstractContentInterface):
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.STATUS, "content": ProcessUpdates.processStatus})
 
             elif updateType == ProcessUpdates.provisionalContractor:
-                del currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor]
-                self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
+                if ProcessDetails.provisionalContractor in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessUpdates.provisionalContractor] = {}
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.provisionalContractor})
 
             elif updateType in [ProcessUpdates.dependenciesIn, ProcessUpdates.dependenciesOut]:
                 dependencyKey = ProcessDescription.dependenciesIn if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesOut
-                if content in currentProcess.get(dependencyKey, []):
-                    currentProcess[dependencyKey].remove(content)
+                oppositeKey = ProcessDescription.dependenciesOut if updateType == ProcessUpdates.dependenciesIn else ProcessDescription.dependenciesIn
+                assert isinstance(content, list), "DependencyOut Content is not a list"
+                for contentProcessID in content:
+                    if contentProcessID in currentProcess.get(dependencyKey, []):
+                        currentProcess[dependencyKey].remove(contentProcessID)
+                    dependentProcess = self.structuredSessionObj.getProcess(projectID, contentProcessID)
+                    if contentProcessID in dependentProcess.get(oppositeKey, []):
+                        dependentProcess[oppositeKey].remove(processID)
                 self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.DEPENDENCY, "content": updateType})
+
+            elif updateType == ProcessUpdates.additionalInput:
+                if ProcessDetails.additionalInput in currentProcess[ProcessDescription.processDetails]:
+                    currentProcess[ProcessDescription.processDetails][ProcessDetails.additionalInput] = {}
+                    self.createDataEntry({}, dataID, processID, DataType.DELETION, deletedBy, {"deletion": DataType.OTHER, "content": ProcessUpdates.additionalInput})
 
             else:
                 raise Exception(f"deleteFromProcess {updateType} not implemented")

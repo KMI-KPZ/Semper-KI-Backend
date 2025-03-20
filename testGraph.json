@@ -27,11 +27,11 @@
         "nodeType": "printer",
         "context": "Resin printer",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
-          {"name": "chamberBuildHeight", "value": "196", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildWidth", "value": "124.8", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildLength", "value": "70.2", "unit": "mm", "type": "number"},
-          {"name": "certificates", "value": "FCC, CE, EMC", "unit": "", "type": "text"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "key": "chamberBuildHeight", "value": "196", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "key": "chamberBuildWidth", "value": "124.8", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "key": "chamberBuildLength", "value": "70.2", "unit": "mm", "type": "number"},
+          {"name": "certificates", "key": "certificates", "value": "FCC, CE, EMC", "unit": "", "type": "text"}
         ],
         "active": true
       }
@@ -53,12 +53,12 @@
         "nodeType": "printer",
         "context": "Wax printer",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
-          {"name": "chamberBuildHeight", "value": "144", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildWidth", "value": "294", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildLength", "value": "211", "unit": "mm", "type": "number"},
-          {"name": "possibleLayerHeights", "value": "16, 8", "unit": "µm", "type": "text"},
-          {"name": "buildRate", "value": "147", "unit": "cm³/h", "type": "number"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "key": "chamberBuildHeight", "value": "144", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "key": "chamberBuildWidth", "value": "294", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "key": "chamberBuildLength", "value": "211", "unit": "mm", "type": "number"},
+          {"name": "possibleLayerHeights", "key": "possibleLayerHeights", "value": "16, 8", "unit": "µm", "type": "text"},
+          {"name": "buildRate", "key": "buildRate", "value": "147", "unit": "cm³/h", "type": "number"}
         ],
         "active": true
       }
@@ -92,11 +92,11 @@
         "nodeType": "printer",
         "context": "Powder printer",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
-          {"name": "chamberBuildHeight", "value": "500", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildWidth", "value": "600", "unit": "mm", "type": "number"},
-          {"name": "chamberBuildLength", "value": "1000", "unit": "mm", "type": "number"},
-          {"name": "possibleLayerHeights", "value": "300, 150", "unit": "µm", "type": "text"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"},
+          {"name": "chamberBuildHeight", "key": "chamberBuildHeight", "value": "500", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildWidth", "key": "chamberBuildWidth", "value": "600", "unit": "mm", "type": "number"},
+          {"name": "chamberBuildLength", "key": "chamberBuildLength", "value": "1000", "unit": "mm", "type": "number"},
+          {"name": "possibleLayerHeights", "key": "possibleLayerHeights", "value": "300, 150", "unit": "µm", "type": "text"}
         ],
         "active": true
       }
@@ -128,6 +128,67 @@
   },
   {
     "node": {
+      "nodeTempID": 21,
+      "nodeName": "Irrelevant",
+      "nodeType": "material",
+      "context": "Material is not important.",
+      "properties": [
+        {"name": "Bildpfad", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        ],
+        "active": true
+    },
+    "edges":[]
+  },
+  {
+    "node": {
+      "nodeTempID": 23,
+      "nodeName": "Resin",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 24,
+      "nodeName": "Wax",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 25,
+      "nodeName": "Acrylic",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
+      "nodeTempID": 26,
+      "nodeName": "Quarz",
+      "nodeType": "materialType",
+      "context": "",
+      "properties": [],
+      "active": true
+    },
+    "edges": [
+    ]	
+  },
+  {
+    "node": {
       "nodeTempID": 7
     },
     "edges": [
@@ -137,10 +198,14 @@
         "nodeType": "material",
         "context": "Resin material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "density", "value": "1.31", "unit": "g/cm³", "type": "number"},
-          {"name": "printingSpeed", "value": "4.8", "unit": "cm/h", "type": "number"},
-          {"name": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "key": "density", "value": "1.31", "unit": "g/cm³", "type": "number"},
+          {"name": "printingSpeed", "key": "printingSpeed", "value": "4.8", "unit": "cm/h", "type": "number"},
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "200", "unit": "€/kg", "type": "number"},
+          {"name": "poissonRatio", "key": "poissonRatio", "value": "0.35", "unit": "", "type": "number"},
+          {"name": "tensileModulus", "key": "tensileModulus", "value": "2798", "unit": "MPa", "type": "number"},
+          {"name": "elongationAtBreak", "key": "elongationAtBreak", "value": "0.04", "unit": "%", "type": "number"},
+          {"name": "ultimateTensileStrength", "key": "ultimateTensileStrength", "value": "64.083", "unit": "MPa", "type": "number"}
           ],
           "active": true
       }
@@ -157,9 +222,9 @@
         "nodeType": "material",
         "context": "Wax material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "density", "value": "0.8", "unit": "g/cm³", "type": "number"},
-          {"name": "acquisitionCosts", "value": "650", "unit": "€/kg", "type": "number"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "key": "density", "value": "0.8", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "650", "unit": "€/kg", "type": "number"}
           ],
           "active": true
       }
@@ -176,9 +241,9 @@
         "nodeType": "material",
         "context": "Plastic material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "density", "value": "1.18", "unit": "g/cm³", "type": "number"},
-          {"name": "acquisitionCosts", "value": "30", "unit": "€/kg", "type": "number"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "key": "density", "value": "1.18", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "30", "unit": "€/kg", "type": "number"}
           ],
           "active": true
       },
@@ -188,9 +253,9 @@
         "nodeType": "material",
         "context": "Quarzsand material",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "density", "value": "2.65", "unit": "g/cm³", "type": "number"},
-          {"name": "acquisitionCosts", "value": "9", "unit": "€/kg", "type": "number"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "density", "key": "density", "value": "2.65", "unit": "g/cm³", "type": "number"},
+          {"name": "acquisitionCosts", "key": "acquisitionCosts", "value": "9", "unit": "€/kg", "type": "number"}
           ],
           "active": true
         }
@@ -199,11 +264,11 @@
   {
     "node": {
       "nodeTempID": 14,
-      "nodeName": "Remove Support",
+      "nodeName": "Support entfernen",
       "nodeType": "additionalRequirement",
       "context": "Removing support structures",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
       ],
       "active": true
     },
@@ -213,11 +278,11 @@
   {
     "node": {
       "nodeTempID": 15,
-      "nodeName": "Plastics",
+      "nodeName": "Polymer",
       "nodeType": "materialCategory",
-      "context": "All materials considered plastics",
+      "context": "All materials consisting of macromolecules",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -230,11 +295,11 @@
   {
     "node": {
       "nodeTempID": 16,
-      "nodeName": "Metals",
+      "nodeName": "Metal",
       "nodeType": "materialCategory",
       "context": "All materials considered metals",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -243,11 +308,11 @@
   {
     "node": {
       "nodeTempID": 17,
-      "nodeName": "Photopolymers",
+      "nodeName": "Photopolymer",
       "nodeType": "materialCategory",
       "context": "All materials considered photopolymers",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -260,11 +325,11 @@
   {
     "node": {
       "nodeTempID": 19,
-      "nodeName": "Composites",
+      "nodeName": "Composite",
       "nodeType": "materialCategory",
       "context": "All materials considered composites",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -273,18 +338,15 @@
   {
     "node": {
       "nodeTempID": 19,
-      "nodeName": "Powders",
+      "nodeName": "Sand",
       "nodeType": "materialCategory",
-      "context": "All materials considered powders",
+      "context": "All materials considered sand",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
     "edges":[
-      {
-        "nodeTempID": 8
-      },
       {
         "nodeTempID": 13
       }
@@ -293,11 +355,11 @@
   {
     "node": {
       "nodeTempID": 20,
-      "nodeName": "Thermoplastics",
+      "nodeName": "Wax",
       "nodeType": "materialCategory",
-      "context": "All materials considered thermoplastics",
+      "context": "All materials considered wax",
       "properties": [
-        {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
+        {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/testpicture.jpg", "unit": "", "type": "text"}
         ],
         "active": true
     },
@@ -313,15 +375,49 @@
     },
     "edges": [
       {
-        "nodeTempID": 3,
-        "nodeName": "Black",
+        "nodeTempID": 22,
+        "nodeName": "Color irrelevant",
         "nodeType": "color",
         "context": "The default color",
         "properties": [
-          {"name": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
-          {"name": "color", "value": "000000", "unit": "#Hex", "type": "string"}
+          {"name": "imgPath", "key": "imgPath", "value": "https://kiss-statics.fra1.cdn.digitaloceanspaces.com/kiss-statics/public/media/PLA_black.jpg", "unit": "", "type": "text"},
+          {"name": "colorRAL", "key": "colorRAL", "value": "RAL 9004", "unit": "", "type": "text"},
+          {"name": "certificates", "key": "certificates", "value": "", "unit": "", "type": "text"}
         ],
         "active": true
+      },
+      {
+        "nodeTempID": 23
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 11
+    },
+    "edges": [
+      {
+        "nodeTempID": 24
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 12
+    },
+    "edges": [
+      {
+        "nodeTempID": 25
+      }
+    ]
+  },
+  {
+    "node": {
+      "nodeTempID": 13
+    },
+    "edges": [
+      {
+        "nodeTempID": 26
       }
     ]
   }

@@ -5,14 +5,18 @@ Silvio Weging 2023
 
 Contains: Class which describes the service in particular
 """
+from django.conf import settings
+
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
+from code_SemperKI.definitions import PricesDetails, ValidationSteps, ValidationInformationForFrontend
 
-from .connections.postgresql.pgService import updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails
-from .handlers.public.checkService import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
+from .connections.postgresql.pgService import initializeService as AM_initializeService, parseServiceDetails as AM_parseServiceDetails, updateServiceDetails as AM_updateServiceDetails, deleteServiceDetails as AM_deleteServiceDetails, isFileRelevantForService as AM_isFileRelevantForService, serviceReady as AM_serviceIsReady, cloneServiceDetails as AM_cloneServiceDetails, getSearchableDetails as AM_getSearchableDetails
+from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AM_checkIfSelectionIsAvailable
 from .connections.filterViaSparql import *
-from .definitions import ServiceDetails, SERVICE_NAME, SERVICE_NUMBER
-from .logics.costs import Costs
+from .definitions import SERVICE_NAME, SERVICE_NUMBER, ServiceSpecificDetailsForContractors
+from .logics.costsLogic import Costs
+from .logics.femAnalysisLogic import startFEMAnalysis
 
 ###################################################
 class AdditiveManufacturing(Semper.ServiceBase):
@@ -20,6 +24,14 @@ class AdditiveManufacturing(Semper.ServiceBase):
     All functions of this service
 
     """
+
+    ###################################################
+    def initializeServiceDetails(self, serviceDetails) -> None:
+        """
+        Initialize the service
+        
+        """
+        return AM_initializeService(serviceDetails)
 
     ###################################################
     def updateServiceDetails(self, existingContent, newContent):
@@ -39,6 +51,25 @@ class AdditiveManufacturing(Semper.ServiceBase):
         return AM_deleteServiceDetails(existingContent, deletedContent)
     
     ###################################################
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+        return AM_isFileRelevantForService(existingContent, fileID)
+    
+    ###################################################
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
+
+        """
+        outContent = AM_parseServiceDetails(existingContent)
+        if isinstance(outContent, Exception):
+            return {}
+        return outContent
+    
+    ###################################################
     def serviceReady(self, existingContent) -> tuple[bool, list[str]]:
         """
         Checks if the service is completely defined
@@ -47,7 +78,7 @@ class AdditiveManufacturing(Semper.ServiceBase):
         completeOrNot, listOfMissingStuff = AM_serviceIsReady(existingContent)
         if completeOrNot is False:
             for idx, entry in enumerate(listOfMissingStuff):
-                listOfMissingStuff[idx] = "Service" + "-" + SERVICE_NAME + "-" + entry
+                listOfMissingStuff[idx]["key"] = "Service" + "-" + SERVICE_NAME + "-" + entry["key"]
         
         return (completeOrNot, listOfMissingStuff)
 
@@ -91,13 +122,15 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         costsObject = Costs(process, additionalArguments, transferObject)
         costs = costsObject.calculateCosts()
-        outDict = {
-            "priceQuantity": costs[1],
-        }
+        outDict = {"groupCosts": []}
+        for groupCosts in costs:
+            outDict["groupCosts"].append(groupCosts)
+        # detailed overview, encrypted
+        outDict[PricesDetails.details] = costsObject.getEncryptedCostOverview()
         return outDict
 
     ###################################################
-    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj:ProcessInterface|Process) -> tuple[dict, object]:
         """
         Get a list of contractors that are available for this service
 
@@ -109,14 +142,45 @@ class AdditiveManufacturing(Semper.ServiceBase):
         """
         # filter by choice of material, post-processings, build plate, etc...
         
-        filteredContractors = Filter()
-        postProcessings = {}
-        if ServiceDetails.postProcessings in processObj.serviceDetails:
-            postProcessings = processObj.serviceDetails[ServiceDetails.postProcessings]
+        filteredContractors = FilterAM()
 
-        outList = filteredContractors.getFilteredContractors(processObj.serviceDetails[ServiceDetails.materials], postProcessings, processObj.serviceDetails[ServiceDetails.calculations])
+        outDict = filteredContractors.getFilteredContractors(processObj)
+        if isinstance(outDict, Exception):
+            outDict = {}
         
-        return outList, filteredContractors
+        return outDict, filteredContractors
+    
+    ###################################################
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+        existingDetails[ServiceSpecificDetailsForContractors.verified] = contractor[1]
+        existingDetails[ServiceSpecificDetailsForContractors.groups] = contractor[2]
+        return existingDetails
+    
+    ###################################################
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+        resultDict = startFEMAnalysis(session, processObj)
+        if resultDict[ServiceDetails.groups] == []:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: True}
+        else:
+            validationResults[ValidationSteps.serviceSpecificTasks]["FEM"] = {ValidationInformationForFrontend.isSuccessful.value: False, "groups": resultDict[ServiceDetails.groups]}
+        return validationResults
+    
+    ###################################################
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
+
+        """
+        return AM_getSearchableDetails(existingContent)
 
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing())
+
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AdditiveManufacturing(), settings.STATIC_URL+"media/AM.png")

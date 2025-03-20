@@ -1,0 +1,34 @@
+code_SemperKI.services.service_PostProcessing.utilities.basics
+==============================================================
+
+.. py:module:: code_SemperKI.services.service_PostProcessing.utilities.basics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Basic implementations regarding the PP service
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_PostProcessing.utilities.basics.checkIfOrgaHasPPAsService
+
+
+Module Contents
+---------------
+
+.. py:function:: checkIfOrgaHasPPAsService()
+
+   Check whether an orga can change their resources
+
+   :return: Response whether the orga can change their resources or not. If so, call the function.
+   :rtype: Response, Func
+
+

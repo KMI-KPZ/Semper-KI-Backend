@@ -1,5 +1,5 @@
-:py:mod:`code_SemperKI.connections.cmem`
-========================================
+code_SemperKI.connections.cmem
+==============================
 
 .. py:module:: code_SemperKI.connections.cmem
 
@@ -13,107 +13,65 @@
 
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.cmem.ManageSPARQLQuery
+
+
 Module Contents
 ---------------
 
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   code_SemperKI.connections.cmem.ManageToken
-   code_SemperKI.connections.cmem.ManageQueries
-
-
-
-Functions
-~~~~~~~~~
-
-.. autoapisummary::
-
-   code_SemperKI.connections.cmem.sendGeneralQuery
-
-
-
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   code_SemperKI.connections.cmem.endpoint
-   code_SemperKI.connections.cmem.oauthToken
-
-
-.. py:class:: ManageToken
-
-   Manage oauth token class.
-
-   .. py:attribute:: _token
-      
-
-      
-
-   .. py:attribute:: client
-      
-
-      
-
-   .. py:method:: __getattr__(item)
-
-
-   .. py:method:: __del__()
-
-
-   .. py:method:: getAccessToken()
-
-      Get initial token. Made as a function to be callable from outside. 
-      Reminder for me: It makes no sense to save this access token in redis because it expires much to quickly!
-
-
-   .. py:method:: checkIfExpired()
-
-      Check if token has expired and if so, refresh it. 
-
-
-
-.. py:data:: endpoint
-   
-
-   
-
-.. py:data:: oauthToken
-   
-
-   
-
-.. py:class:: ManageQueries(filePathAndName)
+.. py:class:: ManageSPARQLQuery(filePathAndName, post=False, parameters={})
 
    Contains query from file as object
 
 
+
    .. py:attribute:: redisCon
-      
 
-      
 
-   .. py:method:: sendQuery()
+   .. py:attribute:: oauthToken
+
+
+   .. py:attribute:: filePathAndName
+
+
+   .. py:attribute:: parameters
+
+
+   .. py:method:: retrieveContentFromRedis(initial=False) -> str
+
+      Check if the key is inside redis, if it is, take it from there, if not, save it for faster access
+
+      :return: The query as string
+      :rtype: str
+
+
+
+
+   .. py:method:: getParameters() -> dict
+
+      Retrieve the parameters if there are any so that they can be filled
+
+      :return: Dictionary that describe the parameters for the query
+      :rtype: dict
+
+
+
+
+   .. py:method:: sendQuery(parameters: dict = {})
 
       Send SPARQL query.
       :param self: Contains sparql query as obj
       :type self: Object
+      :param parameters: The parameters for the query. Need to come from the outside to ensure thread safety!
+      :type parameters: dict
       :return: result of query
       :rtype: JSON
 
-
-
-
-.. py:function:: sendGeneralQuery(query)
-
-   Send SPARQL query.
-   :param query: Contains sparql query as string
-   :type query: str
-   :return: result of query
-   :rtype: JSON
 
 
 

@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
 """
 import enum
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
@@ -88,6 +89,8 @@ class ProcessUpdates(StrEnumExactlyAsDefined):
     provisionalContractor = enum.auto()
     dependenciesIn = enum.auto()
     dependenciesOut = enum.auto()
+    verificationResults = enum.auto()
+    additionalInput = enum.auto()
 
 ####################################################################################
 # Enum for processDetails
@@ -111,6 +114,38 @@ class ProcessDetails(StrEnumExactlyAsDefined):
     clientDeliverAddress = enum.auto()
     imagePath = enum.auto()
     priorities = enum.auto()
+    prices = enum.auto()
+    verificationResults = enum.auto()
+    additionalInput = enum.auto()
+
+####################################################################################
+# Enum for the output of the process
+class ProcessOutput(StrEnumExactlyAsDefined):
+    """
+    What should the output object contain?
+    
+    """
+    processStatusButtons = enum.auto()
+    processErrors = enum.auto()
+    flatProcessStatus = enum.auto()
+
+####################################################################################
+# Enum for the output of the project
+class ProjectOutput(StrEnumExactlyAsDefined):
+    owner = enum.auto()
+    processIDs = enum.auto()
+    searchableData = enum.auto()
+    processesCount = enum.auto()
+
+
+####################################################################################
+# Enum for prices
+class PricesDetails(StrEnumExactlyAsDefined):
+    """
+    What should the prices object contain?
+    
+    """
+    details = enum.auto()
 
 ####################################################################################
 # Enum for messages
@@ -162,7 +197,28 @@ class FlatProcessStatus(StrEnumExactlyAsDefined):
     WAITING_CLIENT = enum.auto()
     WAITING_PROCESS = enum.auto()
     IN_PROGRESS = enum.auto()
+    FAILED = enum.auto()
     COMPLETED = enum.auto()
+
+####################################################################################
+# Enum for organization details for SemperKI
+class OrganizationDetailsSKI(StrEnumExactlyAsDefined):
+    maturityLevel = enum.auto()
+    resilienceScore = enum.auto()
+    todos = enum.auto()
+
+####################################################################################
+# Enum for user details for SemperKI
+class UserDetailsSKI(StrEnumExactlyAsDefined):
+    todos = enum.auto()
+
+####################################################################################
+# Enum for Addresses for SemperKI
+class AddressesSKI(StrEnumExactlyAsDefined):
+    """
+    What address-specific fields are there for SKI?
+    """
+    coordinates = enum.auto()
 
 ####################################################################################
 # Enum for notification settings
@@ -282,3 +338,30 @@ class UnitsForPriceCalculation(enum.StrEnum):
     grammPerCubicCentimeter = "g/cm³"
     euroPerHourPerSquareMeter = "€/(h*m²)"
     
+##################################################
+class ValidationSteps(StrEnumExactlyAsDefined):
+    """
+    The steps of the validation process
+    """
+    serviceReady = enum.auto()
+    serviceSpecificTasks = enum.auto()
+
+##################################################
+class ValidationInformationForFrontend(StrEnumExactlyAsDefined):
+    """
+    What is the content of the verification stuff that the frontend needs
+    
+    """
+    isSuccessful = enum.auto()
+    reason = enum.auto()
+
+##################################################
+class ContractorParsingForFrontend(StrEnumExactlyAsDefined):
+    """
+    How the frontend wants the output of the contractors
+    
+    """
+    contractors = enum.auto()
+    errors = enum.auto()
+    groupID = enum.auto()
+    error = enum.auto()

@@ -1,0 +1,110 @@
+code_SemperKI.connections.content.postgresql.pgProfilesSKI
+==========================================================
+
+.. py:module:: code_SemperKI.connections.content.postgresql.pgProfilesSKI
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Connector to Generic Backend's profile database (User/Organization)
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.userCreatedSemperKI
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.fetchCoordinates
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.userUpdatedSemperKI
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.orgaCreatedSemperKI
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.orgaUpdatedSemperKI
+   code_SemperKI.connections.content.postgresql.pgProfilesSKI.gatherUserHashIDsAndNotificationPreference
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: userCreatedSemperKI(userHashID: str, session, oldDetails: dict)
+
+   Look for (new) user, update details according to Semper-KI specific fields
+
+   :param userHashID: The ID transmitted via signal
+   :type userHashID: str
+   :param session: The session object
+   :type session: Session
+   :param oldDetails: The old details of the user
+   :type oldDetails: dict
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: fetchCoordinates(address)
+   :async:
+
+
+.. py:function:: userUpdatedSemperKI(userHashID: str, session, updates)
+
+   Update user details according to Semper-KI specific fields
+
+   :param userHashID: The ID transmitted via signal
+   :type userHashID: str
+   :param session: The session object
+   :type session: Session
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: orgaCreatedSemperKI(orgaHashID: str, oldDetails: dict)
+
+   Look for orga, update details according to Semper-KI specific fields
+
+   :param orgaHashID: The ID transmitted via signal
+   :type orgaHashID: str
+   :return: Nothing
+   :rtype: None
+
+
+.. py:function:: orgaUpdatedSemperKI(orgaHashID: str, session, updates)
+
+   Update orga details according to Semper-KI specific fields
+
+   :param userHashID: The ID transmitted via signal
+   :type userHashID: str
+   :param session: The session object
+   :type session: Session
+   :return: Nothing
+   :rtype: None
+
+
+
+.. py:function:: gatherUserHashIDsAndNotificationPreference(orgaOrUserID: str, notification: str, notificationType: str)
+
+   Gather all IDs for either a user or members of an organization and their preference for a certain notification
+
+   :param orgaOrUserID: The hashed ID of the user/orga in question
+   :type orgaOrUserID: str
+   :param notification: The notification sent
+   :type notification: str
+   :param notificationType: What kind of notification it is (email or event)
+   :type notificationType: str
+   :return: dict with userID(s) and their to get the notification or not
+   :rtype: dict
+
+
+

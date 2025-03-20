@@ -1,0 +1,19 @@
+test
+====
+
+.. py:module:: test
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   test.output
+
+
+Module Contents
+---------------
+
+.. py:data:: output
+

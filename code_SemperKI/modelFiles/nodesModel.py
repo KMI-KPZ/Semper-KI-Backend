@@ -55,6 +55,7 @@ class NodePropertyDescription(StrEnumExactlyAsDefined):
     
     """
     name = enum.auto()
+    key = enum.auto()
     value = enum.auto()
     unit = enum.auto()
     type = enum.auto()
@@ -68,7 +69,7 @@ class NodePropertiesTypesOfEntries(StrEnumExactlyAsDefined):
     number = enum.auto()
     text = enum.auto()
     string = enum.auto()
-    color = enum.auto()
+    array = enum.auto()
 
 ##################################################
 defaultOwner = "SYSTEM"

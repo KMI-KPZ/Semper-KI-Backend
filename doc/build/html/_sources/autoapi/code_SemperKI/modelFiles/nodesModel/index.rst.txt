@@ -1,0 +1,237 @@
+code_SemperKI.modelFiles.nodesModel
+===================================
+
+.. py:module:: code_SemperKI.modelFiles.nodesModel
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Model for database version of the Knowledge Graph
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.modelFiles.nodesModel.defaultOwner
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.modelFiles.nodesModel.NodeDescription
+   code_SemperKI.modelFiles.nodesModel.NodeType
+   code_SemperKI.modelFiles.nodesModel.NodeProperties
+   code_SemperKI.modelFiles.nodesModel.NodePropertyDescription
+   code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries
+   code_SemperKI.modelFiles.nodesModel.Node
+
+
+Module Contents
+---------------
+
+.. py:class:: NodeDescription
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a node consists of?
+
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: uniqueID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+
+   .. py:attribute:: properties
+
+
+   .. py:attribute:: edges
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: clonedFrom
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+.. py:class:: NodeType
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the possible types of a node?
+
+
+
+   .. py:attribute:: organization
+
+
+.. py:class:: NodeProperties
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a node can have?
+
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: NodePropertyDescription
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   How is a property structured?
+
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: key
+
+
+   .. py:attribute:: value
+
+
+   .. py:attribute:: unit
+
+
+   .. py:attribute:: type
+
+
+.. py:class:: NodePropertiesTypesOfEntries
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What types can a property object have?
+
+
+
+   .. py:attribute:: number
+
+
+   .. py:attribute:: text
+
+
+   .. py:attribute:: string
+
+
+   .. py:attribute:: array
+
+
+.. py:data:: defaultOwner
+   :value: 'SYSTEM'
+
+
+.. py:class:: Node(*args, **kwargs)
+
+   Bases: :py:obj:`django.db.models.Model`
+
+
+   The class of a node containing different information, depending on it's type.
+
+   :nodeID: The ID for that node
+   :uniqueID: An ID, that is resistant to cloning
+   :nodeName: The name of that node
+   :nodeType: The type of the node as described in the respective Enum
+   :context: Some information about the node, can be anything
+   :properties: The properties that this node has, depends on the type
+   :edges: The nodes connected to this one, symmetrical (so it's an undirected graph)
+   :createdBy: Who created that node? (hashedID or SYSTEM)
+   :clonedFrom: Parent from which the node was cloned
+   :active: Is that node currently active or not?
+   :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
+   :updatedWhen: Date and time at which the entry was updated
+   :accessedWhen: Last date and time the entry was fetched from the database, automatically set
+
+
+   .. py:attribute:: nodeID
+
+
+   .. py:attribute:: uniqueID
+
+
+   .. py:attribute:: nodeName
+
+
+   .. py:attribute:: nodeType
+
+
+   .. py:attribute:: context
+
+
+   .. py:attribute:: properties
+
+
+   .. py:attribute:: edges
+
+
+   .. py:attribute:: createdBy
+
+
+   .. py:attribute:: clonedFrom
+
+
+   .. py:attribute:: active
+
+
+   .. py:attribute:: createdWhen
+
+
+   .. py:attribute:: updatedWhen
+
+
+   .. py:attribute:: accessedWhen
+
+
+   .. py:class:: Meta
+
+      .. py:attribute:: indexes
+
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: toDict()
+
+      Return only the node information, not the whole graph
+
+
+
+

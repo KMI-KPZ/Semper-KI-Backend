@@ -1,0 +1,54 @@
+code_SemperKI.logics.statemachineLogics
+=======================================
+
+.. py:module:: code_SemperKI.logics.statemachineLogics
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Akshay NS 2024, Silvio Weging 2025
+
+   Contains: Logics for state machine handlers
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.statemachineLogics.logger
+   code_SemperKI.logics.statemachineLogics.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.logics.statemachineLogics.logicForStatusButtonRequest
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:function:: logicForStatusButtonRequest(request: rest_framework.request.Request, validatedInput: dict, functionName: str)
+
+   Logic for status button request
+
+   :param request: Request
+   :type request: Request
+   :param validatedInput: Validated input
+   :type validatedInput: dict
+   :param functionName: Function name
+   :type functionName: str
+   :return: Response|Exception, status code
+   :rtype: Response|Exception, int
+
+
+

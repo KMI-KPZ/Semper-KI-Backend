@@ -16,10 +16,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from drf_spectacular.utils import extend_schema
+from rest_framework.exceptions import ValidationError
 
 from Generic_Backend.code_General.definitions import *
 from Generic_Backend.code_General.utilities.basics import checkIfUserIsLoggedIn, checkIfRightsAreSufficient, checkVersion
 from Generic_Backend.code_General.utilities import crypto
+from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase
 
 from code_SemperKI.definitions import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
@@ -69,13 +71,12 @@ def getServices(request:Request):
     try:
         
         services = serviceManager.getAllServices()
+        services.sort(key=lambda x: x[ServicesStructure.identifier])
         outList = []
         for entry in services:
             if entry[ServicesStructure.name] == "None":
                 continue
-            outList.append({"type": entry[ServicesStructure.name], "imgPath": testPicture})
-        # NRU ONLY
-        outList = [{"type": "ADDITIVE_MANUFACTURING", "imgPath": testPicture}]
+            outList.append({"type": entry[ServicesStructure.name], "imgPath": entry[ServicesStructure.imgPath]})
         outSerializer = SResServices(data=outList, many=True)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
@@ -166,7 +167,23 @@ def retrieveResultsFromQuestionnaire(request:Request):
 
     """
     try:
-        return HttpResponseRedirect(settings.FORWARD_URL)
+        orgID = request.data["orgID"] if "orgID" in request.data else ""
+        assessmentType = request.data["assessmentType"] if "assessmentType" in request.data else ""
+        data = request.data["data"] if "data" in request.data else []
+
+        if orgID != "":
+            orgaObj = ProfileManagementBase.getOrganizationObject(hashID=orgID)
+            if isinstance(orgaObj, Exception):
+                raise ValidationError("No organization found")
+            if "maturity" in assessmentType.lower():
+                orgaObj.details[OrganizationDetailsSKI.maturityLevel] = [data]
+            elif "resilience" in assessmentType.lower():
+                orgaObj.details[OrganizationDetailsSKI.resilienceScore] = data
+            else:
+                raise Exception("Unknown assessment type")
+            orgaObj.save()
+        
+        return Response()
     except (Exception) as error:
         message = f"Error in {retrieveResultsFromQuestionnaire.cls.__name__}: {str(error)}"
         exception = str(error)
@@ -176,4 +193,89 @@ def retrieveResultsFromQuestionnaire(request:Request):
             return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#######################################################
+@extend_schema(
+    summary="Return the maturity level of the project",
+    description=" ",
+    tags=['FE - Questionnaire'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+def maturityLevel(request:Request):
+    """
+    Return the maturity level of the project
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response
+    :rtype: JSONResponse
+
+    """
+    try:
+        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
+        if isinstance(orgaAsDict, Exception):
+            raise ValidationError("No organization found")
+        if OrganizationDetailsSKI.maturityLevel in orgaAsDict[OrganizationDescription.details]:
+            return Response({OrganizationDetailsSKI.maturityLevel.value: orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.maturityLevel]})
+        else:
+            return Response({OrganizationDetailsSKI.maturityLevel.value: []})
         
+    except (Exception) as error:
+        message = f"Error in {maturityLevel.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+
+@extend_schema(
+    summary="Return the resilience score of the project",
+    description=" ",
+    tags=['FE - Questionnaire'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@require_http_methods(["GET"])
+@api_view(["GET"])
+def resilienceScore(request:Request):
+    """
+    Return the resilience score of the project
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: JSON Response
+    :rtype: JSONResponse
+
+    """
+    try:
+        orgaAsDict = ProfileManagementBase.getOrganization(request.session)
+        if isinstance(orgaAsDict, Exception):
+            raise ValidationError("No organization found")
+        if OrganizationDetailsSKI.resilienceScore in orgaAsDict[OrganizationDescription.details]:
+            return Response({OrganizationDetailsSKI.resilienceScore.value: orgaAsDict[OrganizationDescription.details][OrganizationDetailsSKI.resilienceScore]})
+        else:
+            return Response({OrganizationDetailsSKI.resilienceScore.value: []})
+    except (Exception) as error:
+        message = f"Error in {resilienceScore.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

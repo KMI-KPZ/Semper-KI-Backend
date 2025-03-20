@@ -1,15 +1,21 @@
-:py:mod:`code_SemperKI.utilities`
-=================================
+code_SemperKI.utilities
+=======================
 
 .. py:module:: code_SemperKI.utilities
 
 
 Submodules
 ----------
+
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
 
-   signals/index.rst
+   /autoapi/code_SemperKI/utilities/basics/index
+   /autoapi/code_SemperKI/utilities/filePreview/index
+   /autoapi/code_SemperKI/utilities/locales/index
+   /autoapi/code_SemperKI/utilities/serializer/index
+   /autoapi/code_SemperKI/utilities/signals/index
+   /autoapi/code_SemperKI/utilities/sparql/index
+   /autoapi/code_SemperKI/utilities/websocket/index
 
 

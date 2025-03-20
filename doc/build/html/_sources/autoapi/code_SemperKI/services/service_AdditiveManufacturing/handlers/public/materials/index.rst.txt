@@ -1,0 +1,242 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials
+==============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Handlers for AM Materials
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.SReqMaterialsFilter
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.SReqMaterialContent
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.SResMaterialsWithFilters
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.SReqSetMaterial
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.retrieveMaterialsWithFilter
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.setMaterialSelection
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.materials.deleteMaterialFromSelection
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SReqMaterialsFilter(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: filters
+
+
+.. py:class:: SReqMaterialContent(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: propList
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: medianPrice
+
+
+   .. py:attribute:: colors
+
+
+.. py:class:: SResMaterialsWithFilters(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: materials
+
+
+.. py:function:: retrieveMaterialsWithFilter(request: rest_framework.request.Request)
+
+   Return all materials conforming to the filter
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: JSON with materials
+   :rtype: Response
+
+
+
+.. py:class:: SReqSetMaterial(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: projectID
+
+
+   .. py:attribute:: processID
+
+
+   .. py:attribute:: groupID
+
+
+   .. py:attribute:: material
+
+
+   .. py:attribute:: color
+
+
+.. py:function:: setMaterialSelection(request: rest_framework.request.Request)
+
+   User selected a material
+
+   :param request: PATCH Request
+   :type request: HTTP PATCH
+   :return: Success or Exception
+   :rtype: HTTP Response
+
+
+
+.. py:function:: deleteMaterialFromSelection(request: rest_framework.request.Request, projectID: str, processID: str, groupID: int)
+
+   Remove a prior selected material from selection
+
+   :param request: DELETE Request
+   :type request: HTTP DELETE
+   :param projectID: Project ID
+   :type projectID: str
+   :param processID: Process ID
+   :type processID: str
+   :param groupID: Index of the group
+   :type groupID: int
+   :return: Success or Exception
+   :rtype: HTTP Response
+
+
+

@@ -1,0 +1,401 @@
+code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs
+==========================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: API endpoint for cost-calculations
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.logger
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.loggerError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsOrgaDetails
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsMaterial
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsPostProcessings
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsModels
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsProperties
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCostsPrinters
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.SReqCosts
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.handlers.public.costs.apiCalculateCosts
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: loggerError
+
+.. py:class:: SReqCostsOrgaDetails(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: powerCosts
+
+
+   .. py:attribute:: margin
+
+
+   .. py:attribute:: personnelCosts
+
+
+   .. py:attribute:: costRatePersonnelEngineering
+
+
+   .. py:attribute:: repairCosts
+
+
+   .. py:attribute:: additionalFixedCosts
+
+
+   .. py:attribute:: costRateEquipmentEngineering
+
+
+   .. py:attribute:: fixedCostsEquipmentEngineering
+
+
+   .. py:attribute:: safetyGasCosts
+
+
+   .. py:attribute:: roomCosts
+
+
+.. py:class:: SReqCostsMaterial(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: density
+
+
+   .. py:attribute:: printingSpeed
+
+
+   .. py:attribute:: acquisitionCosts
+
+
+.. py:class:: SReqCostsPostProcessings(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: fixedCostsPostProcessing
+
+
+   .. py:attribute:: treatmentCostsPostProcessing
+
+
+.. py:class:: SReqCostsModels(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: levelOfDetail
+
+
+   .. py:attribute:: quantity
+
+
+   .. py:attribute:: complexity
+
+
+   .. py:attribute:: height
+
+
+   .. py:attribute:: length
+
+
+   .. py:attribute:: width
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: id
+
+
+.. py:class:: SReqCostsProperties(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: costRatePersonalMachine
+
+
+   .. py:attribute:: chamberBuildHeight
+
+
+   .. py:attribute:: chamberBuildWidth
+
+
+   .. py:attribute:: chamberBuildLength
+
+
+   .. py:attribute:: lossOfMaterial
+
+
+   .. py:attribute:: machineBatchDistance
+
+
+   .. py:attribute:: possibleLayerHeights
+
+
+   .. py:attribute:: machineSurfaceArea
+
+
+   .. py:attribute:: machineSetUpSimple
+
+
+   .. py:attribute:: machineSetUpComplex
+
+
+   .. py:attribute:: averagePowerConsumption
+
+
+   .. py:attribute:: machineUsageCosts
+
+
+   .. py:attribute:: coatingTime
+
+
+   .. py:attribute:: buildRate
+
+
+   .. py:attribute:: fillRate
+
+
+   .. py:attribute:: nozzleDiameter
+
+
+   .. py:attribute:: maxPrintingSpeed
+
+
+.. py:class:: SReqCostsPrinters(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: technology
+
+
+   .. py:attribute:: properties
+
+
+.. py:class:: SReqCosts(instance=None, data=empty, **kwargs)
+
+   Bases: :py:obj:`rest_framework.serializers.Serializer`
+
+
+   The BaseSerializer class provides a minimal class which may be used
+   for writing custom serializer implementations.
+
+   Note that we strongly restrict the ordering of operations/properties
+   that may be used on the serializer in order to enforce correct usage.
+
+   In particular, if a `data=` argument is passed then:
+
+   .is_valid() - Available.
+   .initial_data - Available.
+   .validated_data - Only available after calling `is_valid()`
+   .errors - Only available after calling `is_valid()`
+   .data - Only available after calling `is_valid()`
+
+   If a `data=` argument is not passed then:
+
+   .is_valid() - Not available.
+   .initial_data - Not available.
+   .validated_data - Not available.
+   .errors - Not available.
+   .data - Available.
+
+
+   .. py:attribute:: organization
+
+
+   .. py:attribute:: material
+
+
+   .. py:attribute:: postProcessings
+
+
+   .. py:attribute:: models
+
+
+   .. py:attribute:: printers
+
+
+.. py:function:: apiCalculateCosts(request: rest_framework.request.Request)
+
+   Calculate costs
+
+   :param request: POST Request
+   :type request: HTTP POST
+   :return: 
+   :rtype: Response
+
+
+

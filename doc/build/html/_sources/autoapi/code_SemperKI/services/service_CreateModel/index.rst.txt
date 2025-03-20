@@ -1,0 +1,23 @@
+code_SemperKI.services.service_CreateModel
+==========================================
+
+.. py:module:: code_SemperKI.services.service_CreateModel
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_CreateModel/connections/index
+   /autoapi/code_SemperKI/services/service_CreateModel/definitions/index
+   /autoapi/code_SemperKI/services/service_CreateModel/handlers/index
+   /autoapi/code_SemperKI/services/service_CreateModel/imports/index
+   /autoapi/code_SemperKI/services/service_CreateModel/logics/index
+   /autoapi/code_SemperKI/services/service_CreateModel/service/index
+   /autoapi/code_SemperKI/services/service_CreateModel/tests/index
+   /autoapi/code_SemperKI/services/service_CreateModel/urls/index
+   /autoapi/code_SemperKI/services/service_CreateModel/utilities/index
+
+

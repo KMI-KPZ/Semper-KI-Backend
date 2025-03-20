@@ -1,0 +1,52 @@
+MSQ.handlers.interface
+======================
+
+.. py:module:: MSQ.handlers.interface
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Interface with the message queuing system
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   MSQ.handlers.interface.returnFileFromfTetWild
+   MSQ.handlers.interface.getResultsBack
+   MSQ.handlers.interface.sendExampleLocal
+
+
+Module Contents
+---------------
+
+.. py:function:: returnFileFromfTetWild(filePath: str)
+
+   Only temporary solution
+
+
+
+.. py:function:: getResultsBack(request, taskID)
+
+   Get results from celery worker via ID, dispatch to further handlers
+
+   :param request: Get request, not used
+   :type request: GET
+   :param taskID: The task ID as GET Parameter sent from the remote worker
+   :type taskID: str
+   :return: Response which is not awaited
+   :rtype: HttpResponse
+
+
+.. py:function:: sendExampleLocal(request)
+
+   Send example to worker
+
+
+

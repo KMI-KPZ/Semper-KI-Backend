@@ -1,0 +1,15 @@
+code_SemperKI.services.service_Assembly.handlers
+================================================
+
+.. py:module:: code_SemperKI.services.service_Assembly.handlers
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/services/service_Assembly/handlers/public/index
+
+

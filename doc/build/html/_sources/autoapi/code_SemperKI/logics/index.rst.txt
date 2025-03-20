@@ -1,0 +1,18 @@
+code_SemperKI.logics
+====================
+
+.. py:module:: code_SemperKI.logics
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/code_SemperKI/logics/filesLogics/index
+   /autoapi/code_SemperKI/logics/processLogics/index
+   /autoapi/code_SemperKI/logics/projectLogics/index
+   /autoapi/code_SemperKI/logics/statemachineLogics/index
+
+

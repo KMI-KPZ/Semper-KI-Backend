@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" />
+    <link rel="next" title="code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql" href="../postgresql/index.html" />
+    <link rel="prev" title="code_SemperKI.services.service_AdditiveManufacturing.connections" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql">
+<span id="code-semperki-services-service-additivemanufacturing-connections-filterviasparql"></span><h1>code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql<a class="headerlink" href="#module-code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2023</p>
+<p>Contains: Functions using the sparql queries to filter for contractors</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError" title="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loggerError</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM" title="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FilterAM</span></code></a></p></td>
+<td><p>Filter and save results</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.</span></span><span class="sig-name descname"><span class="pre">loggerError</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.</span></span><span class="sig-name descname"><span class="pre">FilterAM</span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM" title="Link to this definition">¶</a></dt>
+<dd><p>Filter and save results</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.resultGroups">
+<span class="sig-name descname"><span class="pre">resultGroups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.resultGroups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.printerGroups">
+<span class="sig-name descname"><span class="pre">printerGroups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.printerGroups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.errors">
+<span class="sig-name descname"><span class="pre">errors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.errors" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByMaterialAndColor">
+<span class="sig-name descname"><span class="pre">filterByMaterialAndColor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chosenMaterial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chosenColor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupIdx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByMaterialAndColor" title="Link to this definition">¶</a></dt>
+<dd><p>Filter by material choice</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resultDict</strong> (<em>dict</em>) – Where the found manufacturers go</p></li>
+<li><p><strong>chosenMaterials</strong> (<em>dict</em>) – The materials in the serviceDetails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing, result is written in-place</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPostProcessings">
+<span class="sig-name descname"><span class="pre">filterByPostProcessings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chosenPostProcessings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupIdx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPostProcessings" title="Link to this definition">¶</a></dt>
+<dd><p>Filter by post-processings choice, must be called after filterByMaterial</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resultDict</strong> (<em>dict</em>) – Where the found manufacturers go</p></li>
+<li><p><strong>chosenPostProcessings</strong> (<em>dict</em>) – The post-processings in the serviceDetails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing, result is written in-place</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPrinter">
+<span class="sig-name descname"><span class="pre">filterByPrinter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calculations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupIdx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Exception</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPrinter" title="Link to this definition">¶</a></dt>
+<dd><p>Filter by checking properties of the available printers, must be called after filterByPostProcessings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resultDict</strong> (<em>dict</em>) – Where the found manufacturers go</p></li>
+<li><p><strong>calculations</strong> (<em>dict</em>) – The calculations in the serviceDetails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing, result is written in-place</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None|Exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getFilteredContractors">
+<span class="sig-name descname"><span class="pre">getFilteredContractors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processObj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.ProcessInterface" title="code_SemperKI.modelFiles.processModel.ProcessInterface"><span class="pre">code_SemperKI.modelFiles.processModel.ProcessInterface</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../../../../modelFiles/processModel/index.html#code_SemperKI.modelFiles.processModel.Process" title="code_SemperKI.modelFiles.processModel.Process"><span class="pre">code_SemperKI.modelFiles.processModel.Process</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getFilteredContractors" title="Link to this definition">¶</a></dt>
+<dd><p>Get the filtered contractors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Object with list of suitable contractors</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getPrintersOfAContractor">
+<span class="sig-name descname"><span class="pre">getPrintersOfAContractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contractorID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupIdx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getPrintersOfAContractor" title="Link to this definition">¶</a></dt>
+<dd><p>Get the printers of a contractor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>contractorID</strong> (<em>str</em>) – The contractor in question</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of printers</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../modelFiles/index.html">code_SemperKI.modelFiles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../../../index.html">code_SemperKI.services</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l8 current"><a class="reference internal" href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a><ul class="current">
+<li class="toctree-l9 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l10 current"><a class="current reference internal" href="#">code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql</a><ul>
+<li class="toctree-l11"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l11"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.loggerError"><code class="docutils literal notranslate"><span class="pre">loggerError</span></code></a></li>
+<li class="toctree-l12"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM"><code class="docutils literal notranslate"><span class="pre">FilterAM</span></code></a><ul>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.resultGroups"><code class="docutils literal notranslate"><span class="pre">FilterAM.resultGroups</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.printerGroups"><code class="docutils literal notranslate"><span class="pre">FilterAM.printerGroups</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.errors"><code class="docutils literal notranslate"><span class="pre">FilterAM.errors</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByMaterialAndColor"><code class="docutils literal notranslate"><span class="pre">FilterAM.filterByMaterialAndColor()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPostProcessings"><code class="docutils literal notranslate"><span class="pre">FilterAM.filterByPostProcessings()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.filterByPrinter"><code class="docutils literal notranslate"><span class="pre">FilterAM.filterByPrinter()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getFilteredContractors"><code class="docutils literal notranslate"><span class="pre">FilterAM.getFilteredContractors()</span></code></a></li>
+<li class="toctree-l13"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.filterViaSparql.FilterAM.getPrintersOfAContractor"><code class="docutils literal notranslate"><span class="pre">FilterAM.getPrintersOfAContractor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l10"><a class="reference internal" href="../postgresql/index.html">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.services.service_AdditiveManufacturing.definitions</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.services.service_AdditiveManufacturing.handlers</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../imports/index.html">code_SemperKI.services.service_AdditiveManufacturing.imports</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../logics/index.html">code_SemperKI.services.service_AdditiveManufacturing.logics</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../modelFiles/index.html">code_SemperKI.services.service_AdditiveManufacturing.modelFiles</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../service/index.html">code_SemperKI.services.service_AdditiveManufacturing.service</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.services.service_AdditiveManufacturing.tasks</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../tests/index.html">code_SemperKI.services.service_AdditiveManufacturing.tests</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../urls/index.html">code_SemperKI.services.service_AdditiveManufacturing.urls</a></li>
+<li class="toctree-l8"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.services.service_AdditiveManufacturing.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_AfterSales/index.html">code_SemperKI.services.service_AfterSales</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Assembly/index.html">code_SemperKI.services.service_Assembly</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_CreateModel/index.html">code_SemperKI.services.service_CreateModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Delivery/index.html">code_SemperKI.services.service_Delivery</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_Packaging/index.html">code_SemperKI.services.service_Packaging</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_PostProcessing/index.html">code_SemperKI.services.service_PostProcessing</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../service_QualityControl/index.html">code_SemperKI.services.service_QualityControl</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">API Reference</a><ul>
+  <li><a href="../../../../index.html">code_SemperKI</a><ul>
+  <li><a href="../../../index.html">code_SemperKI.services</a><ul>
+  <li><a href="../../index.html">code_SemperKI.services.service_AdditiveManufacturing</a><ul>
+  <li><a href="../index.html">code_SemperKI.services.service_AdditiveManufacturing.connections</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">code_SemperKI.services.service_AdditiveManufacturing.connections</a></li>
+      <li>Next: <a href="../postgresql/index.html" title="next chapter">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../../../_sources/autoapi/code_SemperKI/services/service_AdditiveManufacturing/connections/filterViaSparql/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

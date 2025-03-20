@@ -1,0 +1,15 @@
+code_SemperKI.services.service_Packaging.connections.postgresql.pgKG
+====================================================================
+
+.. py:module:: code_SemperKI.services.service_Packaging.connections.postgresql.pgKG
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Am specific database knowledge graph stuff 
+
+
+

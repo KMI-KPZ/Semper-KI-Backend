@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>code_SemperKI.modelFiles.nodesModel &#8212; KISS-backend 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="code_SemperKI.modelFiles.processModel" href="../processModel/index.html" />
+    <link rel="prev" title="code_SemperKI.modelFiles.dataModel" href="../dataModel/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-code_SemperKI.modelFiles.nodesModel">
+<span id="code-semperki-modelfiles-nodesmodel"></span><h1>code_SemperKI.modelFiles.nodesModel<a class="headerlink" href="#module-code_SemperKI.modelFiles.nodesModel" title="Link to this heading">¶</a></h1>
+<p>Part of Semper-KI software</p>
+<p>Silvio Weging 2024</p>
+<p>Contains: Model for database version of the Knowledge Graph</p>
+<section id="attributes">
+<h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.defaultOwner" title="code_SemperKI.modelFiles.nodesModel.defaultOwner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultOwner</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription" title="code_SemperKI.modelFiles.nodesModel.NodeDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeDescription</span></code></a></p></td>
+<td><p>What does a node consists of?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeType" title="code_SemperKI.modelFiles.nodesModel.NodeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeType</span></code></a></p></td>
+<td><p>What are the possible types of a node?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeProperties" title="code_SemperKI.modelFiles.nodesModel.NodeProperties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeProperties</span></code></a></p></td>
+<td><p>What are the properties, a node can have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription" title="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyDescription</span></code></a></p></td>
+<td><p>How is a property structured?</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries" title="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries</span></code></a></p></td>
+<td><p>What types can a property object have?</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node" title="code_SemperKI.modelFiles.nodesModel.Node"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Node</span></code></a></p></td>
+<td><p>The class of a node containing different information, depending on it's type.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">NodeDescription</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What does a node consists of?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.uniqueID">
+<span class="sig-name descname"><span class="pre">uniqueID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.uniqueID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.context" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.createdBy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.clonedFrom">
+<span class="sig-name descname"><span class="pre">clonedFrom</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.clonedFrom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.updatedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeDescription.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.accessedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">NodeType</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the possible types of a node?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeType.organization">
+<span class="sig-name descname"><span class="pre">organization</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeType.organization" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeProperties">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">NodeProperties</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeProperties" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What are the properties, a node can have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodeProperties.imgPath">
+<span class="sig-name descname"><span class="pre">imgPath</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodeProperties.imgPath" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">NodePropertyDescription</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>How is a property structured?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.key">
+<span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.unit">
+<span class="sig-name descname"><span class="pre">unit</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.unit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">NodePropertiesTypesOfEntries</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined</span></code></p>
+<p>What types can a property object have?</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.number">
+<span class="sig-name descname"><span class="pre">number</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.number" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.string">
+<span class="sig-name descname"><span class="pre">string</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.string" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.array">
+<span class="sig-name descname"><span class="pre">array</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.array" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.defaultOwner">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">defaultOwner</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SYSTEM'</span></em><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.defaultOwner" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">code_SemperKI.modelFiles.nodesModel.</span></span><span class="sig-name descname"><span class="pre">Node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">django.db.models.Model</span></code></p>
+<p>The class of a node containing different information, depending on it’s type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">NodeID<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The ID for that node</p>
+</dd>
+<dt class="field-even">UniqueID<span class="colon">:</span></dt>
+<dd class="field-even"><p>An ID, that is resistant to cloning</p>
+</dd>
+<dt class="field-odd">NodeName<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of that node</p>
+</dd>
+<dt class="field-even">NodeType<span class="colon">:</span></dt>
+<dd class="field-even"><p>The type of the node as described in the respective Enum</p>
+</dd>
+<dt class="field-odd">Context<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some information about the node, can be anything</p>
+</dd>
+<dt class="field-even">Properties<span class="colon">:</span></dt>
+<dd class="field-even"><p>The properties that this node has, depends on the type</p>
+</dd>
+<dt class="field-odd">Edges<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The nodes connected to this one, symmetrical (so it’s an undirected graph)</p>
+</dd>
+<dt class="field-even">CreatedBy<span class="colon">:</span></dt>
+<dd class="field-even"><p>Who created that node? (hashedID or SYSTEM)</p>
+</dd>
+<dt class="field-odd">ClonedFrom<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parent from which the node was cloned</p>
+</dd>
+<dt class="field-even">Active<span class="colon">:</span></dt>
+<dd class="field-even"><p>Is that node currently active or not?</p>
+</dd>
+<dt class="field-odd">CreatedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Automatically assigned date and time(UTC+0) when the entry is created</p>
+</dd>
+<dt class="field-even">UpdatedWhen<span class="colon">:</span></dt>
+<dd class="field-even"><p>Date and time at which the entry was updated</p>
+</dd>
+<dt class="field-odd">AccessedWhen<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Last date and time the entry was fetched from the database, automatically set</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.nodeID">
+<span class="sig-name descname"><span class="pre">nodeID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.uniqueID">
+<span class="sig-name descname"><span class="pre">uniqueID</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.uniqueID" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.nodeName">
+<span class="sig-name descname"><span class="pre">nodeName</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeName" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.nodeType">
+<span class="sig-name descname"><span class="pre">nodeType</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.context">
+<span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.context" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.properties">
+<span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.properties" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.edges" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.createdBy">
+<span class="sig-name descname"><span class="pre">createdBy</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.createdBy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.clonedFrom">
+<span class="sig-name descname"><span class="pre">clonedFrom</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.clonedFrom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.active" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.createdWhen">
+<span class="sig-name descname"><span class="pre">createdWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.createdWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.updatedWhen">
+<span class="sig-name descname"><span class="pre">updatedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.updatedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.accessedWhen">
+<span class="sig-name descname"><span class="pre">accessedWhen</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.accessedWhen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.Meta" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.Meta.indexes">
+<span class="sig-name descname"><span class="pre">indexes</span></span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.Meta.indexes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.__str__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="code_SemperKI.modelFiles.nodesModel.Node.toDict">
+<span class="sig-name descname"><span class="pre">toDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.modelFiles.nodesModel.Node.toDict" title="Link to this definition">¶</a></dt>
+<dd><p>Return only the node information, not the whole graph</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">KISS-backend</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../MSQ/index.html">MSQ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../conf/index.html">conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/index.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/index.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../manage/index.html">manage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickDebug/index.html">quickDebug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../code_General/index.html">code_General</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">code_SemperKI</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../apps/index.html">code_SemperKI.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../connections/index.html">code_SemperKI.connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../definitions/index.html">code_SemperKI.definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../handlers/index.html">code_SemperKI.handlers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../imports/index.html">code_SemperKI.imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../logics/index.html">code_SemperKI.logics</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">code_SemperKI.modelFiles</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../dataModel/index.html">code_SemperKI.modelFiles.dataModel</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">code_SemperKI.modelFiles.nodesModel</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#attributes">Attributes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription"><code class="docutils literal notranslate"><span class="pre">NodeDescription</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeID"><code class="docutils literal notranslate"><span class="pre">NodeDescription.nodeID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.uniqueID"><code class="docutils literal notranslate"><span class="pre">NodeDescription.uniqueID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeName"><code class="docutils literal notranslate"><span class="pre">NodeDescription.nodeName</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.nodeType"><code class="docutils literal notranslate"><span class="pre">NodeDescription.nodeType</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.context"><code class="docutils literal notranslate"><span class="pre">NodeDescription.context</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.properties"><code class="docutils literal notranslate"><span class="pre">NodeDescription.properties</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.edges"><code class="docutils literal notranslate"><span class="pre">NodeDescription.edges</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.createdBy"><code class="docutils literal notranslate"><span class="pre">NodeDescription.createdBy</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.clonedFrom"><code class="docutils literal notranslate"><span class="pre">NodeDescription.clonedFrom</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.active"><code class="docutils literal notranslate"><span class="pre">NodeDescription.active</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.createdWhen"><code class="docutils literal notranslate"><span class="pre">NodeDescription.createdWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.updatedWhen"><code class="docutils literal notranslate"><span class="pre">NodeDescription.updatedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeDescription.accessedWhen"><code class="docutils literal notranslate"><span class="pre">NodeDescription.accessedWhen</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeType"><code class="docutils literal notranslate"><span class="pre">NodeType</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeType.organization"><code class="docutils literal notranslate"><span class="pre">NodeType.organization</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeProperties"><code class="docutils literal notranslate"><span class="pre">NodeProperties</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodeProperties.imgPath"><code class="docutils literal notranslate"><span class="pre">NodeProperties.imgPath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.name"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription.name</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.key"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription.key</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.value"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription.value</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.unit"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription.unit</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertyDescription.type"><code class="docutils literal notranslate"><span class="pre">NodePropertyDescription.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries"><code class="docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.number"><code class="docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries.number</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.text"><code class="docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries.text</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.string"><code class="docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries.string</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.NodePropertiesTypesOfEntries.array"><code class="docutils literal notranslate"><span class="pre">NodePropertiesTypesOfEntries.array</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.defaultOwner"><code class="docutils literal notranslate"><span class="pre">defaultOwner</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node"><code class="docutils literal notranslate"><span class="pre">Node</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeID"><code class="docutils literal notranslate"><span class="pre">Node.nodeID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.uniqueID"><code class="docutils literal notranslate"><span class="pre">Node.uniqueID</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeName"><code class="docutils literal notranslate"><span class="pre">Node.nodeName</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.nodeType"><code class="docutils literal notranslate"><span class="pre">Node.nodeType</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.context"><code class="docutils literal notranslate"><span class="pre">Node.context</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.properties"><code class="docutils literal notranslate"><span class="pre">Node.properties</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.edges"><code class="docutils literal notranslate"><span class="pre">Node.edges</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.createdBy"><code class="docutils literal notranslate"><span class="pre">Node.createdBy</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.clonedFrom"><code class="docutils literal notranslate"><span class="pre">Node.clonedFrom</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.active"><code class="docutils literal notranslate"><span class="pre">Node.active</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.createdWhen"><code class="docutils literal notranslate"><span class="pre">Node.createdWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.updatedWhen"><code class="docutils literal notranslate"><span class="pre">Node.updatedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.accessedWhen"><code class="docutils literal notranslate"><span class="pre">Node.accessedWhen</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.Meta"><code class="docutils literal notranslate"><span class="pre">Node.Meta</span></code></a><ul>
+<li class="toctree-l10"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.Meta.indexes"><code class="docutils literal notranslate"><span class="pre">Node.Meta.indexes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.__str__"><code class="docutils literal notranslate"><span class="pre">Node.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#code_SemperKI.modelFiles.nodesModel.Node.toDict"><code class="docutils literal notranslate"><span class="pre">Node.toDict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../processModel/index.html">code_SemperKI.modelFiles.processModel</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../projectModel/index.html">code_SemperKI.modelFiles.projectModel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../models/index.html">code_SemperKI.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../serviceManager/index.html">code_SemperKI.serviceManager</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../services/index.html">code_SemperKI.services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../settings/index.html">code_SemperKI.settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../states/index.html">code_SemperKI.states</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tasks/index.html">code_SemperKI.tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/index.html">code_SemperKI.tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../urls/index.html">code_SemperKI.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utilities/index.html">code_SemperKI.utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../BenchyMcMarkface/index.html">BenchyMcMarkface</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">code_SemperKI</a><ul>
+  <li><a href="../index.html">code_SemperKI.modelFiles</a><ul>
+      <li>Previous: <a href="../dataModel/index.html" title="previous chapter">code_SemperKI.modelFiles.dataModel</a></li>
+      <li>Next: <a href="../processModel/index.html" title="next chapter">code_SemperKI.modelFiles.processModel</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Silvio Weging.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/code_SemperKI/modelFiles/nodesModel/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -4,6 +4,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Services for the sparql endpoint
+
 """
 
 import copy

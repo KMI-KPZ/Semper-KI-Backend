@@ -4,8 +4,10 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Metaclass that handles the services
+
 """
 import enum, copy
+
 
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
@@ -34,6 +36,14 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
+    def initializeServiceDetails(self, serviceDetails:dict) -> dict:
+        """
+        Initialize the service
+
+        """
+
+    ###################################################
+    @abstractmethod
     def updateServiceDetails(self, existingContent, newContent):
         """
         Update a service
@@ -45,6 +55,22 @@ class ServiceBase(ABC):
     def deleteServiceDetails(self, existingContent, deletedContent):
         """
         Delete stuff from a service
+
+        """
+
+    ###################################################
+    @abstractmethod
+    def isFileRelevantForService(self, existingContent, fileID:str) -> bool:
+        """
+        Check if a file is relevant for the service
+
+        """
+    
+    ###################################################
+    @abstractmethod
+    def parseServiceDetails(self, existingContent) -> dict:
+        """
+        Parse the service details for Frontend
 
         """
 
@@ -89,9 +115,33 @@ class ServiceBase(ABC):
 
     ###################################################
     @abstractmethod
-    def getFilteredContractors(self, processObj) -> tuple[list, object]:
+    def getFilteredContractors(self, processObj) -> tuple[dict, object]:
         """
         Get a list of contractors that can do the job
+
+        """
+
+    ###################################################
+    @abstractmethod
+    def getServiceSpecificContractorDetails(self, existingDetails:dict, contractor:object) -> dict:
+        """
+        Get the service specific details for a contractor
+
+        """
+    
+    ###################################################
+    @abstractmethod
+    def serviceSpecificTasks(self, session, processObj, validationResults:dict) -> dict|Exception:
+        """
+        Do service specific tasks
+
+        """
+
+    ###################################################
+    @abstractmethod
+    def getSearchableDetails(self, existingContent) -> list:
+        """
+        Get the details for the search index as a string list
 
         """
 
@@ -104,6 +154,7 @@ class ServicesStructure(StrEnumExactlyAsDefined):
     object = enum.auto()
     name = enum.auto()
     identifier = enum.auto()
+    imgPath = enum.auto()
 
 ######################################################
 class _ServicesManager():
@@ -118,10 +169,11 @@ class _ServicesManager():
         self._defaultName = "None"
         self._defaultIdx = 0
         self._services = {}
-        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx} 
+        self._imgPath = ""
+        self._services[self._defaultIdx] = {ServicesStructure.object: None, ServicesStructure.name: self._defaultName, ServicesStructure.identifier: self._defaultIdx, ServicesStructure.imgPath: self._imgPath} 
 
     ###################################################
-    def register(self, name:str, identifier:int, serviceClassObject):
+    def register(self, name:str, identifier:int, serviceClassObject, imgPath:str) -> None:
         """
         Registers a new service class
         
@@ -133,7 +185,7 @@ class _ServicesManager():
         :type kwargs: Any
         """
 
-        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier}
+        self._services[identifier] = {ServicesStructure.object: serviceClassObject, ServicesStructure.name: name, ServicesStructure.identifier: identifier, ServicesStructure.imgPath: imgPath}
 
     ###################################################
     def getNone(self) -> int:
@@ -157,6 +209,19 @@ class _ServicesManager():
         """
 
         return self._services[savedService][ServicesStructure.object]
+    
+    ###################################################
+    def getImgPath(self, savedService : int) -> str:
+        """
+        Depending on the service, select the correct Image path
+
+        :param savedService: The selected service saved in the dictionary _services
+        :type savedService: int
+        :return: The respective Image path
+        :rtype: str
+        """
+
+        return self._services[savedService][ServicesStructure.imgPath]
 
     ####################################################################################
     def getAllServices(self) -> list:

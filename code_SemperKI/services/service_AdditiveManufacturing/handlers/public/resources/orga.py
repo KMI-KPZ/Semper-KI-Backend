@@ -27,14 +27,18 @@ from Generic_Backend.code_General.connections.postgresql.pgProfiles import Profi
 
 from code_SemperKI.definitions import *
 from code_SemperKI.handlers.private.knowledgeGraphDB import SReqCreateNode, SReqUpdateNode, SResGraphForFrontend, SResNode, SResProperties
-from code_SemperKI.services.service_AdditiveManufacturing.utilities.basics import checkIfOrgaHasAMAsService
 from code_SemperKI.utilities.basics import *
+from code_SemperKI.utilities.locales import manageTranslations
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 
+
+from ....definitions import *
+from ....logics.orgaLogic import logicForCloneTestGraphToOrgaForTests
+from ....utilities.basics import checkIfOrgaHasAMAsService
 from ....utilities import sparqlQueries
-from ....service import SERVICE_NUMBER
+from ....service import SERVICE_NUMBER, SERVICE_NAME
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -72,7 +76,7 @@ def orga_getGraph(request:Request):
     try:
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
 
-        result = pgKnowledgeGraph.Basics.getGraph(orgaID)
+        result = pgKnowledgeGraph.Basics.getGraph(orgaID, [NodeTypesAM.technology.value, NodeTypesAM.materialCategory.value])
         if isinstance(result, Exception):
             raise result
         outDict = {"Nodes": [], "Edges": []}
@@ -206,7 +210,12 @@ def orga_getNodes(request:Request, resourceType:str):
             raise result
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-                
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},nodes of type {resourceType} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)
@@ -264,16 +273,21 @@ def orga_getNodeViaID(request:Request, nodeID:str):
         if nodeInfo.createdBy != orgaID and nodeInfo.createdBy != pgKnowledgeGraph.defaultOwner:
             message = f"Rights not sufficient in {orga_getNodeViaID.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
             else:
                 return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        nodeDict = nodeInfo.toDict()
+        for propIdx, prop in enumerate(nodeDict[pgKnowledgeGraph.NodeDescription.properties]):
+            nodeDict[pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
-        outSerializer = SResNode(data=nodeInfo.toDict())
+        outSerializer = SResNode(data=nodeDict)
         if outSerializer.is_valid():
             return Response(outSerializer.data, status=status.HTTP_200_OK)
         else:
@@ -326,7 +340,12 @@ def orga_getAssociatedResources(request:Request, nodeID:str, resourceType:str):
         
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-                
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},connected nodes of type {resourceType} from node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)
@@ -383,7 +402,12 @@ def orga_getNeighbors(request:Request, nodeID:str):
         
         # remove nodes not belonging to the system or the orga
         filteredOutput = [entry for entry in result if entry[pgKnowledgeGraph.NodeDescription.createdBy] == orgaID or entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
-        
+        locale = ProfileManagementOrganization.getUserLocale(request.session)
+        for elemIdx, elem in enumerate(filteredOutput):
+            for propIdx, prop in enumerate(elem[pgKnowledgeGraph.NodeDescription.properties]):
+                filteredOutput[elemIdx][pgKnowledgeGraph.NodeDescription.properties][propIdx][pgKnowledgeGraph.NodePropertyDescription.name] = manageTranslations.getTranslation(locale, ["service",SERVICE_NAME,prop[pgKnowledgeGraph.NodePropertyDescription.key]])
+
+
         logger.info(f"{Logging.Subject.USER},{ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.FETCHED},fetched,{Logging.Object.OBJECT},neighboring nodes of node {nodeID} of orga {orgaID}," + str(datetime.now()))
 
         outSerializer = SResNode(data=filteredOutput, many=True)
@@ -456,7 +480,7 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_createOrUpdateAndLinkNodes.cls.__name__}"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -467,63 +491,97 @@ def orga_createOrUpdateAndLinkNodes(request:Request):
         orgaID = ProfileManagementOrganization.getOrganizationHashID(request.session)
         
         if validatedInput["type"] == "create":
-            # create node for the orga and link it to the orga
-            if "nodeID" in validatedInput["node"]:
-                del validatedInput["node"]["nodeID"]
+            #if "nodeID" in validatedInput["node"]:
+            #    del validatedInput["node"]["nodeID"]
             resultNode = pgKnowledgeGraph.Basics.createNode(validatedInput["node"], orgaID)
             if isinstance(resultNode, Exception):
                 raise resultNode
             exceptionOrNone = pgKnowledgeGraph.Basics.createEdge(orgaID, resultNode.nodeID) 
             if isinstance(exceptionOrNone, Exception):
                 raise exceptionOrNone
-            # create edges
-            for nodeIDFromEdge in validatedInput["edges"]["create"]:
-                # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
-                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
-                if isinstance(otherNode, Exception):
-                    raise otherNode
-
-                nodeIDToBeConnected = otherNode.nodeID
-                if otherNode.createdBy != orgaID:
-                    copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
-                    if isinstance(copiedNode, Exception):
-                        raise copiedNode
-                    nodeIDToBeConnected = copiedNode.nodeID
-
-                # create edge to new node
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
-                if isinstance(result, Exception):
-                    raise result
-                # create edge to orga
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
-                if isinstance(result, Exception):
-                    raise result
+            
             # remove edges
             for nodeIDFromEdge in validatedInput["edges"]["delete"]:
                 result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
+                
+            # create edges
+            connectedToSystem = False
+            for nodeIDFromEdge in validatedInput["edges"]["create"]:
+                # check if node of the other side of the edge comes from the system and if so, create an orga copy of it
+                otherNode = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
+                if isinstance(otherNode, Exception):
+                    raise otherNode
+                if otherNode.nodeType != NodeTypesAM.technology.value and otherNode.nodeType != NodeTypesAM.materialCategory.value and otherNode.nodeType != NodeTypesAM.materialType.value:
+                    nodeIDToBeConnected = otherNode.nodeID
+                    if otherNode.createdBy != orgaID:
+                        connectedToSystem = True
+                        copiedNode = pgKnowledgeGraph.Basics.copyNode(otherNode, orgaID)
+                        if isinstance(copiedNode, Exception):
+                            raise copiedNode
+                        nodeIDToBeConnected = copiedNode.nodeID
+                        # if the new node is a material or printer, make connection to its category
+                        if otherNode.nodeType == NodeTypesAM.material.value:
+                            categoryToBeConnected = NodeTypesAM.materialCategory.value
+                        elif otherNode.nodeType == NodeTypesAM.printer.value:
+                            categoryToBeConnected = NodeTypesAM.technology.value
+                        else:
+                            categoryToBeConnected = None
 
+                        if categoryToBeConnected is not None:
+                            result = pgKnowledgeGraph.Basics.getSpecificNeighborsByType(otherNode.nodeID,categoryToBeConnected)
+                            if isinstance(result, Exception):
+                                raise result
+                            for categoryNode in result:
+                                if categoryNode[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner:
+                                    newResult = pgKnowledgeGraph.Basics.createEdge(categoryNode[pgKnowledgeGraph.NodeDescription.nodeID], copiedNode.nodeID)
+                                    if isinstance(newResult, Exception):
+                                        raise newResult
+                                    break     
+                    # create edge to new node
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, resultNode.nodeID) 
+                    if isinstance(result, Exception):
+                        raise result
+                    # create edge to orga
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDToBeConnected, orgaID)
+                    if isinstance(result, Exception):
+                        raise result
+                else:
+                    # create edge to system category
+                    result = pgKnowledgeGraph.Basics.createEdge(otherNode.nodeID, resultNode.nodeID) 
+                    if isinstance(result, Exception):
+                        raise result
+            # if the node is not connected to any system node, look for the most similar one and connect that or create a new one
+            if not connectedToSystem:
+                result = pgKnowledgeGraph.Logic.checkIfSimilarNodeExists(resultNode.nodeID)
+                if isinstance(result, Exception):
+                    raise result
+            
         elif validatedInput["type"] == "update":
             # update node
             resultNode = pgKnowledgeGraph.Basics.updateNode(validatedInput["node"]["nodeID"], validatedInput["node"])
             if isinstance(resultNode, Exception):
                 raise resultNode
+            # remove edges
+            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
+                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
+                if isinstance(result, Exception):
+                    raise result
             # create edges
             for nodeIDFromEdge in validatedInput["edges"]["create"]:
                 # create edge to new node
                 result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, resultNode.nodeID) 
                 if isinstance(result, Exception):
                     raise result
-                # create edge to orga
-                result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
+                # create edge to orga if necessary
+                result = pgKnowledgeGraph.Basics.getNode(nodeIDFromEdge)
                 if isinstance(result, Exception):
                     raise result
-            # remove edges
-            for nodeIDFromEdge in validatedInput["edges"]["delete"]:
-                result = pgKnowledgeGraph.Basics.deleteEdge(resultNode.nodeID, nodeIDFromEdge)
-                if isinstance(result, Exception):
-                    raise result
+                if result.nodeType != NodeTypesAM.technology.value and result.nodeType != NodeTypesAM.materialCategory.value and result.nodeType != NodeTypesAM.materialType.value:
+                    result = pgKnowledgeGraph.Basics.createEdge(nodeIDFromEdge, orgaID)
+                    if isinstance(result, Exception):
+                        raise result
         else:
             return Response("Wrong type in input!", status=status.HTTP_400_BAD_REQUEST)
 
@@ -575,7 +633,7 @@ def orga_createNode(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_createNode.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -654,7 +712,7 @@ def orga_updateNode(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_updateNode.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -680,7 +738,7 @@ def orga_updateNode(request:Request):
         if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_updateNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -757,7 +815,7 @@ def orga_deleteNode(request:Request, nodeID:str):
         if result.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -821,7 +879,7 @@ def orga_addEdgesToOrga(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgesToOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -903,7 +961,7 @@ def orga_addEdgeForOrga(request:Request):
         if not serializedInput.is_valid():
             message = f"Verification failed in {orga_addEdgeForOrga.cls.__name__}"
             exception = f"Verification failed {serializedInput.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -1058,7 +1116,7 @@ def orga_removeEdge(request:Request, entity1ID:str, entity2ID:str):
         if result1.createdBy != orgaID and result2.createdBy != orgaID:
             message = f"Rights not sufficient in {orga_deleteNode.cls.__name__}"
             exception = "Unauthorized"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_401_UNAUTHORIZED)
@@ -1215,7 +1273,7 @@ def orga_makeRequestForAdditions(request:Request):
         if not inSerializer.is_valid():
             message = f"Verification failed in {orga_makeRequestForAdditions.cls.__name__   }"
             exception = f"Verification failed {inSerializer.errors}"
-            logger.error(message)
+            loggerError.error(message)
             exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
             if exceptionSerializer.is_valid():
                 return Response(exceptionSerializer.data, status=status.HTTP_400_BAD_REQUEST)
@@ -1227,6 +1285,49 @@ def orga_makeRequestForAdditions(request:Request):
         return Response("Success", status=status.HTTP_200_OK)
     except (Exception) as error:
         message = f"Error in {orga_makeRequestForAdditions.cls.__name__}: {str(error)}"
+        exception = str(error)
+        loggerError.error(message)
+        exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})
+        if exceptionSerializer.is_valid():
+            return Response(exceptionSerializer.data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+#######################################################
+
+#######################################################
+@extend_schema(
+    summary="Clone the test graph to the orga for the tests",
+    description=" ",
+    tags=['BE - AM Resources Organization'],
+    request=None,
+    responses={
+        200: None,
+        401: ExceptionSerializer,
+        500: ExceptionSerializer
+    }
+)
+@checkIfUserIsLoggedIn()
+@require_http_methods(["GET"])
+@api_view(["GET"])
+@checkVersion(0.3)
+def cloneTestGraphToOrgaForTests(request:Request):
+    """
+    Clone the test graph to the orga for the tests
+
+    :param request: GET Request
+    :type request: HTTP GET
+    :return: Nothing
+    :rtype: Response
+
+    """
+    try:
+        result = logicForCloneTestGraphToOrgaForTests(request)
+        if isinstance(result, Exception):
+            raise result
+        return Response("Success", status=status.HTTP_200_OK)
+    except (Exception) as error:
+        message = f"Error in {cloneTestGraphToOrgaForTests.cls.__name__}: {str(error)}"
         exception = str(error)
         loggerError.error(message)
         exceptionSerializer = ExceptionSerializer(data={"message": message, "exception": exception})

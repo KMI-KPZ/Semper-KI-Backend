@@ -1,0 +1,553 @@
+code_SemperKI.connections.content.session
+=========================================
+
+.. py:module:: code_SemperKI.connections.content.session
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2024
+
+   Contains: Offers an interface to access the session dictionary in a structured way
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.session.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.connections.content.session.StructuredSession
+   code_SemperKI.connections.content.session.ProcessManagementSession
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: StructuredSession(session)
+
+   Interface class that handles the session content
+
+
+
+   .. py:attribute:: currentSession
+      :type:  dict
+
+
+   .. py:method:: getSession()
+
+      Return current session
+
+
+
+
+   .. py:method:: getIfContentIsInSession() -> bool
+
+      Tell whether there is content in the session
+
+      :return: if there are projects in the session, use these and tell the this
+      :rtype: bool
+
+
+
+
+   .. py:method:: clearContentFromSession() -> None
+
+      Delete all projects from session
+
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: getProject(projectID: str) -> dict
+
+      Return specific project from session
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :return: Dictionary with project in it
+      :rtype: dict
+
+
+
+
+   .. py:method:: getProjects() -> list
+
+      Return all projects from session
+
+      :return: list with projects in it
+      :rtype: list
+
+
+
+
+   .. py:method:: setProject(projectID: str, content: dict) -> None
+
+      Set content of project in session
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param content: What the project should consist of
+      :type content: dict
+      :return: Nothing
+      :rtype: None
+
+
+
+   .. py:method:: deleteProject(projectID: str)
+
+      Delete the project
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :return: Nothing
+      :rtype: None
+
+
+
+   .. py:method:: getProcesses(projectID: str)
+
+      Return the process from session
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :return: dict of process
+      :rtype: dict
+
+
+
+
+   .. py:method:: getProcess(projectID: str, processID: str)
+
+      Return the process from session
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Dictionary with process in it
+      :rtype: Dict
+
+
+
+
+   .. py:method:: getProcessPerID(processID: str)
+
+      Get process without project ID
+
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Dictionary with process in it
+      :rtype: dict
+
+
+
+
+   .. py:method:: getProcessAndProjectPerID(processID: str)
+
+      Get process without project ID but return it
+
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Corresponding projectID and dictionary with process in it
+      :rtype: (str,dict)
+
+
+
+
+   .. py:method:: setProcess(projectID: str, processID: str, content: dict)
+
+      Set content of process in session
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :param content: What the process should consist of
+      :type content: dict
+      :return: Nothing
+      :rtype: None
+
+
+
+   .. py:method:: deleteProcess(processID: str)
+
+      Delete one specific process
+
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+.. py:class:: ProcessManagementSession(session)
+
+   Bases: :py:obj:`code_SemperKI.connections.content.abstractInterface.AbstractContentInterface`
+
+
+   Offers an interface equal to that of the postgres, albeit session based
+
+
+
+   .. py:attribute:: structuredSessionObj
+
+
+   .. py:method:: getSession()
+
+      Get the session
+
+      :return: The session 
+      :rtype: Django session obj (dict)
+
+
+
+   .. py:method:: getUserID() -> str
+
+      Retrieve UserID from session
+
+      :return: UserID
+      :rtype: str
+
+
+
+   .. py:method:: getActualUserID() -> str
+
+      Retrieve the user behind the organization
+
+      :return: UserID
+      :rtype: str
+
+
+
+   .. py:method:: checkIfUserIsClient(userHashID, projectID='', processID='')
+
+      See if the user is the client of either the project or the process
+
+      :param userHashID: The hashed ID of the user/organization
+      :type userHashID: str
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: True if user is client, false if not
+      :rtype: bool
+
+
+
+   .. py:method:: getData(processID, processObj=None)
+
+      Get all data entries for a process
+
+      :param processID: The ID of the process
+      :type processID: str
+      :return: List of data entries
+      :rtype: list
+
+
+
+   .. py:method:: getDataWithContentID(processID, contentID)
+
+      Get data entries for a process with a specific content ID
+
+      :param processID: The ID of the process
+      :type processID: str
+      :param contentID: The content ID to search for
+      :type contentID: str
+      :return: List of matching data entries
+      :rtype: list
+
+
+
+   .. py:method:: getDataWithID(processID, dataID)
+
+      Get a specific data entry for a process
+
+      :param processID: The ID of the process
+      :type processID: str
+      :param dataID: The data ID to search for
+      :type dataID: str
+      :return: The matching data entry or None
+      :rtype: dict or None
+
+
+
+   .. py:method:: getDataByType(processID, dataType)
+
+      Get data entries for a process of a specific type
+
+      :param processID: The ID of the process
+      :type processID: str
+      :param dataType: The data type to search for
+      :type dataType: DataType
+      :return: List of matching data entries
+      :rtype: list
+
+
+
+   .. py:method:: getIfContentIsInSession() -> bool
+
+      Tell management class whether there is content in the session
+
+      :return: if there are projects in the session, use these and tell the management class this
+      :rtype: bool
+
+
+
+
+   .. py:method:: getProjectObj(projectID: str)
+
+      Return the project and all its details
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :return: Project Object
+      :rtype: ProjectInterface
+
+
+
+
+   .. py:method:: createProject(projectID: str, client: str)
+
+      Create the project
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param client: anonymous client, necessary for interface
+      :type client: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: getProject(projectID: str) -> dict
+
+      Get info about one project.
+
+      :param projectID: ID of the project
+      :type projectID: str
+      :return: dict with info about that project
+      :rtype: dict
+
+
+
+
+   .. py:method:: updateProject(projectID: str, updateType: code_SemperKI.definitions.ProjectUpdates, content: dict)
+
+      Change details of an project like its status. 
+
+      :param projectID: project ID that this project belongs to
+      :type projectID: str
+      :param updateType: changed project details
+      :type updateType: EnumUpdates
+      :param content: changed project, can be many stuff
+      :type content: json dict
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: deleteProject(projectID: str)
+
+      Delete specific project.
+
+      :param projectID: unique project ID to be deleted
+      :type projectID: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: getProjectsFlat(session)
+
+      Get all projects for that user but with limited detail.
+
+      :param session: session of that user, not used here
+      :type session: dict
+      :return: sorted list with projects
+      :rtype: list
+
+
+
+
+   .. py:method:: getProcessObj(projectID: str, processID: str) -> code_SemperKI.modelFiles.processModel.ProcessInterface
+
+      Return the process and all its details
+
+      :param projectID: The ID of the project (can be empty)
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Process Object
+      :rtype: ProcessInterface
+
+
+
+   .. py:method:: getProcess(projectID: str, processID: str)
+
+      Return the process and all its details as dict
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Dictionary containing the process
+      :rtype: dict
+
+
+
+
+   .. py:method:: getProcessDependencies(projectID: str, processID: str) -> tuple[list[code_SemperKI.modelFiles.processModel.ProcessInterface], list[code_SemperKI.modelFiles.processModel.ProcessInterface]]
+
+      Return the process dependencies 
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :return: Incoming and outgoing dependencies
+      :rtype: tuple[list,list]
+
+
+
+
+   .. py:method:: createProcess(projectID: str, processID: str, client: str)
+
+      Create the process
+
+      :param projectID: The ID of the project
+      :type projectID: str
+      :param processID: The ID of the process
+      :type processID: str
+      :param client: anonymous client, necessary for interface
+      :type client: str
+      :return: Nothing
+      :rtype: None
+
+
+
+
+   .. py:method:: deleteProcess(processID: str, processObj=None)
+
+      Delete specific process.
+
+      :param processID: unique process ID to be deleted
+      :type processID: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: updateProcess(projectID: str, processID: str, updateType: code_SemperKI.definitions.ProcessUpdates, content: dict, updatedBy: str) -> tuple[str, dict] | Exception
+
+      Change details of a process like its status, or save communication. 
+
+      :param projectID: Project that this process belongs to
+      :type projectID: str
+      :param processID: unique processID to be edited
+      :type processID: str
+      :param updateType: changed process details
+      :type updateType: EnumUpdates
+      :param content: changed process, can be many stuff
+      :type content: json dict
+      :param updatedBy: ID of the person who updated the process (for history)
+      :type updatedBy: str
+      :return: The relevant thing that got updated, for event queue
+      :rtype: tuple[str,dict]|Exception
+
+
+
+
+   .. py:method:: deleteFromProcess(projectID: str, processID: str, updateType: code_SemperKI.definitions.ProcessUpdates, content: dict, deletedBy: str)
+
+      Delete details of a process like its status, or content. 
+
+      :param projectID: Project that this process belongs to
+      :type projectID: str
+      :param processID: unique process ID to be edited
+      :type processID: str
+      :param updateType: changed process details
+      :type updateType: EnumUpdates
+      :param content: deletions
+      :type content: json dict
+      :param deletedBy: ID of the person who deleted from the process (for history)
+      :type deletedBy: str
+      :return: Flag if it worked or not
+      :rtype: Bool
+
+
+
+
+   .. py:method:: getProcessesPerPID(projectID)
+
+      Retrieve infos about one project, for admins
+
+      :param projectID: project of interest
+      :type projectID: str
+      :return: list of all processes of that project
+      :rtype: list
+
+
+
+   .. py:method:: checkIfFilesAreRemote(projectID: str, processID: str) -> bool
+
+      If at least one file is remote, say so to trigger upload to remote for new files as well
+
+      :param projectID: The ID of the project that the process is part of
+      :type projectID: str
+      :param processID: The ID of the process in question
+      :type processID: str
+      :return: True if remote, false if local
+      :rtype: bool
+
+
+
+
+   .. py:method:: createDataEntry(data, dataID, processID, typeOfData: code_SemperKI.definitions.DataType, createdBy: str, details={}, IDofData='')
+
+      Create an entry in the Data history
+
+      :param data: The data itself
+      :type data: Dict in JSON
+      :param dataID: The ID of that date
+      :type dataID: Str
+      :param processID: process it belongs to
+      :type processID: str
+      :param typeOfData: The type of this data
+      :type typeOfData: DataType
+      :param createdBy: Who created it (hashed ID)
+      :type createdBy: Str
+      :param details: Some metadata
+      :type details: JSON Dict
+      :param IDofData: If the data has an id, save it
+      :type IDofData: Str
+      :return: Nothing
+      :rtype: None
+
+
+
+   .. py:method:: deleteAllDataEntriesOfProcess(processID: str) -> None
+
+      Delete all entries in history of the process from session
+
+
+
+

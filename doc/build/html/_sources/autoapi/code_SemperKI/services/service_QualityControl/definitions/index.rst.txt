@@ -1,0 +1,75 @@
+code_SemperKI.services.service_QualityControl.definitions
+=========================================================
+
+.. py:module:: code_SemperKI.services.service_QualityControl.definitions
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_QualityControl.definitions.SERVICE_NAME
+   code_SemperKI.services.service_QualityControl.definitions.SERVICE_NUMBER
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_QualityControl.definitions.ServiceDetails
+   code_SemperKI.services.service_QualityControl.definitions.NodeTypesQC
+   code_SemperKI.services.service_QualityControl.definitions.OrganizationDetailsQC
+
+
+Module Contents
+---------------
+
+.. py:data:: SERVICE_NAME
+   :value: 'QUALITY_CONTROL'
+
+
+.. py:data:: SERVICE_NUMBER
+   :value: 6
+
+
+.. py:class:: ServiceDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does the service consists of 
+
+
+
+.. py:class:: NodeTypesQC
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What possible types can a node have in the QC service?
+
+
+
+   .. py:attribute:: organization
+
+
+.. py:class:: OrganizationDetailsQC
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the details of an organization?
+
+
+

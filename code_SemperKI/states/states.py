@@ -1,4 +1,6 @@
-from __future__ import annotations 
+from __future__ import annotations
+
+
 """
 Part of Semper-KI software
 
@@ -13,9 +15,10 @@ import logging
 
 from abc import ABC, abstractmethod
 
-from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets
+from Generic_Backend.code_General.definitions import Logging, UserNotificationTargets, FileObjectContent
 from Generic_Backend.code_General.connections.postgresql.pgProfiles import ProfileManagementBase, ProfileManagementOrganization, ProfileManagementUser, profileManagement, SessionContent
 from Generic_Backend.code_General.utilities.basics import checkIfNestedKeyExists
+from Generic_Backend.code_General.modelFiles.organizationModel import OrganizationDescription 
 
 import code_SemperKI.utilities.websocket as WebsocketEvents
 import code_SemperKI.connections.content.session as SessionInterface
@@ -26,8 +29,9 @@ import code_SemperKI.tasks.processTasks as ProcessTasks
 import code_SemperKI.utilities.locales as Locales
 
 from .stateDescriptions import *
+from .stateButtons import ButtonDefinitions
 
-from ..definitions import ProcessDescription, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
+from ..definitions import ProcessDescription, ValidationSteps, ValidationInformationForFrontend, ProcessUpdates, SessionContentSemperKI, ProcessDetails, FlatProcessStatus, NotificationSettingsOrgaSemperKI, NotificationSettingsUserSemperKI
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -36,7 +40,7 @@ loggerError = logging.getLogger("errors")
 ###############################################################################
 # Functions
 #######################################################
-def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, admin=False):
+def getButtonsForProcess(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface, client=True, contractor=False, admin=False):
     """
     Look at process status of every process of a project and add respective buttons
 
@@ -44,6 +48,8 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
     :type process: ProcessModel.Process|ProcessModel.ProcessInterface
     :param client: Whether the current user is the client or the contractor
     :type client: Bool
+    :param contractor: Whether the current user is the contractor
+    :type contractor: Bool
     :param admin: Whether the current user is an admin (which may see all buttons) or not
     :type admin: Bool
     :return: The buttons corresponding to the status
@@ -52,7 +58,7 @@ def getButtonsForProcess(process:ProcessModel.Process|ProcessModel.ProcessInterf
     """
 
     processStatusAsString = processStatusFromIntToStr(process.processStatus)
-    return stateDict[processStatusAsString].buttons(process, client, admin)
+    return stateDict[processStatusAsString].buttons(interface, process, client, contractor, admin)
 
 ##################################################
 def getMissingElements(interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
@@ -270,7 +276,23 @@ class State(ABC):
 
     ###################################################
     @abstractmethod
-    def buttons(self, process, client=True, admin=False) -> list:
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    @abstractmethod
+    def buttons(self,interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Which buttons should be shown in this state
         """
@@ -330,7 +352,9 @@ class State(ABC):
                     if isinstance(retVal, Exception):
                         raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
+                    returnState.entryCalls(interface, process) # call functions that should be called when entering this state
+
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -363,7 +387,8 @@ class State(ABC):
                     if isinstance(retVal, Exception):
                         raise retVal
                     if returnState.fireEvent:
-                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange)
+                        WebsocketEvents.fireWebsocketEventsForProcess(process.project.projectID, process.processID, interface.getSession(), ProcessUpdates.processStatus, retVal, NotificationSettingsUserSemperKI.statusChange, creatorOfEvent=currentClient)
+                    returnState.entryCalls(interface, process) # call functions that should be called when entering this state
                     break # Ensure that only one transition is possible 
             
             return returnState
@@ -399,22 +424,29 @@ class DRAFT(State):
     name = ProcessStatusAsString.DRAFT
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         None
         """
-        return [{
-                "title": ButtonLabels.DELETE,
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }]
+        if client or admin:
+            return [ButtonDefinitions.deleteProcess]
+        return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -441,7 +473,7 @@ class DRAFT(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return ["Process-ServiceType"]
+        return [{"key":"Process-ServiceType"}]
 
     ###################################################
     # Transitions
@@ -453,6 +485,8 @@ class DRAFT(State):
 
         """
         if process.serviceType != ServiceManager.serviceManager.getNone():
+            if ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[0]:
+                return stateDict[ProcessStatusAsString.SERVICE_READY]
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         return self
 
@@ -471,7 +505,7 @@ class DRAFT(State):
         return self # either all prior processes have been completed or there are none
 
     ###################################################
-    updateTransitions = [to_SERVICE_IN_PROGRESS, to_WAITING_FOR_OTHER_PROCESS]
+    updateTransitions = [to_WAITING_FOR_OTHER_PROCESS, to_SERVICE_IN_PROGRESS]
     buttonTransitions = {}
 
     ###################################################
@@ -492,54 +526,42 @@ class SERVICE_IN_PROGRESS(State):
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_IN_PROGRESS)
     name = ProcessStatusAsString.SERVICE_IN_PROGRESS
     fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
     
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to draft
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.DRAFT,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE,
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                "icon": IconType.FactoryIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                    },
-                },
-                "active": False,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ]
+        if client or admin:
+            buttonList =  [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
+            ]
+            if self.missingForCompletion(interface, process):
+                buttonList[-1]["active"] = False
+            else:
+                buttonList[-1]["active"] = True
+            return buttonList
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -579,6 +601,7 @@ class SERVICE_IN_PROGRESS(State):
 
         """
         serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
         return stateDict[ProcessStatusAsString.DRAFT]
@@ -642,53 +665,41 @@ class SERVICE_READY(State):
     name = ProcessStatusAsString.SERVICE_READY
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Finish this service and go to overview
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.DRAFT,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE,
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                "icon": IconType.FactoryIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+        if client or admin:
+            buttonList = [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToServiceCompleted)
+            ]
+
+            buttonList[-1]["active"] = True
+            return buttonList
+
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -760,6 +771,7 @@ class SERVICE_READY(State):
         """
         serviceContent = process.serviceDetails
         #interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, process.processDetails, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
         interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
         return stateDict[ProcessStatusAsString.DRAFT]
@@ -784,7 +796,22 @@ class SERVICE_COMPLETED(State):
 
     statusCode = processStatusAsInt(ProcessStatusAsString.SERVICE_COMPLETED)
     name = ProcessStatusAsString.SERVICE_COMPLETED
-    fireEvent = False    
+    fireEvent = False
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
 
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -798,69 +825,39 @@ class SERVICE_COMPLETED(State):
         """
         listOfMissingThings = []
         if ProcessDetails.provisionalContractor not in process.processDetails:
-            listOfMissingThings.append("Process-Contractor")
-        elif process.processDetails[ProcessDetails.provisionalContractor] == "":
-            listOfMissingThings.append("Process-Contractor")
+            listOfMissingThings.append({"key": "Process-Contractor"})
+        elif process.processDetails[ProcessDetails.provisionalContractor] == {}:
+            listOfMissingThings.append({"key": "Process-Contractor"})
         if ProcessDetails.clientBillingAddress not in process.processDetails:
-            listOfMissingThings.append("Process-Address-Billing")
+            listOfMissingThings.append({"key": "Process-Address-Billing"})
         elif process.processDetails[ProcessDetails.clientBillingAddress] == {}:
-            listOfMissingThings.append("Process-Address-Billing")
+            listOfMissingThings.append({"key": "Process-Address-Billing"})
         if ProcessDetails.clientDeliverAddress not in process.processDetails:
-            listOfMissingThings.append("Process-Address-Deliver")
+            listOfMissingThings.append({"key": "Process-Address-Deliver"})
         elif process.processDetails[ProcessDetails.clientDeliverAddress] == {}:
-            listOfMissingThings.append("Process-Address-Deliver")
+            listOfMissingThings.append({"key": "Process-Address-Deliver"})
         return listOfMissingThings
 
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Choose contractor
 
         """
-        buttonsList = [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_READY,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_READY,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE,
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                "icon": IconType.DoneAllIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    },
-                },
-                "active": False,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "process",
-            },
-        ]
-        
-        if len(self.missingForCompletion("", process)) == 0:
-            buttonsList[2]["active"] = True #set forward button to active
+        buttonsList = []
+        if client or admin:
+            buttonsList = [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToServiceReady,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.fowardToContractorCompleted)
+            ]
+            
+            if len(self.missingForCompletion(interface, process)) == 0:
+                buttonsList[-1]["active"] = True #set forward button to active
 
         return buttonsList
     
@@ -882,8 +879,20 @@ class SERVICE_COMPLETED(State):
 
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+    ###################################################
     def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-        SERVICE_READY | CONTRACTOR_COMPLETED:
+        SERVICE_COMPLETED | CONTRACTOR_COMPLETED:
         """
         Contractor was selected
 
@@ -894,7 +903,7 @@ class SERVICE_COMPLETED(State):
     
     ###################################################
     def to_SERVICE_COMPLICATION(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          SERVICE_IN_PROGRESS | SERVICE_COMPLICATION:
+          SERVICE_COMPLETED | SERVICE_COMPLICATION:
         """
         Service Conditions not OK
 
@@ -906,7 +915,7 @@ class SERVICE_COMPLETED(State):
         
     ##################################################
     def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
-        SERVICE_IN_PROGRESS:
+        SERVICE_IN_PROGRESS | SERVICE_COMPLETED:
         """
         Service changed	
         """
@@ -914,6 +923,16 @@ class SERVICE_COMPLETED(State):
             return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
         else:
             return self
+        
+    ##################################################
+    def to_SERVICE_IN_PROGRESS_Button(self, interface: SessionInterface.ProcessManagementSession  | DBInterface.ProcessManagementBase, process: ProcessModel.Process  | ProcessModel.ProcessInterface)  -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Service changed	
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: {}}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
     
     ###################################################
     def to_SERVICE_READY_Button(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
@@ -922,12 +941,12 @@ class SERVICE_COMPLETED(State):
         Button was pressed, go back
 
         """
-        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: ""}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.processDetails, {ProcessDetails.provisionalContractor: {}}, process.client)
         return stateDict[ProcessStatusAsString.SERVICE_READY]
     
     ###################################################
     updateTransitions = [to_SERVICE_IN_PROGRESS, to_SERVICE_COMPLICATION]
-    buttonTransitions = {ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS_Button, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY_Button, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -948,39 +967,35 @@ class WAITING_FOR_OTHER_PROCESS(State):
     name = ProcessStatusAsString.WAITING_FOR_OTHER_PROCESS
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for WAITING_FOR_OTHER_PROCESS
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.DRAFT,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.DRAFT,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            }
-        ] 
+        if client or admin:
+            return [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.backToDraft,
+                ButtonDefinitions.deleteProcess
+            ] 
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -1011,7 +1026,7 @@ class WAITING_FOR_OTHER_PROCESS(State):
         dependenciesIn, dependenciesOut = interface.getProcessDependencies(process.project.projectID, process.processID)
         for priorProcess in dependenciesIn:
             if priorProcess.processStatus < processStatusAsInt(ProcessStatusAsString.COMPLETED):
-                listOfMissingStuff.append("Process-Dependency-"+priorProcess.processID)
+                listOfMissingStuff.append({"key": "Process-Dependency", "processID": priorProcess.processID})
         return listOfMissingStuff
         
 
@@ -1104,39 +1119,34 @@ class SERVICE_COMPLICATION(State):
     name = ProcessStatusAsString.SERVICE_COMPLICATION
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Back to Draft
 
         """
-        return [
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                "icon": IconType.TroubleshootIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_IN_PROGRESS,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            },
-        ] 
+        if client or admin:
+            return [
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.fowardToServiceInProgress
+            ]
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -1166,7 +1176,7 @@ class SERVICE_COMPLICATION(State):
         if process.serviceType != ServiceManager.serviceManager.getNone():
             return ServiceManager.serviceManager.getService(process.serviceType).serviceReady(process.serviceDetails)[1]
         else:
-            return ["Process-ServiceType"]
+            return [{"key": "Process-ServiceType"}]
     
     ###################################################
     # Transitions
@@ -1221,53 +1231,41 @@ class CONTRACTOR_COMPLETED(State):
     name = ProcessStatusAsString.CONTRACTOR_COMPLETED
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for  CONTRACTOR_COMPLETED 
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.SERVICE_COMPLETED,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.SERVICE_COMPLETED,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFYING,
-                "icon": IconType.TaskIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.VERIFYING,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+        if client or admin:
+            return [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToServiceCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToVerifying
+            ]
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -1298,6 +1296,30 @@ class CONTRACTOR_COMPLETED(State):
 
     ###################################################
     # Transitions
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+    
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
+
     ###################################################
     def to_VERIFYING(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFYING: 
@@ -1321,7 +1343,7 @@ class CONTRACTOR_COMPLETED(State):
 
     ###################################################
     updateTransitions = []
-    buttonTransitions = {ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.VERIFYING: to_VERIFYING}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1342,53 +1364,41 @@ class VERIFYING(State):
     name = ProcessStatusAsString.VERIFYING
     fireEvent = False
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for VERIFYING
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            { # this button shall not do anything
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.VERIFICATION_COMPLETED,
-                "icon": IconType.MailIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.VERIFYING,
-                    },
-                },
-                "active": False,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+        if client or admin:
+            return [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.fowardToVerificationCompleted
+            ] 
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -1419,6 +1429,48 @@ class VERIFYING(State):
 
     ###################################################
     # Transitions
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
     ###################################################
     def to_VERIFICATION_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFYING | VERIFICATION_COMPLETED:
@@ -1442,7 +1494,184 @@ class VERIFYING(State):
 
     ###################################################
     updateTransitions = [to_VERIFICATION_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED }
+
+    ###################################################
+    def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
+        return super().onUpdateEvent(interface, process) # do not change
+        
+    ###################################################
+    def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        return super().onButtonEvent(event, interface, process) # do not change
+
+#######################################################
+class VERIFICATION_FAILED(State):
+    """
+    Process is currently being verified
+
+    """
+
+    statusCode = processStatusAsInt(ProcessStatusAsString.VERIFICATION_FAILED)
+    name = ProcessStatusAsString.VERIFICATION_FAILED
+    fireEvent = True
+
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
+        """
+        Buttons for VERIFYING
+
+        """
+        if client or admin:
+            buttonList = [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.deleteProcess,
+                copy.deepcopy(ButtonDefinitions.forwardToRequestCompleted)
+            ]
+            whatsMissing = self.missingForCompletion(interface, process)
+            if len(whatsMissing) == 0:
+                buttonList[-1]["active"] = True #set forward button to active
+            else:
+                buttonList[-1]["active"] = True
+                for entry in whatsMissing:
+                    if entry["key"] == "Process-VerificationFailed":
+                        buttonList[-1]["active"] = False # that's the only thing that can make the button inactive
+                        break
+            return buttonList
+        else:
+            return []
+    
+    ###################################################
+    def getFlatStatus(self, client:bool) -> str:
+        """
+        Get code string if something is required from the user for that status
+
+        :param client: Signals, if the user is the client of the process or not
+        :type client: Bool
+        :returns: The flat status string from FlatProcessStatus
+        :rtype: str
+        """
+        if client:
+            return FlatProcessStatus.ACTION_REQUIRED
+        else:
+            return FlatProcessStatus.ACTION_REQUIRED
+    
+    ##################################################
+    def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
+        """
+        Ask the state what it needs to move forward
+
+        :param process: The current process in question
+        :type process: ProcessModel.Process|ProcessModel.ProcessInterface
+        :return: list of elements that are missing, coded for frontend
+        :rtype: list[str]
+        """
+        # Evaluate the verification results
+        outArray = []
+        if ProcessDetails.verificationResults in process.processDetails:
+            verificationResults = process.processDetails[ProcessDetails.verificationResults]
+            if ValidationSteps.serviceReady in verificationResults and verificationResults[ValidationSteps.serviceReady] is False:
+                outArray.append({"key": "Process-VerificationFailed"})
+            if ValidationSteps.serviceSpecificTasks in verificationResults:
+                for key in verificationResults[ValidationSteps.serviceSpecificTasks]:
+                    if isinstance(verificationResults[ValidationSteps.serviceSpecificTasks][key], dict) and ValidationInformationForFrontend.isSuccessful in verificationResults[ValidationSteps.serviceSpecificTasks][key]:
+                        if verificationResults[ValidationSteps.serviceSpecificTasks][key][ValidationInformationForFrontend.isSuccessful] is False:
+                            outArray.append({"key": "Service-VerificationFailed"})
+                            break
+        return outArray
+
+    ###################################################
+    # Transitions
+    ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
+    def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          VERIFICATION_FAILED | REQUEST_COMPLETED:
+        """
+        From: VERIFICATION_FAILED
+        To: VERIFICATION_FAILED | REQUEST_COMPLETED
+
+        """
+        retVal = interface.sendProcess(process, interface.getSession() , interface.getUserID())
+        if isinstance(retVal, Exception):
+            return stateDict[ProcessStatusAsString.VERIFICATION_FAILED]
+        return stateDict[ProcessStatusAsString.REQUEST_COMPLETED]
+    ###################################################
+    def to_CONTRACTOR_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+          CONTRACTOR_COMPLETED:
+        """
+        To: CONTRACTOR_COMPLETED
+        
+        """
+        # delete verification results
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
+
+    ###################################################
+    updateTransitions = []
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED}
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1462,53 +1691,42 @@ class VERIFICATION_COMPLETED(State):
     name = ProcessStatusAsString.VERIFICATION_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Manual Request
 
         """
-        return [
-            {
-                "title": ButtonLabels.BACK+"-TO-"+ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                "icon": IconType.ArrowBackIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "backstepStatus",
-                        "targetStatus": ProcessStatusAsString.CONTRACTOR_COMPLETED,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.secondary,
-                "showIn": "process",
-            },
-            {
-                "title": ButtonLabels.DELETE, # do not change
-                "icon": IconType.DeleteIcon,
-                "action": {
-                    "type": "request",
-                    "data": { "type": "deleteProcess" },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "project",
-            },
-            {
-                "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.REQUEST_COMPLETED,
-                "icon": IconType.MailIcon,
-                "action": {
-                    "type": "request",
-                    "data": {
-                        "type": "forwardStatus",
-                        "targetStatus": ProcessStatusAsString.REQUEST_COMPLETED,
-                    },
-                },
-                "active": True,
-                "buttonVariant": ButtonTypes.primary,
-                "showIn": "both",
-            }
-        ] 
+        if client or admin:
+            return [
+                ButtonDefinitions.editServiceSelection,
+                ButtonDefinitions.deleteServiceDetails,
+                ButtonDefinitions.editServiceDetails,
+                ButtonDefinitions.editContractorCompleted,
+                ButtonDefinitions.deleteContractorCompleted,
+                ButtonDefinitions.editVerification,
+                ButtonDefinitions.deleteVerification,
+                ButtonDefinitions.backToContractorCompleted,
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.forwardToRequestCompleted
+            ] 
+        else:
+            return []
     
     ###################################################
     def getFlatStatus(self, client:bool) -> str:
@@ -1540,6 +1758,52 @@ class VERIFICATION_COMPLETED(State):
     ###################################################
     # Transitions
     ###################################################
+    def to_DRAFT(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        DRAFT:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        serviceContent = process.serviceDetails
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.additionalInput, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceDetails, serviceContent, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.serviceType, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.DRAFT]
+
+    ###################################################
+    def to_SERVICE_IN_PROGRESS(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_IN_PROGRESS:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_IN_PROGRESS]
+    
+    ###################################################
+    def to_SERVICE_READY(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_READY:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.provisionalContractor, {}, process.client)
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_READY]
+    
+    ###################################################
+    def to_SERVICE_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+        SERVICE_COMPLETED:
+        """
+        Button was pressed, clean up and go back
+
+        """
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
+        return stateDict[ProcessStatusAsString.SERVICE_COMPLETED]
+
+    ###################################################
     def to_REQUEST_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
           VERIFICATION_COMPLETED | REQUEST_COMPLETED:
         """
@@ -1560,12 +1824,12 @@ class VERIFICATION_COMPLETED(State):
         To: CONTRACTOR_COMPLETED
         
         """
-        # TODO discard verification
+        interface.deleteFromProcess(process.project.projectID, process.processID, ProcessUpdates.verificationResults, {}, process.client)
         return stateDict[ProcessStatusAsString.CONTRACTOR_COMPLETED]
 
     ###################################################
     updateTransitions = [to_REQUEST_COMPLETED]
-    buttonTransitions = {ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
+    buttonTransitions = {ProcessStatusAsString.DRAFT: to_DRAFT, ProcessStatusAsString.SERVICE_IN_PROGRESS: to_SERVICE_IN_PROGRESS, ProcessStatusAsString.SERVICE_READY: to_SERVICE_READY, ProcessStatusAsString.SERVICE_COMPLETED: to_SERVICE_COMPLETED, ProcessStatusAsString.CONTRACTOR_COMPLETED: to_CONTRACTOR_COMPLETED, ProcessStatusAsString.REQUEST_COMPLETED: to_REQUEST_COMPLETED} # TODO add functions that are called on button click, leave empty if none exist
 
     ###################################################
     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
@@ -1585,8 +1849,23 @@ class REQUEST_COMPLETED(State):
     name = ProcessStatusAsString.REQUEST_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for REQUEST_COMPLETED, no Back-Button, Contractor chooses between Confirm, Reject and Clarification
         
@@ -1594,60 +1873,15 @@ class REQUEST_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend([
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
             ])
-        if not client or admin: # contractor
+        if contractor or admin: # contractor
+            outArr = [] # reset as to not duplicate the button
             outArr.extend([
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToOfferRejected,
+                copy.deepcopy(ButtonDefinitions.forwardToOfferCompleted)
             ])
+            if len(self.missingForCompletion(interface, process)) == 0:
+                outArr[1]["active"] = True #set forward button to active
         return outArr
     
     ###################################################
@@ -1675,6 +1909,12 @@ class REQUEST_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
+        if interface.getUserID() == process.contractor.hashedID:
+            # Scan for file with origin "ContractFiles"
+            for fileID, file in process.files.items():
+                if file[FileObjectContent.origin] == "ContractFiles":
+                    return []
+            return [{"key": "Process-ContractFiles"}]
         return []
 
     ###################################################
@@ -1687,6 +1927,8 @@ class REQUEST_COMPLETED(State):
         To: OFFER_COMPLETED
 
         """
+        if len(self.missingForCompletion(interface, process)) > 0:
+            return self
         subject = ["email","subjects","confirmedByContractor"]
         message = ["email","content","confirmedByContractor"]
         ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.responseFromContractor, subject, message, process.processDetails[ProcessDetails.title])
@@ -1717,127 +1959,6 @@ class REQUEST_COMPLETED(State):
     def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         return super().onButtonEvent(event, interface, process) # do not change
 
-# #######################################################
-# class CLARIFICATION(State):
-#     """
-#     Clarification needed by Contractor
-
-#     """
-
-#     statusCode = processStatusAsInt(ProcessStatusAsString.CLARIFICATION)
-#     name = ProcessStatusAsString.CLARIFICATION
-
-#     ###################################################
-#     def buttons(self, process, client=True, admin=False) -> list:
-#         """
-#         Buttons for CLARIFICATION
-
-#         """
-#         outArr = []
-#         if client or admin:
-#             outArr.extend([
-#                 {
-#                     "title": ButtonLabels.DELETE, # do not change
-#                     "icon": IconType.DeleteIcon,
-#                     "action": {
-#                         "type": "request",
-#                         "data": { "type": "deleteProcess" },
-#                     },
-#                     "active": True,
-#                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "project",
-#                 },
-#             ])
-#         if not client or admin:
-#             outArr.extend([
-#                 {
-#                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_COMPLETED,
-#                     "icon": IconType.DoneAllIcon,
-#                     "action": {
-#                         "type": "request",
-#                         "data": {
-#                             "type": "forwardStatus",
-#                             "targetStatus": ProcessStatusAsString.OFFER_COMPLETED,
-#                         },
-#                     },
-#                     "active": True,
-#                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "both",
-#                 },
-#                 {
-#                     "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.OFFER_REJECTED,
-#                     "icon": IconType.CancelIcon,
-#                     "action": {
-#                         "type": "request",
-#                         "data": {
-#                             "type": "forwardStatus",
-#                             "targetStatus": ProcessStatusAsString.OFFER_REJECTED,
-#                         },
-#                     },
-#                     "active": True,
-#                     "buttonVariant": ButtonTypes.primary,
-#                     "showIn": "both",
-#                 }
-#             ])
-#         return outArr
-    
-#     ###################################################
-#     def getFlatStatus(self, client:bool) -> str:
-#         """
-#         Get code string if something is required from the user for that status
-
-#         :param client: Signals, if the user is the client of the process or not
-#         :type client: Bool
-#         :returns: The flat status string from FlatProcessStatus
-#         :rtype: str
-#         """
-#         if client:
-#             return FlatProcessStatus.ACTION_REQUIRED
-#         else:
-#             return FlatProcessStatus.WAITING_CLIENT
-    
-#     ###################################################
-#     # Transitions
-#     ###################################################
-#     def to_OFFER_COMPLETED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-#           CLARIFICATION | OFFER_COMPLETED:
-#         """
-#         From: CLARIFICATION
-#         To: OFFER_COMPLETED
-
-#         """
-#         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-#         subject = ["email","subjects","confirmedByContractor"])
-#         message = ["email","content","confirmedByContractor"])
-#         self.sendMailToClient(interface, process, userLocale, subject, message)
-#         return stateDict[ProcessStatusAsString.OFFER_COMPLETED]
-
-#     ###################################################
-#     def to_OFFER_REJECTED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-#           CLARIFICATION | OFFER_REJECTED:
-#         """
-#         From: CLARIFICATION
-#         To: OFFER_REJECTED
-
-#         """
-#         userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
-#         subject = ["email","subjects","declinedByContractor"])
-#         message = ["email","content","declinedByContractor"])
-#         self.sendMailToClient(interface, process, userLocale, subject, message)
-#         return stateDict[ProcessStatusAsString.OFFER_REJECTED]
-
-#     ###################################################
-#     updateTransitions = [] # TODO add functions that are called on update, leave empty if none exist
-#     buttonTransitions = {ProcessStatusAsString.OFFER_COMPLETED: to_OFFER_COMPLETED, ProcessStatusAsString.OFFER_REJECTED: to_OFFER_REJECTED} # TODO add functions that are called on button click, leave empty if none exist
-
-#     ###################################################
-#     def onUpdateEvent(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface):
-#         return super().onUpdateEvent(interface, process) # do not change
-        
-#     ###################################################
-#     def onButtonEvent(self, event:str, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
-#         return super().onButtonEvent(event, interface, process) # do not change
-
 #######################################################
 class OFFER_COMPLETED(State):
     """
@@ -1848,8 +1969,23 @@ class OFFER_COMPLETED(State):
     name = ProcessStatusAsString.OFFER_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for OFFER_COMPLETED, no Back-Button
 
@@ -1857,47 +1993,10 @@ class OFFER_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend([
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.CONFIRMATION_REJECTED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.CONFIRMATION_REJECTED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToConfirmationRejected,
+                ButtonDefinitions.forwardToConfirmationCompleted
             ])
-        if not client or admin:
+        if contractor:
             outArr.extend(
             [
             ])
@@ -1980,28 +2079,33 @@ class OFFER_REJECTED(State):
     name = ProcessStatusAsString.OFFER_REJECTED
     fireEvent = True
 
-    ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         """
-        No Buttons only CANCELED
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
+        """
+        No Buttons
 
         """
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2018,9 +2122,9 @@ class OFFER_REJECTED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.ACTION_REQUIRED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -2037,18 +2141,18 @@ class OFFER_REJECTED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          OFFER_REJECTED | CANCELED:
-        """
-        From: OFFER_REJECTED
-        To: CANCELED
+    # def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    #       OFFER_REJECTED | CANCELED:
+    #     """
+    #     From: OFFER_REJECTED
+    #     To: CANCELED
 
-        """
-        # TODO do stuff to clean up
-        return stateDict[ProcessStatusAsString.CANCELED]
+    #     """
+    #     # TODO do stuff to clean up
+    #     return stateDict[ProcessStatusAsString.CANCELED]
 
     ###################################################
-    updateTransitions = [to_CANCELED]
+    updateTransitions = []#[to_CANCELED]
     buttonTransitions = {}
 
     ###################################################
@@ -2069,8 +2173,23 @@ class CONFIRMATION_COMPLETED(State):
     name = ProcessStatusAsString.CONFIRMATION_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for CONFIRMATION_COMPLETED, no Back-Button
 
@@ -2078,34 +2197,10 @@ class CONFIRMATION_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                    "icon": IconType.FactoryIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToProductionInProgress
             ] )
         return outArr
     
@@ -2173,28 +2268,33 @@ class CONFIRMATION_REJECTED(State):
     name = ProcessStatusAsString.CONFIRMATION_REJECTED
     fireEvent = True
 
-    ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
         """
-        No Buttons only CANCELED
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
+    ###################################################
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
+        """
+        No Buttons
 
         """
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
+                ButtonDefinitions.deleteProcess
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2211,9 +2311,9 @@ class CONFIRMATION_REJECTED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.ACTION_REQUIRED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -2230,18 +2330,18 @@ class CONFIRMATION_REJECTED(State):
     ###################################################
     # Transitions
     ###################################################
-    def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
-          CONFIRMATION_REJECTED | CANCELED:
-        """
-        From: CONFIRMATION_REJECTED
-        To: CANCELLED
+    # def to_CANCELED(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process: ProcessModel.Process | ProcessModel.ProcessInterface) -> \
+    #       CONFIRMATION_REJECTED | CANCELED:
+    #     """
+    #     From: CONFIRMATION_REJECTED
+    #     To: CANCELLED
 
-        """
-        # TODO clean up and stuff
-        return stateDict[ProcessStatusAsString.CANCELED]
+    #     """
+    #     # TODO clean up and stuff
+    #     return stateDict[ProcessStatusAsString.CANCELED]
 
     ###################################################
-    updateTransitions = [to_CANCELED]
+    updateTransitions = []#[to_CANCELED]
     buttonTransitions = {}
 
     ###################################################
@@ -2262,8 +2362,23 @@ class PRODUCTION_IN_PROGRESS(State):
     name = ProcessStatusAsString.PRODUCTION_IN_PROGRESS
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_IN_PROGRESS, no Back-Button
 
@@ -2272,47 +2387,10 @@ class PRODUCTION_IN_PROGRESS(State):
         if client or admin:
             outArr.extend( [
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.PRODUCTION_COMPLETED,
-                    "icon": IconType.LocalShippingIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.PRODUCTION_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardProductionCompleted
             ] )
         return outArr
     
@@ -2390,8 +2468,23 @@ class PRODUCTION_COMPLETED(State):
     name = ProcessStatusAsString.PRODUCTION_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for PRODUCTION_COMPLETED, no Back-Button
 
@@ -2400,48 +2493,13 @@ class PRODUCTION_COMPLETED(State):
         if client or admin:
             outArr.extend( [
             ])
-        if not client or admin:
+        if contractor or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                    "icon": IconType.LocalShippingIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_IN_PROGRESS,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToFailed,
+                copy.deepcopy(ButtonDefinitions.forwardToDeliveryInProgress)
             ] )
+            if len(self.missingForCompletion(interface, process)) == 0:
+                outArr[1]["active"] = True #set forward button to active
         return outArr
     
     ###################################################
@@ -2469,7 +2527,14 @@ class PRODUCTION_COMPLETED(State):
         :return: list of elements that are missing, coded for frontend
         :rtype: list[str]
         """
-        return []
+        if interface.getUserID() == process.contractor.hashedID:
+            # Scan for file with origin "PaymentFiles"
+            for fileID, file in process.files.items():
+                if file[FileObjectContent.origin] == "PaymentFiles":
+                    return []
+            return [{"key": "Process-Payment"}]
+        else:
+            return []
 
     ###################################################
     # Transitions
@@ -2481,7 +2546,8 @@ class PRODUCTION_COMPLETED(State):
         To: DELIVERY_IN_PROGRESS
 
         """
-        userLocale = ProfileManagementBase.getUserLocale(hashedID=process.client)
+        if len(self.missingForCompletion(interface, process)) > 0:
+            return self
         subject = ["email","subjects","inDelivery"]
         message = ["email","content","inDelivery"]
         ProcessTasks.sendEMail(process.client, NotificationSettingsUserSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
@@ -2522,8 +2588,23 @@ class DELIVERY_IN_PROGRESS(State):
     name = ProcessStatusAsString.DELIVERY_IN_PROGRESS
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_IN_PROGRESS, no Back-Button
 
@@ -2531,33 +2612,9 @@ class DELIVERY_IN_PROGRESS(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DELIVERY_COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DELIVERY_COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToDeliveryCompleted
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2625,8 +2682,23 @@ class DELIVERY_COMPLETED(State):
     name = ProcessStatusAsString.DELIVERY_COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DELIVERY_COMPLETED, no Back-Button
 
@@ -2634,61 +2706,11 @@ class DELIVERY_COMPLETED(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE,
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.DISPUTE,
-                    "icon": IconType.TroubleshootIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.DISPUTE,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToDispute,
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2732,12 +2754,6 @@ class DELIVERY_COMPLETED(State):
 
         """
         
-        # signal to dependent processes, that this one is finished
-        signalCompleteToDependentProcesses(interface, process)
-
-        subject = ["email","subjects","processFinished"]
-        message = ["email","content","processFinished"]
-        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2788,8 +2804,23 @@ class DISPUTE(State):
     name = ProcessStatusAsString.DISPUTE
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Buttons for DISPUTE, no Back-Button
 
@@ -2797,47 +2828,10 @@ class DISPUTE(State):
         outArr = []
         if client or admin:
             outArr.extend( [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.COMPLETED,
-                    "icon": IconType.DoneAllIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.COMPLETED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                },
-                {
-                    "title": ButtonLabels.FORWARD+"-TO-"+ProcessStatusAsString.FAILED,
-                    "icon": IconType.CancelIcon,
-                    "action": {
-                        "type": "request",
-                        "data": {
-                            "type": "forwardStatus",
-                            "targetStatus": ProcessStatusAsString.FAILED,
-                        },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "both",
-                }
+                ButtonDefinitions.forwardToFailed,
+                ButtonDefinitions.forwardToCompleted  
             ] )
-        if not client or admin:
+        if contractor or admin:
             outArr.extend([
 
             ])
@@ -2881,12 +2875,6 @@ class DISPUTE(State):
         To: COMPLETED
 
         """
-        # signal to dependent processes, that this one is finished
-        signalCompleteToDependentProcesses(interface, process)
-
-        subject = ["email","subjects","processFinished"]
-        message = ["email","content","processFinished"]
-        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
         return stateDict[ProcessStatusAsString.COMPLETED]
 
     ###################################################
@@ -2925,36 +2913,37 @@ class COMPLETED(State):
     name = ProcessStatusAsString.COMPLETED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        # signal to dependent processes, that this one is finished
+        signalCompleteToDependentProcesses(interface, process)
+
+        subject = ["email","subjects","processFinished"]
+        message = ["email","content","processFinished"]
+        ProcessTasks.sendEMail(process.contractor.hashedID, NotificationSettingsOrgaSemperKI.statusChange, subject, message, process.processDetails[ProcessDetails.title])
+
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3011,36 +3000,31 @@ class FAILED(State):
     name = ProcessStatusAsString.FAILED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3056,9 +3040,9 @@ class FAILED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
     
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:
@@ -3097,36 +3081,31 @@ class CANCELED(State):
     name = ProcessStatusAsString.CANCELED
     fireEvent = True
 
+    ##################################################
+    def entryCalls(self, interface:SessionInterface.ProcessManagementSession|DBInterface.ProcessManagementBase, process:ProcessModel.Process|ProcessModel.ProcessInterface):
+        """
+        Call functions that should be called when entering this state
+
+        :param interface: The session or database interface
+        :type interface: ProcessManagementSession | ProcessManagementBase
+        :param process: The process object
+        :type process: Process | ProcessInterface
+        :return: Nothing
+        :rtype: None
+
+        """
+        pass
+
     ###################################################
-    def buttons(self, process, client=True, admin=False) -> list:
+    def buttons(self, interface, process, client=True, contractor=False, admin=False) -> list:
         """
         Delete and clone (client only)
 
         """
         if client or admin:
             return [
-                {
-                    "title": ButtonLabels.DELETE, # do not change
-                    "icon": IconType.DeleteIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "deleteProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                },
-                {
-                    "title": ButtonLabels.CLONE,
-                    "icon": IconType.ReplayIcon,
-                    "action": {
-                        "type": "request",
-                        "data": { "type": "cloneProcess" },
-                    },
-                    "active": True,
-                    "buttonVariant": ButtonTypes.primary,
-                    "showIn": "project",
-                }
+                ButtonDefinitions.deleteProcess,
+                ButtonDefinitions.clone
             ] 
         else:
             return []
@@ -3142,9 +3121,9 @@ class CANCELED(State):
         :rtype: str
         """
         if client:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         else:
-            return FlatProcessStatus.COMPLETED
+            return FlatProcessStatus.FAILED
         
     ##################################################
     def missingForCompletion(self, interface: SessionInterface.ProcessManagementSession | DBInterface.ProcessManagementBase, process:ProcessModel.Process | ProcessModel.ProcessInterface) -> list[str]:

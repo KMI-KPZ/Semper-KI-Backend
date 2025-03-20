@@ -10,11 +10,11 @@ import json, enum, copy
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .projectModel import Project, ProjectInterface
-from ..serviceManager import serviceManager
 from Generic_Backend.code_General.modelFiles.organizationModel import Organization, OrganizationDescription
 from Generic_Backend.code_General.utilities.customStrEnum import StrEnumExactlyAsDefined
 
+from .projectModel import Project, ProjectInterface
+from ..serviceManager import serviceManager
 ###################################################
 class ProcessDescription(StrEnumExactlyAsDefined):
     """
@@ -160,6 +160,7 @@ class ProcessInterface():
     :serviceStatus: How everything is going for the service
     :serviceType: Which service it is
     :client: Who started the process
+    :contractor: Who gets to handle it
     :files: Registrar keeping check, which files are currently there, link to Data model
     :messages: same as files but for chat messages
     :createdWhen: Automatically assigned date and time(UTC+0) when the entry is created
@@ -182,6 +183,7 @@ class ProcessInterface():
     dependenciesOut = ManyToManySimulation()
 
     client = ""
+    contractor = None
     
     files = {}
     messages = {}
@@ -202,11 +204,13 @@ class ProcessInterface():
         self.dependenciesIn = ManyToManySimulation()
         self.dependenciesOut = ManyToManySimulation()
         self.client = client
+        self.contractor = None
         self.files = {}
         self.messages = {}
         self.createdWhen = currentTime
         self.updatedWhen = currentTime
         self.accessedWhen = currentTime
+        self.contractor = None
 
     ###################################################
     def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, dependenciedIn, dependenciesOut, updatedWhen, accessedWhen) -> None:
@@ -220,6 +224,7 @@ class ProcessInterface():
         self.serviceStatus = serviceStatus
         self.serviceType = serviceType
         self.client = client
+        self.contractor = None
         self.files = files
         self.messages = messages
         self.dependenciesIn.initialize(dependenciedIn)
@@ -238,10 +243,12 @@ class ProcessInterface():
                 ProcessDescription.dependenciesIn: self.dependenciesIn.all(),
                 ProcessDescription.dependenciesOut: self.dependenciesOut.all(),
                 ProcessDescription.client: self.client,
+                ProcessDescription.contractor: self.contractor,
                 ProcessDescription.files: self.files,
                 ProcessDescription.messages: self.messages,
                 ProcessDescription.createdWhen: str(self.createdWhen), ProcessDescription.updatedWhen: str(self.updatedWhen), ProcessDescription.accessedWhen: str(self.accessedWhen)}
-
+    
+    ###################################################
     def save(self) -> None:
         """
         Save to database

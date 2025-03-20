@@ -29,7 +29,7 @@ from code_SemperKI.utilities.basics import *
 from code_SemperKI.utilities.serializer import ExceptionSerializer
 from code_SemperKI.connections.content.postgresql import pgKnowledgeGraph
 
-from ...definitions import NodeTypesAM
+from ...definitions import *
 
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
@@ -61,6 +61,45 @@ def getFilters(request:Request):
 
     """
     try:
+        # TODO use translation here for nodeName
+        allMaterialCategories = [{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        allMaterialTypes = [{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialType) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner]
+        allMaterials = pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.material)
+        minTensileStrengthRange = 9999
+        maxTensileStrengthRange = 0
+        minDensityRange = 9999
+        maxDensityRange = 0
+        minElongationAtBreak = 100
+        maxElongationAtBreak = 0
+        setOfCertificates = set()
+        for material in allMaterials:
+            for prop in material[pgKnowledgeGraph.NodeDescription.properties]:
+                if prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
+                    propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                    if minTensileStrengthRange > propValue:
+                        minTensileStrengthRange = propValue
+                    if maxTensileStrengthRange < propValue:
+                        maxTensileStrengthRange = propValue
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.density:
+                    propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                    if minDensityRange > propValue:
+                        minDensityRange = propValue
+                    if maxDensityRange < propValue:
+                        maxDensityRange = propValue
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
+                    propValue = float(prop[pgKnowledgeGraph.NodePropertyDescription.value])
+                    if minElongationAtBreak > propValue:
+                        minElongationAtBreak = propValue
+                    if maxElongationAtBreak < propValue:
+                        maxElongationAtBreak = propValue
+                elif prop[pgKnowledgeGraph.NodePropertyDescription.key] == NodePropertiesAMMaterial.certificates:
+                    propValues = prop[pgKnowledgeGraph.NodePropertyDescription.value].split(",")
+                    setOfCertificates.update(propValues)
+        
+        tensileStrengthRange = [minTensileStrengthRange, maxTensileStrengthRange] if minTensileStrengthRange != 9999 and maxTensileStrengthRange != 0 else [0, 0]
+        densityRange = [minDensityRange, maxDensityRange] if minDensityRange != 9999 and maxDensityRange != 0 else [0, 0]
+        elongationAtBreakRange = [minElongationAtBreak, maxElongationAtBreak] if minElongationAtBreak != 100 and maxElongationAtBreak != 0 else [0, 0]
+        certificateList = list(setOfCertificates)
         filters = {
             "filters": [
                 # {"id":0,
@@ -82,17 +121,85 @@ def getFilters(request:Request):
                  "isOpen":False,
                  "question":{
                      "isSelectable":True,
-                     "title":"materialCategory", # TODO define somewhere
-                     "category":"MATERIAL", # TODO define somewhere
-                     "type":"SELECTION", # TODO define somewhere
+                     "title":FilterCategories.materialCategory.value,
+                     "category":"MATERIAL",
+                     "type":"SELECTION",
                      "range":None,
-                     "values":[{"name": entry[pgKnowledgeGraph.NodeDescription.nodeName], "id": entry[pgKnowledgeGraph.NodeDescription.uniqueID]} for entry in pgKnowledgeGraph.Basics.getNodesByType(NodeTypesAM.materialCategory) if entry[pgKnowledgeGraph.NodeDescription.createdBy] == pgKnowledgeGraph.defaultOwner],
+                     "values":allMaterialCategories,
                      "units":None
                      },
                 "answer":None
+                },
+                {"id":1,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.materialType,
+                     "category":"MATERIAL",
+                     "type":"SELECTION",
+                     "range":None,
+                     "values":allMaterialTypes,
+                     "units":None
+                     },
+                "answer":None
+                },
+                {"id":2,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.tensileStrength,
+                     "category":"MATERIAL",
+                     "type":"SLIDER",
+                     "range":tensileStrengthRange,
+                     "values":None,
+                     "units":"MPa"
+                    },
+                "answer":None
+                },
+                {"id":3,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.density,
+                     "category":"MATERIAL",
+                     "type":"SLIDER",
+                     "range":densityRange,
+                     "values":None,
+                     "units":"g/cm³"
+                    },
+                "answer":None
+                },
+                {"id":4,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.elongationAtBreak,
+                     "category":"MATERIAL",
+                     "type":"SLIDER",
+                     "range":elongationAtBreakRange,
+                     "values":None,
+                     "units":"%"
+                    },
+                "answer":None
+                },
+                {"id":5,
+                 "isChecked":False,
+                 "isOpen":False,
+                 "question":{
+                     "isSelectable":True,
+                     "title":FilterCategories.certificates,
+                     "category":"MATERIAL",
+                     "type":"MULTISELECTION",
+                     "range":None,
+                     "values":certificateList,
+                     "units":None
+                    },
+                "answer":None
                 }
-                #,
-                #{"id":1,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"deliverTime","category":"GENERAL","type":"SLIDERSELECTION","range":[0,99],"values":None,"units":["Tage","Wochen"]},"answer":None},{"id":2,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"amount","category":"GENERAL","type":"SLIDER","range":[0,99999],"values":None,"units":"Stück"},"answer":None},{"id":3,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"categorys","category":"GENERAL","type":"MULTISELECTION","range":None,"values":["medicine","fashion","hobby","tools","MODELs","toy","gadgets","art","learning"],"units":None},"answer":None},{"id":4,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"boxSize","category":"GENERAL","type":"SLIDERSELECTION","range":[0,9999],"values":None,"units":["m","cm","mm"]},"answer":None},{"id":5,"isChecked":True,"isOpen":False,"question":{"isSelectable":True,"title":"materialcategory","category":"GENERAL","type":"MULTISELECTION","range":[0,9999],"values":["Metall","Plastic","Ceramic","Organic"],"units":None},"answer":{"unit":None,"value":["Plastic"]}},{"id":6,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"volume","category":"MODEL","type":"SLIDERSELECTION","range":[0,9999],"values":None,"units":["m³","cm³","mm³"]},"answer":None},{"id":7,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"materialCategory","category":"MATERIAL","type":"SELECTION","range":None,"values":["plastic","metal","ceramic","organic"],"units":None},"answer":None},{"id":8,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"proceeding","category":"MATERIAL","type":"SELECTION","range":None,"values":["3D-Print,Molding"],"units":None},"answer":None},{"id":9,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"proceeding","category":"PROCEEDING","type":"SELECTION","range":None,"values":["3D-Print","Molding"],"units":None},"answer":None},{"id":10,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"manufacturer","category":"MANUFACTURER","type":"SELECTION","range":None,"values":["Man 1","Man 2"],"units":None},"answer":None},{"id":11,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"postProcessing","category":"POSTPROCESSING","type":"SELECTION","range":None,"values":["Finish","Threds"],"units":None},"answer":None},{"id":12,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"date","category":"TEST","type":"DATE","range":None,"values":None,"units":None},"answer":None},{"id":13,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"text","category":"TEST","type":"TEXT","range":None,"values":None,"units":None},"answer":None},{"id":14,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"textarea","category":"TEST","type":"TEXTAREA","range":None,"values":None,"units":None},"answer":None},{"id":15,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"color","category":"TEST","type":"COLOR","range":None,"values":None,"units":None},"answer":None},{"id":16,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"number","category":"TEST","type":"NUMBER","range":None,"values":None,"units":None},"answer":None},{"id":17,"isChecked":False,"isOpen":False,"question":{"isSelectable":True,"title":"multiselection","category":"TEST","type":"MULTISELECTION","range":None,"values":["medicine","fashion","hobby","tools","MODELs","toy","gadgets","art","learning"],"units":None},"answer":None}]}
             ]
         }
         return Response(filters, status=status.HTTP_200_OK)

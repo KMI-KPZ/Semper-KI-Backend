@@ -1,0 +1,581 @@
+code_SemperKI.services.service_AdditiveManufacturing.definitions
+================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.definitions
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2023
+
+   Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NAME
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.SERVICE_NUMBER
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceDetails
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.FileContentsAM
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.Calculations
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.Measurements
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.MbbDimensions
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.MaterialDetails
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.PostProcessDetails
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodeTypesAM
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMPrinter
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterial
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMAdditionalRequirement
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMColor
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialCategory
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMTechnology
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.NodePropertiesAMMaterialType
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.OrganizationDetailsAM
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.ServiceSpecificDetailsForContractors
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterCategories
+   code_SemperKI.services.service_AdditiveManufacturing.definitions.FilterErrors
+
+
+Module Contents
+---------------
+
+.. py:data:: SERVICE_NAME
+   :value: 'ADDITIVE_MANUFACTURING'
+
+
+.. py:data:: SERVICE_NUMBER
+   :value: 1
+
+
+.. py:class:: ServiceDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does the service consists of 
+
+
+
+   .. py:attribute:: groups
+
+
+   .. py:attribute:: models
+
+
+   .. py:attribute:: material
+
+
+   .. py:attribute:: postProcessings
+
+
+   .. py:attribute:: calculations
+
+
+   .. py:attribute:: color
+
+
+   .. py:attribute:: context
+
+
+.. py:class:: FileContentsAM
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a file contain?
+
+
+
+   .. py:attribute:: width
+
+
+   .. py:attribute:: height
+
+
+   .. py:attribute:: length
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: complexity
+
+
+   .. py:attribute:: scalingFactor
+
+
+   .. py:attribute:: femRequested
+
+
+   .. py:attribute:: testType
+
+
+   .. py:attribute:: pressure
+
+
+.. py:class:: Calculations
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a calculation entry contain?
+
+
+   .. py:attribute:: filename
+
+
+   .. py:attribute:: measurements
+
+
+   .. py:attribute:: status_code
+
+
+.. py:class:: Measurements
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a measurement entry contain?
+
+
+   .. py:attribute:: volume
+
+
+   .. py:attribute:: surfaceArea
+
+
+   .. py:attribute:: mbbDimensions
+
+
+   .. py:attribute:: mbbVolume
+
+
+.. py:class:: MbbDimensions
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a mbbDimensions entry contain?
+
+
+   .. py:attribute:: _1
+
+
+   .. py:attribute:: _2
+
+
+   .. py:attribute:: _3
+
+
+.. py:class:: MaterialDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a material entry contain?
+
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: medianPrice
+
+
+   .. py:attribute:: propList
+
+
+   .. py:attribute:: colors
+
+
+.. py:class:: PostProcessDetails
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What does a postprocess entry contain?
+
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: checked
+
+
+   .. py:attribute:: selectedValue
+
+
+   .. py:attribute:: valueList
+
+
+   .. py:attribute:: type
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: NodeTypesAM
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What possible types can a node have in the AM service?
+
+
+
+   .. py:attribute:: organization
+
+
+   .. py:attribute:: printer
+
+
+   .. py:attribute:: material
+
+
+   .. py:attribute:: additionalRequirement
+
+
+   .. py:attribute:: color
+
+
+   .. py:attribute:: materialCategory
+
+
+   .. py:attribute:: technology
+
+
+   .. py:attribute:: materialType
+
+
+.. py:class:: NodePropertiesAMPrinter
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a printer node can have?
+
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: nozzleDiameter
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: lossOfMaterial
+
+
+   .. py:attribute:: fixedCosts
+
+
+   .. py:attribute:: machineBatchDistance
+
+
+   .. py:attribute:: fillRate
+
+
+   .. py:attribute:: chamberBuildHeight
+
+
+   .. py:attribute:: chamberBuildWidth
+
+
+   .. py:attribute:: chamberBuildLength
+
+
+   .. py:attribute:: buildRate
+
+
+   .. py:attribute:: averagePowerConsumption
+
+
+   .. py:attribute:: possibleLayerHeights
+
+
+   .. py:attribute:: machineUsageCosts
+
+
+   .. py:attribute:: machineSurfaceArea
+
+
+   .. py:attribute:: simpleMachineSetUp
+
+
+   .. py:attribute:: complexMachineSetUp
+
+
+   .. py:attribute:: machineHourlyRate
+
+
+   .. py:attribute:: costRatePersonalMachine
+
+
+   .. py:attribute:: coatingTime
+
+
+   .. py:attribute:: maxPrintingSpeed
+
+
+.. py:class:: NodePropertiesAMMaterial
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a material node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: foodSafe
+
+
+   .. py:attribute:: heatResistant
+
+
+   .. py:attribute:: flexible
+
+
+   .. py:attribute:: smooth
+
+
+   .. py:attribute:: eModul
+
+
+   .. py:attribute:: poissonRatio
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: density
+
+
+   .. py:attribute:: printingSpeed
+
+
+   .. py:attribute:: acquisitionCosts
+
+
+   .. py:attribute:: ultimateTensileStrength
+
+
+   .. py:attribute:: tensileModulus
+
+
+   .. py:attribute:: elongationAtBreak
+
+
+   .. py:attribute:: flexuralStrength
+
+
+   .. py:attribute:: specificMaterialType
+
+
+.. py:class:: NodePropertiesAMAdditionalRequirement
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a additional requirement node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: heatResistant
+
+
+   .. py:attribute:: smooth
+
+
+   .. py:attribute:: foodSafe
+
+
+   .. py:attribute:: certificates
+
+
+   .. py:attribute:: treatmentCosts
+
+
+   .. py:attribute:: fixedCosts
+
+
+.. py:class:: NodePropertiesAMColor
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a color node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+   .. py:attribute:: colorRAL
+
+
+   .. py:attribute:: colorHEX
+
+
+   .. py:attribute:: certificates
+
+
+.. py:class:: NodePropertiesAMMaterialCategory
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a material category node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: NodePropertiesAMTechnology
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a technology node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: NodePropertiesAMMaterialType
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the properties, a material type node can have?
+
+
+   .. py:attribute:: imgPath
+
+
+.. py:class:: OrganizationDetailsAM
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the details of an organization?
+
+
+
+   .. py:attribute:: powerCosts
+
+
+   .. py:attribute:: margin
+
+
+   .. py:attribute:: personnelCosts
+
+
+   .. py:attribute:: costRatePersonnelEngineering
+
+
+   .. py:attribute:: repairCosts
+
+
+   .. py:attribute:: additionalFixedCosts
+
+
+   .. py:attribute:: costRateEquipmentEngineering
+
+
+   .. py:attribute:: fixedCostsEquipmentEngineering
+
+
+   .. py:attribute:: safetyGasCosts
+
+
+   .. py:attribute:: roomCosts
+
+
+.. py:class:: ServiceSpecificDetailsForContractors
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What are the details of a service for contractors?
+       
+
+
+   .. py:attribute:: verified
+
+
+   .. py:attribute:: groups
+
+
+.. py:class:: FilterCategories
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What filters can be applied?
+
+
+
+   .. py:attribute:: materialCategory
+
+
+   .. py:attribute:: materialType
+
+
+   .. py:attribute:: tensileStrength
+
+
+   .. py:attribute:: density
+
+
+   .. py:attribute:: elongationAtBreak
+
+
+   .. py:attribute:: certificates
+
+
+.. py:class:: FilterErrors
+
+   Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`
+
+
+   What can go wrong when filtering?
+
+
+
+   .. py:attribute:: material
+
+
+   .. py:attribute:: color
+
+
+   .. py:attribute:: postProcessing
+
+
+   .. py:attribute:: printer
+
+

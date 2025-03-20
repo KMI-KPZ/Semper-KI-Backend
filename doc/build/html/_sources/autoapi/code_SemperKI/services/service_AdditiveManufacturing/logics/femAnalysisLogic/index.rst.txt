@@ -1,0 +1,42 @@
+code_SemperKI.services.service_AdditiveManufacturing.logics.femAnalysisLogic
+============================================================================
+
+.. py:module:: code_SemperKI.services.service_AdditiveManufacturing.logics.femAnalysisLogic
+
+.. autoapi-nested-parse::
+
+   Part of Semper-KI software
+
+   Silvio Weging 2025
+
+   Contains: Logic for FEM analysis
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.femAnalysisLogic.loggerError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   code_SemperKI.services.service_AdditiveManufacturing.logics.femAnalysisLogic.startFEMAnalysis
+
+
+Module Contents
+---------------
+
+.. py:data:: loggerError
+
+.. py:function:: startFEMAnalysis(session, processObj: code_SemperKI.modelFiles.processModel.Process) -> dict | Exception
+
+   Start the FEM Analysis on eligable models and materials
+
+
+
