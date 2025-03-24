@@ -92,6 +92,8 @@ def calculate_bounding_box(mesh):
 
 ##################################################
 def pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt):
+    #Regelungstechnik zur Bestimmung der richtigen Mesh Dichte.
+    #ist nach dem 
     error = setpoint - current_value
     integral += error * dt
     derivative = (error - prev_error) / dt
@@ -100,6 +102,8 @@ def pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt
 
 ##################################################
 def determine_opt_amount_Tets(mesh_data):
+    #ein einfacher Dreisatz zur Bestimmung des richtigen Tetraeder Verhältnisses
+    # für unser Simulationsobjekt
      ratio = calculate_bbox_volume_ratio(mesh_data)
      calc_ratio_TOSV = 0.190595 #for 10000 Tets
      result = (ratio * 10000) / calc_ratio_TOSV
@@ -107,6 +111,9 @@ def determine_opt_amount_Tets(mesh_data):
 
 ##################################################
 def determine_ELF(mesh_data):
+    #Bestimmung des Parameters edge_length_fac (Netzdichte)für das Simulationsobjekt
+    #Ziel ist nicht zu viele und nicht zu wenige Tetraeder zu generieren, da sonst
+    #Simulationsfehler auftreten können
     Setpoint_value, ratio = determine_opt_amount_Tets(mesh_data)
     
     SETPOINT = Setpoint_value
@@ -207,14 +214,16 @@ def determine_ELF(mesh_data):
 
 ##################################################
 def read_and_tetrahedralize(mesh_data, elf):
-    
-    #we need at least 10 iterations here 
+    #tetrahedralisierung der STL_FILE mit edge_length_fac
+
     vertices, tetrahedras = pytetwild.tetrahedralize(mesh_data.points, mesh_data.cells_dict["triangle"], optimize=True, edge_length_fac=elf)
     p, t = np.array(vertices.T, dtype=np.float64), np.array(tetrahedras, dtype=np.float64).T
     return MeshTet(p, t)
 
 ##################################################
 def define_dofs(ib):
+    #definiere Degrees Of Freedom mit dem einfachen Fall,
+    #dass wir die Ränder der BBox erfasst werden
     return {
         'links': ib.get_dofs(lambda x: np.isclose(x[0], x[0].min())),
         'rechts': ib.get_dofs(lambda x: np.isclose(x[0], x[0].max())),
@@ -226,6 +235,8 @@ def define_dofs(ib):
 
 ##################################################
 def define_displacements(pressure, test_type):
+    #Bsp.: Auf die linke Seite des Objektes wirkt gewünschter Druck, 
+    #rechte Seite wird fixiert und ein Druck, oder Streckversuch wird simuliert
     return {
         'links': ('rechts', 'u^1', pressure if test_type == 'compression' else -pressure, 'x'),
         'rechts': ('links', 'u^1', -pressure if test_type == 'compression' else pressure, 'x'),
@@ -237,6 +248,7 @@ def define_displacements(pressure, test_type):
 
 ##################################################
 def yield_stress(array, threshold):
+    # überprüft, ob Von Mises Spannung allen Tetraedern überschritten wurde
     " threshold: yielding stress of material"
     " array: von-mises-stress of all elements"
     max_stress = np.max(array)
@@ -246,6 +258,7 @@ def yield_stress(array, threshold):
 
 ##################################################
 def calculate_displacements_and_stresses(mesh, lame_params, poisson_ratio, ib, K, dofs, displacements, bbox_length, material):
+    # 
     results = {}
     for direction, (opposite, component, press_value, bbox_side) in displacements.items():
         u, F = ib.zeros(), np.zeros(ib.zeros().shape)
