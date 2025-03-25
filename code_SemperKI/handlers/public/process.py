@@ -109,7 +109,7 @@ class SResProcessDetails(serializers.Serializer):
     title = serializers.CharField(max_length=200, required=False)
     clientBillingAddress = serializers.DictField(allow_empty=True, required=False)
     clientDeliverAddress = serializers.DictField(allow_empty=True, required=False)
-    imagePath = serializers.ListField(child=serializers.URLField(), required=False, allow_empty=True)
+    imagePath = serializers.ListField(child=serializers.URLField(allow_blank=True), required=False, allow_empty=True)
     priorities = serializers.DictField(allow_empty=True, required=False)
     prices = serializers.DictField(allow_empty=True, required=False)
     verificationResults = serializers.DictField(allow_empty=True, required=False)

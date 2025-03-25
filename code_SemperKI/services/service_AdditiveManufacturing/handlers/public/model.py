@@ -287,6 +287,10 @@ def uploadFromRepository(request:Request):
 
     """
     try:
+        # Check if there even is one
+        if settings.AWS_SECRET_ACCESS_KEY == "":
+            raise Exception("No AWS credentials found")
+
         inSerializer = SReqUploadModelsFromRepo(data=request.data)
         if not inSerializer.is_valid():
             message = f"Verification failed in {uploadFromRepository.cls.__name__}"
@@ -492,6 +496,10 @@ def getModelRepository(request:Request):
 
     """
     try:
+        # Check if there even is one
+        if settings.AWS_SECRET_ACCESS_KEY == "":
+            raise Exception("No AWS credentials found")
+        
         outDict = logicForGetModelRepository()
         if isinstance(outDict,Exception):
             raise outDict

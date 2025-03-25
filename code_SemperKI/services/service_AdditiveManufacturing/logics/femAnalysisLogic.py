@@ -40,9 +40,9 @@ def startFEMAnalysis(session, processObj:Process) -> dict|Exception:
                 if prop[NodePropertyDescription.key] == NodePropertiesAMMaterial.poissonRatio:
                     poissonRatio = float(prop[NodePropertyDescription.value])
                 elif prop[NodePropertyDescription.key] == NodePropertiesAMMaterial.tensileModulus:
-                    youngsModulus = float(prop[NodePropertyDescription.value])
+                    youngsModulus = float(prop[NodePropertyDescription.value]) * 1000000000 # Convert to Pa from GPa
                 elif prop[NodePropertyDescription.key] == NodePropertiesAMMaterial.ultimateTensileStrength:
-                    yieldingStress = float(prop[NodePropertyDescription.value])
+                    yieldingStress = float(prop[NodePropertyDescription.value]) * 1000000 # Convert to Pa from MPa
                 elif prop[NodePropertyDescription.key] == NodePropertiesAMMaterial.elongationAtBreak:
                     elongationAtBreak = float(prop[NodePropertyDescription.value])
             material = {"Youngs Modulus": youngsModulus, "Poisson Ratio": poissonRatio, "Yielding Stress": yieldingStress, "Elon_at_break": elongationAtBreak}
