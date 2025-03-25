@@ -7,7 +7,6 @@ If you want a good Style Guide for Python, please refer to: [this](https://peps.
 - [Code Style Guide for the backend of SEMPER-KI](#code-style-guide-for-the-backend-of-semper-ki)
   - [Table of content](#table-of-content)
   - [General](#general)
-  - [Folder structure](#folder-structure)
   - [File structure](#file-structure)
   - [Class structure](#class-structure)
   - [Function structure](#function-structure)
@@ -20,7 +19,7 @@ If you want a good Style Guide for Python, please refer to: [this](https://peps.
 ## General
 We use [Camel case](https://en.wikipedia.org/wiki/Camel_case) for almost everything.
 
-## Folder structure
+<!-- ## Folder structure
 - `backend`: Contains docker files, .env files and files necessary for git.
   - `.vscode`: Contains the settings for the local debug configuration
   - `code_*`: Contains source code
@@ -40,7 +39,7 @@ We use [Camel case](https://en.wikipedia.org/wiki/Camel_case) for almost everyth
   - `postgres`: Contains the database(s) for the postgres container
   - `redis`: Contains snapshots of redis
 
-The `Generic_Backend/code_General` folder is the main application with mostly generic code usable by all (future) web-apps. `code_SemperKI` contains all code specific for our purpose including the `code_services` with code that is specific to certain services used in the Semper KI like Additive Manufacturing and so on.
+The `Generic_Backend/code_General` folder is the main application with mostly generic code usable by all (future) web-apps. `code_SemperKI` contains all code specific for our purpose including the `code_services` with code that is specific to certain services used in the Semper KI like Additive Manufacturing and so on. -->
 
 ## File structure
 Every file should start with a header like this:
@@ -51,6 +50,7 @@ Part of Semper-KI software
 Silvio Weging 2023
 
 Contains: Handlers using simulation to check the orders
+
 """
 ```
 
@@ -63,9 +63,9 @@ from django.conf import settings
 
 from channels.layers import get_channel_layer
 
-from ..utilities import basics
-
 from Generic_Backend.code_General.connections import redis
+
+from ..utilities import basics
 
 logger = logging.getLogger("logToFile")
 ################################################################################################
@@ -83,7 +83,7 @@ def updateOrderCollection(request):
     ...
 ``` 
 
-It is recommended to place functions which are used inside the same file as helper functions at the top of the file. Then functions which use GET, followed by those who PATCH, PUT or POST and at the end those that DELETE. If these are inside a class then this structure recursively aplies to member functions as well.
+It is recommended to place functions which are used inside the same file as helper functions at the top of the file. Then handlers which use GET, followed by those who PATCH, PUT or POST and at the end those that DELETE. If these are inside a class then this structure recursively aplies to member functions as well.
 
 
 ## Class structure
@@ -95,10 +95,11 @@ class ManageQueries():
     Contains query from file as object
 
     """
-    savedQuery = None
+    savedQuery = None # static variable, can be changed from outside for every instance
 
     #######################################################
     def __init__(self, ...):
+        self.classVariable = None # Instance specific class variable
         ...
 
     #######################################################
@@ -116,6 +117,10 @@ Exceptions to this structure are Enum-Classes:
 ####################################################################################
 # Enum for updateOrder
 class EnumUpdates(enum.Enum):
+    """
+    This enum class is about something.
+
+    """
     status = 1
     chat = 2
     files = 3
@@ -129,8 +134,8 @@ Functions usually contain the visual barrier, some decorators that check paramet
 ```
 #######################################################
 @checkIfUserIsLoggedIn(json=True)
-@require_http_methods(["GET"])
 @checkIfRightsAreSufficient(json=True)
+@require_http_methods(["GET"])
 def getMissedEvents(request):
     """
     Show how many events (chat messages ...) were missed since last login.
@@ -148,7 +153,7 @@ If the type of a parameter and or the return type of the function is important, 
 def foo(param:type) -> retType:
     ...
 ```
-The docstring is structures as follows:
+The docstring is structured as follows:
 ```
 """
 Context
@@ -256,5 +261,3 @@ Docs are automatically created via [sphinx](https://www.sphinx-doc.org/en/master
 If anything is commited to the main branch of the backend, the CI/CD pipeline is triggered. It goes like this: GitHub starts an action and launches the docker compose command for test. This runs all tests and checks if they work. If so, a webhook event is send to the server which (if successful) pulls the commit and restarts the docker containers for production.
 
 However, this means that the .env file needs to be in the GitHub repository of the backend since it's used by the test container.
-
-It is work-in-progress to also have this for staging and dev.

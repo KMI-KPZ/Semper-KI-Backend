@@ -11,6 +11,7 @@ import enum, logging
 from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from Generic_Backend.code_General.utilities import basics
 from Generic_Backend.code_General.modelFiles.userModel import User, UserDescription, UserNotificationTargets
@@ -1424,6 +1425,10 @@ class ProcessManagementBase(AbstractContentInterface):
             # Send files from local to remote
             for fileKey in processObj.files:
                 if processObj.files[fileKey][FileObjectContent.remote] or processObj.files[fileKey][FileObjectContent.path] == "" or (FileObjectContent.deleteFromStorage in processObj.files[fileKey] and processObj.files[fileKey][FileObjectContent.deleteFromStorage] is False):
+                    continue
+
+                # operate without cloud storage
+                if settings.AWS_SECRET_ACCESS_KEY == "":
                     continue
 
                 pathOnStorage = processObj.files[fileKey][FileObjectContent.path]
