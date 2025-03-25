@@ -251,9 +251,11 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
                         return (model, 500)
 
                 # create preview
-                previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
-                if isinstance(previewPath, Exception):
-                    return (previewPath, 500)
+                previewPath = ""
+                if settings.AWS_SECRET_ACCESS_KEY != "":
+                    previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
+                    if isinstance(previewPath, Exception):
+                        return (previewPath, 500)
                 
                 modelsToBeSaved[fileID] = {}
                 createModel(modelsToBeSaved[fileID], {
