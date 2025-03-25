@@ -20,6 +20,7 @@ from reportlab.lib import pagesizes
 
 from django.utils import timezone
 from django.http import HttpResponse, FileResponse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.request import Request
@@ -124,9 +125,11 @@ def logicForUploadFiles(request, validatedInput:dict, functionName:str):
                 filePath = projectID + "/" + processID + "/" + fileID
 
                 # generate preview
-                previewPath = createAndStorePreview(file, nameOfFile, locale, filePath)
-                if isinstance(previewPath, Exception):
-                    return previewPath, status.HTTP_500_INTERNAL_SERVER_ERROR
+                previewPath = ""
+                if settings.AWS_SECRET_ACCESS_KEY != "":
+                    previewPath = createAndStorePreview(file, nameOfFile, locale, filePath)
+                    if isinstance(previewPath, Exception):
+                        return previewPath, status.HTTP_500_INTERNAL_SERVER_ERROR
 
                 changes["changes"][ProcessUpdates.files][fileID] = {}
                 changes["changes"][ProcessUpdates.files][fileID][FileObjectContent.id] = fileID
