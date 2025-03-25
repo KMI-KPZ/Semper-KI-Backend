@@ -36,7 +36,7 @@ mockMaterials = {
 ##################################################
 def calculate_surface_area(mesh_data):
     """
-    Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.
+    Calculates the total surface area of an STL file by summing up the triangle areas.
     """
     
     vertices = mesh_data.points
@@ -64,7 +64,7 @@ def calculate_surface_area(mesh_data):
 ##################################################
 def calculate_bbox_volume_ratio(mesh_data):
     """
-    Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.
+    Calculates the ratio of surface area to bounding box volume.
     """
     
     vertices = mesh_data.points
@@ -84,6 +84,7 @@ def calculate_bbox_volume_ratio(mesh_data):
 
 ##################################################
 def calculate_bounding_box(mesh):
+    """Calculates the bounding box dimensions of a given mesh. """
     bbox_min = np.min(mesh.p, axis=1)
     bbox_max = np.max(mesh.p, axis=1)
     bbox_dims = bbox_max - bbox_min
@@ -92,8 +93,8 @@ def calculate_bounding_box(mesh):
 
 ##################################################
 def pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt):
-    #Regelungstechnik zur Bestimmung der richtigen Mesh Dichte.
-    #ist nach dem 
+    """A simple PID controller for determining the correct mesh density."""
+    
     error = setpoint - current_value
     integral += error * dt
     derivative = (error - prev_error) / dt
@@ -102,8 +103,8 @@ def pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt
 
 ##################################################
 def determine_opt_amount_Tets(mesh_data):
-    #ein einfacher Dreisatz zur Bestimmung des richtigen Tetraeder Verhältnisses
-    # für unser Simulationsobjekt
+     """Determines the optimal amount of tetrahedra for a given mesh."""
+    
      ratio = calculate_bbox_volume_ratio(mesh_data)
      calc_ratio_TOSV = 0.190595 #for 10000 Tets
      result = (ratio * 10000) / calc_ratio_TOSV
@@ -111,9 +112,7 @@ def determine_opt_amount_Tets(mesh_data):
 
 ##################################################
 def determine_ELF(mesh_data):
-    #Bestimmung des Parameters edge_length_fac (Netzdichte)für das Simulationsobjekt
-    #Ziel ist nicht zu viele und nicht zu wenige Tetraeder zu generieren, da sonst
-    #Simulationsfehler auftreten können
+    """" Determines the optimal edge length factor for a given mesh."""
     Setpoint_value, ratio = determine_opt_amount_Tets(mesh_data)
     
     SETPOINT = Setpoint_value
@@ -154,10 +153,7 @@ def determine_ELF(mesh_data):
             successful_runs.append((edge_length_fac, num_elements))          
             relative_error = abs(SETPOINT - num_elements) / SETPOINT
             if iteration >= min_iterations and relative_error <= tolerance:
-                # print(f"\nZielwert erreicht mit {num_elements:,} Tetraedern!", flush=True)
-                # print(f"Relative Abweichung: {relative_error*100:.1f}% (Toleranz: {tolerance*100:.1f}%)")
-                # print(f"Abbruch nach {iteration + 1} Iterationen")
-                return edge_length_fac
+               return edge_length_fac
             
             current_difference = abs(SETPOINT - num_elements)
             if current_difference < best_difference:
@@ -203,18 +199,18 @@ def determine_ELF(mesh_data):
         time.sleep(0.5)
     
  
-    #for idx, (elf, num) in enumerate(successful_runs, 1):
-        #print(f"Durchlauf {idx}: ELF={elf:.4f}, Tetraeder={num:,}", flush=True)
-    
     if best_run:
-        #print(f"\nBester Durchlauf: ELF={best_run[0]:.4f} mit {best_run[1]:,} Tetraedern")
-        #print(f"Abweichung vom Zielwert: {abs(SETPOINT-best_run[1]):,} ({abs(SETPOINT-best_run[1])/SETPOINT*100:.1f}%)")
-        return best_run[0]
+       return best_run[0]
     return 0.01
 
 ##################################################
 def read_and_tetrahedralize(mesh_data, elf):
-    #tetrahedralisierung der STL_FILE mit edge_length_fac
+    """ Reads a mesh file and tetrahedralizes it with the given edge length factor.
+    
+    :mesh_data: meshio mesh object"
+    :elf: edge length factor"
+    :returns: MeshTet object"
+    """
 
     vertices, tetrahedras = pytetwild.tetrahedralize(mesh_data.points, mesh_data.cells_dict["triangle"], optimize=True, edge_length_fac=elf)
     p, t = np.array(vertices.T, dtype=np.float64), np.array(tetrahedras, dtype=np.float64).T
@@ -222,8 +218,10 @@ def read_and_tetrahedralize(mesh_data, elf):
 
 ##################################################
 def define_dofs(ib):
-    #definiere Degrees Of Freedom mit dem einfachen Fall,
-    #dass wir die Ränder der BBox erfasst werden
+    """Defines the degrees of freedom for the simulation.
+
+    ib: The basis object for the simulation.
+    """
     return {
         'links': ib.get_dofs(lambda x: np.isclose(x[0], x[0].min())),
         'rechts': ib.get_dofs(lambda x: np.isclose(x[0], x[0].max())),
@@ -235,8 +233,12 @@ def define_dofs(ib):
 
 ##################################################
 def define_displacements(pressure, test_type):
-    #Bsp.: Auf die linke Seite des Objektes wirkt gewünschter Druck, 
-    #rechte Seite wird fixiert und ein Druck, oder Streckversuch wird simuliert
+    """Defines the displacements for the simulation.
+
+        pressure: The pressure applied to the model.
+        test_type: The type of test to be performed ('compression' or 'tension').
+        returns: A dictionary containing the displacements for each side of the model.
+    """
     return {
         'links': ('rechts', 'u^1', pressure if test_type == 'compression' else -pressure, 'x'),
         'rechts': ('links', 'u^1', -pressure if test_type == 'compression' else pressure, 'x'),
@@ -248,9 +250,13 @@ def define_displacements(pressure, test_type):
 
 ##################################################
 def yield_stress(array, threshold):
-    # überprüft, ob Von Mises Spannung allen Tetraedern überschritten wurde
-    " threshold: yielding stress of material"
-    " array: von-mises-stress of all elements"
+    """Calculates the percentage of elements that exceed the yield stress threshold.
+    
+    array: The array of stresses to be analyzed.
+    threshold: The yield stress threshold.
+    returns: A dictionary containing the stress percentage and the indices of the plastic elements.
+    
+    """
     max_stress = np.max(array)
     stress_percentage = (max_stress / threshold) * 100
     plastic_elements = [i for i in range(len(array)) if array[i] > threshold]
@@ -258,7 +264,20 @@ def yield_stress(array, threshold):
 
 ##################################################
 def calculate_displacements_and_stresses(mesh, lame_params, poisson_ratio, ib, K, dofs, displacements, bbox_length, material):
-    # 
+    """Calculates the displacements and stresses for the given mesh and material properties.
+   
+    mesh: The mesh object for the simulation.
+    lame_params: The parameters for the linear elasticity model.
+    poisson_ratio: The Poisson ratio of the material.
+    ib: The basis object for the simulation.
+    K: The stiffness matrix for the simulation.
+    dofs: The degrees of freedom for the simulation.
+    displacements: The displacements for the simulation.
+    bbox_length: The dimensions of the bounding box.
+    material: The material properties for the simulation.
+    
+    returns: A dictionary containing the results of the simulation.
+    """
     results = {}
     for direction, (opposite, component, press_value, bbox_side) in displacements.items():
         u, F = ib.zeros(), np.zeros(ib.zeros().shape)
@@ -299,7 +318,8 @@ def calculate_displacements_and_stresses(mesh, lame_params, poisson_ratio, ib, K
 
 ##################################################
 def calculate_average_results(results_list):
-    """Berechnet Mittelwerte der Simulationsergebnisse"""
+    """ Calculates the average results for a list of simulation results."""
+    
     avg_results = {}
     for direction in results_list[0].keys():
         avg_results[direction] = {
@@ -318,7 +338,16 @@ def calculate_average_results(results_list):
 
 ##################################################
 def run_FEM_test(material, pressure, stl_file, stl_fileName, test_type, resultQueue):
-    try:# print("\nStarte FEM-Simulationen mit Mittelwertberechnung...")
+    """ Runs a FEM simulation for a given STL file and material properties.
+    
+    :material: The material properties for the simulation.
+    :pressure: The pressure applied to the model.
+    :stl_file: The STL file to be simulated.
+    :test_type: The type of test to be performed ('compression' or 'tension').
+    :returns: A dictionary containing the results of the simulation.
+    """
+    
+    try:
         output_data = {}
         with tempfile.TemporaryDirectory() as tempDir: # because meshio.read does not accept BytesIO, we have to use this bs
             temporaryFileName = tempDir+"\\"+stl_fileName
