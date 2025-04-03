@@ -132,3 +132,7 @@ As for the compose files:
 - ```python manage.py mail --env <environment> email-address``` to send a test mail to the email-address
 
 
+## CI/CD
+If anything is commited to the main branch of the backend, the CI/CD pipeline is triggered. It goes like this: GitHub starts an action and launches the docker compose command for test. This runs all tests and checks if they work. If so, a webhook event is send to the server which (if successful) pulls the commit and restarts the docker containers for production.
+
+However, this means that the content of the .env.production file needs to be in the GitHub secrets of the backend since it's used by the test container.
