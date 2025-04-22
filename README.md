@@ -2,9 +2,10 @@
 
 <p align="center">
   <a href="https://semper-ki.org/">
-    <img src="doc/readmeKissLogo.png" alt="logo" width="130" height="130">
+    <img src="doc/readme_kiss_logo.png" alt="kiss-logo" width="130" height="130">
   </a>
 </p>
+
 
 ## 🔍 Project Overview
 
