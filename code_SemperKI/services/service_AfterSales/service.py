@@ -10,6 +10,7 @@ from django.conf import settings
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
+from code_SemperKI.utilities.basics import staticMediaContentForSemperKI
 
 from .connections.postgresql.pgService import initializeService as AS_initializeService, updateServiceDetails as AS_updateServiceDetails, deleteServiceDetails as AS_deleteServiceDetails, isFileRelevantForService as AS_isFileRelevantForService, serviceReady as AS_serviceReady, cloneServiceDetails as AS_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as AS_checkIfSelectionIsAvailable
@@ -167,4 +168,4 @@ class AfterSales(Semper.ServiceBase):
         """
         return []
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AfterSales(), settings.STATIC_URL+"media/AS.png")
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, AfterSales(), staticMediaContentForSemperKI.getValue("AS"))

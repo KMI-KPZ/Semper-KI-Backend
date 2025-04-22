@@ -83,6 +83,7 @@ class BackendConfigHelper(ConfigHelper):
         'AWS_CDN_ENDPOINT': {'var': 'AWS_CDN_ENDPOINT', 'hint': 'Same as domain, except for cdn. before the domain', 'default': None, 'required': True},
         'AWS_LOCATION': {'var': 'AWS_LOCATION', 'hint': 'Usually the same as the bucket name but can be different', 'default': None, 'required': True},
         'AWS_STATICS_LOCATION': {'var': 'AWS_STATICS_LOCATION', 'hint': 'Same but for the statics folder', 'default': None, 'required': True},
+        'STATIC_URL': {'var': 'STATIC_URL', 'hint': 'URL for the static files', 'default': None, 'required': True},
 
         'EMAIL_HOST': {'var': 'EMAIL_HOST', 'hint': 'Email host for sending emails', 'default': 'localhost', 'required': False,},
         'EMAIL_HOST_PASSWORD': {'var': 'EMAIL_HOST_PASSWORD', 'hint': 'Email host password for sending emails', 'default': '', 'required': False,},
@@ -440,8 +441,6 @@ STORAGES = {
     }
 }
 
-
-STATIC_URL = f"https://{AWS_STATICS_BUCKET_NAME}.{AWS_REGION_NAME}.{AWS_CDN_ENDPOINT}/{AWS_STATICS_LOCATION}/public/"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

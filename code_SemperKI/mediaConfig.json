@@ -1,0 +1,14 @@
+{
+    "testPicture" : "media/testpicture.jpg",
+    "previewNotAvailable" : "media/PreviewNotAvailable.png",
+    "previewNotAvailableGER" : "media/KeineVorschauVerfuegbar.png",
+    "kissLogo" : "media/KISS_logo.jpg",
+    "AM": "media/AM.png",
+    "AS": "media/AS.png",
+    "A": "media/A.png",
+    "CM": "media/CM.png",
+    "D": "media/D.png",
+    "P": "media/P.png",
+    "PP": "media/PP.png",
+    "QC": "media/QC.png"
+}
