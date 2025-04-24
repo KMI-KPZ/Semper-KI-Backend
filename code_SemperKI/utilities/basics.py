@@ -140,7 +140,37 @@ def checkVersion(version=0.3):
     return decorator
 
 #######################################################
-testPicture = settings.STATIC_URL+"media/testpicture.jpg"
-previewNotAvailable = settings.STATIC_URL+"media/PreviewNotAvailable.png"
-previewNotAvailableGER = settings.STATIC_URL+"media/KeineVorschauVerfuegbar.png"
-kissLogo = settings.STATIC_URL+"media/KISS_logo.jpg"
+class StaticMediaContentForSemperKI:
+    """
+    Class that holds all static media content for Semper-KI
+    """
+
+    #######################################################
+    def __init__(self):
+        with open(str(settings.BASE_DIR) + "/code_SemperKI/mediaConfig.json") as configFile:
+            config = json.load(configFile)
+            self.config = config
+
+    #######################################################
+    # Static Media Content
+    def getValue(self, key:str) -> str:
+        """
+        Retrieve value from config file
+
+        :param key: Key to retrieve value for
+        :type key: str
+        :return: Value for the key
+        :rtype: str
+
+        """
+        if key in self.config:
+            return settings.S3_STATIC_URL + self.config[key]
+        else:
+            return ""
+staticMediaContentForSemperKI = StaticMediaContentForSemperKI()
+
+#######################################################
+testPicture = staticMediaContentForSemperKI.getValue("testpicture")
+previewNotAvailable = staticMediaContentForSemperKI.getValue("previewNotAvailable")
+previewNotAvailableGER = staticMediaContentForSemperKI.getValue("previewNotAvailableGER")
+kissLogo = staticMediaContentForSemperKI.getValue("kissLogo")

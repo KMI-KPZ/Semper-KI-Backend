@@ -10,6 +10,7 @@ from django.conf import settings
 import code_SemperKI.serviceManager as Semper
 from code_SemperKI.modelFiles.processModel import ProcessInterface, Process
 from code_SemperKI.definitions import PricesDetails
+from code_SemperKI.utilities.basics import staticMediaContentForSemperKI
 
 from .connections.postgresql.pgService import initializeService as QC_initializeService, updateServiceDetails as QC_updateServiceDetails, deleteServiceDetails as QC_deleteServiceDetails, isFileRelevantForService as QC_isFileRelevantForService, serviceReady as QC_serviceReady, cloneServiceDetails as QC_cloneServiceDetails
 from .logics.checkServiceLogic import checkIfSelectionIsAvailable as QC_checkIfSelectionIsAvailable
@@ -168,4 +169,4 @@ class QualityControl(Semper.ServiceBase):
         """
         return []
 
-Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl(), settings.STATIC_URL+"media/QC.png")
+Semper.serviceManager.register(SERVICE_NAME, SERVICE_NUMBER, QualityControl(), staticMediaContentForSemperKI.getValue("QC"))

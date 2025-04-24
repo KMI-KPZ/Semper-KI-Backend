@@ -542,7 +542,7 @@ def logicForCloneProcesses(request:Request, oldProjectID:str, oldProcessIDs:list
                 newFile[FileObjectContent.date] = str(timezone.now())
                 if FileObjectContent.isFile not in newFile or newFile[FileObjectContent.isFile]:
                     if oldFile[FileObjectContent.remote]:
-                        s3.manageRemoteS3.copyFile(settings.AWS_BUCKET_NAME+"/"+oldFile[FileObjectContent.path], newFilePath)
+                        s3.manageRemoteS3.copyFile(settings.S3_BUCKET_NAME+"/"+oldFile[FileObjectContent.path], newFilePath)
                     else:
                         s3.manageLocalS3.copyFile(oldFile[FileObjectContent.path], newFilePath)
                 newFileDict[fileKey] = newFile

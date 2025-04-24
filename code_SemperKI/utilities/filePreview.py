@@ -49,7 +49,7 @@ try:
             #fileNameRoot, extension= os.path.splitext(file.name)
             basePath = storagePath+"_preview"+".jpg"
             remotePath = "public/previews/" + basePath
-            outPath = settings.STATIC_URL + "previews/" + basePath
+            outPath = settings.S3_STATIC_URL + "previews/" + basePath
             try:
                 pathToPreviewImage = ""
                 #resultQueue = MPQueue()
