@@ -37,13 +37,13 @@ def getEmptyMockModel():
 def mockMaterials():
     materials = {"materials": []}
 
-    materials["materials"].append({"id": crypto.generateMD5("PLA - black"), "title": "PLA - black", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_black.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - white"), "title": "PLA - white", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_white.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - gray"), "title": "PLA - gray", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_grey.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - red"), "title": "PLA - red", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_red.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - blue"), "title": "PLA - blue", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_blue.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - yellow"), "title": "PLA - yellow", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_yellow.jpg"})
-    materials["materials"].append({"id": crypto.generateMD5("PLA - green"), "title": "PLA - green", "propList": [], "imgPath": settings.STATIC_URL+"media/PLA_green.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - black"), "title": "PLA - black", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_black.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - white"), "title": "PLA - white", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_white.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - gray"), "title": "PLA - gray", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_grey.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - red"), "title": "PLA - red", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_red.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - blue"), "title": "PLA - blue", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_blue.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - yellow"), "title": "PLA - yellow", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_yellow.jpg"})
+    materials["materials"].append({"id": crypto.generateMD5("PLA - green"), "title": "PLA - green", "propList": [], "imgPath": settings.S3_STATIC_URL+"media/PLA_green.jpg"})
 
     """
     materials["materials"].append({"id": crypto.generateMD5("ABS"), "title": "ABS", "propList": ["Tough", "Heat resistant", "Impact resistant"], "URI": testpicture})

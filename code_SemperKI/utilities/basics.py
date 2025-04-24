@@ -164,7 +164,7 @@ class StaticMediaContentForSemperKI:
 
         """
         if key in self.config:
-            return settings.STATIC_URL + self.config[key]
+            return settings.S3_STATIC_URL + self.config[key]
         else:
             return ""
 staticMediaContentForSemperKI = StaticMediaContentForSemperKI()

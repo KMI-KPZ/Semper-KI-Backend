@@ -1428,7 +1428,7 @@ class ProcessManagementBase(AbstractContentInterface):
                     continue
 
                 # operate without cloud storage
-                if settings.AWS_SECRET_ACCESS_KEY == "":
+                if settings.S3_SECRET_ACCESS_KEY == "":
                     continue
 
                 pathOnStorage = processObj.files[fileKey][FileObjectContent.path]

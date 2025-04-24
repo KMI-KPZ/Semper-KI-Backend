@@ -288,7 +288,7 @@ def uploadFromRepository(request:Request):
     """
     try:
         # Check if there even is one
-        if settings.AWS_SECRET_ACCESS_KEY == "":
+        if settings.S3_SECRET_ACCESS_KEY == "":
             raise Exception("No AWS credentials found")
 
         inSerializer = SReqUploadModelsFromRepo(data=request.data)
@@ -497,7 +497,7 @@ def getModelRepository(request:Request):
     """
     try:
         # Check if there even is one
-        if settings.AWS_SECRET_ACCESS_KEY == "":
+        if settings.S3_SECRET_ACCESS_KEY == "":
             raise Exception("No AWS credentials found")
         
         outDict = logicForGetModelRepository()
