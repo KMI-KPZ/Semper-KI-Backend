@@ -47,12 +47,12 @@ services:
     container_name: minio-production
     volumes:
       - ./minio/data:/data
-      - ./minio/config:/root/.minio
       - ./docker/docker-service-minio-start.sh:/usr/local/bin/docker-service-minio-start.sh
     env_file:
       - .env.production
     ports:
       - "127.0.0.1:4571:9000"
+      - "127.0.0.1:9002:9001"
     entrypoint: /usr/local/bin/docker-service-minio-start.sh
     networks:
       - semper-ki-production-network
