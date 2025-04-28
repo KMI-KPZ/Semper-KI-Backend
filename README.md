@@ -2,9 +2,10 @@
 
 <p align="center">
   <a href="https://semper-ki.org/">
-    <img src="doc/readme_kiss_logo.png" alt="kiss-logo" width="130" height="130">
+    <img src="./doc/readme_kiss_logo.png" alt="kiss-logo" width="130" height="130">
   </a>
 </p>
+
 
 
 ## 🔍 Project Overview
@@ -141,6 +142,12 @@ Follow installation in [Getting Started](#-Getting-Started) (clone project and i
 python -m pip install -r requirements.txt
 ```
 
+NOTE for Linux users:
+- Verify that the Python 3.11 development headers are installed
+```
+sudo apt-get install python3.11-dev
+```
+
 #### Services
 - Run the services in Docker containers:
 
@@ -165,6 +172,32 @@ python manage.py migrate --env local
 3. Run the backend locally:
 ```
 python manage.py runserver --env local
+```
+
+#### Optional commands
+
+- **Generate Example .env File:**
+Outputs an example .env file with default values. Use -p --env to see the current values used by Django.
+```
+python manage.py generate_env 
+```
+
+- **Create Database:**
+Creates the database specified in the environment. (Currently, the database name should be "local".)
+```
+python manage.py create_db --env <environment> 
+```
+
+- **Check Environment Health:**
+Verifies that configuration parameters are set correctly, and ensures that both the database and Redis are reachable.
+```
+python manage.py check --env <environment>
+```
+
+- **Send Test Email:**
+Sends a test email to the address configured for the environment.
+```
+python manage.py mail --env <environment> 
 ```
 
 
