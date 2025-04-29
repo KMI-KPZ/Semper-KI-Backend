@@ -47,12 +47,12 @@ services:
     container_name: minio-staging
     volumes:
       - ./minio/data:/data
-      - ./minio/config:/root/.minio
       - ./docker/docker-service-minio-start.sh:/usr/local/bin/docker-service-minio-start.sh
     env_file:
       - .env.staging
     ports:
       - "127.0.0.1:4570:9000"
+      - "127.0.0.1:9001:9001"
     entrypoint: /usr/local/bin/docker-service-minio-start.sh
     networks:
       - semper-ki-staging-network

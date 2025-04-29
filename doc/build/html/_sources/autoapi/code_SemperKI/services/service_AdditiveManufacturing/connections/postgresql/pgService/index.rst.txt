@@ -33,6 +33,7 @@ Functions
    code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.isFileRelevantForService
    code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.serviceReady
    code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.cloneServiceDetails
+   code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails
 
 
 Module Contents
@@ -113,6 +114,17 @@ Module Contents
    :type newProcess: Process|ProcessInterface
    :return: The copy of the service details
    :rtype: dict
+
+
+
+.. py:function:: getSearchableDetails(existingContent: dict) -> list
+
+   Get the searchable details for the frontend
+
+   :param existingContent: What the process currently holds about the service
+   :type existingContent: dict
+   :return: The searchable details
+   :rtype: list
 
 
 

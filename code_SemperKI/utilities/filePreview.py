@@ -49,7 +49,7 @@ try:
             #fileNameRoot, extension= os.path.splitext(file.name)
             basePath = storagePath+"_preview"+".jpg"
             remotePath = "public/previews/" + basePath
-            outPath = settings.STATIC_URL + "previews/" + basePath
+            outPath = settings.S3_STATIC_URL + "previews/" + basePath
             try:
                 pathToPreviewImage = ""
                 #resultQueue = MPQueue()
@@ -90,7 +90,8 @@ try:
         try:
             if path == previewNotAvailableGER or path == previewNotAvailable:
                 return
-            manageStaticsS3.deleteFile(path)
+            pathInStorage = "public/" + path.replace(settings.S3_STATIC_URL, "")
+            manageStaticsS3.deleteFile(pathInStorage)
         except Exception as error:
             loggerError.error(f"Error while deleting preview: {str(error)}")
 

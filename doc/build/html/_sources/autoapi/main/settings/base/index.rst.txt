@@ -45,7 +45,6 @@ Attributes
    main.settings.base.WSGI_APPLICATION
    main.settings.base.ASGI_APPLICATION
    main.settings.base.STORAGES
-   main.settings.base.STATIC_URL
    main.settings.base.REST_FRAMEWORK
    main.settings.base.SPECTACULAR_SETTINGS
 
@@ -211,8 +210,6 @@ Module Contents
 
 
 .. py:data:: STORAGES
-
-.. py:data:: STATIC_URL
 
 .. py:data:: REST_FRAMEWORK
 

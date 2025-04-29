@@ -166,6 +166,15 @@ Module Contents
 
 
 
+   .. py:method:: getSearchableDetails(existingContent) -> list
+      :abstractmethod:
+
+
+      Get the details for the search index as a string list
+
+
+
+
 .. py:class:: ServicesStructure
 
    Bases: :py:obj:`Generic_Backend.code_General.utilities.customStrEnum.StrEnumExactlyAsDefined`

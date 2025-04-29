@@ -252,7 +252,7 @@ def logicForUploadModel(validatedInput:dict, request) -> tuple[Exception, int]:
 
                 # create preview
                 previewPath = ""
-                if settings.AWS_SECRET_ACCESS_KEY != "":
+                if settings.S3_SECRET_ACCESS_KEY != "":
                     previewPath = createAndStorePreview(model, nameOfFile, locale, filePath)
                     if isinstance(previewPath, Exception):
                         return (previewPath, 500)
@@ -528,14 +528,14 @@ def logicForGetModelRepository() -> dict|Exception:
         redisConn = RedisConnection()
         redisContent = redisConn.retrieveContentJSON("ModelRepository")
         if redisContent[1] is False:
-            content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.AWS_BUCKET_NAME+"/ModelRepository")
+            content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.S3_BUCKET_NAME+"/ModelRepository")
             outDict = {"repository": {}}
             for elem in content:
                 path = elem["Key"]
                 splitPath = path.split("/")[1:]
                 pathWithoutBucket = '/'.join(splitPath)
                 sizeOfFile = elem["Size"]
-                nameOfFile = splitPath[1]
+                nameOfFile = splitPath[1] + ".stl"
                 if path[-1] != "/":
                     if ContentOfRepoModel.license.value in elem["Metadata"]:
                         licenseOfFile = elem["Metadata"][ContentOfRepoModel.license.value]

@@ -18,6 +18,7 @@ Attributes
 
 .. autoapisummary::
 
+   code_SemperKI.utilities.basics.staticMediaContentForSemperKI
    code_SemperKI.utilities.basics.testPicture
    code_SemperKI.utilities.basics.previewNotAvailable
    code_SemperKI.utilities.basics.previewNotAvailableGER
@@ -30,6 +31,7 @@ Classes
 .. autoapisummary::
 
    code_SemperKI.utilities.basics.VersioningForHandlers
+   code_SemperKI.utilities.basics.StaticMediaContentForSemperKI
 
 
 Functions
@@ -106,6 +108,25 @@ Module Contents
    :return: Response whether the version is supported or not
    :rtype: HTTPRespone
 
+
+.. py:class:: StaticMediaContentForSemperKI
+
+   Class that holds all static media content for Semper-KI
+
+
+   .. py:method:: getValue(key: str) -> str
+
+      Retrieve value from config file
+
+      :param key: Key to retrieve value for
+      :type key: str
+      :return: Value for the key
+      :rtype: str
+
+
+
+
+.. py:data:: staticMediaContentForSemperKI
 
 .. py:data:: testPicture
 
