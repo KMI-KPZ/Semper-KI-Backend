@@ -27,11 +27,11 @@ streamlining the process of connecting supply and demand in the 3D printing indu
 
 - **Language**: Python 3.11
 - **Backend**: Django, Django REST Framework, Channels
-- **Auth & Security**: Authlib, python-jose, PyJWT, social-auth-app-django
+- **Auth & Security**: Authlib, OAuth2
 - **Database**: PostgreSQL
 - **Caching**: Redis
 - **Task Queue**: Celery (Redis as broker)
-- **Storage**: MinIO, Amazon S3 (`django-storages`)
+- **Storage**: MinIO
 - **API Documentation**: Swagger UI (DRF Spectacular)
 - **Testing & Debugging**: pytest, Django Test Framework
 - **Deployment**: Gunicorn, Uvicorn, Nginx
@@ -41,7 +41,7 @@ streamlining the process of connecting supply and demand in the 3D printing indu
 - **PDF & Document Parsing**: PyMuPDF, pdfplumber, reportlab
 - **Geospatial**: geopy
 - **Semantic Web**: SPARQLWrapper
-- **Code Quality**: Pylint, Flake8
+- **Code Quality**: Pylint
 
 
 ## 📚 Table of Contents
@@ -50,7 +50,9 @@ streamlining the process of connecting supply and demand in the 3D printing indu
 2. [Development](#-Development)
 3. [Deployment](#-Deployment)
 4. [Best Practices](#-Best-Practices)
-5. [License](#-License)
+5. [Testing](#-Testing)
+6. [Important Components](#-Important-Components)
+7. [License](#-License)
 
 
 ## 🚀 Getting Started
@@ -69,7 +71,7 @@ Make sure you have the following `.env` file
 
 - If you don't have this .env file:
   - Ask the KISS team to send it to you
-  - You can check the .env template `exampleEnv.txt`
+  - You can check the .env template `exampleEnv.txt` and fill it out yourself
 
 ### Installation
 
@@ -312,31 +314,52 @@ The process works as follows:
 >  **Note:** Since the `.env.production` file is used by the test container, its contents must be stored securely in the GitHub secrets for the backend repository
 
 
-
 ## 🌟 Best Practices
 ### Clean Code
-bla
-
-### Naming
-bla
+See [CodeStyle.md](./CodeStyle.md) for the code style used in this project.
 
 
 ### Linting and Formatting
-
 A `.pylintrc` configuration file is located in the main folder and can be used with the **Pylint** extension in VS Code.
 This ensures consistent linting across the project.
 
-### VSCode Extensions
+### Recommended VSCode Extensions
 
-- pylintrc
+- Pylint
+- Docker
+- Dev Containers
+- GitHub Actions
+- Python
+- Pip Manager
 
-#### WSL Extensions
-bla
+## 🔧 Testing
+### Running Tests
+To run the tests, start the Docker containers using the `docker-compose.test.yml` file and look at the logs of the backend container to find errors. Alternatively, start the local_container version, go inside the container (either with the interface or via `docker exec -it <container name>`), type `bash` to get a console and call `python manage.py --env local_container test`.
 
-#### Local Extensions
+### Test files
+- `code_SemperKI/tests.py`: Contains all tests for the Semper-KI Part of the backend
+- `code_SemperKI/services/service_AdditiveManufacturing/tests.py`: Contains all tests for the Additive Manufacturing Service
+- `Generic_Backend/tests.py`: Contains all tests for the Generic Backend
 
-bla
+## 📌 Important Components
+### FEM Analysis
+The platform contains a finite element simulation tool designed for 3D mechanical testing of arbitrary geometries described via STL files. It simulates simple compression or tension tests by automatically meshing the geometry and solving a linear elasticity problem. Please refer to [README_FEM.md](./code_SemperKI/services/service_AdditiveManufacturing/tasks/README_FEM.md) for more details.
 
+### MinIO
+[MinIO](https://min.io/) is used for object storage, providing a scalable and high-performance solution for storing files. It is compatible with the S3 API, making it easy to integrate with existing applications.
+The backend can be run with an external S3 storage as well as with MinIO. To use the latter, some environment variables need to be set in the `.env.` files and a few folders need creating:
+
+- Start the service via `docker-compose.local-dev-services.yml` or the `start_local_dev` script
+- Open [http://127.0.0.1:9001](http://127.0.0.1:9001) and log in with the credentials set in the `.env` file
+- Create a bucket called `kiss` and set the access policy to `public` with anynmous access set to read-only
+  - Create a new path inside that bucket named `kiss` as well
+  - Inside that path, the `ModelRepository` folder can to be created should you have one (this is not necessary for the backend to run but could be useful)
+  - Upload some empty txt file or something, otherwise MinIO will delete the folder right away
+- Create a bucket named `static` and set the access policy to `public` with anynmous access set to read-only
+  - Create a new path inside that bucket named `public`
+  - Inside that path, create two folders, `media` and `previews`
+  - `media` should hold the icons for the services as well as placeholders like the KISS_logo and such (see [mediaConfig.json](./code_SemperKI/mediaConfig.json))
+  - `previews` holds the preview images for the uploaded 3D models
 
 ## 📜 License
 
