@@ -55,7 +55,7 @@ Module Contents
 
 
 
-   .. py:method:: addContentJSON(key, content, expire=False)
+   .. py:method:: addContentJSON(key, content, expire=True)
 
       Save a key and its content in redis.
 

@@ -55,43 +55,43 @@ Silvio Weging 2025</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_surface_area</span></code></a>(mesh_data)</p></td>
-<td><p>Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.</p></td>
+<td><p>Calculates the total surface area of an STL file by summing up the triangle areas.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_bbox_volume_ratio</span></code></a>(mesh_data)</p></td>
-<td><p>Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.</p></td>
+<td><p>Calculates the ratio of surface area to bounding box volume.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_bounding_box</span></code></a>(mesh)</p></td>
-<td><p></p></td>
+<td><p>Calculates the bounding box dimensions of a given mesh.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pid_controller</span></code></a>(setpoint, current_value, prev_error, ...)</p></td>
-<td><p></p></td>
+<td><p>A simple PID controller for determining the correct mesh density.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_opt_amount_Tets</span></code></a>(mesh_data)</p></td>
-<td><p></p></td>
+<td><p>Determines the optimal amount of tetrahedra for a given mesh.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_ELF</span></code></a>(mesh_data)</p></td>
-<td><p></p></td>
+<td><p>&quot; Determines the optimal edge length factor for a given mesh.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_and_tetrahedralize</span></code></a>(mesh_data, elf)</p></td>
-<td><p></p></td>
+<td><p>Reads a mesh file and tetrahedralizes it with the given edge length factor.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_dofs</span></code></a>(ib)</p></td>
-<td><p></p></td>
+<td><p>Defines the degrees of freedom for the simulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_displacements</span></code></a>(pressure, test_type)</p></td>
-<td><p></p></td>
+<td><p>Defines the displacements for the simulation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">yield_stress</span></code></a>(array, threshold)</p></td>
-<td><p>threshold: yielding stress of material</p></td>
+<td><p>Calculates the percentage of elements that exceed the yield stress threshold.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_displacements_and_stresses</span></code></a>(mesh, ...)</p></td>
-<td><p></p></td>
+<td><p>Calculates the displacements and stresses for the given mesh and material properties.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_average_results</span></code></a>(results_list)</p></td>
-<td><p>Berechnet Mittelwerte der Simulationsergebnisse</p></td>
+<td><p>Calculates the average results for a list of simulation results.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test" title="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_FEM_test</span></code></a>(material, pressure, stl_file, ...)</p></td>
-<td><p></p></td>
+<td><p>Runs a FEM simulation for a given STL file and material properties.</p></td>
 </tr>
 </tbody>
 </table>
@@ -106,71 +106,125 @@ Silvio Weging 2025</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_surface_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_surface_area" title="Link to this definition">¶</a></dt>
-<dd><p>Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.</p>
+<dd><p>Calculates the total surface area of an STL file by summing up the triangle areas.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_bbox_volume_ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bbox_volume_ratio" title="Link to this definition">¶</a></dt>
-<dd><p>Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.</p>
+<dd><p>Calculates the ratio of surface area to bounding box volume.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_bounding_box" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculates the bounding box dimensions of a given mesh.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">pid_controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integral</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ki</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Kd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.pid_controller" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A simple PID controller for determining the correct mesh density.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">determine_opt_amount_Tets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_opt_amount_Tets" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Determines the optimal amount of tetrahedra for a given mesh.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">determine_ELF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.determine_ELF" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>“ Determines the optimal edge length factor for a given mesh.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">read_and_tetrahedralize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.read_and_tetrahedralize" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads a mesh file and tetrahedralizes it with the given edge length factor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Mesh_data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>meshio mesh object”</p>
+</dd>
+<dt class="field-even">Elf<span class="colon">:</span></dt>
+<dd class="field-even"><p>edge length factor”</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MeshTet object”</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">define_dofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ib</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_dofs" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Defines the degrees of freedom for the simulation.</p>
+<p>ib: The basis object for the simulation.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">define_displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pressure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.define_displacements" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Defines the displacements for the simulation.</p>
+<p>pressure: The pressure applied to the model.
+test_type: The type of test to be performed (‘compression’ or ‘tension’).
+returns: A dictionary containing the displacements for each side of the model.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">yield_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.yield_stress" title="Link to this definition">¶</a></dt>
-<dd><p>threshold: yielding stress of material</p>
+<dd><p>Calculates the percentage of elements that exceed the yield stress threshold.</p>
+<p>array: The array of stresses to be analyzed.
+threshold: The yield stress threshold.
+returns: A dictionary containing the stress percentage and the indices of the plastic elements.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_displacements_and_stresses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lame_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poisson_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ib</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_displacements_and_stresses" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculates the displacements and stresses for the given mesh and material properties.</p>
+<p>mesh: The mesh object for the simulation.
+lame_params: The parameters for the linear elasticity model.
+poisson_ratio: The Poisson ratio of the material.
+ib: The basis object for the simulation.
+K: The stiffness matrix for the simulation.
+dofs: The degrees of freedom for the simulation.
+displacements: The displacements for the simulation.
+bbox_length: The dimensions of the bounding box.
+material: The material properties for the simulation.</p>
+<p>returns: A dictionary containing the results of the simulation.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">calculate_average_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.calculate_average_results" title="Link to this definition">¶</a></dt>
-<dd><p>Berechnet Mittelwerte der Simulationsergebnisse</p>
+<dd><p>Calculates the average results for a list of simulation results.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test">
 <span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.</span></span><span class="sig-name descname"><span class="pre">run_FEM_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">material</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stl_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stl_fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resultQueue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.tasks.femSimulationTask.run_FEM_test" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Runs a FEM simulation for a given STL file and material properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Material<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The material properties for the simulation.</p>
+</dd>
+<dt class="field-even">Pressure<span class="colon">:</span></dt>
+<dd class="field-even"><p>The pressure applied to the model.</p>
+</dd>
+<dt class="field-odd">Stl_file<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The STL file to be simulated.</p>
+</dd>
+<dt class="field-even">Test_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>The type of test to be performed (‘compression’ or ‘tension’).</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary containing the results of the simulation.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>

@@ -138,3 +138,10 @@ Module Contents
 
 
 
+   .. py:method:: getSearchableDetails(existingContent) -> list
+
+      Get the details for the search index as a string list
+
+
+
+
