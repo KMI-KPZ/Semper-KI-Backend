@@ -74,6 +74,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.cloneServiceDetails" title="code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.cloneServiceDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cloneServiceDetails</span></code></a>(→ dict)</p></td>
 <td><p>Clone content of the service</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails" title="code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getSearchableDetails</span></code></a>(→ list)</p></td>
+<td><p>Get the searchable details for the frontend</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -204,6 +207,23 @@
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails">
+<span class="sig-prename descclassname"><span class="pre">code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.</span></span><span class="sig-name descname"><span class="pre">getSearchableDetails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existingContent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails" title="Link to this definition">¶</a></dt>
+<dd><p>Get the searchable details for the frontend</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>existingContent</strong> (<em>dict</em>) – What the process currently holds about the service</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The searchable details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -276,6 +296,7 @@
 <li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.isFileRelevantForService"><code class="docutils literal notranslate"><span class="pre">isFileRelevantForService()</span></code></a></li>
 <li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.serviceReady"><code class="docutils literal notranslate"><span class="pre">serviceReady()</span></code></a></li>
 <li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.cloneServiceDetails"><code class="docutils literal notranslate"><span class="pre">cloneServiceDetails()</span></code></a></li>
+<li class="toctree-l14"><a class="reference internal" href="#code_SemperKI.services.service_AdditiveManufacturing.connections.postgresql.pgService.getSearchableDetails"><code class="docutils literal notranslate"><span class="pre">getSearchableDetails()</span></code></a></li>
 </ul>
 </li>
 </ul>

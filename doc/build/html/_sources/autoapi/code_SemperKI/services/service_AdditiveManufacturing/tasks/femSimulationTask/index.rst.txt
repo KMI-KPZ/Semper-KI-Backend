@@ -49,39 +49,99 @@ Module Contents
 
 .. py:function:: calculate_surface_area(mesh_data)
 
-   Berechnet die Gesamtoberfläche einer STL-Datei durch Summierung der Dreiecksflächen.
+   Calculates the total surface area of an STL file by summing up the triangle areas.
 
 
 .. py:function:: calculate_bbox_volume_ratio(mesh_data)
 
-   Berechnet das Verhältnis von Oberfläche zu Bounding-Box-Volumen.
+   Calculates the ratio of surface area to bounding box volume.
 
 
 .. py:function:: calculate_bounding_box(mesh)
 
+   Calculates the bounding box dimensions of a given mesh. 
+
+
 .. py:function:: pid_controller(setpoint, current_value, prev_error, integral, Kp, Ki, Kd, dt)
+
+   A simple PID controller for determining the correct mesh density.
+
 
 .. py:function:: determine_opt_amount_Tets(mesh_data)
 
+   Determines the optimal amount of tetrahedra for a given mesh.
+
+
 .. py:function:: determine_ELF(mesh_data)
+
+   " Determines the optimal edge length factor for a given mesh.
+
 
 .. py:function:: read_and_tetrahedralize(mesh_data, elf)
 
+   Reads a mesh file and tetrahedralizes it with the given edge length factor.
+
+   :mesh_data: meshio mesh object"
+   :elf: edge length factor"
+   :returns: MeshTet object"
+
+
 .. py:function:: define_dofs(ib)
+
+   Defines the degrees of freedom for the simulation.
+
+   ib: The basis object for the simulation.
+
 
 .. py:function:: define_displacements(pressure, test_type)
 
+   Defines the displacements for the simulation.
+
+   pressure: The pressure applied to the model.
+   test_type: The type of test to be performed ('compression' or 'tension').
+   returns: A dictionary containing the displacements for each side of the model.
+
+
 .. py:function:: yield_stress(array, threshold)
 
-   threshold: yielding stress of material
+   Calculates the percentage of elements that exceed the yield stress threshold.
+
+   array: The array of stresses to be analyzed.
+   threshold: The yield stress threshold.
+   returns: A dictionary containing the stress percentage and the indices of the plastic elements.
+
 
 
 .. py:function:: calculate_displacements_and_stresses(mesh, lame_params, poisson_ratio, ib, K, dofs, displacements, bbox_length, material)
 
+   Calculates the displacements and stresses for the given mesh and material properties.
+
+   mesh: The mesh object for the simulation.
+   lame_params: The parameters for the linear elasticity model.
+   poisson_ratio: The Poisson ratio of the material.
+   ib: The basis object for the simulation.
+   K: The stiffness matrix for the simulation.
+   dofs: The degrees of freedom for the simulation.
+   displacements: The displacements for the simulation.
+   bbox_length: The dimensions of the bounding box.
+   material: The material properties for the simulation.
+
+   returns: A dictionary containing the results of the simulation.
+
+
 .. py:function:: calculate_average_results(results_list)
 
-   Berechnet Mittelwerte der Simulationsergebnisse
+   Calculates the average results for a list of simulation results.
 
 
 .. py:function:: run_FEM_test(material, pressure, stl_file, stl_fileName, test_type, resultQueue)
+
+   Runs a FEM simulation for a given STL file and material properties.
+
+   :material: The material properties for the simulation.
+   :pressure: The pressure applied to the model.
+   :stl_file: The STL file to be simulated.
+   :test_type: The type of test to be performed ('compression' or 'tension').
+   :returns: A dictionary containing the results of the simulation.
+
 
