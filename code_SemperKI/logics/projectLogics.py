@@ -276,7 +276,7 @@ def logicForDeleteProjects(request, functionName:str):
 
         contentManager = ManageContent(request.session)
         interface = contentManager.getCorrectInterface(functionName)
-        if interface == None:
+        if interface is None:
             return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
 
 
