@@ -210,7 +210,6 @@ class ProcessInterface():
         self.createdWhen = currentTime
         self.updatedWhen = currentTime
         self.accessedWhen = currentTime
-        self.contractor = None
 
     ###################################################
     def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, dependenciedIn, dependenciesOut, updatedWhen, accessedWhen) -> None:

@@ -22,7 +22,8 @@ from code_SemperKI.connections.content.manageContent import ManageContent
 from code_SemperKI.connections.content.postgresql import pgProcesses
 from code_SemperKI.serviceManager import serviceManager
 from code_SemperKI.definitions import *
-from code_SemperKI.states.states import getFlatStatus, getMissingElements
+from code_SemperKI.states.stateDescriptions import ButtonLabels
+from code_SemperKI.states.states import getButtonsForProcess, getFlatStatus, getMissingElements
 from code_SemperKI.logics.processLogics import parseProcessOutputForFrontend
 
 logger = logging.getLogger("logToFile")
@@ -279,10 +280,28 @@ def logicForDeleteProjects(request, functionName:str):
         if interface is None:
             return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
 
+        adminOrNot = manualCheckifAdmin(contentManager.currentSession)
+        clientID = contentManager.getClient()
 
         for projectID in projectIDs:
             if not contentManager.checkRightsForProject(projectID):
                 return Exception(f"Rights not sufficient in {functionName}"), status.HTTP_401_UNAUTHORIZED
+            
+            # check if at least one process is "too far gone"
+            processes = interface.getProject(projectID)[SessionContentSemperKI.processes]
+            if len(processes) > 0:
+                for process in processes:
+                    contractor = False
+                    if process[ProcessDescription.contractor] is not None:
+                        contractor = process[ProcessDescription.contractor][OrganizationDescription.hashedID] == clientID
+                    buttons = getButtonsForProcess(interface, interface.getProcessObj(projectID, process[ProcessDescription.processID]), process[ProcessDescription.client] == clientID, contractor, adminOrNot) # calls current node of the state machine
+                    deletable = False
+                    for button in buttons:
+                        if button["title"] == ButtonLabels.DELETE_PROCESS.value and button["active"] == True:
+                            deletable = True
+                            break
+                    if not deletable:
+                        return Exception(f"Project {projectID} not deletable, process {process[ProcessDescription.processID]} is too far gone"), status.HTTP_401_UNAUTHORIZED
 
             interface.deleteProject(projectID)
             logger.info(f"{Logging.Subject.USER},{pgProfiles.ProfileManagementBase.getUserName(request.session)},{Logging.Predicate.DELETED},deleted,{Logging.Object.OBJECT},project {projectID}," + str(datetime.now()))
