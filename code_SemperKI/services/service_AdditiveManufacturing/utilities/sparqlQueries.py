@@ -19,7 +19,7 @@ class SparqlParameters(StrEnumExactlyAsDefined):
     """
     ID = enum.auto()
     name = enum.auto()
-    PrinterModel = enum.auto() 
+    PrinterModel = enum.auto()
     Material = enum.auto()
     min_length = enum.auto()
     min_width = enum.auto()
@@ -27,6 +27,7 @@ class SparqlParameters(StrEnumExactlyAsDefined):
 
 ########################################
 # list of Sparql queries
+""" 
 getAllMaterials = SKICmem.ManageSPARQLQuery("/Ontology/queries/material_Hannes")
 getAllPrinters = SKICmem.ManageSPARQLQuery("/Ontology/queries/printer_Hannes")
 getServiceProviders = SKICmem.ManageSPARQLQuery("/Ontology/queries/ServiceProvider_list_Hannes", parameters={SparqlParameters.ID: ""})
@@ -36,4 +37,5 @@ deleteAllFromContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data dele
 deleteLinkPrinterMaterialOfContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/DeleteLinkPrinterMaterial", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.PrinterModel: "", SparqlParameters.Material: ""})
 deletePrinterOfContractor = SKICmem.ManageSPARQLQuery("/Ontology/queries/Data delete/DeletePrinterOfSP", post=True, parameters={SparqlParameters.ID: "", SparqlParameters.PrinterModel: ""})
 getManufacturersByBuildPlate = SKICmem.ManageSPARQLQuery("/Ontology/queries/serviceprovider_by_buildplate_Hannes",parameters={SparqlParameters.min_height: 0, SparqlParameters.min_length: 0, SparqlParameters.min_width: 0})
-getManufacturersByMaterial = SKICmem.ManageSPARQLQuery("/Ontology/queries/serviceprovider_by_material_Hannes")
+getManufacturersByMaterial = SKICmem.ManageSPARQLQuery("/Ontology/queries/serviceprovider_by_material_Hannes") 
+"""

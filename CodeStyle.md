@@ -28,13 +28,11 @@ We use [Camel case](https://en.wikipedia.org/wiki/Camel_case) for almost everyth
     - `modelFiles`: Database models
     - `connections`: Capsule classes for handling local and remote connections like ID Management, Database access and much more
     - `settings`: Django settings for different environments
-    - `SPARQLQueries`: Remnant, will soon be replaced by content of the Ontology folder
     - `templates`: html code for some default views, not important
     - `utilities`: Helper files that offer specific functionality for most handlers/services
   - `Benchy`: Benchmark tool for Silvio, can safely be ignored
   - `doc`: Documentation, see [Create Documentation](#create-documentation).
   - `logs`: Log files, see [Logging](#logging)
-  - `Ontology`: SPARQL Query files and other stuff for usage of the Ontology/Knowledge Graph
   - `postgres`: Contains the database(s) for the postgres container
   - `redis`: Contains snapshots of redis
 

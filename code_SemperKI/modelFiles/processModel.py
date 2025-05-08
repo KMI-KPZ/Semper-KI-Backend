@@ -210,7 +210,6 @@ class ProcessInterface():
         self.createdWhen = currentTime
         self.updatedWhen = currentTime
         self.accessedWhen = currentTime
-        self.contractor = None
 
     ###################################################
     def setValues(self, processDetails, processStatus, serviceDetails, serviceStatus, serviceType, client, files, messages, dependenciedIn, dependenciesOut, updatedWhen, accessedWhen) -> None:
@@ -234,8 +233,9 @@ class ProcessInterface():
 
     ###################################################
     def toDict(self):
-        return {ProcessDescription.processID: self.processID, 
-                ProcessDescription.serviceDetails: self.serviceDetails, 
+        return {ProcessDescription.processID: self.processID,
+                ProcessDescription.project: self.project.toDict(),
+                ProcessDescription.serviceDetails: self.serviceDetails,
                 ProcessDescription.processStatus: self.processStatus,
                 ProcessDescription.serviceType: self.serviceType,
                 ProcessDescription.serviceStatus: self.serviceStatus,
