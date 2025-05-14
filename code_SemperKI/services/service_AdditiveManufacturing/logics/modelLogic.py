@@ -527,7 +527,7 @@ def logicForGetModelRepository() -> dict|Exception:
         outDict = {}
         redisConn = RedisConnection()
         redisContent = redisConn.retrieveContentJSON("ModelRepository")
-        if redisContent[1] is False:
+        if redisContent[1] is False or redisContent[1] is True:
             content = s3.manageRemoteS3Buckets.getContentOfBucket(settings.S3_BUCKET_NAME+"/ModelRepository")
             outDict = {"repository": {}}
             for elem in content:
@@ -563,9 +563,9 @@ def logicForGetModelRepository() -> dict|Exception:
                         outDict["repository"][nameOfFile] = {ContentOfRepoModel.name.value: nameOfFile, ContentOfRepoModel.license.value: [], ContentOfRepoModel.preview.value: "", ContentOfRepoModel.tags.value: [], ContentOfRepoModel.file.value: "", ContentOfRepoModel.certificates.value: [], ContentOfRepoModel.levelOfDetail.value: 1, ContentOfRepoModel.complexity.value: 0, ContentOfRepoModel.size.value: sizeOfFile}
                     
                     if "Preview" in splitPath[2]:
-                        outDict["repository"][nameOfFile][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+path.replace(" ", "%20")
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.preview.value] = s3.manageRemoteS3.getDownloadLinkPrefix()+path #.replace(" ", "%20") # This replacement of spaces may be necessary in a cdn environment but not for minio
                     else:
-                        outDict["repository"][nameOfFile][ContentOfRepoModel.file.value] = pathWithoutBucket.replace(" ", "%20")
+                        outDict["repository"][nameOfFile][ContentOfRepoModel.file.value] = pathWithoutBucket #.replace(" ", "%20")
                     if licenseOfFile != "" and outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] == "":
                         outDict["repository"][nameOfFile][ContentOfRepoModel.license.value] = licenseOfFile
                     if certificatesOfFile != [] and outDict["repository"][nameOfFile][ContentOfRepoModel.certificates.value] == []:
@@ -680,6 +680,8 @@ def logicForUploadFromRepository(request, validatedInput) -> tuple[Exception, in
         if calculationsFromRedis[1] is False:
             model = getFileViaPath(repoModel[ContentOfRepoModel.file.value], True, False)
             calculationResult = calculateBoundaryData(model, repoModel[ContentOfRepoModel.name.value], repoModel[FileObjectContent.size.value], 1.0)
+            if isinstance(calculationResult, Exception):
+                return (calculationResult, 500)
             redisCon.addContentJSON("ModelRepositoryCalculations_"+repoModel[ContentOfRepoModel.name.value], calculationResult)
         else:
             calculationResult = calculationsFromRedis[0]
