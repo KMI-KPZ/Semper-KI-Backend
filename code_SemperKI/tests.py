@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2023
+Lukas Hein 2024
 
 Contains: Tests for various functions and services
 
