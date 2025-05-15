@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2024
+Lukas Hein 2025
 
 Contains: Basic implementations regarding the P service
 """

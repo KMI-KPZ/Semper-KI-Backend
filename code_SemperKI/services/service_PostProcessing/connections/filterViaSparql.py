@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2023
+Lukas Hein 2025
 
 Contains: Functions using the sparql queries to filter for contractors
 """
