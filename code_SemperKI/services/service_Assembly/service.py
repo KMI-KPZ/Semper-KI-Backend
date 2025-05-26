@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2023
+Lukas Hein 2024
 
 Contains: Class which describes the service in particular
 """

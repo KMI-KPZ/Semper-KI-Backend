@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2024
+Lukas Hein 2025
 
 Contains: Cost calculations for this service
 """
@@ -25,7 +26,7 @@ from ..connections.filterViaSparql import FilterQC
 logger = logging.getLogger("logToFile")
 loggerError = logging.getLogger("errors")
 
-# TODO: THIS WHOLE FILE IS A MESS AND NEEDS TO BE REFACTORED
+# TODO: needs to be REFACTORED into costsLogics and costs Handler (see AM) 
 
 ##################################################
 PLATFORM_MARGIN = 10. # random value
