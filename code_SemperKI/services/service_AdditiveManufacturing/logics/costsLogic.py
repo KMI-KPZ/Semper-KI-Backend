@@ -870,9 +870,16 @@ def logicForCosts(apiGivenValues:dict={}) -> dict|Exception:
             "groups": [
                 {
                     "material": {
-                        "density": float(apiGivenValues["material"]["density"].split(" ")[0]),
-                        "printingSpeed": float(apiGivenValues["material"]["printingSpeed"].split(" ")[0]),
-                        "acquisitionCosts": float(apiGivenValues["material"]["acquisitionCosts"].split(" ")[0])
+                        "id": "1234",
+                        "title": "test",
+                        "colors": [],
+                        "imgPath": "",
+                        "propList": [
+                            {"key": "density", "name": "Dichte", "type": "number", "unit": "g/cm³", "value": float(apiGivenValues["material"]["density"].split(" ")[0])},
+                            {"key": "printingSpeed", "name": "Druckgeschwindigkeit", "type": "number", "unit": "mm/s", "value": float(apiGivenValues["material"]["printingSpeed"].split(" ")[0])},
+                            {"key": "acquisitionCosts", "name": "Anschaffungskosten", "type": "number", "unit": "€", "value": float(apiGivenValues["material"]["acquisitionCosts"].split(" ")[0])}
+                        ],
+                        "medianPrice": 0.0
                     },
                     "postProcessings": postProcessingObjects,
                     "models": modelObjects
