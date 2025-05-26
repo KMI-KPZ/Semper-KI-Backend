@@ -292,7 +292,7 @@ def logicForDeleteProjects(request, functionName:str):
             if len(processes) > 0:
                 for process in processes:
                     contractor = False
-                    if process[ProcessDescription.contractor] is not None:
+                    if process[ProcessDescription.contractor] is not None and process[ProcessDescription.contractor] != {}:
                         contractor = process[ProcessDescription.contractor][OrganizationDescription.hashedID] == clientID
                     buttons = getButtonsForProcess(interface, interface.getProcessObj(projectID, process[ProcessDescription.processID]), process[ProcessDescription.client] == clientID, contractor, adminOrNot) # calls current node of the state machine
                     deletable = False
