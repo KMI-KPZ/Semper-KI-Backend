@@ -2,8 +2,9 @@
 Part of Semper-KI software
 
 Silvio Weging 2024
+Lukas Hein 2025
 
-Contains: Signals send by the other apps which relate to the Additive Sales service
+Contains: Signals send by the other apps which relate to the After Sales service
 """
 
 import Generic_Backend.code_General.utilities.signals as GeneralSignals

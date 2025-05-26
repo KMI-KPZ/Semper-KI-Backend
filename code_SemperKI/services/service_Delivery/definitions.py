@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2023
+Lukas Hein 2024
 
 Contains: Definitions, Classes, Enums to describe Elements in the Backend as well as Services
 """
