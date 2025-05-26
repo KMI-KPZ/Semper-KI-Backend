@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2023
+Lukas Hein 2025
 
 Contains: Tests for various functions and services
 """
@@ -34,7 +35,7 @@ class TestCreateModel(TestCase):
         mockSession[SessionContent.PATH_AFTER_LOGIN] = "127.0.0.1:3000" # no real use but needs to be set
         mockSession.save()
         client.get("/"+paths["callbackLogin"][0])
-        client.patch("/"+paths["updateDetailsOfOrga"][0], data={"changes": { "supportedServices": [1] } }, content_type="application/json")
+        client.patch("/"+paths["updateDetailsOfOrga"][0], data={"changes": { "supportedServices": [2] } }, content_type="application/json")
         return mockSession
 
     #######################################################
@@ -87,48 +88,15 @@ class TestCreateModel(TestCase):
 
         # TODO set stuff so that the service is complete
 
-        # # set service type to 1
-        # changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 1}, "deletions":{} }
+        # # set service type to 2
+        # changes = {"projectID": projectObj[ProjectDescription.projectID], "processIDs": [processObj[ProcessDescription.processID]], "changes": { "serviceType": 2}, "deletions":{} }
         # response = client.patch("/"+paths["updateProcess"][0], data=json.dumps(changes), content_type="application/json")
-        # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-
-        # # upload model
-        # date =  f'"{str(datetime.datetime.now())}"'
-        # certificates = '""'
-        # licenses = '""'
-        # tags = '""'
-        # filename = '"file2.stl"'
-        # details = '[{"details":{"date": ' + date + ', "certificates": ' + certificates +',"licenses": ' + licenses + ', "tags": ' + tags + ', "quantity": 1, "levelOfDetail": 1, "scalingFactor": 100.0' + '}, "fileName": ' + filename + '}]'
-        # uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "details": details, "origin": "test_origin", "file2.stl": self.testFile} # non-default case
-        # #uploadBody = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "file.stl": self.testFile} # default case
-        # response = client.post("/"+paths["uploadModel"][0], uploadBody )
         # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
         # getProcPathSplit = paths["getProcess"][0].split("/")
         # getProcPath = getProcPathSplit[0] + "/" + getProcPathSplit[1] + "/" + getProcPathSplit[2] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"
         # response = json.loads(client.get("/"+getProcPath).content)
         # fileID = list(response[ProcessDescription.files].keys())[0]
-
-        # # call checkModel to calculate stuff
-        # checkModelPathSplit = paths["checkModel"][0].split("/")
-        # checkModelPath = checkModelPathSplit[0] + "/" + checkModelPathSplit[1] + "/" + checkModelPathSplit[2] + "/" + checkModelPathSplit[3] + "/" + checkModelPathSplit[4] + "/" + projectObj[ProjectDescription.projectID] + "/" + processObj[ProcessDescription.processID] + "/"+ fileID + "/"
-        # response = client.get("/"+checkModelPath)
-        # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-
-        # # set material
-        # ## get filters
-        # response = client.get("/"+paths["getFilters"][0])
-        # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-        # filters = json.loads(response.content)
-        # ## get materials
-        # response = client.post("/"+paths["getMaterials"][0], data=json.dumps(filters), content_type="application/json")
-        # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
-
-        # materials = json.loads(response.content)
-        # material = materials["materials"][0]
-        # changes = {ProjectDescription.projectID: projectObj[ProjectDescription.projectID], ProcessDescription.processID: processObj[ProcessDescription.processID], "groupID": 0, "material": material}
-        # response = client.patch("/"+paths["setMaterial"][0], data=json.dumps(changes), content_type="application/json")
-        # self.assertIs(response.status_code == 200, True, f"got: {response.status_code}")
 
         # # advance state to service finished
         # getProcPathSplit = paths["getProcess"][0].split("/")

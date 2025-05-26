@@ -2,6 +2,7 @@
 Part of Semper-KI software
 
 Silvio Weging 2024
+Lukas Hein 2025
 
 Contains: Connector to the profiles of the Generic Backend which adds stuff to the details specific to this service
 """

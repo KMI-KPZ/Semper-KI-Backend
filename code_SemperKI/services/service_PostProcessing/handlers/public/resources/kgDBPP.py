@@ -3,7 +3,7 @@ Part of Semper-KI software
 
 Silvio Weging 2024
 
-Contains: General handlers for the AM knowledge graph
+Contains: General handlers for the PP knowledge graph
 """ 
 
 import json, logging, copy
